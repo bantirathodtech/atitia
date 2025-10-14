@@ -7,7 +7,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -49,20 +48,20 @@ class OwnerMenuEditScreen extends StatefulWidget {
 class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
-  
+
   late List<String> _breakfastItems;
   late List<String> _lunchItems;
   late List<String> _dinnerItems;
   late List<String> _photoUrls;
-  
+
   bool _isSaving = false;
   final bool _isUploadingPhoto = false;
-  final List<dynamic> _newPhotosToUpload = [];  // File on mobile, XFile on web
+  final List<dynamic> _newPhotosToUpload = []; // File on mobile, XFile on web
 
   @override
   void initState() {
     super.initState();
-    
+
     if (widget.existingMenu != null) {
       _breakfastItems = List.from(widget.existingMenu!.breakfast);
       _lunchItems = List.from(widget.existingMenu!.lunch);
@@ -87,7 +86,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   Widget build(BuildContext context) {
     // Check if we're editing an existing menu or creating a new one
     final isEditing = widget.existingMenu != null;
-    
+
     return Scaffold(
       // =======================================================================
       // App Bar with Custom Actions + Theme Toggle
@@ -98,11 +97,11 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       // Auto action: Theme toggle (Light/Dark/System)
       // =======================================================================
       appBar: AdaptiveAppBar(
-        title: isEditing 
-            ? 'Edit ${widget.dayLabel} Menu'     // ✏️ Editing existing menu
-            : 'Create ${widget.dayLabel} Menu',  // ➕ Creating new menu
+        title: isEditing
+            ? 'Edit ${widget.dayLabel} Menu' // ✏️ Editing existing menu
+            : 'Create ${widget.dayLabel} Menu', // ➕ Creating new menu
         elevation: 2,
-        showThemeToggle: true,  // Theme toggle for comfortable editing
+        showThemeToggle: true, // Theme toggle for comfortable editing
         actions: [
           // Delete menu button (only shown if editing existing menu)
           if (isEditing)
@@ -146,7 +145,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                       items: _breakfastItems,
                       icon: Icons.free_breakfast,
                       onAdd: () => _addMealItem('Breakfast', _breakfastItems),
-                      onRemove: (index) => _removeMealItem(_breakfastItems, index),
+                      onRemove: (index) =>
+                          _removeMealItem(_breakfastItems, index),
                     ),
                     const SizedBox(height: AppSpacing.paddingM),
 
@@ -179,8 +179,12 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                       width: double.infinity,
                       child: PrimaryButton(
                         onPressed: _saveMenu,
-                        label: isEditing ? 'Update Menu' : 'Create Menu',  // Dynamic label
-                        icon: isEditing ? Icons.update : Icons.save,  // Dynamic icon
+                        label: isEditing
+                            ? 'Update Menu'
+                            : 'Create Menu', // Dynamic label
+                        icon: isEditing
+                            ? Icons.update
+                            : Icons.save, // Dynamic icon
                       ),
                     ),
                   ],
@@ -194,7 +198,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   /// World-Class Header Card - Premium Menu Overview
   /// ============================================================================
   /// Displays menu summary with elegant design and theme support
-  /// 
+  ///
   /// Features:
   /// - Day-specific gradient background
   /// - Real-time item count tracking
@@ -206,13 +210,16 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   Widget _buildHeaderCard() {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final textPrimary = theme.textTheme.bodyLarge?.color ?? AppColors.textPrimary;
-    final textSecondary = theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+    final textPrimary =
+        theme.textTheme.bodyLarge?.color ?? AppColors.textPrimary;
+    final textSecondary =
+        theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
     final primaryColor = theme.colorScheme.primary;
-    
-    final totalItems = _breakfastItems.length + _lunchItems.length + _dinnerItems.length;
+
+    final totalItems =
+        _breakfastItems.length + _lunchItems.length + _dinnerItems.length;
     final totalPhotos = _photoUrls.length + _newPhotosToUpload.length;
-    
+
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -268,9 +275,9 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 ),
                 child: Icon(
                   Icons.restaurant_menu_rounded,
-                  color: AppColors.textOnPrimary,  // White icon
-                size: 28,
-              ),
+                  color: AppColors.textOnPrimary, // White icon
+                  size: 28,
+                ),
               ),
               const SizedBox(width: AppSpacing.paddingM),
               Expanded(
@@ -294,15 +301,15 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                         color: textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-              ),
-            ],
-          ),
-          
+
           const SizedBox(height: AppSpacing.paddingM),
-          
+
           // ====================================================================
           // Stats Row - Modern Design with Icons
           // ====================================================================
@@ -318,7 +325,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 color: AppColors.info,
                 isDarkMode: isDarkMode,
               ),
-              
+
               // Breakfast Count
               _buildStatChip(
                 icon: Icons.breakfast_dining_rounded,
@@ -327,7 +334,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 color: AppColors.breakfast,
                 isDarkMode: isDarkMode,
               ),
-              
+
               // Lunch Count
               _buildStatChip(
                 icon: Icons.lunch_dining_rounded,
@@ -336,7 +343,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 color: AppColors.lunch,
                 isDarkMode: isDarkMode,
               ),
-              
+
               // Dinner Count
               _buildStatChip(
                 icon: Icons.dinner_dining_rounded,
@@ -345,7 +352,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 color: AppColors.dinner,
                 isDarkMode: isDarkMode,
               ),
-              
+
               // Photos Count
               _buildStatChip(
                 icon: Icons.photo_library_rounded,
@@ -356,7 +363,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
               ),
             ],
           ),
-          
+
           // ====================================================================
           // Last Updated Info (if menu exists)
           // ====================================================================
@@ -480,7 +487,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          
+
           // Empty Photo State - Theme-aware
           if (_photoUrls.isEmpty && _newPhotosToUpload.isEmpty)
             _buildEmptyPhotoState(context)
@@ -505,13 +512,14 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                       onDelete: () => _deletePhoto(index, isNewPhoto: false),
                     );
                   }),
-                  
+
                   // New photos from file (cross-platform)
                   ..._newPhotosToUpload.asMap().entries.map((entry) {
                     final index = entry.key;
                     final file = entry.value;
                     return _buildPhotoItem(
-                      child: _buildImagePreview(file),  // Cross-platform image display
+                      child: _buildImagePreview(
+                          file), // Cross-platform image display
                       onDelete: () => _deletePhoto(index, isNewPhoto: true),
                       isNew: true,
                     );
@@ -519,7 +527,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 ],
               ),
             ),
-          
+
           if (_isUploadingPhoto) ...[
             const SizedBox(height: AppSpacing.paddingS),
             const LinearProgressIndicator(),
@@ -560,13 +568,13 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.success,  // Theme-aware success color
+                  color: AppColors.success, // Theme-aware success color
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   'NEW',
                   style: TextStyle(
-                    color: AppColors.textOnPrimary,  // White text on green
+                    color: AppColors.textOnPrimary, // White text on green
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
@@ -581,12 +589,12 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: AppColors.error,  // Theme-aware error color
+                  color: AppColors.error, // Theme-aware error color
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.close,
-                  color: AppColors.textOnPrimary,  // White icon on red
+                  color: AppColors.textOnPrimary, // White icon on red
                   size: 16,
                 ),
               ),
@@ -601,19 +609,20 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   Widget _buildEmptyPhotoState(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final textSecondary = theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
-    
+    final textSecondary =
+        theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: isDarkMode 
-            ? AppColors.darkCard  // Dark background in dark mode
-            : AppColors.surfaceVariant,  // Light background in light mode
+        color: isDarkMode
+            ? AppColors.darkCard // Dark background in dark mode
+            : AppColors.surfaceVariant, // Light background in light mode
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
           color: isDarkMode
-              ? AppColors.darkDivider  // Subtle border in dark mode
-              : AppColors.outline,  // Medium border in light mode
+              ? AppColors.darkDivider // Subtle border in dark mode
+              : AppColors.outline, // Medium border in light mode
           style: BorderStyle.solid,
         ),
       ),
@@ -622,16 +631,16 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.photo_camera, 
-              size: 40, 
+              Icons.photo_camera,
+              size: 40,
               color: isDarkMode
-                  ? AppColors.textTertiary  // Light icon in dark mode
-                  : AppColors.textSecondary,  // Medium icon in light mode
+                  ? AppColors.textTertiary // Light icon in dark mode
+                  : AppColors.textSecondary, // Medium icon in light mode
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
               text: 'No photos added yet',
-              color: textSecondary,  // Theme-aware text
+              color: textSecondary, // Theme-aware text
             ),
           ],
         ),
@@ -649,10 +658,12 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   }) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final textPrimary = theme.textTheme.bodyLarge?.color ?? AppColors.textPrimary;
-    final textSecondary = theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+    final textPrimary =
+        theme.textTheme.bodyLarge?.color ?? AppColors.textPrimary;
+    final textSecondary =
+        theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
     final primaryColor = theme.colorScheme.primary;
-    
+
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -674,7 +685,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.borderRadiusS),
                     ),
                     child: BodyText(
                       text: '${items.length} items',
@@ -691,7 +703,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             ],
           ),
           const SizedBox(height: AppSpacing.paddingS),
-          
+
           // Empty state with theme-aware text
           if (items.isEmpty)
             Center(
@@ -699,7 +711,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 padding: const EdgeInsets.all(AppSpacing.paddingM),
                 child: BodyText(
                   text: 'No $title items added yet',
-                  color: textSecondary,  // Theme-aware
+                  color: textSecondary, // Theme-aware
                 ),
               ),
             )
@@ -712,14 +724,14 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
                 padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: BoxDecoration(
-                  color: isDarkMode 
-                      ? AppColors.darkInputFill  // Dark background for item
-                      : AppColors.surfaceVariant,  // Light background for item
+                  color: isDarkMode
+                      ? AppColors.darkInputFill // Dark background for item
+                      : AppColors.surfaceVariant, // Light background for item
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                   border: Border.all(
                     color: isDarkMode
-                        ? AppColors.darkDivider  // Subtle border in dark mode
-                        : AppColors.outline,  // Medium border in light mode
+                        ? AppColors.darkDivider // Subtle border in dark mode
+                        : AppColors.outline, // Medium border in light mode
                   ),
                 ),
                 child: Row(
@@ -748,7 +760,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
-                          color: textPrimary,  // ✅ CRITICAL: Theme-aware text for visibility!
+                          color:
+                              textPrimary, // ✅ CRITICAL: Theme-aware text for visibility!
                         ),
                       ),
                     ),
@@ -756,8 +769,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                     IconButton(
                       onPressed: () => onRemove(index),
                       icon: Icon(
-                        Icons.delete_outline, 
-                        color: AppColors.error,  // Theme-aware error color
+                        Icons.delete_outline,
+                        color: AppColors.error, // Theme-aware error color
                         size: 20,
                       ),
                       tooltip: 'Remove Item',
@@ -805,13 +818,13 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
     final controller = TextEditingController();
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDarkMode 
-            ? AppColors.darkCard  // Dark background for dark mode
-            : AppColors.surface,  // White background for light mode
+        backgroundColor: isDarkMode
+            ? AppColors.darkCard // Dark background for dark mode
+            : AppColors.surface, // White background for light mode
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
@@ -820,10 +833,11 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextFormField(
-          controller: controller,
+              controller: controller,
               autofocus: true,
               style: TextStyle(
-                color: theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary,  // Theme-aware text color
+                color: theme.textTheme.bodyMedium?.color ??
+                    AppColors.textPrimary, // Theme-aware text color
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -838,15 +852,18 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 ),
                 filled: true,
-                fillColor: isDarkMode 
-                    ? AppColors.darkInputFill  // Dark input background
-                    : AppColors.surfaceVariant,  // Light input background
+                fillColor: isDarkMode
+                    ? AppColors.darkInputFill // Dark input background
+                    : AppColors.surfaceVariant, // Light input background
                 // Ensure label and hint are visible
                 labelStyle: TextStyle(
-                  color: theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary,
+                  color: theme.textTheme.bodyMedium?.color ??
+                      AppColors.textSecondary,
                 ),
                 hintStyle: TextStyle(
-                  color: (theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary).withOpacity(0.6),
+                  color: (theme.textTheme.bodyMedium?.color ??
+                          AppColors.textSecondary)
+                      .withOpacity(0.6),
                 ),
               ),
             ),
@@ -889,12 +906,12 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   Future<void> _pickImage() async {
     try {
       final pickedFile = await ImagePickerHelper.pickImageFromGallery(
-        imageQuality: 85,  // Only parameter supported
-    );
+        imageQuality: 85, // Only parameter supported
+      );
 
-    if (pickedFile != null) {
-      setState(() {
-          _newPhotosToUpload.add(pickedFile);  // Add File or XFile
+      if (pickedFile != null) {
+        setState(() {
+          _newPhotosToUpload.add(pickedFile); // Add File or XFile
         });
       }
     } catch (e) {
@@ -960,20 +977,22 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   }
 
   Future<void> _saveMenu() async {
-    print('🔍 Starting _saveMenu...');  // Debug log
-    
+    print('🔍 Starting _saveMenu...'); // Debug log
+
     if (!_formKey.currentState!.validate()) {
       print('❌ Form validation failed');
       return;
     }
 
     // Validation: At least one meal item required
-    if (_breakfastItems.isEmpty && _lunchItems.isEmpty && _dinnerItems.isEmpty) {
+    if (_breakfastItems.isEmpty &&
+        _lunchItems.isEmpty &&
+        _dinnerItems.isEmpty) {
       print('❌ No meal items added');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please add at least one meal item'),
-          backgroundColor: AppColors.warning,  // Theme-aware warning color
+          backgroundColor: AppColors.warning, // Theme-aware warning color
         ),
       );
       return;
@@ -986,25 +1005,26 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
     try {
       final authProvider = context.read<AuthProvider>();
       final user = authProvider.user;
-      
-      print('👤 AuthProvider User Info:');  // Debug log
+
+      print('👤 AuthProvider User Info:'); // Debug log
       print('   - User: ${user != null ? "EXISTS" : "NULL"}');
       print('   - User ID: ${user?.userId ?? "EMPTY"}');
       print('   - User Role: ${user?.role ?? "EMPTY"}');
       print('   - Phone: ${user?.phoneNumber ?? "EMPTY"}');
-      
+
       final ownerId = user?.userId ?? '';
-      
+
       // ========================================================================
       // CRITICAL: Validate owner ID before proceeding
       // ========================================================================
       if (ownerId.isEmpty) {
         print('❌ Owner ID is EMPTY! Cannot save menu.');
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Error: User not authenticated. Please login again.'),
+              content: const Text(
+                  'Error: User not authenticated. Please login again.'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -1012,25 +1032,26 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         setState(() => _isSaving = false);
         return;
       }
-      
-      print('🍽️ Saving menu for owner: $ownerId');  // Debug log
-      
+
+      print('🍽️ Saving menu for owner: $ownerId'); // Debug log
+
       final foodVM = context.read<OwnerFoodViewModel>();
 
       // Upload new photos first
       final uploadedPhotoUrls = <String>[];
       for (int i = 0; i < _newPhotosToUpload.length; i++) {
         final file = _newPhotosToUpload[i];
-        final fileName = 'menu_${widget.dayLabel.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
-        
-        print('📸 Uploading photo $i for owner: $ownerId');  // Debug log
-        
+        final fileName =
+            'menu_${widget.dayLabel.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
+
+        print('📸 Uploading photo $i for owner: $ownerId'); // Debug log
+
         final photoUrl = await foodVM.uploadPhoto(ownerId, fileName, file);
         if (photoUrl != null) {
           uploadedPhotoUrls.add(photoUrl);
-          print('✅ Photo uploaded: $photoUrl');  // Debug log
+          print('✅ Photo uploaded: $photoUrl'); // Debug log
         } else {
-          print('❌ Photo upload failed');  // Debug log
+          print('❌ Photo upload failed'); // Debug log
         }
       }
 
@@ -1040,10 +1061,10 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       // Create updated menu
       final selectedPgProvider = context.read<SelectedPgProvider>();
       final currentPgId = selectedPgProvider.selectedPgId;
-      
-      final menuId = widget.existingMenu?.menuId ?? 
+
+      final menuId = widget.existingMenu?.menuId ??
           '${ownerId}_${currentPgId ?? 'legacy'}_${widget.dayLabel.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}';
-      
+
       final updatedMenu = OwnerFoodMenu(
         menuId: menuId,
         ownerId: ownerId,
@@ -1053,20 +1074,21 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         lunch: _lunchItems,
         dinner: _dinnerItems,
         photoUrls: allPhotoUrls,
-        description: _descriptionController.text.trim().isEmpty 
-            ? null 
+        description: _descriptionController.text.trim().isEmpty
+            ? null
             : _descriptionController.text.trim(),
         isActive: true,
         createdAt: widget.existingMenu?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
-      print('💾 Saving menu to Firestore:');  // Debug log
+      print('💾 Saving menu to Firestore:'); // Debug log
       print('   - Owner ID: $ownerId');
       print('   - PG ID: ${currentPgId ?? 'legacy'}');
       print('   - Menu ID: $menuId');
       print('   - Day: ${widget.dayLabel}');
-      print('   - Total Items: ${_breakfastItems.length + _lunchItems.length + _dinnerItems.length}');
+      print(
+          '   - Total Items: ${_breakfastItems.length + _lunchItems.length + _dinnerItems.length}');
       print('   - Photos: ${allPhotoUrls.length}');
 
       // Save to repository
@@ -1074,45 +1096,45 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
 
       if (success) {
         final isEditing = widget.existingMenu != null;
-        print(isEditing 
-            ? '✅ Menu updated successfully!' 
-            : '✅ Menu created successfully!');  // Debug log
-        
+        print(isEditing
+            ? '✅ Menu updated successfully!'
+            : '✅ Menu created successfully!'); // Debug log
+
         if (mounted) {
           // Refresh menus for current PG
           await foodVM.loadMenus(ownerId, pgId: currentPgId);
-          
+
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(isEditing
-                  ? '${widget.dayLabel} menu updated successfully!'  // ✏️ Updated
-                  : '${widget.dayLabel} menu created successfully!'  // ➕ Created
-              ),
-              backgroundColor: AppColors.success,  // Theme-aware success color
+                      ? '${widget.dayLabel} menu updated successfully!' // ✏️ Updated
+                      : '${widget.dayLabel} menu created successfully!' // ➕ Created
+                  ),
+              backgroundColor: AppColors.success, // Theme-aware success color
             ),
           );
         }
       } else {
-        print('❌ Menu save failed: ${foodVM.errorMessage}');  // Debug log
-        
+        print('❌ Menu save failed: ${foodVM.errorMessage}'); // Debug log
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Failed to save menu: ${foodVM.errorMessage}'),
-              backgroundColor: AppColors.error,  // Theme-aware error color
+              backgroundColor: AppColors.error, // Theme-aware error color
             ),
           );
         }
       }
     } catch (e) {
-      print('❌ Exception saving menu: $e');  // Debug log
-      
+      print('❌ Exception saving menu: $e'); // Debug log
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error saving menu: $e'),
-            backgroundColor: AppColors.error,  // Theme-aware error color
+            backgroundColor: AppColors.error, // Theme-aware error color
           ),
         );
       }
@@ -1130,7 +1152,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       context: context,
       builder: (context) => ConfirmationDialog(
         title: 'Clear Menu?',
-        message: 'Are you sure you want to clear this menu? This will remove all items and photos.',
+        message:
+            'Are you sure you want to clear this menu? This will remove all items and photos.',
         confirmText: 'Clear',
         cancelText: 'Cancel',
         isDestructive: true,
@@ -1156,4 +1179,3 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
     }
   }
 }
-

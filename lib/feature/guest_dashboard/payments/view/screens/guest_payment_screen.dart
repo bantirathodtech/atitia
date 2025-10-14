@@ -48,15 +48,17 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final paymentVM = Provider.of<PaymentNotificationViewModel>(context, listen: false);
-      
+      final paymentVM =
+          Provider.of<PaymentNotificationViewModel>(context, listen: false);
+
       if (authProvider.user?.userId != null) {
         paymentVM.streamGuestNotifications(authProvider.user!.userId);
         // TODO: Load owner details from guest's booked PG
-        _loadOwnerPaymentDetails('blg5v21mbvb6U70xUpzrfKVjYh13'); // Demo owner ID
+        _loadOwnerPaymentDetails(
+            'blg5v21mbvb6U70xUpzrfKVjYh13'); // Demo owner ID
       }
     });
   }
@@ -223,7 +225,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   }
 
   /// 💳 Payment Card
-  Widget _buildPaymentCard(BuildContext context, dynamic notification, bool isDarkMode) {
+  Widget _buildPaymentCard(
+      BuildContext context, dynamic notification, bool isDarkMode) {
     final theme = Theme.of(context);
     final statusColor = _getStatusColor(notification.status);
     final statusIcon = _getStatusIcon(notification.status);
@@ -303,7 +306,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   ),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: Text(
                     notification.status.toUpperCase(),
@@ -356,7 +360,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 if (notification.screenshotUrl != null) ...[
                   const SizedBox(height: AppSpacing.paddingS),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
                     child: AdaptiveImage(
                       imageUrl: notification.screenshotUrl!,
                       width: double.infinity,
@@ -373,14 +378,16 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       color: isDarkMode
                           ? AppColors.darkInputFill
                           : AppColors.surfaceVariant,
-                      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.borderRadiusM),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.message, size: 16, color: theme.primaryColor),
+                            Icon(Icons.message,
+                                size: 16, color: theme.primaryColor),
                             const SizedBox(width: 8),
                             Text(
                               'Owner Response',
@@ -500,7 +507,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   BodyText(text: 'UPI QR Code', color: AppColors.textSecondary),
                   const SizedBox(height: AppSpacing.paddingS),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
                     child: AdaptiveImage(
                       imageUrl: _ownerPaymentDetails!.upiQrCodeUrl!,
                       width: 200,
@@ -521,7 +529,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   Widget _buildSendPaymentForm(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Container(
       decoration: BoxDecoration(
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
@@ -572,7 +580,9 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
             children: [
               CaptionText(
                 text: label,
-                color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+                color: isDarkMode
+                    ? AppColors.textTertiary
+                    : AppColors.textSecondary,
               ),
               const SizedBox(height: 2),
               BodyText(text: value),
@@ -742,7 +752,8 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                 ),
                 items: const [
                   DropdownMenuItem(value: 'UPI', child: Text('UPI')),
-                  DropdownMenuItem(value: 'Bank Transfer', child: Text('Bank Transfer')),
+                  DropdownMenuItem(
+                      value: 'Bank Transfer', child: Text('Bank Transfer')),
                   DropdownMenuItem(value: 'Cash', child: Text('Cash')),
                 ],
                 onChanged: (value) {
@@ -776,11 +787,13 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                         height: 150,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.borderRadiusM),
                           border: Border.all(color: theme.primaryColor),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.borderRadiusM),
                           child: Image.memory(
                             snapshot.data!,
                             fit: BoxFit.cover,
@@ -792,7 +805,8 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                       height: 150,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.borderRadiusM),
                         border: Border.all(color: theme.primaryColor),
                       ),
                       child: const Center(child: CircularProgressIndicator()),
@@ -847,16 +861,17 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       await paymentVM.sendPaymentNotification(
         guestId: authProvider.user!.userId,
         ownerId: 'blg5v21mbvb6U70xUpzrfKVjYh13', // TODO: Get from booking
-        pgId: 'blg5v21mbvb6U70xUpzrfKVjYh13_pg_1760205806856', // TODO: Get from booking
-        bookingId: 'booking_demo_${DateTime.now().millisecondsSinceEpoch}', // TODO: Get from actual booking
+        pgId:
+            'blg5v21mbvb6U70xUpzrfKVjYh13_pg_1760205806856', // TODO: Get from booking
+        bookingId:
+            'booking_demo_${DateTime.now().millisecondsSinceEpoch}', // TODO: Get from actual booking
         amount: double.parse(_amountController.text),
         paymentMethod: _paymentMethod,
         transactionId: _transactionIdController.text.isEmpty
             ? null
             : _transactionIdController.text,
-        paymentNote: _messageController.text.isEmpty
-            ? null
-            : _messageController.text,
+        paymentNote:
+            _messageController.text.isEmpty ? null : _messageController.text,
         paymentScreenshot: _screenshotFile,
       );
 

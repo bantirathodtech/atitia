@@ -52,7 +52,8 @@ class AuthProvider extends BaseProviderState {
     try {
       await loadUserFromPrefs();
       if (_user != null) {
-        print('🔄 AuthProvider: User data loaded from storage on init: ${_user!.userId}');
+        print(
+            '🔄 AuthProvider: User data loaded from storage on init: ${_user!.userId}');
       } else {
         print('🔄 AuthProvider: No cached user data found');
       }
@@ -66,11 +67,11 @@ class AuthProvider extends BaseProviderState {
   // ==========================================================================
   // Files can be File (mobile) or XFile (web) - using dynamic for compatibility
   // ==========================================================================
-  dynamic _profilePhotoFile;  // File on mobile, XFile on web
+  dynamic _profilePhotoFile; // File on mobile, XFile on web
   String? _profilePhotoUrl;
   bool _uploadingProfile = false;
 
-  dynamic _aadhaarFile;  // File on mobile, XFile on web
+  dynamic _aadhaarFile; // File on mobile, XFile on web
   String? _aadhaarUrl;
   bool _uploadingAadhaar = false;
 
@@ -94,7 +95,7 @@ class AuthProvider extends BaseProviderState {
       // 🔥 STEP 1: Try to restore user from local storage first (INSTANT)
       // This ensures _user is available immediately even if network is slow
       await loadUserFromPrefs();
-      
+
       if (_user != null) {
         print('✅ User restored from local storage: ${_user!.userId}');
         await _analyticsService.logEvent(
@@ -134,7 +135,7 @@ class AuthProvider extends BaseProviderState {
 
       // Update user data from Firestore (source of truth)
       _user = UserModel.fromJson(doc.data() as Map<String, dynamic>);
-      
+
       // Update last login timestamp
       await _firestoreService.updateDocument(
         FirestoreConstants.users,
@@ -162,7 +163,7 @@ class AuthProvider extends BaseProviderState {
       // This allows offline access
       if (_user != null) {
         print('⚠️ Using cached user data despite sync error');
-        return true;  // Continue with cached data
+        return true; // Continue with cached data
       }
       setError(true, 'Auto login failed: $e');
       return false;
@@ -177,7 +178,8 @@ class AuthProvider extends BaseProviderState {
       await _analyticsService.logEvent(name: 'auth_navigate_after_splash');
 
       if (_user == null) {
-        await _analyticsService.logEvent(name: 'auth_navigate_to_role_selection');
+        await _analyticsService.logEvent(
+            name: 'auth_navigate_to_role_selection');
         _navigation.goToRoleSelection();
         return;
       }
@@ -270,7 +272,7 @@ class AuthProvider extends BaseProviderState {
       // Storage service handles both File and XFile automatically
       final url = await _storageService.uploadFile(
           file, 'users/${_user?.userId}/profile_photos/', fileName);
-      
+
       _profilePhotoFile = file;
       _profilePhotoUrl = url;
 
@@ -311,7 +313,7 @@ class AuthProvider extends BaseProviderState {
       // Storage service handles both File and XFile automatically
       final url = await _storageService.uploadFile(
           file, 'users/${_user?.userId}/documents/', fileName);
-      
+
       _aadhaarFile = file;
       _aadhaarUrl = url;
 
@@ -378,13 +380,17 @@ class AuthProvider extends BaseProviderState {
       if (!kIsWeb && Platform.isMacOS) {
         await _analyticsService.logEvent(
           name: 'auth_send_otp_error',
-          parameters: {'phone_number': fullPhoneNumber, 'error': 'Phone OTP not supported on macOS'},
+          parameters: {
+            'phone_number': fullPhoneNumber,
+            'error': 'Phone OTP not supported on macOS'
+          },
         );
         throw AppException(
           message: 'Phone OTP authentication is not available on macOS',
           details: 'Please use Google Sign-In instead',
           severity: ErrorSeverity.medium,
-          recoverySuggestion: 'Use Google Sign-In button below for macOS authentication',
+          recoverySuggestion:
+              'Use Google Sign-In button below for macOS authentication',
         );
       }
 
@@ -422,7 +428,6 @@ class AuthProvider extends BaseProviderState {
       notifyListeners();
     }
   }
-
 
   /// Verifies OTP entered by user
   Future<bool> verifyOTP(String smsCode) async {
@@ -462,7 +467,7 @@ class AuthProvider extends BaseProviderState {
         _user = userModel.copyWith(
           role: _user?.role ?? userModel.role,
         );
-        
+
         // Debug log to verify phone number
         await _analyticsService.logEvent(
           name: 'auth_new_user_data_set',
@@ -472,7 +477,7 @@ class AuthProvider extends BaseProviderState {
             'role': _user!.role,
           },
         );
-        
+
         await _saveUserToPrefs(_user!);
         notifyListeners();
         return false;
@@ -486,7 +491,7 @@ class AuthProvider extends BaseProviderState {
       }
 
       _user = userData.copyWith(lastLoginAt: DateTime.now());
-      
+
       // Update last login in Firestore
       await _firestoreService.updateDocument(
         FirestoreConstants.users,
