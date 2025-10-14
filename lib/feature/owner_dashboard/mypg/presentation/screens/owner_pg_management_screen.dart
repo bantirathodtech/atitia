@@ -95,11 +95,11 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
         titleWidget: const PgSelectorDropdown(compact: false),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add_business),
-            onPressed: () => _navigateToCreatePG(context),
-            tooltip: 'List New PG',
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.add_business),
+          //   onPressed: () => _navigateToCreatePG(context),
+          //   tooltip: 'List New PG',
+          // ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: viewModel.loading ? null : viewModel.refreshData,
