@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../../common/styles/spacing.dart';
-import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/inputs/text_input.dart';
-import '../../../../../common/widgets/text/body_text.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../../common/styles/spacing.dart';
+import '../../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../../common/widgets/inputs/text_input.dart';
+import '../../../../../../common/widgets/text/body_text.dart';
+import '../../../../../../common/widgets/text/heading_medium.dart';
 
 /// Rent Configuration Form Widget for PG Setup
 class PgRentConfigFormWidget extends StatelessWidget {
@@ -41,7 +41,7 @@ class PgRentConfigFormWidget extends StatelessWidget {
               children: [
                 HeadingMedium(text: '💰 Rent Configuration'),
                 const SizedBox(height: AppSpacing.paddingM),
-                
+
                 // Rent per sharing type
                 ...rentControllers.entries.map((entry) {
                   final sharingType = entry.key;
@@ -61,7 +61,7 @@ class PgRentConfigFormWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Deposit Configuration
         AdaptiveCard(
           child: Padding(
@@ -71,7 +71,6 @@ class PgRentConfigFormWidget extends StatelessWidget {
               children: [
                 HeadingMedium(text: '💳 Security Deposit'),
                 const SizedBox(height: AppSpacing.paddingM),
-                
                 TextInput(
                   controller: depositController,
                   label: 'Security Deposit (₹)',
@@ -79,10 +78,8 @@ class PgRentConfigFormWidget extends StatelessWidget {
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
-                
                 BodyText(
                   text: 'Deposit Refund Policy:',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
                 const BodyText(text: '• Full refund if notice ≥ 30 days'),
@@ -93,7 +90,7 @@ class PgRentConfigFormWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Maintenance Configuration
         AdaptiveCard(
           child: Padding(
@@ -103,18 +100,23 @@ class PgRentConfigFormWidget extends StatelessWidget {
               children: [
                 HeadingMedium(text: '🔧 Maintenance'),
                 const SizedBox(height: AppSpacing.paddingM),
-                
                 DropdownButtonFormField<String>(
                   value: maintenanceType,
                   decoration: InputDecoration(
                     labelText: 'Maintenance Type',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM)),
+                    border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.borderRadiusM)),
                     filled: true,
                     fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
                   ),
                   items: const [
-                    DropdownMenuItem(value: 'one-time', child: Text('One-time (Non-refundable)')),
-                    DropdownMenuItem(value: 'monthly', child: Text('Monthly (Added to rent)')),
+                    DropdownMenuItem(
+                        value: 'one-time',
+                        child: Text('One-time (Non-refundable)')),
+                    DropdownMenuItem(
+                        value: 'monthly',
+                        child: Text('Monthly (Added to rent)')),
                   ],
                   onChanged: (value) {
                     if (value != null) {
@@ -123,7 +125,6 @@ class PgRentConfigFormWidget extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
-                
                 TextInput(
                   controller: maintenanceAmountController,
                   label: 'Maintenance Amount (₹)',
@@ -131,9 +132,8 @@ class PgRentConfigFormWidget extends StatelessWidget {
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
-                
                 BodyText(
-                  text: maintenanceType == 'one-time' 
+                  text: maintenanceType == 'one-time'
                       ? 'One-time maintenance fee will be charged upfront and is non-refundable.'
                       : 'Monthly maintenance fee will be added to the monthly rent.',
                   color: Colors.grey[600],

@@ -1,16 +1,15 @@
 // lib/feature/owner_dashboard/mypg/presentation/widgets/pg_floor_structure_form_widget.dart
 
 import 'package:flutter/material.dart';
-// import 'package:uuid/uuid.dart'; // TODO: Add uuid package to pubspec.yaml
 
-import '../../../../../common/styles/spacing.dart';
-import '../../../../../common/widgets/buttons/primary_button.dart';
-import '../../../../../common/widgets/buttons/secondary_button.dart';
-import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/text/body_text.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
-import '../../../../../common/widgets/text/heading_small.dart';
-import '../../data/models/owner_pg_management_model.dart';
+import '../../../../../../common/styles/spacing.dart';
+import '../../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../../common/widgets/text/body_text.dart';
+import '../../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../../common/widgets/text/heading_small.dart';
+import '../../../data/models/owner_pg_management_model.dart';
+// import 'package:uuid/uuid.dart'; // TODO: Add uuid package to pubspec.yaml
 
 /// Floor Structure Form Widget for PG Setup
 class PgFloorStructureFormWidget extends StatefulWidget {
@@ -32,10 +31,12 @@ class PgFloorStructureFormWidget extends StatefulWidget {
   });
 
   @override
-  State<PgFloorStructureFormWidget> createState() => _PgFloorStructureFormWidgetState();
+  State<PgFloorStructureFormWidget> createState() =>
+      _PgFloorStructureFormWidgetState();
 }
 
-class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget> {
+class _PgFloorStructureFormWidgetState
+    extends State<PgFloorStructureFormWidget> {
   // final Uuid _uuid = const Uuid(); // TODO: Add uuid package
   final _totalFloorsController = TextEditingController();
 
@@ -56,7 +57,7 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
     for (int i = 0; i < totalFloors; i++) {
       final floorId = 'floor_${DateTime.now().millisecondsSinceEpoch}';
       final floorName = i == 0 ? 'Ground Floor' : 'Floor $i';
-      
+
       final floor = OwnerFloor(
         id: floorId,
         floorName: floorName,
@@ -73,8 +74,9 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
 
   void _addRoomToFloor(OwnerFloor floor) {
     final roomId = 'room_${DateTime.now().millisecondsSinceEpoch}';
-    final roomNumber = '${floor.floorNumber == 0 ? 'G' : floor.floorNumber}${(widget.rooms.where((r) => r.floorId == floor.id).length + 1).toString().padLeft(2, '0')}';
-    
+    final roomNumber =
+        '${floor.floorNumber == 0 ? 'G' : floor.floorNumber}${(widget.rooms.where((r) => r.floorId == floor.id).length + 1).toString().padLeft(2, '0')}';
+
     final room = OwnerRoom(
       id: roomId,
       floorId: floor.id,
@@ -82,17 +84,17 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
       capacity: 3, // Default 3-share
       rentPerBed: 0.0,
     );
-    
+
     final newRooms = List<OwnerRoom>.from(widget.rooms)..add(room);
     widget.onRoomsChanged(newRooms);
-    
+
     // Generate beds for the room
     _generateBedsForRoom(room);
   }
 
   void _generateBedsForRoom(OwnerRoom room) {
     final newBeds = <OwnerBed>[];
-    
+
     for (int i = 1; i <= room.capacity; i++) {
       final bed = OwnerBed(
         id: 'bed_${DateTime.now().millisecondsSinceEpoch}_$i',
@@ -103,7 +105,7 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
       );
       newBeds.add(bed);
     }
-    
+
     final updatedBeds = List<OwnerBed>.from(widget.beds)..addAll(newBeds);
     widget.onBedsChanged(updatedBeds);
   }
@@ -116,19 +118,20 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
       capacity: newCapacity,
       rentPerBed: room.rentPerBed,
     );
-    
-    final newRooms = widget.rooms.map((r) => r.id == room.id ? updatedRoom : r).toList();
+
+    final newRooms =
+        widget.rooms.map((r) => r.id == room.id ? updatedRoom : r).toList();
     widget.onRoomsChanged(newRooms);
-    
+
     // Update beds
     final roomBeds = widget.beds.where((b) => b.roomId == room.id).toList();
     final otherBeds = widget.beds.where((b) => b.roomId != room.id).toList();
-    
+
     if (newCapacity > roomBeds.length) {
       // Add new beds
       for (int i = roomBeds.length + 1; i <= newCapacity; i++) {
-      final bed = OwnerBed(
-        id: 'bed_${DateTime.now().millisecondsSinceEpoch}_$i',
+        final bed = OwnerBed(
+          id: 'bed_${DateTime.now().millisecondsSinceEpoch}_$i',
           roomId: room.id,
           floorId: room.floorId,
           bedNumber: 'Bed $i',
@@ -140,14 +143,14 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
       // Remove excess beds
       roomBeds.removeRange(newCapacity, roomBeds.length);
     }
-    
+
     widget.onBedsChanged([...otherBeds, ...roomBeds]);
   }
 
   void _removeRoom(OwnerRoom room) {
     final newRooms = widget.rooms.where((r) => r.id != room.id).toList();
     final newBeds = widget.beds.where((b) => b.roomId != room.id).toList();
-    
+
     widget.onRoomsChanged(newRooms);
     widget.onBedsChanged(newBeds);
   }
@@ -191,11 +194,12 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
           ),
         ),
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Floors and Rooms
         ...widget.floors.map((floor) {
-          final floorRooms = widget.rooms.where((r) => r.floorId == floor.id).toList();
-          
+          final floorRooms =
+              widget.rooms.where((r) => r.floorId == floor.id).toList();
+
           return Column(
             children: [
               AdaptiveCard(
@@ -216,35 +220,41 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
                         ],
                       ),
                       const SizedBox(height: AppSpacing.paddingM),
-                      
+
                       // Rooms in this floor
                       ...floorRooms.map((room) {
-                        final roomBeds = widget.beds.where((b) => b.roomId == room.id).toList();
-                        
+                        final roomBeds = widget.beds
+                            .where((b) => b.roomId == room.id)
+                            .toList();
+
                         return Container(
-                          margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+                          margin: const EdgeInsets.only(
+                              bottom: AppSpacing.paddingS),
                           padding: const EdgeInsets.all(AppSpacing.paddingM),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey[300]!),
-                            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.borderRadiusM),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   BodyText(text: 'Room ${room.roomNumber}'),
                                   Row(
                                     children: [
                                       DropdownButton<int>(
                                         value: room.capacity,
-                                        items: [1, 2, 3, 4, 5].map((capacity) => 
-                                          DropdownMenuItem(
-                                            value: capacity,
-                                            child: Text('$capacity-share'),
-                                          )
-                                        ).toList(),
+                                        items: [1, 2, 3, 4, 5]
+                                            .map((capacity) => DropdownMenuItem(
+                                                  value: capacity,
+                                                  child:
+                                                      Text('$capacity-share'),
+                                                ))
+                                            .toList(),
                                         onChanged: (capacity) {
                                           if (capacity != null) {
                                             _updateRoomCapacity(room, capacity);
@@ -252,7 +262,8 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
                                         },
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        icon: const Icon(Icons.delete,
+                                            color: Colors.red),
                                         onPressed: () => _removeRoom(room),
                                       ),
                                     ],
@@ -260,20 +271,22 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
                                 ],
                               ),
                               BodyText(
-                                text: 'Beds: ${roomBeds.map((b) => b.bedNumber).join(', ')}',
+                                text:
+                                    'Beds: ${roomBeds.map((b) => b.bedNumber).join(', ')}',
                                 color: Colors.grey[600],
                               ),
                             ],
                           ),
                         );
                       }).toList(),
-                      
+
                       if (floorRooms.isEmpty)
                         const Padding(
                           padding: EdgeInsets.all(AppSpacing.paddingM),
                           child: Center(
                             child: BodyText(
-                              text: 'No rooms added yet. Click "Add Room" to get started.',
+                              text:
+                                  'No rooms added yet. Click "Add Room" to get started.',
                               color: Colors.grey,
                             ),
                           ),
@@ -286,19 +299,21 @@ class _PgFloorStructureFormWidgetState extends State<PgFloorStructureFormWidget>
             ],
           );
         }).toList(),
-        
+
         if (widget.floors.isEmpty)
           AdaptiveCard(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.paddingL),
               child: Column(
                 children: [
-                  Icon(Icons.home_work_outlined, size: 64, color: Colors.grey[400]),
+                  Icon(Icons.home_work_outlined,
+                      size: 64, color: Colors.grey[400]),
                   const SizedBox(height: AppSpacing.paddingM),
                   const HeadingMedium(text: 'No Floors Generated'),
                   const SizedBox(height: AppSpacing.paddingS),
                   const BodyText(
-                    text: 'Enter the number of floors and click "Generate" to create your floor structure.',
+                    text:
+                        'Enter the number of floors and click "Generate" to create your floor structure.',
                   ),
                 ],
               ),
