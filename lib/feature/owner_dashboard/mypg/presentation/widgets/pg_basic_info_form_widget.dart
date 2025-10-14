@@ -37,9 +37,9 @@ class PgBasicInfoFormWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     // Get cities for selected state
-    final availableCities = selectedState != null 
+    final availableCities = selectedState != null
         ? IndianStatesCities.getCitiesForState(selectedState!)
         : <String>[];
 
@@ -51,7 +51,7 @@ class PgBasicInfoFormWidget extends StatelessWidget {
           children: [
             HeadingMedium(text: '🏠 Basic Information'),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // PG Name
             TextInput(
               controller: pgNameController,
@@ -59,7 +59,7 @@ class PgBasicInfoFormWidget extends StatelessWidget {
               hint: 'e.g., Green Meadows PG',
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // Address
             TextInput(
               controller: addressController,
@@ -68,7 +68,7 @@ class PgBasicInfoFormWidget extends StatelessWidget {
               maxLines: 3,
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // Contact Number
             TextInput(
               controller: contactController,
@@ -77,7 +77,7 @@ class PgBasicInfoFormWidget extends StatelessWidget {
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // State and City
             Row(
               children: [
@@ -86,19 +86,25 @@ class PgBasicInfoFormWidget extends StatelessWidget {
                     value: selectedState,
                     decoration: InputDecoration(
                       labelText: 'State',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM)),
+                      border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.borderRadiusM)),
                       filled: true,
-                      fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                      fillColor:
+                          isDarkMode ? Colors.grey[800] : Colors.grey[100],
                     ),
                     hint: const Text('Select State'),
-                    items: IndianStatesCities.states.map((state) => 
-                      DropdownMenuItem(value: state, child: Text(state))
-                    ).toList(),
+                    items: IndianStatesCities.states
+                        .map((state) =>
+                            DropdownMenuItem(value: state, child: Text(state)))
+                        .toList(),
                     onChanged: (value) {
                       onStateChanged(value);
                       onCityChanged(null); // Reset city when state changes
                     },
-                    validator: (value) => value == null || value.isEmpty ? 'State is required' : null,
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'State is required'
+                        : null,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
@@ -107,22 +113,28 @@ class PgBasicInfoFormWidget extends StatelessWidget {
                     value: selectedCity,
                     decoration: InputDecoration(
                       labelText: 'City',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM)),
+                      border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.borderRadiusM)),
                       filled: true,
-                      fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                      fillColor:
+                          isDarkMode ? Colors.grey[800] : Colors.grey[100],
                     ),
                     hint: const Text('Select City'),
-                    items: availableCities.map((city) => 
-                      DropdownMenuItem(value: city, child: Text(city))
-                    ).toList(),
+                    items: availableCities
+                        .map((city) =>
+                            DropdownMenuItem(value: city, child: Text(city)))
+                        .toList(),
                     onChanged: onCityChanged,
-                    validator: (value) => value == null || value.isEmpty ? 'City is required' : null,
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'City is required'
+                        : null,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // Google Map Link
             TextInput(
               controller: mapLinkController,
@@ -130,7 +142,7 @@ class PgBasicInfoFormWidget extends StatelessWidget {
               hint: 'Paste Google Maps URL',
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // Description
             TextInput(
               controller: descriptionController,

@@ -21,7 +21,8 @@ class PgPhotosFormWidget extends StatelessWidget {
   Future<void> _addPhoto(BuildContext context) async {
     try {
       // TODO: Implement image picker and upload
-      final imageUrl = 'https://via.placeholder.com/300x200?text=PG+Photo+${uploadedPhotos.length + 1}';
+      final imageUrl =
+          'https://via.placeholder.com/300x200?text=PG+Photo+${uploadedPhotos.length + 1}';
       final updatedPhotos = List<String>.from(uploadedPhotos)..add(imageUrl);
       onPhotosChanged(updatedPhotos);
     } catch (e) {
@@ -49,13 +50,13 @@ class PgPhotosFormWidget extends StatelessWidget {
           children: [
             HeadingMedium(text: '📸 Photos'),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             BodyText(
               text: 'Add photos of your PG to attract more guests:',
               color: Colors.grey[600],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // Photo Grid
             Wrap(
               spacing: 8,
@@ -68,7 +69,8 @@ class PgPhotosFormWidget extends StatelessWidget {
                   return Stack(
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.borderRadiusM),
                         child: Image.network(
                           photoUrl,
                           width: 100,
@@ -106,7 +108,7 @@ class PgPhotosFormWidget extends StatelessWidget {
                     ],
                   );
                 }).toList(),
-                
+
                 // Add photo button
                 GestureDetector(
                   onTap: () => _addPhoto(context),
@@ -115,7 +117,8 @@ class PgPhotosFormWidget extends StatelessWidget {
                     height: 100,
                     decoration: BoxDecoration(
                       color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
-                      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.borderRadiusM),
                       border: Border.all(
                         color: theme.primaryColor.withOpacity(0.5),
                         style: BorderStyle.solid,
@@ -140,7 +143,7 @@ class PgPhotosFormWidget extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             if (uploadedPhotos.isEmpty) ...[
               const SizedBox(height: AppSpacing.paddingM),
               Container(
@@ -164,22 +167,23 @@ class PgPhotosFormWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.paddingS),
                     BodyText(
-                      text: 'Add photos to showcase your PG and attract more guests',
+                      text:
+                          'Add photos to showcase your PG and attract more guests',
                       color: Colors.grey[500],
                     ),
                   ],
                 ),
               ),
             ],
-            
+
             const SizedBox(height: AppSpacing.paddingM),
             BodyText(
               text: 'Tips for great photos:',
-              style: TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: AppSpacing.paddingS),
             const BodyText(text: '• Take photos in good lighting'),
-            const BodyText(text: '• Show different areas (rooms, common areas, kitchen)'),
+            const BodyText(
+                text: '• Show different areas (rooms, common areas, kitchen)'),
             const BodyText(text: '• Include amenities in photos'),
             const BodyText(text: '• Keep photos clear and well-framed'),
           ],

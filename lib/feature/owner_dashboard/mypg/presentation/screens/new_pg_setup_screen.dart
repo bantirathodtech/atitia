@@ -24,7 +24,7 @@ import '../widgets/pg_summary_widget.dart';
 /// Handles both CREATE and EDIT modes using existing models and repository
 class NewPgSetupScreen extends StatefulWidget {
   final String? pgId; // null for create, non-null for edit
-  
+
   const NewPgSetupScreen({
     super.key,
     this.pgId,
@@ -45,19 +45,19 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   List<OwnerFloor> _floors = [];
   List<OwnerRoom> _rooms = [];
   List<OwnerBed> _beds = [];
-  
+
   // Form controllers
   final _pgNameController = TextEditingController();
   final _addressController = TextEditingController();
   final _contactController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _mapLinkController = TextEditingController();
-  
+
   String? _selectedState;
   String? _selectedCity;
   List<String> _selectedAmenities = [];
   List<String> _uploadedPhotos = [];
-  
+
   // Rent configuration
   final Map<String, TextEditingController> _rentControllers = {
     '1-share': TextEditingController(),
@@ -99,10 +99,10 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
   Future<void> _loadPgForEdit() async {
     if (widget.pgId == null) return;
-    
+
     final vm = context.read<OwnerPgManagementViewModel>();
     await vm.initialize(widget.pgId!);
-    
+
     if (vm.pgDetails != null) {
       _pgEntity = OwnerPgEntity.fromMap(vm.pgDetails!);
       _populateFormFromEntity();
@@ -111,7 +111,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
   void _populateFormFromEntity() {
     if (_pgEntity == null) return;
-    
+
     _pgNameController.text = _pgEntity!.name;
     _addressController.text = _pgEntity!.address;
     _contactController.text = _pgEntity!.contactNumber;
@@ -120,10 +120,10 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     _selectedCity = _pgEntity!.city;
     _selectedAmenities = List.from(_pgEntity!.amenities);
     _uploadedPhotos = List.from(_pgEntity!.photos);
-    
+
     // Parse floor structure
     _parseFloorStructure(_pgEntity!.floorStructure);
-    
+
     setState(() {});
   }
 
@@ -131,7 +131,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     _floors.clear();
     _rooms.clear();
     _beds.clear();
-    
+
     for (final floorData in floorStructure) {
       final floor = OwnerFloor(
         id: floorData['floorId'] ?? '',
@@ -140,7 +140,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         totalRooms: (floorData['rooms'] as List).length,
       );
       _floors.add(floor);
-      
+
       for (final roomData in floorData['rooms'] ?? []) {
         final room = OwnerRoom(
           id: roomData['roomId'] ?? '',
@@ -150,7 +150,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           rentPerBed: (roomData['pricePerBed'] ?? 0).toDouble(),
         );
         _rooms.add(room);
-        
+
         for (final bedData in roomData['beds'] ?? []) {
           final bed = OwnerBed(
             id: bedData['bedId'] ?? '',
@@ -195,7 +195,9 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                   isScrollable: true,
                   tabs: const [
                     Tab(text: 'Basic Info', icon: Icon(Icons.info_outline)),
-                    Tab(text: 'Floor Structure', icon: Icon(Icons.home_work_outlined)),
+                    Tab(
+                        text: 'Floor Structure',
+                        icon: Icon(Icons.home_work_outlined)),
                     Tab(text: 'Rent Config', icon: Icon(Icons.attach_money)),
                     Tab(text: 'Amenities', icon: Icon(Icons.room_service)),
                     Tab(text: 'Photos', icon: Icon(Icons.photo_library)),
@@ -203,7 +205,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                   ],
                 ),
               ),
-              
+
               // Tab Content
               Expanded(
                 child: Form(
@@ -221,7 +223,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                   ),
                 ),
               ),
-              
+
               // Bottom Action Bar
               _buildBottomActionBar(vm),
             ],
@@ -273,7 +275,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         depositController: _depositController,
         maintenanceType: _maintenanceType,
         maintenanceAmountController: _maintenanceAmountController,
-        onMaintenanceTypeChanged: (type) => setState(() => _maintenanceType = type),
+        onMaintenanceTypeChanged: (type) =>
+            setState(() => _maintenanceType = type),
       ),
     );
   }
@@ -284,7 +287,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: PgAmenitiesFormWidget(
         selectedAmenities: _selectedAmenities,
-        onAmenitiesChanged: (amenities) => setState(() => _selectedAmenities = amenities),
+        onAmenitiesChanged: (amenities) =>
+            setState(() => _selectedAmenities = amenities),
       ),
     );
   }
@@ -317,7 +321,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         rentControllers: _rentControllers,
         depositAmount: double.tryParse(_depositController.text) ?? 0.0,
         maintenanceType: _maintenanceType,
-        maintenanceAmount: double.tryParse(_maintenanceAmountController.text) ?? 0.0,
+        maintenanceAmount:
+            double.tryParse(_maintenanceAmountController.text) ?? 0.0,
       ),
     );
   }
@@ -339,7 +344,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           Expanded(
             child: PrimaryButton(
               onPressed: vm.loading ? null : _submitForm,
-              label: vm.loading 
+              label: vm.loading
                   ? (isEditMode ? 'Updating...' : 'Creating...')
                   : (isEditMode ? 'Update PG' : 'Create PG'),
               icon: isEditMode ? Icons.save : Icons.add_business,
@@ -376,7 +381,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     // Convert to floor structure format
     final floorStructure = _floors.map((floor) {
-      final floorRooms = _rooms.where((room) => room.floorId == floor.id).toList();
+      final floorRooms =
+          _rooms.where((room) => room.floorId == floor.id).toList();
       return {
         'floorId': floor.id,
         'floorNumber': floor.floorNumber,
@@ -407,15 +413,21 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       'photos': _uploadedPhotos,
       'floorStructure': floorStructure,
       'rentConfiguration': {
-        'oneShare': double.tryParse(_rentControllers['1-share']?.text ?? '0') ?? 0.0,
-        'twoShare': double.tryParse(_rentControllers['2-share']?.text ?? '0') ?? 0.0,
-        'threeShare': double.tryParse(_rentControllers['3-share']?.text ?? '0') ?? 0.0,
-        'fourShare': double.tryParse(_rentControllers['4-share']?.text ?? '0') ?? 0.0,
-        'fiveShare': double.tryParse(_rentControllers['5-share']?.text ?? '0') ?? 0.0,
+        'oneShare':
+            double.tryParse(_rentControllers['1-share']?.text ?? '0') ?? 0.0,
+        'twoShare':
+            double.tryParse(_rentControllers['2-share']?.text ?? '0') ?? 0.0,
+        'threeShare':
+            double.tryParse(_rentControllers['3-share']?.text ?? '0') ?? 0.0,
+        'fourShare':
+            double.tryParse(_rentControllers['4-share']?.text ?? '0') ?? 0.0,
+        'fiveShare':
+            double.tryParse(_rentControllers['5-share']?.text ?? '0') ?? 0.0,
       },
       'deposit': double.tryParse(_depositController.text) ?? 0.0,
       'maintenanceType': _maintenanceType,
-      'maintenanceAmount': double.tryParse(_maintenanceAmountController.text) ?? 0.0,
+      'maintenanceAmount':
+          double.tryParse(_maintenanceAmountController.text) ?? 0.0,
       'ownerUid': ownerId,
       'createdAt': DateTime.now(),
       'updatedAt': DateTime.now(),
@@ -434,13 +446,16 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       Navigator.of(context).pop(true);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(isEditMode ? 'PG updated successfully!' : 'PG created successfully!'),
+          content: Text(isEditMode
+              ? 'PG updated successfully!'
+              : 'PG created successfully!'),
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(vm.errorMessage ?? (isEditMode ? 'Failed to update PG' : 'Failed to create PG')),
+          content: Text(vm.errorMessage ??
+              (isEditMode ? 'Failed to update PG' : 'Failed to create PG')),
         ),
       );
     }
