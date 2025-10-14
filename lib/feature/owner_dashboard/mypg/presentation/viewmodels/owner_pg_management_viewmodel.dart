@@ -452,15 +452,18 @@ class OwnerPgManagementViewModel extends BaseProviderState {
       setLoading(true);
       clearError();
 
-      await _repository.createOrUpdatePG(pgModel);
+      // If pgModel is a Map (create flow), call createPG; if it's a model with pgId, upsert
+      if (pgModel is Map<String, dynamic>) {
+        final String newPgId = await _repository.createPG(pgModel);
+        _pgId = newPgId;
+      } else {
+        await _repository.createOrUpdatePG(pgModel);
+        _pgId = pgModel.pgId;
+      }
 
       _analyticsService.logEvent(
         name: 'owner_pg_created',
-        parameters: {
-          'pg_id': pgModel.pgId,
-          'pg_name': pgModel.pgName,
-          'city': pgModel.city,
-        },
+        parameters: {'pg_id': _pgId ?? 'unknown'},
       );
 
       return true;
