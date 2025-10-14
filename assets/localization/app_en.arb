@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+  "appTitle": "Atitia",
+  "buttonContinue": "Continue",
+  "roleGuest": "I am Guest",
+  "roleOwner": "I am PG Owner",
+  "login": "Login",
+  "logout": "Logout",
+  "phoneNumber": "Phone Number",
+  "changeNumber": "Change Number",
+  "sendOTP": "Send OTP",
+  "enterOTP": "Enter OTP",
+  "verify": "Verify",
+  "guestRegistration": "Guest Registration",
+  "ownerRegistration": "Owner Registration",
+  "home": "Home",
+  "booking": "Booking",
+  "payments": "Payments",
+  "feedback": "Feedback",
+  "profile": "Profile",
+  "selectRole": "Select Your Role"
+
+}

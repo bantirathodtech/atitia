@@ -1,0 +1,22 @@
+{
+  "@@locale": "te",
+  "appTitle": "అటిటియా",
+  "buttonContinue": "కొనసాగు",
+  "roleGuest": "నేను అతిథిని",
+  "roleOwner": "నేను PG యజమాని",
+  "login": "ప్రవేశించండి",
+  "logout": "లాగ్ అవుట్",
+  "phoneNumber": "ఫోన్ నంబర్",
+  "changeNumber": "నంబర్ మార్చండి",
+  "sendOTP": "OTP పంపండి",
+  "enterOTP": "OTP నమోదు చేయండి",
+  "verify": "సత్యాపించండి",
+  "guestRegistration": "అతిథి నమోదు",
+  "ownerRegistration": "యజమాని నమోదు",
+  "home": "హోమ్",
+  "booking": "బుకింగ్",
+  "payments": "చెల్లింపులు",
+  "feedback": "ప్రతిక్రియ",
+  "profile": "ప్రొఫైల్",
+  "selectRole": "మీ పాత్రను ఎంచుకోండి"
+}

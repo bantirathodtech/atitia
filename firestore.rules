@@ -1,0 +1,377 @@
+rules_version = '2';
+
+// ============================================================================
+// Firestore Security Rules - Multi-Platform Support
+// ============================================================================
+// These rules are designed to work across all supported platforms:
+// - Android (mobile)
+// - iOS (mobile) 
+// - macOS (desktop)
+// - Web (browser)
+// - Windows (desktop)
+//
+// Key Features:
+// - Platform-agnostic authentication checks
+// - Cross-platform user role management
+// - Consistent data validation across platforms
+// - Secure multi-tenant access patterns
+//
+// Authentication Methods Supported:
+// - Phone OTP (all platforms)
+// - Google Sign-In (all platforms)
+// - Email/Password (if enabled)
+//
+// User Roles:
+// - admin: Full system access
+// - owner: Property management access
+// - guest: Booking and profile access
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions - Cross-platform compatible
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isGuest(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    // Platform-agnostic helper functions
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    function isOwnerRole() {
+      return isAuthenticated() && getUserRole() == 'owner';
+    }
+    
+    function isGuestRole() {
+      return isAuthenticated() && getUserRole() == 'guest';
+    }
+    
+    // Multi-platform user validation
+    function isValidUser() {
+      return isAuthenticated() && request.auth.uid != null && request.auth.uid != '';
+    }
+    
+    // Cross-platform data validation
+    function hasRequiredFields(data, requiredFields) {
+      return requiredFields.hasAll(data.keys());
+    }
+    
+    // Users Collection - Cross-platform user management
+    match /users/{userId} {
+      // Allow listing users for authenticated users (needed for dashboard)
+      allow list: if isValidUser();
+      
+      // Allow reading specific user - Cross-platform compatible
+      allow get: if isValidUser() && (
+        request.auth.uid == userId ||  // User can read their own profile
+        isAdmin() ||                   // Admins can read all profiles
+        isOwnerRole()                  // Owners can read guest profiles
+      );
+      
+      // Allow creating user profile - Must be authenticated and own the profile
+      allow create: if isValidUser() && 
+                       request.auth.uid == userId &&
+                       hasRequiredFields(request.resource.data, ['userId', 'role']);
+      
+      // Allow updating user profile - Cross-platform compatible
+      allow update: if isValidUser() && (
+        request.auth.uid == userId ||   // User can update their own profile
+        isAdmin() ||                    // Admins can update profiles
+        (isOwnerRole() && resource.data.role == 'guest') // Owners can update guests
+      );
+      
+      // Allow deleting user profile - Admin/Owner only
+      allow delete: if isValidUser() && (
+        isAdmin() ||                    // Admins can delete
+        (isOwnerRole() && resource.data.role == 'guest') // Owners can delete guests
+      );
+    }
+    
+    // PG Properties - Cross-platform property management
+    match /pg_properties/{propertyId} {
+      // Allow reading properties for all authenticated users
+      allow read: if isValidUser();
+      
+      // Allow creating properties - Must be authenticated and own the property
+      allow create: if isValidUser() && 
+                       request.resource.data.ownerId == request.auth.uid &&
+                       hasRequiredFields(request.resource.data, ['ownerId', 'name']);
+      
+      // Allow updating/deleting properties - Only property owner or admin
+      allow update, delete: if isValidUser() && (
+        resource.data.ownerId == request.auth.uid ||  // Property owner
+        isAdmin()                                      // Admin can manage all properties
+      );
+    }
+    
+    // PGs Collection (alternative name for properties) - Cross-platform compatible
+    match /pgs/{pgId} {
+      // Allow reading PGs for all authenticated users
+      allow read: if isValidUser();
+      
+      // Allow creating PGs - Must be authenticated and own the PG
+      allow create: if isValidUser() && 
+                       request.resource.data.ownerUid == request.auth.uid &&
+                       hasRequiredFields(request.resource.data, ['ownerUid', 'name']);
+      
+      // Allow updating/deleting PGs - Only PG owner or admin
+      allow update, delete: if isValidUser() && (
+        resource.data.ownerUid == request.auth.uid ||  // PG owner
+        isAdmin()                                       // Admin can manage all PGs
+      );
+    }
+    
+    // Rooms - Owners can manage rooms in their properties
+    match /rooms/{roomId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       exists(/databases/$(database)/documents/pg_properties/$(request.resource.data.propertyId)) &&
+                       get(/databases/$(database)/documents/pg_properties/$(request.resource.data.propertyId)).data.ownerId == request.auth.uid;
+      
+      allow update, delete: if isAuthenticated() && 
+                               exists(/databases/$(database)/documents/pg_properties/$(resource.data.propertyId)) &&
+                               get(/databases/$(database)/documents/pg_properties/$(resource.data.propertyId)).data.ownerId == request.auth.uid;
+    }
+    
+    // Bookings - Cross-platform booking management
+    match /bookings/{bookingId} {
+      // Allow listing bookings for authenticated users (needed for filtering)
+      allow list: if isValidUser();
+      
+      // Allow reading specific booking - Cross-platform compatible
+      allow get: if isValidUser() && (
+        resource.data.guestId == request.auth.uid ||  // Guest can read their bookings
+        resource.data.ownerId == request.auth.uid ||  // Owner can read bookings for their properties
+        isAdmin()                                     // Admin can read all bookings
+      );
+      
+      // Allow creating bookings - Must be authenticated guest
+      allow create: if isValidUser() && 
+                       request.resource.data.guestId == request.auth.uid &&
+                       hasRequiredFields(request.resource.data, ['guestId', 'pgId', 'roomId']);
+      
+      // Allow updating bookings - Guest, owner, or admin
+      allow update: if isValidUser() && (
+        resource.data.guestId == request.auth.uid ||  // Guest can update their bookings
+        resource.data.ownerId == request.auth.uid ||  // Owner can update bookings
+        isAdmin()                                     // Admin can update all bookings
+      );
+      
+      // Allow deleting bookings - Admin only for safety
+      allow delete: if isValidUser() && isAdmin();
+    }
+    
+    // Payments - Users can read their own payments, owners can list all for dashboard
+    match /payments/{paymentId} {
+      // Allow listing payments for owners (for dashboard overview)
+      allow list: if isAuthenticated();
+      
+      // Allow reading specific payment if user is involved
+      allow get: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||  // Guest can read their payments
+        resource.data.ownerId == request.auth.uid     // Owner can read payments
+      );
+      
+      allow create: if isAuthenticated();
+      
+      allow update: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid
+      );
+      
+      allow delete: if isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    // Complaints - Users can manage their own complaints
+    match /complaints/{complaintId} {
+      // Allow listing complaints for owners (needed for dashboard)
+      allow list: if isAuthenticated();
+      
+      // Allow reading specific complaint
+      allow get: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||  // Guest can read their complaints
+        resource.data.ownerId == request.auth.uid ||  // Owner can read complaints
+        getUserRole() == 'admin'
+      );
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.guestId == request.auth.uid;
+      
+      allow update: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid ||
+        getUserRole() == 'admin'
+      );
+      
+      allow delete: if isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    // Reviews - Guests can create reviews, everyone can read
+    match /reviews/{reviewId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.guestId == request.auth.uid;
+      
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.guestId == request.auth.uid;
+    }
+    
+    // Menus - Owners can manage menus for their properties
+    match /weekly_menus/{menuId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       exists(/databases/$(database)/documents/pg_properties/$(request.resource.data.propertyId)) &&
+                       get(/databases/$(database)/documents/pg_properties/$(request.resource.data.propertyId)).data.ownerId == request.auth.uid;
+      
+      allow update, delete: if isAuthenticated() && 
+                               exists(/databases/$(database)/documents/pg_properties/$(resource.data.propertyId)) &&
+                               get(/databases/$(database)/documents/pg_properties/$(resource.data.propertyId)).data.ownerId == request.auth.uid;
+    }
+    
+    match /menu_overrides/{overrideId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       exists(/databases/$(database)/documents/pg_properties/$(request.resource.data.propertyId)) &&
+                       get(/databases/$(database)/documents/pg_properties/$(request.resource.data.propertyId)).data.ownerId == request.auth.uid;
+      
+      allow update, delete: if isAuthenticated() && 
+                               exists(/databases/$(database)/documents/pg_properties/$(resource.data.propertyId)) &&
+                               get(/databases/$(database)/documents/pg_properties/$(resource.data.propertyId)).data.ownerId == request.auth.uid;
+    }
+    
+    // Owner Food Menus - Owners can manage their own food menus
+    match /owner_weekly_menus/{menuId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.ownerId == request.auth.uid;
+      
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.ownerId == request.auth.uid;
+    }
+    
+    match /owner_daily_overrides/{overrideId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.ownerId == request.auth.uid;
+      
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.ownerId == request.auth.uid;
+    }
+    
+    // Notifications - Users can read their own notifications
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated();
+      
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+      
+      allow delete: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
+    }
+    
+    // Emergency Contacts - Users can manage their own emergency contacts
+    match /emergency_contacts/{contactId} {
+      allow read, write: if isAuthenticated() && 
+                            resource.data.userId == request.auth.uid;
+    }
+    
+    // Visitors - Guests and owners can manage visitor records
+    match /visitors/{visitorId} {
+      allow read: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid
+      );
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.guestId == request.auth.uid;
+      
+      allow update: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid
+      );
+      
+      allow delete: if isAuthenticated() && 
+                       resource.data.guestId == request.auth.uid;
+    }
+    
+    // Payment Notifications - Guest creates, Owner confirms/rejects
+    match /payment_notifications/{notificationId} {
+      allow read: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||
+        resource.data.ownerId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && 
+                       request.resource.data.guestId == request.auth.uid;
+      allow update: if isAuthenticated() && 
+                       resource.data.ownerId == request.auth.uid;
+      allow delete: if isAuthenticated() && getUserRole() == 'admin';
+      allow list: if isAuthenticated();
+    }
+
+    // Owner Payment Details - Only owner can manage their own payment details
+    match /owner_payment_details/{ownerId} {
+      allow read: if isAuthenticated(); // All authenticated users can see payment details
+      allow write: if isAuthenticated() && request.auth.uid == ownerId;
+    }
+
+    // Revenue Projections - Owner's analytics data
+    match /revenue_projections/{projectionId} {
+      allow read: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+      allow write: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
+    }
+
+    // Occupancy Trends - Owner's analytics data
+    match /occupancy_trends/{trendId} {
+      allow read: if isAuthenticated() && resource.data.pgId in getUserPgIds();
+      allow write: if isAuthenticated();
+    }
+
+    // Maintenance Tasks - Owner's maintenance schedule
+    match /maintenance_tasks/{taskId} {
+      allow read: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+      allow write: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
+      allow list: if isAuthenticated();
+    }
+
+    // Owner Documents - Secure document storage
+    match /owner_documents/{documentId} {
+      allow read: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+      allow write: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
+      allow list: if isAuthenticated();
+    }
+
+    // Notification Preferences - User's notification settings
+    match /notification_preferences/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Default deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

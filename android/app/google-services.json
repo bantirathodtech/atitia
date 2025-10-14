@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "665010238088",
+    "project_id": "atitia-87925",
+    "storage_bucket": "atitia-87925.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665010238088:android:27a01be236b0ad9d19a53d",
+        "android_client_info": {
+          "package_name": "com.avishio.atitia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "665010238088-27a01be236b0ad9d19a53d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.avishio.atitia",
+            "certificate_hash": "c35426383935af00f2f54b0bb7fc7cb6e8150f15"
+          }
+        },
+        {
+          "client_id": "665010238088-27a01be236b0ad9d19a53d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWFaZgLfoGlJeLIrLNK_d9xFuYfqp6XtQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

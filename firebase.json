@@ -1,0 +1,45 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "atitia-87925",
+          "appId": "1:665010238088:android:27a01be236b0ad9d19a53d",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "atitia-87925",
+          "appId": "1:665010238088:ios:76437d681978a96019a53d",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "atitia-87925",
+          "appId": "1:665010238088:ios:76437d681978a96019a53d",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "atitia-87925",
+          "configurations": {
+            "android": "1:665010238088:android:27a01be236b0ad9d19a53d",
+            "ios": "1:665010238088:ios:76437d681978a96019a53d",
+            "macos": "1:665010238088:ios:76437d681978a96019a53d",
+            "web": "1:665010238088:web:4ab7c29b9112469119a53d",
+            "windows": "1:665010238088:web:128b16317971fd2819a53d"
+          }
+        }
+      }
+    }
+  }
+}

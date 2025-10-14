@@ -1,0 +1,50 @@
+{
+  // Flutter launch configurations
+  // Ensures consistent localhost ports for web development
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "atitia (Chrome - Port 8080)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--web-port=8080",
+        "--web-hostname=localhost"
+      ],
+      "deviceId": "chrome"
+    },
+    {
+      "name": "atitia (Chrome - Port 5000)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--web-port=5000",
+        "--web-hostname=localhost"
+      ],
+      "deviceId": "chrome"
+    },
+    {
+      "name": "atitia (Android)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "atitia (Profile mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "atitia (Release mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main.dart"
+    }
+  ]
+}
+
