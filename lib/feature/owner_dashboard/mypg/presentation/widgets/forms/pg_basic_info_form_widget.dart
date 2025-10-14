@@ -18,6 +18,11 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
   final String? selectedCity;
   final Function(String?) onStateChanged;
   final Function(String?) onCityChanged;
+  final String? pgNameError;
+  final String? addressError;
+  final String? contactError;
+  final String? stateError;
+  final String? cityError;
 
   const PgBasicInfoFormWidget({
     super.key,
@@ -30,6 +35,11 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
     required this.selectedCity,
     required this.onStateChanged,
     required this.onCityChanged,
+    this.pgNameError,
+    this.addressError,
+    this.contactError,
+    this.stateError,
+    this.cityError,
   });
 
   @override
@@ -50,6 +60,7 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
           controller: pgNameController,
           label: 'PG Name',
           hint: 'e.g., Green Meadows PG',
+          error: pgNameError,
         ),
         const SizedBox(height: AppSpacing.paddingM),
 
@@ -59,6 +70,7 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
           label: 'Complete Address',
           hint: 'Full address with landmark',
           maxLines: 3,
+          error: addressError,
         ),
         const SizedBox(height: AppSpacing.paddingM),
 
@@ -68,6 +80,7 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
           label: 'Contact Number',
           hint: 'e.g., +91 9876543210',
           keyboardType: TextInputType.phone,
+          error: contactError,
         ),
         const SizedBox(height: AppSpacing.paddingM),
 
@@ -83,6 +96,7 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
           }).toList(),
           onChanged: onStateChanged,
           hint: 'Select State',
+          error: stateError,
         ),
         const SizedBox(height: AppSpacing.paddingM),
 
@@ -99,6 +113,7 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
           onChanged: onCityChanged,
           hint: 'Select City',
           enabled: selectedState != null,
+          error: cityError,
         ),
         const SizedBox(height: AppSpacing.paddingM),
 
