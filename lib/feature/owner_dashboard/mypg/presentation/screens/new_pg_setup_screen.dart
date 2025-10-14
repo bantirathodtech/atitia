@@ -13,12 +13,12 @@ import '../../../../auth/logic/auth_provider.dart';
 import '../../data/models/owner_pg_management_model.dart';
 import '../../domain/entities/owner_pg_entity.dart';
 import '../viewmodels/owner_pg_management_viewmodel.dart';
-import '../widgets/pg_basic_info_form_widget.dart';
-import '../widgets/pg_floor_structure_form_widget.dart';
-import '../widgets/pg_rent_config_form_widget.dart';
-import '../widgets/pg_amenities_form_widget.dart';
-import '../widgets/pg_photos_form_widget.dart';
-import '../widgets/pg_summary_widget.dart';
+import '../widgets/forms/pg_basic_info_form_widget.dart';
+import '../widgets/forms/pg_floor_structure_form_widget.dart';
+import '../widgets/forms/pg_rent_config_form_widget.dart';
+import '../widgets/forms/pg_amenities_form_widget.dart';
+import '../widgets/forms/pg_photos_form_widget.dart';
+import '../widgets/forms/pg_summary_widget.dart';
 
 /// Smart PG Setup Screen with MVVM Architecture
 /// Handles both CREATE and EDIT modes using existing models and repository

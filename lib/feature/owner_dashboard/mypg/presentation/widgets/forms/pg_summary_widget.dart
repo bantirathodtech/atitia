@@ -73,10 +73,8 @@ class PgSummaryWidget extends StatelessWidget {
                 children: [
                   HeadingMedium(text: '📋 Basic Information'),
                   const SizedBox(height: AppSpacing.paddingM),
-                  _buildSummaryRow(
-                      'PG Name', pgName.isEmpty ? 'Not specified' : pgName),
-                  _buildSummaryRow(
-                      'Address', address.isEmpty ? 'Not specified' : address),
+                  _buildSummaryRow('PG Name', pgName.isEmpty ? 'Not specified' : pgName),
+                  _buildSummaryRow('Address', address.isEmpty ? 'Not specified' : address),
                   _buildSummaryRow('Location', '$city, $state'),
                   _buildSummaryRow('Photos', '${photos.length} photos'),
                 ],
@@ -97,21 +95,18 @@ class PgSummaryWidget extends StatelessWidget {
                   _buildSummaryRow('Total Floors', '${floors.length}'),
                   _buildSummaryRow('Total Rooms', '$totalRooms'),
                   _buildSummaryRow('Total Beds', '$totalBeds'),
+                  
                   if (floors.isNotEmpty) ...[
                     const SizedBox(height: AppSpacing.paddingM),
                     HeadingSmall(text: 'Floor Details:'),
                     const SizedBox(height: AppSpacing.paddingS),
                     ...floors.map((floor) {
-                      final floorRooms =
-                          rooms.where((r) => r.floorId == floor.id).toList();
-                      final floorBeds =
-                          beds.where((b) => b.floorId == floor.id).toList();
+                      final floorRooms = rooms.where((r) => r.floorId == floor.id).toList();
+                      final floorBeds = beds.where((b) => b.floorId == floor.id).toList();
                       return Padding(
-                        padding:
-                            const EdgeInsets.only(bottom: AppSpacing.paddingS),
+                        padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
                         child: BodyText(
-                          text:
-                              '${floor.floorName}: ${floorRooms.length} rooms, ${floorBeds.length} beds',
+                          text: '${floor.floorName}: ${floorRooms.length} rooms, ${floorBeds.length} beds',
                           color: Colors.grey[600],
                         ),
                       );
@@ -132,7 +127,7 @@ class PgSummaryWidget extends StatelessWidget {
                 children: [
                   HeadingMedium(text: '💰 Rent Configuration'),
                   const SizedBox(height: AppSpacing.paddingM),
-
+                  
                   // Rent per sharing type
                   ...rentControllers.entries.map((entry) {
                     final sharingType = entry.key;
@@ -142,29 +137,31 @@ class PgSummaryWidget extends StatelessWidget {
                       rent > 0 ? '₹${rent.toStringAsFixed(0)}/bed' : 'Not set',
                     );
                   }).toList(),
-
-                  _buildSummaryRow('Security Deposit',
-                      '₹${depositAmount.toStringAsFixed(0)}'),
-                  _buildSummaryRow('Maintenance',
-                      '$maintenanceType - ₹${maintenanceAmount.toStringAsFixed(0)}'),
-
+                  
+                  _buildSummaryRow('Security Deposit', '₹${depositAmount.toStringAsFixed(0)}'),
+                  _buildSummaryRow('Maintenance', '$maintenanceType - ₹${maintenanceAmount.toStringAsFixed(0)}'),
+                  
                   const SizedBox(height: AppSpacing.paddingM),
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.paddingM),
                     decoration: BoxDecoration(
                       color: theme.primaryColor.withOpacity(0.1),
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.borderRadiusM),
+                      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         BodyText(
                           text: 'Estimated Monthly Revenue:',
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         BodyText(
                           text: '₹${totalRent.toStringAsFixed(0)}',
-                          color: theme.primaryColor,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: theme.primaryColor,
+                            fontSize: 18,
+                          ),
                         ),
                       ],
                     ),
@@ -185,6 +182,7 @@ class PgSummaryWidget extends StatelessWidget {
                   HeadingMedium(text: '🧰 Amenities'),
                   const SizedBox(height: AppSpacing.paddingM),
                   _buildSummaryRow('Total Amenities', '${amenities.length}'),
+                  
                   if (amenities.isNotEmpty) ...[
                     const SizedBox(height: AppSpacing.paddingM),
                     BodyText(
@@ -213,12 +211,12 @@ class PgSummaryWidget extends StatelessWidget {
                 children: [
                   HeadingMedium(text: '✅ Final Review'),
                   const SizedBox(height: AppSpacing.paddingM),
+                  
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.paddingM),
                     decoration: BoxDecoration(
                       color: Colors.green[50],
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.borderRadiusM),
+                      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                       border: Border.all(color: Colors.green[200]!),
                     ),
                     child: Column(
@@ -228,15 +226,14 @@ class PgSummaryWidget extends StatelessWidget {
                             Icon(Icons.check_circle, color: Colors.green[600]),
                             const SizedBox(width: AppSpacing.paddingS),
                             BodyText(
-                              text:
-                                  'Ready to ${pgName.isEmpty ? 'create' : 'update'} your PG!',
+                              text: 'Ready to ${pgName.isEmpty ? 'create' : 'update'} your PG!',
+                              style: TextStyle(fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
                         const SizedBox(height: AppSpacing.paddingS),
                         BodyText(
-                          text:
-                              'Review all details above and click the button below to proceed.',
+                          text: 'Review all details above and click the button below to proceed.',
                           color: Colors.grey[600],
                         ),
                       ],
@@ -268,6 +265,7 @@ class PgSummaryWidget extends StatelessWidget {
           Expanded(
             child: BodyText(
               text: value,
+              style: TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
         ],

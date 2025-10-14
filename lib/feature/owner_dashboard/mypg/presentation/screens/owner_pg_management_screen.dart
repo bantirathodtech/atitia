@@ -19,14 +19,14 @@ import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../../shared/widgets/pg_selector_dropdown.dart';
 import '../../data/models/owner_pg_management_model.dart';
-import '../widgets/owner_bed_map_widget.dart';
-import '../widgets/owner_booking_request_list_widget.dart';
-import '../widgets/owner_occupancy_report_widget.dart';
-import '../widgets/owner_pg_info_card.dart';
-import '../widgets/owner_revenue_report_widget.dart';
-import '../widgets/owner_upcoming_vacating_widget.dart';
 import '../screens/new_pg_setup_screen.dart';
 import '../viewmodels/owner_pg_management_viewmodel.dart';
+import '../widgets/management/owner_bed_map_widget.dart';
+import '../widgets/management/owner_booking_request_list_widget.dart';
+import '../widgets/management/owner_occupancy_report_widget.dart';
+import '../widgets/management/owner_pg_info_card.dart';
+import '../widgets/management/owner_revenue_report_widget.dart';
+import '../widgets/management/owner_upcoming_vacating_widget.dart';
 
 class OwnerPgManagementScreen extends StatefulWidget {
   const OwnerPgManagementScreen({super.key});

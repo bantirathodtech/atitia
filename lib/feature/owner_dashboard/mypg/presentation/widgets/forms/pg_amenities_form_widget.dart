@@ -20,45 +20,14 @@ class PgAmenitiesFormWidget extends StatelessWidget {
   });
 
   static const List<String> _availableAmenities = [
-    'WiFi',
-    'Parking',
-    'Security',
-    'CCTV',
-    'Laundry',
-    'Kitchen',
-    'AC',
-    'Geyser',
-    'TV',
-    'Refrigerator',
-    'Power Backup',
-    'Gym',
-    'Curtains',
-    'Bucket',
-    'Water Cooler',
-    'Washing Machine',
-    'Microwave',
-    'Lift',
-    'Housekeeping',
-    'Attached Bathroom',
-    'RO Water',
-    '24x7 Water Supply',
-    'Bed with Mattress',
-    'Wardrobe',
-    'Study Table',
-    'Chair',
-    'Fan',
-    'Lighting',
-    'Balcony',
-    'Common Area',
-    'Dining Area',
-    'Induction Stove',
-    'Cooking Allowed',
-    'Fire Extinguisher',
-    'First Aid Kit',
-    'Smoke Detector',
-    'Visitor Parking',
-    'Intercom',
-    'Maintenance Staff'
+    'WiFi', 'Parking', 'Security', 'CCTV', 'Laundry', 'Kitchen', 'AC',
+    'Geyser', 'TV', 'Refrigerator', 'Power Backup', 'Gym', 'Curtains',
+    'Bucket', 'Water Cooler', 'Washing Machine', 'Microwave', 'Lift',
+    'Housekeeping', 'Attached Bathroom', 'RO Water', '24x7 Water Supply',
+    'Bed with Mattress', 'Wardrobe', 'Study Table', 'Chair', 'Fan',
+    'Lighting', 'Balcony', 'Common Area', 'Dining Area', 'Induction Stove',
+    'Cooking Allowed', 'Fire Extinguisher', 'First Aid Kit', 'Smoke Detector',
+    'Visitor Parking', 'Intercom', 'Maintenance Staff'
   ];
 
   @override
@@ -73,11 +42,13 @@ class PgAmenitiesFormWidget extends StatelessWidget {
           children: [
             HeadingMedium(text: '🧰 Amenities'),
             const SizedBox(height: AppSpacing.paddingM),
+            
             BodyText(
               text: 'Select all amenities available in your PG:',
               color: Colors.grey[600],
             ),
             const SizedBox(height: AppSpacing.paddingM),
+            
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -87,8 +58,7 @@ class PgAmenitiesFormWidget extends StatelessWidget {
                   label: Text(amenity),
                   selected: isSelected,
                   onSelected: (selected) {
-                    final updatedAmenities =
-                        List<String>.from(selectedAmenities);
+                    final updatedAmenities = List<String>.from(selectedAmenities);
                     if (selected) {
                       updatedAmenities.add(amenity);
                     } else {
@@ -99,13 +69,12 @@ class PgAmenitiesFormWidget extends StatelessWidget {
                   selectedColor: theme.primaryColor.withOpacity(0.2),
                   checkmarkColor: theme.primaryColor,
                   labelStyle: TextStyle(
-                    color: isSelected
-                        ? theme.primaryColor
-                        : theme.textTheme.bodyLarge?.color,
+                    color: isSelected ? theme.primaryColor : theme.textTheme.bodyLarge?.color,
                   ),
                 );
               }).toList(),
             ),
+            
             if (selectedAmenities.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.paddingM),
               Container(
@@ -119,6 +88,7 @@ class PgAmenitiesFormWidget extends StatelessWidget {
                   children: [
                     BodyText(
                       text: 'Selected Amenities (${selectedAmenities.length}):',
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: AppSpacing.paddingS),
                     BodyText(
