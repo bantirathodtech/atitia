@@ -195,10 +195,10 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                   isScrollable: true,
                   tabs: const [
                     Tab(text: 'Basic Info', icon: Icon(Icons.info_outline)),
+                    Tab(text: 'Rent Config', icon: Icon(Icons.attach_money)),
                     Tab(
                         text: 'Floor Structure',
                         icon: Icon(Icons.home_work_outlined)),
-                    Tab(text: 'Rent Config', icon: Icon(Icons.attach_money)),
                     Tab(text: 'Amenities', icon: Icon(Icons.room_service)),
                     Tab(text: 'Photos', icon: Icon(Icons.photo_library)),
                     Tab(text: 'Summary', icon: Icon(Icons.preview)),
@@ -214,8 +214,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                     controller: _tabController,
                     children: [
                       _buildBasicInfoTab(),
-                      _buildFloorStructureTab(),
                       _buildRentConfigTab(),
+                      _buildFloorStructureTab(),
                       _buildAmenitiesTab(),
                       _buildPhotosTab(),
                       _buildSummaryTab(),
