@@ -47,25 +47,40 @@ class _PgFloorStructureFormWidgetState
   }
 
   void _generateFloorStructure() {
-    final int totalFloors = int.tryParse(_totalFloorsController.text) ?? 0;
-    if (totalFloors <= 0) return;
+    final int inputFloors = int.tryParse(_totalFloorsController.text) ?? 0;
+    if (inputFloors <= 0) return;
 
     final List<OwnerFloor> newFloors = [];
     final List<OwnerRoom> newRooms = [];
     final List<OwnerBed> newBeds = [];
 
-    for (int i = 0; i < totalFloors; i++) {
-      final floorId = 'floor_${DateTime.now().millisecondsSinceEpoch}';
-      final floorName = i == 0 ? 'Ground Floor' : 'Floor $i';
+    // Always start with Ground Floor
+    newFloors.add(OwnerFloor(
+      id: 'floor_${DateTime.now().millisecondsSinceEpoch}_0',
+      floorName: 'Ground Floor',
+      floorNumber: 0,
+      totalRooms: 0,
+    ));
 
-      final floor = OwnerFloor(
-        id: floorId,
-        floorName: floorName,
+    // Add regular floors based on input
+    // Input "1 floor" = Ground + Floor 1 + Terrace
+    // Input "2 floors" = Ground + Floor 1 + Floor 2 + Terrace
+    for (int i = 1; i <= inputFloors; i++) {
+      newFloors.add(OwnerFloor(
+        id: 'floor_${DateTime.now().millisecondsSinceEpoch}_$i',
+        floorName: 'Floor $i',
         floorNumber: i,
-        totalRooms: 0, // Will be updated when rooms are added
-      );
-      newFloors.add(floor);
+        totalRooms: 0,
+      ));
     }
+
+    // Always end with Terrace
+    newFloors.add(OwnerFloor(
+      id: 'floor_${DateTime.now().millisecondsSinceEpoch}_${inputFloors + 1}',
+      floorName: 'Terrace',
+      floorNumber: inputFloors + 1,
+      totalRooms: 0,
+    ));
 
     widget.onFloorsChanged(newFloors);
     widget.onRoomsChanged(newRooms);
@@ -74,8 +89,13 @@ class _PgFloorStructureFormWidgetState
 
   void _addRoomToFloor(OwnerFloor floor) {
     final roomId = 'room_${DateTime.now().millisecondsSinceEpoch}';
-    final roomNumber =
-        '${floor.floorNumber == 0 ? 'G' : floor.floorNumber}${(widget.rooms.where((r) => r.floorId == floor.id).length + 1).toString().padLeft(2, '0')}';
+
+    // Get existing rooms for this specific floor only
+    final existingRoomsForFloor =
+        widget.rooms.where((r) => r.floorId == floor.id).length;
+    final roomNumber = _generateRoomNumber(floor, existingRoomsForFloor + 1);
+
+    // Add room to specific floor only
 
     final room = OwnerRoom(
       id: roomId,
@@ -92,6 +112,20 @@ class _PgFloorStructureFormWidgetState
     _generateBedsForRoom(room);
   }
 
+  String _generateRoomNumber(OwnerFloor floor, int roomIndex) {
+    if (floor.floorNumber == 0) {
+      // Ground Floor: G001, G002, G003...
+      return 'G${roomIndex.toString().padLeft(3, '0')}';
+    } else if (floor.floorName == 'Terrace') {
+      // Terrace: T001, T002, T003...
+      return 'T${roomIndex.toString().padLeft(3, '0')}';
+    } else {
+      // Regular Floors: F101, F102, F103... (F = Floor)
+      return 'F${floor.floorNumber}${roomIndex.toString().padLeft(2, '0')}';
+    }
+  }
+
+
   void _generateBedsForRoom(OwnerRoom room) {
     final newBeds = <OwnerBed>[];
 
@@ -100,7 +134,7 @@ class _PgFloorStructureFormWidgetState
         id: 'bed_${DateTime.now().millisecondsSinceEpoch}_$i',
         roomId: room.id,
         floorId: room.floorId,
-        bedNumber: 'Bed $i',
+        bedNumber: 'Bed $i', // Bed 1, Bed 2, Bed 3...
         status: 'vacant',
       );
       newBeds.add(bed);
@@ -174,8 +208,8 @@ class _PgFloorStructureFormWidgetState
                       child: TextField(
                         controller: _totalFloorsController,
                         decoration: const InputDecoration(
-                          labelText: 'Total Floors',
-                          hintText: 'e.g., 3',
+                          labelText: 'Number of Regular Floors',
+                          hintText: 'e.g., 1',
                           border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
@@ -189,6 +223,7 @@ class _PgFloorStructureFormWidgetState
                     ),
                   ],
                 ),
+                const SizedBox(height: AppSpacing.paddingS),
               ],
             ),
           ),
@@ -211,7 +246,21 @@ class _PgFloorStructureFormWidgetState
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          HeadingSmall(text: floor.floorName),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                HeadingSmall(text: floor.floorName),
+                                const SizedBox(height: 4),
+                                BodyText(
+                                  text:
+                                      '${floorRooms.length} rooms • ${floorRooms.fold(0, (sum, room) => sum + room.capacity)} beds',
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(height: 2),
+                              ],
+                            ),
+                          ),
                           PrimaryButton(
                             onPressed: () => _addRoomToFloor(floor),
                             label: 'Add Room',

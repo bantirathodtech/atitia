@@ -167,13 +167,16 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AdaptiveAppBar(
         title: isEditMode ? 'Edit PG' : 'New PG Setup',
         showThemeToggle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.save),
+            icon: Icon(
+              isEditMode ? Icons.save : Icons.add_business,
+            ),
             onPressed: _submitForm,
             tooltip: isEditMode ? 'Update PG' : 'Create PG',
           ),
@@ -187,23 +190,19 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
           return Column(
             children: [
-              // Tab Bar
-              Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  tabs: const [
-                    Tab(text: 'Basic Info', icon: Icon(Icons.info_outline)),
-                    Tab(text: 'Rent Config', icon: Icon(Icons.attach_money)),
-                    Tab(
-                        text: 'Floor Structure',
-                        icon: Icon(Icons.home_work_outlined)),
-                    Tab(text: 'Amenities', icon: Icon(Icons.room_service)),
-                    Tab(text: 'Photos', icon: Icon(Icons.photo_library)),
-                    Tab(text: 'Summary', icon: Icon(Icons.preview)),
-                  ],
-                ),
+              TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                tabs: const [
+                  Tab(text: 'Basic Info', icon: Icon(Icons.info_outline)),
+                  Tab(text: 'Rent Config', icon: Icon(Icons.attach_money)),
+                  Tab(
+                      text: 'Floor Structure',
+                      icon: Icon(Icons.home_work_outlined)),
+                  Tab(text: 'Amenities', icon: Icon(Icons.room_service)),
+                  Tab(text: 'Photos', icon: Icon(Icons.photo_library)),
+                  Tab(text: 'Summary', icon: Icon(Icons.preview)),
+                ],
               ),
 
               // Tab Content
@@ -316,13 +315,12 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         floors: _floors,
         rooms: _rooms,
         beds: _beds,
-        amenities: _selectedAmenities,
-        photos: _uploadedPhotos,
         rentControllers: _rentControllers,
         depositAmount: double.tryParse(_depositController.text) ?? 0.0,
         maintenanceType: _maintenanceType,
-        maintenanceAmount:
-            double.tryParse(_maintenanceAmountController.text) ?? 0.0,
+        maintenanceAmount: double.tryParse(_maintenanceAmountController.text) ?? 0.0,
+        selectedAmenities: _selectedAmenities,
+        uploadedPhotos: _uploadedPhotos,
       ),
     );
   }
