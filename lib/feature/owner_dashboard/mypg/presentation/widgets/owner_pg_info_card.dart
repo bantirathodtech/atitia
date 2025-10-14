@@ -10,7 +10,7 @@ import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../guest_dashboard/pgs/data/models/guest_pg_model.dart';
-import '../screens/owner_pg_edit_screen.dart';
+import '../screens/new_pg_setup_screen.dart';
 
 /// Displays selected PG's complete information card
 /// Shows PG name, address, contact, floors/rooms/beds structure, amenities
@@ -441,7 +441,7 @@ class OwnerPgInfoCard extends StatelessWidget {
   void _editPG(BuildContext context, String pgId) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => OwnerPgEditScreen(pgId: pgId),
+        builder: (_) => NewPgSetupScreen(pgId: pgId),
       ),
     );
   }

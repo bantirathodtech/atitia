@@ -25,8 +25,14 @@ import '../viewmodels/owner_pg_management_viewmodel.dart';
 /// - Smart rent calculation and deposit logic
 /// - Comprehensive amenities selection
 /// - Validation and preview before creation
+/// - Handles both CREATE and EDIT modes
 class NewPgSetupScreen extends StatefulWidget {
-  const NewPgSetupScreen({super.key});
+  final String? pgId; // null for create, non-null for edit
+  
+  const NewPgSetupScreen({
+    super.key,
+    this.pgId,
+  });
 
   @override
   State<NewPgSetupScreen> createState() => _NewPgSetupScreenState();
@@ -51,12 +57,45 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
 
   // Amenities
   final List<String> _availableAmenities = [
-    'WiFi', 'Parking', 'Security', 'CCTV', 'Laundry', 'Kitchen', 'AC', 'Geyser',
-    'TV', 'Refrigerator', 'Power Backup', 'Gym', 'Curtains', 'Bucket', 'Water Cooler',
-    'Washing Machine', 'Microwave', 'Lift', 'Housekeeping', 'Attached Bathroom', 'RO Water',
-    '24x7 Water Supply', 'Bed with Mattress', 'Wardrobe', 'Study Table', 'Chair', 'Fan',
-    'Lighting', 'Balcony', 'Common Area', 'Dining Area', 'Induction Stove', 'Cooking Allowed',
-    'Fire Extinguisher', 'First Aid Kit', 'Smoke Detector', 'Visitor Parking', 'Intercom', 'Maintenance Staff'
+    'WiFi',
+    'Parking',
+    'Security',
+    'CCTV',
+    'Laundry',
+    'Kitchen',
+    'AC',
+    'Geyser',
+    'TV',
+    'Refrigerator',
+    'Power Backup',
+    'Gym',
+    'Curtains',
+    'Bucket',
+    'Water Cooler',
+    'Washing Machine',
+    'Microwave',
+    'Lift',
+    'Housekeeping',
+    'Attached Bathroom',
+    'RO Water',
+    '24x7 Water Supply',
+    'Bed with Mattress',
+    'Wardrobe',
+    'Study Table',
+    'Chair',
+    'Fan',
+    'Lighting',
+    'Balcony',
+    'Common Area',
+    'Dining Area',
+    'Induction Stove',
+    'Cooking Allowed',
+    'Fire Extinguisher',
+    'First Aid Kit',
+    'Smoke Detector',
+    'Visitor Parking',
+    'Intercom',
+    'Maintenance Staff'
   ];
   final List<String> _selectedAmenities = [];
 
@@ -86,10 +125,17 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
   double _totalDeposit = 0.0;
   double _totalMaintenance = 0.0;
 
+  // Mode detection
+  bool get isEditMode => widget.pgId != null;
+
   @override
   void initState() {
     super.initState();
-    _generateStructure();
+    if (isEditMode) {
+      _loadPgDetailsForEdit();
+    } else {
+      _generateStructure();
+    }
   }
 
   @override
@@ -113,16 +159,16 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
 
   void _generateStructure() {
     _generatedFloors.clear();
-    
+
     for (int floor = 0; floor < _totalFloors; floor++) {
       final floorName = floor == 0 ? 'Ground Floor' : 'Floor $floor';
       final floorPrefix = floor == 0 ? 'G' : floor.toString();
-      
+
       final rooms = <RoomData>[];
       for (int room = 1; room <= _roomsPerFloor; room++) {
         final roomNumber = '${floorPrefix}${room.toString().padLeft(2, '0')}';
         final sharingCount = int.parse(_sharingType.split('-')[0]);
-        
+
         final beds = <BedData>[];
         for (int bed = 1; bed <= sharingCount; bed++) {
           beds.add(BedData(
@@ -131,7 +177,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
             status: 'vacant',
           ));
         }
-        
+
         final rentPerBed = _getRentForSharingType(sharingCount);
         rooms.add(RoomData(
           roomNumber: roomNumber,
@@ -141,26 +187,32 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
           totalRent: rentPerBed * sharingCount,
         ));
       }
-      
+
       _generatedFloors.add(FloorData(
         floorNumber: floor,
         floorName: floorName,
         rooms: rooms,
       ));
     }
-    
+
     _calculateTotals();
     setState(() {});
   }
 
   double _getRentForSharingType(int sharingCount) {
     switch (sharingCount) {
-      case 1: return double.tryParse(_oneShareRentController.text) ?? 0.0;
-      case 2: return double.tryParse(_twoShareRentController.text) ?? 0.0;
-      case 3: return double.tryParse(_threeShareRentController.text) ?? 0.0;
-      case 4: return double.tryParse(_fourShareRentController.text) ?? 0.0;
-      case 5: return double.tryParse(_fiveShareRentController.text) ?? 0.0;
-      default: return 0.0;
+      case 1:
+        return double.tryParse(_oneShareRentController.text) ?? 0.0;
+      case 2:
+        return double.tryParse(_twoShareRentController.text) ?? 0.0;
+      case 3:
+        return double.tryParse(_threeShareRentController.text) ?? 0.0;
+      case 4:
+        return double.tryParse(_fourShareRentController.text) ?? 0.0;
+      case 5:
+        return double.tryParse(_fiveShareRentController.text) ?? 0.0;
+      default:
+        return 0.0;
     }
   }
 
@@ -168,22 +220,118 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
     _totalRent = 0.0;
     _totalDeposit = 0.0;
     _totalMaintenance = 0.0;
-    
+
     for (final floor in _generatedFloors) {
       for (final room in floor.rooms) {
         _totalRent += room.totalRent;
       }
     }
-    
+
     _totalDeposit = double.tryParse(_depositController.text) ?? 0.0;
-    _totalMaintenance = double.tryParse(_maintenanceAmountController.text) ?? 0.0;
+    _totalMaintenance =
+        double.tryParse(_maintenanceAmountController.text) ?? 0.0;
+  }
+
+  Future<void> _loadPgDetailsForEdit() async {
+    if (widget.pgId == null) return;
+    
+    final vm = context.read<OwnerPgManagementViewModel>();
+    await vm.initialize(widget.pgId!);
+    
+    if (vm.pgDetails != null) {
+      final pg = vm.pgDetails!;
+      
+      // Load basic details
+      _pgNameController.text = pg['pgName'] ?? '';
+      _addressController.text = pg['address'] ?? '';
+      _mapLinkController.text = pg['mapLink'] ?? '';
+      _contactController.text = pg['contactNumber'] ?? '';
+      _ownerNumberController.text = pg['ownerNumber'] ?? '';
+      _descriptionController.text = pg['description'] ?? '';
+      _selectedState = pg['state'];
+      _selectedCity = pg['city'];
+      
+      // Load amenities
+      _selectedAmenities.clear();
+      if (pg['amenities'] != null) {
+        _selectedAmenities.addAll(List<String>.from(pg['amenities']));
+      }
+      
+      // Load photos
+      _uploadedPhotos.clear();
+      if (pg['photos'] != null) {
+        _uploadedPhotos.addAll(List<String>.from(pg['photos']));
+      }
+      
+      // Load rent configuration
+      if (pg['rentConfiguration'] != null) {
+        final rentConfig = pg['rentConfiguration'];
+        _oneShareRentController.text = (rentConfig['oneShare'] ?? 0).toString();
+        _twoShareRentController.text = (rentConfig['twoShare'] ?? 0).toString();
+        _threeShareRentController.text = (rentConfig['threeShare'] ?? 0).toString();
+        _fourShareRentController.text = (rentConfig['fourShare'] ?? 0).toString();
+        _fiveShareRentController.text = (rentConfig['fiveShare'] ?? 0).toString();
+      }
+      
+      _depositController.text = (pg['deposit'] ?? 0).toString();
+      _maintenanceType = pg['maintenanceType'] ?? 'one-time';
+      _maintenanceAmountController.text = (pg['maintenanceAmount'] ?? 0).toString();
+      
+      // Load floor structure
+      if (pg['floorStructure'] != null) {
+        _parseFloorStructureFromPG(pg['floorStructure']);
+      }
+      
+      setState(() {});
+    }
+  }
+
+  void _parseFloorStructureFromPG(List<dynamic> floorStructure) {
+    _generatedFloors.clear();
+    
+    for (final floorData in floorStructure) {
+      final floorNumber = floorData['floorNumber'] ?? 0;
+      final floorName = floorData['floorName'] ?? 'Floor $floorNumber';
+      
+      final rooms = <RoomData>[];
+      for (final roomData in floorData['rooms'] ?? []) {
+        final roomNumber = roomData['roomNumber'] ?? '';
+        final sharingType = roomData['sharingType'] ?? '3-share';
+        final rentPerBed = (roomData['pricePerBed'] ?? 0).toDouble();
+        
+        final beds = <BedData>[];
+        for (final bedData in roomData['beds'] ?? []) {
+          beds.add(BedData(
+            bedNumber: bedData['bedNumber'] ?? 1,
+            bedId: bedData['bedId'] ?? '',
+            status: bedData['status'] ?? 'vacant',
+          ));
+        }
+        
+        rooms.add(RoomData(
+          roomNumber: roomNumber,
+          sharingType: sharingType,
+          beds: beds,
+          rentPerBed: rentPerBed,
+          totalRent: rentPerBed * beds.length,
+        ));
+      }
+      
+      _generatedFloors.add(FloorData(
+        floorNumber: floorNumber,
+        floorName: floorName,
+        rooms: rooms,
+      ));
+    }
+    
+    _calculateTotals();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'New PG Setup',
+        title: isEditMode ? 'Edit PG' : 'New PG Setup',
         showThemeToggle: true,
       ),
       body: Form(
@@ -223,14 +371,14 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
           children: [
             HeadingMedium(text: '🏠 PG Details'),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             TextInput(
               controller: _pgNameController,
               label: 'PG Name',
               hint: 'e.g., Green Meadows PG',
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             TextInput(
               controller: _addressController,
               label: 'Complete Address',
@@ -238,14 +386,14 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
               maxLines: 3,
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             TextInput(
               controller: _mapLinkController,
               label: 'Google Map Link',
               hint: 'Paste Google Maps share link',
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             Row(
               children: [
                 Expanded(
@@ -268,7 +416,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // State Dropdown
             DropdownButtonFormField<String>(
               value: _selectedState,
@@ -283,13 +431,14 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
                 setState(() {
                   _selectedState = value;
                   _selectedCity = null;
-                  _availableCities = IndianStatesCities.getCitiesForState(value ?? '');
+                  _availableCities =
+                      IndianStatesCities.getCitiesForState(value ?? '');
                 });
               },
               validator: (value) => value == null ? 'State is required' : null,
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // City Dropdown
             DropdownButtonFormField<String>(
               value: _selectedCity,
@@ -308,7 +457,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
               validator: (value) => value == null ? 'City is required' : null,
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             TextInput(
               controller: _descriptionController,
               label: 'Description',
@@ -330,13 +479,14 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
           children: [
             HeadingMedium(text: '💰 Rent Configuration'),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // Sharing Type Selection
             HeadingSmall(text: 'Sharing Type'),
             const SizedBox(height: AppSpacing.paddingS),
             Wrap(
               spacing: 8,
-              children: ['1-share', '2-share', '3-share', '4-share', '5-share'].map((type) {
+              children: ['1-share', '2-share', '3-share', '4-share', '5-share']
+                  .map((type) {
                 return ChoiceChip(
                   label: Text(type),
                   selected: _sharingType == type,
@@ -352,7 +502,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
               }).toList(),
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // Rent per sharing type
             HeadingSmall(text: 'Rent per Bed (₹)'),
             const SizedBox(height: AppSpacing.paddingS),
@@ -428,7 +578,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
+
             // Maintenance Type
             HeadingSmall(text: 'Maintenance Charges'),
             const SizedBox(height: AppSpacing.paddingS),
@@ -482,7 +632,6 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
           children: [
             HeadingMedium(text: '🏢 Floor & Room Configuration'),
             const SizedBox(height: AppSpacing.paddingM),
-            
             Row(
               children: [
                 Expanded(
@@ -496,7 +645,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                         ),
-                        items: List.generate(10, (index) => index + 1).map((floor) {
+                        items: List.generate(10, (index) => index + 1)
+                            .map((floor) {
                           return DropdownMenuItem(
                             value: floor,
                             child: Text('$floor Floor${floor > 1 ? 's' : ''}'),
@@ -524,7 +674,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                         ),
-                        items: List.generate(20, (index) => index + 1).map((room) {
+                        items:
+                            List.generate(20, (index) => index + 1).map((room) {
                           return DropdownMenuItem(
                             value: room,
                             child: Text('$room Room${room > 1 ? 's' : ''}'),
@@ -543,7 +694,6 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingM),
               decoration: BoxDecoration(
@@ -557,12 +707,14 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
                   HeadingSmall(text: 'Auto-Generation Preview'),
                   const SizedBox(height: AppSpacing.paddingS),
                   BodyText(
-                    text: 'Floors: ${_totalFloors} | Rooms per floor: $_roomsPerFloor | Sharing: $_sharingType',
+                    text:
+                        'Floors: ${_totalFloors} | Rooms per floor: $_roomsPerFloor | Sharing: $_sharingType',
                     color: AppColors.info,
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
                   BodyText(
-                    text: 'Total Rooms: ${_totalFloors * _roomsPerFloor} | Total Beds: ${_totalFloors * _roomsPerFloor * int.parse(_sharingType.split('-')[0])}',
+                    text:
+                        'Total Rooms: ${_totalFloors * _roomsPerFloor} | Total Beds: ${_totalFloors * _roomsPerFloor * int.parse(_sharingType.split('-')[0])}',
                     color: AppColors.info,
                   ),
                 ],
@@ -700,17 +852,21 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
                     const SizedBox(height: AppSpacing.paddingS),
                     ...floor.rooms.map((room) {
                       return Padding(
-                        padding: const EdgeInsets.only(left: AppSpacing.paddingM),
+                        padding:
+                            const EdgeInsets.only(left: AppSpacing.paddingM),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             BodyText(
-                              text: 'Room ${room.roomNumber} (${room.sharingType}) - ₹${room.totalRent.toStringAsFixed(0)}/month',
+                              text:
+                                  'Room ${room.roomNumber} (${room.sharingType}) - ₹${room.totalRent.toStringAsFixed(0)}/month',
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: AppSpacing.paddingM),
+                              padding: const EdgeInsets.only(
+                                  left: AppSpacing.paddingM),
                               child: BodyText(
-                                text: 'Beds: ${room.beds.map((b) => 'Bed ${b.bedNumber}').join(', ')}',
+                                text:
+                                    'Beds: ${room.beds.map((b) => 'Bed ${b.bedNumber}').join(', ')}',
                                 color: AppColors.textSecondary,
                               ),
                             ),
@@ -737,7 +893,6 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
           children: [
             HeadingMedium(text: '💰 Financial Summary'),
             const SizedBox(height: AppSpacing.paddingM),
-            
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -749,7 +904,6 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
               ],
             ),
             const SizedBox(height: AppSpacing.paddingS),
-            
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -761,7 +915,6 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
               ],
             ),
             const SizedBox(height: AppSpacing.paddingS),
-            
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -773,19 +926,18 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
               ],
             ),
             const Divider(),
-            
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 HeadingSmall(text: 'Total Setup Value:'),
                 HeadingSmall(
-                  text: '₹${(_totalRent + _totalDeposit + _totalMaintenance).toStringAsFixed(0)}',
+                  text:
+                      '₹${(_totalRent + _totalDeposit + _totalMaintenance).toStringAsFixed(0)}',
                   color: AppColors.primary,
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingM),
               decoration: BoxDecoration(
@@ -814,8 +966,10 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
       builder: (context, vm, _) {
         return PrimaryButton(
           onPressed: vm.loading ? null : _submitForm,
-          label: vm.loading ? 'Creating PG...' : 'Create PG',
-          icon: Icons.add_business,
+          label: vm.loading 
+              ? (isEditMode ? 'Updating PG...' : 'Creating PG...')
+              : (isEditMode ? 'Update PG' : 'Create PG'),
+          icon: isEditMode ? Icons.save : Icons.add_business,
         );
       },
     );
@@ -824,7 +978,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
   Future<void> _addPhoto() async {
     try {
       // TODO: Implement image picker and upload
-      final imageUrl = 'https://via.placeholder.com/300x200?text=PG+Photo+${_uploadedPhotos.length + 1}';
+      final imageUrl =
+          'https://via.placeholder.com/300x200?text=PG+Photo+${_uploadedPhotos.length + 1}';
       setState(() {
         _uploadedPhotos.add(imageUrl);
       });
@@ -899,25 +1054,40 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen> {
       'maintenanceType': _maintenanceType,
       'maintenanceAmount': _totalMaintenance,
       'totalRent': _totalRent,
-      'totalBeds': _generatedFloors.fold(0, (sum, floor) => sum + floor.rooms.fold(0, (roomSum, room) => roomSum + room.beds.length)),
-      'totalRooms': _generatedFloors.fold(0, (sum, floor) => sum + floor.rooms.length),
+      'totalBeds': _generatedFloors.fold(
+          0,
+          (sum, floor) =>
+              sum +
+              floor.rooms
+                  .fold(0, (roomSum, room) => roomSum + room.beds.length)),
+      'totalRooms':
+          _generatedFloors.fold(0, (sum, floor) => sum + floor.rooms.length),
       'ownerUid': ownerId,
       'createdAt': DateTime.now(),
       'updatedAt': DateTime.now(),
     };
 
-    final success = await vm.createOrUpdatePG(pgData);
+    bool success;
+    if (isEditMode) {
+      success = await vm.updatePGDetails(widget.pgId!, pgData);
+    } else {
+      success = await vm.createOrUpdatePG(pgData);
+    }
 
     if (!mounted) return;
 
     if (success) {
       Navigator.of(context).pop(true);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('PG created successfully!')),
+        SnackBar(
+          content: Text(isEditMode ? 'PG updated successfully!' : 'PG created successfully!'),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(vm.errorMessage ?? 'Failed to create PG')),
+        SnackBar(
+          content: Text(vm.errorMessage ?? (isEditMode ? 'Failed to update PG' : 'Failed to create PG')),
+        ),
       );
     }
   }
