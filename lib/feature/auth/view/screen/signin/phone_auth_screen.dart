@@ -177,7 +177,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       if (!mounted) return;
 
       final navigation = getIt<NavigationService>();
-      
+
       if (!isExistingUser) {
         // New user - navigate to registration
         navigation.goToRegistration();
@@ -232,12 +232,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   /// Handles Google sign-in
   Future<void> _handleGoogleSignIn() async {
     setState(() => _loading = true);
-    
+
     try {
       await context.read<AuthProvider>().signInWithGoogle();
-      
+
       if (!mounted) return;
-      
+
       // Navigation is handled in AuthProvider.signInWithGoogle()
     } catch (e) {
       if (mounted) {
@@ -277,7 +277,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppSpacing.xl),
-              
+
               // Header icon
               Icon(
                 Icons.phone_android,
@@ -285,23 +285,23 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 color: Theme.of(context).primaryColor,
               ),
               const SizedBox(height: AppSpacing.lg),
-              
+
               // Title
               HeadingLarge(
                 text: role != null ? 'Login as ${role.toUpperCase()}' : 'Login',
                 align: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
-              
+
               // Subtitle
               const CaptionText(
                 text: 'Enter your phone number to receive OTP',
                 align: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
-              
+
               // Phone input field - Disabled on macOS and Web
-              if (!kIsWeb && !kIsWeb && !Platform.isMacOS) ...[
+              if (!kIsWeb && !Platform.isMacOS) ...[
                 TextInput(
                   controller: _phoneController,
                   label: loc.phoneNumber,
@@ -355,7 +355,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   ),
                 ),
               ],
-              
+
               // OTP input field (shown after OTP is sent) - Not available on macOS
               if (_otpSent && !kIsWeb && !Platform.isMacOS) ...[
                 const SizedBox(height: AppSpacing.lg),
@@ -379,9 +379,9 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   align: TextAlign.center,
                 ),
               ],
-              
+
               const SizedBox(height: AppSpacing.xl),
-              
+
               // Action button (Send OTP / Verify) - Not available on macOS
               if (!kIsWeb && !Platform.isMacOS) ...[
                 PrimaryButton(
@@ -394,7 +394,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   isLoading: _loading,
                 ),
               ],
-              
+
               // Change number option - Not available on macOS
               if (_otpSent && !kIsWeb && !Platform.isMacOS) ...[
                 const SizedBox(height: AppSpacing.md),
@@ -412,16 +412,17 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   icon: Icons.edit,
                 ),
               ],
-              
+
               const SizedBox(height: AppSpacing.lg),
-              
+
               // Divider - Only show when both methods are available
               if (!kIsWeb && !Platform.isMacOS) ...[
                 Row(
                   children: [
                     const Expanded(child: Divider()),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                       child: CaptionText(
                         text: 'OR',
                         color: Colors.grey.shade600,
@@ -432,19 +433,22 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
               ],
-              
+
               // Google sign-in - Prominent for macOS (not web)
               if (!kIsWeb && Platform.isMacOS) ...[
                 const SizedBox(height: AppSpacing.md),
                 const CaptionText(
-                  text: 'Phone OTP is not available on macOS. Please use Google Sign-In:',
+                  text:
+                      'Phone OTP is not available on macOS. Please use Google Sign-In:',
                   align: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.sm),
               ],
               PrimaryButton(
                 onPressed: _loading ? null : _signInWithGoogle,
-                label: (!kIsWeb && Platform.isMacOS) ? 'Sign in with Google (Recommended)' : 'Continue with Google',
+                label: (!kIsWeb && Platform.isMacOS)
+                    ? 'Sign in with Google (Recommended)'
+                    : 'Continue with Google',
                 icon: Icons.g_mobiledata,
               ),
             ],

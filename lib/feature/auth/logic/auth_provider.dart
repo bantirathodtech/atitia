@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../common/lifecycle/state/provider_state.dart';
 import '../../../common/utils/constants/firestore.dart';
@@ -373,8 +374,8 @@ class AuthProvider extends BaseProviderState {
         parameters: {'phone_number': fullPhoneNumber},
       );
 
-      // Check if running on macOS - phone OTP is not supported
-      if (Platform.isMacOS) {
+      // Check if running on macOS or Web - phone OTP is not supported
+      if (!kIsWeb && Platform.isMacOS) {
         await _analyticsService.logEvent(
           name: 'auth_send_otp_error',
           parameters: {'phone_number': fullPhoneNumber, 'error': 'Phone OTP not supported on macOS'},

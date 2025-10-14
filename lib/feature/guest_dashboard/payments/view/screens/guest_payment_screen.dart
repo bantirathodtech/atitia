@@ -14,11 +14,8 @@ import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
-import '../../../../../common/widgets/buttons/secondary_button.dart';
-import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
-import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/viewmodels/payment_notification_viewmodel.dart';
 import '../../../../../core/repositories/owner_payment_details_repository.dart';
 import '../../../../../core/models/owner_payment_details_model.dart';
@@ -101,8 +98,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
             child: Column(
               children: [
                 _buildTabBar(context, isDarkMode),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height - 300,
+                Expanded(
                   child: TabBarView(
                     controller: _tabController,
                     children: [
