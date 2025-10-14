@@ -42,7 +42,8 @@ class OwnerPgManagementRepository {
   Future<String> createPG(Map<String, dynamic> pgData) async {
     try {
       // Generate a new document ID
-      final String pgId = _firestore.collection(FirestoreConstants.pgs).doc().id;
+      final String pgId =
+          _firestore.collection(FirestoreConstants.pgs).doc().id;
 
       final now = DateTime.now();
       final dataWithMeta = {
