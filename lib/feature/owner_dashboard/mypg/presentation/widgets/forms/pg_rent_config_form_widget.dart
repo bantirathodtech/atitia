@@ -31,13 +31,13 @@ class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
       children: [
         HeadingMedium(text: 'Rent Configuration'),
         const SizedBox(height: AppSpacing.paddingL),
-        
+
         // Rent for different sharing types
         ...rentControllers.entries.map((entry) {
           final sharingType = entry.key;
           final controller = entry.value;
           final displayName = sharingType.replaceAll('-', ' ').toUpperCase();
-          
+
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
             child: TextInput(
@@ -48,9 +48,9 @@ class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
             ),
           );
         }).toList(),
-        
+
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Security Deposit
         TextInput(
           controller: depositController,
@@ -59,7 +59,7 @@ class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Maintenance Type
         AdaptiveDropdown<String>(
           label: 'Maintenance Type',
@@ -77,7 +77,7 @@ class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
           },
         ),
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Maintenance Amount
         TextInput(
           controller: maintenanceAmountController,
@@ -86,7 +86,7 @@ class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: AppSpacing.paddingL),
-        
+
         // Deposit Refund Policy
         BodyText(
           text: 'Deposit Refund Policy:',

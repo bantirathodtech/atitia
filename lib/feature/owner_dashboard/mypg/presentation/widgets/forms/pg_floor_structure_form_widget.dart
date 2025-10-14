@@ -125,7 +125,6 @@ class _PgFloorStructureFormWidgetState
     }
   }
 
-
   void _generateBedsForRoom(OwnerRoom room) {
     final newBeds = <OwnerBed>[];
 

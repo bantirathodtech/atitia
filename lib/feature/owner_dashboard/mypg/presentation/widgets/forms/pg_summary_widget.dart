@@ -50,20 +50,22 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
       children: [
         HeadingMedium(text: 'PG Summary'),
         const SizedBox(height: AppSpacing.paddingL),
-        
+
         // Basic Information
         _buildSummaryCard(
           context,
           'Basic Information',
           [
-            _buildSummaryRow('PG Name', pgName.isNotEmpty ? pgName : 'Not specified'),
-            _buildSummaryRow('Address', address.isNotEmpty ? address : 'Not specified'),
+            _buildSummaryRow(
+                'PG Name', pgName.isNotEmpty ? pgName : 'Not specified'),
+            _buildSummaryRow(
+                'Address', address.isNotEmpty ? address : 'Not specified'),
             _buildSummaryRow('Location', '$city, $state'),
           ],
         ),
-        
+
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Floor Structure
         _buildSummaryCard(
           context,
@@ -74,35 +76,39 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
             _buildSummaryRow('Total Beds', '${beds.length}'),
           ],
         ),
-        
+
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Rent Information
         _buildSummaryCard(
           context,
           'Rent Information',
           [
-            _buildSummaryRow('Estimated Monthly Revenue', '₹${totalRent.toStringAsFixed(0)}'),
-            _buildSummaryRow('Security Deposit', '₹${depositAmount.toStringAsFixed(0)}'),
-            _buildSummaryRow('Maintenance', '$maintenanceType - ₹${maintenanceAmount.toStringAsFixed(0)}'),
+            _buildSummaryRow('Estimated Monthly Revenue',
+                '₹${totalRent.toStringAsFixed(0)}'),
+            _buildSummaryRow(
+                'Security Deposit', '₹${depositAmount.toStringAsFixed(0)}'),
+            _buildSummaryRow('Maintenance',
+                '$maintenanceType - ₹${maintenanceAmount.toStringAsFixed(0)}'),
           ],
         ),
-        
+
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Amenities
         _buildSummaryCard(
           context,
           'Amenities',
           [
-            _buildSummaryRow('Selected Amenities', '${selectedAmenities.length}'),
+            _buildSummaryRow(
+                'Selected Amenities', '${selectedAmenities.length}'),
             if (selectedAmenities.isNotEmpty)
               _buildSummaryRow('List', selectedAmenities.join(', ')),
           ],
         ),
-        
+
         const SizedBox(height: AppSpacing.paddingM),
-        
+
         // Photos
         _buildSummaryCard(
           context,
@@ -111,9 +117,9 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
             _buildSummaryRow('Uploaded Photos', '${uploadedPhotos.length}'),
           ],
         ),
-        
+
         const SizedBox(height: AppSpacing.paddingL),
-        
+
         // Ready to Create/Update
         AdaptiveCard(
           child: Padding(
@@ -125,13 +131,15 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
                     Icon(Icons.check_circle, color: Colors.green[600]),
                     const SizedBox(width: AppSpacing.paddingS),
                     BodyText(
-                      text: 'Ready to ${pgName.isEmpty ? 'create' : 'update'} your PG!',
+                      text:
+                          'Ready to ${pgName.isEmpty ? 'create' : 'update'} your PG!',
                     ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
                 BodyText(
-                  text: 'Review all details above and click the save button to proceed.',
+                  text:
+                      'Review all details above and click the save button to proceed.',
                   color: Colors.grey[600],
                 ),
               ],
@@ -142,7 +150,8 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard(BuildContext context, String title, List<Widget> children) {
+  Widget _buildSummaryCard(
+      BuildContext context, String title, List<Widget> children) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingM),

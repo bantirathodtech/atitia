@@ -67,7 +67,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     '5-share': TextEditingController(),
   };
   final _depositController = TextEditingController();
-  String _maintenanceType = 'one-time';
+  String _maintenanceType = 'one_time';
   final _maintenanceAmountController = TextEditingController();
 
   // Mode detection
@@ -167,7 +167,6 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AdaptiveAppBar(
         title: isEditMode ? 'Edit PG' : 'New PG Setup',
@@ -318,7 +317,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         rentControllers: _rentControllers,
         depositAmount: double.tryParse(_depositController.text) ?? 0.0,
         maintenanceType: _maintenanceType,
-        maintenanceAmount: double.tryParse(_maintenanceAmountController.text) ?? 0.0,
+        maintenanceAmount:
+            double.tryParse(_maintenanceAmountController.text) ?? 0.0,
         selectedAmenities: _selectedAmenities,
         uploadedPhotos: _uploadedPhotos,
       ),

@@ -65,19 +65,17 @@ class PgAmenitiesFormWidget extends AdaptiveStatelessWidget {
       children: [
         HeadingMedium(text: 'Amenities & Facilities'),
         const SizedBox(height: AppSpacing.paddingL),
-        
         BodyText(
           text: 'Select all amenities available in your PG:',
           color: Colors.grey[600],
         ),
         const SizedBox(height: AppSpacing.paddingL),
-        
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: _availableAmenities.map((amenity) {
             final isSelected = selectedAmenities.contains(amenity);
-            
+
             return ChoiceChip(
               label: Text(amenity),
               selected: isSelected,
@@ -93,7 +91,6 @@ class PgAmenitiesFormWidget extends AdaptiveStatelessWidget {
             );
           }).toList(),
         ),
-        
         if (selectedAmenities.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.paddingL),
           BodyText(

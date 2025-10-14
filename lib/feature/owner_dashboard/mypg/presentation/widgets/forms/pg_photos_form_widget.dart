@@ -45,13 +45,13 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
       children: [
         HeadingMedium(text: 'Photos & Gallery'),
         const SizedBox(height: AppSpacing.paddingL),
-        
+
         BodyText(
           text: 'Add photos of your PG to attract more guests:',
           color: Colors.grey[600],
         ),
         const SizedBox(height: AppSpacing.paddingL),
-        
+
         // Add Photo Button
         PrimaryButton(
           onPressed: () => _addPhoto(context),
@@ -59,7 +59,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
           icon: Icons.add_a_photo,
         ),
         const SizedBox(height: AppSpacing.paddingL),
-        
+
         // Photo Grid
         if (uploadedPhotos.isEmpty)
           AdaptiveCard(
@@ -101,7 +101,8 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
               return Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
                     child: AdaptiveImage(
                       imageUrl: uploadedPhotos[index],
                       fit: BoxFit.cover,
