@@ -23,10 +23,12 @@ jobs:
       
       - name: Install Dependencies
         run: flutter pub get
+        timeout-minutes: 5
       
       - name: Analyze Code
         run: flutter analyze --no-fatal-infos --no-fatal-warnings || true
         continue-on-error: true
+        timeout-minutes: 10
       
       - name: Check Formatting
         run: dart format --set-exit-if-changed . || echo "Format check completed"
@@ -48,16 +50,19 @@ jobs:
       
       - name: Install Dependencies
         run: flutter pub get
+        timeout-minutes: 5
       
       - name: Run Unit Tests (excluding Firebase-dependent)
         run: |
           # Run only tests that don't require Firebase
           flutter test --no-pub || echo "Some tests skipped"
         continue-on-error: true
+        timeout-minutes: 10
       
       - name: Run Widget Tests
         run: flutter test test/widget_test.dart
         continue-on-error: true
+        timeout-minutes: 5
       
       - name: Generate Coverage Report
         run: flutter test --coverage
@@ -91,11 +96,13 @@ jobs:
       
       - name: Install Dependencies
         run: flutter pub get
+        timeout-minutes: 5
       
       - name: Build Android APK
         run: |
           flutter build apk --debug || echo "Android build skipped"
         continue-on-error: true
+        timeout-minutes: 15
 
   # Build iOS (requires macOS)
   build-ios:
@@ -113,16 +120,19 @@ jobs:
       
       - name: Install Dependencies
         run: flutter pub get
+        timeout-minutes: 5
       
       - name: Setup CocoaPods
         run: |
           cd ios
           pod install || echo "CocoaPods install skipped"
           cd ..
+        timeout-minutes: 10
       
       - name: Build iOS
         run: flutter build ios --no-codesign || echo "iOS build skipped"
         continue-on-error: true
+        timeout-minutes: 20
 
   # Build Web
   build-web:
@@ -140,10 +150,12 @@ jobs:
       
       - name: Install Dependencies
         run: flutter pub get
+        timeout-minutes: 5
       
       - name: Build Web
         run: flutter build web --release || echo "Web build skipped"
         continue-on-error: true
+        timeout-minutes: 15
       
       - name: Upload Web Build Artifact
         uses: actions/upload-artifact@v4
@@ -167,8 +179,10 @@ jobs:
       
       - name: Install Dependencies
         run: flutter pub get
+        timeout-minutes: 5
       
       - name: Run Security Audit
         run: |
           flutter pub audit --json || echo "Security audit completed with notes"
         continue-on-error: true
+        timeout-minutes: 5
