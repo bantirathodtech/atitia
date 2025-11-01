@@ -11,7 +11,7 @@ jobs:
   deploy-android:
     name: Deploy Android to Play Store
     runs-on: ubuntu-latest
-    environment: production
+    # environment: production  # Uncomment when production environment is configured in GitHub
     
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
   deploy-ios:
     name: Deploy iOS to App Store
     runs-on: macos-latest
-    environment: production
+    # environment: production  # Uncomment when production environment is configured in GitHub
     
     steps:
       - uses: actions/checkout@v4
@@ -107,7 +107,7 @@ jobs:
   deploy-web:
     name: Deploy Web to Firebase
     runs-on: ubuntu-latest
-    environment: production
+    # environment: production  # Uncomment when production environment is configured in GitHub
     
     steps:
       - uses: actions/checkout@v4
