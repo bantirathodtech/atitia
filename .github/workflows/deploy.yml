@@ -46,7 +46,7 @@ jobs:
           keyAlias=$KEY_ALIAS
           keyPassword=$KEY_PASSWORD
           EOF
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
       
       - name: Build App Bundle
         run: flutter build appbundle --release
@@ -58,7 +58,7 @@ jobs:
           packageName: com.avishio.atitia
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
           track: internal  # internal | alpha | beta | production
-        if: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        if: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
 
   # Deploy to App Store Connect (TestFlight)
   deploy-ios:
@@ -101,7 +101,7 @@ jobs:
           api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           api-issuer: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
           api-key: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
-        if: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID != '' }}
+        if: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
 
   # Deploy Web to Firebase Hosting
   deploy-web:
@@ -132,5 +132,5 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
           channelId: live
           projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
-        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
