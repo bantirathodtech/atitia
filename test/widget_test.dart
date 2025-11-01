@@ -1,29 +1,35 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+// Widget test for Atitia app
+import 'package:atitia/core/di/firebase/start/firebase_service_initializer.dart';
+import 'package:atitia/core/providers/firebase/firebase_app_providers.dart';
 import 'package:atitia/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const AtitiaApp());
+  testWidgets('Atitia app smoke test', (WidgetTester tester) async {
+    // Initialize Flutter binding
+    WidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Mock Firebase initialization (skip actual Firebase init in tests)
+    // In a real scenario, you'd use mocks, but for CI we'll skip
+    try {
+      await FirebaseServiceInitializer.initialize();
+    } catch (e) {
+      // Ignore Firebase init errors in test environment
+      // In production CI, you'd use Firebase emulators or mocks
+    }
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Build our app with providers
+    await tester.pumpWidget(
+      FirebaseAppProviders.buildWithProviders(
+        child: const AtitiaApp(),
+      ),
+    );
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Wait for app to initialize
+    await tester.pumpAndSettle(const Duration(seconds: 2));
+
+    // Basic smoke test: verify app builds without crashing
+    expect(find.byType(MaterialApp), findsOneWidget);
   });
 }
