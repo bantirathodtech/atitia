@@ -117,14 +117,11 @@ jobs:
       - name: Setup CocoaPods
         run: |
           cd ios
-          pod install
-      
-      - name: Build iOS
-        run: |
-          cd ios
           pod install || echo "CocoaPods install skipped"
           cd ..
-          flutter build ios --no-codesign || echo "iOS build skipped"
+      
+      - name: Build iOS
+        run: flutter build ios --no-codesign || echo "iOS build skipped"
         continue-on-error: true
 
   # Build Web
