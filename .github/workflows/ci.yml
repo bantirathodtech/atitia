@@ -24,6 +24,7 @@ concurrency:
 env:
   FLUTTER_VERSION: '3.24.0'
   JAVA_VERSION: '17'
+  PUB_CACHE: ${{ runner.tool_cache }}/flutter/.pub-cache
 
 jobs:
   # ============================================================================
@@ -55,7 +56,7 @@ jobs:
   dependencies:
     name: 📦 Resolve Dependencies
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     needs: validate
     
     steps:
