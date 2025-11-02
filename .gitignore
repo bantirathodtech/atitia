@@ -44,7 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-<<<<<<< HEAD
 # Cursor IDE files
 .cursor/
 
@@ -61,14 +60,8 @@ macos/Runner/GoogleService-Info.plist
 # Google Services JSON (Android Firebase config)
 # Note: Similar to plist files, contains client-side public keys
 android/app/google-services.json
+web/firebase-config.json
 
-# Environment files with secrets
-.env
-.env.local
-.env.production
-.env.development
-secrets.json
-=======
 # Environment and Credential Files
 .env
 .env.local
@@ -77,21 +70,15 @@ secrets.json
 .env.development
 **/credentials/
 **/secrets/
+secrets.json
 
 # Sensitive Configuration Files
 config/secrets.dart
 lib/common/constants/environment_config_production.dart
 lib/common/constants/environment_config_staging.dart
 
-# Firebase Configuration Files (contain sensitive data)
-android/app/google-services.json
-ios/Runner/GoogleService-Info.plist
-macos/Runner/GoogleService-Info.plist
-web/firebase-config.json
-
 # API Keys and Secrets
 **/api-keys.json
-**/secrets.json
 **/auth-keys.json
 **/config.json
 
@@ -112,4 +99,3 @@ ios/Flutter/Generated.xcconfig
 ios/Flutter/ephemeral/
 *.xcworkspace
 !default.xcworkspace
->>>>>>> temp-stash-apply
