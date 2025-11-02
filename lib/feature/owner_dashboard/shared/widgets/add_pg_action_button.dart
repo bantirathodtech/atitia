@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../mypg/presentation/screens/owner_pg_create_screen.dart';
+import '../../mypg/presentation/screens/new_pg_setup_screen.dart';
 
 /// Reusable app bar action to add a new PG
 class AddPgActionButton extends StatelessWidget {
@@ -21,7 +21,7 @@ class AddPgActionButton extends StatelessWidget {
       onPressed: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => const OwnerPgCreateScreen(),
+            builder: (_) => const NewPgSetupScreen(),
           ),
         );
       },
