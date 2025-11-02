@@ -24,7 +24,6 @@ concurrency:
 env:
   FLUTTER_VERSION: '3.24.0'
   JAVA_VERSION: '17'
-  PUB_CACHE: ${{ runner.tool_cache }}/flutter/.pub-cache
 
 jobs:
   # ============================================================================
@@ -77,6 +76,7 @@ jobs:
           path: |
             ${{ runner.tool_cache }}/flutter/.pub-cache
             .dart_tool
+            ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
           restore-keys: |
             ${{ runner.os }}-pub-
