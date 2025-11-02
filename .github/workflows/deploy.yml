@@ -183,14 +183,35 @@ jobs:
         run: |
           if [ -n "$CERTIFICATE_BASE64" ] && [ "$CERTIFICATE_BASE64" != "" ]; then
             echo "🔐 Setting up iOS code signing..."
+            
+            # Create keychain for certificate
+            KEYCHAIN_NAME="build.keychain"
+            KEYCHAIN_PASSWORD=$(openssl rand -base64 12)
+            
+            # Create temporary keychain
+            security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+            security set-keychain-settings -lut 21600 "$KEYCHAIN_NAME"
+            security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+            
             # Decode and install certificate
             echo "$CERTIFICATE_BASE64" | base64 -d > cert.p12
+            security import cert.p12 -k "$KEYCHAIN_NAME" -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign || true
+            security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME" || true
+            
             # Decode and install provisioning profile
-            echo "$PROVISIONING_PROFILE_BASE64" | base64 -d > profile.mobileprovision
-            # Note: Actual installation requires Keychain access which is handled by Xcode
-            echo "✅ Signing assets prepared"
+            if [ -n "$PROVISIONING_PROFILE_BASE64" ] && [ "$PROVISIONING_PROFILE_BASE64" != "" ]; then
+              echo "$PROVISIONING_PROFILE_BASE64" | base64 -d > profile.mobileprovision
+              mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+              UUID=$(grep -aA1 UUID profile.mobileprovision | grep -o "[-A-Z0-9]\{36\}" | head -1)
+              cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/"$UUID.mobileprovision"
+            fi
+            
+            # Set default keychain
+            security list-keychains -s "$KEYCHAIN_NAME"
+            
+            echo "✅ Code signing configured"
           else
-            echo "⚠️ iOS certificate not configured - build will use default signing"
+            echo "⚠️ iOS certificate not configured - build will use automatic signing"
             echo "💡 Add IOS_CERTIFICATE_BASE64 secret to enable production signing"
           fi
 
