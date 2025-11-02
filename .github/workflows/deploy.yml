@@ -3,27 +3,27 @@ name: 🚀 Deploy to Stores - Production
 on:
   push:
     tags:
-      - 'v*.*.*'  # e.g., v1.0.0, v1.2.3
+      - 'v*.*.*'  # Triggers on semantic version tags
   workflow_dispatch:
     inputs:
-      version:
+      version_tag:
         description: 'Version tag (e.g., v1.0.0)'
         required: true
         default: 'v1.0.0'
 
-# Global defaults
-defaults:
-  run:
-    shell: bash
-    timeout-minutes: 30
+# Prevent concurrent deployments
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
 
 env:
   FLUTTER_VERSION: '3.24.0'
   JAVA_VERSION: '17'
+  APP_ID: 'com.avishio.atitia'
 
 jobs:
   # ============================================================================
-  # PREREQUISITE: Validate Deploy Readiness
+  # PREREQUISITE: Validate Deployment Readiness
   # ============================================================================
   validate-deploy:
     name: ✅ Validate Deployment
@@ -31,25 +31,37 @@ jobs:
     timeout-minutes: 5
     
     steps:
-      - name: Checkout Code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Verify Secrets
+      - name: 🔍 Verify Deployment Config
         run: |
-          echo "🔐 Verifying required secrets..."
+          echo "🔍 Validating deployment configuration..."
+          
+          # Check Android signing
           if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
-            echo "⚠️ Android keystore secret not found (Android deploy will skip)"
+            echo "⚠️ Android keystore secret not configured"
           else
             echo "✅ Android keystore secret found"
           fi
           
+          # Check iOS signing
+          if [ -z "${{ secrets.IOS_CERTIFICATE_BASE64 }}" ]; then
+            echo "⚠️ iOS certificate not configured (iOS deploy will skip)"
+          else
+            echo "✅ iOS certificate found"
+          fi
+          
+          # Check store credentials
           if [ -z "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" ]; then
-            echo "⚠️ Google Play service account not found (Android upload will skip)"
+            echo "⚠️ Google Play service account not configured (upload will skip)"
           else
             echo "✅ Google Play service account found"
           fi
+          
+          echo "✅ Deployment validation complete"
 
   # ============================================================================
   # ANDROID: Build & Deploy to Google Play
@@ -57,39 +69,40 @@ jobs:
   deploy-android:
     name: 🤖 Deploy Android
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     needs: validate-deploy
     if: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
     
     steps:
-      - name: Checkout Code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: ☕ Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
 
-      - name: Setup Flutter
+      - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
-      - name: Get Dependencies
+      - name: 📦 Get Dependencies
         run: flutter pub get
         timeout-minutes: 3
 
-      - name: Decode Signing Key
+      - name: 🔐 Setup Signing
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          echo "🔐 Setting up Android signing..."
+          echo "🔐 Configuring Android signing..."
           echo "$KEYSTORE_BASE64" | base64 -d > android/keystore.jks
           cat > android/key.properties << EOF
           storeFile=keystore.jks
@@ -97,30 +110,30 @@ jobs:
           keyAlias=$KEY_ALIAS
           keyPassword=$KEY_PASSWORD
           EOF
-          echo "✅ Signing key configured"
+          echo "✅ Signing configured"
 
-      - name: Build App Bundle
+      - name: 🔨 Build App Bundle
         run: |
           echo "🔨 Building Android App Bundle..."
           flutter build appbundle --release --no-pub
-          echo "✅ App bundle built successfully"
+          echo "✅ App bundle built: $(ls -lh build/app/outputs/bundle/release/*.aab)"
 
-      - name: Upload to Google Play
+      - name: 📤 Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab-release
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 90
+
+      - name: 🚀 Deploy to Google Play
         if: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: com.avishio.atitia
+          packageName: ${{ env.APP_ID }}
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
           track: internal
         continue-on-error: true
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-aab-${{ github.run_number }}
-          path: build/app/outputs/bundle/release/app-release.aab
-          retention-days: 30
 
   # ============================================================================
   # iOS: Build & Deploy to App Store
@@ -128,39 +141,50 @@ jobs:
   deploy-ios:
     name: 🍎 Deploy iOS
     runs-on: macos-15
-    timeout-minutes: 40
+    timeout-minutes: 45
     needs: validate-deploy
     if: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
     
     steps:
-      - name: Checkout Code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
+      - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
-      - name: Get Dependencies
+      - name: 📦 Get Dependencies
         run: flutter pub get
         timeout-minutes: 3
 
-      - name: Setup CocoaPods
+      - name: 📦 Setup CocoaPods
         run: |
           cd ios
           pod install --repo-update
           cd ..
         timeout-minutes: 10
 
-      - name: Build iOS Archive
+      - name: 🔐 Setup Code Signing
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
           CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
           PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          echo "🔐 Setting up iOS code signing..."
+          # Decode and install certificate
+          echo "$CERTIFICATE_BASE64" | base64 -d > cert.p12
+          # Decode and install provisioning profile
+          echo "$PROVISIONING_PROFILE_BASE64" | base64 -d > profile.mobileprovision
+          # Note: Actual installation requires Keychain access which is handled by Xcode
+          echo "✅ Signing assets prepared"
+
+      - name: 🔨 Build iOS Archive
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
           echo "🔨 Building iOS archive..."
           flutter build ipa --release --no-pub || {
@@ -169,9 +193,18 @@ jobs:
           }
           echo "✅ iOS archive built"
         continue-on-error: true
-        timeout-minutes: 30
+        timeout-minutes: 35
 
-      - name: Upload to App Store Connect
+      - name: 📤 Upload IPA Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa-release
+          path: build/ios/ipa/*.ipa
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: 🚀 Deploy to App Store Connect
         if: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID && success() }}
         uses: apple-actions/upload-testflight-build@v1
         with:
@@ -187,31 +220,38 @@ jobs:
   deploy-web:
     name: 🌐 Deploy Web
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     needs: validate-deploy
     
     steps:
-      - name: Checkout Code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
+      - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
-      - name: Get Dependencies
+      - name: 📦 Get Dependencies
         run: flutter pub get
         timeout-minutes: 3
 
-      - name: Build Web
+      - name: 🌐 Build Web
         run: |
-          echo "🔨 Building Web..."
+          echo "🔨 Building Web for production..."
           flutter build web --release --no-pub
           echo "✅ Web build completed"
 
-      - name: Deploy to Firebase
+      - name: 📤 Upload Web Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-production-build
+          path: build/web/
+          retention-days: 90
+
+      - name: 🚀 Deploy to Firebase
         if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -221,10 +261,29 @@ jobs:
           projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
         continue-on-error: true
 
-      - name: Upload Artifact
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-build-${{ github.run_number }}
-          path: build/web/
-          retention-days: 30
+  # ============================================================================
+  # DEPLOYMENT SUMMARY
+  # ============================================================================
+  deployment-summary:
+    name: 📋 Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [validate-deploy, deploy-android, deploy-ios, deploy-web]
+    if: always()
+    
+    steps:
+      - name: 📊 Generate Summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed At:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🤖 Android | ${{ needs.deploy-android.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🍎 iOS | ${{ needs.deploy-ios.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌐 Web | ${{ needs.deploy-web.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Deployment pipeline completed. Check artifacts for build outputs." >> $GITHUB_STEP_SUMMARY
