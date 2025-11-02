@@ -17,7 +17,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  FLUTTER_VERSION: '3.27.0'
   JAVA_VERSION: '17'
   APP_ID: 'com.avishio.atitia'
 
