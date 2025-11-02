@@ -68,16 +68,20 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
-          cache-key: 'flutter-${{ env.FLUTTER_VERSION }}-${{ runner.os }}'
-          cache-path: ${{ env.FLUTTER_PUB_CACHE }}
 
       - name: 🔧 Get Dependencies
         run: |
           echo "📦 Resolving dependencies..."
-          flutter pub get --no-example || {
-            echo "❌ Dependency resolution failed"
-            flutter pub get --verbose 2>&1 | tail -50
-            exit 1
+          flutter pub get || {
+            echo "❌ Dependency resolution failed - showing error details"
+            flutter pub get --verbose 2>&1 | tail -100
+            echo "🔍 Attempting to resolve with retry..."
+            flutter clean
+            flutter pub cache repair || true
+            flutter pub get || {
+              echo "❌ Dependency resolution failed after retry"
+              exit 1
+            }
           }
           echo "✅ Dependencies resolved"
 
