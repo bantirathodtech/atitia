@@ -11,8 +11,14 @@ import '../data/repository/guest_profile_repository.dart';
 /// Extends BaseProviderState for automatic service access and state management
 /// Handles profile loading, updates, document upload operations, and analytics tracking
 class GuestProfileViewModel extends BaseProviderState {
-  final GuestProfileRepository _repository = GuestProfileRepository();
+  final GuestProfileRepository _repository;
   final _analyticsService = getIt.analytics;
+
+  /// Constructor with dependency injection
+  /// If repository is not provided, creates it with default services
+  GuestProfileViewModel({
+    GuestProfileRepository? repository,
+  }) : _repository = repository ?? GuestProfileRepository();
 
   GuestProfileModel? _guest;
   bool _isEditing = false;
@@ -35,7 +41,7 @@ class GuestProfileViewModel extends BaseProviderState {
       setLoading(true);
       clearError();
       _guest = await _repository.getGuestProfile(userId);
-      
+
       _analyticsService.logEvent(
         name: 'guest_profile_loaded',
         parameters: {
@@ -79,7 +85,7 @@ class GuestProfileViewModel extends BaseProviderState {
       clearError();
       await _repository.updateGuestProfile(updatedGuest);
       _guest = updatedGuest;
-      
+
       _analyticsService.logEvent(
         name: 'guest_profile_update_success',
         parameters: {
@@ -87,7 +93,7 @@ class GuestProfileViewModel extends BaseProviderState {
           'profile_completion': updatedGuest.profileCompletionPercentage,
         },
       );
-      
+
       return true;
     } catch (e) {
       setError(true, 'Failed to update profile: $e');
@@ -107,10 +113,10 @@ class GuestProfileViewModel extends BaseProviderState {
       setLoading(true);
       clearError();
       await _repository.updateGuestProfileFields(userId, fields);
-      
+
       // Reload profile to get updated data
       await loadGuestProfile(userId);
-      
+
       _analyticsService.logEvent(
         name: 'guest_profile_fields_update_success',
         parameters: {
@@ -118,7 +124,7 @@ class GuestProfileViewModel extends BaseProviderState {
           'fields_count': fields.length,
         },
       );
-      
+
       return true;
     } catch (e) {
       setError(true, 'Failed to update profile fields: $e');
@@ -139,16 +145,17 @@ class GuestProfileViewModel extends BaseProviderState {
     try {
       setLoading(true);
       clearError();
-      final downloadUrl = await _repository.uploadProfilePhoto(userId, fileName, file);
-      
+      final downloadUrl =
+          await _repository.uploadProfilePhoto(userId, fileName, file);
+
       // Update profile with new photo URL
       await updateProfileFields(userId, {'profilePhotoUrl': downloadUrl});
-      
+
       _analyticsService.logEvent(
         name: 'profile_photo_upload_success',
         parameters: {'user_id': userId},
       );
-      
+
       return downloadUrl;
     } catch (e) {
       setError(true, 'Failed to upload profile photo: $e');
@@ -169,16 +176,17 @@ class GuestProfileViewModel extends BaseProviderState {
     try {
       setLoading(true);
       clearError();
-      final downloadUrl = await _repository.uploadAadhaarPhoto(userId, fileName, file);
-      
+      final downloadUrl =
+          await _repository.uploadAadhaarPhoto(userId, fileName, file);
+
       // Update profile with new Aadhaar photo URL
       await updateProfileFields(userId, {'aadhaarPhotoUrl': downloadUrl});
-      
+
       _analyticsService.logEvent(
         name: 'aadhaar_photo_upload_success',
         parameters: {'user_id': userId},
       );
-      
+
       return downloadUrl;
     } catch (e) {
       setError(true, 'Failed to upload Aadhaar photo: $e');
@@ -205,13 +213,13 @@ class GuestProfileViewModel extends BaseProviderState {
         file,
         idProofType,
       );
-      
+
       // Update profile with new ID proof URL
       await updateProfileFields(userId, {
         'idProofUrl': downloadUrl,
         'idProofType': idProofType,
       });
-      
+
       _analyticsService.logEvent(
         name: 'id_proof_upload_success',
         parameters: {
@@ -219,7 +227,7 @@ class GuestProfileViewModel extends BaseProviderState {
           'id_proof_type': idProofType,
         },
       );
-      
+
       return downloadUrl;
     } catch (e) {
       setError(true, 'Failed to upload ID proof: $e');
@@ -235,10 +243,10 @@ class GuestProfileViewModel extends BaseProviderState {
       setLoading(true);
       clearError();
       await _repository.updateGuestStatus(userId, isActive);
-      
+
       // Reload profile to get updated status
       await loadGuestProfile(userId);
-      
+
       _analyticsService.logEvent(
         name: 'guest_status_update_success',
         parameters: {
@@ -246,7 +254,7 @@ class GuestProfileViewModel extends BaseProviderState {
           'is_active': isActive,
         },
       );
-      
+
       return true;
     } catch (e) {
       setError(true, 'Failed to update guest status: $e');
@@ -264,7 +272,7 @@ class GuestProfileViewModel extends BaseProviderState {
     _editedFields = {};
     clearError();
     notifyListeners();
-    
+
     _analyticsService.logEvent(
       name: 'guest_profile_cleared',
       parameters: {},
@@ -276,7 +284,7 @@ class GuestProfileViewModel extends BaseProviderState {
     _isEditing = true;
     _editedFields = {};
     notifyListeners();
-    
+
     _analyticsService.logEvent(
       name: 'guest_profile_edit_started',
       parameters: {},
@@ -288,7 +296,7 @@ class GuestProfileViewModel extends BaseProviderState {
     _isEditing = false;
     _editedFields = {};
     notifyListeners();
-    
+
     _analyticsService.logEvent(
       name: 'guest_profile_edit_cancelled',
       parameters: {},
@@ -320,7 +328,7 @@ class GuestProfileViewModel extends BaseProviderState {
   /// Refreshes profile data
   Future<void> refreshProfile(String userId) async {
     await loadGuestProfile(userId);
-    
+
     _analyticsService.logEvent(
       name: 'guest_profile_refreshed',
       parameters: {'user_id': userId},
@@ -337,7 +345,8 @@ class GuestProfileViewModel extends BaseProviderState {
   String get initials => _guest?.initials ?? 'GU';
 
   /// Gets profile completion percentage
-  int get profileCompletionPercentage => _guest?.profileCompletionPercentage ?? 0;
+  int get profileCompletionPercentage =>
+      _guest?.profileCompletionPercentage ?? 0;
 
   /// Checks if profile has emergency contact
   bool get hasEmergencyContact => _guest?.hasEmergencyContact ?? false;

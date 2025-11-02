@@ -15,7 +15,6 @@ class SampleDataCreator {
   /// This should only be called during development/testing
   Future<void> createSampleData(String userId) async {
     try {
-      print('🎯 Creating sample data for user: $userId');
       
       // Create sample PG
       final samplePgId = await _createSamplePG();
@@ -26,7 +25,6 @@ class SampleDataCreator {
       // Create sample booking for the user
       await _createSampleBooking(userId, samplePgId);
       
-      print('✅ Sample data created successfully');
       
       _analyticsService.logEvent(
         name: 'sample_data_created',
@@ -36,7 +34,6 @@ class SampleDataCreator {
         },
       );
     } catch (e) {
-      print('❌ Failed to create sample data: $e');
       _analyticsService.logEvent(
         name: 'sample_data_creation_failed',
         parameters: {
@@ -84,7 +81,6 @@ class SampleDataCreator {
       samplePG.toMap(),
     );
 
-    print('✅ Sample PG created: $pgId');
     return pgId;
   }
 
@@ -112,7 +108,6 @@ class SampleDataCreator {
       sampleMenu.toMap(),
     );
 
-    print('✅ Sample food menu created: $menuId');
   }
 
   /// Creates a sample booking for the user
@@ -147,6 +142,5 @@ class SampleDataCreator {
       sampleBooking.toMap(),
     );
 
-    print('✅ Sample booking created: $bookingId');
   }
 }

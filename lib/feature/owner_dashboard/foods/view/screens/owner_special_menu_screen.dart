@@ -4,7 +4,7 @@
 // Create special menus for festivals, events, or specific dates with theme toggle.
 // ============================================================================
 
-import 'dart:io';
+// import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +50,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
   List<String>? _photoUrls;
 
   bool _isSaving = false;
-  final List<File> _newPhotosToUpload = [];
+  // final List<File> _newPhotosToUpload = [];
 
   @override
   void initState() {
@@ -94,7 +94,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
             ? 'Edit Special Menu'
             : 'Add Special Menu',
         elevation: 2,
-        showThemeToggle: true,  // Theme toggle for comfortable form filling
+        showThemeToggle: true, // Theme toggle for comfortable form filling
       ),
       body: _isSaving
           ? Center(
@@ -174,7 +174,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
   Widget _buildDateSection() {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -182,8 +182,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.calendar_today,
-                  color: theme.primaryColor, size: 20),
+              Icon(Icons.calendar_today, color: theme.primaryColor, size: 20),
               const SizedBox(width: AppSpacing.paddingS),
               const HeadingSmall(text: 'Date'),
             ],
@@ -194,7 +193,9 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.paddingM),
               decoration: BoxDecoration(
-                color: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
+                color: isDarkMode
+                    ? AppColors.darkInputFill
+                    : AppColors.surfaceVariant,
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 border: Border.all(
                   color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
@@ -208,8 +209,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                         '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
                     medium: true,
                   ),
-                  Icon(Icons.edit_calendar,
-                      color: theme.primaryColor),
+                  Icon(Icons.edit_calendar, color: theme.primaryColor),
                 ],
               ),
             ),
@@ -272,26 +272,27 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
   Widget _buildFallbackInfo() {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
-      backgroundColor: isDarkMode 
-          ? AppColors.info.withOpacity(0.15) 
+      backgroundColor: isDarkMode
+          ? AppColors.info.withOpacity(0.15)
           : AppColors.infoContainer,
       child: Row(
         children: [
           Icon(
-            Icons.info_outline, 
-            color: isDarkMode ? AppColors.info : AppColors.info.withOpacity(0.8),
+            Icons.info_outline,
+            color:
+                isDarkMode ? AppColors.info : AppColors.info.withValues(alpha: 0.8),
           ),
           const SizedBox(width: AppSpacing.paddingS),
           Expanded(
             child: BodyText(
               text:
                   'Leave meal sections empty to use the default weekly menu for this day',
-              color: isDarkMode 
-                  ? theme.textTheme.bodyMedium?.color 
-                  : AppColors.info.withOpacity(0.9),
+              color: isDarkMode
+                  ? theme.textTheme.bodyMedium?.color
+                  : AppColors.info.withValues(alpha: 0.9),
             ),
           ),
         ],
@@ -309,7 +310,8 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
     final mealItems = items ?? [];
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final textSecondary = theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+    // final textSecondary =
+    //     theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
 
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -346,8 +348,10 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                 child: Column(
                   children: [
                     BodyText(
-                      text: 'No items added', 
-                      color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+                      text: 'No items added',
+                      color: isDarkMode
+                          ? AppColors.textTertiary
+                          : AppColors.textSecondary,
                     ),
                     const SizedBox(height: AppSpacing.paddingS),
                     SecondaryButton(
@@ -366,11 +370,15 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                   margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
                   padding: const EdgeInsets.all(AppSpacing.paddingS),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
+                    color: isDarkMode
+                        ? AppColors.darkInputFill
+                        : AppColors.surfaceVariant,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                     border: Border.all(
-                      color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+                      color: isDarkMode
+                          ? AppColors.darkDivider
+                          : AppColors.outline,
                     ),
                   ),
                   child: Row(
@@ -379,7 +387,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: theme.primaryColor.withOpacity(0.1),
+                          color: theme.primaryColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
@@ -509,7 +517,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
       // Create override
       final selectedPgProvider = context.read<SelectedPgProvider>();
       final currentPgId = selectedPgProvider.selectedPgId;
-      
+
       final overrideId = widget.existingOverride?.overrideId ??
           '${ownerId}_${currentPgId ?? 'legacy'}_override_${_selectedDate.millisecondsSinceEpoch}';
 

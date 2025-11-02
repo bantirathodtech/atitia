@@ -1,6 +1,7 @@
 // lib/core/models/owner_document_model.dart
 
 import 'package:flutter/material.dart';
+import '../../common/utils/date/converter/date_service_converter.dart';
 
 import '../../common/styles/colors.dart';
 
@@ -53,12 +54,12 @@ class OwnerDocumentModel {
       thumbnailUrl: map['thumbnailUrl'] as String?,
       fileType: map['fileType'] as String,
       fileSize: map['fileSize'] as int,
-      expiryDate: DateTime.parse(map['expiryDate'] as String),
-      uploadedAt: DateTime.parse(map['uploadedAt'] as String),
+      expiryDate: DateServiceConverter.fromService(map['expiryDate'] as String),
+      uploadedAt: DateServiceConverter.fromService(map['uploadedAt'] as String),
       notes: map['notes'] as String?,
       isVerified: map['isVerified'] as bool? ?? false,
       verifiedAt: map['verifiedAt'] != null
-          ? DateTime.parse(map['verifiedAt'] as String)
+          ? DateServiceConverter.fromService(map['verifiedAt'] as String)
           : null,
       verifiedBy: map['verifiedBy'] as String?,
     );
@@ -75,11 +76,13 @@ class OwnerDocumentModel {
       'thumbnailUrl': thumbnailUrl,
       'fileType': fileType,
       'fileSize': fileSize,
-      'expiryDate': expiryDate.toIso8601String(),
-      'uploadedAt': uploadedAt.toIso8601String(),
+      'expiryDate': DateServiceConverter.toService(expiryDate),
+      'uploadedAt': DateServiceConverter.toService(uploadedAt),
       'notes': notes,
       'isVerified': isVerified,
-      'verifiedAt': verifiedAt?.toIso8601String(),
+      'verifiedAt': verifiedAt != null
+          ? DateServiceConverter.toService(verifiedAt!)
+          : null,
       'verifiedBy': verifiedBy,
     };
   }

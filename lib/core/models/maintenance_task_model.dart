@@ -3,6 +3,7 @@
 import 'dart:ui';
 
 import '../../common/styles/colors.dart';
+import '../../common/utils/date/converter/date_service_converter.dart';
 
 /// Model for PG maintenance tasks and schedules
 /// Tracks recurring and one-time maintenance activities
@@ -61,9 +62,10 @@ class MaintenanceTaskModel {
       category: map['category'] as String,
       priority: map['priority'] as String? ?? 'medium',
       status: map['status'] as String? ?? 'pending',
-      scheduledDate: DateTime.parse(map['scheduledDate'] as String),
+      scheduledDate:
+          DateServiceConverter.fromService(map['scheduledDate'] as String),
       completedDate: map['completedDate'] != null
-          ? DateTime.parse(map['completedDate'] as String)
+          ? DateServiceConverter.fromService(map['completedDate'] as String)
           : null,
       assignedTo: map['assignedTo'] as String?,
       estimatedCost: (map['estimatedCost'] as num?)?.toDouble(),
@@ -72,8 +74,8 @@ class MaintenanceTaskModel {
       isRecurring: map['isRecurring'] as bool? ?? false,
       recurringDays: map['recurringDays'] as int?,
       affectedAreas: (map['affectedAreas'] as List<dynamic>?)?.cast<String>(),
-      createdAt: DateTime.parse(map['createdAt'] as String),
-      updatedAt: DateTime.parse(map['updatedAt'] as String),
+      createdAt: DateServiceConverter.fromService(map['createdAt'] as String),
+      updatedAt: DateServiceConverter.fromService(map['updatedAt'] as String),
     );
   }
 
@@ -87,8 +89,10 @@ class MaintenanceTaskModel {
       'category': category,
       'priority': priority,
       'status': status,
-      'scheduledDate': scheduledDate.toIso8601String(),
-      'completedDate': completedDate?.toIso8601String(),
+      'scheduledDate': DateServiceConverter.toService(scheduledDate),
+      'completedDate': completedDate != null
+          ? DateServiceConverter.toService(completedDate!)
+          : null,
       'assignedTo': assignedTo,
       'estimatedCost': estimatedCost,
       'actualCost': actualCost,
@@ -96,8 +100,8 @@ class MaintenanceTaskModel {
       'isRecurring': isRecurring,
       'recurringDays': recurringDays,
       'affectedAreas': affectedAreas,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': DateServiceConverter.toService(createdAt),
+      'updatedAt': DateServiceConverter.toService(updatedAt),
     };
   }
 

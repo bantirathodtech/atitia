@@ -1,6 +1,7 @@
 // lib/features/owner_dashboard/overview/viewmodel/owner_overview_view_model.dart
 
 import '../../../../common/lifecycle/state/provider_state.dart';
+import '../../../../common/utils/logging/logging_mixin.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../data/models/owner_overview_model.dart';
 import '../data/repository/owner_overview_repository.dart';
@@ -8,9 +9,15 @@ import '../data/repository/owner_overview_repository.dart';
 /// ViewModel for fetching and managing owner overview dashboard data
 /// Extends BaseProviderState for automatic service access and state management
 /// Handles owner analytics, property statistics, revenue data, and real-time updates
-class OwnerOverviewViewModel extends BaseProviderState {
-  final OwnerOverviewRepository _repository = OwnerOverviewRepository();
+class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
+  final OwnerOverviewRepository _repository;
   final _analyticsService = getIt.analytics;
+
+  /// Constructor with dependency injection
+  /// If repository is not provided, creates it with default services
+  OwnerOverviewViewModel({
+    OwnerOverviewRepository? repository,
+  }) : _repository = repository ?? OwnerOverviewRepository();
 
   OwnerOverviewModel? _overviewData;
   Map<String, double>? _monthlyBreakdown;
@@ -33,25 +40,60 @@ class OwnerOverviewViewModel extends BaseProviderState {
   /// Handles one-time data fetch for dashboard initialization
   /// If pgId is provided, loads data for that specific PG only
   Future<void> loadOverviewData(String ownerId, {String? pgId}) async {
+    logMethodEntry(
+      'loadOverviewData',
+      parameters: {'ownerId': ownerId, 'pgId': pgId},
+      feature: 'owner_overview',
+    );
+
     try {
       setLoading(true);
       clearError();
-      _overviewData = await _repository.fetchOwnerOverviewData(ownerId, pgId: pgId);
+
+      logInfo(
+        'Loading owner overview data',
+        feature: 'owner_overview',
+        metadata: {'ownerId': ownerId, 'pgId': pgId ?? 'all'},
+      );
+
+      _overviewData =
+          await _repository.fetchOwnerOverviewData(ownerId, pgId: pgId);
+
+      logInfo(
+        'Owner overview data loaded successfully',
+        feature: 'owner_overview',
+        metadata: {
+          'ownerId': ownerId,
+          'pgId': pgId ?? 'all',
+          'hasProperties': _overviewData?.hasProperties ?? false,
+          'totalBeds': _overviewData?.totalBeds ?? 0,
+          'occupiedBeds': _overviewData?.occupiedBeds ?? 0,
+        },
+      );
 
       _analyticsService.logEvent(
         name: 'owner_overview_loaded',
         parameters: {
           'owner_id': ownerId,
           'pg_id': pgId ?? 'all',
-          'has_properties': (_overviewData?.hasProperties ?? false) ? 'true' : 'false', // Convert boolean to string
+          'has_properties': (_overviewData?.hasProperties ?? false)
+              ? 'true'
+              : 'false', // Convert boolean to string
           'total_beds': _overviewData?.totalBeds ?? 0,
           'occupied_beds': _overviewData?.occupiedBeds ?? 0,
         },
       );
     } catch (e) {
+      logError(
+        'Failed to load overview data',
+        feature: 'owner_overview',
+        error: e,
+        metadata: {'ownerId': ownerId, 'pgId': pgId},
+      );
       setError(true, 'Failed to load overview data: $e');
     } finally {
       setLoading(false);
+      logMethodExit('loadOverviewData');
     }
   }
 
@@ -180,8 +222,7 @@ class OwnerOverviewViewModel extends BaseProviderState {
   bool get hasPendingBookings => _overviewData?.hasPendingBookings ?? false;
 
   /// Checks if owner has pending complaints
-  bool get hasPendingComplaints =>
-      _overviewData?.hasPendingComplaints ?? false;
+  bool get hasPendingComplaints => _overviewData?.hasPendingComplaints ?? false;
 
   /// Gets total properties count
   int get totalProperties => _overviewData?.totalProperties ?? 0;

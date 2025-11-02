@@ -10,7 +10,7 @@ import '../../../../feature/guest_dashboard/pgs/viewmodel/guest_pg_viewmodel.dar
 import '../../../../feature/guest_dashboard/profile/viewmodel/guest_profile_viewmodel.dart';
 // Owner feature viewmodels
 import '../../../../feature/owner_dashboard/foods/viewmodel/owner_food_viewmodel.dart';
-import '../../../../feature/owner_dashboard/myguest/viewmodel/owner_guest_viewmodel.dart';
+import '../../../../feature/owner_dashboard/guests/viewmodel/owner_guest_viewmodel.dart';
 // Core providers
 import '../../../../feature/owner_dashboard/mypg/presentation/viewmodels/owner_pg_management_viewmodel.dart';
 import '../../../../feature/owner_dashboard/overview/viewmodel/owner_overview_view_model.dart';

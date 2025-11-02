@@ -2,6 +2,10 @@
 
 /// Model for tracking occupancy trends over time
 /// Used to display historical occupancy data and identify patterns
+library;
+
+import '../../../common/utils/date/converter/date_service_converter.dart';
+
 class OccupancyTrendModel {
   final String pgId;
   final DateTime date;
@@ -28,7 +32,7 @@ class OccupancyTrendModel {
   factory OccupancyTrendModel.fromMap(Map<String, dynamic> map) {
     return OccupancyTrendModel(
       pgId: map['pgId'] as String,
-      date: DateTime.parse(map['date'] as String),
+      date: DateServiceConverter.fromService(map['date'] as String),
       totalBeds: map['totalBeds'] as int,
       occupiedBeds: map['occupiedBeds'] as int,
       vacantBeds: map['vacantBeds'] as int? ?? 0,
@@ -42,7 +46,7 @@ class OccupancyTrendModel {
   Map<String, dynamic> toMap() {
     return {
       'pgId': pgId,
-      'date': date.toIso8601String(),
+      'date': DateServiceConverter.toService(date),
       'totalBeds': totalBeds,
       'occupiedBeds': occupiedBeds,
       'vacantBeds': vacantBeds,
@@ -55,13 +59,13 @@ class OccupancyTrendModel {
 
   // Getters
   String get formattedDate => '${date.day}/${date.month}';
-  String get formattedOccupancyRate => '${(occupancyRate * 100).toStringAsFixed(1)}%';
+  String get formattedOccupancyRate =>
+      '${(occupancyRate * 100).toStringAsFixed(1)}%';
   String get formattedRevenue => '₹${revenueGenerated.toStringAsFixed(0)}';
-  
+
   bool get isFullyOccupied => occupiedBeds >= totalBeds;
   bool get isFullyVacant => occupiedBeds == 0;
   bool get isHighOccupancy => occupancyRate >= 0.8;
   bool get isMediumOccupancy => occupancyRate >= 0.5 && occupancyRate < 0.8;
   bool get isLowOccupancy => occupancyRate < 0.5;
 }
-

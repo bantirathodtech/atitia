@@ -1,19 +1,32 @@
 // lib/core/repositories/owner_payment_details_repository.dart
 
-import '../di/firebase/di/firebase_service_locator.dart';
+import '../di/common/unified_service_locator.dart';
 import '../../common/utils/constants/firestore.dart';
+import '../interfaces/analytics/analytics_service_interface.dart';
+import '../interfaces/database/database_service_interface.dart';
 import '../models/owner_payment_details_model.dart';
 
 /// Repository for managing owner payment details
 /// Handles bank account, UPI, and QR code information
+/// Uses interface-based services for dependency injection (swappable backends)
 class OwnerPaymentDetailsRepository {
-  final _firestoreService = getIt.firestore;
-  final _analyticsService = getIt.analytics;
+  final IDatabaseService _databaseService;
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  OwnerPaymentDetailsRepository({
+    IDatabaseService? databaseService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Save or update owner payment details
   Future<void> savePaymentDetails(OwnerPaymentDetailsModel details) async {
     try {
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.ownerPaymentDetails,
         details.ownerId,
         details.toMap(),
@@ -35,7 +48,7 @@ class OwnerPaymentDetailsRepository {
   /// Get owner payment details
   Future<OwnerPaymentDetailsModel?> getPaymentDetails(String ownerId) async {
     try {
-      final doc = await _firestoreService.getDocument(
+      final doc = await _databaseService.getDocument(
         FirestoreConstants.ownerPaymentDetails,
         ownerId,
       );
@@ -44,7 +57,8 @@ class OwnerPaymentDetailsRepository {
         return null;
       }
 
-      return OwnerPaymentDetailsModel.fromMap(doc.data() as Map<String, dynamic>);
+      return OwnerPaymentDetailsModel.fromMap(
+          doc.data() as Map<String, dynamic>);
     } catch (e) {
       throw Exception('Failed to get payment details: $e');
     }
@@ -52,20 +66,21 @@ class OwnerPaymentDetailsRepository {
 
   /// Stream owner payment details for real-time updates
   Stream<OwnerPaymentDetailsModel?> streamPaymentDetails(String ownerId) {
-    return _firestoreService
+    return _databaseService
         .getDocumentStream(FirestoreConstants.ownerPaymentDetails, ownerId)
         .map((doc) {
       if (!doc.exists) {
         return null;
       }
-      return OwnerPaymentDetailsModel.fromMap(doc.data() as Map<String, dynamic>);
+      return OwnerPaymentDetailsModel.fromMap(
+          doc.data() as Map<String, dynamic>);
     });
   }
 
   /// Delete owner payment details
   Future<void> deletePaymentDetails(String ownerId) async {
     try {
-      await _firestoreService.deleteDocument(
+      await _databaseService.deleteDocument(
         FirestoreConstants.ownerPaymentDetails,
         ownerId,
       );
@@ -79,4 +94,3 @@ class OwnerPaymentDetailsRepository {
     }
   }
 }
-

@@ -51,17 +51,20 @@ class AppRoutes {
   /// Guest complaints list: '/guest/complaints'
   static const String guestComplaints = '$guestHome/complaints';
 
+  /// Guest notifications: '/guest/notifications'
+  static const String guestNotifications = '$guestHome/notifications';
+
   /// Guest profile management: '/guest/profile'
   static const String guestProfile = '$guestHome/profile';
+
+  /// Guest room/bed view: '/guest/room-bed'
+  static const String guestRoomBed = '$guestHome/room-bed';
 
   /// Guest settings: '/guest/settings'
   static const String guestSettings = '$guestHome/settings';
 
-  /// Guest help: '/guest/help'
+  /// Guest help & support: '/guest/help'
   static const String guestHelp = '$guestHome/help';
-
-  /// Guest notifications: '/guest/notifications'
-  static const String guestNotifications = '$guestHome/notifications';
 
   // MARK: - Owner Feature Routes
   // ==========================================
@@ -87,11 +90,11 @@ class AppRoutes {
   /// Owner settings: '/owner/settings'
   static const String ownerSettings = '$ownerHome/settings';
 
-  /// Owner help: '/owner/help'
-  static const String ownerHelp = '$ownerHome/help';
-
   /// Owner notifications: '/owner/notifications'
   static const String ownerNotifications = '$ownerHome/notifications';
+
+  /// Owner help & support: '/owner/help'
+  static const String ownerHelp = '$ownerHome/help';
 
   /// Owner analytics: '/owner/analytics'
   static const String ownerAnalytics = '$ownerHome/analytics';

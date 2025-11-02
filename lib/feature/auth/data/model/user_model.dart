@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
+import '../../../../common/utils/date/converter/date_service_converter.dart';
 
 /// User model representing both Guest and Owner users
 /// Enhanced with timestamps, validation, and helper methods
@@ -141,7 +142,7 @@ class UserModel extends Equatable {
       dateOfBirth: json['dateOfBirth'] != null
           ? (json['dateOfBirth'] is Timestamp
               ? (json['dateOfBirth'] as Timestamp).toDate()
-              : DateTime.parse(json['dateOfBirth']))
+              : DateServiceConverter.fromService(json['dateOfBirth']))
           : null,
       age: json['age'] as int?,
       gender: json['gender'] as String?,
@@ -161,17 +162,17 @@ class UserModel extends Equatable {
       createdAt: json['createdAt'] != null
           ? (json['createdAt'] is Timestamp
               ? (json['createdAt'] as Timestamp).toDate()
-              : DateTime.parse(json['createdAt']))
+              : DateServiceConverter.fromService(json['createdAt']))
           : null,
       updatedAt: json['updatedAt'] != null
           ? (json['updatedAt'] is Timestamp
               ? (json['updatedAt'] as Timestamp).toDate()
-              : DateTime.parse(json['updatedAt']))
+              : DateServiceConverter.fromService(json['updatedAt']))
           : null,
       lastLoginAt: json['lastLoginAt'] != null
           ? (json['lastLoginAt'] is Timestamp
               ? (json['lastLoginAt'] as Timestamp).toDate()
-              : DateTime.parse(json['lastLoginAt']))
+              : DateServiceConverter.fromService(json['lastLoginAt']))
           : null,
       metadata: json['metadata'] != null
           ? Map<String, dynamic>.from(json['metadata'])
@@ -186,7 +187,9 @@ class UserModel extends Equatable {
       'phoneNumber': phoneNumber,
       'role': role,
       'fullName': fullName,
-      'dateOfBirth': dateOfBirth?.toIso8601String(),
+      'dateOfBirth': dateOfBirth != null
+          ? DateServiceConverter.toService(dateOfBirth!)
+          : null,
       'age': age,
       'gender': gender,
       'email': email,
@@ -200,9 +203,13 @@ class UserModel extends Equatable {
       'pincode': pincode,
       'isActive': isActive,
       'isVerified': isVerified,
-      'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-      'lastLoginAt': lastLoginAt?.toIso8601String(),
+      'createdAt':
+          createdAt != null ? DateServiceConverter.toService(createdAt!) : null,
+      'updatedAt':
+          updatedAt != null ? DateServiceConverter.toService(updatedAt!) : null,
+      'lastLoginAt': lastLoginAt != null
+          ? DateServiceConverter.toService(lastLoginAt!)
+          : null,
       'metadata': metadata,
     };
   }
@@ -283,9 +290,8 @@ class UserModel extends Equatable {
       : 'N/A';
 
   /// Get formatted created date
-  String get formattedCreatedAt => createdAt != null
-      ? DateFormat('MMM dd, yyyy').format(createdAt!)
-      : 'N/A';
+  String get formattedCreatedAt =>
+      createdAt != null ? DateFormat('MMM dd, yyyy').format(createdAt!) : 'N/A';
 
   /// Get formatted last login
   String get formattedLastLogin => lastLoginAt != null

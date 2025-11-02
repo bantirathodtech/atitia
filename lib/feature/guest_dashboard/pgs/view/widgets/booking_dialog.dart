@@ -100,9 +100,10 @@ class _BookingDialogState extends State<BookingDialog> {
                 ),
                 const SizedBox(width: AppSpacing.paddingS),
                 ElevatedButton(
-                  onPressed: _selectedBed != null && _startDate != null && !_booking
-                      ? _confirmBooking
-                      : null,
+                  onPressed:
+                      _selectedBed != null && _startDate != null && !_booking
+                          ? _confirmBooking
+                          : null,
                   child: _booking
                       ? const SizedBox(
                           width: 20,
@@ -158,9 +159,10 @@ class _BookingDialogState extends State<BookingDialog> {
             final isSelected = _selectedRoom?.roomId == room.roomId;
             final availableBeds =
                 room.beds.where((b) => b.status == 'vacant').length;
-            
+
             return FilterChip(
-              label: Text('${room.roomNumber} (${room.sharingType}-sharing) - $availableBeds available'),
+              label: Text(
+                  '${room.roomNumber} (${room.sharingType}-sharing) - $availableBeds available'),
               selected: isSelected,
               onSelected: availableBeds > 0
                   ? (selected) {
@@ -178,8 +180,9 @@ class _BookingDialogState extends State<BookingDialog> {
   }
 
   Widget _buildBedSelector(BuildContext context, bool isDarkMode) {
-    final vacantBeds = _selectedRoom!.beds.where((b) => b.status == 'vacant').toList();
-    
+    final vacantBeds =
+        _selectedRoom!.beds.where((b) => b.status == 'vacant').toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -225,7 +228,9 @@ class _BookingDialogState extends State<BookingDialog> {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             decoration: BoxDecoration(
-              color: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
+              color: isDarkMode
+                  ? AppColors.darkInputFill
+                  : AppColors.surfaceVariant,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
               border: Border.all(
                 color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
@@ -233,7 +238,8 @@ class _BookingDialogState extends State<BookingDialog> {
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
+                Icon(Icons.calendar_today,
+                    color: Theme.of(context).primaryColor),
                 const SizedBox(width: AppSpacing.paddingS),
                 Text(
                   _startDate != null
@@ -252,9 +258,9 @@ class _BookingDialogState extends State<BookingDialog> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: AppColors.success.withOpacity(0.1),
+        color: AppColors.success.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: AppColors.success.withOpacity(0.3)),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,7 +273,9 @@ class _BookingDialogState extends State<BookingDialog> {
           _buildSummaryRow('Rent', '₹${_selectedRoom!.pricePerBed}/month'),
           _buildSummaryRow(
             'Start Date',
-            _startDate != null ? DateFormat('MMM dd, yyyy').format(_startDate!) : 'Not selected',
+            _startDate != null
+                ? DateFormat('MMM dd, yyyy').format(_startDate!)
+                : 'Not selected',
           ),
         ],
       ),
@@ -303,9 +311,10 @@ class _BookingDialogState extends State<BookingDialog> {
     try {
       final authProvider = context.read<AuthProvider>();
       final guestId = authProvider.user!.userId;
-      
+
       final booking = BookingModel(
-        bookingId: '${guestId}_${widget.pg.pgId}_${DateTime.now().millisecondsSinceEpoch}',
+        bookingId:
+            '${guestId}_${widget.pg.pgId}_${DateTime.now().millisecondsSinceEpoch}',
         guestId: guestId,
         ownerId: widget.pg.ownerUid,
         pgId: widget.pg.pgId,
@@ -317,7 +326,8 @@ class _BookingDialogState extends State<BookingDialog> {
         bedNumber: _selectedBed!.bedNumber.toString(),
         sharingType: int.parse(_selectedRoom!.sharingType),
         rentPerMonth: _selectedRoom!.pricePerBed.toDouble(),
-        securityDeposit: _selectedRoom!.pricePerBed.toDouble(), // 1 month deposit
+        securityDeposit:
+            _selectedRoom!.pricePerBed.toDouble(), // 1 month deposit
         bookingDate: DateTime.now(),
         startDate: _startDate!,
       );
@@ -349,10 +359,9 @@ class _BookingDialogState extends State<BookingDialog> {
     }
   }
 
-  void _sharePG(BuildContext context, pg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Share feature coming soon!')),
-    );
-  }
+  // void _sharePG(BuildContext context, pg) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(content: Text('Share feature coming soon!')),
+  //   );
+  // }
 }
-

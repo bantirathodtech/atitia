@@ -60,7 +60,7 @@ class OwnerPgInfoCard extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                theme.primaryColor.withOpacity(0.1),
+                theme.primaryColor.withValues(alpha: 0.1),
                 theme.colorScheme.surface,
               ],
             ),
@@ -71,7 +71,7 @@ class OwnerPgInfoCard extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: isDarkMode
-                    ? Colors.black.withOpacity(0.2)
+                    ? Colors.black.withValues(alpha: 0.2)
                     : theme.primaryColor.withOpacity(0.05),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
@@ -90,13 +90,13 @@ class OwnerPgInfoCard extends StatelessWidget {
                       gradient: LinearGradient(
                         colors: [
                           theme.primaryColor,
-                          theme.primaryColor.withOpacity(0.7),
+                          theme.primaryColor.withValues(alpha: 0.7),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: theme.primaryColor.withOpacity(0.3),
+                          color: theme.primaryColor.withValues(alpha: 0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -144,7 +144,7 @@ class OwnerPgInfoCard extends StatelessWidget {
                     ),
                     tooltip: 'Edit PG Details',
                     style: IconButton.styleFrom(
-                      backgroundColor: theme.primaryColor.withOpacity(0.1),
+                      backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -282,10 +282,10 @@ class OwnerPgInfoCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.info.withOpacity(0.1),
+                        color: AppColors.info.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border:
-                            Border.all(color: AppColors.info.withOpacity(0.3)),
+                            Border.all(color: AppColors.info.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -331,7 +331,7 @@ class OwnerPgInfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withOpacity(isDarkMode ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -346,7 +346,7 @@ class OwnerPgInfoCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          CaptionText(text: label, color: color.withOpacity(0.8)),
+          CaptionText(text: label, color: color.withValues(alpha: 0.8)),
         ],
       ),
     );
@@ -375,7 +375,7 @@ class OwnerPgInfoCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.2),
+                  color: AppColors.success.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -409,7 +409,7 @@ class OwnerPgInfoCard extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isDarkMode
-                        ? AppColors.darkCard.withOpacity(0.5)
+                        ? AppColors.darkCard.withValues(alpha: 0.5)
                         : AppColors.surface,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(

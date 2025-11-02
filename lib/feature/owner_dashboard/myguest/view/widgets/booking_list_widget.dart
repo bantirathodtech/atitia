@@ -63,7 +63,7 @@ class BookingListWidget extends StatelessWidget {
                     vertical: AppSpacing.paddingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(booking.status).withOpacity(0.2),
+                    color: _getStatusColor(booking.status).withValues(alpha: 0.2),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),

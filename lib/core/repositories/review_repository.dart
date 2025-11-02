@@ -1,7 +1,8 @@
 // lib/core/repositories/review_repository.dart
 
-import '../../core/services/firebase/database/firestore_database_service.dart';
-import '../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../core/di/common/unified_service_locator.dart';
+import '../../common/utils/date/converter/date_service_converter.dart';
+import '../../core/interfaces/database/database_service_interface.dart';
 import '../models/review_model.dart';
 
 /// ⭐ **REVIEW REPOSITORY - PRODUCTION READY**
@@ -11,14 +12,22 @@ import '../models/review_model.dart';
 /// - Real-time review streams
 /// - Review analytics and statistics
 /// - Review moderation
+/// Uses interface-based services for dependency injection (swappable backends)
 class ReviewRepository {
-  final FirestoreServiceWrapper _firestoreService = getIt.firestore;
+  final IDatabaseService _databaseService;
   static const String _reviewsCollection = 'reviews';
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  ReviewRepository({
+    IDatabaseService? databaseService,
+  }) : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database;
 
   /// Create a new review
   Future<String> createReview(ReviewModel review) async {
     try {
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         _reviewsCollection,
         review.reviewId,
         review.toMap(),
@@ -32,7 +41,7 @@ class ReviewRepository {
   /// Update an existing review
   Future<void> updateReview(ReviewModel review) async {
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         _reviewsCollection,
         review.reviewId,
         review.toMap(),
@@ -44,7 +53,7 @@ class ReviewRepository {
 
   /// Get reviews for a specific PG
   Stream<List<ReviewModel>> streamPGReviews(String pgId, {int limit = 20}) {
-    return _firestoreService
+    return _databaseService
         .getCollectionStreamWithFilter(_reviewsCollection, 'pgId', pgId)
         .map((snapshot) {
       return snapshot.docs
@@ -52,9 +61,8 @@ class ReviewRepository {
             final data = doc.data() as Map<String, dynamic>;
             return ReviewModel.fromMap(data);
           })
-          .where((review) => 
-              review.status == 'approved' &&
-              !review.isOwnerResponse)
+          .where((review) =>
+              review.status == 'approved' && !review.isOwnerResponse)
           .toList()
         ..sort((a, b) => b.reviewDate.compareTo(a.reviewDate))
         ..take(limit);
@@ -63,30 +71,26 @@ class ReviewRepository {
 
   /// Get guest's reviews
   Stream<List<ReviewModel>> streamGuestReviews(String guestId) {
-    return _firestoreService
+    return _databaseService
         .getCollectionStreamWithFilter(_reviewsCollection, 'guestId', guestId)
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return ReviewModel.fromMap(data);
-          })
-          .toList()
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return ReviewModel.fromMap(data);
+      }).toList()
         ..sort((a, b) => b.reviewDate.compareTo(a.reviewDate));
     });
   }
 
   /// Get owner's reviews (for all their PGs)
   Stream<List<ReviewModel>> streamOwnerReviews(String ownerId) {
-    return _firestoreService
+    return _databaseService
         .getCollectionStreamWithFilter(_reviewsCollection, 'ownerId', ownerId)
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return ReviewModel.fromMap(data);
-          })
-          .toList()
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return ReviewModel.fromMap(data);
+      }).toList()
         ..sort((a, b) => b.reviewDate.compareTo(a.reviewDate));
     });
   }
@@ -94,7 +98,7 @@ class ReviewRepository {
   /// Get review statistics for a PG
   Future<Map<String, dynamic>> getPGReviewStats(String pgId) async {
     try {
-      final reviews = await _firestoreService.queryDocuments(
+      final reviews = await _databaseService.queryDocuments(
         _reviewsCollection,
         field: 'pgId',
         isEqualTo: pgId,
@@ -120,7 +124,8 @@ class ReviewRepository {
             final data = doc.data() as Map<String, dynamic>;
             return ReviewModel.fromMap(data);
           })
-          .where((review) => review.status == 'approved' && !review.isOwnerResponse)
+          .where((review) =>
+              review.status == 'approved' && !review.isOwnerResponse)
           .toList();
 
       if (approvedReviews.isEmpty) {
@@ -154,20 +159,25 @@ class ReviewRepository {
       // Calculate aspect ratings
       final aspectRatings = {
         'cleanliness': approvedReviews
-            .map((review) => review.cleanlinessRating)
-            .reduce((a, b) => a + b) / approvedReviews.length,
+                .map((review) => review.cleanlinessRating)
+                .reduce((a, b) => a + b) /
+            approvedReviews.length,
         'amenities': approvedReviews
-            .map((review) => review.amenitiesRating)
-            .reduce((a, b) => a + b) / approvedReviews.length,
+                .map((review) => review.amenitiesRating)
+                .reduce((a, b) => a + b) /
+            approvedReviews.length,
         'location': approvedReviews
-            .map((review) => review.locationRating)
-            .reduce((a, b) => a + b) / approvedReviews.length,
+                .map((review) => review.locationRating)
+                .reduce((a, b) => a + b) /
+            approvedReviews.length,
         'food': approvedReviews
-            .map((review) => review.foodRating)
-            .reduce((a, b) => a + b) / approvedReviews.length,
+                .map((review) => review.foodRating)
+                .reduce((a, b) => a + b) /
+            approvedReviews.length,
         'staff': approvedReviews
-            .map((review) => review.staffRating)
-            .reduce((a, b) => a + b) / approvedReviews.length,
+                .map((review) => review.staffRating)
+                .reduce((a, b) => a + b) /
+            approvedReviews.length,
       };
 
       return {
@@ -182,22 +192,26 @@ class ReviewRepository {
   }
 
   /// Vote on review helpfulness
-  Future<void> voteReviewHelpful(String reviewId, String userId, bool isHelpful) async {
+  Future<void> voteReviewHelpful(
+      String reviewId, String userId, bool isHelpful) async {
     try {
       // This would typically be handled by a separate votes collection
       // For now, we'll update the review directly
-      final reviewDoc = await _firestoreService.getDocument(_reviewsCollection, reviewId);
+      final reviewDoc =
+          await _databaseService.getDocument(_reviewsCollection, reviewId);
       if (reviewDoc.exists) {
         final data = reviewDoc.data() as Map<String, dynamic>;
         final review = ReviewModel.fromMap(data);
-        final newHelpfulVotes = isHelpful 
-            ? review.helpfulVotes + 1 
-            : review.helpfulVotes;
-        
-        await _firestoreService.updateDocument(
+        final newHelpfulVotes =
+            isHelpful ? review.helpfulVotes + 1 : review.helpfulVotes;
+
+        await _databaseService.updateDocument(
           _reviewsCollection,
           reviewId,
-          {'helpfulVotes': newHelpfulVotes, 'totalVotes': review.totalVotes + 1},
+          {
+            'helpfulVotes': newHelpfulVotes,
+            'totalVotes': review.totalVotes + 1
+          },
         );
       }
     } catch (e) {
@@ -208,12 +222,12 @@ class ReviewRepository {
   /// Add owner response to review
   Future<void> addOwnerResponse(String reviewId, String response) async {
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         _reviewsCollection,
         reviewId,
         {
           'ownerResponse': response,
-          'ownerResponseDate': DateTime.now().toIso8601String(),
+          'ownerResponseDate': DateServiceConverter.toService(DateTime.now()),
         },
       );
     } catch (e) {
@@ -224,12 +238,12 @@ class ReviewRepository {
   /// Moderate review (approve/reject)
   Future<void> moderateReview(String reviewId, String status) async {
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         _reviewsCollection,
         reviewId,
         {
           'status': status,
-          'lastUpdated': DateTime.now().toIso8601String(),
+          'lastUpdated': DateServiceConverter.toService(DateTime.now()),
         },
       );
     } catch (e) {
@@ -240,7 +254,7 @@ class ReviewRepository {
   /// Check if guest has reviewed PG
   Future<bool> hasGuestReviewedPG(String guestId, String pgId) async {
     try {
-      final reviews = await _firestoreService.queryDocuments(
+      final reviews = await _databaseService.queryDocuments(
         _reviewsCollection,
         field: 'guestId',
         isEqualTo: guestId,
@@ -258,7 +272,7 @@ class ReviewRepository {
 
   /// Get pending reviews for moderation
   Stream<List<ReviewModel>> streamPendingReviews() {
-    return _firestoreService
+    return _databaseService
         .getCollectionStream(_reviewsCollection)
         .map((snapshot) {
       return snapshot.docs
@@ -275,7 +289,7 @@ class ReviewRepository {
   /// Delete review
   Future<void> deleteReview(String reviewId) async {
     try {
-      await _firestoreService.deleteDocument(_reviewsCollection, reviewId);
+      await _databaseService.deleteDocument(_reviewsCollection, reviewId);
     } catch (e) {
       throw Exception('Failed to delete review: $e');
     }
@@ -283,7 +297,7 @@ class ReviewRepository {
 
   /// Get recent reviews across all PGs
   Stream<List<ReviewModel>> streamRecentReviews({int limit = 10}) {
-    return _firestoreService
+    return _databaseService
         .getCollectionStream(_reviewsCollection)
         .map((snapshot) {
       return snapshot.docs

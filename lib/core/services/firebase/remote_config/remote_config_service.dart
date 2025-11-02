@@ -39,7 +39,6 @@ class RemoteConfigServiceWrapper {
       await _remoteConfig.fetchAndActivate();
       return true;
     } catch (e) {
-      print('Remote Config fetch failed: $e');
       return false;
     }
   }

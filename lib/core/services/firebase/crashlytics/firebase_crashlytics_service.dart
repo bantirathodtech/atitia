@@ -1,4 +1,5 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import '../../../../common/utils/date/converter/date_service_converter.dart';
 
 /// Firebase Crashlytics service for error monitoring and crash reporting.
 ///
@@ -30,12 +31,7 @@ class CrashlyticsServiceWrapper {
 
       // Set initial configuration
       await _setInitialConfiguration();
-
-      print('✅ Crashlytics service initialized successfully');
-      print('   - Crash reporting: Enabled');
-      print('   - Error monitoring: Active');
     } catch (error) {
-      print('⚠️ Crashlytics initialization completed with notes: $error');
       // Don't throw error - crashlytics should not block app startup
       // App should continue functioning even if crash reporting fails
     }
@@ -50,13 +46,11 @@ class CrashlyticsServiceWrapper {
   Future<void> _setInitialConfiguration() async {
     // Set initial custom keys for better crash context
     await _crashlytics.setCustomKey(
-        'app_start_time', DateTime.now().toIso8601String());
+        'app_start_time', DateServiceConverter.toService(DateTime.now()));
     await _crashlytics.setCustomKey('crashlytics_initialized', true);
 
     // Log initialization event for tracking
     await _crashlytics.log('Crashlytics service initialized');
-
-    print('🔧 Crashlytics initial configuration applied');
   }
 
   /// Enable crash reporting and error monitoring.
@@ -65,13 +59,11 @@ class CrashlyticsServiceWrapper {
   /// Call this during app initialization to start crash collection.
   Future<void> enableCrashReporting() async {
     await _crashlytics.setCrashlyticsCollectionEnabled(true);
-    print('✅ Crashlytics error monitoring enabled');
   }
 
   /// Disable crash reporting (useful for debug builds).
   Future<void> disableCrashReporting() async {
     await _crashlytics.setCrashlyticsCollectionEnabled(false);
-    print('⚠️ Crashlytics error monitoring disabled');
   }
 
   /// Record a custom error with stack trace for monitoring.

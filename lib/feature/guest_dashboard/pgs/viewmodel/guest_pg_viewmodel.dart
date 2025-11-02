@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../common/lifecycle/state/provider_state.dart';
+import '../../../../common/utils/logging/logging_mixin.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../data/models/guest_pg_model.dart';
 import '../data/repository/guest_pg_repository.dart';
@@ -10,9 +11,15 @@ import '../data/repository/guest_pg_repository.dart';
 /// ViewModel for managing guest PGs UI state and business logic
 /// Extends BaseProviderState for automatic service access and state management
 /// Coordinates between UI layer and Repository layer
-class GuestPgViewModel extends BaseProviderState {
-  final GuestPgRepository _repository = GuestPgRepository();
+class GuestPgViewModel extends BaseProviderState with LoggingMixin {
+  final GuestPgRepository _repository;
   final _analyticsService = getIt.analytics;
+
+  /// Constructor with dependency injection
+  /// If repository is not provided, creates it with default services
+  GuestPgViewModel({
+    GuestPgRepository? repository,
+  }) : _repository = repository ?? GuestPgRepository();
 
   List<GuestPgModel> _pgList = [];
   List<GuestPgModel> _filteredPGs = [];
@@ -76,8 +83,11 @@ class GuestPgViewModel extends BaseProviderState {
   /// Sets up continuous listener for PG listing updates
   /// Automatically manages loading state through BaseProviderState
   void loadPGs(BuildContext context) {
+    logMethodEntry('loadPGs');
     setLoading(true);
     clearError();
+
+    logInfo('Starting to load PGs', feature: 'guest_pgs');
 
     // Listen to real-time PG updates
     _repository.getAllPGsStream().listen(
@@ -86,6 +96,13 @@ class GuestPgViewModel extends BaseProviderState {
         _updateFilteredPGs();
         _updatePGStats();
         setLoading(false);
+
+        logInfo(
+          'PGs loaded successfully',
+          feature: 'guest_pgs',
+          metadata: {'count': pgs.length},
+        );
+
         _analyticsService.logEvent(
           name: 'pgs_loaded',
           parameters: {
@@ -96,6 +113,13 @@ class GuestPgViewModel extends BaseProviderState {
       onError: (error) {
         setError(true, 'Failed to load PGs: $error');
         setLoading(false);
+
+        logError(
+          'Failed to load PGs',
+          feature: 'guest_pgs',
+          error: error,
+        );
+
         _analyticsService.logEvent(
           name: 'pgs_load_error',
           parameters: {
@@ -104,11 +128,14 @@ class GuestPgViewModel extends BaseProviderState {
         );
       },
     );
+
+    logMethodExit('loadPGs');
   }
 
   /// Refreshes PG data manually
   /// Useful for pull-to-refresh functionality
   void refreshPGs(BuildContext context) {
+    logUserAction('Refresh PGs', feature: 'guest_pgs');
     loadPGs(context);
   }
 
@@ -117,6 +144,18 @@ class GuestPgViewModel extends BaseProviderState {
   void setSelectedPG(GuestPgModel pg) {
     _selectedPG = pg;
     notifyListeners();
+
+    logUserAction(
+      'PG Selected',
+      feature: 'guest_pgs',
+      metadata: {
+        'pgId': pg.pgId,
+        'pgName': pg.pgName,
+        'city': pg.city,
+        'area': pg.area,
+      },
+    );
+
     _analyticsService.logEvent(
       name: 'pg_selected',
       parameters: {
@@ -133,13 +172,24 @@ class GuestPgViewModel extends BaseProviderState {
   void clearSelectedPG() {
     _selectedPG = null;
     notifyListeners();
+
+    logUserAction('Clear Selected PG', feature: 'guest_pgs');
   }
 
   /// Sets filter for PG listings
   void setFilter(String filter) {
+    final oldFilter = _selectedFilter;
     _selectedFilter = filter;
     _updateFilteredPGs();
     notifyListeners();
+
+    logStateChange(
+      oldFilter,
+      filter,
+      feature: 'guest_pgs',
+      metadata: {'filter': filter},
+    );
+
     _analyticsService.logEvent(
       name: 'pg_filter_changed',
       parameters: {'filter': filter},
@@ -148,9 +198,21 @@ class GuestPgViewModel extends BaseProviderState {
 
   /// Sets search query for PG listings
   void setSearchQuery(String query) {
+    final oldQuery = _searchQuery;
     _searchQuery = query;
     _updateFilteredPGs();
     notifyListeners();
+
+    logUserAction(
+      'Search Query Changed',
+      feature: 'guest_pgs',
+      metadata: {
+        'oldQuery': oldQuery,
+        'newQuery': query,
+        'resultCount': _filteredPGs.length,
+      },
+    );
+
     _analyticsService.logEvent(
       name: 'pg_search_query_changed',
       parameters: {'query': query},

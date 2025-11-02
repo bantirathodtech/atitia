@@ -42,16 +42,16 @@ class ThemeToggleButton extends StatelessWidget {
   // ==========================================================================
   // Optional Parameters
   // ==========================================================================
-  
+
   /// Icon size (default: 24.0 for standard app bar icons)
   final double size;
-  
+
   /// Custom tooltip text (if null, auto-generates based on current mode)
   final String? tooltip;
-  
+
   /// Show theme mode name next to icon (useful for settings screens)
   final bool showLabel;
-  
+
   /// Enable haptic feedback on tap (optional tactile response)
   final bool enableHapticFeedback;
 
@@ -72,14 +72,14 @@ class ThemeToggleButton extends StatelessWidget {
     // This keeps the icon and colors in sync with current theme mode
     // ==========================================================================
     final themeProvider = context.watch<ThemeProvider>();
-    
+
     // ==========================================================================
     // Get current theme info
     // ==========================================================================
     final currentMode = themeProvider.themeMode;
     final icon = themeProvider.themeModeIcon;
     final modeName = themeProvider.themeModeName;
-    
+
     // ==========================================================================
     // Determine next theme mode for tooltip
     // ==========================================================================
@@ -95,7 +95,7 @@ class ThemeToggleButton extends StatelessWidget {
         nextModeName = 'Light Mode';
         break;
     }
-    
+
     // ==========================================================================
     // Get icon color based on current theme
     // ==========================================================================
@@ -104,8 +104,10 @@ class ThemeToggleButton extends StatelessWidget {
     // This ensures the icon is always visible regardless of background
     // ==========================================================================
     final iconColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.amber  // Warm amber in dark mode (sun/moon color)
-        : Theme.of(context).primaryColor;  // Primary color in light mode
+        ? Colors.amber // Warm amber in dark mode (sun/moon color)
+        : Theme.of(context)
+            .appBarTheme
+            .foregroundColor; // Theme-based white color in light mode
 
     // ==========================================================================
     // Build button based on showLabel parameter
@@ -140,7 +142,7 @@ class ThemeToggleButton extends StatelessWidget {
                 },
                 child: Icon(
                   icon,
-                  key: ValueKey<IconData>(icon),  // Key for animation
+                  key: ValueKey<IconData>(icon), // Key for animation
                   color: iconColor,
                   size: size,
                 ),
@@ -175,7 +177,7 @@ class ThemeToggleButton extends StatelessWidget {
           },
           child: Icon(
             icon,
-            key: ValueKey<IconData>(icon),  // Key ensures animation triggers
+            key: ValueKey<IconData>(icon), // Key ensures animation triggers
             color: iconColor,
             size: size,
           ),
@@ -209,7 +211,7 @@ class ThemeModeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -224,7 +226,7 @@ class ThemeModeSelector extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: 12),
-            
+
             // Light Mode Option
             _buildThemeOption(
               context,
@@ -235,7 +237,7 @@ class ThemeModeSelector extends StatelessWidget {
               'Always use bright theme',
             ),
             const Divider(height: 1),
-            
+
             // Dark Mode Option
             _buildThemeOption(
               context,
@@ -246,7 +248,7 @@ class ThemeModeSelector extends StatelessWidget {
               'Always use dark theme',
             ),
             const Divider(height: 1),
-            
+
             // System Mode Option
             _buildThemeOption(
               context,
@@ -272,7 +274,7 @@ class ThemeModeSelector extends StatelessWidget {
     String subtitle,
   ) {
     final isSelected = provider.themeMode == mode;
-    
+
     return InkWell(
       onTap: () => provider.setThemeMode(mode),
       child: Padding(
@@ -287,7 +289,7 @@ class ThemeModeSelector extends StatelessWidget {
                   : Theme.of(context).textTheme.bodyMedium?.color,
             ),
             const SizedBox(width: 16),
-            
+
             // Title and subtitle
             Expanded(
               child: Column(
@@ -307,7 +309,7 @@ class ThemeModeSelector extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Radio button indicator
             Radio<ThemeMode>(
               value: mode,
@@ -324,4 +326,3 @@ class ThemeModeSelector extends StatelessWidget {
     );
   }
 }
-

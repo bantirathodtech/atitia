@@ -37,10 +37,10 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final surfaceColor = theme.colorScheme.surface;
-    final textSecondary = theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
-    final dividerColor = theme.dividerColor;
-    
+    // final surfaceColor = theme.colorScheme.surface;
+    // final textSecondary = theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+    // final dividerColor = theme.dividerColor;
+
     // ========================================================================
     // Empty State - No Photos Added
     // ========================================================================
@@ -48,14 +48,14 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
       return Container(
         height: 180,
         decoration: BoxDecoration(
-          color: isDarkMode 
-              ? AppColors.darkCard  // Dark background in dark mode
-              : AppColors.surfaceVariant,  // Light background in light mode
+          color: isDarkMode
+              ? AppColors.darkCard // Dark background in dark mode
+              : AppColors.surfaceVariant, // Light background in light mode
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           border: Border.all(
             color: isDarkMode
-                ? AppColors.darkDivider  // Subtle border in dark mode
-                : AppColors.outline,  // Medium border in light mode
+                ? AppColors.darkDivider // Subtle border in dark mode
+                : AppColors.outline, // Medium border in light mode
           ),
         ),
         child: Center(
@@ -63,16 +63,16 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.photo_library, 
-                size: 48, 
+                Icons.photo_library,
+                size: 48,
                 color: isDarkMode
-                    ? AppColors.textTertiary  // Light icon in dark mode
-                    : AppColors.textSecondary,  // Medium icon in light mode
+                    ? AppColors.textTertiary // Light icon in dark mode
+                    : AppColors.textSecondary, // Medium icon in light mode
               ),
               const SizedBox(height: AppSpacing.paddingS),
               CaptionText(
                 text: 'No photos added',
-                color: textSecondary,  // Theme-aware text
+                color: AppColors.textSecondary, // Theme-aware text
               ),
             ],
           ),
@@ -86,23 +86,26 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
     if (photoUrls.length == 1) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        child: AdaptiveImage(
-          imageUrl: photoUrls.first,
-          height: 180,
+        child: SizedBox(
           width: double.infinity,
-          fit: BoxFit.cover,
-          placeholder: Container(
+          height: 180,
+          child: AdaptiveImage(
+            imageUrl: photoUrls.first,
             height: 180,
-            color: isDarkMode 
-                ? AppColors.darkCard  // Dark placeholder in dark mode
-                : AppColors.surfaceVariant,  // Light placeholder in light mode
-            child: Center(
-              child: Icon(
-                Icons.image, 
-                size: 48, 
-                color: isDarkMode
-                    ? AppColors.textTertiary  // Light icon in dark mode
-                    : AppColors.textSecondary,  // Medium icon in light mode
+            fit: BoxFit.cover,
+            placeholder: Container(
+              height: 180,
+              color: isDarkMode
+                  ? AppColors.darkCard // Dark placeholder in dark mode
+                  : AppColors.surfaceVariant, // Light placeholder in light mode
+              child: Center(
+                child: Icon(
+                  Icons.image,
+                  size: 48,
+                  color: isDarkMode
+                      ? AppColors.textTertiary // Light icon in dark mode
+                      : AppColors.textSecondary, // Medium icon in light mode
+                ),
               ),
             ),
           ),
@@ -129,16 +132,16 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
             placeholder: Container(
               height: 180,
               width: 180,
-              color: isDarkMode 
-                  ? AppColors.darkCard  // Dark placeholder in dark mode
-                  : AppColors.surfaceVariant,  // Light placeholder in light mode
+              color: isDarkMode
+                  ? AppColors.darkCard // Dark placeholder in dark mode
+                  : AppColors.surfaceVariant, // Light placeholder in light mode
               child: Center(
                 child: Icon(
-                  Icons.image, 
-                  size: 48, 
+                  Icons.image,
+                  size: 48,
                   color: isDarkMode
-                      ? AppColors.textTertiary  // Light icon in dark mode
-                      : AppColors.textSecondary,  // Medium icon in light mode
+                      ? AppColors.textTertiary // Light icon in dark mode
+                      : AppColors.textSecondary, // Medium icon in light mode
                 ),
               ),
             ),

@@ -1,53 +1,75 @@
 // lib/features/guest_dashboard/complaints/viewmodel/guest_complaint_viewmodel.dart
 
+import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
+import '../../../../common/lifecycle/mixin/stream_subscription_mixin.dart';
 import '../../../../common/lifecycle/state/provider_state.dart';
-import '../../../auth/logic/auth_provider.dart';
+import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../data/models/guest_complaint_model.dart';
 import '../data/repository/guest_complaint_repository.dart';
 
 /// ViewModel for managing guest complaints UI state and business logic
-/// Extends BaseViewModel for automatic service access and state management
+/// Extends BaseProviderState for automatic service access and state management
 /// Coordinates between UI layer and Repository layer
-class GuestComplaintViewModel extends BaseProviderState {
-  final GuestComplaintRepository _repository = GuestComplaintRepository();
+class GuestComplaintViewModel extends BaseProviderState
+    with StreamSubscriptionMixin {
+  final GuestComplaintRepository _repository;
+  final _authService = getIt.auth;
+  final _analyticsService = getIt.analytics;
+
+  /// Constructor with dependency injection
+  /// If repository is not provided, creates it with default services
+  GuestComplaintViewModel({
+    GuestComplaintRepository? repository,
+  }) : _repository = repository ?? GuestComplaintRepository();
 
   List<GuestComplaintModel> _complaints = [];
+  StreamSubscription<List<GuestComplaintModel>>? _complaintsSubscription;
 
   /// Read-only list of guest complaints for UI consumption
   List<GuestComplaintModel> get complaints => _complaints;
 
   /// Loads complaints for the current authenticated guest user
-  /// Uses BuildContext to access AuthProvider for guestId
   /// Sets up real-time stream listener for complaint updates
-  void loadComplaints(BuildContext context) {
-    // Get guestId from AuthProvider
-    final guestId =
-        Provider.of<AuthProvider>(context, listen: false).user?.userId ?? '';
+  void loadComplaints([String? guestId]) {
+    // Cancel existing subscription if any
+    _complaintsSubscription?.cancel();
 
-    if (guestId.isEmpty) {
+    // Get guestId from auth service if not provided
+    final userId = guestId ?? _authService.currentUserId ?? '';
+
+    if (userId.isEmpty) {
       _complaints = [];
       notifyListeners();
       return;
     }
 
     setLoading(true);
+    clearError();
 
     // Listen to real-time complaint updates
-    _repository.getComplaintsForGuest(guestId).listen(
+    _complaintsSubscription = _repository.getComplaintsForGuest(userId).listen(
       (complaintList) {
         _complaints = complaintList;
         setLoading(false);
+        notifyListeners();
       },
       onError: (error) {
-        setError(true, 'Failed to load complaints: $error');
+        setError(true, 'Failed to load complaints: ${error.toString()}');
         setLoading(false);
+        notifyListeners();
+        _analyticsService.logEvent(
+          name: 'complaint_load_error',
+          parameters: {'error': error.toString()},
+        );
       },
     );
+
+    // Register subscription for automatic cleanup
+    if (_complaintsSubscription != null) {
+      addSubscription(_complaintsSubscription!);
+    }
   }
 
   /// Submits a new complaint to the repository
@@ -86,10 +108,35 @@ class GuestComplaintViewModel extends BaseProviderState {
     File file,
   ) async {
     try {
-      return await _repository.uploadComplaintImage(guestId, complaintId, file);
+      setLoading(true);
+      clearError();
+      final url =
+          await _repository.uploadComplaintImage(guestId, complaintId, file);
+      _analyticsService.logEvent(
+        name: 'complaint_image_uploaded',
+        parameters: {'complaintId': complaintId},
+      );
+      return url;
     } catch (e) {
-      setError(true, 'Failed to upload image: $e');
+      setError(true, 'Failed to upload image: ${e.toString()}');
+      _analyticsService.logEvent(
+        name: 'complaint_image_upload_failed',
+        parameters: {'error': e.toString()},
+      );
       rethrow;
+    } finally {
+      setLoading(false);
     }
+  }
+
+  /// Refreshes complaints list
+  void refreshComplaints([String? guestId]) {
+    loadComplaints(guestId);
+  }
+
+  @override
+  void dispose() {
+    disposeAll(); // Clean up all subscriptions and timers
+    super.dispose();
   }
 }

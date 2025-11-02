@@ -2,6 +2,10 @@
 
 /// Model for owner's payment details (bank account, UPI, QR code)
 /// Used by guests to make payments
+library;
+
+import '../../common/utils/date/converter/date_service_converter.dart';
+
 class OwnerPaymentDetailsModel {
   final String ownerId;
   final String? bankName;
@@ -13,7 +17,7 @@ class OwnerPaymentDetailsModel {
   final String? paymentNote; // Additional instructions for guests
   final bool isActive;
   final DateTime? lastUpdated;
-  
+
   OwnerPaymentDetailsModel({
     required this.ownerId,
     this.bankName,
@@ -39,7 +43,7 @@ class OwnerPaymentDetailsModel {
       paymentNote: map['paymentNote'] as String?,
       isActive: map['isActive'] as bool? ?? true,
       lastUpdated: map['lastUpdated'] != null
-          ? DateTime.parse(map['lastUpdated'] as String)
+          ? DateServiceConverter.fromService(map['lastUpdated'] as String)
           : null,
     );
   }
@@ -55,7 +59,8 @@ class OwnerPaymentDetailsModel {
       'upiQrCodeUrl': upiQrCodeUrl,
       'paymentNote': paymentNote,
       'isActive': isActive,
-      'lastUpdated': (lastUpdated ?? DateTime.now()).toIso8601String(),
+      'lastUpdated':
+          DateServiceConverter.toService(lastUpdated ?? DateTime.now()),
     };
   }
 
@@ -101,4 +106,3 @@ class OwnerPaymentDetailsModel {
     return '****${accountNumber!.substring(accountNumber!.length - 4)}';
   }
 }
-

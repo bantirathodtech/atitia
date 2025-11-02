@@ -10,6 +10,10 @@
 /// - PG, Floor, Room, Bed details
 /// - Financial info (rent, deposit, dues)
 /// - Timestamps
+library;
+
+import '../../common/utils/date/converter/date_service_converter.dart';
+
 class BookingModel {
   final String bookingId;
   final String guestId;
@@ -18,24 +22,24 @@ class BookingModel {
   final String floorId;
   final String roomId;
   final String bedId;
-  
+
   final String pgName;
   final String roomNumber;
   final String bedNumber;
   final int sharingType; // 1-5 sharing
-  
+
   final double rentPerMonth;
   final double securityDeposit;
   final double? pendingDues;
-  
+
   final DateTime bookingDate;
   final DateTime startDate;
   final DateTime? endDate;
-  
+
   final String status; // pending, confirmed, active, expired, cancelled
   final String? cancellationReason;
   final DateTime? cancellationDate;
-  
+
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -81,19 +85,21 @@ class BookingModel {
       rentPerMonth: (map['rentPerMonth'] ?? 0).toDouble(),
       securityDeposit: (map['securityDeposit'] ?? 0).toDouble(),
       pendingDues: map['pendingDues']?.toDouble(),
-      bookingDate: DateTime.parse(map['bookingDate']),
-      startDate: DateTime.parse(map['startDate']),
-      endDate: map['endDate'] != null ? DateTime.parse(map['endDate']) : null,
+      bookingDate: DateServiceConverter.fromService(map['bookingDate']),
+      startDate: DateServiceConverter.fromService(map['startDate']),
+      endDate: map['endDate'] != null
+          ? DateServiceConverter.fromService(map['endDate'])
+          : null,
       status: map['status'] ?? 'pending',
       cancellationReason: map['cancellationReason'],
       cancellationDate: map['cancellationDate'] != null
-          ? DateTime.parse(map['cancellationDate'])
+          ? DateServiceConverter.fromService(map['cancellationDate'])
           : null,
       createdAt: map['createdAt'] != null
-          ? DateTime.parse(map['createdAt'])
+          ? DateServiceConverter.fromService(map['createdAt'])
           : null,
       updatedAt: map['updatedAt'] != null
-          ? DateTime.parse(map['updatedAt'])
+          ? DateServiceConverter.fromService(map['updatedAt'])
           : null,
     );
   }
@@ -114,14 +120,17 @@ class BookingModel {
       'rentPerMonth': rentPerMonth,
       'securityDeposit': securityDeposit,
       'pendingDues': pendingDues,
-      'bookingDate': bookingDate.toIso8601String(),
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate?.toIso8601String(),
+      'bookingDate': DateServiceConverter.toService(bookingDate),
+      'startDate': DateServiceConverter.toService(startDate),
+      'endDate':
+          endDate != null ? DateServiceConverter.toService(endDate!) : null,
       'status': status,
       'cancellationReason': cancellationReason,
-      'cancellationDate': cancellationDate?.toIso8601String(),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'cancellationDate': cancellationDate != null
+          ? DateServiceConverter.toService(cancellationDate!)
+          : null,
+      'createdAt': DateServiceConverter.toService(createdAt),
+      'updatedAt': DateServiceConverter.toService(updatedAt),
     };
   }
 
@@ -175,4 +184,3 @@ class BookingModel {
     );
   }
 }
-

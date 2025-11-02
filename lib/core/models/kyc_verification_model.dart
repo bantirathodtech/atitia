@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../../common/styles/colors.dart';
+import '../../common/utils/date/converter/date_service_converter.dart';
 
 /// Model for KYC (Know Your Customer) verification status
 /// Tracks document verification progress for compliance
@@ -73,10 +74,10 @@ class KycVerificationModel {
       businessLicenseVerified: map['businessLicenseVerified'] as bool? ?? false,
       businessLicenseUrl: map['businessLicenseUrl'] as String?,
       submittedAt: map['submittedAt'] != null
-          ? DateTime.parse(map['submittedAt'] as String)
+          ? DateServiceConverter.fromService(map['submittedAt'] as String)
           : null,
       verifiedAt: map['verifiedAt'] != null
-          ? DateTime.parse(map['verifiedAt'] as String)
+          ? DateServiceConverter.fromService(map['verifiedAt'] as String)
           : null,
       verifiedBy: map['verifiedBy'] as String?,
       rejectionReason: map['rejectionReason'] as String?,
@@ -85,7 +86,8 @@ class KycVerificationModel {
       documentsSubmitted: map['documentsSubmitted'] as int? ?? 0,
       documentsVerified: map['documentsVerified'] as int? ?? 0,
       totalDocumentsRequired: map['totalDocumentsRequired'] as int? ?? 4,
-      lastUpdated: DateTime.parse(map['lastUpdated'] as String),
+      lastUpdated:
+          DateServiceConverter.fromService(map['lastUpdated'] as String),
     );
   }
 
@@ -102,15 +104,19 @@ class KycVerificationModel {
       'addressProofUrl': addressProofUrl,
       'businessLicenseVerified': businessLicenseVerified,
       'businessLicenseUrl': businessLicenseUrl,
-      'submittedAt': submittedAt?.toIso8601String(),
-      'verifiedAt': verifiedAt?.toIso8601String(),
+      'submittedAt': submittedAt != null
+          ? DateServiceConverter.toService(submittedAt!)
+          : null,
+      'verifiedAt': verifiedAt != null
+          ? DateServiceConverter.toService(verifiedAt!)
+          : null,
       'verifiedBy': verifiedBy,
       'rejectionReason': rejectionReason,
       'missingDocuments': missingDocuments,
       'documentsSubmitted': documentsSubmitted,
       'documentsVerified': documentsVerified,
       'totalDocumentsRequired': totalDocumentsRequired,
-      'lastUpdated': lastUpdated.toIso8601String(),
+      'lastUpdated': DateServiceConverter.toService(lastUpdated),
     };
   }
 

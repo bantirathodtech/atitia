@@ -7,7 +7,12 @@ import '../../../feature/owner_dashboard/foods/data/models/owner_food_menu.dart'
 class MenuInitializationHelper {
   /// Creates default weekly menus for a new owner
   /// Returns list of 7 menus (Monday to Sunday) with sample Indian meals
-  static List<OwnerFoodMenu> createDefaultWeeklyMenus(String ownerId) {
+  ///
+  /// Multi-PG Support:
+  /// - If pgId is provided, creates menus for that specific PG
+  /// - If pgId is null, creates menus for all PGs (backward compatible)
+  static List<OwnerFoodMenu> createDefaultWeeklyMenus(String ownerId,
+      {String? pgId}) {
     final weekdays = [
       'Monday',
       'Tuesday',
@@ -20,8 +25,10 @@ class MenuInitializationHelper {
 
     return weekdays.map((day) {
       return OwnerFoodMenu(
-        menuId: '${ownerId}_${day.toLowerCase()}_default',
+        menuId:
+            '${ownerId}_${day.toLowerCase()}_default${pgId != null ? '_$pgId' : ''}',
         ownerId: ownerId,
+        pgId: pgId, // Link menu to specific PG
         day: day,
         breakfast: _getDefaultBreakfast(day),
         lunch: _getDefaultLunch(day),
@@ -215,10 +222,13 @@ class MenuInitializationHelper {
   }
 
   /// Creates an empty menu template for a specific day
-  static OwnerFoodMenu createEmptyMenu(String ownerId, String day) {
+  static OwnerFoodMenu createEmptyMenu(String ownerId, String day,
+      {String? pgId}) {
     return OwnerFoodMenu(
-      menuId: '${ownerId}_${day.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}',
+      menuId:
+          '${ownerId}_${day.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}',
       ownerId: ownerId,
+      pgId: pgId, // Include pgId for PG-specific menus
       day: day,
       breakfast: [],
       lunch: [],
@@ -265,7 +275,8 @@ class MenuInitializationHelper {
     String? description,
   }) {
     return OwnerFoodMenu(
-      menuId: '${ownerId}_${day.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}',
+      menuId:
+          '${ownerId}_${day.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}',
       ownerId: ownerId,
       day: day,
       breakfast: breakfast ?? [],
@@ -310,7 +321,7 @@ class MenuInitializationHelper {
   /// Checks if a menu needs update (older than 30 days)
   static bool needsUpdate(OwnerFoodMenu menu) {
     if (menu.updatedAt == null) return true;
-    
+
     final daysSinceUpdate = DateTime.now().difference(menu.updatedAt!).inDays;
     return daysSinceUpdate > 30;
   }
@@ -319,7 +330,7 @@ class MenuInitializationHelper {
   static OwnerFoodMenu? getCurrentDayMenu(List<OwnerFoodMenu> weeklyMenus) {
     final now = DateTime.now();
     final currentDay = weekdayString(now);
-    
+
     try {
       return weeklyMenus.firstWhere((menu) => menu.day == currentDay);
     } catch (_) {
@@ -341,4 +352,3 @@ class MenuInitializationHelper {
     return weekdays[date.weekday - 1];
   }
 }
-

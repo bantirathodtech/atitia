@@ -111,22 +111,25 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
   // ==========================================================================
   // Platform Detection Helper Methods
   // ==========================================================================
-  
+
   /// Get current platform with override support
   TargetPlatform _getCurrentPlatform(BuildContext context) {
     if (widget.forcePlatform != null) return widget.forcePlatform!;
     return Theme.of(context).platform;
   }
-  
+
   /// Check if running on iOS
-  bool _isIOS(BuildContext context) => _getCurrentPlatform(context) == TargetPlatform.iOS;
-  
+  bool _isIOS(BuildContext context) =>
+      _getCurrentPlatform(context) == TargetPlatform.iOS;
+
   /// Check if running on Android
-  bool _isAndroid(BuildContext context) => _getCurrentPlatform(context) == TargetPlatform.android;
-  
+  bool _isAndroid(BuildContext context) =>
+      _getCurrentPlatform(context) == TargetPlatform.android;
+
   /// Check if running on macOS
-  bool _isMacOS(BuildContext context) => _getCurrentPlatform(context) == TargetPlatform.macOS;
-  
+  bool _isMacOS(BuildContext context) =>
+      _getCurrentPlatform(context) == TargetPlatform.macOS;
+
   /// Check if running on Web
   bool _isWeb(BuildContext context) => kIsWeb;
 
@@ -147,11 +150,11 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
   // ==========================================================================
   // Responsive Sizing Methods
   // ==========================================================================
-  
+
   /// Get platform-specific input height
   double? _getInputHeight(BuildContext context) {
     if (widget.height != null) return widget.height!;
-    
+
     if (_isIOS(context)) {
       return 50; // iOS standard height
     } else if (_isAndroid(context)) {
@@ -163,11 +166,11 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
     }
     return null; // Default auto height
   }
-  
+
   /// Get platform-specific padding
   EdgeInsetsGeometry _getInputPadding(BuildContext context) {
     if (widget.padding != null) return widget.padding!;
-    
+
     if (_isIOS(context)) {
       return const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingM,
@@ -188,7 +191,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
     }
     return const EdgeInsets.all(AppSpacing.paddingM);
   }
-  
+
   /// Get platform-specific border radius
   double _getBorderRadius(BuildContext context) {
     if (_isIOS(context)) {
@@ -228,7 +231,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
   Widget _buildIOSInput(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       textField: true,
@@ -254,11 +257,13 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
           Container(
             height: _getInputHeight(context),
             decoration: BoxDecoration(
-              color: isDark ? CupertinoColors.systemGrey6 : CupertinoColors.systemBackground,
+              color: isDark
+                  ? CupertinoColors.systemGrey6
+                  : CupertinoColors.systemBackground,
               borderRadius: BorderRadius.circular(_getBorderRadius(context)),
               border: Border.all(
-                color: widget.error != null 
-                    ? Colors.red 
+                color: widget.error != null
+                    ? Colors.red
                     : (isDark ? Colors.white12 : Colors.black12),
                 width: 0.5,
               ),
@@ -303,7 +308,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
   Widget _buildAndroidInput(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       textField: true,
@@ -363,7 +368,8 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
                 ),
               ),
               filled: true,
-              fillColor: isDark ? AppColors.darkInputFill : AppColors.lightInputFill,
+              fillColor:
+                  isDark ? AppColors.darkInputFill : AppColors.lightInputFill,
               contentPadding: _getInputPadding(context),
             ),
           ),
@@ -376,7 +382,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
   Widget _buildMacOSInput(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       textField: true,
@@ -405,8 +411,8 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               color: isDark ? const Color(0xFF2D2D2D) : const Color(0xFFF5F5F5),
               borderRadius: BorderRadius.circular(_getBorderRadius(context)),
               border: Border.all(
-                color: widget.error != null 
-                    ? Colors.red 
+                color: widget.error != null
+                    ? Colors.red
                     : (isDark ? Colors.white12 : Colors.black12),
                 width: 0.5,
               ),
@@ -457,7 +463,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
   Widget _buildWebInput(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       textField: true,
@@ -486,8 +492,8 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
               borderRadius: BorderRadius.circular(_getBorderRadius(context)),
               border: Border.all(
-                color: widget.error != null 
-                    ? Colors.red 
+                color: widget.error != null
+                    ? Colors.red
                     : (isDark ? Colors.white12 : Colors.black12),
                 width: 1,
               ),
@@ -547,7 +553,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
   Widget _buildMaterialInput(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       textField: true,
@@ -607,7 +613,8 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
                 ),
               ),
               filled: true,
-              fillColor: isDark ? AppColors.darkInputFill : AppColors.lightInputFill,
+              fillColor:
+                  isDark ? AppColors.darkInputFill : AppColors.lightInputFill,
               contentPadding: _getInputPadding(context),
             ),
           ),

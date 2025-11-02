@@ -33,15 +33,15 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _initializeApp() async {
     try {
       final authProvider = context.read<AuthProvider>();
-      
+
       // Wait a bit for splash effect
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // Try auto-login
-      final isLoggedIn = await authProvider.tryAutoLogin();
-      
+      // final isLoggedIn = await authProvider.tryAutoLogin();
+
       if (!mounted) return;
-      
+
       // Navigate based on result
       await authProvider.navigateAfterSplash();
     } catch (e) {
@@ -72,27 +72,27 @@ class _SplashScreenState extends State<SplashScreen> {
                   color: Colors.white,
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                
+
                 // App Name
                 const HeadingLarge(
                   text: 'Atitia PG',
                   color: Colors.white,
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                
+
                 // Tagline
                 const BodyText(
                   text: 'Your Home Away From Home',
                   color: Colors.white70,
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 // Loading indicator
                 const AdaptiveLoader(
                   color: Colors.white,
                 ),
                 const SizedBox(height: AppSpacing.md),
-                
+
                 // Loading message
                 BodyText(
                   text: authProvider.loading

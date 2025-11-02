@@ -1,6 +1,10 @@
 // guest_complaint_model.dart
 
 /// Model representing a complaint submitted by a guest.
+library;
+
+import '../../../../../common/utils/date/converter/date_service_converter.dart';
+
 class GuestComplaintModel {
   final String complaintId;
   final String guestId;
@@ -34,7 +38,7 @@ class GuestComplaintModel {
       subject: map['subject'] ?? '',
       description: map['description'] ?? '',
       complaintDate: map['complaintDate'] != null
-          ? DateTime.parse(map['complaintDate'])
+          ? DateServiceConverter.fromService(map['complaintDate'])
           : DateTime.now(),
       status: map['status'] ?? 'Pending',
       photos: List<String>.from(map['photos'] ?? []),
@@ -50,7 +54,7 @@ class GuestComplaintModel {
       'ownerId': ownerId,
       'subject': subject,
       'description': description,
-      'complaintDate': complaintDate.toIso8601String(),
+      'complaintDate': DateServiceConverter.toService(complaintDate),
       'status': status,
       'photos': photos,
     };

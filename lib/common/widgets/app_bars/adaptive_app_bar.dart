@@ -87,6 +87,16 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
   final Widget? leading;
 
   // ==========================================================================
+  // Drawer Parameters
+  // ==========================================================================
+
+  /// Show drawer button (hamburger menu) on the left
+  final bool showDrawer;
+
+  /// Drawer callback (called when drawer button is tapped)
+  final VoidCallback? onDrawerTap;
+
+  // ==========================================================================
   // Layout Parameters
   // ==========================================================================
 
@@ -152,6 +162,8 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
     this.backgroundGradient,
     this.showBackButton = true,
     this.showThemeToggle = true,
+    this.showDrawer = false,
+    this.onDrawerTap,
     this.bottom,
     this.forcePlatform,
   }) : assert(
@@ -324,7 +336,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
         boxShadow: platformElevation > 0
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: platformElevation,
                   offset: Offset(0, platformElevation / 2),
                 ),
@@ -393,6 +405,11 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
     final isDark = theme.brightness == Brightness.dark;
     final platformElevation = _getPlatformElevation(context);
 
+    // For web, use Stack to truly center title when centerTitle is true
+    final leadingWidget = _buildLeading(context);
+    final actionsList = _buildWebActions(context);
+    final hasActions = actionsList.isNotEmpty;
+
     return Container(
       height: _getToolbarHeight(context) + (bottom?.preferredSize.height ?? 0),
       decoration: BoxDecoration(
@@ -401,7 +418,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
         boxShadow: platformElevation > 0
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: platformElevation,
                   offset: Offset(0, platformElevation / 2),
                 ),
@@ -414,24 +431,63 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
           children: [
             // Main app bar content
             Expanded(
-              child: Row(
-                children: [
-                  // Leading section
-                  _buildLeading(context) ?? const SizedBox.shrink(),
+              child: centerTitle
+                  ? Stack(
+                      // Use Stack with Positioned.fill to truly center title on web
+                      children: [
+                        // Leading section (left-aligned)
+                        if (leadingWidget != null)
+                          Positioned(
+                            left: 0,
+                            child: leadingWidget,
+                          ),
 
-                  // Title section
-                  Expanded(
-                    child: centerTitle
-                        ? Center(
-                            child: titleWidget ??
-                                Text(
-                                  title!,
-                                  style: AppTypography.appBarTitle.copyWith(
-                                    color: isDark ? Colors.white : Colors.black,
+                        // Title section (truly centered using Positioned.fill - ignores leading/actions for centering)
+                        Positioned.fill(
+                          child: Center(
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                // Constrain the title widget to available space to prevent overflow
+                                return ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: constraints.maxWidth * 0.6, // Use max 60% of available width
+                                    minWidth: 120.0,
                                   ),
-                                ),
-                          )
-                        : Padding(
+                                  child: titleWidget ??
+                                      Text(
+                                        title!,
+                                        style: AppTypography.appBarTitle.copyWith(
+                                          color: isDark ? Colors.white : Colors.black,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+
+                        // Actions section (right-aligned)
+                        if (hasActions)
+                          Positioned(
+                            right: 0,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: actionsList,
+                            ),
+                          ),
+                      ],
+                    )
+                  : Row(
+                      // Standard Row layout when not centered
+                      children: [
+                        // Leading section
+                        leadingWidget ?? const SizedBox.shrink(),
+
+                        // Title section
+                        Expanded(
+                          child: Padding(
                             padding: const EdgeInsets.only(
                                 left: AppSpacing.paddingM),
                             child: titleWidget ??
@@ -442,12 +498,12 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                   ),
                                 ),
                           ),
-                  ),
+                        ),
 
-                  // Actions section with web-specific hover effects
-                  ..._buildWebActions(context),
-                ],
-              ),
+                        // Actions section with web-specific hover effects
+                        ...actionsList,
+                      ],
+                    ),
             ),
 
             // Bottom widget
@@ -530,7 +586,12 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
     // 1. Custom leading widget takes highest precedence
     if (leading != null) return leading;
 
-    // 2. Leading actions (multiple icons/buttons on left)
+    // 2. Drawer button (if enabled)
+    if (showDrawer) {
+      return _buildDrawerButton(context);
+    }
+
+    // 3. Leading actions (multiple icons/buttons on left)
     if (leadingActions != null && leadingActions!.isNotEmpty) {
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -538,14 +599,14 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
       );
     }
 
-    // 3. Don't show back button if explicitly disabled
+    // 4. Don't show back button if explicitly disabled
     if (!showBackButton) return null;
 
-    // 4. Only show back button if route can be popped
+    // 5. Only show back button if route can be popped
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     if (!canPop) return null;
 
-    // 5. Show platform-specific back button
+    // 6. Show platform-specific back button
     return _buildPlatformBackButton(context);
   }
 
@@ -554,7 +615,12 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
     // 1. Custom leading widget takes highest precedence
     if (leading != null) return leading;
 
-    // 2. Leading actions (multiple icons/buttons on left)
+    // 2. Drawer button (if enabled)
+    if (showDrawer) {
+      return _buildDrawerButton(context);
+    }
+
+    // 3. Leading actions (multiple icons/buttons on left)
     if (leadingActions != null && leadingActions!.isNotEmpty) {
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -562,14 +628,14 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
       );
     }
 
-    // 3. Don't show back button if explicitly disabled
+    // 4. Don't show back button if explicitly disabled
     if (!showBackButton) return null;
 
-    // 4. Only show back button if route can be popped
+    // 5. Only show back button if route can be popped
     final canPop = ModalRoute.of(context)?.canPop ?? false;
     if (!canPop) return null;
 
-    // 5. Show iOS-style back button
+    // 6. Show iOS-style back button
     return CupertinoNavigationBarBackButton(
       previousPageTitle: null,
       onPressed: () => Navigator.of(context).pop(),
@@ -615,6 +681,28 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
         tooltip: 'Back',
       );
     }
+  }
+
+  /// Build drawer button (hamburger menu)
+  Widget _buildDrawerButton(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return IconButton(
+      icon: Icon(
+        Icons.menu,
+        color: isDark
+            ? theme.appBarTheme.foregroundColor
+            : theme.appBarTheme.foregroundColor,
+        size: 24,
+      ),
+      onPressed: onDrawerTap ??
+          () {
+            // Default behavior: open drawer
+            Scaffold.of(context).openDrawer();
+          },
+      tooltip: 'Menu',
+    );
   }
 
   // ==========================================================================

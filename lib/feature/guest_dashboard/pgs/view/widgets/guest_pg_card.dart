@@ -1,6 +1,7 @@
 // lib/features/guest_dashboard/pgs/view/widgets/guest_pg_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
@@ -8,24 +9,35 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
+import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../../common/widgets/sharing_summary.dart';
 import '../../data/models/guest_pg_model.dart';
+import 'booking_request_dialog.dart';
 
-/// 🏠 **PREMIUM PG CARD - PRODUCTION READY**
+/// 🏠 **UPDATED PG PREVIEW CARD**
 ///
 /// **Features:**
-/// - Gradient overlays
-/// - Theme-aware styling
-/// - Photo gallery preview
-/// - Amenity badges
-/// - Availability status
-/// - Smooth animations
+/// - Visual identity with photo, photo count, and status
+/// - Basic identification with name, location, and distance
+/// - Quick decision factors (PG type, meal type, sharing preview)
+/// - Action elements (View Details, Book Now)
+///
+/// **Removed:**
+/// - Monthly rent
+/// - Amenities icons
+/// - Stats (rooms, beds, floors count)
 class GuestPgCard extends StatelessWidget {
   final GuestPgModel pg;
   final VoidCallback? onTap;
+  final double? userLatitude; // User's current location latitude
+  final double? userLongitude; // User's current location longitude
 
   const GuestPgCard({
     required this.pg,
     this.onTap,
+    this.userLatitude,
+    this.userLongitude,
     super.key,
   });
 
@@ -43,18 +55,16 @@ class GuestPgCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+              color: isDarkMode ? AppColors.darkCard : Colors.white,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
               border: Border.all(
-                color: isDarkMode
-                    ? AppColors.darkDivider
-                    : AppColors.outline.withOpacity(0.2),
+                color: isDarkMode ? AppColors.darkDivider : Colors.grey.shade300,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.08),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -63,6 +73,7 @@ class GuestPgCard extends StatelessWidget {
               children: [
                 _buildImageSection(context, isDarkMode),
                 _buildDetailsSection(context, isDarkMode),
+                _buildActionSection(context, isDarkMode),
               ],
             ),
           ),
@@ -71,10 +82,8 @@ class GuestPgCard extends StatelessWidget {
     );
   }
 
-  /// 📸 Image section with gradient overlay and badges
+  /// 📸 Image section with status indicator, badges, and PG info overlay
   Widget _buildImageSection(BuildContext context, bool isDarkMode) {
-    final theme = Theme.of(context);
-
     return Stack(
       children: [
         // Main Image
@@ -84,17 +93,20 @@ class GuestPgCard extends StatelessWidget {
             topRight: Radius.circular(AppSpacing.borderRadiusL),
           ),
           child: pg.hasPhotos
-              ? AdaptiveImage(
-                  imageUrl: pg.photos.first,
+              ? SizedBox(
                   width: double.infinity,
                   height: 200,
-                  fit: BoxFit.cover,
-                  placeholder: _buildImagePlaceholder(context, isDarkMode),
+                  child: AdaptiveImage(
+                    imageUrl: pg.photos.first,
+                    height: 200,
+                    fit: BoxFit.cover,
+                    placeholder: _buildImagePlaceholder(context, isDarkMode),
+                  ),
                 )
               : _buildImagePlaceholder(context, isDarkMode),
         ),
 
-        // Gradient Overlay
+        // Gradient Overlay for text readability
         Container(
           height: 200,
           decoration: BoxDecoration(
@@ -107,14 +119,14 @@ class GuestPgCard extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [
                 Colors.transparent,
-                Colors.black.withOpacity(0.7),
+                Colors.black.withValues(alpha: 0.6),
               ],
               stops: const [0.5, 1.0],
             ),
           ),
         ),
 
-        // Top badges
+        // Top badges row
         Positioned(
           top: AppSpacing.paddingM,
           left: AppSpacing.paddingM,
@@ -122,25 +134,20 @@ class GuestPgCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // PG Type badge
-              if (pg.pgType != null)
-                _buildBadge(
-                  pg.pgType!,
-                  AppColors.info,
-                  Icons.home,
-                ),
-              // Photos count
+              // Status Indicator Badge
+              _buildStatusBadge(),
+              // Photo count badge
               if (pg.hasPhotos)
                 _buildBadge(
                   '${pg.photos.length} Photos',
-                  Colors.black.withOpacity(0.6),
+                  Colors.black.withValues(alpha: 0.7),
                   Icons.photo_library,
                 ),
             ],
           ),
         ),
 
-        // Bottom text overlay
+        // Bottom overlay: PG Name and Location
         Positioned(
           bottom: AppSpacing.paddingM,
           left: AppSpacing.paddingM,
@@ -154,25 +161,8 @@ class GuestPgCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(
-                    Icons.location_on,
-                    size: 14,
-                    color: AppColors.textOnPrimary.withOpacity(0.9),
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: BodyText(
-                      text: '${pg.area}, ${pg.city}',
-                      color: AppColors.textOnPrimary.withOpacity(0.9),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(height: 6),
+              _buildLocationRow(context),
             ],
           ),
         ),
@@ -180,144 +170,146 @@ class GuestPgCard extends StatelessWidget {
     );
   }
 
-  /// 📋 Details section with stats and amenities
+  /// 📋 Details section with quick decision factors
   Widget _buildDetailsSection(BuildContext context, bool isDarkMode) {
-    final theme = Theme.of(context);
-    final textColor = isDarkMode ? AppColors.textSecondary : AppColors.textPrimary;
-
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Stats row
-          Row(
-            children: [
-              _buildStatItem(
-                '${pg.totalBeds}',
-                'Total Beds',
-                Icons.hotel,
-                AppColors.success,
-                isDarkMode,
-              ),
-              const SizedBox(width: AppSpacing.paddingM),
-              _buildStatItem(
-                '${pg.totalRooms}',
-                'Rooms',
-                Icons.door_front_door,
-                AppColors.info,
-                isDarkMode,
-              ),
-              const SizedBox(width: AppSpacing.paddingM),
-              _buildStatItem(
-                '${pg.totalFloors}',
-                'Floors',
-                Icons.stairs,
-                AppColors.warning,
-                isDarkMode,
-              ),
-            ],
+          // Quick Decision Factors Row
+          _buildQuickDecisionFactors(context, isDarkMode),
+          const SizedBox(height: AppSpacing.paddingM),
+          // Sharing Summary Preview
+          _buildSharingPreview(context, isDarkMode),
+        ],
+      ),
+    );
+  }
+
+  /// 🏷️ Quick decision factors: PG Type, Meal Type
+  Widget _buildQuickDecisionFactors(BuildContext context, bool isDarkMode) {
+    return Wrap(
+      spacing: AppSpacing.paddingS,
+      runSpacing: AppSpacing.paddingS,
+      children: [
+        // PG Type Badge
+        if (pg.pgType != null)
+          _buildDecisionFactorBadge(
+            _getPgTypeIcon(pg.pgType!),
+            pg.pgType!,
+            AppColors.info,
+            isDarkMode,
           ),
+        // Meal Type Badge
+        if (pg.mealType != null)
+          _buildDecisionFactorBadge(
+            _getMealTypeIcon(pg.mealType!),
+            pg.mealType!,
+            AppColors.secondary,
+            isDarkMode,
+          ),
+      ],
+    );
+  }
 
-          const SizedBox(height: AppSpacing.paddingM),
+  /// 👥 Sharing summary preview
+  Widget _buildSharingPreview(BuildContext context, bool isDarkMode) {
+    final summary = getSharingSummary(pg);
+    
+    if (summary.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-          // Amenities
-          if (pg.hasAmenities) ...[
-            Wrap(
-              spacing: AppSpacing.paddingS,
-              runSpacing: AppSpacing.paddingS,
-              children: pg.amenities.take(4).map((amenity) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.paddingS,
-                    vertical: AppSpacing.paddingXS,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? AppColors.darkInputFill
-                        : AppColors.surfaceVariant,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.borderRadiusS),
-                    border: Border.all(
-                      color: isDarkMode
-                          ? AppColors.darkDivider
-                          : AppColors.outline.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        _getAmenityIcon(amenity),
-                        size: 12,
-                        color: theme.primaryColor,
-                      ),
-                      const SizedBox(width: 4),
-                      CaptionText(
-                        text: amenity,
-                        color: textColor,
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
+    // Get unique sharing types (1, 2, 3, 4, 5 sharing)
+    final sharingTypes = summary.keys.toList()..sort((a, b) {
+      final aNum = int.tryParse(a.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+      final bNum = int.tryParse(b.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+      return aNum.compareTo(bNum);
+    });
+
+    return Wrap(
+      spacing: AppSpacing.paddingS,
+      runSpacing: AppSpacing.paddingS,
+      children: sharingTypes.map((sharingType) {
+        final info = summary[sharingType]!;
+        return _buildSharingBadge(
+          sharingType,
+          info.vacantBedsCount > 0,
+          isDarkMode,
+        );
+      }).toList(),
+    );
+  }
+
+  /// 🎯 Action section with buttons
+  Widget _buildActionSection(BuildContext context, bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.paddingM,
+        0,
+        AppSpacing.paddingM,
+        AppSpacing.paddingM,
+      ),
+      child: Row(
+        children: [
+          // View Details Button (Primary)
+          Expanded(
+            child: SecondaryButton(
+              label: 'View Details',
+              icon: Icons.arrow_forward,
+              onPressed: onTap,
             ),
-            if (pg.amenities.length > 4) ...[
-              const SizedBox(height: AppSpacing.paddingS),
-              CaptionText(
-                text: '+${pg.amenities.length - 4} more amenities',
-                color: theme.primaryColor,
-              ),
-            ],
-          ],
-
-          const SizedBox(height: AppSpacing.paddingM),
-
-          // Footer row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Contact info
-              Row(
-                children: [
-                  Icon(
-                    Icons.phone,
-                    size: 14,
-                    color: textColor,
-                  ),
-                  const SizedBox(width: 4),
-                  BodyText(
-                    text: pg.contactNumber ?? 'No contact',
-                    color: textColor,
-                  ),
-                ],
-              ),
-              // View details button
-              Row(
-                children: [
-                  Text(
-                    'View Details',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.primaryColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 14,
-                    color: theme.primaryColor,
-                  ),
-                ],
-              ),
-            ],
+          ),
+          const SizedBox(width: AppSpacing.paddingS),
+          // Book Now Button (Optional)
+          PrimaryButton(
+            label: 'Book Now',
+            icon: Icons.home_work,
+            onPressed: () => _showBookingRequestDialog(context),
           ),
         ],
       ),
     );
   }
 
-  /// 🏷️ Badge widget
+  /// 🏷️ Status badge (Available/Unavailable)
+  Widget _buildStatusBadge() {
+    final isAvailable = pg.isActive;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingS,
+        vertical: AppSpacing.paddingXS,
+      ),
+      decoration: BoxDecoration(
+        color: isAvailable
+            ? AppColors.success.withValues(alpha: 0.9)
+            : AppColors.error.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isAvailable ? Icons.check_circle : Icons.cancel,
+            size: 12,
+            color: AppColors.textOnPrimary,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            isAvailable ? 'Available' : 'Unavailable',
+            style: const TextStyle(
+              color: AppColors.textOnPrimary,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🏷️ Badge widget for photo count
   Widget _buildBadge(String text, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -346,44 +338,132 @@ class GuestPgCard extends StatelessWidget {
     );
   }
 
-  /// 📊 Stat item widget
-  Widget _buildStatItem(String value, String label, IconData icon,
-      Color color, bool isDarkMode) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.paddingS),
-        decoration: BoxDecoration(
-          color: color.withOpacity(isDarkMode ? 0.15 : 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-          border: Border.all(
-            color: color.withOpacity(0.3),
-          ),
+  /// 📍 Location row with clickable map link and distance
+  Widget _buildLocationRow(BuildContext context) {
+    final distanceText = _getDistanceText();
+
+    return Row(
+      children: [
+        Icon(
+          Icons.location_on,
+          size: 14,
+          color: AppColors.textOnPrimary.withValues(alpha: 0.9),
         ),
-        child: Column(
-          children: [
-            Icon(icon, size: 18, color: color),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
+        const SizedBox(width: 4),
+        Expanded(
+          child: GestureDetector(
+            onTap: () => _openMap(context),
+            child: BodyText(
+              text: pg.fullAddress,
+              color: AppColors.textOnPrimary.withValues(alpha: 0.9),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-          ],
+          ),
         ),
+        if (distanceText != null) ...[
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 6,
+              vertical: 2,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusXS),
+            ),
+            child: CaptionText(
+              text: distanceText,
+              color: AppColors.textOnPrimary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// 🎯 Decision factor badge (PG Type, Meal Type)
+  Widget _buildDecisionFactorBadge(
+    IconData icon,
+    String label,
+    Color color,
+    bool isDarkMode,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingS,
+        vertical: AppSpacing.paddingXS,
+      ),
+      decoration: BoxDecoration(
+        color: isDarkMode
+            ? color.withValues(alpha: 0.2)
+            : color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          CaptionText(
+            text: label,
+            color: color,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 👥 Sharing badge
+  Widget _buildSharingBadge(
+    String sharingType,
+    bool hasVacancy,
+    bool isDarkMode,
+  ) {
+    final sharingNumber = sharingType.replaceAll(RegExp(r'[^0-9]'), '');
+    final displayText = '$sharingNumber Sharing';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingS,
+        vertical: AppSpacing.paddingXS,
+      ),
+      decoration: BoxDecoration(
+        color: isDarkMode
+            ? AppColors.primary.withValues(alpha: 0.2)
+            : AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.people,
+            size: 14,
+            color: AppColors.primary,
+          ),
+          const SizedBox(width: 4),
+          CaptionText(
+            text: displayText,
+            color: AppColors.primary,
+          ),
+          if (hasVacancy) ...[
+            const SizedBox(width: 4),
+            Icon(
+              Icons.check_circle,
+              size: 12,
+              color: AppColors.success,
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -394,7 +474,7 @@ class GuestPgCard extends StatelessWidget {
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
+        color: isDarkMode ? AppColors.darkInputFill : Colors.grey.shade200,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(AppSpacing.borderRadiusL),
           topRight: Radius.circular(AppSpacing.borderRadiusL),
@@ -406,44 +486,91 @@ class GuestPgCard extends StatelessWidget {
           Icon(
             Icons.apartment,
             size: 48,
-            color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+            color: AppColors.textTertiary,
           ),
           const SizedBox(height: 8),
           CaptionText(
             text: 'No Image Available',
-            color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+            color: AppColors.textTertiary,
           ),
         ],
       ),
     );
   }
 
-  /// 🎯 Get icon for amenity
-  IconData _getAmenityIcon(String amenity) {
-    final amenityLower = amenity.toLowerCase();
-    
-    if (amenityLower.contains('wifi') || amenityLower.contains('internet')) {
-      return Icons.wifi;
-    } else if (amenityLower.contains('parking')) {
-      return Icons.local_parking;
-    } else if (amenityLower.contains('laundry') || amenityLower.contains('washing')) {
-      return Icons.local_laundry_service;
-    } else if (amenityLower.contains('ac') || amenityLower.contains('air')) {
-      return Icons.ac_unit;
-    } else if (amenityLower.contains('tv')) {
-      return Icons.tv;
-    } else if (amenityLower.contains('gym') || amenityLower.contains('fitness')) {
-      return Icons.fitness_center;
-    } else if (amenityLower.contains('food') || amenityLower.contains('meal')) {
-      return Icons.restaurant;
-    } else if (amenityLower.contains('security')) {
-      return Icons.security;
-    } else if (amenityLower.contains('water') || amenityLower.contains('purifier')) {
-      return Icons.water_drop;
-    } else if (amenityLower.contains('power') || amenityLower.contains('backup')) {
-      return Icons.power;
-    } else {
-      return Icons.check_circle;
+  /// 📍 Get distance text from user location
+  String? _getDistanceText() {
+    if (userLatitude == null ||
+        userLongitude == null ||
+        !pg.hasLocation) {
+      return null;
     }
+
+    final distance = pg.getDistanceFrom(userLatitude, userLongitude);
+    if (distance == null) return null;
+
+    if (distance < 1) {
+      return '${(distance * 1000).toStringAsFixed(0)}m away';
+    } else {
+      return '${distance.toStringAsFixed(1)}km away';
+    }
+  }
+
+  /// 🗺️ Open map with PG location
+  Future<void> _openMap(BuildContext context) async {
+    if (!pg.hasLocation) {
+      // Fallback to Google Maps search if coordinates not available
+      final query = Uri.encodeComponent(pg.fullAddress);
+      final googleMapsUrl = Uri.parse('https://www.google.com/maps/search/?api=1&query=$query');
+      
+      if (await canLaunchUrl(googleMapsUrl)) {
+        await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
+      }
+      return;
+    }
+
+    // Use coordinates if available
+    final googleMapsUrl = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=${pg.latitude},${pg.longitude}',
+    );
+
+    if (await canLaunchUrl(googleMapsUrl)) {
+      await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open maps')),
+        );
+      }
+    }
+  }
+
+  /// 🏠 Get icon for PG type
+  IconData _getPgTypeIcon(String pgType) {
+    final typeLower = pgType.toLowerCase();
+    if (typeLower.contains('boys')) return Icons.male;
+    if (typeLower.contains('girls')) return Icons.female;
+    if (typeLower.contains('co-ed') || typeLower.contains('coed')) {
+      return Icons.people;
+    }
+    return Icons.home;
+  }
+
+  /// 🍽️ Get icon for meal type
+  IconData _getMealTypeIcon(String mealType) {
+    final typeLower = mealType.toLowerCase();
+    if (typeLower.contains('veg')) return Icons.eco;
+    if (typeLower.contains('non') || typeLower.contains('non-veg')) {
+      return Icons.restaurant;
+    }
+    return Icons.restaurant_menu;
+  }
+
+  /// Shows the booking request dialog
+  void _showBookingRequestDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => BookingRequestDialog(pg: pg),
+    );
   }
 }

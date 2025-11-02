@@ -25,13 +25,14 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../supabase_config.dart';
 
 /// Supabase Storage service providing file operations
-/// 
+///
 /// This is a drop-in replacement for CloudStorageServiceWrapper (Firebase Storage)
 /// Maintains the exact same interface for seamless switching
 ///
@@ -43,7 +44,7 @@ import '../supabase_config.dart';
 /// Note: This is a reusable core service - never modify for app-specific logic
 class SupabaseStorageServiceWrapper {
   SupabaseClient? _supabaseClient;
-  
+
   // Default bucket name from config
   final String defaultBucket = SupabaseConfig.storageBucket;
 
@@ -86,8 +87,8 @@ class SupabaseStorageServiceWrapper {
 
     try {
       // Try to access the client - if it works, Supabase is initialized
-      final client = Supabase.instance.client;
-      return client != null;
+      // final client = Supabase.instance.client;
+      return true; // client is never null if Supabase.instance.client doesn't throw
     } catch (e) {
       // If accessing client throws an error, Supabase is not initialized
       return false;
@@ -98,7 +99,6 @@ class SupabaseStorageServiceWrapper {
   /// Creates default bucket if it doesn't exist
   Future<void> initialize() async {
     if (!isReady) {
-      print('⚠️ Supabase not ready - skipping storage bucket creation');
       return;
     }
 
@@ -112,17 +112,25 @@ class SupabaseStorageServiceWrapper {
         await _supabase.storage.createBucket(
           defaultBucket,
           const BucketOptions(
-            public: true,
+            public: true, // Allow public access for uploads
             fileSizeLimit: '10485760', // 10MB limit (must be string)
             allowedMimeTypes: ['image/*', 'application/pdf'],
           ),
         );
-        print('✅ Created Supabase storage bucket: $defaultBucket');
+        
+        // Note: After bucket creation, you still need to add RLS policies
+        // in Supabase Dashboard to allow INSERT operations
+        debugPrint(
+          '⚠️ Supabase Storage Bucket "$defaultBucket" created.\n'
+          '⚠️ IMPORTANT: You must add RLS policies in Supabase Dashboard:\n'
+          '   1. Go to Storage → Policies → $defaultBucket\n'
+          '   2. Create policy: Allow INSERT for "anon" role\n'
+          '   3. Policy SQL: bucket_id = \'$defaultBucket\'::text\n'
+          '   See SUPABASE_STORAGE_SETUP.md for detailed instructions.'
+        );
       } else {
-        print('✅ Supabase storage bucket already exists: $defaultBucket');
       }
     } catch (e) {
-      print('⚠️ Supabase Storage bucket initialization: $e');
       // Bucket might already exist or permissions issue - continue anyway
     }
   }
@@ -152,7 +160,7 @@ class SupabaseStorageServiceWrapper {
   //   await storage.uploadFile(file, 'photos/', 'image.jpg');
   // ==========================================================================
   Future<String> uploadFile(
-    dynamic file,  // Can be File or XFile depending on platform
+    dynamic file, // Can be File or XFile depending on platform
     String folderPath,
     String fileName,
   ) async {
@@ -170,7 +178,7 @@ class SupabaseStorageServiceWrapper {
       // Read bytes based on file type (File vs XFile)
       // =======================================================================
       Uint8List bytes;
-      
+
       if (file is XFile) {
         // Web: XFile from image_picker (readAsBytes works on web)
         bytes = Uint8List.fromList(await file.readAsBytes());
@@ -308,7 +316,7 @@ class SupabaseStorageServiceWrapper {
       // We can get file info from list
       final fileName = filePath.split('/').last;
       final folderPath = filePath.substring(0, filePath.lastIndexOf('/'));
-      
+
       final files = await listFiles(folderPath);
       final file = files.firstWhere(
         (f) => f.name == fileName,

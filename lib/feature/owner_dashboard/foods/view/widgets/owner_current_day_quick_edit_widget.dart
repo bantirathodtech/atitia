@@ -45,7 +45,7 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.paddingS),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -162,7 +162,7 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
         Icon(
           icon,
           size: 18,
-          color: theme.primaryColor.withOpacity(0.7),
+          color: theme.primaryColor.withValues(alpha: 0.7),
         ),
         const SizedBox(width: AppSpacing.paddingS),
         BodyText(text: mealType, medium: true),

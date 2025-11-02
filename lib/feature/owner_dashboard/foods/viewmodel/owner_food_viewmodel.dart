@@ -1,19 +1,32 @@
 // lib/features/owner_dashboard/foods/viewmodel/owner_food_viewmodel.dart
 
-
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../common/utils/helpers/menu_initialization_helper.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/db/flutter_secure_storage.dart';
 import '../data/models/owner_food_menu.dart';
 import '../data/repository/owner_food_repository.dart';
+import '../../../../core/repositories/food_feedback_repository.dart';
+import 'dart:async';
+import 'package:intl/intl.dart';
 
 /// ViewModel for managing owner's food menus and dietary overrides.
 /// Extends BaseProviderState for automatic service access and state management
 /// Fetches and updates weekly menus and daily overrides from repository.
 /// Supports uploading photos and maintains loading/error states with analytics tracking
 class OwnerFoodViewModel extends BaseProviderState {
-  final OwnerFoodRepository _repository = OwnerFoodRepository();
+  final OwnerFoodRepository _repository;
   final _analyticsService = getIt.analytics;
+  final LocalStorageService _localStorage = getIt<LocalStorageService>();
+  final FoodFeedbackRepository _feedbackRepository;
+
+  /// Constructor with dependency injection
+  /// If repositories are not provided, creates them with default services
+  OwnerFoodViewModel({
+    OwnerFoodRepository? repository,
+    FoodFeedbackRepository? feedbackRepository,
+  })  : _repository = repository ?? OwnerFoodRepository(),
+        _feedbackRepository = feedbackRepository ?? FoodFeedbackRepository();
 
   List<OwnerFoodMenu> _weeklyMenus = [];
   List<OwnerMenuOverride> _overrides = [];
@@ -21,6 +34,16 @@ class OwnerFoodViewModel extends BaseProviderState {
   OwnerMenuOverride? _selectedOverride;
   String _selectedDay = 'Monday';
   Map<String, dynamic> _menuStats = {};
+  Map<String, Map<String, int>> _feedbackAgg = {
+    'breakfast': {'likes': 0, 'dislikes': 0},
+    'lunch': {'likes': 0, 'dislikes': 0},
+    'dinner': {'likes': 0, 'dislikes': 0},
+  };
+  StreamSubscription<Map<String, Map<String, int>>>? _feedbackSub;
+
+  // Track last loaded data for auto-reload optimization
+  String? _lastLoadedOwnerId;
+  String? _lastLoadedPgId;
 
   /// Read-only list of weekly menus
   List<OwnerFoodMenu> get weeklyMenus => _weeklyMenus;
@@ -39,9 +62,10 @@ class OwnerFoodViewModel extends BaseProviderState {
 
   /// Menu statistics
   Map<String, dynamic> get menuStats => _menuStats;
+  Map<String, Map<String, int>> get feedbackAggregates => _feedbackAgg;
 
   /// Loads weekly menus and daily overrides from backend.
-  /// 
+  ///
   /// Multi-PG Support:
   /// - If pgId is provided, loads menus for that specific PG
   /// - If pgId is null, loads all menus (backward compatible)
@@ -53,6 +77,14 @@ class OwnerFoodViewModel extends BaseProviderState {
       _weeklyMenus = await _repository.fetchWeeklyMenus(ownerId, pgId: pgId);
       _overrides = await _repository.fetchMenuOverrides(ownerId, pgId: pgId);
       await _loadMenuStats(ownerId, pgId: pgId);
+      _startFeedbackStream(pgId: pgId);
+
+      // Update tracking variables
+      _lastLoadedOwnerId = ownerId;
+      _lastLoadedPgId = pgId;
+
+      // Save state to local storage for persistence
+      await _saveMenuState(ownerId, pgId);
 
       _analyticsService.logEvent(
         name: 'owner_menus_loaded',
@@ -63,17 +95,76 @@ class OwnerFoodViewModel extends BaseProviderState {
           'overrides_count': _overrides.length,
         },
       );
+
+      // Notify listeners to update UI
+      notifyListeners();
     } catch (e) {
       setError(true, 'Failed to load menus: $e');
       _weeklyMenus = [];
       _overrides = [];
+      notifyListeners();
     } finally {
       setLoading(false);
     }
   }
 
+  /// Auto-reloads menus when PG selection changes
+  /// Only reloads if the owner or PG has actually changed
+  Future<void> autoReloadIfNeeded(String ownerId, {String? pgId}) async {
+    if (_lastLoadedOwnerId != ownerId || _lastLoadedPgId != pgId) {
+      await loadMenus(ownerId, pgId: pgId);
+    } else {}
+  }
+
+  /// Refresh menus for current PG (force reload)
+  Future<void> refreshMenus(String ownerId, {String? pgId}) async {
+    await loadMenus(ownerId, pgId: pgId);
+  }
+
+  void _startFeedbackStream({String? pgId}) {
+    _feedbackSub?.cancel();
+    if (pgId == null) return;
+    final dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    _feedbackSub = _feedbackRepository
+        .streamAggregates(pgId: pgId, dateKey: dateKey)
+        .listen((agg) {
+      _feedbackAgg = agg;
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _feedbackSub?.cancel();
+    super.dispose();
+  }
+
+  /// Save current menu state to local storage
+  Future<void> _saveMenuState(String ownerId, String? pgId) async {
+    try {
+      if (pgId != null) {
+        await _localStorage.write('food_menu_loaded_$ownerId', pgId);
+        await _localStorage.write(
+            'food_menu_timestamp_$ownerId', DateTime.now().toIso8601String());
+      }
+    } catch (e) {}
+  }
+
+  /// Clear menu state and force reload
+  Future<void> clearMenuState(String ownerId) async {
+    try {
+      await _localStorage.delete('food_menu_loaded_$ownerId');
+      await _localStorage.delete('food_menu_timestamp_$ownerId');
+      _lastLoadedOwnerId = null;
+      _lastLoadedPgId = null;
+      _weeklyMenus = [];
+      _overrides = [];
+      notifyListeners();
+    } catch (e) {}
+  }
+
   /// Streams weekly menus for real-time updates
-  /// 
+  ///
   /// Multi-PG Support:
   /// - If pgId is provided, streams menus for that specific PG
   /// - If pgId is null, streams all menus (backward compatible)
@@ -95,7 +186,7 @@ class OwnerFoodViewModel extends BaseProviderState {
   }
 
   /// Streams menu overrides for real-time updates
-  /// 
+  ///
   /// Multi-PG Support:
   /// - If pgId is provided, streams overrides for that specific PG
   /// - If pgId is null, streams all overrides (backward compatible)
@@ -126,9 +217,12 @@ class OwnerFoodViewModel extends BaseProviderState {
         },
       );
 
+      // Notify listeners to update UI
+      notifyListeners();
       return true;
     } catch (e) {
       setError(true, 'Failed to save menu: $e');
+      notifyListeners();
       return false;
     } finally {
       setLoading(false);
@@ -147,9 +241,12 @@ class OwnerFoodViewModel extends BaseProviderState {
         parameters: {'menus_count': menus.length},
       );
 
+      // Notify listeners to update UI
+      notifyListeners();
       return true;
     } catch (e) {
       setError(true, 'Failed to save menus: $e');
+      notifyListeners();
       return false;
     } finally {
       setLoading(false);
@@ -228,12 +325,13 @@ class OwnerFoodViewModel extends BaseProviderState {
   Future<String?> uploadPhoto(
     String ownerId,
     String filename,
-    dynamic file,  // File on mobile, XFile on web
+    dynamic file, // File on mobile, XFile on web
   ) async {
     try {
       setLoading(true);
       clearError();
-      final downloadUrl = await _repository.uploadPhoto(ownerId, filename, file);
+      final downloadUrl =
+          await _repository.uploadPhoto(ownerId, filename, file);
 
       _analyticsService.logEvent(
         name: 'owner_food_photo_upload_success',
@@ -392,16 +490,6 @@ class OwnerFoodViewModel extends BaseProviderState {
     notifyListeners();
   }
 
-  /// Refreshes menus data
-  Future<void> refreshMenus(String ownerId) async {
-    await loadMenus(ownerId);
-
-    _analyticsService.logEvent(
-      name: 'owner_menus_refreshed',
-      parameters: {'owner_id': ownerId},
-    );
-  }
-
   /// Loads menu statistics
   Future<void> _loadMenuStats(String ownerId, {String? pgId}) async {
     try {
@@ -441,18 +529,14 @@ class OwnerFoodViewModel extends BaseProviderState {
   /// Gets upcoming overrides (future dates)
   List<OwnerMenuOverride> get upcomingOverrides {
     final now = DateTime.now();
-    return _overrides
-        .where((override) => override.date.isAfter(now))
-        .toList()
+    return _overrides.where((override) => override.date.isAfter(now)).toList()
       ..sort((a, b) => a.date.compareTo(b.date));
   }
 
   /// Gets past overrides (past dates)
   List<OwnerMenuOverride> get pastOverrides {
     final now = DateTime.now();
-    return _overrides
-        .where((override) => override.date.isBefore(now))
-        .toList()
+    return _overrides.where((override) => override.date.isBefore(now)).toList()
       ..sort((a, b) => b.date.compareTo(a.date));
   }
 
@@ -488,35 +572,45 @@ class OwnerFoodViewModel extends BaseProviderState {
 
   /// Initializes default weekly menus for a new owner
   /// Creates sample menus for all 7 days with default items
-  Future<bool> initializeDefaultMenus(String ownerId) async {
+  ///
+  /// Multi-PG Support:
+  /// - If pgId is provided, creates menus for that specific PG
+  /// - If pgId is null, creates menus for all PGs (backward compatible)
+  Future<bool> initializeDefaultMenus(String ownerId, {String? pgId}) async {
     try {
       setLoading(true);
       clearError();
 
-      // Check if menus already exist
-      final existingMenus = await _repository.fetchWeeklyMenus(ownerId);
+      // Check if menus already exist for this PG
+      final existingMenus =
+          await _repository.fetchWeeklyMenus(ownerId, pgId: pgId);
       if (existingMenus.isNotEmpty) {
-        setError(true, 'Menus already exist for this owner');
+        setError(true, 'Menus already exist for this PG');
         return false;
       }
 
-      // Create default menus
-      final defaultMenus = MenuInitializationHelper.createDefaultWeeklyMenus(ownerId);
-      
+      // Create default menus with PG association
+      final defaultMenus = MenuInitializationHelper.createDefaultWeeklyMenus(
+          ownerId,
+          pgId: pgId);
+
       // Save all default menus
       await _repository.saveWeeklyMenus(defaultMenus);
-      
+
       // Reload menus
-      await loadMenus(ownerId);
+      await loadMenus(ownerId, pgId: pgId);
 
       _analyticsService.logEvent(
         name: 'owner_default_menus_initialized',
         parameters: {
           'owner_id': ownerId,
+          'pg_id': pgId ?? 'all',
           'menus_count': defaultMenus.length,
         },
       );
 
+      // Notify listeners to update UI
+      notifyListeners();
       return true;
     } catch (e) {
       setError(true, 'Failed to initialize default menus: $e');
@@ -542,7 +636,7 @@ class OwnerFoodViewModel extends BaseProviderState {
       final currentDay = MenuInitializationHelper.weekdayString(DateTime.now());
       final existingMenu = getMenuByDay(currentDay);
 
-      final menuId = existingMenu?.menuId ?? 
+      final menuId = existingMenu?.menuId ??
           '${ownerId}_${currentDay.toLowerCase()}_${DateTime.now().millisecondsSinceEpoch}';
 
       final updatedMenu = OwnerFoodMenu(
@@ -589,7 +683,24 @@ class OwnerFoodViewModel extends BaseProviderState {
   }
 
   /// Creates an empty menu for a specific day
-  OwnerFoodMenu createEmptyMenuForDay(String ownerId, String day) {
-    return MenuInitializationHelper.createEmptyMenu(ownerId, day);
+  OwnerFoodMenu createEmptyMenuForDay(String ownerId, String day,
+      {String? pgId}) {
+    return MenuInitializationHelper.createEmptyMenu(ownerId, day, pgId: pgId);
+  }
+
+  /// Gets menu override for a specific date
+  /// Returns the special menu override if it exists for the given date
+  OwnerMenuOverride? getMenuOverrideForDate(DateTime date) {
+    final dateString =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+    for (final override in _overrides) {
+      final overrideDateString =
+          '${override.date.year}-${override.date.month.toString().padLeft(2, '0')}-${override.date.day.toString().padLeft(2, '0')}';
+      if (overrideDateString == dateString && override.isActive) {
+        return override;
+      }
+    }
+    return null;
   }
 }

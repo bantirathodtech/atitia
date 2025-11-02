@@ -47,6 +47,17 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
     }
     
+    // Draft/publish helpers
+    function isDraftDoc() {
+      return resource.data.isDraft == true;
+    }
+    function isDraftIncoming() {
+      return request.resource.data.isDraft == true;
+    }
+    function isPublishedDoc() {
+      return resource.data.isDraft == false;
+    }
+    
     // Platform-agnostic helper functions
     function isAdmin() {
       return isAuthenticated() && getUserRole() == 'admin';
@@ -66,8 +77,9 @@ service cloud.firestore {
     }
     
     // Cross-platform data validation
+    // Ensure the provided 'data' contains all 'requiredFields'
     function hasRequiredFields(data, requiredFields) {
-      return requiredFields.hasAll(data.keys());
+      return data.keys().hasAll(requiredFields);
     }
     
     // Users Collection - Cross-platform user management
@@ -120,18 +132,41 @@ service cloud.firestore {
     
     // PGs Collection (alternative name for properties) - Cross-platform compatible
     match /pgs/{pgId} {
-      // Allow reading PGs for all authenticated users
-      allow read: if isValidUser();
+      // List: Allow all authenticated users to list (we filter drafts in app code)
+      // This is needed because Firestore rules can't filter on list queries
+      allow list: if isValidUser();
       
-      // Allow creating PGs - Must be authenticated and own the PG
-      allow create: if isValidUser() && 
+      // Get: Only published PGs or owner/admin can read drafts
+      allow get: if isValidUser() && (
+        resource.data.isDraft != true ||
+        resource.data.ownerUid == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Creates:
+      // - Owner can create PGs.
+      // - If creating a draft (isDraft == true), only ownerUid is required.
+      // - If creating a published PG (isDraft != true), require 'name' as well.
+      allow create: if isValidUser() &&
                        request.resource.data.ownerUid == request.auth.uid &&
-                       hasRequiredFields(request.resource.data, ['ownerUid', 'name']);
-      
-      // Allow updating/deleting PGs - Only PG owner or admin
-      allow update, delete: if isValidUser() && (
-        resource.data.ownerUid == request.auth.uid ||  // PG owner
-        isAdmin()                                       // Admin can manage all PGs
+                       (
+                         (isDraftIncoming() && hasRequiredFields(request.resource.data, ['ownerUid'])) ||
+                         (!isDraftIncoming() && hasRequiredFields(request.resource.data, ['ownerUid', 'name']))
+                       );
+
+      // Updates:
+      // - Owner/admin can update PGs.
+      // - Owners can iterate on drafts freely and later publish by setting isDraft to false.
+      allow update: if isValidUser() && (
+        resource.data.ownerUid == request.auth.uid ||
+        isAdmin()
+      );
+
+      // Deletes:
+      // - Owner/admin only
+      allow delete: if isValidUser() && (
+        resource.data.ownerUid == request.auth.uid ||
+        isAdmin()
       );
     }
     
@@ -260,6 +295,7 @@ service cloud.firestore {
     // Owner Food Menus - Owners can manage their own food menus
     match /owner_weekly_menus/{menuId} {
       allow read: if isAuthenticated();
+      allow list: if isAuthenticated();
       
       allow create: if isAuthenticated() && 
                        request.resource.data.ownerId == request.auth.uid;
@@ -270,6 +306,7 @@ service cloud.firestore {
     
     match /owner_daily_overrides/{overrideId} {
       allow read: if isAuthenticated();
+      allow list: if isAuthenticated();
       
       allow create: if isAuthenticated() && 
                        request.resource.data.ownerId == request.auth.uid;
@@ -345,8 +382,8 @@ service cloud.firestore {
 
     // Occupancy Trends - Owner's analytics data
     match /occupancy_trends/{trendId} {
-      allow read: if isAuthenticated() && resource.data.pgId in getUserPgIds();
-      allow write: if isAuthenticated();
+      allow read: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+      allow write: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
     }
 
     // Maintenance Tasks - Owner's maintenance schedule
@@ -366,6 +403,181 @@ service cloud.firestore {
     // Notification Preferences - User's notification settings
     match /notification_preferences/{userId} {
       allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Owner Guests - Owner can manage guests in their properties
+    match /owner_guests/{guestId} {
+      allow read, write: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow list: if isAuthenticated();
+    }
+    
+    // Owner Complaints - Owner can manage complaints for their properties
+    match /owner_complaints/{complaintId} {
+      allow read, write: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow list: if isAuthenticated();
+    }
+    
+    // Owner Bikes - Owner can manage bike registry for their properties
+    match /owner_bikes/{bikeId} {
+      allow read, write: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow list: if isAuthenticated();
+    }
+    
+    // Owner Services - Owner can manage service requests for their properties
+    match /owner_services/{serviceId} {
+      allow read, write: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow list: if isAuthenticated();
+    }
+    
+    // Bike Movement Requests - Guests request bike movements, Owners approve/reject
+    match /bike_movement_requests/{requestId} {
+      allow read: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||  // Guest can read their requests
+        resource.data.ownerId == request.auth.uid ||  // Owner can read requests for their PGs
+        isAdmin()
+      );
+      allow list: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.guestId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||  // Owner can approve/reject
+        isAdmin()
+      );
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // Owner Booking Requests - Guests create, Owners approve/reject
+    match /owner_booking_requests/{requestId} {
+      // Allow reading individual documents if user is the guest, owner, or admin
+      allow get: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||  // Guest can read their requests
+        resource.data.ownerId == request.auth.uid ||  // Owner can read requests for their PGs
+        isAdmin()
+      );
+      
+      // Allow listing/querying: Any authenticated user can list
+      // Firestore will automatically filter results based on the get rule above
+      // So guests querying with where('guestId', == uid) will only see their own requests
+      // And owners querying with where('ownerId', == uid) will only see their PG requests
+      allow list: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.guestId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||  // Owner can approve/reject
+        isAdmin()
+      );
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // Bed Change Requests - Guests request, Owners approve/reject
+    match /bed_change_requests/{requestId} {
+      allow read: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||  // Guest can read their requests
+        resource.data.ownerId == request.auth.uid ||  // Owner can read requests for their PGs
+        isAdmin()
+      );
+      allow list: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.guestId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||  // Owner can approve/reject
+        isAdmin()
+      );
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // Food Feedback - Guests submit, Owners read aggregated
+    match /food_feedback/{feedbackId} {
+      allow read: if isAuthenticated(); // Owners can read for analytics
+      allow create: if isAuthenticated() && 
+                       request.resource.data.guestId == request.auth.uid;
+      allow update: if isAuthenticated() && 
+                       resource.data.guestId == request.auth.uid;
+      allow delete: if isAuthenticated() && (
+        resource.data.guestId == request.auth.uid ||
+        isAdmin()
+      );
+      allow list: if isAuthenticated();
+    }
+    
+    // Foods Collection - Guest food menu browsing
+    match /foods/{foodId} {
+      // Allow all authenticated users to read foods (for guest dashboard)
+      allow read: if isAuthenticated();
+      allow list: if isAuthenticated();
+      
+      // Only admins or owners can create/update/delete foods
+      allow create: if isAuthenticated() && (
+        isAdmin() ||
+        isOwnerRole()
+      );
+      
+      allow update: if isAuthenticated() && (
+        isAdmin() ||
+        isOwnerRole()
+      );
+      
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // Guest Booking Requests - Mirror collection for guest's own requests
+    match /guest_booking_requests/{requestId} {
+      // Allow reading individual documents if user is the guest
+      allow get: if isAuthenticated() && 
+                   resource.data.guestId == request.auth.uid;
+      
+      // Allow listing/querying: Guests can query their own requests
+      allow list: if isAuthenticated();
+      
+      // Guests can create their own booking requests
+      allow create: if isAuthenticated() && 
+                       request.resource.data.guestId == request.auth.uid;
+      
+      // Guests can update their own requests (but not status after owner responds)
+      allow update: if isAuthenticated() && 
+                       resource.data.guestId == request.auth.uid;
+      
+      // Only admins can delete
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // PG Subcollections - Beds, Rooms, Floors
+    // Owners can manage, Guests can read their assigned beds/rooms
+    match /pgs/{pgId}/beds/{bedId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (
+        get(/databases/$(database)/documents/pgs/$(pgId)).data.ownerUid == request.auth.uid ||
+        isAdmin()
+      );
+    }
+    
+    match /pgs/{pgId}/rooms/{roomId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (
+        get(/databases/$(database)/documents/pgs/$(pgId)).data.ownerUid == request.auth.uid ||
+        isAdmin()
+      );
+    }
+    
+    match /pgs/{pgId}/floors/{floorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (
+        get(/databases/$(database)/documents/pgs/$(pgId)).data.ownerUid == request.auth.uid ||
+        isAdmin()
+      );
     }
     
     // Default deny all other access

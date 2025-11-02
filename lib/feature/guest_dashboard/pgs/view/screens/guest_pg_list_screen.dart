@@ -12,8 +12,13 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/widgets/drawers/guest_drawer.dart';
+import '../../../../../common/widgets/performance/optimized_list_view.dart';
+import '../../../../../common/utils/performance/memory_manager.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
+import '../../../shared/widgets/guest_pg_appbar_display.dart';
 import '../../viewmodel/guest_pg_viewmodel.dart';
 import '../widgets/guest_pg_card.dart';
 
@@ -34,7 +39,8 @@ class GuestPgListScreen extends StatefulWidget {
   State<GuestPgListScreen> createState() => _GuestPgListScreenState();
 }
 
-class _GuestPgListScreenState extends State<GuestPgListScreen> {
+class _GuestPgListScreenState extends State<GuestPgListScreen>
+    with MemoryManagementMixin {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _showFilterPanel = false;
@@ -42,6 +48,11 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Register controllers for automatic disposal
+    registerController(_searchController);
+    registerScrollController(_scrollController);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final pgVM = Provider.of<GuestPgViewModel>(context, listen: false);
       if (!pgVM.loading && pgVM.pgList.isEmpty) {
@@ -50,11 +61,13 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _scrollController.dispose();
-    super.dispose();
+  // Dispose is handled by MemoryManagementMixin
+
+  /// Toggle filter panel visibility
+  void _toggleFilterPanel() {
+    setState(() {
+      _showFilterPanel = !_showFilterPanel;
+    });
   }
 
   @override
@@ -62,16 +75,33 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
     final pgVM = Provider.of<GuestPgViewModel>(context);
 
     return Scaffold(
+      appBar: AdaptiveAppBar(
+        titleWidget: const GuestPgAppBarDisplay(),
+        centerTitle: true,
+        showDrawer: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => _toggleFilterPanel(),
+            tooltip: 'Search & Filters',
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => pgVM.refreshPGs(context),
+            tooltip: 'Refresh',
+          ),
+        ],
+        showBackButton: false,
+        showThemeToggle: false,
+      ),
+
+      // Centralized Guest Drawer
+      drawer: const GuestDrawer(),
+
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: () async => pgVM.refreshPGs(context),
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            _buildPremiumSliverAppBar(context, pgVM),
-            SliverToBoxAdapter(child: _buildBody(context, pgVM)),
-          ],
-        ),
+        child: _buildBody(context, pgVM),
       ),
     );
   }
@@ -79,16 +109,17 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
   /// 🎨 Premium Sliver App Bar with gradient and stats
   Widget _buildPremiumSliverAppBar(
       BuildContext context, GuestPgViewModel pgVM) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    final primaryColor = theme.primaryColor;
+    // final theme = Theme.of(context);
+    // final isDarkMode = theme.brightness == Brightness.dark;
+    // final primaryColor = AppColors.primary;
 
     return SliverAppBar(
       expandedHeight: 240,
       floating: false,
       pinned: true,
       stretch: true,
-      backgroundColor: isDarkMode ? AppColors.darkCard : primaryColor,
+      backgroundColor:
+          AppColors.darkCard, // Fixed: using dark mode for consistency
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
         title: HeadingMedium(
@@ -100,15 +131,10 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: isDarkMode
-                  ? [
-                      AppColors.darkCard,
-                      AppColors.darkCard.withOpacity(0.9),
-                    ]
-                  : [
-                      primaryColor,
-                      primaryColor.withOpacity(0.8),
-                    ],
+              colors: [
+                AppColors.darkCard,
+                AppColors.darkCard.withValues(alpha: 0.9),
+              ],
             ),
           ),
           child: Padding(
@@ -118,7 +144,8 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
               right: AppSpacing.paddingM,
               bottom: 60,
             ),
-            child: _buildStatsRow(context, pgVM, isDarkMode),
+            child:
+                _buildStatsRow(context, pgVM, true), // Fixed: using dark mode
           ),
         ),
       ),
@@ -160,7 +187,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
           'PGs Available',
           Icons.apartment,
           AppColors.success,
-          isDarkMode,
+          true,
         ),
         _buildStatBadge(
           context,
@@ -168,7 +195,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
           'Cities',
           Icons.location_city,
           AppColors.info,
-          isDarkMode,
+          true,
         ),
         _buildStatBadge(
           context,
@@ -176,7 +203,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
           'Amenities',
           Icons.room_service,
           AppColors.warning,
-          isDarkMode,
+          true,
         ),
       ],
     );
@@ -191,12 +218,10 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
         vertical: AppSpacing.paddingXS,
       ),
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? Colors.white.withOpacity(0.1)
-            : Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -205,7 +230,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 16),
@@ -221,12 +246,12 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textOnPrimary.withOpacity(0.9),
+                  color: AppColors.textOnPrimary.withValues(alpha: 0.9),
                   fontSize: 9,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -247,23 +272,25 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
       return _buildEmptyState(context, pgVM);
     }
 
-    return Column(
-      children: [
-        _buildSearchBar(context, pgVM),
-        if (_showFilterPanel) _buildAdvancedFilters(context, pgVM),
-        if (pgVM.searchQuery.isNotEmpty ||
-            pgVM.selectedCity != null ||
-            pgVM.selectedAmenities.isNotEmpty)
-          _buildActiveFiltersChips(context, pgVM),
-        _buildPGsList(context, pgVM),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildSearchBar(context, pgVM),
+          if (_showFilterPanel) _buildAdvancedFilters(context, pgVM),
+          if (pgVM.searchQuery.isNotEmpty ||
+              pgVM.selectedCity != null ||
+              pgVM.selectedAmenities.isNotEmpty)
+            _buildActiveFiltersChips(context, pgVM),
+          _buildPGsList(context, pgVM),
+        ],
+      ),
     );
   }
 
   /// 🔍 Premium search bar
   Widget _buildSearchBar(BuildContext context, GuestPgViewModel pgVM) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    // final theme = Theme.of(context);
+    // final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
@@ -283,9 +310,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
                 )
               : null,
           filled: true,
-          fillColor: isDarkMode
-              ? AppColors.darkInputFill
-              : AppColors.surfaceVariant,
+          fillColor: AppColors.darkInputFill,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
             borderSide: BorderSide.none,
@@ -293,13 +318,13 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
             borderSide: BorderSide(
-              color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+              color: AppColors.darkDivider,
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
             borderSide: BorderSide(
-              color: theme.primaryColor,
+              color: AppColors.primary,
               width: 2,
             ),
           ),
@@ -310,22 +335,22 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
 
   /// 🎛️ Advanced filters panel
   Widget _buildAdvancedFilters(BuildContext context, GuestPgViewModel pgVM) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    // final theme = Theme.of(context);
+    // final isDarkMode = theme.brightness == Brightness.dark;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+          color: AppColors.darkDivider,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -339,7 +364,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
             children: [
               HeadingSmall(
                 text: 'Filters',
-                color: theme.primaryColor,
+                color: AppColors.primary,
               ),
               TextButton(
                 onPressed: () => pgVM.clearAllFilters(),
@@ -348,10 +373,10 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          
+
           // City filter
           if (pgVM.getAvailableCities().isNotEmpty) ...[
-            BodyText(text: 'City', color: theme.textTheme.bodyMedium?.color),
+            BodyText(text: 'City', color: AppColors.textSecondary),
             const SizedBox(height: AppSpacing.paddingS),
             Wrap(
               spacing: AppSpacing.paddingS,
@@ -364,11 +389,9 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
                   onSelected: (selected) {
                     pgVM.setSelectedCity(selected ? city : null);
                   },
-                  backgroundColor: isDarkMode
-                      ? AppColors.darkInputFill
-                      : AppColors.surfaceVariant,
-                  selectedColor: theme.primaryColor.withOpacity(0.2),
-                  checkmarkColor: theme.primaryColor,
+                  backgroundColor: AppColors.darkInputFill,
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  checkmarkColor: AppColors.primary,
                 );
               }).toList(),
             ),
@@ -377,7 +400,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
 
           // Amenities filter
           if (pgVM.getAvailableAmenities().isNotEmpty) ...[
-            BodyText(text: 'Amenities', color: theme.textTheme.bodyMedium?.color),
+            BodyText(text: 'Amenities', color: AppColors.textSecondary),
             const SizedBox(height: AppSpacing.paddingS),
             Wrap(
               spacing: AppSpacing.paddingS,
@@ -388,7 +411,8 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
                   label: Text(amenity),
                   selected: isSelected,
                   onSelected: (selected) {
-                    final newAmenities = List<String>.from(pgVM.selectedAmenities);
+                    final newAmenities =
+                        List<String>.from(pgVM.selectedAmenities);
                     if (selected) {
                       newAmenities.add(amenity);
                     } else {
@@ -396,11 +420,9 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
                     }
                     pgVM.setSelectedAmenities(newAmenities);
                   },
-                  backgroundColor: isDarkMode
-                      ? AppColors.darkInputFill
-                      : AppColors.surfaceVariant,
-                  selectedColor: theme.primaryColor.withOpacity(0.2),
-                  checkmarkColor: theme.primaryColor,
+                  backgroundColor: AppColors.darkInputFill,
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  checkmarkColor: AppColors.primary,
                 );
               }).toList(),
             ),
@@ -412,8 +434,8 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
 
   /// 🏷️ Active filters chips
   Widget _buildActiveFiltersChips(BuildContext context, GuestPgViewModel pgVM) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    // final theme = Theme.of(context);
+    // final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
@@ -425,7 +447,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
             children: [
               CaptionText(
                 text: 'Active Filters:',
-                color: theme.textTheme.bodySmall?.color,
+                color: AppColors.textSecondary,
               ),
               const SizedBox(width: AppSpacing.paddingS),
               Expanded(
@@ -441,27 +463,27 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
                             _searchController.clear();
                             pgVM.setSearchQuery('');
                           },
-                          isDarkMode,
+                          true,
                         ),
                       if (pgVM.selectedCity != null)
                         _buildActiveFilterChip(
                           context,
                           'City: ${pgVM.selectedCity}',
                           () => pgVM.setSelectedCity(null),
-                          isDarkMode,
+                          true,
                         ),
-                      ...pgVM.selectedAmenities.map((amenity) =>
-                          _buildActiveFilterChip(
-                            context,
-                            amenity,
-                            () {
-                              final newAmenities =
-                                  List<String>.from(pgVM.selectedAmenities);
-                              newAmenities.remove(amenity);
-                              pgVM.setSelectedAmenities(newAmenities);
-                            },
-                            isDarkMode,
-                          )),
+                      ...pgVM.selectedAmenities
+                          .map((amenity) => _buildActiveFilterChip(
+                                context,
+                                amenity,
+                                () {
+                                  final newAmenities =
+                                      List<String>.from(pgVM.selectedAmenities);
+                                  newAmenities.remove(amenity);
+                                  pgVM.setSelectedAmenities(newAmenities);
+                                },
+                                true,
+                              )),
                     ],
                   ),
                 ),
@@ -471,7 +493,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
           const SizedBox(height: AppSpacing.paddingS),
           BodyText(
             text: '${pgVM.filteredPGCount} of ${pgVM.totalPGCount} PGs',
-            color: theme.textTheme.bodySmall?.color,
+            color: AppColors.textSecondary,
           ),
         ],
       ),
@@ -479,17 +501,15 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
   }
 
   /// 🏷️ Active filter chip
-  Widget _buildActiveFilterChip(
-      BuildContext context, String label, VoidCallback onRemove, bool isDarkMode) {
+  Widget _buildActiveFilterChip(BuildContext context, String label,
+      VoidCallback onRemove, bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.only(right: AppSpacing.paddingS),
       child: Chip(
         label: Text(label),
         deleteIcon: const Icon(Icons.close, size: 16),
         onDeleted: onRemove,
-        backgroundColor: isDarkMode
-            ? AppColors.darkInputFill
-            : AppColors.surfaceVariant,
+        backgroundColor: AppColors.darkInputFill,
         labelStyle: Theme.of(context).textTheme.bodySmall,
       ),
     );
@@ -515,15 +535,16 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
       );
     }
 
-    return ListView.builder(
+    return OptimizedListView<dynamic>(
+      items: pgs,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: pgs.length,
       padding: const EdgeInsets.all(AppSpacing.paddingM),
-      itemBuilder: (context, index) {
-        final pg = pgs[index];
+      itemBuilder: (context, pg, index) {
         return GuestPgCard(
           pg: pg,
+          userLatitude: null, // TODO: Get from location service if needed
+          userLongitude: null, // TODO: Get from location service if needed
           onTap: () {
             pgVM.setSelectedPG(pg);
             getIt<NavigationService>().goToGuestPGDetails(pg.pgId);
@@ -535,12 +556,14 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
 
   /// ⏳ Loading state with shimmer
   Widget _buildLoadingState(BuildContext context) {
-    return ListView.builder(
+    final shimmerItems = List.generate(5, (index) => index);
+
+    return OptimizedListView<int>(
+      items: shimmerItems,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: 5,
       padding: const EdgeInsets.all(AppSpacing.paddingM),
-      itemBuilder: (context, index) {
+      itemBuilder: (context, index, _) {
         return Container(
           margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
           child: ShimmerLoader(
@@ -555,8 +578,8 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
 
   /// ❌ Error state
   Widget _buildErrorState(BuildContext context, GuestPgViewModel pgVM) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    // final theme = Theme.of(context);
+    // final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -572,18 +595,18 @@ class _GuestPgListScreenState extends State<GuestPgListScreen> {
           HeadingMedium(
             text: 'Error loading PGs',
             align: TextAlign.center,
-            color: theme.textTheme.headlineMedium?.color,
+            color: AppColors.textPrimary,
           ),
           const SizedBox(height: AppSpacing.paddingS),
           BodyText(
             text: pgVM.errorMessage ?? 'Unknown error occurred',
             align: TextAlign.center,
-            color: theme.textTheme.bodyMedium?.color,
+            color: AppColors.textSecondary,
           ),
           const SizedBox(height: AppSpacing.paddingL),
           PrimaryButton(
             onPressed: () {
-              pgVM.clearError();
+              // pgVM.clearError();
               pgVM.loadPGs(context);
             },
             label: 'Try Again',

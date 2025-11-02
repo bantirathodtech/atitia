@@ -29,13 +29,10 @@ class AppleSignInServiceWrapper {
     try {
       // Check if Apple Sign-In is available on this platform
       if (!await SignInWithApple.isAvailable()) {
-        print('⚠️ Apple Sign-In not available on this platform');
         return;
       }
       
-      print('✅ Apple Sign-In service initialized successfully');
     } catch (e) {
-      print('⚠️ Apple Sign-In service initialization failed: $e');
       // Don't throw - let the app continue without Apple Sign-In
     }
   }
@@ -43,7 +40,6 @@ class AppleSignInServiceWrapper {
   /// Signs in a user with Apple ID and returns Firebase [User]
   Future<User?> signInWithApple() async {
     try {
-      print('🔄 Starting Apple Sign-In process...');
       
       // Check if Apple Sign-In is available
       if (!await SignInWithApple.isAvailable()) {
@@ -53,7 +49,6 @@ class AppleSignInServiceWrapper {
         );
       }
 
-      print('🔄 Authenticating with Apple...');
       
       // Request Apple ID authentication
       final credential = await SignInWithApple.getAppleIDCredential(
@@ -64,7 +59,6 @@ class AppleSignInServiceWrapper {
       );
       
       _currentCredential = credential;
-      print('✅ Apple authentication successful: ${credential.userIdentifier}');
 
       // Create Firebase credential from Apple ID credential
       final oauthCredential = OAuthProvider("apple.com").credential(
@@ -72,19 +66,15 @@ class AppleSignInServiceWrapper {
         accessToken: credential.authorizationCode,
       );
 
-      print('🔄 Creating Firebase credential...');
       
       if (oauthCredential.accessToken == null) {
         throw AppException(message: 'Apple Sign-In failed: No access token received');
       }
 
-      print('🔄 Signing in to Firebase...');
       final userCredential = await _authService.signInWithCredential(oauthCredential);
-      print('✅ Firebase sign-in successful: ${userCredential.user?.uid}');
       
       return userCredential.user;
     } on SignInWithAppleAuthorizationException catch (e) {
-      print('❌ Apple Sign-In authorization exception: ${e.code} - ${e.message}');
       if (e.code == AuthorizationErrorCode.canceled) {
         throw AppException(message: 'Apple sign-in canceled by user');
       } else if (e.code == AuthorizationErrorCode.failed) {
@@ -98,7 +88,6 @@ class AppleSignInServiceWrapper {
       }
       throw AppException(message: 'Apple sign-in failed: ${e.message}');
     } catch (e) {
-      print('❌ Apple Sign-In error: $e');
       if (e.toString().contains('not available')) {
         throw AppException(
           message: 'Apple Sign-In not available',
@@ -116,10 +105,8 @@ class AppleSignInServiceWrapper {
     try {
       // Apple Sign-In doesn't support silent sign-in like Google
       // This method is kept for API consistency
-      print('⚠️ Apple Sign-In does not support silent sign-in');
       return null;
     } catch (e) {
-      print('Silent sign-in failed: ${e.toString()}');
       return null;
     }
   }
@@ -129,7 +116,6 @@ class AppleSignInServiceWrapper {
     try {
       await _authService.signOut();
       _currentCredential = null;
-      print('✅ Apple Sign-In: User signed out');
     } catch (e) {
       throw AppException(message: 'Apple sign-out failed: ${e.toString()}');
     }

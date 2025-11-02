@@ -2,18 +2,33 @@
 
 import '../../../../../common/utils/constants/firestore.dart';
 import '../../../../../common/utils/exceptions/exceptions.dart';
-import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../../core/di/common/unified_service_locator.dart';
+import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
+import '../../../../../core/interfaces/database/database_service_interface.dart';
+import '../../../../../core/interfaces/storage/storage_service_interface.dart';
 import '../models/owner_profile_model.dart';
 
 /// Repository for Owner Profile Firestore and Storage operations
-/// Uses GetIt service locator for Firebase service access
+/// Uses interface-based services for dependency injection (swappable backends)
 /// Handles owner profile CRUD operations and document uploads
 /// Enhanced with analytics tracking and error handling
 class OwnerProfileRepository {
-  // Get Firebase services through GetIt service locator
-  final _firestoreService = getIt.firestore;
-  final _storageService = getIt.storage;
-  final _analyticsService = getIt.analytics;
+  final IDatabaseService _databaseService;
+  final IStorageService _storageService;
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  OwnerProfileRepository({
+    IDatabaseService? databaseService,
+    IStorageService? storageService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _storageService =
+            storageService ?? UnifiedServiceLocator.serviceFactory.storage,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Fetches the OwnerProfile document for the given ownerId
   Future<OwnerProfile?> getOwnerProfile(String ownerId) async {
@@ -23,7 +38,7 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId},
       );
 
-      final doc = await _firestoreService.getDocument(
+      final doc = await _databaseService.getDocument(
         FirestoreConstants.users,
         ownerId,
       );
@@ -57,7 +72,7 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId},
       );
 
-      return _firestoreService
+      return _databaseService
           .getDocumentStream(
             FirestoreConstants.users,
             ownerId,
@@ -83,7 +98,7 @@ class OwnerProfileRepository {
         parameters: {'owner_id': profile.ownerId},
       );
 
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.users,
         profile.ownerId,
         profile.toMap(),
@@ -125,7 +140,7 @@ class OwnerProfileRepository {
       // Add updatedAt timestamp
       updatedData['updatedAt'] = DateTime.now();
 
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.users,
         ownerId,
         updatedData,
@@ -155,7 +170,7 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId},
       );
 
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.users,
         ownerId,
         {'profilePhoto': photoUrl, 'updatedAt': DateTime.now()},
@@ -176,7 +191,7 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId},
       );
 
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.users,
         ownerId,
         {'aadhaarPhoto': photoUrl, 'updatedAt': DateTime.now()},
@@ -197,7 +212,7 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId},
       );
 
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.users,
         ownerId,
         {
@@ -224,7 +239,7 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId},
       );
 
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.users,
         ownerId,
         {
@@ -253,7 +268,7 @@ class OwnerProfileRepository {
 
       businessInfo['updatedAt'] = DateTime.now();
 
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.users,
         ownerId,
         businessInfo,
@@ -279,7 +294,11 @@ class OwnerProfileRepository {
       );
 
       final path = 'owners/$ownerId/profile_photos';
-      final photoUrl = await _storageService.uploadFile(file, path, fileName);
+      final photoUrl = await _storageService.uploadFile(
+        path: path,
+        file: file,
+        fileName: fileName,
+      );
 
       await _analyticsService.logEvent(
         name: 'owner_profile_photo_uploaded',
@@ -312,8 +331,11 @@ class OwnerProfileRepository {
       );
 
       final path = 'owners/$ownerId/documents/aadhaar';
-      final documentUrl =
-          await _storageService.uploadFile(file, path, fileName);
+      final documentUrl = await _storageService.uploadFile(
+        path: path,
+        file: file,
+        fileName: fileName,
+      );
 
       await _analyticsService.logEvent(
         name: 'owner_aadhaar_uploaded',
@@ -346,7 +368,11 @@ class OwnerProfileRepository {
       );
 
       final path = 'owners/$ownerId/upi_qr_codes';
-      final qrCodeUrl = await _storageService.uploadFile(file, path, fileName);
+      final qrCodeUrl = await _storageService.uploadFile(
+        path: path,
+        file: file,
+        fileName: fileName,
+      );
 
       await _analyticsService.logEvent(
         name: 'owner_upi_qr_uploaded',
@@ -484,4 +510,3 @@ class OwnerProfileRepository {
     }
   }
 }
-

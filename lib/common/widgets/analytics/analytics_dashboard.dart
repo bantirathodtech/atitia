@@ -118,7 +118,7 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant.withOpacity(0.5),
+        color: AppColors.surfaceVariant.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
       ),
       child: Row(

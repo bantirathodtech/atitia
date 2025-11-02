@@ -6,17 +6,19 @@ class AdaptiveLoader extends AdaptiveStatelessWidget {
   final double size;
   final Color? color;
   final double strokeWidth;
+  final bool center;
 
   const AdaptiveLoader({
     super.key,
     this.size = 24,
     this.color,
     this.strokeWidth = 3,
+    this.center = true,
   });
 
   @override
   Widget buildAdaptive(BuildContext context) {
-    return SizedBox(
+    final loader = SizedBox(
       width: size,
       height: size,
       child: CircularProgressIndicator(
@@ -26,5 +28,8 @@ class AdaptiveLoader extends AdaptiveStatelessWidget {
         strokeWidth: strokeWidth,
       ),
     );
+
+    if (!center) return loader;
+    return Center(child: loader);
   }
 }

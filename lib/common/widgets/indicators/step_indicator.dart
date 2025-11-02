@@ -92,7 +92,7 @@ class StepIndicator extends AdaptiveStatelessWidget {
                             boxShadow: isActive
                                 ? [
                                     BoxShadow(
-                                      color: active.withOpacity(0.3),
+                                      color: active.withValues(alpha: 0.3),
                                       blurRadius: 8,
                                       spreadRadius: 2,
                                     ),

@@ -2,9 +2,13 @@
 
 /// Model for user notification preferences
 /// Controls how and when users receive notifications (push, email, SMS)
+library;
+
+import '../../common/utils/date/converter/date_service_converter.dart';
+
 class NotificationPreferencesModel {
   final String userId;
-  
+
   // Push notification preferences
   final bool pushEnabled;
   final bool pushNewBooking;
@@ -12,24 +16,24 @@ class NotificationPreferencesModel {
   final bool pushComplaint;
   final bool pushMaintenance;
   final bool pushGuestActivity;
-  
+
   // Email preferences
   final bool emailEnabled;
   final bool emailDailySummary;
   final bool emailWeeklyReport;
   final bool emailPaymentReminders;
   final bool emailMaintenanceAlerts;
-  
+
   // SMS preferences
   final bool smsEnabled;
   final bool smsUrgentOnly;
   final bool smsPaymentConfirmation;
-  
+
   // Quiet hours
   final bool quietHoursEnabled;
   final int quietHoursStart; // Hour (0-23)
   final int quietHoursEnd; // Hour (0-23)
-  
+
   final DateTime lastUpdated;
 
   NotificationPreferencesModel({
@@ -74,7 +78,8 @@ class NotificationPreferencesModel {
       quietHoursEnabled: map['quietHoursEnabled'] as bool? ?? false,
       quietHoursStart: map['quietHoursStart'] as int? ?? 22,
       quietHoursEnd: map['quietHoursEnd'] as int? ?? 8,
-      lastUpdated: DateTime.parse(map['lastUpdated'] as String),
+      lastUpdated:
+          DateServiceConverter.fromService(map['lastUpdated'] as String),
     );
   }
 
@@ -98,7 +103,7 @@ class NotificationPreferencesModel {
       'quietHoursEnabled': quietHoursEnabled,
       'quietHoursStart': quietHoursStart,
       'quietHoursEnd': quietHoursEnd,
-      'lastUpdated': lastUpdated.toIso8601String(),
+      'lastUpdated': DateServiceConverter.toService(lastUpdated),
     };
   }
 
@@ -134,11 +139,14 @@ class NotificationPreferencesModel {
       emailEnabled: emailEnabled ?? this.emailEnabled,
       emailDailySummary: emailDailySummary ?? this.emailDailySummary,
       emailWeeklyReport: emailWeeklyReport ?? this.emailWeeklyReport,
-      emailPaymentReminders: emailPaymentReminders ?? this.emailPaymentReminders,
-      emailMaintenanceAlerts: emailMaintenanceAlerts ?? this.emailMaintenanceAlerts,
+      emailPaymentReminders:
+          emailPaymentReminders ?? this.emailPaymentReminders,
+      emailMaintenanceAlerts:
+          emailMaintenanceAlerts ?? this.emailMaintenanceAlerts,
       smsEnabled: smsEnabled ?? this.smsEnabled,
       smsUrgentOnly: smsUrgentOnly ?? this.smsUrgentOnly,
-      smsPaymentConfirmation: smsPaymentConfirmation ?? this.smsPaymentConfirmation,
+      smsPaymentConfirmation:
+          smsPaymentConfirmation ?? this.smsPaymentConfirmation,
       quietHoursEnabled: quietHoursEnabled ?? this.quietHoursEnabled,
       quietHoursStart: quietHoursStart ?? this.quietHoursStart,
       quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
@@ -162,7 +170,5 @@ class NotificationPreferencesModel {
           emailPaymentReminders ||
           emailMaintenanceAlerts);
 
-  String get quietHoursDisplay =>
-      '$quietHoursStart:00 - $quietHoursEnd:00';
+  String get quietHoursDisplay => '$quietHoursStart:00 - $quietHoursEnd:00';
 }
-

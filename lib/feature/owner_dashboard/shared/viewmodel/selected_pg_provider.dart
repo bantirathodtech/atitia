@@ -1,232 +1,182 @@
 // lib/feature/owner_dashboard/shared/viewmodel/selected_pg_provider.dart
 
-import 'package:atitia/core/services/firebase/analytics/firebase_analytics_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../../../core/db/flutter_secure_storage.dart';
-import '../../../../core/di/firebase/container/firebase_dependency_container.dart';
-import '../../../guest_dashboard/pgs/data/models/guest_pg_model.dart';
-import '../../mypg/data/repositories/owner_pg_management_repository.dart';
+import '../../../../core/di/common/unified_service_locator.dart';
+import '../../../../common/utils/constants/firestore.dart';
+import '../../../../core/interfaces/database/database_service_interface.dart';
+import '../../../../core/interfaces/analytics/analytics_service_interface.dart';
 
-/// Manages the currently selected PG for multi-PG owners
-///
-/// Responsibilities:
-/// - Load all PGs for the current owner
-/// - Track which PG is currently selected
-/// - Persist selection across app restarts
-/// - Notify dependent tabs when PG changes
-/// - Handle edge cases (no PGs, single PG, etc.)
+/// Provider for managing selected PG across owner dashboard
+/// Loads PGs from Firebase and manages selection state
 class SelectedPgProvider extends ChangeNotifier {
-  final OwnerPgManagementRepository _repository =
-      getIt<OwnerPgManagementRepository>();
-  final LocalStorageService _localStorage = getIt<LocalStorageService>();
-  final AnalyticsServiceWrapper _analytics = getIt<AnalyticsServiceWrapper>();
+  final IDatabaseService _databaseService;
+  final IAnalyticsService _analyticsService;
 
-  // State
-  List<GuestPgModel> _ownerPgs = [];
-  GuestPgModel? _selectedPg;
+  String? _selectedPgId;
+  String? _ownerId;
+  List<Map<String, dynamic>> _pgs = [];
   bool _isLoading = false;
   String? _error;
 
-  // Getters
-  List<GuestPgModel> get ownerPgs => _ownerPgs;
-  GuestPgModel? get selectedPg => _selectedPg;
+  SelectedPgProvider({
+    IDatabaseService? databaseService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
+
+  String? get selectedPgId => _selectedPgId;
+  String? get ownerId => _ownerId;
+  bool get hasPgs => _pgs.isNotEmpty;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  bool get hasMultiplePgs => _ownerPgs.length > 1;
-  bool get hasPgs => _ownerPgs.isNotEmpty;
-  String? get selectedPgId => _selectedPg?.pgId;
-  String? get selectedPgName => _selectedPg?.pgName;
+  List<Map<String, dynamic>> get pgs => List.unmodifiable(_pgs);
+  Map<String, dynamic>? get selectedPg {
+    if (_selectedPgId == null || _pgs.isEmpty) return null;
+    try {
+      return _pgs.firstWhere(
+        (pg) => pg['pgId'] == _selectedPgId || pg['id'] == _selectedPgId,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
 
-  /// Initialize and load PGs for owner
+  /// Initialize for owner and load PGs from Firebase
   Future<void> initializeForOwner(String ownerId) async {
-    if (ownerId.isEmpty) {
-      debugPrint('⚠️ SelectedPgProvider: Cannot initialize with empty ownerId');
+    if (_ownerId == ownerId && _pgs.isNotEmpty) {
+      // Already initialized with this owner
       return;
     }
 
-    _isLoading = true;
+    _ownerId = ownerId;
     _error = null;
-    notifyListeners();
+    await loadPgsFromFirebase();
+  }
+
+  /// Load PGs from Firebase for the current owner
+  Future<void> loadPgsFromFirebase() async {
+    if (_ownerId == null || _ownerId!.isEmpty) {
+      _error = 'Owner ID not set';
+      notifyListeners();
+      return;
+    }
 
     try {
-      debugPrint('🏢 SelectedPgProvider: Loading PGs for owner $ownerId');
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
 
-      // Load owner's PGs from repository
-      final pgs = await _repository.fetchOwnerPGs(ownerId);
+      // Fetch PGs from Firestore using ownerUid filter
+      // Try ownerUid first (standard field), fallback to ownerId if needed
+      Stream<QuerySnapshot> stream;
+      try {
+        stream = _databaseService.getCollectionStreamWithFilter(
+            FirestoreConstants.pgs, 'ownerUid', _ownerId!);
+      } catch (e) {
+        // Fallback: try ownerId field name
+        stream = _databaseService.getCollectionStreamWithFilter(
+            FirestoreConstants.pgs, 'ownerId', _ownerId!);
+      }
 
-      // Convert dynamic list to List<GuestPgModel>
-      _ownerPgs = pgs.map((pg) {
-        if (pg is GuestPgModel) {
-          return pg;
-        } else if (pg is Map<String, dynamic>) {
-          return GuestPgModel.fromMap(pg);
-        } else {
-          throw Exception('Invalid PG data type: ${pg.runtimeType}');
+      final snapshot = await stream.first;
+
+      final List<Map<String, dynamic>> loadedPgs = [];
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        // Verify this PG belongs to the owner (double check)
+        final docOwnerUid = data['ownerUid'] as String?;
+        final docOwnerId = data['ownerId'] as String?;
+
+        // Exclude drafts from selection dropdown
+        final isDraft = (data['isDraft'] == true);
+        if ((docOwnerUid == _ownerId || docOwnerId == _ownerId) && !isDraft) {
+          loadedPgs.add({
+            ...data,
+            'id': doc.id, // Document ID
+            'pgId': doc.id, // Also store as pgId for consistency
+          });
         }
-      }).toList();
+      }
 
-      debugPrint('✅ SelectedPgProvider: Loaded ${_ownerPgs.length} PGs');
-      _analytics.logEvent(
+      _pgs = loadedPgs;
+
+      // Auto-select first PG if none selected and PGs exist
+      if (_selectedPgId == null && _pgs.isNotEmpty) {
+        _selectedPgId =
+            _pgs.first['pgId'] as String? ?? _pgs.first['id'] as String?;
+      }
+
+      // If selected PG is no longer in list, clear selection
+      if (_selectedPgId != null &&
+          !_pgs.any((pg) =>
+              (pg['pgId'] == _selectedPgId || pg['id'] == _selectedPgId))) {
+        _selectedPgId = _pgs.isNotEmpty
+            ? (_pgs.first['pgId'] as String? ?? _pgs.first['id'] as String?)
+            : null;
+      }
+
+      await _analyticsService.logEvent(
         name: 'owner_pgs_loaded',
         parameters: {
-          'owner_id': ownerId,
-          'pgs_count': _ownerPgs.length,
+          'owner_id': _ownerId!,
+          'pgs_count': _pgs.length,
+          'has_selection': _selectedPgId != null,
         },
       );
-
-      // Determine which PG to select
-      await _autoSelectPg(ownerId);
 
       _isLoading = false;
       notifyListeners();
     } catch (e) {
-      debugPrint('❌ SelectedPgProvider: Error loading PGs: $e');
       _error = 'Failed to load PGs: $e';
       _isLoading = false;
-      _analytics.logEvent(
+
+      await _analyticsService.logEvent(
         name: 'owner_pgs_load_error',
         parameters: {
-          'owner_id': ownerId,
+          'owner_id': _ownerId ?? 'unknown',
           'error': e.toString(),
         },
       );
+
       notifyListeners();
     }
   }
 
-  /// Auto-select appropriate PG based on persistence and availability
-  Future<void> _autoSelectPg(String ownerId) async {
-    if (_ownerPgs.isEmpty) {
-      _selectedPg = null;
-      debugPrint('ℹ️ SelectedPgProvider: No PGs available, nothing to select');
-      return;
+  /// Set selected PG
+  void setSelectedPg(String pgId) {
+    // Validate that the PG exists in our list
+    if (_pgs.any((pg) => pg['pgId'] == pgId || pg['id'] == pgId)) {
+      _selectedPgId = pgId;
+      notifyListeners();
     }
+  }
 
-    // Try to restore last selected PG from storage
-    final lastSelectedPgId =
-        await _localStorage.read('selected_pg_id_$ownerId');
+  /// Set PGs list (for testing or manual updates)
+  void setPgs(List<Map<String, dynamic>> pgs) {
+    _pgs = pgs;
+    notifyListeners();
+  }
 
-    if (lastSelectedPgId != null) {
-      // Check if last selected PG still exists
-      final lastPg = _ownerPgs.firstWhere(
-        (pg) => pg.pgId == lastSelectedPgId,
-        orElse: () => _ownerPgs.first,
+  /// Refresh PGs from Firebase
+  Future<void> refreshPgs() async {
+    await loadPgsFromFirebase();
+  }
+
+  /// Get PG name by ID
+  String? getPgName(String? pgId) {
+    if (pgId == null) return null;
+    try {
+      final pg = _pgs.firstWhere(
+        (p) => p['pgId'] == pgId || p['id'] == pgId,
       );
-      _selectedPg = lastPg;
-      debugPrint(
-          '✅ SelectedPgProvider: Restored last selected PG: ${lastPg.pgName}');
-    } else {
-      // No previous selection, select first PG
-      _selectedPg = _ownerPgs.first;
-      debugPrint(
-          '✅ SelectedPgProvider: Auto-selected first PG: ${_selectedPg!.pgName}');
+      return pg['pgName'] as String? ?? pg['name'] as String? ?? 'Unknown PG';
+    } catch (e) {
+      return null;
     }
-
-    _analytics.logEvent(
-      name: 'owner_pg_selected',
-      parameters: {
-        'owner_id': ownerId,
-        'pg_id': _selectedPg!.pgId,
-        'pg_name': _selectedPg!.pgName,
-        'auto_selected': lastSelectedPgId == null
-            ? 'true'
-            : 'false', // Convert boolean to string
-      },
-    );
-  }
-
-  /// Manually select a specific PG
-  Future<void> selectPg(GuestPgModel pg, String ownerId) async {
-    if (_selectedPg?.pgId == pg.pgId) {
-      debugPrint('ℹ️ SelectedPgProvider: PG already selected, skipping');
-      return;
-    }
-
-    _selectedPg = pg;
-
-    // Persist selection
-    await _localStorage.write('selected_pg_id_$ownerId', pg.pgId);
-
-    debugPrint('✅ SelectedPgProvider: PG selected: ${pg.pgName}');
-    _analytics.logEvent(
-      name: 'owner_pg_switched',
-      parameters: {
-        'owner_id': ownerId,
-        'pg_id': pg.pgId,
-        'pg_name': pg.pgName,
-      },
-    );
-
-    notifyListeners();
-  }
-
-  /// Refresh PGs list (call after creating/deleting a PG)
-  Future<void> refreshPgs(String ownerId) async {
-    debugPrint('🔄 SelectedPgProvider: Refreshing PGs list');
-    await initializeForOwner(ownerId);
-  }
-
-  /// Add a newly created PG and auto-select it
-  void addAndSelectPg(GuestPgModel newPg, String ownerId) {
-    _ownerPgs.add(newPg);
-    _selectedPg = newPg;
-
-    // Persist selection
-    _localStorage.write('selected_pg_id_$ownerId', newPg.pgId);
-
-    debugPrint(
-        '✅ SelectedPgProvider: New PG added and selected: ${newPg.pgName}');
-    _analytics.logEvent(
-      name: 'owner_pg_added_and_selected',
-      parameters: {
-        'owner_id': ownerId,
-        'pg_id': newPg.pgId,
-        'pg_name': newPg.pgName,
-      },
-    );
-
-    notifyListeners();
-  }
-
-  /// Remove a deleted PG and auto-select another
-  Future<void> removePg(String pgId, String ownerId) async {
-    _ownerPgs.removeWhere((pg) => pg.pgId == pgId);
-
-    // If deleted PG was selected, select another
-    if (_selectedPg?.pgId == pgId) {
-      if (_ownerPgs.isNotEmpty) {
-        _selectedPg = _ownerPgs.first;
-        await _localStorage.write('selected_pg_id_$ownerId', _selectedPg!.pgId);
-        debugPrint(
-            '✅ SelectedPgProvider: Deleted PG was selected, switched to: ${_selectedPg!.pgName}');
-      } else {
-        _selectedPg = null;
-        await _localStorage.delete('selected_pg_id_$ownerId');
-        debugPrint('ℹ️ SelectedPgProvider: No PGs remaining after deletion');
-      }
-    }
-
-    _analytics.logEvent(
-      name: 'owner_pg_removed',
-      parameters: {
-        'owner_id': ownerId,
-        'pg_id': pgId,
-        'remaining_pgs': _ownerPgs.length,
-      },
-    );
-
-    notifyListeners();
-  }
-
-  /// Clear all state (call on logout)
-  Future<void> clear(String ownerId) async {
-    _ownerPgs = [];
-    _selectedPg = null;
-    _error = null;
-    _isLoading = false;
-    await _localStorage.delete('selected_pg_id_$ownerId');
-    debugPrint('🧹 SelectedPgProvider: Cleared all state');
-    notifyListeners();
   }
 }

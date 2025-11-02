@@ -1,22 +1,35 @@
 // lib/features/owner_dashboard/overview/data/repository/owner_overview_repository.dart
 
-import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../common/utils/constants/firestore.dart';
+import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
+import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../models/owner_overview_model.dart';
 
 /// Repository to fetch owner overview data from Firestore
-/// Uses Firebase service locator for dependency injection
+/// Uses interface-based services for dependency injection (swappable backends)
 /// Handles owner dashboard analytics, summary data operations, and data aggregation
 class OwnerOverviewRepository {
-  final _firestoreService = getIt.firestore;
-  final _analyticsService = getIt.analytics;
+  final IDatabaseService _databaseService;
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  OwnerOverviewRepository({
+    IDatabaseService? databaseService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Fetches owner overview data including properties, revenue, and tenants
   /// Aggregates data from multiple sources for comprehensive dashboard view
-  /// 
+  ///
   /// If pgId is provided, shows data for that specific PG only
   /// If pgId is null, aggregates data across all owner's PGs
-  Future<OwnerOverviewModel> fetchOwnerOverviewData(String ownerId, {String? pgId}) async {
+  Future<OwnerOverviewModel> fetchOwnerOverviewData(String ownerId,
+      {String? pgId}) async {
     try {
       // Aggregate data from multiple collections
       final overview = await _aggregateOwnerData(ownerId, pgId: pgId);
@@ -48,46 +61,60 @@ class OwnerOverviewRepository {
 
   /// Aggregates data from multiple collections
   /// If pgId is provided, filters all data by that specific PG
-  Future<OwnerOverviewModel> _aggregateOwnerData(String ownerId, {String? pgId}) async {
+  /// NOTE: totalProperties always shows ALL owner's properties, not filtered by pgId
+  Future<OwnerOverviewModel> _aggregateOwnerData(String ownerId,
+      {String? pgId}) async {
     try {
       // Fetch properties count and calculate total beds
-      final propertiesSnapshot = await _firestoreService
+      final propertiesSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
               FirestoreConstants.pgs, 'ownerUid', ownerId)
           .first;
-      
-      int totalProperties = propertiesSnapshot.docs.length;
+
+      // Filter out drafts - only count published/active properties
+      final publishedProperties = propertiesSnapshot.docs.where((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final isDraft = data['isDraft'] == true;
+        return !isDraft; // Only count non-draft properties
+      }).toList();
+
+      // Always count ALL published properties for the owner (not filtered by selected PG)
+      int totalProperties = publishedProperties.length;
       int totalBeds = 0;
-      int totalRooms = 0;
-      
-      // If specific PG selected, filter to that PG only
+      // int totalRooms = 0;
+
+      // If specific PG selected, filter beds calculation to that PG only
+      // But keep totalProperties as all published properties count
       if (pgId != null) {
-        final pgDoc = propertiesSnapshot.docs.where((doc) => doc.id == pgId).firstOrNull;
+        final pgDoc =
+            publishedProperties.where((doc) => doc.id == pgId).firstOrNull;
         if (pgDoc != null) {
-          totalProperties = 1; // Only counting the selected PG
+          // Don't change totalProperties - keep it as all published properties count
+          // totalProperties remains = publishedProperties.length
           final pgData = pgDoc.data() as Map<String, dynamic>;
-          
+
           // Calculate total beds from floorStructure
-          final floorStructure = pgData['floorStructure'] as List<dynamic>? ?? [];
+          final floorStructure =
+              pgData['floorStructure'] as List<dynamic>? ?? [];
           for (var floor in floorStructure) {
             final rooms = floor['rooms'] as List<dynamic>? ?? [];
-            totalRooms += rooms.length;
+            // totalRooms += rooms.length;
             for (var room in rooms) {
               totalBeds += (room['bedsCount'] as int?) ?? 0;
             }
           }
-        } else {
-          // PG not found, return empty data
-          totalProperties = 0;
         }
+        // Note: If PG not found (pgDoc == null), we still show all properties
+        // totalProperties remains as all properties count
       } else {
-        // Calculate total beds across all PGs
-        for (var pgDoc in propertiesSnapshot.docs) {
+        // Calculate total beds across all published PGs (excluding drafts)
+        for (var pgDoc in publishedProperties) {
           final pgData = pgDoc.data() as Map<String, dynamic>;
-          final floorStructure = pgData['floorStructure'] as List<dynamic>? ?? [];
+          final floorStructure =
+              pgData['floorStructure'] as List<dynamic>? ?? [];
           for (var floor in floorStructure) {
             final rooms = floor['rooms'] as List<dynamic>? ?? [];
-            totalRooms += rooms.length;
+            // totalRooms += rooms.length;
             for (var room in rooms) {
               totalBeds += (room['bedsCount'] as int?) ?? 0;
             }
@@ -96,7 +123,7 @@ class OwnerOverviewRepository {
       }
 
       // Fetch payments data (filter by pgId if provided)
-      final paymentsSnapshot = await _firestoreService
+      final paymentsSnapshot = await _databaseService
           .getCollectionStream(FirestoreConstants.payments)
           .first;
 
@@ -110,10 +137,10 @@ class OwnerOverviewRepository {
 
       for (var doc in paymentsSnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        
+
         // Filter by pgId if specified
         if (pgId != null && data['pgId'] != pgId) continue;
-        
+
         final amount = (data['amount'] ?? 0).toDouble();
         final status = data['status'] as String? ?? 'pending';
         final date = data['date']?.toDate();
@@ -133,22 +160,23 @@ class OwnerOverviewRepository {
       }
 
       // Fetch bookings data (filter by pgId if provided)
-      final bookingsSnapshot = await _firestoreService
+      final bookingsSnapshot = await _databaseService
           .getCollectionStream(FirestoreConstants.bookings)
           .first;
 
       int pendingBookings = 0;
       int approvedBookings = 0;
-      int activeTenants = 0; // Count from bookings where status = approved/active
+      int activeTenants =
+          0; // Count from bookings where status = approved/active
 
       for (var doc in bookingsSnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        
+
         // Filter by pgId if specified
         if (pgId != null && data['pgId'] != pgId) continue;
-        
+
         final status = data['status'] as String? ?? 'pending';
-        
+
         if (status == 'pending') {
           pendingBookings++;
         } else if (status == 'approved' || status == 'active') {
@@ -158,7 +186,7 @@ class OwnerOverviewRepository {
       }
 
       // Fetch complaints data (filter by pgId if provided)
-      final complaintsSnapshot = await _firestoreService
+      final complaintsSnapshot = await _databaseService
           .getCollectionStream(FirestoreConstants.complaints)
           .first;
 
@@ -167,12 +195,12 @@ class OwnerOverviewRepository {
 
       for (var doc in complaintsSnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        
+
         // Filter by pgId if specified
         if (pgId != null && data['pgId'] != pgId) continue;
-        
+
         final status = data['status'] as String? ?? 'pending';
-        
+
         if (status == 'pending') {
           pendingComplaints++;
         } else if (status == 'resolved') {
@@ -220,7 +248,7 @@ class OwnerOverviewRepository {
   Future<Map<String, double>> getMonthlyRevenueBreakdown(
       String ownerId, int year) async {
     try {
-      final paymentsSnapshot = await _firestoreService
+      final paymentsSnapshot = await _databaseService
           .getCollectionStream(FirestoreConstants.payments)
           .first;
 
@@ -266,23 +294,31 @@ class OwnerOverviewRepository {
   }
 
   /// Fetches property-wise revenue breakdown
+  /// Only includes published properties (excludes drafts)
   Future<Map<String, double>> getPropertyRevenueBreakdown(
       String ownerId) async {
     try {
-      final propertiesSnapshot = await _firestoreService
+      final propertiesSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
               FirestoreConstants.pgs, 'ownerUid', ownerId)
           .first;
 
+      // Filter out drafts - only include published properties
+      final publishedProperties = propertiesSnapshot.docs.where((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final isDraft = data['isDraft'] == true;
+        return !isDraft; // Only process non-draft properties
+      }).toList();
+
       final Map<String, double> breakdown = {};
 
-      for (var propertyDoc in propertiesSnapshot.docs) {
+      for (var propertyDoc in publishedProperties) {
         final pgId = propertyDoc.id;
         final pgData = propertyDoc.data() as Map<String, dynamic>;
         final pgName = pgData['pgName'] ?? 'Property $pgId';
 
         // Fetch payments for this property
-        final paymentsSnapshot = await _firestoreService
+        final paymentsSnapshot = await _databaseService
             .getCollectionStreamWithFilter(
                 FirestoreConstants.payments, 'pgId', pgId)
             .first;
@@ -322,4 +358,3 @@ class OwnerOverviewRepository {
     }
   }
 }
-

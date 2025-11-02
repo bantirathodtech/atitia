@@ -1,5 +1,7 @@
 // App Bars
 export '../../common/widgets/app_bars/adaptive_app_bar.dart';
+// Drawers
+export '../../common/widgets/drawers/adaptive_drawer.dart';
 // Bottom Sheets
 export '../../common/widgets/bottom_sheets/adaptive_bottom_sheet.dart';
 // Buttons

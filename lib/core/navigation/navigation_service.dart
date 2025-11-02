@@ -31,24 +31,35 @@ class NavigationService {
   // Guest navigation methods
   void goToGuestHome() => _router.go(AppRoutes.guestHome);
   void goToGuestPGs() => _router.go(AppRoutes.guestPGs);
-  void goToGuestPGDetails(String pgId) =>
-      _router.go(AppRoutes.guestPGDetails(pgId));
+  void goToGuestPGDetails(String pgId) {
+    _router.pushNamed(
+      'guestPGDetails',
+      pathParameters: {'pgId': pgId},
+    );
+  }
   void goToGuestPGAdd() => _router.go(AppRoutes.guestPGAdd());
   void goToGuestFoods() => _router.go(AppRoutes.guestFoods);
   void goToGuestFoodDetails(String foodId) =>
       _router.go(AppRoutes.guestFoodDetails(foodId));
   void goToGuestPayments() => _router.go(AppRoutes.guestPayments);
-  void goToGuestPaymentDetails(String paymentId) =>
-      _router.go(AppRoutes.guestPaymentDetails(paymentId));
+  void goToGuestPaymentDetails(String paymentId) {
+    _router.pushNamed(
+      'guestPaymentDetails',
+      pathParameters: {'paymentId': paymentId},
+    );
+  }
   void goToGuestPaymentAdd() => _router.go(AppRoutes.guestPaymentAdd());
   void goToGuestComplaints() => _router.go(AppRoutes.guestComplaints);
-  void goToGuestComplaintAdd() => _router.go(AppRoutes.guestComplaintAdd());
+  void goToGuestComplaintAdd() {
+    _router.pushNamed('guestComplaintsAdd');
+  }
   void goToGuestComplaintDetails(String complaintId) =>
       _router.go(AppRoutes.guestComplaintDetails(complaintId));
   void goToGuestProfile() => _router.go(AppRoutes.guestProfile);
+  void goToGuestNotifications() => _router.go(AppRoutes.guestNotifications);
+  void goToGuestRoomBed() => _router.go(AppRoutes.guestRoomBed);
   void goToGuestSettings() => _router.go(AppRoutes.guestSettings);
   void goToGuestHelp() => _router.go(AppRoutes.guestHelp);
-  void goToGuestNotifications() => _router.go(AppRoutes.guestNotifications);
 
   // Owner navigation methods
   void goToOwnerHome() => _router.go(AppRoutes.ownerHome);
@@ -58,8 +69,8 @@ class NavigationService {
   void goToOwnerGuests() => _router.go(AppRoutes.ownerGuests);
   void goToOwnerProfile() => _router.go(AppRoutes.ownerProfile);
   void goToOwnerSettings() => _router.go(AppRoutes.ownerSettings);
-  void goToOwnerHelp() => _router.go(AppRoutes.ownerHelp);
   void goToOwnerNotifications() => _router.go(AppRoutes.ownerNotifications);
+  void goToOwnerHelp() => _router.go(AppRoutes.ownerHelp);
   void goToOwnerAnalytics() => _router.go(AppRoutes.ownerAnalytics);
   void goToOwnerReports() => _router.go(AppRoutes.ownerReports);
 
@@ -96,6 +107,23 @@ class NavigationService {
   /// Check if user is on owner flow
   bool get isOnOwnerFlow =>
       getCurrentLocation().startsWith(AppRoutes.ownerHome);
+
+  /// STRICT: Navigate to home dashboard based on user role
+  /// This method should be used instead of directly calling goToGuestHome/goToOwnerHome
+  /// to ensure role-based navigation is always enforced
+  void goToHomeByRole(String? role) {
+    final userRole = role?.toLowerCase().trim();
+
+    // STRICT: Only navigate if role is explicitly 'guest' or 'owner'
+    if (userRole == 'guest') {
+      goToGuestHome();
+    } else if (userRole == 'owner') {
+      goToOwnerHome();
+    } else {
+      // Invalid or missing role - redirect to role selection
+      goToRoleSelection();
+    }
+  }
 }
 
 /// Extension to easily access NavigationService from GetIt

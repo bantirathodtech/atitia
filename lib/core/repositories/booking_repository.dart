@@ -1,7 +1,8 @@
 // lib/core/repositories/booking_repository.dart
 
-import '../../core/services/firebase/database/firestore_database_service.dart';
-import '../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../core/di/common/unified_service_locator.dart';
+import '../../common/utils/date/converter/date_service_converter.dart';
+import '../../core/interfaces/database/database_service_interface.dart';
 import '../models/booking_model.dart';
 
 /// 🏠 **BOOKING REPOSITORY - PRODUCTION READY**
@@ -11,14 +12,22 @@ import '../models/booking_model.dart';
 /// - Real-time booking streams
 /// - Query bookings by guest/owner/PG
 /// - Update booking status
+/// Uses interface-based services for dependency injection (swappable backends)
 class BookingRepository {
-  final FirestoreServiceWrapper _firestoreService = getIt.firestore;
+  final IDatabaseService _databaseService;
   static const String _bookingsCollection = 'bookings';
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  BookingRepository({
+    IDatabaseService? databaseService,
+  }) : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database;
 
   /// Creates a new booking
   Future<String> createBooking(BookingModel booking) async {
     try {
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         _bookingsCollection,
         booking.bookingId,
         booking.toMap(),
@@ -32,7 +41,7 @@ class BookingRepository {
   /// Updates an existing booking
   Future<void> updateBooking(BookingModel booking) async {
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         _bookingsCollection,
         booking.bookingId,
         booking.toMap(),
@@ -45,7 +54,7 @@ class BookingRepository {
   /// Gets a specific booking by ID
   Future<BookingModel?> getBooking(String bookingId) async {
     try {
-      final doc = await _firestoreService.getDocument(
+      final doc = await _databaseService.getDocument(
         _bookingsCollection,
         bookingId,
       );
@@ -59,15 +68,13 @@ class BookingRepository {
 
   /// Streams guest's bookings
   Stream<List<BookingModel>> streamGuestBookings(String guestId) {
-    return _firestoreService
+    return _databaseService
         .getCollectionStreamWithFilter(_bookingsCollection, 'guestId', guestId)
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return BookingModel.fromMap(data);
-          })
-          .toList()
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return BookingModel.fromMap(data);
+      }).toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     });
   }
@@ -77,30 +84,27 @@ class BookingRepository {
       {String? pgId}) {
     if (pgId != null) {
       // Use compound filter for both ownerId and pgId
-      return _firestoreService
+      return _databaseService
           .getCollectionStreamWithCompoundFilter(_bookingsCollection, [
         {'field': 'ownerId', 'value': ownerId},
         {'field': 'pgId', 'value': pgId},
       ]).map((snapshot) {
-        return snapshot.docs
-            .map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              return BookingModel.fromMap(data);
-            })
-            .toList()
+        return snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return BookingModel.fromMap(data);
+        }).toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       });
     } else {
       // Use single filter for ownerId only
-      return _firestoreService
-          .getCollectionStreamWithFilter(_bookingsCollection, 'ownerId', ownerId)
+      return _databaseService
+          .getCollectionStreamWithFilter(
+              _bookingsCollection, 'ownerId', ownerId)
           .map((snapshot) {
-        return snapshot.docs
-            .map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              return BookingModel.fromMap(data);
-            })
-            .toList()
+        return snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return BookingModel.fromMap(data);
+        }).toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       });
     }
@@ -109,7 +113,7 @@ class BookingRepository {
   /// Gets guest's active booking
   Future<BookingModel?> getGuestActiveBooking(String guestId) async {
     try {
-      final bookings = await _firestoreService.queryDocuments(
+      final bookings = await _databaseService.queryDocuments(
         _bookingsCollection,
         field: 'guestId',
         isEqualTo: guestId,
@@ -136,14 +140,14 @@ class BookingRepository {
   /// Cancels a booking
   Future<void> cancelBooking(String bookingId, String reason) async {
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         _bookingsCollection,
         bookingId,
         {
           'status': 'cancelled',
           'cancellationReason': reason,
-          'cancellationDate': DateTime.now().toIso8601String(),
-          'updatedAt': DateTime.now().toIso8601String(),
+          'cancellationDate': DateServiceConverter.toService(DateTime.now()),
+          'updatedAt': DateServiceConverter.toService(DateTime.now()),
         },
       );
     } catch (e) {
@@ -154,12 +158,12 @@ class BookingRepository {
   /// Updates booking status
   Future<void> updateBookingStatus(String bookingId, String status) async {
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         _bookingsCollection,
         bookingId,
         {
           'status': status,
-          'updatedAt': DateTime.now().toIso8601String(),
+          'updatedAt': DateServiceConverter.toService(DateTime.now()),
         },
       );
     } catch (e) {
@@ -167,4 +171,3 @@ class BookingRepository {
     }
   }
 }
-

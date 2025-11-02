@@ -1,17 +1,34 @@
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
 import '../../../../common/utils/exceptions/exceptions.dart';
+import '../../../../core/di/common/unified_service_locator.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/interfaces/analytics/analytics_service_interface.dart';
+import '../../../../core/interfaces/auth/auth_service_interface.dart';
 import '../model/user_model.dart';
 
 /// Repository for authentication operations
 /// Handles phone OTP, Google sign-in, and user session management
 /// Enhanced with analytics tracking and comprehensive error handling
+///
+/// Note: GoogleSignIn and AppleSignIn remain as direct dependencies as they
+/// are platform-specific services. Core auth operations use IAuthService.
 class AuthRepository {
-  final _authService = getIt.auth;
-  final _googleSignInService = getIt.googleSignIn;
-  final _appleSignInService = getIt.appleSignIn;
-  final _analyticsService = getIt.analytics;
+  final IAuthService _authService;
+  final _googleSignInService =
+      getIt.googleSignIn; // Platform-specific, kept direct
+  final _appleSignInService =
+      getIt.appleSignIn; // Platform-specific, kept direct
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  AuthRepository({
+    IAuthService? authService,
+    IAnalyticsService? analyticsService,
+  })  : _authService = authService ?? UnifiedServiceLocator.serviceFactory.auth,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Sends OTP verification code
   Future<void> sendVerificationCode({
@@ -55,15 +72,16 @@ class AuthRepository {
     }
   }
 
-
   /// Verifies OTP and signs in user
-  Future<UserModel> verifySmsCode(fb_auth.PhoneAuthCredential credential) async {
+  Future<UserModel> verifySmsCode(
+      fb_auth.PhoneAuthCredential credential) async {
     try {
       await _analyticsService.logEvent(
         name: 'auth_verify_otp_start',
       );
 
-      final userCredential = await _authService.signInWithCredential(credential);
+      final userCredential = await _authService
+          .signInWithCredential(credential as fb_auth.AuthCredential);
       final fbUser = userCredential.user;
 
       if (fbUser == null) {
@@ -221,7 +239,7 @@ class AuthRepository {
   }
 
   /// Checks if user is authenticated
-  bool get isAuthenticated => _authService.isSignedIn;
+  bool get isAuthenticated => _authService.isAuthenticated;
 
   /// Gets current user ID
   String? get currentUserId => _authService.currentUserId;

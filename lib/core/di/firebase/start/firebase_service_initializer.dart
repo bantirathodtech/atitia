@@ -2,7 +2,7 @@
 // Firebase + Supabase Service Initializer
 // ============================================================================
 // This file handles the complete initialization of all backend services.
-// 
+//
 // INITIALIZATION FLOW:
 // 1. Register all services with GetIt (dependency injection)
 // 2. Initialize Supabase (for storage - cost-effective alternative)
@@ -42,7 +42,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../services/supabase/supabase_config.dart';
 import '../../../services/supabase/storage/supabase_storage_service.dart';
+import '../../../../common/constants/environment_config.dart';
 import '../di/firebase_service_locator.dart';
+import '../../common/unified_service_locator.dart';
 
 // ============================================================================
 // CRITICAL IMPORT for Web Platform Support
@@ -71,7 +73,7 @@ import '../../../../firebase_options.dart';
 class FirebaseServiceInitializer {
   // Static flag to prevent multiple initialization calls
   static bool _isInitialized = false;
-  
+
   // ==========================================================================
   // Main initialization method - Entry point for all services
   // ==========================================================================
@@ -108,16 +110,12 @@ class FirebaseServiceInitializer {
   static Future<void> initialize() async {
     // Prevent multiple initialization calls
     if (_isInitialized) {
-      print('✅ Firebase services already initialized - skipping');
       return;
     }
-    
-    print('\n🔥 Starting FIREBASE + SUPABASE Service Initialization...');
 
     // STEP 1: Register all services with dependency injection container
     // This makes services available via getIt<ServiceName>() throughout the app
     setupFirebaseDependencies();
-    print('✅ Services registered in GetIt');
 
     // STEP 2: Initialize Supabase for storage
     // Graceful degradation: App continues even if Supabase fails
@@ -126,7 +124,6 @@ class FirebaseServiceInitializer {
     // STEP 3: Initialize Firebase Core and all Firebase services
     // CRITICAL: This will fail if Firebase SDK not loaded (web) or options not passed
     await _initializeFirebaseCore();
-    print('✅ Firebase core initialized');
 
     // Defer non-critical initialization and verification to after first frame
     // to reduce time-to-first-frame and perceived startup cost.
@@ -139,12 +136,10 @@ class FirebaseServiceInitializer {
       } catch (_) {}
     });
 
-    print('\n🎯 Setup complete - Firebase + Supabase Storage ready!');
-    
     // Mark as initialized to prevent future calls
     _isInitialized = true;
   }
-  
+
   /// Reset initialization flag (for development/testing purposes)
   static void reset() {
     _isInitialized = false;
@@ -156,79 +151,45 @@ class FirebaseServiceInitializer {
   static Future<void> _initializeOptionalServices() async {
     // Initialize Google Sign-In service
     try {
-      await getIt.googleSignIn.initialize();
-      print('✅ Google Sign-In initialized');
-    } catch (e) {
-      print('⚠️ Google Sign-In initialization failed: $e');
-      print('   App will continue without Google Sign-In');
-    }
+      await getIt.googleSignIn.initialize(
+        clientId: EnvironmentConfig.getGoogleSignInClientId('web'),
+        serverClientId: EnvironmentConfig.googleSignInClientSecret,
+      );
+    } catch (e) {}
 
     // Initialize Apple Sign-In service
     try {
       await getIt.appleSignIn.initialize();
-      print('✅ Apple Sign-In initialized');
-    } catch (e) {
-      print('⚠️ Apple Sign-In initialization failed: $e');
-      print('   App will continue without Apple Sign-In');
-    }
+    } catch (e) {}
 
     // OPTIONAL Firebase services (failures are logged but don't crash app)
     try {
-      await getIt.appCheck.initialize();    // Security & anti-abuse
-      print('✅ App Check initialized');
-    } catch (e) {
-      print('⚠️ App Check initialization failed: $e');
-      print('   App will continue without App Check protection');
-    }
+      await getIt.appCheck.initialize(); // Security & anti-abuse
+    } catch (e) {}
 
     try {
-      await getIt.analytics.initialize();   // User behavior tracking
-      print('✅ Analytics initialized');
-    } catch (e) {
-      print('⚠️ Analytics initialization failed: $e');
-      print('   App will continue without analytics tracking');
-    }
+      await getIt.analytics.initialize(); // User behavior tracking
+    } catch (e) {}
 
     try {
-      await getIt.messaging.initialize();   // Push notifications
-      print('✅ Messaging initialized');
-    } catch (e) {
-      print('⚠️ Messaging initialization failed: $e');
-      print('   App will continue without push notifications');
-      print('   This is expected on web without service worker configured');
-    }
+      await getIt.messaging.initialize(); // Push notifications
+    } catch (e) {}
 
     try {
       await getIt.crashlytics.initialize(); // Crash reporting
-      print('✅ Crashlytics initialized');
-    } catch (e) {
-      print('⚠️ Crashlytics initialization failed: $e');
-      print('   App will continue without crash reporting');
-    }
+    } catch (e) {}
 
     try {
       await getIt.remoteConfig.initialize(); // Feature flags & A/B testing
-      print('✅ Remote Config initialized');
-    } catch (e) {
-      print('⚠️ Remote Config initialization failed: $e');
-      print('   App will continue without remote config');
-    }
+    } catch (e) {}
 
     try {
       await getIt.performance.initialize(); // Performance monitoring
-      print('✅ Performance initialized');
-    } catch (e) {
-      print('⚠️ Performance initialization failed: $e');
-      print('   App will continue without performance monitoring');
-    }
+    } catch (e) {}
 
     try {
-      await getIt.functions.initialize();   // Cloud functions/backend logic
-      print('✅ Cloud Functions initialized');
-    } catch (e) {
-      print('⚠️ Cloud Functions initialization failed: $e');
-      print('   App will continue with limited backend functionality');
-    }
+      await getIt.functions.initialize(); // Cloud functions/backend logic
+    } catch (e) {}
 
     // Initialize Supabase storage lazily on first access; nothing to do here.
   }
@@ -266,18 +227,12 @@ class FirebaseServiceInitializer {
           url: SupabaseConfig.supabaseUrl,
           anonKey: SupabaseConfig.supabaseAnonKey,
         );
-        print('✅ Supabase initialized successfully');
       } else {
         // Not configured - app continues without storage
-        print('⚠️ Supabase not configured - Storage features will be limited');
-        print('   To enable Supabase Storage, update supabase_config.dart');
-        print('   App will continue with limited storage functionality');
         // Don't throw - let app continue with other features
       }
     } catch (error) {
       // Initialization failed - log warning but don't crash app
-      print('⚠️ Supabase initialization warning: $error');
-      print('   App will continue with limited storage functionality');
       // Don't rethrow - graceful degradation
     }
   }
@@ -300,18 +255,16 @@ class FirebaseServiceInitializer {
   // - Permission issues are logged but don't stop app
   // - App continues even if bucket initialization fails
   // ==========================================================================
-  static Future<void> _initializeSupabaseStorage() async {
-    try {
-      // Lazily initialize storage: do not block startup; run only when used
-      // This method is kept for API compatibility but no-op at boot.
-      // Actual initialization should happen inside the storage service on first use.
-      print('ℹ️ Supabase Storage init deferred until first use');
-    } catch (error) {
-      // Bucket might already exist or permissions issue
-      print('⚠️ Supabase Storage bucket initialization: $error');
-      // Continue anyway - not a critical error
-    }
-  }
+  // static Future<void> _initializeSupabaseStorage() async {
+  //   try {
+  //     // Lazily initialize storage: do not block startup; run only when used
+  //     // This method is kept for API compatibility but no-op at boot.
+  //     // Actual initialization should happen inside the storage service on first use.
+  //   } catch (error) {
+  //     // Bucket might already exist or permissions issue
+  //     // Continue anyway - not a critical error
+  //   }
+  // }
 
   // ==========================================================================
   // Core Firebase initialization with platform-specific options
@@ -345,35 +298,33 @@ class FirebaseServiceInitializer {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
-        print('✅ Firebase Core initialized successfully');
       } catch (e) {
         // Check if it's a duplicate app error
-        if (e.toString().contains('duplicate-app') || 
+        if (e.toString().contains('duplicate-app') ||
             e.toString().contains('already exists')) {
           // Firebase is already initialized - this is fine
           final defaultApp = Firebase.app();
-          print('✅ Firebase Core already initialized (${defaultApp.name})');
         } else {
           // Different error - re-throw it
-          print('❌ Firebase Core initialization failed: $e');
           rethrow;
         }
       }
-      
+
       // Initialize only CRITICAL services synchronously
-      await getIt.auth.initialize();          // User authentication
-      await getIt.firestore.initialize();     // Cloud database
-      
+      await getIt.auth.initialize(); // User authentication
+      await getIt.firestore.initialize(); // Cloud database
+
+      // Initialize UnifiedServiceLocator for DI abstraction (after Firebase services)
+      // This allows repositories/ViewModels to use interfaces instead of concrete services
+      await UnifiedServiceLocator.initialize();
+
       // Defer OPTIONAL services
       // Keep only CRITICAL services here. Optional ones are deferred.
-      
+
       // Note: LocalStorageService (secure storage) doesn't need async initialization
-      
-      print('✅ Firebase Core services initialized (auth + firestore)');
     } catch (error) {
       // Log the error for debugging
-      print('❌ Firebase Core initialization failed: $error');
-      
+
       // Re-throw to trigger emergency fallback app
       // This ensures user never sees a frozen/broken app
       rethrow;
@@ -405,11 +356,10 @@ class FirebaseServiceInitializer {
   // - Cloud Functions: Backend logic (not always needed)
   // ==========================================================================
   static void _verifyFirebaseServices() {
-    print('\n🔍 Verifying FIREBASE Services...');
-
     // CRITICAL SERVICES - Must be present
     final criticalServices = [
-      _ServiceInfo('Authentication', getIt.get<AuthenticationServiceWrapper>(), true),
+      _ServiceInfo(
+          'Authentication', getIt.get<AuthenticationServiceWrapper>(), true),
       _ServiceInfo('Firestore', getIt.get<FirestoreServiceWrapper>(), true),
       _ServiceInfo('Local Storage', getIt.get<LocalStorageService>(), true),
       _ServiceInfo('Navigation', getIt.get<NavigationService>(), true),
@@ -417,51 +367,47 @@ class FirebaseServiceInitializer {
 
     // OPTIONAL SERVICES - Nice to have but not required
     final optionalServices = [
-      _ServiceInfo('Google Sign-In', getIt.get<GoogleSignInServiceWrapper>(), false),
-      _ServiceInfo('Apple Sign-In', getIt.get<AppleSignInServiceWrapper>(), false),
-      _ServiceInfo('Supabase Storage', getIt.get<SupabaseStorageServiceWrapper>(), false),
+      _ServiceInfo(
+          'Google Sign-In', getIt.get<GoogleSignInServiceWrapper>(), false),
+      _ServiceInfo(
+          'Apple Sign-In', getIt.get<AppleSignInServiceWrapper>(), false),
+      _ServiceInfo('Supabase Storage',
+          getIt.get<SupabaseStorageServiceWrapper>(), false),
       _ServiceInfo('App Check', getIt.get<AppIntegrityServiceWrapper>(), false),
       _ServiceInfo('Analytics', getIt.get<AnalyticsServiceWrapper>(), false),
-      _ServiceInfo('Messaging', getIt.get<CloudMessagingServiceWrapper>(), false),
-      _ServiceInfo('Crashlytics', getIt.get<CrashlyticsServiceWrapper>(), false),
-      _ServiceInfo('Remote Config', getIt.get<RemoteConfigServiceWrapper>(), false),
-      _ServiceInfo('Performance', getIt.get<PerformanceMonitoringServiceWrapper>(), false),
-      _ServiceInfo('Cloud Functions', getIt.get<CloudFunctionsServiceWrapper>(), false),
+      _ServiceInfo(
+          'Messaging', getIt.get<CloudMessagingServiceWrapper>(), false),
+      _ServiceInfo(
+          'Crashlytics', getIt.get<CrashlyticsServiceWrapper>(), false),
+      _ServiceInfo(
+          'Remote Config', getIt.get<RemoteConfigServiceWrapper>(), false),
+      _ServiceInfo('Performance',
+          getIt.get<PerformanceMonitoringServiceWrapper>(), false),
+      _ServiceInfo(
+          'Cloud Functions', getIt.get<CloudFunctionsServiceWrapper>(), false),
     ];
 
     bool allCriticalReady = true;
     int optionalReady = 0;
 
-    print('\n📌 CRITICAL SERVICES (must be present):');
     for (final service in criticalServices) {
       if (service.instance != null) {
-        print('  ${service.name}: ✅ READY');
       } else {
         allCriticalReady = false;
-        print('  ${service.name}: ❌ MISSING (CRITICAL!)');
       }
     }
 
-    print('\n🔧 OPTIONAL SERVICES (nice to have):');
     for (final service in optionalServices) {
       if (service.instance != null) {
         optionalReady++;
-        print('  ${service.name}: ✅ READY');
-      } else {
-        print('  ${service.name}: ⚠️ NOT AVAILABLE (not critical)');
-      }
+      } else {}
     }
 
-    print('\n${'=' * 50}');
     if (allCriticalReady) {
-      print('✅ ALL CRITICAL SERVICES READY');
-      print('✅ Optional services: $optionalReady/${optionalServices.length} available');
-      print('✅ App ready to start!');
+      // Optional services initialized
     } else {
-      print('❌ CRITICAL SERVICES MISSING - App cannot start');
       throw Exception('Critical service initialization failed');
     }
-    print('=' * 50);
   }
 }
 

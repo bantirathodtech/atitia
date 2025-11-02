@@ -9,6 +9,10 @@
 /// - Guest and PG information
 /// - Review metadata (helpful votes, responses)
 /// - Timestamps
+library;
+
+import '../../common/utils/date/converter/date_service_converter.dart';
+
 class ReviewModel {
   final String reviewId;
   final String guestId;
@@ -17,27 +21,27 @@ class ReviewModel {
   final String pgId;
   final String pgName;
   final String ownerId;
-  
+
   final double rating; // 1.0 to 5.0
   final String comment;
   final List<String> photos;
-  
+
   // Review aspects
   final double cleanlinessRating;
   final double amenitiesRating;
   final double locationRating;
   final double foodRating;
   final double staffRating;
-  
+
   final int helpfulVotes;
   final int totalVotes;
   final bool isVerified; // Verified guest
   final bool isOwnerResponse; // Is this an owner response
-  
+
   final DateTime reviewDate;
   final DateTime? lastUpdated;
   final String status; // pending, approved, rejected, hidden
-  
+
   // Owner response
   final String? ownerResponse;
   final DateTime? ownerResponseDate;
@@ -90,14 +94,14 @@ class ReviewModel {
       totalVotes: map['totalVotes'] ?? 0,
       isVerified: map['isVerified'] ?? false,
       isOwnerResponse: map['isOwnerResponse'] ?? false,
-      reviewDate: DateTime.parse(map['reviewDate']),
-      lastUpdated: map['lastUpdated'] != null 
-          ? DateTime.parse(map['lastUpdated']) 
+      reviewDate: DateServiceConverter.fromService(map['reviewDate']),
+      lastUpdated: map['lastUpdated'] != null
+          ? DateServiceConverter.fromService(map['lastUpdated'])
           : null,
       status: map['status'] ?? 'pending',
       ownerResponse: map['ownerResponse'],
-      ownerResponseDate: map['ownerResponseDate'] != null 
-          ? DateTime.parse(map['ownerResponseDate']) 
+      ownerResponseDate: map['ownerResponseDate'] != null
+          ? DateServiceConverter.fromService(map['ownerResponseDate'])
           : null,
     );
   }
@@ -123,11 +127,15 @@ class ReviewModel {
       'totalVotes': totalVotes,
       'isVerified': isVerified,
       'isOwnerResponse': isOwnerResponse,
-      'reviewDate': reviewDate.toIso8601String(),
-      'lastUpdated': lastUpdated?.toIso8601String(),
+      'reviewDate': DateServiceConverter.toService(reviewDate),
+      'lastUpdated': lastUpdated != null
+          ? DateServiceConverter.toService(lastUpdated!)
+          : null,
       'status': status,
       'ownerResponse': ownerResponse,
-      'ownerResponseDate': ownerResponseDate?.toIso8601String(),
+      'ownerResponseDate': ownerResponseDate != null
+          ? DateServiceConverter.toService(ownerResponseDate!)
+          : null,
     };
   }
 

@@ -53,77 +53,115 @@ class RoleSelectionScreen extends StatelessWidget {
           // Main scrollable content
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: AppSpacing.xl),
-                  
+                  const SizedBox(height: 32.0),
+
                   // App Logo with theme-aware color
                   Icon(
                     Icons.home_work,
                     size: 100,
                     color: Theme.of(context).primaryColor,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  
+                  const SizedBox(height: 24.0),
+
                   // Welcome Text
                   const HeadingLarge(
                     text: 'Welcome to Atitia PG',
                     align: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                  
+                  SizedBox(height: AppSpacing.sm),
+
                   const BodyText(
                     text: 'Your Home Away From Home',
                     align: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacing.xl),
-                  
+                  SizedBox(height: AppSpacing.xl),
+
                   // Role Selection Title
                   const HeadingMedium(
                     text: 'Select Your Role',
                     align: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                  
+                  SizedBox(height: AppSpacing.sm),
+
                   const CaptionText(
                     text: 'Choose how you want to use the app',
                     align: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacing.xl),
-                  
+                  SizedBox(height: AppSpacing.xl),
+
                   // Guest Role Card with theme-aware colors
                   _buildRoleCard(
                     context: context,
                     title: 'Guest',
                     description: 'Find and book PG accommodations',
                     icon: Icons.person,
-                    color: AppColors.info,  // Theme-aware blue
+                    color: AppColors.info, // Theme-aware blue
                     onTap: () {
                       authProvider.setRole('guest');
-                      getIt<NavigationService>().goToPhoneAuth();
+
+                      // Check if user is already authenticated (Google Sign-In)
+                      if (authProvider.user != null &&
+                          authProvider.user!.userId.isNotEmpty) {
+                        // Validate that stored role matches selected role
+                        if (authProvider.user!.role == 'guest') {
+                          // User is already authenticated with guest role, navigate to dashboard
+                          getIt<NavigationService>().goToGuestHome();
+                        } else if (authProvider.user!.role == 'owner') {
+                          // User is registered as owner, cannot switch to guest without proper flow
+                          // For now, still navigate to phone auth for role validation
+                          getIt<NavigationService>().goToPhoneAuth();
+                        } else {
+                          // No role set, proceed with auth
+                          getIt<NavigationService>().goToPhoneAuth();
+                        }
+                      } else {
+                        // User needs to authenticate, go to phone auth
+                        getIt<NavigationService>().goToPhoneAuth();
+                      }
                     },
                   ),
                   const SizedBox(height: AppSpacing.md),
-                  
+
                   // Owner Role Card with theme-aware colors
                   _buildRoleCard(
                     context: context,
                     title: 'Owner',
                     description: 'Manage your PG properties and guests',
                     icon: Icons.business,
-                    color: AppColors.success,  // Theme-aware green
+                    color: AppColors.success, // Theme-aware green
                     onTap: () {
                       authProvider.setRole('owner');
-                      getIt<NavigationService>().goToPhoneAuth();
+
+                      // Check if user is already authenticated (Google Sign-In)
+                      if (authProvider.user != null &&
+                          authProvider.user!.userId.isNotEmpty) {
+                        // Validate that stored role matches selected role
+                        if (authProvider.user!.role == 'owner') {
+                          // User is already authenticated with owner role, navigate to dashboard
+                          getIt<NavigationService>().goToOwnerHome();
+                        } else if (authProvider.user!.role == 'guest') {
+                          // User is registered as guest, cannot switch to owner without proper flow
+                          // For now, still navigate to phone auth for role validation
+                          getIt<NavigationService>().goToPhoneAuth();
+                        } else {
+                          // No role set, proceed with auth
+                          getIt<NavigationService>().goToPhoneAuth();
+                        }
+                      } else {
+                        // User needs to authenticate, go to phone auth
+                        getIt<NavigationService>().goToPhoneAuth();
+                      }
                     },
                   ),
                 ],
               ),
             ),
           ),
-          
+
           // =================================================================
           // Floating Theme Toggle Button (Top-Right Corner)
           // =================================================================
@@ -140,9 +178,9 @@ class RoleSelectionScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
@@ -173,7 +211,7 @@ class RoleSelectionScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -182,7 +220,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 color: color,
               ),
             ),
-            const SizedBox(width: AppSpacing.md),
+            SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +229,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     text: title,
                     color: color,
                   ),
-                  const SizedBox(height: AppSpacing.xs),
+                  SizedBox(height: AppSpacing.xs),
                   BodyText(text: description),
                 ],
               ),
@@ -207,4 +245,3 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 }
-

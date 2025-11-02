@@ -1,20 +1,31 @@
 // lib/features/guest_dashboard/payments/repository/guest_payment_repository.dart
 import '../../../../../common/utils/constants/firestore.dart';
-import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../../core/di/common/unified_service_locator.dart';
+import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
+import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../models/guest_payment_model.dart';
 
 /// Repository layer for guest payments data operations
-/// Uses GetIt service locator for Firebase service access
+/// Uses interface-based services for dependency injection (swappable backends)
 /// Handles Firestore operations for payment data
 class GuestPaymentRepository {
-  // Get Firebase services via centralized GetIt
-  final _firestoreService = getIt.firestore;
-  final _analyticsService = getIt.analytics;
+  final IDatabaseService _databaseService;
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  GuestPaymentRepository({
+    IDatabaseService? databaseService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Streams payments for a specific guest with real-time updates
   /// Uses Firestore query to filter payments by guestId, ordered by payment date
   Stream<List<GuestPaymentModel>> getPaymentsForGuest(String guestId) {
-    return _firestoreService
+    return _databaseService
         .getCollectionStreamWithFilter(
       FirestoreConstants.payments, // Collection name from constants
       'guestId',
@@ -35,7 +46,7 @@ class GuestPaymentRepository {
 
   /// Streams pending payments for a specific guest
   Stream<List<GuestPaymentModel>> getPendingPaymentsForGuest(String guestId) {
-    return _firestoreService.getCollectionStreamWithCompoundFilter(
+    return _databaseService.getCollectionStreamWithCompoundFilter(
       FirestoreConstants.payments,
       [
         {'field': 'guestId', 'value': guestId},
@@ -50,8 +61,8 @@ class GuestPaymentRepository {
 
   /// Streams overdue payments for a specific guest
   Stream<List<GuestPaymentModel>> getOverduePaymentsForGuest(String guestId) {
-    final now = DateTime.now();
-    return _firestoreService.getCollectionStreamWithCompoundFilter(
+    // final now = DateTime.now();
+    return _databaseService.getCollectionStreamWithCompoundFilter(
       FirestoreConstants.payments,
       [
         {'field': 'guestId', 'value': guestId},
@@ -76,7 +87,7 @@ class GuestPaymentRepository {
           )
           .toMap();
 
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.payments,
         payment.paymentId,
         paymentData,
@@ -114,7 +125,7 @@ class GuestPaymentRepository {
           )
           .toMap();
 
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.payments,
         payment.paymentId,
         paymentData,
@@ -145,7 +156,7 @@ class GuestPaymentRepository {
   /// Gets a specific payment by ID
   Future<GuestPaymentModel?> getPaymentById(String paymentId) async {
     try {
-      final doc = await _firestoreService.getDocument(
+      final doc = await _databaseService.getDocument(
         FirestoreConstants.payments,
         paymentId,
       );
@@ -209,7 +220,7 @@ class GuestPaymentRepository {
   /// Deletes a payment document from Firestore
   Future<void> deletePayment(String paymentId) async {
     try {
-      await _firestoreService.deleteDocument(
+      await _databaseService.deleteDocument(
         FirestoreConstants.payments,
         paymentId,
       );
@@ -237,7 +248,7 @@ class GuestPaymentRepository {
   /// Gets payment statistics for a guest
   Future<Map<String, dynamic>> getPaymentStatsForGuest(String guestId) async {
     try {
-      final payments = await _firestoreService
+      final payments = await _databaseService
           .getCollectionStreamWithFilter(
             FirestoreConstants.payments,
             'guestId',

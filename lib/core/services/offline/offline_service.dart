@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../di/firebase/di/firebase_service_locator.dart';
 import '../firebase/analytics/firebase_analytics_service.dart';
+import '../../../common/utils/date/converter/date_service_converter.dart';
 
 /// 📱 **OFFLINE SERVICE - PRODUCTION READY**
 ///
@@ -18,18 +19,19 @@ import '../firebase/analytics/firebase_analytics_service.dart';
 class OfflineService {
   final Connectivity _connectivity = Connectivity();
   final AnalyticsServiceWrapper _analytics = getIt<AnalyticsServiceWrapper>();
-  
+
   static const String _offlineQueueKey = 'offline_queue';
   static const String _cachedDataKey = 'cached_data';
   static const String _lastSyncKey = 'last_sync';
-  
+
   bool _isOnline = true;
   final List<OfflineAction> _syncQueue = [];
-  
+
   // Stream controllers for connectivity
-  Stream<bool> get connectivityStream => _connectivity.onConnectivityChanged
-      .map((result) => result.isNotEmpty && !result.contains(ConnectivityResult.none));
-  
+  Stream<bool> get connectivityStream =>
+      _connectivity.onConnectivityChanged.map((result) =>
+          result.isNotEmpty && !result.contains(ConnectivityResult.none));
+
   bool get isOnline => _isOnline;
   List<OfflineAction> get pendingActions => List.unmodifiable(_syncQueue);
 
@@ -37,22 +39,20 @@ class OfflineService {
   Future<void> initialize() async {
     await _loadOfflineQueue();
     await _checkConnectivity();
-    
+
     // Monitor connectivity changes
     _connectivity.onConnectivityChanged.listen(_onConnectivityChanged);
-    
-    print('📱 Offline Service initialized');
   }
 
   /// Check current connectivity status
   Future<void> _checkConnectivity() async {
     final result = await _connectivity.checkConnectivity();
     _isOnline = result.isNotEmpty && !result.contains(ConnectivityResult.none);
-    
+
     if (_isOnline && _syncQueue.isNotEmpty) {
       await _processSyncQueue();
     }
-    
+
     await _analytics.logEvent(
       name: 'connectivity_checked',
       parameters: {
@@ -66,9 +66,8 @@ class OfflineService {
   Future<void> _onConnectivityChanged(List<ConnectivityResult> result) async {
     final wasOffline = !_isOnline;
     _isOnline = result.isNotEmpty && !result.contains(ConnectivityResult.none);
-    
+
     if (wasOffline && _isOnline) {
-      print('🌐 Connection restored - processing sync queue');
       await _processSyncQueue();
       await _analytics.logEvent(
         name: 'connection_restored',
@@ -90,7 +89,7 @@ class OfflineService {
   Future<void> enqueueAction(OfflineAction action) async {
     _syncQueue.add(action);
     await _saveOfflineQueue();
-    
+
     await _analytics.logEvent(
       name: 'action_enqueued',
       parameters: {
@@ -98,7 +97,7 @@ class OfflineService {
         'queue_size': _syncQueue.length,
       },
     );
-    
+
     // Try to process immediately if online
     if (_isOnline) {
       await _processSyncQueue();
@@ -113,10 +112,10 @@ class OfflineService {
   /// Process sync queue
   Future<void> _processSyncQueue() async {
     if (!_isOnline || _syncQueue.isEmpty) return;
-    
+
     final actionsToProcess = List<OfflineAction>.from(_syncQueue);
     _syncQueue.clear();
-    
+
     for (final action in actionsToProcess) {
       try {
         await _executeAction(action);
@@ -139,7 +138,7 @@ class OfflineService {
         );
       }
     }
-    
+
     await _saveOfflineQueue();
     await _updateLastSyncTime();
   }
@@ -148,26 +147,26 @@ class OfflineService {
   Future<void> _executeAction(OfflineAction action) async {
     // TODO: Implement actual action execution based on action.type
     // This would involve calling appropriate repository methods
-    print('Executing action: ${action.type}');
-    
+
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
   }
 
   /// Cache data for offline access
-  Future<void> cacheData(String key, Map<String, dynamic> data, {Duration? expiry}) async {
+  Future<void> cacheData(String key, Map<String, dynamic> data,
+      {Duration? expiry}) async {
     final cacheEntry = {
       'data': data,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'expiry': expiry?.inMilliseconds,
     };
-    
+
     final prefs = await SharedPreferences.getInstance();
     final cachedData = await getCachedData();
     cachedData[key] = cacheEntry;
-    
+
     await prefs.setString(_cachedDataKey, jsonEncode(cachedData));
-    
+
     await _analytics.logEvent(
       name: 'data_cached',
       parameters: {
@@ -181,14 +180,14 @@ class OfflineService {
   Future<Map<String, dynamic>?> getCachedDataForKey(String key) async {
     final cachedData = await getCachedData();
     final entry = cachedData[key];
-    
+
     if (entry == null) return null;
-    
+
     final expiry = entry['expiry'] as int?;
     if (expiry != null) {
       final cacheTime = DateTime.fromMillisecondsSinceEpoch(entry['timestamp']);
       final expiryTime = cacheTime.add(Duration(milliseconds: expiry));
-      
+
       if (DateTime.now().isAfter(expiryTime)) {
         // Remove expired data
         cachedData.remove(key);
@@ -196,7 +195,7 @@ class OfflineService {
         return null;
       }
     }
-    
+
     return entry['data'] as Map<String, dynamic>;
   }
 
@@ -204,11 +203,11 @@ class OfflineService {
   Future<Map<String, dynamic>> getCachedData() async {
     final prefs = await SharedPreferences.getInstance();
     final cachedString = prefs.getString(_cachedDataKey);
-    
+
     if (cachedString != null) {
       return Map<String, dynamic>.from(jsonDecode(cachedString));
     }
-    
+
     return {};
   }
 
@@ -217,7 +216,7 @@ class OfflineService {
     final cachedData = await getCachedData();
     cachedData.remove(key);
     await _saveCachedData(cachedData);
-    
+
     await _analytics.logEvent(
       name: 'cache_cleared',
       parameters: {
@@ -230,7 +229,7 @@ class OfflineService {
   Future<void> clearAllCachedData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_cachedDataKey);
-    
+
     await _analytics.logEvent(
       name: 'all_cache_cleared',
       parameters: {},
@@ -247,7 +246,7 @@ class OfflineService {
   Future<void> _loadOfflineQueue() async {
     final prefs = await SharedPreferences.getInstance();
     final queueString = prefs.getString(_offlineQueueKey);
-    
+
     if (queueString != null) {
       final queueList = jsonDecode(queueString) as List<dynamic>;
       _syncQueue.clear();
@@ -265,18 +264,19 @@ class OfflineService {
   /// Update last sync time
   Future<void> _updateLastSyncTime() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_lastSyncKey, DateTime.now().toIso8601String());
+    await prefs.setString(
+        _lastSyncKey, DateServiceConverter.toService(DateTime.now()));
   }
 
   /// Get last sync time
   Future<DateTime?> getLastSyncTime() async {
     final prefs = await SharedPreferences.getInstance();
     final lastSyncString = prefs.getString(_lastSyncKey);
-    
+
     if (lastSyncString != null) {
-      return DateTime.parse(lastSyncString);
+      return DateServiceConverter.fromService(lastSyncString);
     }
-    
+
     return null;
   }
 

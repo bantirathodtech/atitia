@@ -126,7 +126,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.paddingM),
                 decoration: BoxDecoration(
-                  color: _getStatusColor().withOpacity(0.1),
+                  color: _getStatusColor().withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 ),
                 child: Text(

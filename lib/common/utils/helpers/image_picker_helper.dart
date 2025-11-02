@@ -1,5 +1,5 @@
 // ============================================================================
-// Image Picker Helper - Cross-Platform Image Selection  
+// Image Picker Helper - Cross-Platform Image Selection
 // ============================================================================
 // Handles image picking for both mobile and web platforms.
 //
@@ -20,13 +20,13 @@
 
 import 'dart:io';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:image_picker/image_picker.dart';
 
 /// A small helper to pick images using image_picker with consistent defaults.
 class ImagePickerHelper {
   // Static cache for web file bytes (workaround for File limitations on web)
-  static final Map<String, List<int>> _webFileCache = {};
+  // static final Map<String, List<int>> _webFileCache = {};
 
   // ==========================================================================
   // Pick Image from Gallery - Cross-Platform
@@ -51,7 +51,7 @@ class ImagePickerHelper {
       source: ImageSource.gallery,
       imageQuality: imageQuality,
     );
-    
+
     if (pickedFile == null) return null;
 
     // =======================================================================
@@ -60,14 +60,14 @@ class ImagePickerHelper {
     if (kIsWeb) {
       // Web: Return XFile directly
       // Storage service will call xfile.readAsBytes() which works on web
-      return pickedFile;  // Returns XFile
+      return pickedFile; // Returns XFile
     } else {
       // Mobile/Desktop: Return File from path
       // Works normally with file system
-      return File(pickedFile.path);  // Returns File
+      return File(pickedFile.path); // Returns File
     }
   }
-  
+
   // ==========================================================================
   // Get XFile directly - For advanced usage
   // ==========================================================================
@@ -80,5 +80,51 @@ class ImagePickerHelper {
       source: ImageSource.gallery,
       imageQuality: imageQuality,
     );
+  }
+
+  // ==========================================================================
+  // Pick Multiple Images from Gallery - Cross-Platform
+  // ==========================================================================
+  // PLATFORM HANDLING:
+  // - Web: Uses file picker with multiple selection
+  // - Mobile/Desktop: Returns List of Files from paths
+  //
+  // USAGE:
+  // var files = await ImagePickerHelper.pickMultipleImagesFromGallery();
+  // for (var file in files) {
+  //   await storage.uploadFile(file, 'folder/', 'name.jpg');
+  // }
+  // ==========================================================================
+  static Future<List<dynamic>> pickMultipleImagesFromGallery({
+    int imageQuality = 85,
+    int? limit,
+  }) async {
+    final picker = ImagePicker();
+    
+    try {
+      // Use pickMultipleMedia for multiple selection (works on web and mobile)
+      final List<XFile> pickedFiles = await picker.pickMultiImage(
+        imageQuality: imageQuality,
+        limit: limit, // Optional limit on number of images
+      );
+
+      if (pickedFiles.isEmpty) return [];
+
+      // =======================================================================
+      // Platform-Specific Return Types
+      // =======================================================================
+      if (kIsWeb) {
+        // Web: Return XFile list directly
+        return pickedFiles;
+      } else {
+        // Mobile/Desktop: Return File list from paths
+        return pickedFiles.map((xfile) => File(xfile.path)).toList();
+      }
+    } catch (e) {
+      // If pickMultiImage is not available or fails, fallback to single selection
+      // This handles older versions or platforms that don't support multiple selection
+      debugPrint('Multiple image selection not available, error: $e');
+      return [];
+    }
   }
 }

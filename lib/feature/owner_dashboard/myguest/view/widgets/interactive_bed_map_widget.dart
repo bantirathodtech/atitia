@@ -95,7 +95,7 @@ class InteractiveBedMapWidget extends StatelessWidget {
                     vertical: AppSpacing.paddingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -130,7 +130,7 @@ class InteractiveBedMapWidget extends StatelessWidget {
       width: 80,
       padding: const EdgeInsets.all(AppSpacing.paddingS),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         border: Border.all(color: color),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
       ),

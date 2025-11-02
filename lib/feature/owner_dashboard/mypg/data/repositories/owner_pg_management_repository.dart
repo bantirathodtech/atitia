@@ -1,17 +1,28 @@
 // lib/features/owner_dashboard/mypg/data/repositories/owner_pg_management_repository.dart
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../common/utils/constants/firestore.dart';
+import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
+import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../models/owner_pg_management_model.dart';
+import '../../../../../common/utils/date/converter/date_service_converter.dart';
 
 /// Repository for PG management Firestore operations
-/// Uses Firebase service locator for dependency injection
+/// Uses interface-based services for dependency injection (swappable backends)
 /// Handles beds, rooms, floors, bookings with analytics tracking
 class OwnerPgManagementRepository {
-  final _firestoreService = getIt.firestore;
-  final _analyticsService = getIt.analytics;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final IDatabaseService _databaseService;
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  OwnerPgManagementRepository({
+    IDatabaseService? databaseService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Stream beds real-time by PG ID with validation and analytics
   Stream<List<OwnerBed>> streamBeds(String pgId) {
@@ -19,7 +30,7 @@ class OwnerPgManagementRepository {
       throw ArgumentError('PG ID cannot be empty for streamBeds');
     }
 
-    return _firestoreService
+    return _databaseService
         .getCollectionStream('pgs/$pgId/beds')
         .map((snapshot) {
       final beds =
@@ -41,19 +52,18 @@ class OwnerPgManagementRepository {
   /// Returns the created pgId
   Future<String> createPG(Map<String, dynamic> pgData) async {
     try {
-      // Generate a new document ID
-      final String pgId =
-          _firestore.collection(FirestoreConstants.pgs).doc().id;
+      // Generate a new document ID using interface
+      final String pgId = _databaseService.generateDocumentId();
 
       final now = DateTime.now();
       final dataWithMeta = {
         ...pgData,
         'pgId': pgId,
-        'createdAt': pgData['createdAt'] ?? now,
-        'updatedAt': now,
+        'createdAt': pgData['createdAt'] ?? DateServiceConverter.toService(now),
+        'updatedAt': DateServiceConverter.toService(now),
       };
 
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.pgs,
         pgId,
         dataWithMeta,
@@ -85,7 +95,7 @@ class OwnerPgManagementRepository {
       throw ArgumentError('PG ID cannot be empty for streamRooms');
     }
 
-    return _firestoreService
+    return _databaseService
         .getCollectionStream('pgs/$pgId/rooms')
         .map((snapshot) {
       final rooms =
@@ -109,7 +119,7 @@ class OwnerPgManagementRepository {
       throw ArgumentError('PG ID cannot be empty for streamFloors');
     }
 
-    return _firestoreService
+    return _databaseService
         .getCollectionStream('pgs/$pgId/floors')
         .map((snapshot) {
       final floors =
@@ -133,7 +143,7 @@ class OwnerPgManagementRepository {
       throw ArgumentError('PG ID cannot be empty for streamBookings');
     }
 
-    return _firestoreService
+    return _databaseService
         .getCollectionStreamWithFilter(
             FirestoreConstants.bookings, 'pgId', pgId)
         .map((snapshot) {
@@ -159,7 +169,7 @@ class OwnerPgManagementRepository {
     }
 
     try {
-      final paymentsSnapshot = await _firestoreService
+      final paymentsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
               FirestoreConstants.payments, 'pgId', pgId)
           .first;
@@ -258,10 +268,13 @@ class OwnerPgManagementRepository {
     }
 
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.bookings,
         bookingId,
-        {'status': 'approved', 'updatedAt': DateTime.now()},
+        {
+          'status': 'approved',
+          'updatedAt': DateServiceConverter.toService(DateTime.now())
+        },
       );
 
       await _analyticsService.logEvent(
@@ -287,10 +300,13 @@ class OwnerPgManagementRepository {
     }
 
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.bookings,
         bookingId,
-        {'status': 'rejected', 'updatedAt': DateTime.now()},
+        {
+          'status': 'rejected',
+          'updatedAt': DateServiceConverter.toService(DateTime.now())
+        },
       );
 
       await _analyticsService.logEvent(
@@ -317,14 +333,14 @@ class OwnerPgManagementRepository {
     }
 
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.bookings,
         bookingId,
         {
-          'startDate': newStartDate,
-          'endDate': newEndDate,
+          'startDate': DateServiceConverter.toService(newStartDate),
+          'endDate': DateServiceConverter.toService(newEndDate),
           'status': 'pending',
-          'updatedAt': DateTime.now(),
+          'updatedAt': DateServiceConverter.toService(DateTime.now()),
         },
       );
 
@@ -332,8 +348,8 @@ class OwnerPgManagementRepository {
         name: 'owner_booking_rescheduled',
         parameters: {
           'booking_id': bookingId,
-          'new_start': newStartDate.toIso8601String(),
-          'new_end': newEndDate.toIso8601String(),
+          'new_start': DateServiceConverter.toService(newStartDate),
+          'new_end': DateServiceConverter.toService(newEndDate),
         },
       );
     } catch (e) {
@@ -351,10 +367,13 @@ class OwnerPgManagementRepository {
   /// Update bed status
   Future<void> updateBedStatus(String pgId, String bedId, String status) async {
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         'pgs/$pgId/beds',
         bedId,
-        {'status': status, 'updatedAt': DateTime.now()},
+        {
+          'status': status,
+          'updatedAt': DateServiceConverter.toService(DateTime.now())
+        },
       );
 
       await _analyticsService.logEvent(
@@ -381,7 +400,7 @@ class OwnerPgManagementRepository {
   /// This makes the PG visible to guests immediately
   Future<void> createOrUpdatePG(dynamic pgModel) async {
     try {
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.pgs,
         pgModel.pgId,
         pgModel.toMap(),
@@ -407,7 +426,7 @@ class OwnerPgManagementRepository {
   /// Deletes a PG property
   Future<void> deletePG(String pgId) async {
     try {
-      await _firestoreService.deleteDocument(
+      await _databaseService.deleteDocument(
         FirestoreConstants.pgs,
         pgId,
       );
@@ -434,12 +453,12 @@ class OwnerPgManagementRepository {
     }
 
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.pgs,
         pgId,
         {
           ...updates,
-          'updatedAt': DateTime.now(),
+          'updatedAt': DateServiceConverter.toService(DateTime.now()),
         },
       );
 
@@ -465,10 +484,11 @@ class OwnerPgManagementRepository {
   /// Fetches owner's PG properties
   Future<List<dynamic>> fetchOwnerPGs(String ownerId) async {
     try {
-      final snapshot = await _firestoreService.queryDocuments(
+      final snapshot = await _databaseService.queryCollection(
         FirestoreConstants.pgs,
-        field: 'ownerUid',
-        isEqualTo: ownerId,
+        [
+          {'field': 'ownerUid', 'value': ownerId},
+        ],
       );
 
       final pgs = snapshot.docs.map((doc) => doc.data()).toList();
@@ -498,7 +518,7 @@ class OwnerPgManagementRepository {
   /// Returns full PG document with all fields (name, address, amenities, floors structure, etc.)
   Future<Map<String, dynamic>?> fetchPGDetails(String pgId) async {
     try {
-      final doc = await _firestoreService.getDocument(
+      final doc = await _databaseService.getDocument(
         FirestoreConstants.pgs,
         pgId,
       );
@@ -536,11 +556,48 @@ class OwnerPgManagementRepository {
 
   /// Streams a single PG's details for real-time updates
   Stream<Map<String, dynamic>?> streamPGDetails(String pgId) {
-    return _firestoreService
+    return _databaseService
         .getDocumentStream(FirestoreConstants.pgs, pgId)
         .map((doc) {
       if (!doc.exists) return null;
       return doc.data() as Map<String, dynamic>;
     });
+  }
+
+  /// Fetch the latest draft PG for an owner (isDraft == true), ordered by updatedAt desc
+  Future<Map<String, dynamic>?> fetchLatestDraftForOwner(String ownerId) async {
+    try {
+      final snapshot = await _databaseService
+          .queryCollection(FirestoreConstants.pgs, [
+        {'field': 'ownerUid', 'value': ownerId},
+        {'field': 'isDraft', 'value': true},
+      ])
+          .then((qs) async {
+        // If interface lacks order/limit, emulate by picking max updatedAt
+        final docs = qs.docs.map((d) => d).toList();
+        if (docs.isEmpty) return null;
+        docs.sort((a, b) {
+          final am = (a.data() as Map<String, dynamic>);
+          final bm = (b.data() as Map<String, dynamic>);
+          final au = am['updatedAt'];
+          final bu = bm['updatedAt'];
+          return (bu?.toString() ?? '').compareTo(au?.toString() ?? '');
+        });
+        return docs.first;
+      });
+
+      if (snapshot == null) return null;
+      final data = snapshot.data() as Map<String, dynamic>;
+      return {
+        ...data,
+        'pgId': snapshot.id,
+      };
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'owner_latest_draft_fetch_error',
+        parameters: {'owner_id': ownerId, 'error': e.toString()},
+      );
+      return null;
+    }
   }
 }

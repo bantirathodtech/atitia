@@ -1,7 +1,9 @@
 // lib/features/guest_dashboard/pgs/data/models/guest_pg_model.dart
 
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' show Timestamp;
 
+import '../../../../../common/utils/date/converter/date_service_converter.dart';
 import '../../../../owner_dashboard/mypg/data/models/pg_floor_model.dart';
 
 /// Data model representing PG (Pay Guest) accommodation details
@@ -26,6 +28,10 @@ class GuestPgModel {
   final double? longitude;
   final String? description;
   final Map<String, dynamic>? pricing;
+  final Map<String, dynamic>? rentConfig; // oneShare, twoShare, threeShare, fourShare, fiveShare
+  final double? depositAmount; // Security deposit amount
+  final String? maintenanceType; // 'one_time', 'monthly', 'none'
+  final double? maintenanceAmount; // Maintenance charges
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -35,10 +41,16 @@ class GuestPgModel {
   final List<String>? nearbyPlaces;
   final String? pgType; // 'Boys', 'Girls', 'Co-ed'
   final String? mealType; // 'Veg', 'Non-Veg', 'Both'
+  final String? mealTimings; // Meal timing schedule
+  final String? foodQuality; // Food quality description
   final bool? parkingAvailable;
+  final String? parkingDetails; // Parking details description
   final bool? wifiAvailable;
   final bool? securityAvailable;
+  final String? securityMeasures; // Security measures description
+  final String? paymentInstructions; // Payment instructions
   final String? ownerName;
+  final String? googleMapLink; // Google Maps link
   final Map<String, dynamic>? metadata;
 
   GuestPgModel({
@@ -60,6 +72,10 @@ class GuestPgModel {
     this.longitude,
     this.description,
     this.pricing,
+    this.rentConfig,
+    this.depositAmount,
+    this.maintenanceType,
+    this.maintenanceAmount,
     this.isActive = true,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -69,13 +85,46 @@ class GuestPgModel {
     this.nearbyPlaces,
     this.pgType,
     this.mealType,
+    this.mealTimings,
+    this.foodQuality,
     this.parkingAvailable,
+    this.parkingDetails,
     this.wifiAvailable,
     this.securityAvailable,
+    this.securityMeasures,
+    this.paymentInstructions,
     this.ownerName,
+    this.googleMapLink,
     this.metadata,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
+
+  /// Parse date from various formats (Timestamp, String, DateTime)
+  static DateTime? _parseDate(dynamic date) {
+    if (date == null) return null;
+    
+    // If it's already a DateTime, return it
+    if (date is DateTime) return date;
+    
+    // If it's a Firestore Timestamp, convert to DateTime
+    if (date is Timestamp) return date.toDate();
+    
+    // If it's a String (ISO format), parse it
+    if (date is String) {
+      try {
+        return DateServiceConverter.fromService(date);
+      } catch (e) {
+        // If parsing fails, try direct DateTime.parse
+        try {
+          return DateTime.parse(date);
+        } catch (e2) {
+          return null;
+        }
+      }
+    }
+    
+    return null;
+  }
 
   /// Creates GuestPgModel instance from Firestore document data
   /// Handles null values gracefully with appropriate defaults
@@ -92,9 +141,9 @@ class GuestPgModel {
               ?.map((f) => PgFloorModel.fromMap(f as Map<String, dynamic>))
               .toList() ??
           [],
-      floors: map['floors'] ?? 0,
-      roomsPerFloor: map['roomsPerFloor'] ?? 0,
-      bedsPerRoom: map['bedsPerRoom'] ?? 0,
+      floors: (map['floors'] ?? 0).toInt(),
+      roomsPerFloor: (map['roomsPerFloor'] ?? 0).toInt(),
+      bedsPerRoom: (map['bedsPerRoom'] ?? 0).toInt(),
       amenities: List<String>.from(map['amenities'] ?? []),
       photos: List<String>.from(map['photos'] ?? []),
       bankDetails: Map<String, dynamic>.from(map['bankDetails'] ?? {}),
@@ -104,9 +153,15 @@ class GuestPgModel {
       pricing: map['pricing'] != null
           ? Map<String, dynamic>.from(map['pricing'])
           : null,
+      rentConfig: map['rentConfig'] != null
+          ? Map<String, dynamic>.from(map['rentConfig'])
+          : null,
+      depositAmount: map['depositAmount']?.toDouble(),
+      maintenanceType: map['maintenanceType'],
+      maintenanceAmount: map['maintenanceAmount']?.toDouble(),
       isActive: map['isActive'] ?? true,
-      createdAt: map['createdAt']?.toDate() ?? DateTime.now(),
-      updatedAt: map['updatedAt']?.toDate() ?? DateTime.now(),
+      createdAt: _parseDate(map['createdAt']) ?? DateTime.now(),
+      updatedAt: _parseDate(map['updatedAt']) ?? DateTime.now(),
       contactNumber: map['contactNumber'],
       email: map['email'],
       rules:
@@ -116,10 +171,16 @@ class GuestPgModel {
           : null,
       pgType: map['pgType'],
       mealType: map['mealType'],
+      mealTimings: map['mealTimings'],
+      foodQuality: map['foodQuality'],
       parkingAvailable: map['parkingAvailable'],
+      parkingDetails: map['parkingDetails'],
       wifiAvailable: map['wifiAvailable'],
       securityAvailable: map['securityAvailable'],
+      securityMeasures: map['securityMeasures'],
+      paymentInstructions: map['paymentInstructions'],
       ownerName: map['ownerName'],
+      googleMapLink: map['googleMapLink'] ?? map['mapLink'], // Support both field names
       metadata: map['metadata'] != null
           ? Map<String, dynamic>.from(map['metadata'])
           : null,
@@ -148,6 +209,10 @@ class GuestPgModel {
       'longitude': longitude,
       'description': description,
       'pricing': pricing,
+      'rentConfig': rentConfig,
+      'depositAmount': depositAmount,
+      'maintenanceType': maintenanceType,
+      'maintenanceAmount': maintenanceAmount,
       'isActive': isActive,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
@@ -157,10 +222,16 @@ class GuestPgModel {
       'nearbyPlaces': nearbyPlaces,
       'pgType': pgType,
       'mealType': mealType,
+      'mealTimings': mealTimings,
+      'foodQuality': foodQuality,
       'parkingAvailable': parkingAvailable,
+      'parkingDetails': parkingDetails,
       'wifiAvailable': wifiAvailable,
       'securityAvailable': securityAvailable,
+      'securityMeasures': securityMeasures,
+      'paymentInstructions': paymentInstructions,
       'ownerName': ownerName,
+      'googleMapLink': googleMapLink,
       'metadata': metadata,
     };
   }
@@ -199,6 +270,7 @@ class GuestPgModel {
     bool? wifiAvailable,
     bool? securityAvailable,
     String? ownerName,
+    String? googleMapLink,
     Map<String, dynamic>? metadata,
   }) {
     return GuestPgModel(
@@ -220,6 +292,10 @@ class GuestPgModel {
       longitude: longitude ?? this.longitude,
       description: description ?? this.description,
       pricing: pricing ?? this.pricing,
+      rentConfig: rentConfig ?? this.rentConfig,
+      depositAmount: depositAmount ?? this.depositAmount,
+      maintenanceType: maintenanceType ?? this.maintenanceType,
+      maintenanceAmount: maintenanceAmount ?? this.maintenanceAmount,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
@@ -229,10 +305,16 @@ class GuestPgModel {
       nearbyPlaces: nearbyPlaces ?? this.nearbyPlaces,
       pgType: pgType ?? this.pgType,
       mealType: mealType ?? this.mealType,
+      mealTimings: mealTimings ?? this.mealTimings,
+      foodQuality: foodQuality ?? this.foodQuality,
       parkingAvailable: parkingAvailable ?? this.parkingAvailable,
+      parkingDetails: parkingDetails ?? this.parkingDetails,
       wifiAvailable: wifiAvailable ?? this.wifiAvailable,
       securityAvailable: securityAvailable ?? this.securityAvailable,
+      securityMeasures: securityMeasures ?? this.securityMeasures,
+      paymentInstructions: paymentInstructions ?? this.paymentInstructions,
       ownerName: ownerName ?? this.ownerName,
+      googleMapLink: googleMapLink ?? this.googleMapLink,
       metadata: metadata ?? this.metadata,
     );
   }

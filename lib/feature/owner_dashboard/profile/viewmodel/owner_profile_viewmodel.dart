@@ -13,9 +13,15 @@ import '../data/repository/owner_profile_repository.dart';
 /// Handles profile CRUD operations, file uploads, and business logic
 /// Enhanced with real-time streaming and comprehensive error handling
 class OwnerProfileViewModel extends BaseProviderState {
-  final OwnerProfileRepository _repository = OwnerProfileRepository();
+  final OwnerProfileRepository _repository;
   final _authService = getIt.auth;
   final _analyticsService = getIt.analytics;
+
+  /// Constructor with dependency injection
+  /// If repository is not provided, creates it with default services
+  OwnerProfileViewModel({
+    OwnerProfileRepository? repository,
+  }) : _repository = repository ?? OwnerProfileRepository();
 
   OwnerProfile? _profile;
   StreamSubscription<OwnerProfile?>? _profileSubscription;

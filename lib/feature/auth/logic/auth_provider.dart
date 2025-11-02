@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
 
 import '../../../common/lifecycle/state/provider_state.dart';
 import '../../../common/utils/constants/firestore.dart';
 import '../../../common/utils/exceptions/exceptions.dart';
+import '../../../common/utils/logging/logging_mixin.dart';
 import '../../../core/db/flutter_secure_storage.dart';
 import '../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../core/navigation/navigation_service.dart';
@@ -21,7 +22,7 @@ import '../data/repository/auth_repository.dart';
 /// Extends BaseProviderState for proper state management
 /// Handles phone OTP, Google sign-in, role-based navigation, and profile management
 /// Enhanced with analytics tracking and comprehensive error handling
-class AuthProvider extends BaseProviderState {
+class AuthProvider extends BaseProviderState with LoggingMixin {
   // Service access via GetIt
   final AuthenticationServiceWrapper _authService = getIt.auth;
   final FirestoreServiceWrapper _firestoreService = getIt.firestore;
@@ -29,12 +30,13 @@ class AuthProvider extends BaseProviderState {
   final SupabaseStorageServiceWrapper _storageService = getIt.storage;
   final NavigationService _navigation = getIt<NavigationService>();
   final _analyticsService = getIt.analytics;
-  final _appleSignInService = getIt.appleSignIn;
+  // final _appleSignInService = getIt.appleSignIn;
   final AuthRepository _repository = AuthRepository();
 
   UserModel? _user;
   String? _verificationId;
   bool _sendingOtp = false;
+  String? _selectedRole; // Store the selected role separately
 
   UserModel? get user => _user;
   bool get sendingOtp => _sendingOtp;
@@ -52,13 +54,27 @@ class AuthProvider extends BaseProviderState {
     try {
       await loadUserFromPrefs();
       if (_user != null) {
-        print(
-            '🔄 AuthProvider: User data loaded from storage on init: ${_user!.userId}');
-      } else {
-        print('🔄 AuthProvider: No cached user data found');
-      }
+        // SECURITY FIX: Validate cached user against current Firebase Auth session
+        final currentFirebaseUser = _authService.currentUser;
+        if (currentFirebaseUser == null) {
+          debugPrint(
+              '🔒 AuthProvider: No Firebase Auth session - clearing cached user');
+          _user = null;
+          _selectedRole = null;
+          await _localStorage.delete('userData');
+        } else if (currentFirebaseUser.uid != _user!.userId) {
+          debugPrint(
+              '🔒 AuthProvider: Firebase Auth user mismatch - clearing cached user');
+          _user = null;
+          _selectedRole = null;
+          await _localStorage.delete('userData');
+        } else {}
+      } else {}
     } catch (e) {
-      print('⚠️ AuthProvider: Failed to load cached user: $e');
+      // Clear any corrupted cached data
+      _user = null;
+      _selectedRole = null;
+      await _localStorage.delete('userData');
     }
   }
 
@@ -83,6 +99,600 @@ class AuthProvider extends BaseProviderState {
   String? get aadhaarUrl => _aadhaarUrl;
   bool get uploadingAadhaar => _uploadingAadhaar;
 
+  // ==========================================================================
+  // Platform-Specific Authentication Methods
+  // ==========================================================================
+
+  /// Get available authentication methods for current platform
+  List<String> getAvailableAuthMethods() {
+    return _authService.getAvailableAuthMethods();
+  }
+
+  /// Check if specific authentication method is available
+  bool isAuthMethodAvailable(String method) {
+    return _authService.isAuthMethodAvailable(method);
+  }
+
+  /// Get current platform name
+  String get platformName => _authService.platformName;
+
+  // ==========================================================================
+  // Google Sign-In Authentication
+  // ==========================================================================
+
+  /// Sign in with Google (Android, iOS, macOS, Web, Windows, Linux)
+  Future<bool> signInWithGoogle() async {
+    logMethodEntry('signInWithGoogle', feature: 'authentication');
+
+    try {
+      setLoading(true);
+      clearError();
+
+      logUserAction('Google Sign-In Attempt', feature: 'authentication');
+      await _analyticsService.logEvent(name: 'auth_google_signin_attempt');
+
+      final userCredential = await _authService.signInWithGoogle();
+
+      if (userCredential == null) {
+        logUserAction('Google Sign-In Cancelled', feature: 'authentication');
+        await _analyticsService.logEvent(name: 'auth_google_signin_cancelled');
+        return false;
+      }
+
+      final user = userCredential.user;
+      if (user == null) {
+        throw Exception('Google sign-in failed: No user returned');
+      }
+
+      // CRITICAL: If no role was selected before Google sign-in, redirect to role selection
+      if (_selectedRole == null) {
+        await _analyticsService.logEvent(
+          name: 'auth_google_signin_no_role_selected',
+          parameters: {'user_id': user.uid},
+        );
+        // Don't proceed with authentication - user needs to select role first
+        _navigation.goToRoleSelection();
+        return false;
+      }
+
+      // Create or update user profile
+      await _handleSuccessfulAuthentication(user);
+
+      logUserAction(
+        'Google Sign-In Success',
+        feature: 'authentication',
+        metadata: {
+          'userId': user.uid,
+          'platform': platformName,
+        },
+      );
+
+      await _analyticsService.logEvent(
+        name: 'auth_google_signin_success',
+        parameters: {
+          'user_id': user.uid,
+          'platform': platformName,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      logError(
+        'Google Sign-In Failed',
+        feature: 'authentication',
+        error: e,
+      );
+
+      await _analyticsService.logEvent(
+        name: 'auth_google_signin_error',
+        parameters: {'error': e.toString()},
+      );
+      setError(true, 'Google sign-in failed: ${e.toString()}');
+      return false;
+    } finally {
+      setLoading(false);
+      logMethodExit('signInWithGoogle');
+    }
+  }
+
+  /// Silent sign-in with Google (restores previous sessions)
+  Future<bool> silentSignInWithGoogle() async {
+    try {
+      setLoading(true);
+      clearError();
+
+      await _analyticsService.logEvent(
+          name: 'auth_google_silent_signin_attempt');
+
+      final userCredential = await _authService.silentSignInWithGoogle();
+
+      if (userCredential == null) {
+        // No previous session found
+        await _analyticsService.logEvent(
+            name: 'auth_google_silent_signin_no_session');
+        return false;
+      }
+
+      final user = userCredential.user;
+      if (user == null) {
+        return false;
+      }
+
+      // Create or update user profile
+      await _handleSuccessfulAuthentication(user);
+
+      await _analyticsService.logEvent(
+        name: 'auth_google_silent_signin_success',
+        parameters: {
+          'user_id': user.uid,
+          'platform': platformName,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'auth_google_silent_signin_error',
+        parameters: {'error': e.toString()},
+      );
+      // Silent sign-in should not show errors to user
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Get Google Sign-In button for web platform
+  Widget? getGoogleSignInButton() {
+    return _authService.getGoogleSignInButton();
+  }
+
+  /// Get Google Sign-In authentication state stream
+  Stream<GoogleSignInCredentials?> get googleSignInState =>
+      _authService.googleSignInState;
+
+  /// Handle Google Sign-In for web platform
+  Future<bool> signInWithGoogleWeb(GoogleSignInCredentials credentials) async {
+    try {
+      setLoading(true);
+      clearError();
+
+      await _analyticsService.logEvent(name: 'auth_google_web_signin_attempt');
+
+      final userCredential =
+          await _authService.signInWithGoogleWeb(credentials);
+
+      if (userCredential == null) {
+        await _analyticsService.logEvent(name: 'auth_google_web_signin_failed');
+        return false;
+      }
+
+      final user = userCredential.user;
+      if (user == null) {
+        throw Exception('Google web sign-in failed: No user returned');
+      }
+
+      // Create or update user profile
+      await _handleSuccessfulAuthentication(user);
+
+      await _analyticsService.logEvent(
+        name: 'auth_google_web_signin_success',
+        parameters: {
+          'user_id': user.uid,
+          'platform': platformName,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'auth_google_web_signin_error',
+        parameters: {'error': e.toString()},
+      );
+      setError(true, 'Google web sign-in failed: ${e.toString()}');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ==========================================================================
+  // Apple Sign-In Authentication (iOS, macOS only)
+  // ==========================================================================
+
+  /// Sign in with Apple (iOS, macOS only)
+  Future<bool> signInWithApple() async {
+    try {
+      setLoading(true);
+      clearError();
+
+      await _analyticsService.logEvent(name: 'auth_apple_signin_attempt');
+
+      final userCredential = await _authService.signInWithApple();
+
+      if (userCredential == null) {
+        // User cancelled the sign-in
+        await _analyticsService.logEvent(name: 'auth_apple_signin_cancelled');
+        return false;
+      }
+
+      final user = userCredential.user;
+      if (user == null) {
+        throw Exception('Apple sign-in failed: No user returned');
+      }
+
+      // CRITICAL: If no role was selected before Apple sign-in, redirect to role selection
+      if (_selectedRole == null) {
+        await _analyticsService.logEvent(
+          name: 'auth_apple_signin_no_role_selected',
+          parameters: {'user_id': user.uid},
+        );
+        // Don't proceed with authentication - user needs to select role first
+        _navigation.goToRoleSelection();
+        return false;
+      }
+
+      // Create or update user profile
+      await _handleSuccessfulAuthentication(user);
+
+      await _analyticsService.logEvent(
+        name: 'auth_apple_signin_success',
+        parameters: {
+          'user_id': user.uid,
+          'platform': platformName,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'auth_apple_signin_error',
+        parameters: {'error': e.toString()},
+      );
+      setError(true, 'Apple sign-in failed: ${e.toString()}');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ==========================================================================
+  // Enhanced Phone Authentication
+  // ==========================================================================
+
+  /// Send OTP to phone number with enhanced error handling
+  Future<bool> sendOTPToPhone(String phoneNumber) async {
+    try {
+      setLoading(true);
+      clearError();
+      _sendingOtp = true;
+
+      await _analyticsService.logEvent(
+        name: 'auth_phone_otp_send_attempt',
+        parameters: {'phone_number': phoneNumber},
+      );
+
+      await _authService.sendOTPToPhone(
+        phoneNumber: phoneNumber,
+        timeout: const Duration(seconds: 60),
+        verificationCompleted: (PhoneAuthCredential credential) {
+          // Auto-verification completed (Android only)
+          _handleAutoVerification(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          setError(true, 'Phone verification failed: ${e.message}');
+          _sendingOtp = false;
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          _verificationId = verificationId;
+          _sendingOtp = false;
+          _analyticsService.logEvent(name: 'auth_phone_otp_sent');
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          _verificationId = verificationId;
+          _sendingOtp = false;
+        },
+      );
+
+      return true;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'auth_phone_otp_send_error',
+        parameters: {'error': e.toString()},
+      );
+      setError(true, 'Failed to send OTP: ${e.toString()}');
+      _sendingOtp = false;
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /// Verify OTP and sign in with enhanced error handling
+  Future<bool> verifyOTPAndSignIn(String smsCode) async {
+    try {
+      setLoading(true);
+      clearError();
+
+      if (_verificationId == null) {
+        throw Exception('No verification ID found. Please request OTP first.');
+      }
+
+      // CRITICAL: Ensure role was selected before OTP verification
+      // This prevents creating users with default 'guest' role
+      if (_selectedRole == null) {
+        await _analyticsService.logEvent(
+          name: 'auth_phone_otp_verify_no_role',
+        );
+        setError(true,
+            'Please select your role (Guest or Owner) before verifying OTP.');
+        return false;
+      }
+
+      await _analyticsService.logEvent(
+        name: 'auth_phone_otp_verify_attempt',
+        parameters: {'selected_role': _selectedRole ?? 'none'},
+      );
+
+      final userCredential = await _authService.verifyOTPAndSignIn(
+        verificationId: _verificationId!,
+        smsCode: smsCode,
+      );
+
+      final user = userCredential.user;
+      if (user == null) {
+        throw Exception('OTP verification failed: No user returned');
+      }
+
+      // Create or update user profile (will use _selectedRole)
+      await _handleSuccessfulAuthentication(user);
+
+      await _analyticsService.logEvent(
+        name: 'auth_phone_otp_verify_success',
+        parameters: {
+          'user_id': user.uid,
+          'platform': platformName,
+        },
+      );
+
+      return true;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'auth_phone_otp_verify_error',
+        parameters: {'error': e.toString()},
+      );
+      setError(true, 'OTP verification failed: ${e.toString()}');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ==========================================================================
+  // Enhanced Authentication Handler
+  // ==========================================================================
+
+  /// Handle auto-verification for phone authentication
+  /// STRICT: Validates role selection before proceeding with auto-verification
+  Future<void> _handleAutoVerification(PhoneAuthCredential credential) async {
+    try {
+      // CRITICAL: Ensure role was selected before auto-verification
+      // Auto-verification (Android only) can bypass normal OTP flow, so we must check role here
+      if (_selectedRole == null || _selectedRole!.isEmpty) {
+        debugPrint(
+            '⚠️ _handleAutoVerification: No role selected - redirecting to role selection');
+        await _analyticsService.logEvent(
+          name: 'auth_auto_verification_no_role',
+        );
+        setError(true,
+            'Please select your role (Guest or Owner) before authentication.');
+        _navigation.goToRoleSelection();
+        return;
+      }
+
+      final userRole = _selectedRole!.toLowerCase().trim();
+
+      // STRICT VALIDATION: Only allow 'guest' or 'owner'
+      if (userRole != 'guest' && userRole != 'owner') {
+        debugPrint(
+            '⚠️ _handleAutoVerification: Invalid role "$userRole" - redirecting to role selection');
+        await _analyticsService.logEvent(
+          name: 'auth_auto_verification_invalid_role',
+          parameters: {'invalid_role': userRole},
+        );
+        setError(true, 'Invalid role selected. Please select Guest or Owner.');
+        _navigation.goToRoleSelection();
+        return;
+      }
+
+      final userCredential =
+          await _authService.signInWithCredential(credential);
+      if (userCredential.user != null) {
+        await _handleSuccessfulAuthentication(userCredential.user!);
+      }
+    } catch (e) {
+      setError(true, 'Auto-verification failed: ${e.toString()}');
+    }
+  }
+
+  /// Handle successful authentication for any method
+  Future<void> _handleSuccessfulAuthentication(User firebaseUser) async {
+    try {
+      // Check if user exists in Firestore
+      final userDoc = await _firestoreService.getDocument(
+        FirestoreConstants.users,
+        firebaseUser.uid,
+      );
+
+      if (userDoc.exists) {
+        // User exists, update their data
+        final existingUser =
+            UserModel.fromJson(userDoc.data() as Map<String, dynamic>);
+
+        // CRITICAL SECURITY FIX: Validate role selection
+
+        // If no role was selected, this is a security issue
+        if (_selectedRole == null) {
+          // Clear and force sign-out to prevent partial sessions
+          _user = null;
+          try {
+            await _authService.signOut();
+          } catch (_) {}
+
+          // Set error and prevent login
+          setError(true,
+              'Please select your role (Guest or Owner) before logging in.');
+          _navigation.goToRoleSelection();
+          return;
+        }
+
+        // If user has selected a role, validate it matches their stored role
+        if (_selectedRole != existingUser.role) {
+          // Clear and force sign-out to block cross-role login
+          _user = null;
+          _selectedRole = null;
+          try {
+            await _authService.signOut();
+          } catch (_) {}
+
+          // Set error and prevent login
+          setError(true,
+              'This phone number is registered as ${existingUser.role}. Please select the correct role and try again.');
+          _navigation.goToRoleSelection();
+          return;
+        }
+
+        // Role validation passed, proceed with authentication
+        _user = existingUser;
+
+        // Clear the selected role after successful validation
+        _selectedRole = null;
+
+        // Update phone number from Firebase user to ensure it's current
+        if (firebaseUser.phoneNumber != null &&
+            firebaseUser.phoneNumber!.isNotEmpty) {
+          _user = _user!.copyWith(phoneNumber: firebaseUser.phoneNumber!);
+        }
+
+        // Update last login and phone number if changed
+        await _firestoreService.updateDocument(
+          FirestoreConstants.users,
+          firebaseUser.uid,
+          {
+            'lastLoginAt': DateTime.now(),
+            'phoneNumber': _user!.phoneNumber,
+          },
+        );
+      } else {
+        // New user, create profile
+        _user = await _createUserProfile(firebaseUser);
+      }
+
+      // Save to local storage
+      await _saveUserToPrefs(_user!);
+
+      // Navigate based on role
+      await _navigateAfterAuthentication();
+    } catch (e) {
+      setError(true, 'Failed to handle authentication: ${e.toString()}');
+    }
+  }
+
+  /// Create user profile for new users
+  /// STRICT: Requires _selectedRole to be set - NO DEFAULT FALLBACK
+  Future<UserModel> _createUserProfile(User firebaseUser) async {
+    // STRICT: _selectedRole MUST be set before creating profile
+    // NO DEFAULT FALLBACK - will throw error if role not selected
+    if (_selectedRole == null || _selectedRole!.isEmpty) {
+      throw Exception(
+          'CRITICAL: Role must be selected before creating user profile. Selected role: $_selectedRole');
+    }
+
+    final userRole = _selectedRole!.toLowerCase().trim();
+
+    // STRICT VALIDATION: Only allow 'guest' or 'owner'
+    if (userRole != 'guest' && userRole != 'owner') {
+      throw Exception(
+          'CRITICAL: Invalid role selected: "$userRole". Role must be either "guest" or "owner".');
+    }
+
+    final userModel = UserModel(
+      userId: firebaseUser.uid,
+      phoneNumber: firebaseUser.phoneNumber ?? '',
+      role:
+          userRole, // Use selected role instead of always defaulting to 'guest'
+      fullName: firebaseUser.displayName ?? 'User',
+      email: firebaseUser.email,
+      profilePhotoUrl: firebaseUser.photoURL,
+      createdAt: DateTime.now(),
+      lastLoginAt: DateTime.now(),
+    );
+
+    // Save to Firestore
+    await _firestoreService.setDocument(
+      FirestoreConstants.users,
+      firebaseUser.uid,
+      userModel.toFirestore(),
+    );
+
+    // Clear selected role after creating profile
+    _selectedRole = null;
+
+    return userModel;
+  }
+
+  /// Navigate after successful authentication
+  /// STRICT: Only navigates if role is explicitly 'guest' or 'owner'
+  /// NO FALLBACK - Will redirect to role selection if role is invalid
+  Future<void> _navigateAfterAuthentication() async {
+    if (_user == null) {
+      debugPrint(
+          '⚠️ _navigateAfterAuthentication: User is null - redirecting to role selection');
+      _navigation.goToRoleSelection();
+      return;
+    }
+
+    final userRole = _user!.role.toLowerCase().trim();
+
+    await _analyticsService.logEvent(
+      name: 'auth_navigate_after_signin',
+      parameters: {'role': userRole, 'user_id': _user!.userId},
+    );
+
+    // STRICT ROLE CHECK: Only allow 'guest' or 'owner', no exceptions
+    // role is non-nullable String, so we only check if it's empty
+    if (userRole.isEmpty) {
+      debugPrint(
+          '⚠️ _navigateAfterAuthentication: User has no role - redirecting to role selection');
+      await _analyticsService.logEvent(
+        name: 'auth_navigate_no_role',
+        parameters: {'user_id': _user!.userId},
+      );
+      _navigation.goToRoleSelection();
+      return;
+    }
+
+    // STRICT: Only navigate if role is exactly 'guest' or 'owner'
+    if (userRole == 'owner') {
+      debugPrint(
+          '✅ _navigateAfterAuthentication: Role is owner - navigating to owner dashboard');
+      _navigation.goToOwnerHome();
+    } else if (userRole == 'guest') {
+      debugPrint(
+          '✅ _navigateAfterAuthentication: Role is guest - navigating to guest dashboard');
+      _navigation.goToGuestHome();
+    } else {
+      // Invalid role value - redirect to role selection
+      debugPrint(
+          '⚠️ _navigateAfterAuthentication: Invalid role "$userRole" - redirecting to role selection');
+      await _analyticsService.logEvent(
+        name: 'auth_navigate_invalid_role',
+        parameters: {'user_id': _user!.userId, 'invalid_role': userRole},
+      );
+      _navigation.goToRoleSelection();
+    }
+  }
+
   /// Attempts auto-login flow used by splash screen and app start
   /// First tries to restore user from local storage for instant access
   /// Then validates with Firebase and Firestore
@@ -97,7 +707,6 @@ class AuthProvider extends BaseProviderState {
       await loadUserFromPrefs();
 
       if (_user != null) {
-        print('✅ User restored from local storage: ${_user!.userId}');
         await _analyticsService.logEvent(
           name: 'auth_user_restored_from_storage',
           parameters: {
@@ -158,11 +767,9 @@ class AuthProvider extends BaseProviderState {
         name: 'auth_auto_login_error',
         parameters: {'error': e.toString()},
       );
-      print('⚠️ Auto login error: $e');
       // Even if Firestore sync fails, keep the locally restored user
       // This allows offline access
       if (_user != null) {
-        print('⚠️ Using cached user data despite sync error');
         return true; // Continue with cached data
       }
       setError(true, 'Auto login failed: $e');
@@ -173,26 +780,56 @@ class AuthProvider extends BaseProviderState {
   }
 
   /// Navigates user based on role and profile completion
+  /// STRICT: Enforces role-based navigation with no fallbacks
   Future<void> navigateAfterSplash() async {
     try {
       await _analyticsService.logEvent(name: 'auth_navigate_after_splash');
 
       if (_user == null) {
+        debugPrint(
+            '⚠️ navigateAfterSplash: User is null - redirecting to role selection');
         await _analyticsService.logEvent(
             name: 'auth_navigate_to_role_selection');
         _navigation.goToRoleSelection();
         return;
       }
 
-      final role = _user!.role;
+      // Guard: if Firebase Auth has no current user, cached user is invalid → reset and re-select role
+      if (_authService.currentUser == null) {
+        debugPrint(
+            '⚠️ navigateAfterSplash: No Firebase Auth user - clearing cache and redirecting');
+        await _analyticsService.logEvent(
+            name: 'auth_navigate_to_role_selection');
+        // Clear stale cached user so we don't carry empty userId/phone
+        _user = null;
+        await _localStorage.delete('userData');
+        _navigation.goToRoleSelection();
+        return;
+      }
+
+      final role = _user!.role.toLowerCase().trim();
 
       await _analyticsService.logEvent(
         name: 'auth_navigate_by_role',
         parameters: {'role': role, 'user_id': _user!.userId},
       );
 
-      // Check if profile is complete
-      if (!_user!.isProfileComplete) {
+      // STRICT ROLE VALIDATION: Role must be 'guest' or 'owner', no exceptions
+      // role is non-nullable String, so we only check if it's empty
+      if (role.isEmpty) {
+        debugPrint(
+            '⚠️ navigateAfterSplash: User has no role - redirecting to role selection');
+        await _analyticsService.logEvent(
+          name: 'auth_navigate_no_role_splash',
+          parameters: {'user_id': _user!.userId},
+        );
+        _navigation.goToRoleSelection();
+        return;
+      }
+
+      // Check if profile is complete; only send to registration if we have an authenticated phone user
+      final hasPhone = (_authService.currentUser?.phoneNumber ?? '').isNotEmpty;
+      if (!_user!.isProfileComplete && hasPhone) {
         await _analyticsService.logEvent(
           name: 'auth_navigate_to_registration',
           parameters: {'role': role, 'user_id': _user!.userId},
@@ -201,15 +838,28 @@ class AuthProvider extends BaseProviderState {
         return;
       }
 
-      // Navigate based on role
+      // STRICT: Only navigate if role is exactly 'guest' or 'owner'
       if (role == 'guest') {
+        debugPrint(
+            '✅ navigateAfterSplash: Role is guest - navigating to guest dashboard');
         _navigation.goToGuestHome();
       } else if (role == 'owner') {
+        debugPrint(
+            '✅ navigateAfterSplash: Role is owner - navigating to owner dashboard');
         _navigation.goToOwnerHome();
       } else {
+        // Invalid role - redirect to role selection
+        debugPrint(
+            '⚠️ navigateAfterSplash: Invalid role "$role" - redirecting to role selection');
+        await _analyticsService.logEvent(
+          name: 'auth_navigate_invalid_role_splash',
+          parameters: {'user_id': _user!.userId, 'invalid_role': role},
+        );
         _navigation.goToRoleSelection();
       }
     } catch (e) {
+      debugPrint(
+          '❌ navigateAfterSplash: Error - $e - redirecting to role selection');
       await _analyticsService.logEvent(
         name: 'auth_navigate_error',
         parameters: {'error': e.toString()},
@@ -220,23 +870,35 @@ class AuthProvider extends BaseProviderState {
 
   /// Clears session and signs out user
   /// After logout, user must select their role again (Owner/Guest)
+  /// Enhanced sign out with platform-specific provider cleanup
   Future<void> signOut() async {
     try {
       setLoading(true);
 
       await _analyticsService.logEvent(
         name: 'auth_logout_start',
-        parameters: {'user_id': _user?.userId ?? 'unknown'},
+        parameters: {
+          'user_id': _user?.userId ?? 'unknown',
+          'platform': platformName,
+        },
       );
 
-      await _repository.logout();
+      // Sign out from all authentication providers
+      await _authService.signOutFromAll();
+
+      // Clear local data
       _user = null;
+      _verificationId = null;
+      _sendingOtp = false;
       await _localStorage.delete('userData');
       clearUploadData();
       notifyListeners();
       clearError();
 
-      await _analyticsService.logEvent(name: 'auth_logout_success');
+      await _analyticsService.logEvent(
+        name: 'auth_logout_success',
+        parameters: {'platform': platformName},
+      );
 
       // Navigate to Role Selection screen (not Phone Auth)
       // User must select their role first, then login
@@ -334,98 +996,144 @@ class AuthProvider extends BaseProviderState {
     }
   }
 
-  /// Sets the user's role and updates the cached user model
+  /// Sets intended role for authentication. Does not persist or mutate existing user role.
   void setRole(String role) {
     try {
+      _selectedRole = role;
       _analyticsService.logEvent(
         name: 'auth_role_selected',
         parameters: {'role': role},
       );
-
-      if (_user == null) {
-        _user = UserModel(
-          userId: _authService.currentUserId ?? '',
-          phoneNumber: _authService.currentUser?.phoneNumber ?? '',
-          role: role,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        );
-      } else {
-        _user = _user!.copyWith(role: role);
-      }
+      // Do NOT modify _user or Firestore here to avoid accidentally switching roles
       notifyListeners();
     } catch (e) {
-      setError(true, 'Failed to set role: $e');
+      // Non-fatal; selection should not error the UI
     }
   }
 
-  /// Sends OTP for login - Platform-aware implementation
+  /// Clears the current role selection (for role switching)
+  void clearRoleSelection() {
+    try {
+      _selectedRole = null;
+      notifyListeners();
+    } catch (e) {}
+  }
+
+  /// Sends OTP for login - Platform-aware implementation with retry logic
   Future<void> sendOTP(
     String phoneNumber,
     PhoneCodeSent onCodeSent,
     PhoneVerificationFailed onError,
   ) async {
-    try {
-      _sendingOtp = true;
-      notifyListeners();
+    const int maxRetries = 3;
+    const Duration retryDelay = Duration(seconds: 2);
 
-      final fullPhoneNumber = '+91$phoneNumber';
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        _sendingOtp = true;
+        notifyListeners();
 
-      await _analyticsService.logEvent(
-        name: 'auth_send_otp_request',
-        parameters: {'phone_number': fullPhoneNumber},
-      );
+        final fullPhoneNumber = '+91$phoneNumber';
 
-      // Check if running on macOS or Web - phone OTP is not supported
-      if (!kIsWeb && Platform.isMacOS) {
+        await _analyticsService.logEvent(
+          name: 'auth_send_otp_request',
+          parameters: {
+            'phone_number': fullPhoneNumber,
+            'attempt': attempt.toString(),
+          },
+        );
+
+        // Check if running on macOS or Web - phone OTP is not supported
+        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.macOS) {
+          await _analyticsService.logEvent(
+            name: 'auth_send_otp_error',
+            parameters: {
+              'phone_number': fullPhoneNumber,
+              'error': 'Phone OTP not supported on macOS'
+            },
+          );
+          throw AppException(
+            message: 'Phone OTP authentication is not available on macOS',
+            details: 'Please use Google Sign-In instead',
+            severity: ErrorSeverity.medium,
+            recoverySuggestion:
+                'Use Google Sign-In button below for macOS authentication',
+          );
+        }
+
+        await _repository.sendVerificationCode(
+          phoneNumber: fullPhoneNumber,
+          timeout: kIsWeb
+              ? const Duration(seconds: 120)
+              : const Duration(seconds: 60),
+          verificationCompleted: (credential) async {
+            await _authService.signInWithCredential(credential);
+          },
+          verificationFailed: (error) {
+            _analyticsService.logEvent(
+              name: 'auth_otp_verification_failed',
+              parameters: {
+                'error': error.message ?? 'Unknown error',
+                'attempt': attempt.toString(),
+              },
+            );
+
+            // Enhanced error handling for common issues
+            String errorMessage = error.message ?? 'Unknown error';
+            if (error.code == 'too-many-requests') {
+              errorMessage = 'Too many requests. Please try again later.';
+            } else if (error.code == 'invalid-phone-number') {
+              errorMessage = 'Invalid phone number format.';
+            } else if (error.code == 'quota-exceeded') {
+              errorMessage = 'SMS quota exceeded. Please try again later.';
+            } else if (error.code == 'captcha-check-failed') {
+              errorMessage = 'reCAPTCHA verification failed. Please try again.';
+            }
+
+            // Create enhanced error with better message
+            final enhancedError = FirebaseAuthException(
+              code: error.code,
+              message: errorMessage,
+            );
+
+            onError(enhancedError);
+          },
+          codeSent: (verificationId, resendToken) {
+            _verificationId = verificationId;
+            _analyticsService.logEvent(
+              name: 'auth_otp_code_sent',
+              parameters: {'attempt': attempt.toString()},
+            );
+            onCodeSent(verificationId, resendToken);
+          },
+          codeAutoRetrievalTimeout: (verificationId) {
+            _verificationId = verificationId;
+          },
+        );
+
+        // If we reach here, OTP was sent successfully
+        return;
+      } catch (e) {
         await _analyticsService.logEvent(
           name: 'auth_send_otp_error',
           parameters: {
-            'phone_number': fullPhoneNumber,
-            'error': 'Phone OTP not supported on macOS'
+            'error': e.toString(),
+            'attempt': attempt.toString(),
           },
         );
-        throw AppException(
-          message: 'Phone OTP authentication is not available on macOS',
-          details: 'Please use Google Sign-In instead',
-          severity: ErrorSeverity.medium,
-          recoverySuggestion:
-              'Use Google Sign-In button below for macOS authentication',
-        );
-      }
 
-      await _repository.sendVerificationCode(
-        phoneNumber: fullPhoneNumber,
-        timeout: const Duration(seconds: 60),
-        verificationCompleted: (credential) async {
-          await _authService.signInWithCredential(credential);
-        },
-        verificationFailed: (error) {
-          _analyticsService.logEvent(
-            name: 'auth_otp_verification_failed',
-            parameters: {'error': error.message ?? 'Unknown error'},
-          );
-          onError(error);
-        },
-        codeSent: (verificationId, resendToken) {
-          _verificationId = verificationId;
-          _analyticsService.logEvent(name: 'auth_otp_code_sent');
-          onCodeSent(verificationId, resendToken);
-        },
-        codeAutoRetrievalTimeout: (verificationId) {
-          _verificationId = verificationId;
-        },
-      );
-    } catch (e) {
-      await _analyticsService.logEvent(
-        name: 'auth_send_otp_error',
-        parameters: {'error': e.toString()},
-      );
-      setError(true, 'Failed to send OTP: $e');
-      rethrow;
-    } finally {
-      _sendingOtp = false;
-      notifyListeners();
+        // If this is the last attempt, throw the error
+        if (attempt == maxRetries) {
+          setError(true, 'Failed to send OTP after $maxRetries attempts: $e');
+          rethrow;
+        }
+
+        // Wait before retrying
+        await Future.delayed(retryDelay);
+      } finally {
+        _sendingOtp = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -461,22 +1169,48 @@ class AuthProvider extends BaseProviderState {
       );
 
       if (isNewUser) {
-        // New user - set basic user data and return false
-        // IMPORTANT: Keep userModel (has phone number from Firebase)
-        // Only update the role if it was pre-selected during role selection
+        // STRICT: New user MUST have _selectedRole set before OTP verification
+        // NO DEFAULT FALLBACK - This prevents creating users without explicit role selection
+        if (_selectedRole == null || _selectedRole!.isEmpty) {
+          setError(true,
+              'CRITICAL: Role must be selected before verifying OTP. Please select Guest or Owner role.');
+          await _analyticsService.logEvent(
+            name: 'auth_verify_otp_no_role_critical',
+            parameters: {'user_id': userId},
+          );
+          return false;
+        }
+
+        final userRole = _selectedRole!.toLowerCase().trim();
+
+        // STRICT VALIDATION: Only allow 'guest' or 'owner'
+        if (userRole != 'guest' && userRole != 'owner') {
+          setError(true,
+              'CRITICAL: Invalid role "$userRole". Role must be "guest" or "owner".');
+          await _analyticsService.logEvent(
+            name: 'auth_verify_otp_invalid_role_critical',
+            parameters: {'user_id': userId, 'invalid_role': userRole},
+          );
+          return false;
+        }
+
         _user = userModel.copyWith(
-          role: _user?.role ?? userModel.role,
+          role: userRole,
         );
 
-        // Debug log to verify phone number
+        // Debug log to verify phone number and role
         await _analyticsService.logEvent(
           name: 'auth_new_user_data_set',
           parameters: {
             'user_id': _user!.userId,
             'phone_number': _user!.phoneNumber,
             'role': _user!.role,
+            'selected_role': _selectedRole ?? 'none',
           },
         );
+
+        // Don't clear _selectedRole yet - keep it for registration screen
+        // It will be used when saving the full profile in registration
 
         await _saveUserToPrefs(_user!);
         notifyListeners();
@@ -556,6 +1290,11 @@ class AuthProvider extends BaseProviderState {
 
       _user = userToSave;
       await _saveUserToPrefs(_user!);
+
+      // Clear _selectedRole after successfully saving user to Firestore
+      // This ensures the role is persisted and won't be lost
+      _selectedRole = null;
+
       notifyListeners();
       clearError();
 
@@ -595,138 +1334,6 @@ class AuthProvider extends BaseProviderState {
         name: 'auth_load_prefs_error',
         parameters: {'error': e.toString()},
       );
-    }
-  }
-
-  /// Sign in with Google and navigate accordingly
-  Future<void> signInWithGoogle() async {
-    try {
-      setLoading(true);
-
-      await _analyticsService.logEvent(name: 'auth_google_signin_attempt');
-
-      final signedInUser = await _repository.signInWithGoogle();
-
-      // Check if user exists in Firestore
-      final doc = await _firestoreService.getDocument(
-        FirestoreConstants.users,
-        signedInUser.userId,
-      );
-
-      if (!doc.exists) {
-        // New user - save basic profile
-        final newUser = signedInUser.copyWith(
-          role: _user?.role ?? 'guest',
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          lastLoginAt: DateTime.now(),
-        );
-
-        await _firestoreService.setDocument(
-          FirestoreConstants.users,
-          newUser.userId,
-          newUser.toFirestore(),
-        );
-
-        _user = newUser;
-      } else {
-        // Existing user - load profile and update last login
-        _user = UserModel.fromJson(doc.data() as Map<String, dynamic>);
-        _user = _user!.copyWith(lastLoginAt: DateTime.now());
-
-        await _firestoreService.updateDocument(
-          FirestoreConstants.users,
-          _user!.userId,
-          {'lastLoginAt': DateTime.now()},
-        );
-      }
-
-      await _saveUserToPrefs(_user!);
-      notifyListeners();
-      clearError();
-
-      await _analyticsService.logEvent(
-        name: 'auth_google_signin_success',
-        parameters: {'user_id': _user!.userId, 'role': _user!.role},
-      );
-
-      // Navigate based on role
-      _navigateByRole();
-    } catch (e) {
-      await _analyticsService.logEvent(
-        name: 'auth_google_signin_error',
-        parameters: {'error': e.toString()},
-      );
-      setError(true, 'Google sign-in failed: $e');
-      rethrow;
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  /// Sign in with Apple and navigate accordingly
-  Future<void> signInWithApple() async {
-    try {
-      setLoading(true);
-
-      await _analyticsService.logEvent(name: 'auth_apple_signin_attempt');
-
-      final signedInUser = await _repository.signInWithApple();
-
-      // Check if user exists in Firestore
-      final doc = await _firestoreService.getDocument(
-        FirestoreConstants.users,
-        signedInUser.userId,
-      );
-
-      if (!doc.exists) {
-        // New user - save basic profile
-        final newUser = signedInUser.copyWith(
-          role: _user?.role ?? 'guest',
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          lastLoginAt: DateTime.now(),
-        );
-
-        await _firestoreService.setDocument(
-          FirestoreConstants.users,
-          newUser.userId,
-          newUser.toFirestore(),
-        );
-
-        _user = newUser;
-      } else {
-        // Existing user - load profile and update last login
-        _user = UserModel.fromJson(doc.data() as Map<String, dynamic>);
-        _user = _user!.copyWith(lastLoginAt: DateTime.now());
-
-        await _firestoreService.updateDocument(
-          FirestoreConstants.users,
-          _user!.userId,
-          {'lastLoginAt': DateTime.now()},
-        );
-      }
-
-      await _saveUserToPrefs(_user!);
-      notifyListeners();
-      clearError();
-
-      await _analyticsService.logEvent(
-        name: 'auth_apple_signin_success',
-        parameters: {'user_id': _user!.userId, 'role': _user!.role},
-      );
-
-      // Navigate based on role
-      _navigateByRole();
-    } catch (e) {
-      await _analyticsService.logEvent(
-        name: 'auth_apple_signin_error',
-        parameters: {'error': e.toString()},
-      );
-      setError(true, 'Apple sign-in failed: $e');
-      rethrow;
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -805,20 +1412,6 @@ class AuthProvider extends BaseProviderState {
     await _localStorage.write('userData', jsonString);
   }
 
-  /// Navigate user based on role
-  void _navigateByRole() {
-    if (_user == null) {
-      _navigation.goToPhoneAuth();
-      return;
-    }
-
-    if (_user!.role == 'owner') {
-      _navigation.goToOwnerHome();
-    } else {
-      _navigation.goToGuestHome();
-    }
-  }
-
   /// Clear temporary upload data
   void clearUploadData() {
     _profilePhotoFile = null;
@@ -861,10 +1454,7 @@ class AuthProvider extends BaseProviderState {
       try {
         final sampleDataCreator = SampleDataCreator();
         await sampleDataCreator.createSampleData(userId);
-        print('✅ Sample data created for guest: $userId');
-      } catch (e) {
-        print('⚠️ Failed to create sample data for guest: $e');
-      }
+      } catch (e) {}
     });
   }
 }

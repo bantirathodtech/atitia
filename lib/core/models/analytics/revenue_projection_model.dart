@@ -2,6 +2,10 @@
 
 /// Model for revenue projections and forecasting
 /// Used to display projected revenue based on historical data and occupancy trends
+library;
+
+import '../../../common/utils/date/converter/date_service_converter.dart';
+
 class RevenueProjectionModel {
   final String pgId;
   final int month;
@@ -41,7 +45,7 @@ class RevenueProjectionModel {
       totalBeds: map['totalBeds'] as int,
       occupiedBeds: map['occupiedBeds'] as int,
       projectionMethod: map['projectionMethod'] as String? ?? 'historical',
-      createdAt: DateTime.parse(map['createdAt'] as String),
+      createdAt: DateServiceConverter.fromService(map['createdAt'] as String),
     );
   }
 
@@ -57,27 +61,39 @@ class RevenueProjectionModel {
       'totalBeds': totalBeds,
       'occupiedBeds': occupiedBeds,
       'projectionMethod': projectionMethod,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': DateServiceConverter.toService(createdAt),
     };
   }
 
   // Getters
-  String get formattedProjectedRevenue => '₹${projectedRevenue.toStringAsFixed(2)}';
+  String get formattedProjectedRevenue =>
+      '₹${projectedRevenue.toStringAsFixed(2)}';
   String get formattedActualRevenue => '₹${actualRevenue.toStringAsFixed(2)}';
-  String get formattedOccupancyRate => '${(occupancyRate * 100).toStringAsFixed(1)}%';
+  String get formattedOccupancyRate =>
+      '${(occupancyRate * 100).toStringAsFixed(1)}%';
   String get monthName {
     const months = [
-      '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
     ];
     return months[month];
   }
-  
+
   double get variance => actualRevenue - projectedRevenue;
-  double get variancePercentage => projectedRevenue > 0 
-      ? ((actualRevenue - projectedRevenue) / projectedRevenue) * 100 
+  double get variancePercentage => projectedRevenue > 0
+      ? ((actualRevenue - projectedRevenue) / projectedRevenue) * 100
       : 0.0;
   bool get isOverPerforming => actualRevenue > projectedRevenue;
   bool get isUnderPerforming => actualRevenue < projectedRevenue;
 }
-

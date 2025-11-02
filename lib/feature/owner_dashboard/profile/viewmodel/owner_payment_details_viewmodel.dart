@@ -2,16 +2,27 @@
 
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/di/common/unified_service_locator.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/interfaces/storage/storage_service_interface.dart';
 import '../../../../core/models/owner_payment_details_model.dart';
 import '../../../../core/repositories/owner_payment_details_repository.dart';
 
 /// ViewModel for managing owner payment details
 /// Handles bank account, UPI, and QR code information
 class OwnerPaymentDetailsViewModel extends ChangeNotifier {
-  final OwnerPaymentDetailsRepository _repository = OwnerPaymentDetailsRepository();
+  final OwnerPaymentDetailsRepository _repository;
   final _analyticsService = getIt.analytics;
-  final _storageService = getIt.storage;
+  final IStorageService _storageService;
+
+  /// Constructor with dependency injection
+  /// If repository or services are not provided, creates them with default services
+  OwnerPaymentDetailsViewModel({
+    OwnerPaymentDetailsRepository? repository,
+    IStorageService? storageService,
+  })  : _repository = repository ?? OwnerPaymentDetailsRepository(),
+        _storageService =
+            storageService ?? UnifiedServiceLocator.serviceFactory.storage;
 
   OwnerPaymentDetailsModel? _paymentDetails;
   bool _loading = false;
@@ -45,7 +56,6 @@ class OwnerPaymentDetailsViewModel extends ChangeNotifier {
       );
     } catch (e) {
       _error = e.toString();
-      debugPrint('❌ Error loading payment details: $e');
     } finally {
       _loading = false;
       notifyListeners();
@@ -78,16 +88,20 @@ class OwnerPaymentDetailsViewModel extends ChangeNotifier {
       _error = e.toString();
       _saving = false;
       notifyListeners();
-      debugPrint('❌ Error saving payment details: $e');
       return false;
     }
   }
 
   /// Upload UPI QR code image
-  Future<String?> uploadQrCode(String ownerId, String filename, dynamic file) async {
+  Future<String?> uploadQrCode(
+      String ownerId, String filename, dynamic file) async {
     try {
       final folderPath = 'owner_payment_qr/$ownerId';
-      final publicUrl = await _storageService.uploadFile(file, folderPath, filename);
+      final publicUrl = await _storageService.uploadFile(
+        path: folderPath,
+        file: file,
+        fileName: filename,
+      );
 
       await _analyticsService.logEvent(
         name: 'owner_qr_code_uploaded',
@@ -96,7 +110,6 @@ class OwnerPaymentDetailsViewModel extends ChangeNotifier {
 
       return publicUrl;
     } catch (e) {
-      debugPrint('❌ Error uploading QR code: $e');
       return null;
     }
   }
@@ -105,9 +118,9 @@ class OwnerPaymentDetailsViewModel extends ChangeNotifier {
   Future<bool> deleteQrCode(String qrCodeUrl) async {
     try {
       // Extract path from URL and delete from storage
-      final uri = Uri.parse(qrCodeUrl);
-      final path = uri.pathSegments.last;
-      
+      // final uri = Uri.parse(qrCodeUrl);
+      // final path = uri.pathSegments.last;
+
       // Note: Supabase Storage delete method would go here
       // await _storageService.deleteFile(path);
 
@@ -118,7 +131,6 @@ class OwnerPaymentDetailsViewModel extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      debugPrint('❌ Error deleting QR code: $e');
       return false;
     }
   }
@@ -138,4 +150,3 @@ class OwnerPaymentDetailsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 }
-

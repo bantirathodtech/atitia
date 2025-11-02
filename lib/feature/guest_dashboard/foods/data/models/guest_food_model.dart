@@ -3,6 +3,10 @@
 /// Model representing a food item available for guest ordering
 /// Contains food details, pricing, availability, and images
 /// Follows Dart naming conventions with 'is' prefix for boolean properties
+library;
+
+import '../../../../../common/utils/date/converter/date_service_converter.dart';
+
 class GuestFoodModel {
   final String foodId;
   final String name;
@@ -39,10 +43,10 @@ class GuestFoodModel {
       // Map from 'available' field in Firestore to 'isAvailable' in model
       isAvailable: map['available'] ?? true, // Default to available
       availableFrom: map['availableFrom'] != null
-          ? DateTime.parse(map['availableFrom'])
+          ? DateServiceConverter.fromService(map['availableFrom'])
           : null,
       availableUntil: map['availableUntil'] != null
-          ? DateTime.parse(map['availableUntil'])
+          ? DateServiceConverter.fromService(map['availableUntil'])
           : null,
     );
   }
@@ -58,8 +62,12 @@ class GuestFoodModel {
       'category': category,
       'photos': photos,
       'available': isAvailable, // Map to 'available' for Firestore
-      'availableFrom': availableFrom?.toIso8601String(),
-      'availableUntil': availableUntil?.toIso8601String(),
+      'availableFrom': availableFrom != null
+          ? DateServiceConverter.toService(availableFrom!)
+          : null,
+      'availableUntil': availableUntil != null
+          ? DateServiceConverter.toService(availableUntil!)
+          : null,
     };
   }
 

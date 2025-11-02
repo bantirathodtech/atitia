@@ -23,7 +23,6 @@
 //
 // 1. Basic primary button:
 //   PrimaryButton(
-//     onPressed: () => print('Button pressed'),
 //     label: 'Save Changes',
 //   )
 //
@@ -52,6 +51,7 @@ import 'package:flutter/cupertino.dart';
 import '../../lifecycle/stateful/adaptive_stateful_widget.dart';
 import '../../styles/spacing.dart';
 import '../../styles/typography.dart';
+import '../loaders/adaptive_loader.dart';
 
 class PrimaryButton extends AdaptiveStatefulWidget {
   final VoidCallback? onPressed;
@@ -93,33 +93,36 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
   // ==========================================================================
   // Platform Detection Helper Methods
   // ==========================================================================
-  
+
   /// Get current platform with override support
   TargetPlatform _getCurrentPlatform(BuildContext context) {
     if (widget.forcePlatform != null) return widget.forcePlatform!;
     return Theme.of(context).platform;
   }
-  
+
   /// Check if running on iOS
-  bool _isIOS(BuildContext context) => _getCurrentPlatform(context) == TargetPlatform.iOS;
-  
+  bool _isIOS(BuildContext context) =>
+      _getCurrentPlatform(context) == TargetPlatform.iOS;
+
   /// Check if running on Android
-  bool _isAndroid(BuildContext context) => _getCurrentPlatform(context) == TargetPlatform.android;
-  
+  bool _isAndroid(BuildContext context) =>
+      _getCurrentPlatform(context) == TargetPlatform.android;
+
   /// Check if running on macOS
-  bool _isMacOS(BuildContext context) => _getCurrentPlatform(context) == TargetPlatform.macOS;
-  
+  bool _isMacOS(BuildContext context) =>
+      _getCurrentPlatform(context) == TargetPlatform.macOS;
+
   /// Check if running on Web
   bool _isWeb(BuildContext context) => kIsWeb;
-  
+
   // ==========================================================================
   // Responsive Sizing Methods
   // ==========================================================================
-  
+
   /// Get platform-specific button height
   double _getButtonHeight(BuildContext context) {
     if (widget.height != null) return widget.height!;
-    
+
     if (_isIOS(context)) {
       return AppSpacing.buttonHeightL; // iOS prefers taller buttons
     } else if (_isAndroid(context)) {
@@ -131,11 +134,11 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
     }
     return AppSpacing.buttonHeightM; // Default fallback
   }
-  
+
   /// Get platform-specific padding
   EdgeInsetsGeometry _getButtonPadding(BuildContext context) {
     if (widget.padding != null) return widget.padding!;
-    
+
     if (_isIOS(context)) {
       return const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingXL,
@@ -162,11 +165,11 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
       vertical: AppSpacing.paddingM,
     );
   }
-  
+
   /// Get platform-specific border radius
   double _getBorderRadius(BuildContext context) {
     if (widget.borderRadius != null) return widget.borderRadius!;
-    
+
     if (_isIOS(context)) {
       return AppSpacing.borderRadiusL; // iOS prefers more rounded corners
     } else if (_isAndroid(context)) {
@@ -178,7 +181,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
     }
     return AppSpacing.borderRadiusM; // Default fallback
   }
-  
+
   /// Get platform-specific elevation
   double _getElevation(BuildContext context) {
     if (_isIOS(context)) {
@@ -219,7 +222,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
     final theme = Theme.of(context);
     final bgColor = widget.backgroundColor ?? theme.primaryColor;
     final fgColor = widget.foregroundColor ?? Colors.white;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       button: true,
@@ -228,10 +231,13 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
         width: widget.width,
         height: _getButtonHeight(context),
         child: CupertinoButton(
-          onPressed: widget.enabled && !widget.isLoading ? widget.onPressed : null,
+          onPressed:
+              widget.enabled && !widget.isLoading ? widget.onPressed : null,
           padding: EdgeInsets.zero,
           borderRadius: BorderRadius.circular(_getBorderRadius(context)),
-          color: widget.enabled && !widget.isLoading ? bgColor : bgColor.withOpacity(0.3),
+          color: widget.enabled && !widget.isLoading
+              ? bgColor
+              : bgColor.withValues(alpha: 0.3),
           child: Container(
             padding: _getButtonPadding(context),
             child: _buildIOSChild(fgColor),
@@ -246,7 +252,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
     final theme = Theme.of(context);
     final bgColor = widget.backgroundColor ?? theme.primaryColor;
     final fgColor = widget.foregroundColor ?? Colors.white;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       button: true,
@@ -255,9 +261,12 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
         width: widget.width,
         height: _getButtonHeight(context),
         child: ElevatedButton(
-          onPressed: widget.enabled && !widget.isLoading ? widget.onPressed : null,
+          onPressed:
+              widget.enabled && !widget.isLoading ? widget.onPressed : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: widget.enabled && !widget.isLoading ? bgColor : bgColor.withOpacity(0.3),
+            backgroundColor: widget.enabled && !widget.isLoading
+                ? bgColor
+                : bgColor.withValues(alpha: 0.3),
             foregroundColor: fgColor,
             padding: _getButtonPadding(context),
             shape: RoundedRectangleBorder(
@@ -278,7 +287,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final bgColor = widget.backgroundColor ?? theme.primaryColor;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       button: true,
@@ -288,15 +297,19 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
         height: _getButtonHeight(context),
         child: Container(
           decoration: BoxDecoration(
-            color: widget.enabled && !widget.isLoading ? bgColor : bgColor.withOpacity(0.3),
+            color: widget.enabled && !widget.isLoading
+                ? bgColor
+                : bgColor.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(_getBorderRadius(context)),
-            boxShadow: _getElevation(context) > 0 ? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: _getElevation(context),
-                offset: Offset(0, _getElevation(context) / 2),
-              ),
-            ] : null,
+            boxShadow: _getElevation(context) > 0
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: _getElevation(context),
+                      offset: Offset(0, _getElevation(context) / 2),
+                    ),
+                  ]
+                : null,
             border: Border.all(
               color: isDark ? Colors.white12 : Colors.black12,
               width: 0.5,
@@ -305,7 +318,8 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: widget.enabled && !widget.isLoading ? widget.onPressed : null,
+              onTap:
+                  widget.enabled && !widget.isLoading ? widget.onPressed : null,
               borderRadius: BorderRadius.circular(_getBorderRadius(context)),
               child: Container(
                 padding: _getButtonPadding(context),
@@ -322,7 +336,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
   Widget _buildWebButton(BuildContext context) {
     final theme = Theme.of(context);
     final bgColor = widget.backgroundColor ?? theme.primaryColor;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       button: true,
@@ -332,24 +346,33 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
         height: _getButtonHeight(context),
         child: Container(
           decoration: BoxDecoration(
-            color: widget.enabled && !widget.isLoading ? bgColor : bgColor.withOpacity(0.3),
+            color: widget.enabled && !widget.isLoading
+                ? bgColor
+                : bgColor.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(_getBorderRadius(context)),
-            boxShadow: _getElevation(context) > 0 ? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: _getElevation(context),
-                offset: Offset(0, _getElevation(context) / 2),
-              ),
-            ] : null,
+            boxShadow: _getElevation(context) > 0
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: _getElevation(context),
+                      offset: Offset(0, _getElevation(context) / 2),
+                    ),
+                  ]
+                : null,
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: widget.enabled && !widget.isLoading ? widget.onPressed : null,
+              onTap:
+                  widget.enabled && !widget.isLoading ? widget.onPressed : null,
               borderRadius: BorderRadius.circular(_getBorderRadius(context)),
               // Web-specific hover effects
-              hoverColor: widget.enabled && !widget.isLoading ? bgColor.withOpacity(0.1) : null,
-              focusColor: widget.enabled && !widget.isLoading ? bgColor.withOpacity(0.2) : null,
+              hoverColor: widget.enabled && !widget.isLoading
+                  ? bgColor.withValues(alpha: 0.1)
+                  : null,
+              focusColor: widget.enabled && !widget.isLoading
+                  ? bgColor.withValues(alpha: 0.2)
+                  : null,
               child: Container(
                 padding: _getButtonPadding(context),
                 child: _buildChild(),
@@ -366,7 +389,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
     final theme = Theme.of(context);
     final bgColor = widget.backgroundColor ?? theme.primaryColor;
     final fgColor = widget.foregroundColor ?? Colors.white;
-    
+
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
       button: true,
@@ -375,9 +398,12 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
         width: widget.width,
         height: _getButtonHeight(context),
         child: ElevatedButton(
-          onPressed: widget.enabled && !widget.isLoading ? widget.onPressed : null,
+          onPressed:
+              widget.enabled && !widget.isLoading ? widget.onPressed : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: widget.enabled && !widget.isLoading ? bgColor : bgColor.withOpacity(0.3),
+            backgroundColor: widget.enabled && !widget.isLoading
+                ? bgColor
+                : bgColor.withValues(alpha: 0.3),
             foregroundColor: fgColor,
             padding: _getButtonPadding(context),
             shape: RoundedRectangleBorder(
@@ -398,15 +424,10 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
   /// Build child widget for all platforms except iOS
   Widget _buildChild() {
     if (widget.isLoading) {
-      return SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(
-            widget.foregroundColor ?? Colors.white,
-          ),
-        ),
+      return AdaptiveLoader(
+        size: 18,
+        color: widget.foregroundColor ?? Colors.white,
+        strokeWidth: 2,
       );
     }
 
@@ -415,7 +436,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (widget.icon != null) ...[
-          Icon(widget.icon, size: 20),
+          Icon(widget.icon, size: 18),
           const SizedBox(width: AppSpacing.paddingS),
         ],
         Flexible(
@@ -433,12 +454,10 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
   /// Build child widget for iOS with Cupertino styling
   Widget _buildIOSChild(Color foregroundColor) {
     if (widget.isLoading) {
-      return SizedBox(
-        width: 20,
-        height: 20,
-        child: CupertinoActivityIndicator(
-          color: foregroundColor,
-        ),
+      return AdaptiveLoader(
+        size: 18,
+        color: foregroundColor,
+        strokeWidth: 2,
       );
     }
 
@@ -447,7 +466,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (widget.icon != null) ...[
-          Icon(widget.icon, size: 20, color: foregroundColor),
+          Icon(widget.icon, size: 18, color: foregroundColor),
           const SizedBox(width: AppSpacing.paddingS),
         ],
         Flexible(

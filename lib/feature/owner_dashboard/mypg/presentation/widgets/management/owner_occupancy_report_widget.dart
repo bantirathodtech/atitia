@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../../common/widgets/grids/responsive_grid.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
@@ -40,65 +41,54 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            Row(
+            ResponsiveGrid(
+              targetTileWidth: 200,
+              horizontalGap: AppSpacing.paddingS,
+              verticalGap: AppSpacing.paddingS,
+              childAspectRatio: 1.8,
               children: [
-                Expanded(
-                  child: _buildStatItem(
-                    'Total Beds',
-                    '${report.totalBeds}',
-                    Icons.bed,
-                    AppColors.info,
-                  ),
+                _buildStatItem(
+                  'Total Beds',
+                  '${report.totalBeds}',
+                  Icons.bed,
+                  AppColors.info,
                 ),
-                Expanded(
-                  child: _buildStatItem(
-                    'Occupied',
-                    '${report.occupiedBeds}',
-                    Icons.person,
-                    AppColors.success,
-                  ),
+                _buildStatItem(
+                  'Occupied',
+                  '${report.occupiedBeds}',
+                  Icons.person,
+                  AppColors.success,
                 ),
-                Expanded(
-                  child: _buildStatItem(
-                    'Vacant',
-                    '${report.vacantBeds}',
-                    Icons.bed_outlined,
+                _buildStatItem(
+                  'Vacant',
+                  '${report.vacantBeds}',
+                  Icons.bed_outlined,
+                  AppColors.warning,
+                ),
+                _buildStatItem(
+                  'Occupancy Rate',
+                  '${report.occupancyPercentage.toStringAsFixed(1)}%',
+                  Icons.pie_chart,
+                  theme.primaryColor,
+                ),
+                if (report.pendingBeds > 0)
+                  _buildStatItem(
+                    'Pending',
+                    '${report.pendingBeds}',
+                    Icons.schedule,
                     AppColors.warning,
                   ),
-                ),
+                if (report.maintenanceBeds > 0)
+                  _buildStatItem(
+                    'Maintenance',
+                    '${report.maintenanceBeds}',
+                    Icons.build,
+                    AppColors.error,
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem(
-                    'Occupancy Rate',
-                    '${report.occupancyPercentage.toStringAsFixed(1)}%',
-                    Icons.pie_chart,
-                    theme.primaryColor,
-                  ),
-                ),
-                if (report.pendingBeds > 0)
-                  Expanded(
-                    child: _buildStatItem(
-                      'Pending',
-                      '${report.pendingBeds}',
-                      Icons.schedule,
-                      AppColors.warning,
-                    ),
-                  ),
-                if (report.maintenanceBeds > 0)
-                  Expanded(
-                    child: _buildStatItem(
-                      'Maintenance',
-                      '${report.maintenanceBeds}',
-                      Icons.build,
-                      AppColors.error,
-                    ),
-                  ),
-              ],
-            ),
+            const SizedBox(height: AppSpacing.paddingS),
           ],
         ),
       ),
@@ -111,9 +101,9 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
       margin: const EdgeInsets.all(4),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [

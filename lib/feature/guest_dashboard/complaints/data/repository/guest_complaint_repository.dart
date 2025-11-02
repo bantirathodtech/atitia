@@ -2,25 +2,33 @@
 
 import 'dart:io';
 
-import 'package:atitia/core/di/firebase/di/firebase_service_locator.dart'
-    hide getIt;
-
 import '../../../../../common/utils/constants/firestore.dart';
-import '../../../../../core/di/firebase/container/firebase_dependency_container.dart';
+import '../../../../../core/di/common/unified_service_locator.dart';
+import '../../../../../core/interfaces/database/database_service_interface.dart';
+import '../../../../../core/interfaces/storage/storage_service_interface.dart';
 import '../models/guest_complaint_model.dart';
 
 /// Repository layer for guest complaints data operations
-/// Uses GetIt service locator for Firebase service access
+/// Uses interface-based services for dependency injection (swappable backends)
 /// Handles both Firestore operations and Cloud Storage uploads
 class GuestComplaintRepository {
-  // Get Firebase services via centralized GetIt
-  final _firestoreService = getIt.firestore;
-  final _storageService = getIt.storage;
+  final IDatabaseService _databaseService;
+  final IStorageService _storageService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  GuestComplaintRepository({
+    IDatabaseService? databaseService,
+    IStorageService? storageService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _storageService =
+            storageService ?? UnifiedServiceLocator.serviceFactory.storage;
 
   /// Streams complaints for a specific guest with real-time updates
   /// Uses Firestore query to filter complaints by guestId
   Stream<List<GuestComplaintModel>> getComplaintsForGuest(String guestId) {
-    return _firestoreService
+    return _databaseService
         .getCollectionStreamWithFilter(
           FirestoreConstants.complaints, // Collection name from constants
           'guestId',
@@ -36,7 +44,7 @@ class GuestComplaintRepository {
   /// Adds a new complaint document to Firestore
   /// Uses complaintId as the document ID for direct access
   Future<void> addComplaint(GuestComplaintModel complaint) async {
-    await _firestoreService.setDocument(
+    await _databaseService.setDocument(
       FirestoreConstants.complaints, // Collection name from constants
       complaint.complaintId,
       complaint.toMap(),
@@ -46,7 +54,7 @@ class GuestComplaintRepository {
   /// Updates an existing complaint document in Firestore
   /// Overwrites entire document with updated complaint data
   Future<void> updateComplaint(GuestComplaintModel complaint) async {
-    await _firestoreService.updateDocument(
+    await _databaseService.updateDocument(
       FirestoreConstants.complaints, // Collection name from constants
       complaint.complaintId,
       complaint.toMap(),
@@ -65,9 +73,9 @@ class GuestComplaintRepository {
     final fileName = 'image_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
     return await _storageService.uploadFile(
-      file,
-      path,
-      fileName,
+      path: path,
+      file: file,
+      fileName: fileName,
     );
   }
 }

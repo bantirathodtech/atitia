@@ -117,6 +117,57 @@
   
   <!-- Firebase Performance Monitoring -->
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-performance-compat.js"></script>
+  
+  <!-- Firebase App Check (for reCAPTCHA Enterprise) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-check-compat.js"></script>
+
+  <!--
+    ============================================================================
+    GOOGLE SIGN-IN CONFIGURATION FOR WEB
+    ============================================================================
+    This meta tag is REQUIRED for Google Sign-In to work on web platform.
+    The client ID should match your Firebase project's web app configuration.
+    ============================================================================
+  -->
+  <meta name="google-signin-client_id" content="665010238088-md8lcd0vv27l3r63edbaoqjcgokbpggj.apps.googleusercontent.com">
+  
+  <!--
+    ============================================================================
+    GOOGLE SIGN-IN CONFIGURATION SCRIPT
+    ============================================================================
+    This script configures Google Sign-In for web platform
+    ============================================================================
+  -->
+  <script>
+    window.googleSignInConfig = {
+      client_id: '665010238088-md8lcd0vv27l3r63edbaoqjcgokbpggj.apps.googleusercontent.com',
+      scope: 'openid profile email',
+      ux_mode: 'popup',
+      redirect_uri: window.location.origin,
+      // Additional configuration for better compatibility
+      hosted_domain: '',
+      prompt: 'select_account'
+    };
+    
+          // Firebase App Check Configuration for reCAPTCHA Enterprise
+          window.firebaseAppCheckConfig = {
+            // reCAPTCHA Enterprise Site Key (from Google Cloud Console)
+            recaptchaSiteKey: '6Lcay_ArAAAAAJyOnbVzzLGSQp_MKZGQcDIwT13p',
+            debugToken: 'debug-token-from-firebase-console', // For development only
+            
+            // Development mode configuration
+            isDevelopment: true, // Set to false in production
+            skipRecaptchaInDevelopment: true // Skip reCAPTCHA in development to avoid errors
+          };
+          
+          // Firebase Auth Configuration for Development
+          window.firebaseAuthConfig = {
+            // Disable reCAPTCHA in development mode
+            skipRecaptcha: true,
+            // Use test phone numbers in development
+            enableTestPhoneNumbers: true
+          };
+  </script>
 
   <!--
     ============================================================================

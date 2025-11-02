@@ -157,18 +157,18 @@ class BoxDecorations {
     return BoxDecoration(
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusL),
-      border: Border.all(color: Colors.white.withOpacity(0.2)),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Colors.white.withOpacity(0.1),
-          Colors.white.withOpacity(0.05),
+          Colors.white.withValues(alpha: 0.1),
+          Colors.white.withValues(alpha: 0.05),
         ],
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.1),
+          color: Colors.black.withValues(alpha: 0.1),
           blurRadius: blur,
           spreadRadius: 1,
         ),
@@ -185,10 +185,10 @@ class BoxDecorations {
     return BoxDecoration(
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusL),
-      border: Border.all(color: glowColor.withOpacity(0.3), width: 1),
+      border: Border.all(color: glowColor.withValues(alpha: 0.3), width: 1),
       boxShadow: [
         BoxShadow(
-          color: glowColor.withOpacity(0.4),
+          color: glowColor.withValues(alpha: 0.4),
           spreadRadius: spreadRadius,
           blurRadius: 15,
           offset: const Offset(0, 0),

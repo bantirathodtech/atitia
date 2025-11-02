@@ -12,7 +12,7 @@ class TextDecorations {
   static List<Shadow> subtle({Color? shadowColor}) {
     return [
       Shadow(
-        color: shadowColor ?? Colors.black.withOpacity(0.1),
+        color: shadowColor ?? Colors.black.withValues(alpha: 0.1),
         offset: const Offset(1, 1),
         blurRadius: 2,
       ),
@@ -23,7 +23,7 @@ class TextDecorations {
   static List<Shadow> strong({Color? shadowColor}) {
     return [
       Shadow(
-        color: shadowColor ?? Colors.black.withOpacity(0.3),
+        color: shadowColor ?? Colors.black.withValues(alpha: 0.3),
         offset: const Offset(2, 2),
         blurRadius: 4,
       ),
@@ -37,12 +37,12 @@ class TextDecorations {
   }) {
     return [
       Shadow(
-        color: glowColor.withOpacity(0.7),
+        color: glowColor.withValues(alpha: 0.7),
         blurRadius: blurRadius,
         offset: Offset.zero,
       ),
       Shadow(
-        color: glowColor.withOpacity(0.5),
+        color: glowColor.withValues(alpha: 0.5),
         blurRadius: blurRadius * 2,
         offset: Offset.zero,
       ),
@@ -101,7 +101,7 @@ class TextDecorations {
   }) {
     return AppTypography.bodyMedium.copyWith(
       color: textColor,
-      backgroundColor: backgroundColor.withOpacity(0.8),
+      backgroundColor: backgroundColor.withValues(alpha: 0.8),
       fontWeight: FontWeight.bold,
     );
   }

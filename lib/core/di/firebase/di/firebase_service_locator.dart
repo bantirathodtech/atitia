@@ -18,6 +18,20 @@ import '../../../services/firebase/remote_config/remote_config_service.dart';
 import '../../../services/firebase/security/app_integrity_service.dart';
 // Supabase Storage (replaces Firebase Storage for cost savings)
 import '../../../services/supabase/storage/supabase_storage_service.dart';
+// Logging Service
+import '../../../services/logging/app_logger.dart';
+// Performance Monitoring Service
+import '../../../services/performance/performance_monitoring_service.dart';
+// Offline and Optimization Services
+import '../../../services/offline/offline_cache_service.dart';
+import '../../../services/connectivity/connectivity_service.dart';
+import '../../../services/optimization/image_optimization_service.dart';
+// Phase 3 Services
+import '../../../services/ui/animation_service.dart';
+import '../../../services/accessibility/accessibility_service.dart';
+import '../../../services/localization/internationalization_service.dart';
+import '../../../services/security/security_hardening_service.dart';
+import '../../../services/deployment/deployment_optimization_service.dart';
 // Owner PG Management Repository
 
 final GetIt getIt = GetIt.instance;
@@ -83,6 +97,52 @@ void setupFirebaseDependencies() {
     () => OwnerPgManagementRepository(),
   );
 
+  // Logging Service
+  getIt.registerLazySingleton<AppLogger>(
+    () => AppLogger.instance,
+  );
+
+  // Performance Monitoring Service (NEW)
+  getIt.registerLazySingleton<PerformanceMonitoringService>(
+    () => PerformanceMonitoringService.instance,
+  );
+
+  // Offline Cache Service (NEW)
+  getIt.registerLazySingleton<OfflineCacheService>(
+    () => OfflineCacheService.instance,
+  );
+
+  // Connectivity Service (NEW)
+  getIt.registerLazySingleton<ConnectivityService>(
+    () => ConnectivityService.instance,
+  );
+
+  // Image Optimization Service (NEW)
+  getIt.registerLazySingleton<ImageOptimizationService>(
+    () => ImageOptimizationService.instance,
+  );
+
+  // Phase 3 Services (NEW)
+  getIt.registerLazySingleton<AnimationService>(
+    () => AnimationService.instance,
+  );
+
+  getIt.registerLazySingleton<AccessibilityService>(
+    () => AccessibilityService.instance,
+  );
+
+  getIt.registerLazySingleton<InternationalizationService>(
+    () => InternationalizationService.instance,
+  );
+
+  getIt.registerLazySingleton<SecurityHardeningService>(
+    () => SecurityHardeningService.instance,
+  );
+
+  getIt.registerLazySingleton<DeploymentOptimizationService>(
+    () => DeploymentOptimizationService.instance,
+  );
+
   // ❌ NO REST API services registered here
 }
 
@@ -124,4 +184,18 @@ extension FirebaseServiceLocator on GetIt {
 
   OwnerPgManagementRepository get ownerPgRepository =>
       get<OwnerPgManagementRepository>();
+
+  AppLogger get logger => get<AppLogger>();
+  PerformanceMonitoringService get performanceMonitoring =>
+      get<PerformanceMonitoringService>();
+  OfflineCacheService get offlineCache => get<OfflineCacheService>();
+  ConnectivityService get connectivity => get<ConnectivityService>();
+  ImageOptimizationService get imageOptimization =>
+      get<ImageOptimizationService>();
+  AnimationService get animation => get<AnimationService>();
+  AccessibilityService get accessibility => get<AccessibilityService>();
+  InternationalizationService get i18n => get<InternationalizationService>();
+  SecurityHardeningService get security => get<SecurityHardeningService>();
+  DeploymentOptimizationService get deployment =>
+      get<DeploymentOptimizationService>();
 }

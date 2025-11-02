@@ -1,22 +1,35 @@
 // lib/features/owner_dashboard/myguest/data/repository/owner_guest_repository.dart
 
-import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../common/utils/constants/firestore.dart';
+import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
+import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../models/owner_guest_model.dart';
+import '../../../guests/data/models/owner_complaint_model.dart';
 
 /// Repository for managing owner guest-related Firestore operations
-/// Uses Firebase service locator for dependency injection
+/// Uses interface-based services for dependency injection (swappable backends)
 /// Handles guest, booking, and payment data streaming with PG filtering and analytics tracking
 class OwnerGuestRepository {
-  // Get Firebase services through service locator
-  final _firestoreService = getIt.firestore;
-  final _analyticsService = getIt.analytics;
+  final IDatabaseService _databaseService;
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  OwnerGuestRepository({
+    IDatabaseService? databaseService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Streams all users with role 'Guest' from Firestore
   /// Returns real-time updates of guest list
   Stream<List<OwnerGuestModel>> streamGuests() {
-    return _firestoreService
-        .getCollectionStreamWithFilter(FirestoreConstants.users, 'role', 'guest')
+    return _databaseService
+        .getCollectionStreamWithFilter(
+            FirestoreConstants.users, 'role', 'guest')
         .map((snapshot) {
       final guests = snapshot.docs
           .map((doc) => OwnerGuestModel.fromFirestore(doc))
@@ -31,10 +44,148 @@ class OwnerGuestRepository {
     });
   }
 
+  /// Streams complaints across multiple PGs (maps guest complaints to owner view)
+  Stream<List<OwnerComplaintModel>> streamComplaintsForMultiplePGs(
+      List<String> pgIds) {
+    if (pgIds.isEmpty) return Stream.value([]);
+
+    return _databaseService
+        .getCollectionStream(FirestoreConstants.complaints)
+        .map((snapshot) {
+      final complaints = snapshot.docs
+          .map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+
+            // Map guest complaint schema to owner complaint view
+            final String statusRaw = (data['status'] ?? 'Pending').toString();
+            String mappedStatus;
+            switch (statusRaw.toLowerCase()) {
+              case 'resolved':
+                mappedStatus = 'resolved';
+                break;
+              case 'closed':
+                mappedStatus = 'closed';
+                break;
+              case 'in_progress':
+                mappedStatus = 'in_progress';
+                break;
+              default:
+                mappedStatus = 'new';
+            }
+
+            final mapped = OwnerComplaintModel(
+              complaintId: data['complaintId'] ?? doc.id,
+              guestId: data['guestId'] ?? '',
+              guestName: data['guestName'] ?? '',
+              pgId: data['pgId'] ?? '',
+              ownerId: data['ownerId'] ?? '',
+              roomNumber: data['roomNumber'] ?? '',
+              complaintType: (data['complaintType'] ?? 'general').toString(),
+              title: (data['subject'] ?? data['title'] ?? '').toString(),
+              description: (data['description'] ?? '').toString(),
+              status: mappedStatus,
+              priority: (data['priority'] ?? 'medium').toString(),
+              createdAt: (data['complaintDate'] is int)
+                  ? DateTime.fromMillisecondsSinceEpoch(
+                      data['complaintDate'] as int)
+                  : DateTime.now(),
+              updatedAt: DateTime.now(),
+              messages: (data['messages'] as List<dynamic>?)?.map((m) {
+                    final map = Map<String, dynamic>.from(m as Map);
+                    return ComplaintMessage.fromMap(map);
+                  }).toList() ??
+                  const <ComplaintMessage>[],
+              assignedTo: data['assignedTo'],
+              resolvedAt: (data['resolvedAt'] is int)
+                  ? DateTime.fromMillisecondsSinceEpoch(
+                      data['resolvedAt'] as int)
+                  : null,
+              resolutionNotes: data['resolutionNotes'],
+              isActive: (data['isActive'] as bool?) ?? true,
+            );
+            return mapped;
+          })
+          .where((c) => pgIds.contains(c.pgId))
+          .toList();
+
+      _analyticsService.logEvent(
+        name: 'owner_multi_pg_complaints_streamed',
+        parameters: {
+          'pg_count': pgIds.length,
+          'complaints_count': complaints.length,
+        },
+      );
+
+      return complaints;
+    });
+  }
+
+  /// Adds a reply to a complaint (stored in the complaint document messages array)
+  Future<void> addComplaintReply(
+      String complaintId, ComplaintMessage reply) async {
+    try {
+      final doc = await _databaseService.getDocument(
+        FirestoreConstants.complaints,
+        complaintId,
+      );
+
+      final data = (doc.data() as Map<String, dynamic>?);
+      final existing = (data?['messages'] as List<dynamic>? ?? []);
+      final updated = [...existing, reply.toMap()];
+
+      await _databaseService.updateDocument(
+        FirestoreConstants.complaints,
+        complaintId,
+        {
+          'messages': updated,
+          'updatedAt': DateTime.now().millisecondsSinceEpoch,
+        },
+      );
+
+      await _analyticsService.logEvent(
+        name: 'owner_complaint_reply_added',
+        parameters: {'complaint_id': complaintId},
+      );
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'owner_complaint_reply_error',
+        parameters: {'complaint_id': complaintId, 'error': e.toString()},
+      );
+      throw Exception('Failed to add complaint reply: $e');
+    }
+  }
+
+  /// Updates complaint status (and optional resolution notes)
+  Future<void> updateComplaintStatus(String complaintId, String status,
+      {String? resolutionNotes}) async {
+    try {
+      await _databaseService.updateDocument(
+        FirestoreConstants.complaints,
+        complaintId,
+        {
+          'status': status,
+          if (resolutionNotes != null) 'resolutionNotes': resolutionNotes,
+          'updatedAt': DateTime.now().millisecondsSinceEpoch,
+        },
+      );
+
+      await _analyticsService.logEvent(
+        name: 'owner_complaint_status_updated',
+        parameters: {'complaint_id': complaintId, 'status': status},
+      );
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'owner_complaint_status_error',
+        parameters: {'complaint_id': complaintId, 'error': e.toString()},
+      );
+      throw Exception('Failed to update complaint status: $e');
+    }
+  }
+
   /// Gets specific guest by ID
   Future<OwnerGuestModel?> getGuestById(String guestUid) async {
     try {
-      final doc = await _firestoreService.getDocument(
+      final doc = await _databaseService.getDocument(
         FirestoreConstants.users,
         guestUid,
       );
@@ -67,7 +218,7 @@ class OwnerGuestRepository {
   /// Updates guest information
   Future<void> updateGuest(OwnerGuestModel guest) async {
     try {
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.users,
         guest.uid,
         guest.toMap(),
@@ -95,7 +246,7 @@ class OwnerGuestRepository {
   /// Deletes a guest
   Future<void> deleteGuest(String guestUid) async {
     try {
-      await _firestoreService.deleteDocument(
+      await _databaseService.deleteDocument(
         FirestoreConstants.users,
         guestUid,
       );
@@ -119,7 +270,7 @@ class OwnerGuestRepository {
   /// Streams all bookings filtered by specific PG ID
   /// Provides real-time booking updates for owner's PG properties
   Stream<List<OwnerBookingModel>> streamBookings(String pgId) {
-    return _firestoreService
+    return _databaseService
         .getCollectionStreamWithFilter(
             FirestoreConstants.bookings, 'pgId', pgId)
         .map((snapshot) {
@@ -142,7 +293,7 @@ class OwnerGuestRepository {
   /// Gets specific booking by ID
   Future<OwnerBookingModel?> getBookingById(String bookingId) async {
     try {
-      final doc = await _firestoreService.getDocument(
+      final doc = await _databaseService.getDocument(
         FirestoreConstants.bookings,
         bookingId,
       );
@@ -165,7 +316,7 @@ class OwnerGuestRepository {
   /// Creates a new booking
   Future<void> createBooking(OwnerBookingModel booking) async {
     try {
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.bookings,
         booking.id,
         booking.toMap(),
@@ -196,7 +347,7 @@ class OwnerGuestRepository {
   Future<void> updateBooking(OwnerBookingModel booking) async {
     try {
       final updatedBooking = booking.copyWith(updatedAt: DateTime.now());
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.bookings,
         booking.id,
         updatedBooking.toMap(),
@@ -224,7 +375,7 @@ class OwnerGuestRepository {
   /// Deletes a booking
   Future<void> deleteBooking(String bookingId) async {
     try {
-      await _firestoreService.deleteDocument(
+      await _databaseService.deleteDocument(
         FirestoreConstants.bookings,
         bookingId,
       );
@@ -248,8 +399,9 @@ class OwnerGuestRepository {
   /// Streams all payments filtered by specific PG ID
   /// Monitors payment status and collections in real-time
   Stream<List<OwnerPaymentModel>> streamPayments(String pgId) {
-    return _firestoreService
-        .getCollectionStreamWithFilter(FirestoreConstants.payments, 'pgId', pgId)
+    return _databaseService
+        .getCollectionStreamWithFilter(
+            FirestoreConstants.payments, 'pgId', pgId)
         .map((snapshot) {
       final payments = snapshot.docs
           .map((doc) => OwnerPaymentModel.fromFirestore(doc))
@@ -270,7 +422,7 @@ class OwnerGuestRepository {
   /// Creates a new payment record
   Future<void> createPayment(OwnerPaymentModel payment) async {
     try {
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.payments,
         payment.id,
         payment.toMap(),
@@ -301,7 +453,7 @@ class OwnerGuestRepository {
   Future<void> updatePayment(OwnerPaymentModel payment) async {
     try {
       final updatedPayment = payment.copyWith(updatedAt: DateTime.now());
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.payments,
         payment.id,
         updatedPayment.toMap(),
@@ -334,7 +486,7 @@ class OwnerGuestRepository {
       return Stream.value([]);
     }
 
-    return _firestoreService
+    return _databaseService
         .getCollectionStream(FirestoreConstants.bookings)
         .map((snapshot) {
       final bookings = snapshot.docs
@@ -362,7 +514,7 @@ class OwnerGuestRepository {
       return Stream.value([]);
     }
 
-    return _firestoreService
+    return _databaseService
         .getCollectionStream(FirestoreConstants.payments)
         .map((snapshot) {
       final payments = snapshot.docs
@@ -385,7 +537,7 @@ class OwnerGuestRepository {
   /// Gets guest statistics for dashboard
   Future<Map<String, dynamic>> getGuestStats(String ownerId) async {
     try {
-      final guestsSnapshot = await _firestoreService
+      final guestsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
               FirestoreConstants.users, 'role', 'guest')
           .first;
@@ -421,4 +573,3 @@ class OwnerGuestRepository {
     }
   }
 }
-

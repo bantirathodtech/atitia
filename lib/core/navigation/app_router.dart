@@ -1,27 +1,36 @@
 // lib/core/navigation/app_router.dart
 
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../feature/auth/view/screen/role_selection/role_selection_screen.dart';
 import '../../../feature/auth/view/screen/signin/phone_auth_screen.dart';
 import '../../../feature/auth/view/screen/signup/registration_screen.dart';
 import '../../../feature/auth/view/screen/splash/splash_screen.dart';
 import '../../../feature/guest_dashboard/complaints/view/screens/guest_complaint_add_screen.dart';
-import '../../../feature/guest_dashboard/complaints/view/screens/guest_complaint_list_screen.dart';
-import '../../../feature/guest_dashboard/foods/view/screens/guest_food_list_screen.dart';
 import '../../../feature/guest_dashboard/guest_dashboard.dart';
-import '../../../feature/guest_dashboard/payments/view/screens/guest_payment_screen.dart';
 import '../../../feature/guest_dashboard/payments/view/screens/guest_payment_detail_screen.dart';
 import '../../../feature/guest_dashboard/pgs/view/screens/guest_pg_detail_screen.dart';
-import '../../../feature/guest_dashboard/pgs/view/screens/guest_pg_list_screen.dart';
+import '../../../feature/guest_dashboard/pgs/view/screens/guest_room_bed_screen.dart';
 import '../../../feature/guest_dashboard/profile/view/screens/guest_profile_screen.dart';
+import '../../../feature/guest_dashboard/settings/view/screens/guest_settings_screen.dart';
+import '../../../feature/guest_dashboard/help/view/screens/guest_help_screen.dart';
+import '../../../common/widgets/notifications/notifications_screen.dart';
 import '../../../feature/owner_dashboard/foods/view/screens/owner_food_management_screen.dart';
-import '../../../feature/owner_dashboard/myguest/view/screens/owner_guest_screen.dart';
+import '../../../feature/owner_dashboard/guests/view/screens/owner_guest_management_screen.dart';
 import '../../../feature/owner_dashboard/mypg/presentation/screens/owner_pg_management_screen.dart';
 import '../../../feature/owner_dashboard/overview/view/screens/owner_overview_screen.dart';
 import '../../../feature/owner_dashboard/owner_dashboard.dart';
 import '../../../feature/owner_dashboard/profile/view/screens/owner_profile_screen.dart';
+import '../../../feature/owner_dashboard/settings/view/screens/owner_settings_screen.dart';
+import '../../../feature/owner_dashboard/notifications/view/screens/owner_notifications_screen.dart';
+import '../../../feature/owner_dashboard/help/view/screens/owner_help_screen.dart';
+import '../../../feature/owner_dashboard/analytics/screens/owner_analytics_dashboard.dart';
+import '../../../feature/owner_dashboard/reports/view/screens/owner_reports_screen.dart';
 import '../../common/utils/constants/routes.dart';
+import '../../common/utils/logging/logging_helper.dart';
+import '../../../feature/auth/logic/auth_provider.dart';
+import 'guards/route_guard.dart';
 import 'screen/error_screen.dart';
 
 /// Main application router configuration combining all feature routes.
@@ -35,6 +44,9 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     // Initial route when app starts
     initialLocation: AppRoutes.splash,
+
+    // Performance optimization: Enable route caching
+    routerNeglect: true,
 
     // Combine all feature routes
     routes: [
@@ -64,15 +76,41 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.guestHome,
         name: AppRoutes.guestHome,
+        redirect: (context, state) {
+          // Redirect /guest to /guest/pgs to always show PGs tab
+          // But don't redirect if we're navigating to a detail route
+          final matched = state.matchedLocation;
+          final fullPath = state.uri.path;
+          
+          // Don't redirect if we're on a detail route (has :pgId, :paymentId, etc.)
+          if (fullPath.contains('/pgs/') && fullPath.split('/').length > 3) {
+            return null; // This is a detail route, don't redirect
+          }
+          if (fullPath.contains('/payments/') && fullPath.split('/').length > 3) {
+            return null; // This is a detail route, don't redirect
+          }
+          if (fullPath.contains('/complaints/add') ||
+              fullPath.contains('/profile') ||
+              fullPath.contains('/notifications') ||
+              fullPath.contains('/room-bed')) {
+            return null; // These are full-screen routes, don't redirect
+          }
+          
+          // Only redirect if we're exactly at /guest
+          if (matched == AppRoutes.guestHome || matched == '${AppRoutes.guestHome}/') {
+            return AppRoutes.guestPGs;
+          }
+          return null;
+        },
         builder: (context, state) => const GuestDashboardScreen(),
         routes: [
-          // PG Listings Route
+          // PG Listings Route - This is the default tab
           GoRoute(
             path: 'pgs',
             name: AppRoutes.guestPGs,
-            builder: (context, state) => const GuestPgListScreen(),
+            builder: (context, state) => const GuestDashboardScreen(),
             routes: [
-              // PG Details Route
+              // PG Details Route - Nested under pgs to properly push on top
               GoRoute(
                 path: ':pgId',
                 name: 'guestPGDetails',
@@ -83,19 +121,19 @@ class AppRouter {
               ),
             ],
           ),
-          // Food Menu Route
+          // Food Menu Route - No builder, dashboard handles it
           GoRoute(
             path: 'foods',
             name: AppRoutes.guestFoods,
-            builder: (context, state) => const GuestFoodListScreen(),
+            builder: (context, state) => const GuestDashboardScreen(),
           ),
-          // Payment History Routes (nested for details functionality)
+          // Payment History Routes
           GoRoute(
             path: 'payments',
             name: AppRoutes.guestPayments,
-            builder: (context, state) => const GuestPaymentScreen(),
+            builder: (context, state) => const GuestDashboardScreen(),
             routes: [
-              // Payment Details Route
+              // Payment Details Route - Nested under payments to properly push on top
               GoRoute(
                 path: ':paymentId',
                 name: 'guestPaymentDetails',
@@ -106,13 +144,19 @@ class AppRouter {
               ),
             ],
           ),
-          // Complaints Routes (nested for add functionality)
+          // Booking Requests Route - No builder, dashboard handles it
+          GoRoute(
+            path: 'requests',
+            name: 'guestRequests',
+            builder: (context, state) => const GuestDashboardScreen(),
+          ),
+          // Complaints Routes
           GoRoute(
             path: 'complaints',
             name: AppRoutes.guestComplaints,
-            builder: (context, state) => const GuestComplaintsListScreen(),
+            builder: (context, state) => const GuestDashboardScreen(),
             routes: [
-              // Complaint Add Screen Route
+              // Complaint Add Screen Route - Nested under complaints to properly push on top
               GoRoute(
                 path: 'add',
                 name: 'guestComplaintsAdd',
@@ -125,6 +169,30 @@ class AppRouter {
             path: 'profile',
             name: AppRoutes.guestProfile,
             builder: (context, state) => const GuestProfileScreen(),
+          ),
+          // Notifications Route
+          GoRoute(
+            path: 'notifications',
+            name: AppRoutes.guestNotifications,
+            builder: (context, state) => const NotificationsScreen(),
+          ),
+          // Room/Bed Management Route
+          GoRoute(
+            path: 'room-bed',
+            name: AppRoutes.guestRoomBed,
+            builder: (context, state) => const GuestRoomBedScreen(),
+          ),
+          // Settings Route
+          GoRoute(
+            path: 'settings',
+            name: AppRoutes.guestSettings,
+            builder: (context, state) => const GuestSettingsScreen(),
+          ),
+          // Help & Support Route
+          GoRoute(
+            path: 'help',
+            name: AppRoutes.guestHelp,
+            builder: (context, state) => const GuestHelpScreen(),
           ),
         ],
       ),
@@ -157,13 +225,43 @@ class AppRouter {
           GoRoute(
             path: 'guests',
             name: AppRoutes.ownerGuests,
-            builder: (context, state) => const OwnerGuestScreen(),
+            builder: (context, state) => const OwnerGuestManagementScreen(),
           ),
           // Profile management tab - ViewModel accessed via Provider
           GoRoute(
             path: 'profile',
             name: AppRoutes.ownerProfile,
             builder: (context, state) => const OwnerProfileScreen(),
+          ),
+          // Settings screen
+          GoRoute(
+            path: 'settings',
+            name: AppRoutes.ownerSettings,
+            builder: (context, state) => const OwnerSettingsScreen(),
+          ),
+          // Notifications screen
+          GoRoute(
+            path: 'notifications',
+            name: AppRoutes.ownerNotifications,
+            builder: (context, state) => const OwnerNotificationsScreen(),
+          ),
+          // Help & Support screen
+          GoRoute(
+            path: 'help',
+            name: AppRoutes.ownerHelp,
+            builder: (context, state) => const OwnerHelpScreen(),
+          ),
+          // Analytics screen
+          GoRoute(
+            path: 'analytics',
+            name: AppRoutes.ownerAnalytics,
+            builder: (context, state) => const OwnerAnalyticsDashboard(),
+          ),
+          // Reports screen
+          GoRoute(
+            path: 'reports',
+            name: AppRoutes.ownerReports,
+            builder: (context, state) => const OwnerReportsScreen(),
           ),
         ],
       ),
@@ -172,11 +270,56 @@ class AppRouter {
     // Global error handler for undefined routes
     errorBuilder: (context, state) => const ErrorScreen(),
 
-    // Optional: Add redirect logic for authentication
+    // Redirect logic for authentication and role-based access
     redirect: (context, state) {
-      // Add authentication-based redirection logic here
-      // Example: Redirect to login if not authenticated
-      return null; // Return null to proceed with current route
+      // Log navigation events
+      LoggingHelper.logNavigation(
+        state.matchedLocation,
+        state.uri.toString(),
+        metadata: {
+          'routeName': state.name,
+          'pathParameters': state.pathParameters,
+          'uri': state.uri.toString(),
+        },
+      );
+
+      final currentRoute = state.matchedLocation;
+
+      // Skip guard for auth routes (splash, phone auth, etc.)
+      if (AppRoutes.isAuthRoute(currentRoute)) {
+        return null;
+      }
+
+      // Try to access AuthProvider from context
+      try {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final user = authProvider.user;
+        final userRole = user?.role;
+
+        // Check authentication
+        if (!RouteGuard.isAuthenticated() &&
+            RouteGuard.requiresAuth(currentRoute)) {
+          // Not authenticated and route requires auth - redirect to splash
+          return AppRoutes.splash;
+        }
+
+        // Check role-based access
+        final redirectPath = RouteGuard.getRedirectPath(currentRoute, userRole);
+        if (redirectPath != null) {
+          return redirectPath;
+        }
+      } catch (e) {
+        // If Provider not available (during initialization), allow route
+        // This happens during app startup before Provider tree is ready
+        if (currentRoute == AppRoutes.splash) {
+          return null; // Allow splash screen
+        }
+        // For other routes during init, redirect to splash
+        return AppRoutes.splash;
+      }
+
+      // Allow access to route
+      return null;
     },
   );
 }

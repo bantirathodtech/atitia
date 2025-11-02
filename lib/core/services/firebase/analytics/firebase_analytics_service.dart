@@ -28,29 +28,29 @@ class AnalyticsServiceWrapper {
         name: name,
         parameters: safeParameters,
       );
-      print('Analytics Event: $name - $safeParameters');
     } catch (e) {
-      print('Analytics Error: $e');
     }
   }
 
   /// Filter out null values from parameters map
-  Map<String, Object> _filterNullParameters(Map<String, Object>? parameters) {
+  Map<String, Object> _filterNullParameters(Map<String, Object?>? parameters) {
     if (parameters == null) return {};
 
     return Map<String, Object>.fromEntries(
-      parameters.entries.where((entry) => entry.value != null),
+      parameters.entries
+          .where((entry) => entry.value != null)
+          .map((entry) => MapEntry(entry.key, entry.value!)),
     );
   }
 
   /// Convert nullable values to safe objects
-  Object _toSafeObject(dynamic value) {
-    if (value == null) return 'null';
-    if (value is int || value is double || value is String || value is bool) {
-      return value;
-    }
-    return value.toString();
-  }
+  // Object _toSafeObject(dynamic value) {
+  //   if (value == null) return 'null';
+  //   if (value is int || value is double || value is String || value is bool) {
+  //     return value;
+  //   }
+  //   return value.toString();
+  // }
 
   /// Screen tracking with new API
   Future<void> logScreenView({
@@ -79,7 +79,6 @@ class AnalyticsServiceWrapper {
         value: safeValue,
       );
     } catch (e) {
-      print('User Property Error: $e');
     }
   }
 
@@ -88,7 +87,6 @@ class AnalyticsServiceWrapper {
     try {
       await _analytics.setUserId(id: userId);
     } catch (e) {
-      print('Set User ID Error: $e');
     }
   }
 

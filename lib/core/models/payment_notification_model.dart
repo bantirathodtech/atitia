@@ -2,6 +2,10 @@
 
 /// Model for payment notifications sent from guest to owner
 /// Supports UPI QR code payments and manual payment confirmation
+library;
+
+import '../../common/utils/date/converter/date_service_converter.dart';
+
 class PaymentNotificationModel {
   final String notificationId;
   final String guestId;
@@ -17,7 +21,7 @@ class PaymentNotificationModel {
   final DateTime createdAt;
   final DateTime? confirmedAt;
   final String? rejectionReason;
-  
+
   PaymentNotificationModel({
     required this.notificationId,
     required this.guestId,
@@ -48,9 +52,9 @@ class PaymentNotificationModel {
       paymentScreenshotUrl: map['paymentScreenshotUrl'] as String?,
       paymentNote: map['paymentNote'] as String?,
       status: map['status'] as String? ?? 'pending',
-      createdAt: DateTime.parse(map['createdAt'] as String),
-      confirmedAt: map['confirmedAt'] != null 
-          ? DateTime.parse(map['confirmedAt'] as String)
+      createdAt: DateServiceConverter.fromService(map['createdAt'] as String),
+      confirmedAt: map['confirmedAt'] != null
+          ? DateServiceConverter.fromService(map['confirmedAt'] as String)
           : null,
       rejectionReason: map['rejectionReason'] as String?,
     );
@@ -69,8 +73,10 @@ class PaymentNotificationModel {
       'paymentScreenshotUrl': paymentScreenshotUrl,
       'paymentNote': paymentNote,
       'status': status,
-      'createdAt': createdAt.toIso8601String(),
-      'confirmedAt': confirmedAt?.toIso8601String(),
+      'createdAt': DateServiceConverter.toService(createdAt),
+      'confirmedAt': confirmedAt != null
+          ? DateServiceConverter.toService(confirmedAt!)
+          : null,
       'rejectionReason': rejectionReason,
     };
   }
@@ -113,7 +119,7 @@ class PaymentNotificationModel {
   bool get isPending => status == 'pending';
   bool get isConfirmed => status == 'confirmed';
   bool get isRejected => status == 'rejected';
-  
+
   String get statusDisplay {
     switch (status) {
       case 'pending':
@@ -126,9 +132,9 @@ class PaymentNotificationModel {
         return status;
     }
   }
-  
+
   String get formattedAmount => '₹${amount.toStringAsFixed(2)}';
-  
+
   String get paymentMethodDisplay {
     switch (paymentMethod) {
       case 'upi_qr':
@@ -144,4 +150,3 @@ class PaymentNotificationModel {
     }
   }
 }
-

@@ -8,12 +8,13 @@ import '../../../feature/guest_dashboard/payments/viewmodel/guest_payment_viewmo
 import '../../../feature/guest_dashboard/pgs/viewmodel/guest_pg_viewmodel.dart';
 import '../../../feature/guest_dashboard/profile/viewmodel/guest_profile_viewmodel.dart';
 import '../../../feature/owner_dashboard/foods/viewmodel/owner_food_viewmodel.dart';
-import '../../../feature/owner_dashboard/myguest/viewmodel/owner_guest_viewmodel.dart';
+import '../../../feature/owner_dashboard/guests/viewmodel/owner_guest_viewmodel.dart';
 import '../../../feature/owner_dashboard/mypg/presentation/viewmodels/owner_pg_management_viewmodel.dart';
 import '../../../feature/owner_dashboard/overview/viewmodel/owner_overview_view_model.dart';
 import '../../../feature/owner_dashboard/profile/viewmodel/owner_payment_details_viewmodel.dart';
 import '../../../feature/owner_dashboard/profile/viewmodel/owner_profile_viewmodel.dart';
 import '../../../feature/owner_dashboard/shared/viewmodel/selected_pg_provider.dart';
+import '../../../feature/guest_dashboard/shared/viewmodel/guest_pg_selection_provider.dart';
 import '../../app/localization/locale_provider.dart';
 import '../../app/theme/theme_provider.dart';
 import '../../di/firebase/container/firebase_dependency_container.dart';
@@ -69,6 +70,11 @@ class FirebaseAppProviders {
         // Guest PGs - PG browsing and booking
         ChangeNotifierProvider<GuestPgViewModel>(
           create: (_) => FirebaseDependencyContainer.createGuestPgViewModel(),
+        ),
+
+        // Guest PG Selection - Selected PG state management for guests
+        ChangeNotifierProvider<GuestPgSelectionProvider>(
+          create: (_) => GuestPgSelectionProvider(),
         ),
 
         // ==================== OWNER PROVIDERS ====================

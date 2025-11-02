@@ -7,6 +7,7 @@ import '../text/heading_medium.dart';
 
 class SectionContainer extends AdaptiveStatelessWidget {
   final String? title;
+  final IconData? icon;
   final Widget child;
   final EdgeInsets padding;
   final CrossAxisAlignment crossAxisAlignment;
@@ -15,6 +16,7 @@ class SectionContainer extends AdaptiveStatelessWidget {
   const SectionContainer({
     super.key,
     this.title,
+    this.icon,
     required this.child,
     this.padding = const EdgeInsets.all(AppSpacing.paddingM),
     this.crossAxisAlignment = CrossAxisAlignment.start,
@@ -30,7 +32,17 @@ class SectionContainer extends AdaptiveStatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (title != null) ...[
-            HeadingMedium(text: title!),
+              Row(
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, size: 24, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: AppSpacing.paddingS),
+                  ],
+                  Expanded(
+                    child: HeadingMedium(text: title!),
+                  ),
+                ],
+              ),
             if (description != null) ...[
               const SizedBox(height: AppSpacing.paddingXS),
               Text(

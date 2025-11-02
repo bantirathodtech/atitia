@@ -4,6 +4,7 @@ import '../../../../../../common/lifecycle/stateless/adaptive_stateless_widget.d
 import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../../common/widgets/chips/choice_chip.dart';
 
 /// Amenities Selection Form Widget
 class PgAmenitiesFormWidget extends AdaptiveStatelessWidget {
@@ -76,8 +77,8 @@ class PgAmenitiesFormWidget extends AdaptiveStatelessWidget {
           children: _availableAmenities.map((amenity) {
             final isSelected = selectedAmenities.contains(amenity);
 
-            return ChoiceChip(
-              label: Text(amenity),
+            return CustomChoiceChip(
+              label: amenity,
               selected: isSelected,
               onSelected: (selected) {
                 final updatedAmenities = List<String>.from(selectedAmenities);

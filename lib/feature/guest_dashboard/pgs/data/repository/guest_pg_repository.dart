@@ -1,25 +1,40 @@
 // lib/features/guest_dashboard/pgs/data/repository/guest_pg_repository.dart
 
 import '../../../../../common/utils/constants/storage.dart';
-import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../common/utils/constants/firestore.dart';
+import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
+import '../../../../../core/interfaces/database/database_service_interface.dart';
+import '../../../../../core/interfaces/storage/storage_service_interface.dart';
 import '../models/guest_pg_model.dart';
 
 /// Repository handling PG data operations and file uploads
-/// Uses Firebase service locator for dependency injection
+/// Uses interface-based services for dependency injection (swappable backends)
 /// Manages PG listings, details, and photo operations with proper error handling
 class GuestPgRepository {
-  // Get Firebase services through service locator
-  final _firestoreService = getIt.firestore;
-  final _storageService = getIt.storage;
-  final _analyticsService = getIt.analytics;
+  final IDatabaseService _databaseService;
+  final IStorageService _storageService;
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  GuestPgRepository({
+    IDatabaseService? databaseService,
+    IStorageService? storageService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _storageService =
+            storageService ?? UnifiedServiceLocator.serviceFactory.storage,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Retrieves specific PG details by pgId from Firestore
   /// Returns null if PG document doesn't exist
   /// Throws exception for network or permission errors
   Future<GuestPgModel?> getPGById(String pgId) async {
     try {
-      final doc = await _firestoreService.getDocument(
+      final doc = await _databaseService.getDocument(
         FirestoreConstants.pgs,
         pgId,
       );
@@ -61,29 +76,33 @@ class GuestPgRepository {
 
   /// Streams all available PGs with real-time updates
   /// Returns continuous stream for reactive UI updates
-  /// Filters out inactive PGs for guest consumption
+  /// Filters out inactive PGs and drafts for guest consumption
   Stream<List<GuestPgModel>> getAllPGsStream() {
-    return _firestoreService
+    return _databaseService
         .getCollectionStream(FirestoreConstants.pgs)
         .map((snapshot) {
-          final pgs = snapshot.docs
-              .map((doc) => GuestPgModel.fromMap(
-                    doc.data() as Map<String, dynamic>,
-                  ))
-              .where((pg) => pg.isActive) // Only show active PGs
-              .toList();
-          
-          // Log analytics for PG list loaded
-          _analyticsService.logEvent(
-            name: 'pgs_loaded',
-            parameters: {
-              'total_pgs': pgs.length,
-              'cities_count': pgs.map((pg) => pg.city).toSet().length,
-            },
-          );
-          
-          return pgs;
-        });
+      final pgs = snapshot.docs
+          .map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            // Exclude drafts - only show published PGs to guests
+            if (data['isDraft'] == true) return null;
+            return GuestPgModel.fromMap(data);
+          })
+          .whereType<GuestPgModel>() // Filter out nulls and cast
+          .where((pg) => pg.isActive) // Only show active, published PGs
+          .toList();
+
+      // Log analytics for PG list loaded
+      _analyticsService.logEvent(
+        name: 'pgs_loaded',
+        parameters: {
+          'total_pgs': pgs.length,
+          'cities_count': pgs.map((pg) => pg.city).toSet().length,
+        },
+      );
+
+      return pgs;
+    });
   }
 
   /// Adds or updates PG document in Firestore
@@ -92,7 +111,7 @@ class GuestPgRepository {
   Future<void> addOrUpdatePG(GuestPgModel pg) async {
     try {
       final pgData = pg.copyWith(updatedAt: DateTime.now());
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.pgs,
         pg.pgId,
         pgData.toMap(),
@@ -127,7 +146,7 @@ class GuestPgRepository {
   /// Throws exception for deletion failures
   Future<void> deletePG(String pgId) async {
     try {
-      await _firestoreService.deleteDocument(
+      await _databaseService.deleteDocument(
         FirestoreConstants.pgs,
         pgId,
       );
@@ -158,8 +177,12 @@ class GuestPgRepository {
   ) async {
     try {
       final path = '${StorageConstants.pgPhotos}$pgId/photos';
-      final downloadUrl = await _storageService.uploadFile(file, path, fileName);
-      
+      final downloadUrl = await _storageService.uploadFile(
+        path: path,
+        file: file,
+        fileName: fileName,
+      );
+
       await _analyticsService.logEvent(
         name: 'pg_photo_uploaded',
         parameters: {
@@ -167,7 +190,7 @@ class GuestPgRepository {
           'file_name': fileName,
         },
       );
-      
+
       return downloadUrl;
     } catch (e) {
       await _analyticsService.logEvent(
@@ -216,16 +239,19 @@ class GuestPgRepository {
             return false;
           }
         }
-        if (pgType != null && pg.pgType?.toLowerCase() != pgType.toLowerCase()) {
+        if (pgType != null &&
+            pg.pgType?.toLowerCase() != pgType.toLowerCase()) {
           return false;
         }
-        if (mealType != null && pg.mealType?.toLowerCase() != mealType.toLowerCase()) {
+        if (mealType != null &&
+            pg.mealType?.toLowerCase() != mealType.toLowerCase()) {
           return false;
         }
         if (wifiAvailable != null && pg.wifiAvailable != wifiAvailable) {
           return false;
         }
-        if (parkingAvailable != null && pg.parkingAvailable != parkingAvailable) {
+        if (parkingAvailable != null &&
+            pg.parkingAvailable != parkingAvailable) {
           return false;
         }
         // Add price filtering logic here when pricing is implemented
@@ -264,7 +290,7 @@ class GuestPgRepository {
     try {
       final allPGs = await getAllPGsStream().first;
       final ownerPGs = allPGs.where((pg) => pg.ownerUid == ownerUid).toList();
-      
+
       await _analyticsService.logEvent(
         name: 'owner_pgs_fetched',
         parameters: {
@@ -272,7 +298,7 @@ class GuestPgRepository {
           'pgs_count': ownerPGs.length,
         },
       );
-      
+
       return ownerPGs;
     } catch (e) {
       await _analyticsService.logEvent(
@@ -291,9 +317,10 @@ class GuestPgRepository {
   Future<List<GuestPgModel>> getPGsByCity(String city) async {
     try {
       final allPGs = await getAllPGsStream().first;
-      final cityPGs = allPGs.where((pg) => 
-          pg.city.toLowerCase() == city.toLowerCase()).toList();
-      
+      final cityPGs = allPGs
+          .where((pg) => pg.city.toLowerCase() == city.toLowerCase())
+          .toList();
+
       await _analyticsService.logEvent(
         name: 'city_pgs_fetched',
         parameters: {
@@ -301,7 +328,7 @@ class GuestPgRepository {
           'pgs_count': cityPGs.length,
         },
       );
-      
+
       return cityPGs;
     } catch (e) {
       await _analyticsService.logEvent(
@@ -325,7 +352,7 @@ class GuestPgRepository {
         final searchAmenities = amenities.map((a) => a.toLowerCase()).toSet();
         return pgAmenities.containsAll(searchAmenities);
       }).toList();
-      
+
       await _analyticsService.logEvent(
         name: 'amenity_pgs_fetched',
         parameters: {
@@ -333,7 +360,7 @@ class GuestPgRepository {
           'pgs_count': amenityPGs.length,
         },
       );
-      
+
       return amenityPGs;
     } catch (e) {
       await _analyticsService.logEvent(
@@ -352,11 +379,14 @@ class GuestPgRepository {
   Future<Map<String, dynamic>> getPGStats() async {
     try {
       final allPGs = await getAllPGsStream().first;
-      
+
       final cities = allPGs.map((pg) => pg.city).toSet();
       final amenities = allPGs.expand((pg) => pg.amenities).toSet();
-      final pgTypes = allPGs.where((pg) => pg.pgType != null).map((pg) => pg.pgType!).toSet();
-      
+      final pgTypes = allPGs
+          .where((pg) => pg.pgType != null)
+          .map((pg) => pg.pgType!)
+          .toSet();
+
       final stats = {
         'totalPGs': allPGs.length,
         'totalCities': cities.length,
@@ -365,17 +395,21 @@ class GuestPgRepository {
         'cities': cities.toList()..sort(),
         'amenities': amenities.toList()..sort(),
         'pgTypes': pgTypes.toList()..sort(),
-        'avgRoomsPerPG': allPGs.isNotEmpty ? 
-            allPGs.map((pg) => pg.totalRooms).reduce((a, b) => a + b) / allPGs.length : 0.0,
-        'avgBedsPerPG': allPGs.isNotEmpty ? 
-            allPGs.map((pg) => pg.totalBeds).reduce((a, b) => a + b) / allPGs.length : 0.0,
+        'avgRoomsPerPG': allPGs.isNotEmpty
+            ? allPGs.map((pg) => pg.totalRooms).reduce((a, b) => a + b) /
+                allPGs.length
+            : 0.0,
+        'avgBedsPerPG': allPGs.isNotEmpty
+            ? allPGs.map((pg) => pg.totalBeds).reduce((a, b) => a + b) /
+                allPGs.length
+            : 0.0,
       };
-      
+
       await _analyticsService.logEvent(
         name: 'pg_stats_generated',
         parameters: stats,
       );
-      
+
       return stats;
     } catch (e) {
       await _analyticsService.logEvent(

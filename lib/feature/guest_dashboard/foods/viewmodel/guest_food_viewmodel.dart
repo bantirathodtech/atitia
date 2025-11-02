@@ -3,12 +3,15 @@
 import 'package:flutter/material.dart';
 
 import '../../../../common/lifecycle/state/provider_state.dart';
+import '../../../../common/utils/logging/logging_mixin.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../core/repositories/booking_repository.dart';
 import '../../../../core/models/booking_model.dart';
 import '../../../auth/logic/auth_provider.dart';
 import '../../../owner_dashboard/foods/data/models/owner_food_menu.dart';
 import '../../../owner_dashboard/foods/data/repository/owner_food_repository.dart';
+import '../../../../core/repositories/food_feedback_repository.dart';
+import 'package:intl/intl.dart';
 
 /// 🍽️ **GUEST FOOD VIEWMODEL - PRODUCTION READY**
 ///
@@ -18,10 +21,21 @@ import '../../../owner_dashboard/foods/data/repository/owner_food_repository.dar
 /// - Show special menu overrides
 /// - Handle loading/error states
 /// - Analytics tracking
-class GuestFoodViewmodel extends BaseProviderState {
-  final OwnerFoodRepository _repository = OwnerFoodRepository();
-  final BookingRepository _bookingRepository = BookingRepository();
+class GuestFoodViewmodel extends BaseProviderState with LoggingMixin {
+  final OwnerFoodRepository _repository;
+  final BookingRepository _bookingRepository;
   final _analyticsService = getIt.analytics;
+  final FoodFeedbackRepository _feedbackRepository;
+
+  /// Constructor with dependency injection
+  /// If repositories are not provided, creates them with default services
+  GuestFoodViewmodel({
+    OwnerFoodRepository? repository,
+    BookingRepository? bookingRepository,
+    FoodFeedbackRepository? feedbackRepository,
+  })  : _repository = repository ?? OwnerFoodRepository(),
+        _bookingRepository = bookingRepository ?? BookingRepository(),
+        _feedbackRepository = feedbackRepository ?? FoodFeedbackRepository();
 
   List<OwnerFoodMenu> _weeklyMenus = [];
   List<OwnerMenuOverride> _specialMenus = [];
@@ -43,6 +57,41 @@ class GuestFoodViewmodel extends BaseProviderState {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<void> _loadBookedPgIfNeeded() async {
+    if (_bookedPgId != null) return;
+    final guestId = getIt<AuthProvider>().user?.userId;
+    if (guestId == null || guestId.isEmpty) return;
+    final booking = await _bookingRepository.getGuestActiveBooking(guestId);
+    if (booking != null) {
+      _bookedPgId = booking.pgId;
+      _ownerIdOfPg = booking.ownerId;
+    }
+  }
+
+  /// Submits simple like/dislike feedback for a meal on today's date
+  Future<void> submitMealFeedback({
+    required String meal, // breakfast|lunch|dinner
+    required bool like,
+  }) async {
+    // Ensure we know the booked PG
+    if (_bookedPgId == null) {
+      await _loadBookedPgIfNeeded();
+      if (_bookedPgId == null) return;
+    }
+
+    final guestId = getIt<AuthProvider>().user?.userId ?? '';
+    if (guestId.isEmpty) return;
+
+    final dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    await _feedbackRepository.submitFeedback(
+      pgId: _bookedPgId!,
+      guestId: guestId,
+      dateKey: dateKey,
+      meal: meal,
+      value: like ? 1 : -1,
+    );
   }
 
   /// Checks if there's a special menu for today
@@ -74,56 +123,73 @@ class GuestFoodViewmodel extends BaseProviderState {
 
       // First, try to get guest's active booking
       await _loadGuestBooking();
-      
+
       if (_bookedPgId != null && _ownerIdOfPg != null) {
         // Guest has a booking - load menu for their booked PG
-        _repository.getWeeklyMenusStream(_ownerIdOfPg!, pgId: _bookedPgId).listen(
-          (menus) {
-            _weeklyMenus = menus;
-            setLoading(false);
-            notifyListeners();
-            
-            _analyticsService.logEvent(
-              name: 'guest_menu_loaded',
-              parameters: {
-                'menus_count': menus.length,
-                'pg_id': _bookedPgId!,
-                'owner_id': _ownerIdOfPg!,
-              },
-            );
-          },
-          onError: (error) {
-            setError(true, 'Failed to load menu: $error');
-            setLoading(false);
-            
-            _analyticsService.logEvent(
-              name: 'guest_menu_load_error',
-              parameters: {
-                'error': error.toString(),
-                'pg_id': _bookedPgId!,
-              },
-            );
-          },
-        );
+        await _loadMenuForPg(_bookedPgId!, _ownerIdOfPg!);
       } else {
         // No booking found - show empty state
         _weeklyMenus = [];
         setLoading(false);
         notifyListeners();
-        
+
         _analyticsService.logEvent(
           name: 'guest_menu_no_booking',
           parameters: {},
         );
       }
+    } catch (e) {
+      setError(true, 'Failed to load menu: $e');
+      setLoading(false);
 
-      // Stream special menus/overrides
-      // Using empty string to fetch all overrides for demo
-      _repository.getMenuOverridesStream('').listen(
+      _analyticsService.logEvent(
+        name: 'guest_menu_load_exception',
+        parameters: {
+          'error': e.toString(),
+        },
+      );
+    }
+  }
+
+  /// Load menu for a specific PG and owner
+  Future<void> _loadMenuForPg(String pgId, String ownerId) async {
+    try {
+      // Stream weekly menus for this PG
+      _repository.getWeeklyMenusStream(ownerId, pgId: pgId).listen(
+        (menus) {
+          _weeklyMenus = menus;
+          setLoading(false);
+          notifyListeners();
+
+          _analyticsService.logEvent(
+            name: 'guest_menu_loaded',
+            parameters: {
+              'menus_count': menus.length,
+              'pg_id': pgId,
+              'owner_id': ownerId,
+            },
+          );
+        },
+        onError: (error) {
+          setError(true, 'Failed to load menu: $error');
+          setLoading(false);
+
+          _analyticsService.logEvent(
+            name: 'guest_menu_load_error',
+            parameters: {
+              'error': error.toString(),
+              'pg_id': pgId,
+            },
+          );
+        },
+      );
+
+      // Stream special menus/overrides for this PG
+      _repository.getMenuOverridesStream(ownerId, pgId: pgId).listen(
         (overrides) {
           _specialMenus = overrides;
           notifyListeners();
-          
+
           _analyticsService.logEvent(
             name: 'guest_special_menus_loaded',
             parameters: {
@@ -137,15 +203,8 @@ class GuestFoodViewmodel extends BaseProviderState {
         },
       );
     } catch (e) {
-      setError(true, 'Failed to load menu: $e');
+      setError(true, 'Failed to load menu for PG: $e');
       setLoading(false);
-      
-      _analyticsService.logEvent(
-        name: 'guest_menu_load_exception',
-        parameters: {
-          'error': e.toString(),
-        },
-      );
     }
   }
 
@@ -155,7 +214,7 @@ class GuestFoodViewmodel extends BaseProviderState {
       // Get current user ID from AuthProvider
       final authProvider = getIt<AuthProvider>();
       final userId = authProvider.user?.userId;
-      
+
       if (userId == null) {
         _bookedPgId = null;
         _ownerIdOfPg = null;
@@ -163,8 +222,9 @@ class GuestFoodViewmodel extends BaseProviderState {
       }
 
       // Get guest's bookings
-      final bookings = await _bookingRepository.streamGuestBookings(userId).first;
-      
+      final bookings =
+          await _bookingRepository.streamGuestBookings(userId).first;
+
       // Find the first confirmed booking
       BookingModel? activeBooking;
       try {
@@ -181,7 +241,7 @@ class GuestFoodViewmodel extends BaseProviderState {
       if (activeBooking != null) {
         _bookedPgId = activeBooking.pgId;
         _ownerIdOfPg = activeBooking.ownerId;
-        
+
         _analyticsService.logEvent(
           name: 'guest_booking_found',
           parameters: {
@@ -193,7 +253,7 @@ class GuestFoodViewmodel extends BaseProviderState {
       } else {
         _bookedPgId = null;
         _ownerIdOfPg = null;
-        
+
         _analyticsService.logEvent(
           name: 'guest_no_booking_found',
           parameters: {
@@ -204,7 +264,7 @@ class GuestFoodViewmodel extends BaseProviderState {
     } catch (e) {
       _bookedPgId = null;
       _ownerIdOfPg = null;
-      
+
       _analyticsService.logEvent(
         name: 'guest_booking_load_error',
         parameters: {
@@ -219,7 +279,7 @@ class GuestFoodViewmodel extends BaseProviderState {
     try {
       setLoading(true);
       clearError();
-      
+
       _bookedPgId = pgId;
       _ownerIdOfPg = ownerId;
 
@@ -231,29 +291,8 @@ class GuestFoodViewmodel extends BaseProviderState {
         },
       );
 
-      // Stream weekly menus for this PG
-      _repository.getWeeklyMenusStream(ownerId, pgId: pgId).listen(
-        (menus) {
-          _weeklyMenus = menus;
-          setLoading(false);
-          notifyListeners();
-        },
-        onError: (error) {
-          setError(true, 'Failed to load menu: $error');
-          setLoading(false);
-        },
-      );
-
-      // Stream special menus/overrides for this PG
-      _repository.getMenuOverridesStream(ownerId, pgId: pgId).listen(
-        (overrides) {
-          _specialMenus = overrides;
-          notifyListeners();
-        },
-        onError: (error) {
-          debugPrint('Failed to load special menus: $error');
-        },
-      );
+      // Use the internal method to load menu
+      await _loadMenuForPg(pgId, ownerId);
     } catch (e) {
       setError(true, 'Failed to load menu: $e');
       setLoading(false);
@@ -264,7 +303,7 @@ class GuestFoodViewmodel extends BaseProviderState {
   OwnerFoodMenu? getTodaysMenu() {
     final today = DateTime.now();
     final dayName = _getDayName(today.weekday);
-    
+
     // Check for special menu first
     final specialMenu = getTodaySpecialMenu();
     if (specialMenu != null && specialMenu.isActive) {
@@ -272,7 +311,7 @@ class GuestFoodViewmodel extends BaseProviderState {
       // Return null to indicate special menu should be shown
       return null;
     }
-    
+
     // Return regular weekly menu
     return getMenuForDay(dayName);
   }
@@ -295,7 +334,7 @@ class GuestFoodViewmodel extends BaseProviderState {
   int getTodayItemsCount() {
     final todayMenu = getTodaysMenu();
     if (todayMenu == null) return 0;
-    
+
     return todayMenu.breakfast.length +
         todayMenu.lunch.length +
         todayMenu.dinner.length;

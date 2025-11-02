@@ -4,24 +4,39 @@ import 'dart:io';
 
 import '../../../../../common/utils/constants/storage.dart';
 import '../../../../../common/utils/constants/firestore.dart';
-import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../../core/di/common/unified_service_locator.dart';
+import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
+import '../../../../../core/interfaces/database/database_service_interface.dart';
+import '../../../../../core/interfaces/storage/storage_service_interface.dart';
 import '../models/guest_profile_model.dart';
 
 /// Repository handling guest profile data operations and file uploads
-/// Uses Firebase service locator for dependency injection
+/// Uses interface-based services for dependency injection (swappable backends)
 /// Manages guest profile CRUD operations, document uploads, and analytics tracking
 class GuestProfileRepository {
-  // Get Firebase services through service locator
-  final _firestoreService = getIt.firestore;
-  final _storageService = getIt.storage;
-  final _analyticsService = getIt.analytics;
+  final IDatabaseService _databaseService;
+  final IStorageService _storageService;
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  GuestProfileRepository({
+    IDatabaseService? databaseService,
+    IStorageService? storageService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _storageService =
+            storageService ?? UnifiedServiceLocator.serviceFactory.storage,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Retrieves guest profile document from Firestore by userId
   /// Returns null if profile document doesn't exist
   /// Tracks analytics for profile views
   Future<GuestProfileModel?> getGuestProfile(String userId) async {
     try {
-      final doc = await _firestoreService.getDocument(
+      final doc = await _databaseService.getDocument(
         FirestoreConstants.users,
         userId,
       );
@@ -65,8 +80,8 @@ class GuestProfileRepository {
   Future<void> updateGuestProfile(GuestProfileModel guest) async {
     try {
       final updatedGuest = guest.copyWith(lastUpdated: DateTime.now());
-      
-      await _firestoreService.setDocument(
+
+      await _databaseService.setDocument(
         FirestoreConstants.users,
         guest.userId,
         updatedGuest.toMap(),
@@ -102,8 +117,8 @@ class GuestProfileRepository {
   ) async {
     try {
       fields['lastUpdated'] = DateTime.now();
-      
-      await _firestoreService.updateDocument(
+
+      await _databaseService.updateDocument(
         FirestoreConstants.users,
         userId,
         fields,
@@ -138,7 +153,11 @@ class GuestProfileRepository {
   ) async {
     try {
       final path = '${StorageConstants.profilePhotos}user_$userId/profile.jpg';
-      final downloadUrl = await _storageService.uploadFile(file, path, fileName);
+      final downloadUrl = await _storageService.uploadFile(
+        path: path,
+        file: file,
+        fileName: fileName,
+      );
 
       await _analyticsService.logEvent(
         name: 'profile_photo_uploaded',
@@ -172,7 +191,11 @@ class GuestProfileRepository {
   ) async {
     try {
       final path = '${StorageConstants.aadhaarDocs}user_$userId/aadhaar.pdf';
-      final downloadUrl = await _storageService.uploadFile(file, path, fileName);
+      final downloadUrl = await _storageService.uploadFile(
+        path: path,
+        file: file,
+        fileName: fileName,
+      );
 
       await _analyticsService.logEvent(
         name: 'aadhaar_photo_uploaded',
@@ -205,8 +228,13 @@ class GuestProfileRepository {
     String idProofType,
   ) async {
     try {
-      final path = '${StorageConstants.aadhaarDocs}user_$userId/$idProofType.pdf';
-      final downloadUrl = await _storageService.uploadFile(file, path, fileName);
+      final path =
+          '${StorageConstants.aadhaarDocs}user_$userId/$idProofType.pdf';
+      final downloadUrl = await _storageService.uploadFile(
+        path: path,
+        file: file,
+        fileName: fileName,
+      );
 
       await _analyticsService.logEvent(
         name: 'id_proof_uploaded',
@@ -236,7 +264,7 @@ class GuestProfileRepository {
   /// Tracks analytics for profile deletions
   Future<void> deleteGuestProfile(String userId) async {
     try {
-      await _firestoreService.deleteDocument(
+      await _databaseService.deleteDocument(
         FirestoreConstants.users,
         userId,
       );
@@ -260,7 +288,7 @@ class GuestProfileRepository {
   /// Streams guest profile data for real-time updates
   /// Returns continuous stream for reactive UI updates
   Stream<GuestProfileModel?> getGuestProfileStream(String userId) {
-    return _firestoreService
+    return _databaseService
         .getDocumentStream(FirestoreConstants.users, userId)
         .map((snapshot) {
       if (!snapshot.exists) return null;

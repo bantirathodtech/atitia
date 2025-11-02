@@ -85,7 +85,7 @@ class _ReviewCardState extends State<ReviewCard> {
       children: [
         CircleAvatar(
           radius: 20,
-          backgroundColor: theme.primaryColor.withOpacity(0.1),
+          backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
           backgroundImage: widget.review.guestPhotoUrl != null
               ? NetworkImage(widget.review.guestPhotoUrl!)
               : null,
@@ -133,10 +133,10 @@ class _ReviewCardState extends State<ReviewCard> {
               vertical: 2,
             ),
             decoration: BoxDecoration(
-              color: AppColors.warning.withOpacity(0.1),
+              color: AppColors.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
               border: Border.all(
-                color: AppColors.warning.withOpacity(0.3),
+                color: AppColors.warning.withValues(alpha: 0.3),
               ),
             ),
             child: Text(
@@ -283,16 +283,16 @@ class _ReviewCardState extends State<ReviewCard> {
                       width: 80,
                       height: 80,
                       color: isDarkMode 
-                          ? AppColors.darkSurface.withOpacity(0.5)
-                          : AppColors.background.withOpacity(0.5),
+                          ? AppColors.darkSurface.withValues(alpha: 0.5)
+                          : AppColors.background.withValues(alpha: 0.5),
                       child: const Icon(Icons.image, color: AppColors.textSecondary),
                     ),
                     errorWidget: Container(
                       width: 80,
                       height: 80,
                       color: isDarkMode 
-                          ? AppColors.darkSurface.withOpacity(0.5)
-                          : AppColors.background.withOpacity(0.5),
+                          ? AppColors.darkSurface.withValues(alpha: 0.5)
+                          : AppColors.background.withValues(alpha: 0.5),
                       child: const Icon(Icons.broken_image, color: AppColors.error),
                     ),
                   ),
@@ -312,13 +312,13 @@ class _ReviewCardState extends State<ReviewCard> {
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
         color: isDarkMode 
-            ? AppColors.darkSurface.withOpacity(0.5)
-            : AppColors.background.withOpacity(0.5),
+            ? AppColors.darkSurface.withValues(alpha: 0.5)
+            : AppColors.background.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
         border: Border.all(
           color: isDarkMode 
-              ? AppColors.borderDark.withOpacity(0.3)
-              : AppColors.border.withOpacity(0.3),
+              ? AppColors.borderDark.withValues(alpha: 0.3)
+              : AppColors.border.withValues(alpha: 0.3),
         ),
       ),
       child: Column(

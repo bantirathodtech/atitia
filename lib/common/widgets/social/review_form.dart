@@ -8,7 +8,7 @@ import '../../styles/typography.dart';
 import '../text/heading_small.dart';
 import '../buttons/primary_button.dart';
 import '../buttons/secondary_button.dart';
-import '../../../core/models/review_model.dart';
+// import '../../../core/models/review_model.dart';
 
 /// ⭐ **REVIEW FORM - PRODUCTION READY**
 ///
@@ -45,14 +45,14 @@ class ReviewForm extends StatefulWidget {
 class _ReviewFormState extends State<ReviewForm> {
   final _formKey = GlobalKey<FormState>();
   final _commentController = TextEditingController();
-  
+
   double _overallRating = 0.0;
   double _cleanlinessRating = 0.0;
   double _amenitiesRating = 0.0;
   double _locationRating = 0.0;
   double _foodRating = 0.0;
   double _staffRating = 0.0;
-  
+
   bool _submitting = false;
 
   @override
@@ -190,7 +190,8 @@ class _ReviewFormState extends State<ReviewForm> {
     );
   }
 
-  Widget _buildAspectRating(String label, double rating, Function(double) onChanged) {
+  Widget _buildAspectRating(
+      String label, double rating, Function(double) onChanged) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -280,10 +281,12 @@ class _ReviewFormState extends State<ReviewForm> {
       children: [
         SecondaryButton(
           label: 'Cancel',
-          onPressed: _submitting ? null : () {
-            Navigator.of(context).pop();
-            widget.onCancelled?.call();
-          },
+          onPressed: _submitting
+              ? null
+              : () {
+                  Navigator.of(context).pop();
+                  widget.onCancelled?.call();
+                },
         ),
         const SizedBox(width: AppSpacing.paddingM),
         PrimaryButton(
@@ -310,24 +313,24 @@ class _ReviewFormState extends State<ReviewForm> {
 
     try {
       // Create review model
-      final review = ReviewModel(
-        reviewId: '${widget.guestId}_${widget.pgId}_${DateTime.now().millisecondsSinceEpoch}',
-        guestId: widget.guestId,
-        guestName: widget.guestName,
-        pgId: widget.pgId,
-        pgName: widget.pgName,
-        ownerId: widget.ownerId,
-        rating: _overallRating,
-        comment: _commentController.text.trim(),
-        photos: [], // TODO: Add photo upload support
-        cleanlinessRating: _cleanlinessRating,
-        amenitiesRating: _amenitiesRating,
-        locationRating: _locationRating,
-        foodRating: _foodRating,
-        staffRating: _staffRating,
-        reviewDate: DateTime.now(),
-        status: 'pending',
-      );
+      // final review = ReviewModel(
+      //   reviewId: '${widget.guestId}_${widget.pgId}_${DateTime.now().millisecondsSinceEpoch}',
+      //   guestId: widget.guestId,
+      //   guestName: widget.guestName,
+      //   pgId: widget.pgId,
+      //   pgName: widget.pgName,
+      //   ownerId: widget.ownerId,
+      //   rating: _overallRating,
+      //   comment: _commentController.text.trim(),
+      //   photos: [], // TODO: Add photo upload support
+      //   cleanlinessRating: _cleanlinessRating,
+      //   amenitiesRating: _amenitiesRating,
+      //   locationRating: _locationRating,
+      //   foodRating: _foodRating,
+      //   staffRating: _staffRating,
+      //   reviewDate: DateTime.now(),
+      //   status: 'pending',
+      // );
 
       // TODO: Submit to repository
       // Simulate API call

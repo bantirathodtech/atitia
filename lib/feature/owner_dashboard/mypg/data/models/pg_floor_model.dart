@@ -28,7 +28,7 @@ class PgFloorModel {
     return PgFloorModel(
       floorId: map['floorId'] ?? '',
       floorName: map['floorName'] ?? '',
-      floorNumber: map['floorNumber'] ?? 0,
+      floorNumber: (map['floorNumber'] ?? 0).toInt(),
       rooms: (map['rooms'] as List<dynamic>?)
               ?.map((r) => PgRoomModel.fromMap(r as Map<String, dynamic>))
               .toList() ??
@@ -82,4 +82,3 @@ class PgFloorModel {
     );
   }
 }
-

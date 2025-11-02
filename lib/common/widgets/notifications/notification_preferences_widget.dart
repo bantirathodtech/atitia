@@ -134,7 +134,7 @@ class _NotificationPreferencesWidgetState extends State<NotificationPreferencesW
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingS),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
               ),
               child: Icon(
@@ -335,7 +335,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingS),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
               ),
               child: Icon(

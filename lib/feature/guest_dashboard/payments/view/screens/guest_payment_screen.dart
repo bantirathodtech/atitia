@@ -8,14 +8,16 @@ import 'dart:typed_data';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/loaders/shimmer_loader.dart';
-import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
+import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/widgets/drawers/guest_drawer.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
+import '../../../shared/widgets/guest_pg_appbar_display.dart';
 import '../../../../../core/viewmodels/payment_notification_viewmodel.dart';
 import '../../../../../core/repositories/owner_payment_details_repository.dart';
 import '../../../../../core/models/owner_payment_details_model.dart';
@@ -86,29 +88,52 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     super.dispose();
   }
 
+  /// Refresh payment data
+  void _refreshData() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final paymentVM =
+        Provider.of<PaymentNotificationViewModel>(context, listen: false);
+
+    if (authProvider.user?.userId != null) {
+      paymentVM.streamGuestNotifications(authProvider.user!.userId);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      appBar: AdaptiveAppBar(
+        titleWidget: const GuestPgAppBarDisplay(),
+        centerTitle: true,
+        showDrawer: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _refreshData(),
+            tooltip: 'Refresh',
+          ),
+        ],
+        showBackButton: false,
+        showThemeToggle: false,
+      ),
+
+      // Centralized Guest Drawer
+      drawer: const GuestDrawer(),
+
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: CustomScrollView(
-        slivers: [
-          _buildPremiumSliverAppBar(context, isDarkMode),
-          SliverToBoxAdapter(
-            child: Column(
+      body: Column(
+        children: [
+          // Tab Bar
+          _buildTabBar(context, theme.brightness == Brightness.dark),
+          // Tab Content
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
               children: [
-                _buildTabBar(context, isDarkMode),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildPaymentHistoryTab(context),
-                      _buildSendPaymentTab(context),
-                    ],
-                  ),
-                ),
+                _buildPaymentHistoryTab(context),
+                _buildSendPaymentTab(context),
               ],
             ),
           ),
@@ -117,7 +142,76 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     );
   }
 
-  /// 🎨 Premium Sliver App Bar
+  /// 🎨 Premium App Bar (non-sliver version)
+  Widget _buildPremiumAppBar(BuildContext context, bool isDarkMode) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDarkMode
+              ? [
+                  AppColors.primary.withValues(alpha: 0.8),
+                  AppColors.primary.withValues(alpha: 0.6),
+                ]
+              : [
+                  AppColors.primary,
+                  AppColors.primary.withValues(alpha: 0.8),
+                ],
+        ),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  Expanded(
+                    child: Text(
+                      'Payments',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.history,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      // TODO: Navigate to payment history
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Manage your payments',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 🎨 Premium Sliver App Bar (kept for compatibility)
   Widget _buildPremiumSliverAppBar(BuildContext context, bool isDarkMode) {
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
@@ -140,8 +234,11 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDarkMode
-                  ? [AppColors.darkCard, AppColors.darkCard.withOpacity(0.9)]
-                  : [primaryColor, primaryColor.withOpacity(0.8)],
+                  ? [
+                      AppColors.darkCard,
+                      AppColors.darkCard.withValues(alpha: 0.9)
+                    ]
+                  : [primaryColor, primaryColor.withValues(alpha: 0.8)],
             ),
           ),
           child: Column(
@@ -151,13 +248,13 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               Icon(
                 Icons.account_balance_wallet,
                 size: 48,
-                color: AppColors.textOnPrimary.withOpacity(0.9),
+                color: AppColors.textOnPrimary.withValues(alpha: 0.9),
               ),
               const SizedBox(height: 8),
               Text(
                 'Payment Management',
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: AppColors.textOnPrimary.withOpacity(0.9),
+                  color: AppColors.textOnPrimary.withValues(alpha: 0.9),
                 ),
               ),
             ],
@@ -237,7 +334,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color: statusColor.withOpacity(0.3),
+          color: statusColor.withValues(alpha: 0.3),
         ),
         boxShadow: [
           BoxShadow(
@@ -257,8 +354,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  statusColor.withOpacity(0.2),
-                  statusColor.withOpacity(0.1),
+                  statusColor.withValues(alpha: 0.2),
+                  statusColor.withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: const BorderRadius.only(
@@ -271,7 +368,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.paddingS),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.2),
+                    color: statusColor.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(statusIcon, color: statusColor, size: 24),
@@ -305,7 +402,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                     vertical: AppSpacing.paddingS,
                   ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.2),
+                    color: statusColor.withValues(alpha: 0.2),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -362,11 +459,14 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   ClipRRect(
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusM),
-                    child: AdaptiveImage(
-                      imageUrl: notification.screenshotUrl!,
+                    child: SizedBox(
                       width: double.infinity,
                       height: 150,
-                      fit: BoxFit.cover,
+                      child: AdaptiveImage(
+                        imageUrl: notification.screenshotUrl!,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ],
@@ -443,16 +543,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     }
 
     if (_ownerPaymentDetails == null) {
-      return Container(
-        padding: const EdgeInsets.all(AppSpacing.paddingL),
-        decoration: BoxDecoration(
-          color: isDarkMode ? AppColors.darkCard : AppColors.surfaceVariant,
-          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-        ),
-        child: const Center(
-          child: BodyText(text: 'Owner payment details not available'),
-        ),
-      );
+      return _buildOwnerPaymentDetailsEmptyState(context, isDarkMode);
     }
 
     return Container(
@@ -640,15 +731,545 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     );
   }
 
-  /// 📭 Empty state
+  /// 💳 Structured empty state with zero-state stats and placeholder data structure
   Widget _buildEmptyState(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingL),
-      child: EmptyState(
-        title: 'No Payment History',
-        message: 'Your payment notifications will appear here',
-        icon: Icons.payment,
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Zero-state stats section
+          _buildPaymentZeroStateStats(context, isDarkMode),
+
+          // Placeholder payment structure
+          _buildPlaceholderPaymentStructure(context, isDarkMode),
+
+          // Call to action
+          _buildPaymentEmptyStateAction(context),
+        ],
       ),
+    );
+  }
+
+  /// 📊 Payment zero-state stats section
+  Widget _buildPaymentZeroStateStats(BuildContext context, bool isDarkMode) {
+    return Container(
+      margin: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+        border: Border.all(
+          color:
+              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HeadingMedium(
+            text: 'Payment Statistics',
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+
+          // Stats grid
+          Row(
+            children: [
+              Expanded(
+                child: _buildPaymentStatCard(
+                  context,
+                  'Total Payments',
+                  '0',
+                  Icons.payment,
+                  Colors.blue,
+                  isDarkMode,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.paddingM),
+              Expanded(
+                child: _buildPaymentStatCard(
+                  context,
+                  'Pending',
+                  '0',
+                  Icons.pending,
+                  Colors.orange,
+                  isDarkMode,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          Row(
+            children: [
+              Expanded(
+                child: _buildPaymentStatCard(
+                  context,
+                  'Completed',
+                  '0',
+                  Icons.check_circle,
+                  Colors.green,
+                  isDarkMode,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.paddingM),
+              Expanded(
+                child: _buildPaymentStatCard(
+                  context,
+                  'Failed',
+                  '0',
+                  Icons.error,
+                  Colors.red,
+                  isDarkMode,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          Row(
+            children: [
+              Expanded(
+                child: _buildPaymentStatCard(
+                  context,
+                  'Total Amount',
+                  '₹0',
+                  Icons.currency_rupee,
+                  Colors.purple,
+                  isDarkMode,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.paddingM),
+              Expanded(
+                child: _buildPaymentStatCard(
+                  context,
+                  'This Month',
+                  '₹0',
+                  Icons.calendar_month,
+                  Colors.teal,
+                  isDarkMode,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 📊 Individual payment stat card
+  Widget _buildPaymentStatCard(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+    bool isDarkMode,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            color: color,
+            size: 24,
+          ),
+          const SizedBox(height: AppSpacing.paddingS),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 💳 Placeholder payment structure
+  Widget _buildPlaceholderPaymentStructure(
+      BuildContext context, bool isDarkMode) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HeadingMedium(
+            text: 'Recent Payments Preview',
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+
+          // Placeholder payment cards
+          ...List.generate(
+              3, (index) => _buildPlaceholderPaymentCard(context, isDarkMode)),
+        ],
+      ),
+    );
+  }
+
+  /// 💳 Placeholder payment card
+  Widget _buildPlaceholderPaymentCard(BuildContext context, bool isDarkMode) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+        border: Border.all(
+          color:
+              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                ),
+                child: Icon(
+                  Icons.payment,
+                  color: Colors.grey.withValues(alpha: 0.5),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.paddingM),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 12,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      height: 8,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 80,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                ),
+                child: Center(
+                  child: Container(
+                    height: 8,
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Amount',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      height: 16,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Status',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      height: 16,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Date',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      height: 16,
+                      width: 70,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🔄 Payment empty state action section
+  Widget _buildPaymentEmptyStateAction(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: const EdgeInsets.all(AppSpacing.paddingL),
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+        border: Border.all(
+          color:
+              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.payment,
+            size: 48,
+            color: isDarkMode ? Colors.white54 : Colors.grey[400],
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          HeadingMedium(
+            text: 'No Payment History',
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+          const SizedBox(height: AppSpacing.paddingS),
+          Text(
+            'Your payment notifications and history will appear here once you make payments.',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                // Switch to send payment tab
+                _tabController.animateTo(1);
+              },
+              icon: const Icon(Icons.send),
+              label: const Text('Send Payment'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primaryColor,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🏦 Owner payment details empty state
+  Widget _buildOwnerPaymentDetailsEmptyState(
+      BuildContext context, bool isDarkMode) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        border: Border.all(
+          color:
+              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingM),
+            child: Row(
+              children: [
+                Icon(Icons.account_balance, color: theme.primaryColor),
+                const SizedBox(width: AppSpacing.paddingS),
+                HeadingSmall(
+                  text: 'Owner Payment Details',
+                  color: theme.textTheme.headlineSmall?.color,
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.account_balance_wallet_outlined,
+                  size: 64,
+                  color: isDarkMode ? Colors.white54 : Colors.grey[400],
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+                HeadingMedium(
+                  text: 'Payment Details Not Available',
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+                const SizedBox(height: AppSpacing.paddingS),
+                Text(
+                  'Owner payment details are not configured yet. Please contact your PG owner to set up payment information.',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.paddingL),
+
+                // Placeholder payment methods
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.paddingM),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.05),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Payment Methods Preview:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.paddingM),
+                      _buildPlaceholderPaymentMethod(
+                          context, 'UPI ID', 'Not Available', isDarkMode),
+                      const SizedBox(height: AppSpacing.paddingS),
+                      _buildPlaceholderPaymentMethod(
+                          context, 'Bank Account', 'Not Available', isDarkMode),
+                      const SizedBox(height: AppSpacing.paddingS),
+                      _buildPlaceholderPaymentMethod(
+                          context, 'Phone Number', 'Not Available', isDarkMode),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 💳 Placeholder payment method
+  Widget _buildPlaceholderPaymentMethod(
+      BuildContext context, String label, String value, bool isDarkMode) {
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: Colors.grey.withValues(alpha: 0.3),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.paddingS),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDarkMode ? Colors.white70 : Colors.grey[600],
+          ),
+        ),
+        const Spacer(),
+        Container(
+          height: 12,
+          width: 80,
+          decoration: BoxDecoration(
+            color: Colors.grey.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+      ],
     );
   }
 

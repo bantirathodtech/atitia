@@ -182,13 +182,13 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             gradient: LinearGradient(
               colors: [
                 theme.primaryColor,
-                theme.primaryColor.withOpacity(0.7),
+                theme.primaryColor.withValues(alpha: 0.7),
               ],
             ),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
             boxShadow: [
               BoxShadow(
-                color: theme.primaryColor.withOpacity(0.3),
+                color: theme.primaryColor.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -199,7 +199,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
               Container(
                 padding: const EdgeInsets.all(AppSpacing.paddingM),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 ),
                 child: const Icon(
@@ -220,7 +220,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                     const SizedBox(height: 4),
                     BodyText(
                       text: 'Configure how guests can pay you',
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ],
                 ),
@@ -238,7 +238,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             boxShadow: [
               BoxShadow(
                 color: isDarkMode 
-                    ? Colors.black.withOpacity(0.3)
+                    ? Colors.black.withValues(alpha: 0.3)
                     : Colors.black.withOpacity(0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
@@ -253,7 +253,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                 : AppColors.textSecondary,
             indicator: BoxDecoration(
               gradient: LinearGradient(
-                colors: [theme.primaryColor, theme.primaryColor.withOpacity(0.7)],
+                colors: [theme.primaryColor, theme.primaryColor.withValues(alpha: 0.7)],
               ),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
             ),
@@ -432,10 +432,10 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
           Container(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             decoration: BoxDecoration(
-              color: AppColors.infoContainer.withOpacity(0.2),
+              color: AppColors.infoContainer.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
               border: Border.all(
-                color: AppColors.info.withOpacity(0.3),
+                color: AppColors.info.withValues(alpha: 0.3),
               ),
             ),
             child: Row(

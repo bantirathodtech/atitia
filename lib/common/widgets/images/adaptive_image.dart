@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../lifecycle/stateless/adaptive_stateless_widget.dart';
 import '../../styles/spacing.dart';
@@ -25,22 +26,41 @@ class AdaptiveImage extends AdaptiveStatelessWidget {
 
   @override
   Widget buildAdaptive(BuildContext context) {
+    final finalUrl = _normalizeUrl(imageUrl);
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
-      child: Image.network(
-        imageUrl,
+      child: CachedNetworkImage(
+        imageUrl: finalUrl,
         width: width,
         height: height,
         fit: fit,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return placeholder ?? _buildDefaultPlaceholder();
-        },
-        errorBuilder: (context, error, stackTrace) {
+        placeholder: (context, url) =>
+            placeholder ?? _buildDefaultPlaceholder(),
+        errorWidget: (context, url, error) {
+          // Log error for debugging but show graceful fallback
+          debugPrint('Image load failed for URL: $url');
+          debugPrint('Error: $error');
           return errorWidget ?? _buildDefaultErrorWidget();
         },
+        // Performance optimizations
+        memCacheWidth: width?.isFinite == true ? width!.toInt() : null,
+        memCacheHeight: height?.isFinite == true ? height!.toInt() : null,
+        maxWidthDiskCache: 800,
+        maxHeightDiskCache: 600,
+        // Cache settings for better performance
+        cacheManager: null, // Use default cache manager
       ),
     );
+  }
+
+  /// Adds CORS-friendly download param for Supabase public URLs on web
+  String _normalizeUrl(String url) {
+    // If it's a Supabase storage public URL and no query is present, append ?download=1
+    // This sometimes avoids opaque response issues on certain browsers/CDNs
+    if (url.contains('/storage/v1/object/public/') && !url.contains('?')) {
+      return '$url?download=1';
+    }
+    return url;
   }
 
   Widget _buildDefaultPlaceholder() {

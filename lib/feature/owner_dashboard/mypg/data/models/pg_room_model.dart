@@ -11,7 +11,8 @@ import 'pg_bed_model.dart';
 class PgRoomModel {
   final String roomId;
   final String roomNumber; // "101", "T1", "A-5", etc.
-  final String sharingType; // "1-sharing", "2-sharing", "3-sharing", "4-sharing", "5-sharing"
+  final String
+      sharingType; // "1-sharing", "2-sharing", "3-sharing", "4-sharing", "5-sharing"
   final int bedsCount; // Number of beds in this room
   final int pricePerBed; // Monthly rent per bed in rupees
   final List<PgBedModel> beds; // Individual bed tracking
@@ -35,8 +36,8 @@ class PgRoomModel {
       roomId: map['roomId'] ?? '',
       roomNumber: map['roomNumber'] ?? '',
       sharingType: map['sharingType'] ?? '',
-      bedsCount: map['bedsCount'] ?? 0,
-      pricePerBed: map['pricePerBed'] ?? 0,
+      bedsCount: (map['bedsCount'] ?? 0).toInt(),
+      pricePerBed: (map['pricePerBed'] ?? 0).toInt(),
       beds: (map['beds'] as List<dynamic>?)
               ?.map((b) => PgBedModel.fromMap(b as Map<String, dynamic>))
               .toList() ??
@@ -67,8 +68,7 @@ class PgRoomModel {
   int get currentRevenue => occupiedBedsCount * pricePerBed;
 
   /// Get vacant beds count
-  int get vacantBedsCount =>
-      beds.where((bed) => bed.status == 'vacant').length;
+  int get vacantBedsCount => beds.where((bed) => bed.status == 'vacant').length;
 
   /// Get occupied beds count
   int get occupiedBedsCount =>
@@ -117,12 +117,14 @@ class PgRoomModel {
   }
 
   /// Generate beds for this room based on bed count
-  static List<PgBedModel> generateBeds(String roomId, String roomNumber, int count) {
+  static List<PgBedModel> generateBeds(
+      String roomId, String roomNumber, int count) {
     return List.generate(
       count,
       (index) => PgBedModel(
         bedId: '${roomId}_bed_${index + 1}',
-        bedNumber: '$roomNumber-${String.fromCharCode(65 + index)}', // A, B, C...
+        bedNumber:
+            '$roomNumber-${String.fromCharCode(65 + index)}', // A, B, C...
         roomId: roomId,
         status: 'vacant',
         guestId: null,
@@ -130,4 +132,3 @@ class PgRoomModel {
     );
   }
 }
-

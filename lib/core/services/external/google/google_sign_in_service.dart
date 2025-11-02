@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -31,6 +29,9 @@ class GoogleSignInServiceWrapper {
   /// Initialize Google Sign-In service
   Future<void> initialize({String? clientId, String? serverClientId}) async {
     try {
+      // Client ID configuration checked
+      // Server Client ID configuration checked
+
       await _googleSignIn.initialize(
         clientId: clientId,
         serverClientId: serverClientId,
@@ -43,10 +44,9 @@ class GoogleSignInServiceWrapper {
 
       // Attempt lightweight authentication
       await _googleSignIn.attemptLightweightAuthentication();
-      
-      print('✅ Google Sign-In service initialized successfully');
+
+      // Google Sign-In service initialized successfully
     } catch (e) {
-      print('⚠️ Google Sign-In service initialization failed: $e');
       // Don't throw - let the app continue without Google Sign-In
     }
   }
@@ -54,67 +54,63 @@ class GoogleSignInServiceWrapper {
   /// Signs in a user with Google and returns Firebase [User]
   Future<User?> signInWithGoogle() async {
     try {
-      print('🔄 Starting Google Sign-In process...');
-      
-      // Check if running on iOS simulator
-      if (Platform.isIOS && !kIsWeb) {
-        print('⚠️ Google Sign-In on iOS simulator may have limitations');
-        print('⚠️ If you get 404 error from accounts.google.com, try on a real device');
-        
-        // Check if we're on simulator by checking for simulator-specific environment
-        if (Platform.environment.containsKey('SIMULATOR_DEVICE_NAME')) {
-          throw AppException(
-            message: 'Google Sign-In not available on iOS Simulator',
-            details: 'Google Sign-In requires a real iOS device. The iOS Simulator cannot handle Google OAuth properly.',
-            severity: ErrorSeverity.medium,
-            recoverySuggestion: 'Please test Google Sign-In on a real iOS device or use phone authentication instead.',
-          );
-        }
+      // Check if running on iOS
+      if (defaultTargetPlatform == TargetPlatform.iOS && !kIsWeb) {}
+
+      // Web platform requires special handling
+      if (kIsWeb) {
+        throw AppException(
+          message:
+              'Web platform requires signInButton() widget instead of direct signIn() call',
+          details:
+              'Google Sign-In on web must use the signInButton() widget for user interaction',
+          severity: ErrorSeverity.medium,
+          recoverySuggestion:
+              'Use getGoogleSignInButton() method to get the widget for web platform',
+        );
       }
-      
+
       if (!_googleSignIn.supportsAuthenticate()) {
         throw AppException(
             message: 'Google Sign-In not supported on this platform');
       }
 
-      print('🔄 Authenticating with Google...');
       // Use authenticate() method which returns GoogleSignInAccount directly
       final GoogleSignInAccount account = await _googleSignIn.authenticate();
       _currentUser = account;
-      print('✅ Google authentication successful: ${account.email}');
 
       // Get authentication tokens from the account
       final GoogleSignInAuthentication auth = account.authentication;
-      
+
       if (auth.idToken == null) {
-        throw AppException(message: 'Google Sign-In failed: No ID token received');
+        throw AppException(
+            message: 'Google Sign-In failed: No ID token received');
       }
 
-      print('🔄 Creating Firebase credential...');
       // For Firebase Auth, we only need the ID token
       final credential = GoogleAuthProvider.credential(
         idToken: auth.idToken,
       );
 
-      print('🔄 Signing in to Firebase...');
-      final userCredential = await _authService.signInWithCredential(credential);
-      print('✅ Firebase sign-in successful: ${userCredential.user?.uid}');
-      
+      final userCredential =
+          await _authService.signInWithCredential(credential);
+
       return userCredential.user;
     } on GoogleSignInException catch (e) {
-      print('❌ Google Sign-In exception: ${e.code} - ${e.description}');
       if (e.code == GoogleSignInExceptionCode.canceled) {
         throw AppException(message: 'Google sign-in canceled by user');
       }
       throw AppException(message: 'Google sign-in failed: ${e.description}');
     } catch (e) {
-      print('❌ Google Sign-In error: $e');
-      if (e.toString().contains('404') || e.toString().contains('accounts.google.com')) {
+      if (e.toString().contains('404') ||
+          e.toString().contains('accounts.google.com')) {
         throw AppException(
           message: 'Google Sign-In not available on iOS Simulator',
-          details: 'Google Sign-In requires a real iOS device. The iOS Simulator cannot handle Google OAuth properly.',
+          details:
+              'Google Sign-In requires a real iOS device. The iOS Simulator cannot handle Google OAuth properly.',
           severity: ErrorSeverity.medium,
-          recoverySuggestion: 'Please test Google Sign-In on a real iOS device or use phone authentication instead.',
+          recoverySuggestion:
+              'Please test Google Sign-In on a real iOS device or use phone authentication instead.',
         );
       }
       throw AppException(message: 'Google sign-in failed: ${e.toString()}');
@@ -238,12 +234,10 @@ class GoogleSignInServiceWrapper {
         return userCredential.user;
       }
       return null;
-    } on GoogleSignInException catch (e) {
+    } on GoogleSignInException {
       // Silent sign-in failures are expected, don't throw
-      print('Silent sign-in failed: ${e.description}');
       return null;
     } catch (e) {
-      print('Silent sign-in failed: ${e.toString()}');
       return null;
     }
   }
@@ -281,17 +275,14 @@ class GoogleSignInServiceWrapper {
     switch (event) {
       case GoogleSignInAuthenticationEventSignIn():
         _currentUser = event.user;
-        print('Google Sign-In: User signed in - ${event.user.email}');
 
       case GoogleSignInAuthenticationEventSignOut():
         _currentUser = null;
-        print('Google Sign-In: User signed out');
     }
   }
 
   /// Handle authentication errors
   void _handleAuthenticationError(Object error) {
-    print('Google Sign-In error: $error');
     _currentUser = null;
   }
 

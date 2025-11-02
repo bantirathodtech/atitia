@@ -44,8 +44,9 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
   void _initializeConnectivity() {
     _isOnline = _offlineService.isOnline;
     _pendingActions = _offlineService.pendingActions.length;
-    
-    _connectivitySubscription = _offlineService.connectivityStream.listen((isOnline) {
+
+    _connectivitySubscription =
+        _offlineService.connectivityStream.listen((isOnline) {
       if (mounted) {
         setState(() {
           _isOnline = isOnline;
@@ -57,7 +58,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    // final theme = Theme.of(context);
 
     // Don't show indicator when online and no pending actions
     if (_isOnline && _pendingActions == 0) {
@@ -71,14 +72,14 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
         vertical: AppSpacing.paddingS,
       ),
       decoration: BoxDecoration(
-        color: _isOnline 
-            ? AppColors.warning.withOpacity(0.1)
-            : AppColors.error.withOpacity(0.1),
+        color: _isOnline
+            ? AppColors.warning.withValues(alpha: 0.1)
+            : AppColors.error.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: _isOnline 
-              ? AppColors.warning.withOpacity(0.3)
-              : AppColors.error.withOpacity(0.3),
+          color: _isOnline
+              ? AppColors.warning.withValues(alpha: 0.3)
+              : AppColors.error.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -92,7 +93,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
           const SizedBox(width: AppSpacing.paddingS),
           Expanded(
             child: Text(
-              _isOnline 
+              _isOnline
                   ? 'Syncing $_pendingActions action${_pendingActions != 1 ? 's' : ''}...'
                   : 'You\'re offline',
               style: AppTypography.bodySmall.copyWith(
@@ -174,15 +175,15 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    // final theme = Theme.of(context);
+    // final isDarkMode = theme.brightness == Brightness.dark;
 
     return AlertDialog(
-      backgroundColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
+      backgroundColor: AppColors.surface,
       title: Text(
         'Sync Queue',
         style: AppTypography.headingSmall.copyWith(
-          color: theme.primaryColor,
+          color: AppColors.primary,
         ),
       ),
       content: Column(
@@ -213,21 +214,18 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
                     margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
                     padding: const EdgeInsets.all(AppSpacing.paddingM),
                     decoration: BoxDecoration(
-                      color: isDarkMode 
-                          ? AppColors.darkSurface.withOpacity(0.5)
-                          : AppColors.background.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                      color: AppColors.background.withValues(alpha: 0.5),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.borderRadiusS),
                       border: Border.all(
-                        color: isDarkMode 
-                            ? AppColors.borderDark.withOpacity(0.3)
-                            : AppColors.border.withOpacity(0.3),
+                        color: AppColors.border.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           _getActionIcon(action.type),
-                          color: theme.primaryColor,
+                          color: AppColors.primary,
                           size: 16,
                         ),
                         const SizedBox(width: AppSpacing.paddingS),
@@ -242,7 +240,8 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
                                 ),
                               ),
                               Text(
-                                DateFormat('MMM dd, HH:mm').format(action.timestamp),
+                                DateFormat('MMM dd, HH:mm')
+                                    .format(action.timestamp),
                                 style: AppTypography.bodySmall.copyWith(
                                   color: AppColors.textSecondary,
                                   fontWeight: FontWeight.w600,
@@ -274,7 +273,7 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
           ElevatedButton(
             onPressed: _syncing ? null : _syncAll,
             style: ElevatedButton.styleFrom(
-              backgroundColor: theme.primaryColor,
+              backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
             ),
             child: _syncing
@@ -283,7 +282,8 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.textOnPrimary),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.textOnPrimary),
                     ),
                   )
                 : Text(
@@ -344,8 +344,9 @@ class _SyncStatusBannerState extends State<SyncStatusBanner> {
   void _initializeConnectivity() {
     _isOnline = _offlineService.isOnline;
     _pendingActions = _offlineService.pendingActions.length;
-    
-    _connectivitySubscription = _offlineService.connectivityStream.listen((isOnline) {
+
+    _connectivitySubscription =
+        _offlineService.connectivityStream.listen((isOnline) {
       if (mounted) {
         setState(() {
           _isOnline = isOnline;
@@ -357,8 +358,8 @@ class _SyncStatusBannerState extends State<SyncStatusBanner> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    // final theme = Theme.of(context);
+    // final isDarkMode = theme.brightness == Brightness.dark;
 
     // Don't show banner when online and no pending actions
     if (_isOnline && _pendingActions == 0) {
@@ -372,14 +373,14 @@ class _SyncStatusBannerState extends State<SyncStatusBanner> {
         vertical: AppSpacing.paddingM,
       ),
       decoration: BoxDecoration(
-        color: _isOnline 
-            ? AppColors.warning.withOpacity(0.1)
-            : AppColors.error.withOpacity(0.1),
+        color: _isOnline
+            ? AppColors.warning.withValues(alpha: 0.1)
+            : AppColors.error.withValues(alpha: 0.1),
         border: Border(
           bottom: BorderSide(
-            color: _isOnline 
-                ? AppColors.warning.withOpacity(0.3)
-                : AppColors.error.withOpacity(0.3),
+            color: _isOnline
+                ? AppColors.warning.withValues(alpha: 0.3)
+                : AppColors.error.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -394,7 +395,7 @@ class _SyncStatusBannerState extends State<SyncStatusBanner> {
           const SizedBox(width: AppSpacing.paddingM),
           Expanded(
             child: Text(
-              _isOnline 
+              _isOnline
                   ? 'Syncing $_pendingActions action${_pendingActions != 1 ? 's' : ''}...'
                   : 'Offline',
               style: AppTypography.bodyMedium.copyWith(

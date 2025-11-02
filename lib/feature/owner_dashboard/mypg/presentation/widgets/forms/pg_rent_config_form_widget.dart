@@ -47,7 +47,7 @@ class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
               keyboardType: TextInputType.number,
             ),
           );
-        }).toList(),
+        }),
 
         const SizedBox(height: AppSpacing.paddingM),
 

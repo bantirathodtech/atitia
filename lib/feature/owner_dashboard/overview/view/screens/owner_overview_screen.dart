@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../../common/styles/colors.dart';
-import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
@@ -17,6 +15,10 @@ import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_large.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
+// Using centralized OwnerDrawer instead of direct AdaptiveDrawer
+import '../../../shared/widgets/owner_drawer.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
@@ -54,7 +56,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   /// Loads overview data when screen initializes
   Future<void> _loadOverviewData() async {
     if (!mounted) return;
-    
+
     final authProvider = context.read<AuthProvider>();
     final selectedPgProvider = context.read<SelectedPgProvider>();
     final viewModel = context.read<OwnerOverviewViewModel>();
@@ -86,45 +88,39 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
       });
     }
 
+    // Return complete screen with individual app bar and drawer
     return Scaffold(
-      // =======================================================================
-      // World-Class App Bar using Enhanced AdaptiveAppBar
-      // =======================================================================
       appBar: AdaptiveAppBar(
-        // Left: Dashboard icon
-        leadingActions: [
-          Padding(
-            padding: const EdgeInsets.only(left: 12),
-            child: Icon(
-              Icons.dashboard_rounded,
-              color: AppColors.textOnPrimary,
-              size: 24,
-            ),
-          ),
-        ],
-        // Center: PG Selector Dropdown
-        titleWidget: const PgSelectorDropdown(compact: false),
+        // Center: PG Selector dropdown
+        titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
-        // Right: Refresh + Theme Toggle (auto-added)
+
+        // Left: Drawer button
+        showDrawer: true,
+
+        // Right: Refresh button
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: viewModel.loading
-                ? null
-                : () => viewModel.refreshOverviewData(ownerId, pgId: currentPgId),
-            tooltip: 'Refresh Data',
+            onPressed: () => viewModel.refreshOverviewData(ownerId),
+            tooltip: 'Refresh Dashboard',
           ),
         ],
-        showThemeToggle: true,
+
         showBackButton: false,
+        showThemeToggle: false,
       ),
+
+      // Centralized Owner Drawer
+      drawer: const OwnerDrawer(),
+
       body: _buildBody(context, viewModel, ownerId, authProvider),
     );
   }
 
   /// Builds appropriate body content based on current state
-  Widget _buildBody(
-      BuildContext context, OwnerOverviewViewModel viewModel, String ownerId, AuthProvider authProvider) {
+  Widget _buildBody(BuildContext context, OwnerOverviewViewModel viewModel,
+      String ownerId, AuthProvider authProvider) {
     if (viewModel.loading && viewModel.overviewData == null) {
       return Center(
         child: Column(
@@ -173,65 +169,102 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
       );
     }
 
+    final responsive = context.responsive;
+    final responsivePadding = context.responsivePadding;
+
     return RefreshIndicator(
       onRefresh: () => viewModel.refreshOverviewData(ownerId),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.paddingM),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome Header
-            _buildWelcomeHeader(context, authProvider),
-            const SizedBox(height: AppSpacing.paddingL),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Full width container with responsive constraints
+          return Center(
+            child: Container(
+              constraints: responsive.isDesktop
+                  ? BoxConstraints(maxWidth: responsive.maxWidth)
+                  : null,
+              child: SingleChildScrollView(
+                padding: responsivePadding,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Welcome Header - Full Width
+                    _buildWelcomeHeader(context, authProvider, responsive),
+                    const SizedBox(height: AppSpacing.paddingL),
 
-            // Summary Cards
-            OwnerSummaryWidget(overview: viewModel.overviewData!),
-            const SizedBox(height: AppSpacing.paddingL),
+                    // Summary Cards
+                    OwnerSummaryWidget(overview: viewModel.overviewData!),
+                    const SizedBox(height: AppSpacing.paddingL),
 
-            // Performance Indicator
-            _buildPerformanceCard(context, viewModel),
-            const SizedBox(height: AppSpacing.paddingL),
+                    // Performance Indicator
+                    _buildPerformanceCard(context, viewModel),
+                    const SizedBox(height: AppSpacing.paddingL),
 
-            // Revenue Chart
-            if (viewModel.monthlyBreakdown != null)
-              OwnerChartWidget(
-                title: 'Monthly Revenue',
-                data: viewModel.monthlyBreakdown!,
+                    // Revenue Chart
+                    if (viewModel.monthlyBreakdown != null)
+                      OwnerChartWidget(
+                        title: 'Monthly Revenue',
+                        data: viewModel.monthlyBreakdown!,
+                      ),
+                    if (viewModel.monthlyBreakdown != null)
+                      const SizedBox(height: AppSpacing.paddingL),
+
+                    // Property Breakdown
+                    if (viewModel.propertyBreakdown != null)
+                      _buildPropertyBreakdown(context, viewModel),
+                    if (viewModel.propertyBreakdown != null)
+                      const SizedBox(height: AppSpacing.paddingL),
+
+                    // Quick Actions
+                    _buildQuickActions(context),
+                  ],
+                ),
               ),
-            const SizedBox(height: AppSpacing.paddingL),
-
-            // Property Breakdown
-            if (viewModel.propertyBreakdown != null)
-              _buildPropertyBreakdown(context, viewModel),
-            const SizedBox(height: AppSpacing.paddingL),
-
-            // Quick Actions
-            _buildQuickActions(context),
-          ],
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  /// Builds welcome header
-  Widget _buildWelcomeHeader(
-      BuildContext context, AuthProvider authProvider) {
+  /// Builds welcome header - Full width responsive design
+  Widget _buildWelcomeHeader(BuildContext context, AuthProvider authProvider,
+      ResponsiveConfig responsive) {
     final userName = authProvider.user?.fullName ?? 'Owner';
+    final theme = Theme.of(context);
+    final padding = context.responsivePadding;
 
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingL),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.symmetric(
+        horizontal: padding.horizontal,
+        vertical: padding.vertical * 1.5,
+      ),
+      child: Row(
         children: [
-          HeadingLarge(
-            text: 'Welcome, $userName!',
-            color: Theme.of(context).primaryColor,
+          // Welcome content - takes available space
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeadingLarge(
+                  text: 'Welcome, $userName!',
+                  color: theme.primaryColor,
+                ),
+                const SizedBox(height: AppSpacing.paddingS),
+                BodyText(
+                  text: 'Here\'s your business overview',
+                  color: Colors.grey.shade600,
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: AppSpacing.paddingS),
-          BodyText(
-            text: 'Here\'s your business overview',
-            color: Colors.grey.shade600,
-          ),
+          // Optional: Add icon or badge on larger screens
+          if (responsive.isDesktop) const SizedBox(width: AppSpacing.paddingM),
+          if (responsive.isDesktop)
+            Icon(
+              Icons.dashboard_outlined,
+              size: 48,
+              color: theme.primaryColor.withOpacity(0.3),
+            ),
         ],
       ),
     );
@@ -273,7 +306,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                   vertical: AppSpacing.paddingS,
                 ),
                 decoration: BoxDecoration(
-                  color: _getPerformanceColor(indicator).withOpacity(0.2),
+                  color: _getPerformanceColor(indicator).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 ),
                 child: BodyText(
@@ -306,6 +339,8 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   Widget _buildPropertyBreakdown(
       BuildContext context, OwnerOverviewViewModel viewModel) {
     final breakdown = viewModel.propertyBreakdown!;
+    final totalPGs = breakdown.length;
+    final totalRevenue = breakdown.values.fold(0.0, (sum, value) => sum + value);
 
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -317,13 +352,17 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
             color: Theme.of(context).primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          ...breakdown.entries.map((entry) {
+          // Display each PG with numbered prefix (1PG:, 2PG:, 3PG:, etc.)
+          ...breakdown.entries.toList().asMap().entries.map((mapEntry) {
+            final index = mapEntry.key + 1; // Start from 1, not 0
+            final entry = mapEntry.value;
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
+              padding:
+                  const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  BodyText(text: entry.key),
+                  BodyText(text: '${index}PG: ${entry.key}'),
                   BodyText(
                     text: '₹${NumberFormat('#,##0').format(entry.value)}',
                     medium: true,
@@ -333,6 +372,28 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
               ),
             );
           }),
+          // Total Revenue with PG count suffix
+          if (totalPGs > 0) ...[
+            const Divider(height: AppSpacing.paddingL),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  BodyText(
+                    text: 'Total Revenue ($totalPGs PGs)',
+                    medium: true,
+                  ),
+                  BodyText(
+                    text: '₹${NumberFormat('#,##0').format(totalRevenue)}',
+                    medium: true,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -353,8 +414,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
             children: [
               _buildActionChip(context, 'Add Property', Icons.add_home, () {}),
               _buildActionChip(context, 'Add Tenant', Icons.person_add, () {}),
-              _buildActionChip(
-                  context, 'View Reports', Icons.analytics, () {}),
+              _buildActionChip(context, 'View Reports', Icons.analytics, () {}),
               _buildActionChip(context, 'Settings', Icons.settings, () {}),
             ],
           ),
@@ -374,10 +434,10 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
           vertical: AppSpacing.paddingS,
         ),
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withOpacity(0.1),
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           border: Border.all(
-            color: Theme.of(context).primaryColor.withOpacity(0.3),
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
@@ -394,4 +454,6 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
       ),
     );
   }
+
+  // Drawer actions centralized in OwnerDrawer
 }

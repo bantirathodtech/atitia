@@ -25,6 +25,8 @@ class OwnerGuestModel {
   final String status; // 'active', 'inactive', 'pending'
   final String? roomNumber;
   final String? bedNumber;
+  final String? vehicleNo;
+  final String? vehicleName;
   final double? rent;
   final double? deposit;
   final DateTime? createdAt;
@@ -49,6 +51,8 @@ class OwnerGuestModel {
     this.status = 'active',
     this.roomNumber,
     this.bedNumber,
+    this.vehicleNo,
+    this.vehicleName,
     this.rent,
     this.deposit,
     DateTime? createdAt,
@@ -78,6 +82,8 @@ class OwnerGuestModel {
       status: data['status'] ?? 'active',
       roomNumber: data['roomNumber'],
       bedNumber: data['bedNumber'],
+      vehicleNo: data['vehicleNo'],
+      vehicleName: data['vehicleName'],
       rent: data['rent']?.toDouble(),
       deposit: data['deposit']?.toDouble(),
       createdAt: data['createdAt']?.toDate(),
@@ -108,6 +114,8 @@ class OwnerGuestModel {
       status: map['status'] ?? 'active',
       roomNumber: map['roomNumber'],
       bedNumber: map['bedNumber'],
+      vehicleNo: map['vehicleNo'],
+      vehicleName: map['vehicleName'],
       rent: map['rent']?.toDouble(),
       deposit: map['deposit']?.toDouble(),
       createdAt: map['createdAt']?.toDate(),
@@ -141,6 +149,8 @@ class OwnerGuestModel {
       'status': status,
       'roomNumber': roomNumber,
       'bedNumber': bedNumber,
+      'vehicleNo': vehicleNo,
+      'vehicleName': vehicleName,
       'rent': rent,
       'deposit': deposit,
       'createdAt': createdAt,
@@ -168,6 +178,8 @@ class OwnerGuestModel {
     String? status,
     String? roomNumber,
     String? bedNumber,
+    String? vehicleNo,
+    String? vehicleName,
     double? rent,
     double? deposit,
     DateTime? createdAt,
@@ -193,6 +205,8 @@ class OwnerGuestModel {
       status: status ?? this.status,
       roomNumber: roomNumber ?? this.roomNumber,
       bedNumber: bedNumber ?? this.bedNumber,
+      vehicleNo: vehicleNo ?? this.vehicleNo,
+      vehicleName: vehicleName ?? this.vehicleName,
       rent: rent ?? this.rent,
       deposit: deposit ?? this.deposit,
       createdAt: createdAt ?? this.createdAt,
@@ -248,6 +262,11 @@ class OwnerGuestModel {
   /// Returns true if guest has emergency contact
   bool get hasEmergencyContact =>
       emergencyContactName != null && emergencyContactPhone != null;
+
+  /// Returns true if guest has vehicle information
+  bool get hasVehicleInfo =>
+      (vehicleNo != null && vehicleNo!.isNotEmpty) ||
+      (vehicleName != null && vehicleName!.isNotEmpty);
 
   /// Returns status color for UI
   Color get statusColor {

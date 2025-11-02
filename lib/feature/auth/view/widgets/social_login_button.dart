@@ -29,10 +29,10 @@ class SocialLoginButton extends StatelessWidget {
         color = Colors.blue;
         icon = Icons.facebook;
         break;
-      default:
-        label = 'Continue';
-        color = Theme.of(context).primaryColor;
-        icon = Icons.login;
+      // default:
+      //   label = 'Continue';
+      //   color = Theme.of(context).primaryColor;
+      //   icon = Icons.login;
     }
 
     return ElevatedButton.icon(

@@ -1,20 +1,31 @@
 // lib/features/guest_dashboard/payments/viewmodel/guest_payment_viewmodel.dart
 
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'dart:async';
 
+import '../../../../common/lifecycle/mixin/stream_subscription_mixin.dart';
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
-import '../../../auth/logic/auth_provider.dart';
 import '../data/models/guest_payment_model.dart';
 import '../data/repository/guest_payment_repository.dart';
 
 /// ViewModel for managing guest payments UI state and business logic
 /// Extends BaseProviderState for automatic service access and state management
 /// Coordinates between UI layer and Repository layer
-class GuestPaymentViewModel extends BaseProviderState {
-  final GuestPaymentRepository _repository = GuestPaymentRepository();
+class GuestPaymentViewModel extends BaseProviderState
+    with StreamSubscriptionMixin {
+  final GuestPaymentRepository _repository;
+  final _authService = getIt.auth;
   final _analyticsService = getIt.analytics;
+
+  /// Constructor with dependency injection
+  /// If repository is not provided, creates it with default services
+  GuestPaymentViewModel({
+    GuestPaymentRepository? repository,
+  }) : _repository = repository ?? GuestPaymentRepository();
+
+  StreamSubscription<List<GuestPaymentModel>>? _paymentsSubscription;
+  StreamSubscription<List<GuestPaymentModel>>? _pendingPaymentsSubscription;
+  StreamSubscription<List<GuestPaymentModel>>? _overduePaymentsSubscription;
 
   List<GuestPaymentModel> _payments = [];
   List<GuestPaymentModel> _pendingPayments = [];
@@ -76,14 +87,17 @@ class GuestPaymentViewModel extends BaseProviderState {
   }
 
   /// Loads payments for the current authenticated guest user
-  /// Uses BuildContext to access AuthProvider for guestId
   /// Sets up real-time stream listener for payment updates
-  void loadPayments(BuildContext context) {
-    // Get guestId from AuthProvider
-    final guestId =
-        Provider.of<AuthProvider>(context, listen: false).user?.userId ?? '';
+  void loadPayments([String? guestId]) {
+    // Cancel existing subscriptions
+    _paymentsSubscription?.cancel();
+    _pendingPaymentsSubscription?.cancel();
+    _overduePaymentsSubscription?.cancel();
 
-    if (guestId.isEmpty) {
+    // Get guestId from auth service if not provided
+    final userId = guestId ?? _authService.currentUserId ?? '';
+
+    if (userId.isEmpty) {
       _payments = [];
       _pendingPayments = [];
       _overduePayments = [];
@@ -92,43 +106,67 @@ class GuestPaymentViewModel extends BaseProviderState {
     }
 
     setLoading(true);
+    clearError();
 
     // Listen to real-time payment updates
-    _repository.getPaymentsForGuest(guestId).listen(
+    _paymentsSubscription = _repository.getPaymentsForGuest(userId).listen(
       (paymentList) {
         _payments = paymentList;
-        _loadPaymentStats(guestId);
+        _loadPaymentStats(userId);
         setLoading(false);
+        notifyListeners();
       },
       onError: (error) {
-        setError(true, 'Failed to load payments: $error');
+        setError(true, 'Failed to load payments: ${error.toString()}');
         setLoading(false);
+        notifyListeners();
+        _analyticsService.logEvent(
+          name: 'payment_load_error',
+          parameters: {'error': error.toString()},
+        );
       },
     );
 
     // Listen to pending payments
-    _repository.getPendingPaymentsForGuest(guestId).listen(
+    _pendingPaymentsSubscription =
+        _repository.getPendingPaymentsForGuest(userId).listen(
       (pendingList) {
         _pendingPayments = pendingList;
         notifyListeners();
       },
       onError: (error) {
         // Don't set error state for pending payments as it's supplementary data
-        debugPrint('Failed to load pending payments: $error');
+        _analyticsService.logEvent(
+          name: 'pending_payments_load_error',
+          parameters: {'error': error.toString()},
+        );
       },
     );
 
     // Listen to overdue payments
-    _repository.getOverduePaymentsForGuest(guestId).listen(
+    _overduePaymentsSubscription =
+        _repository.getOverduePaymentsForGuest(userId).listen(
       (overdueList) {
         _overduePayments = overdueList;
         notifyListeners();
       },
       onError: (error) {
         // Don't set error state for overdue payments as it's supplementary data
-        debugPrint('Failed to load overdue payments: $error');
+        _analyticsService.logEvent(
+          name: 'overdue_payments_load_error',
+          parameters: {'error': error.toString()},
+        );
       },
     );
+
+    // Register all subscriptions for automatic cleanup
+    if (_paymentsSubscription != null) addSubscription(_paymentsSubscription!);
+    if (_pendingPaymentsSubscription != null) {
+      addSubscription(_pendingPaymentsSubscription!);
+    }
+    if (_overduePaymentsSubscription != null) {
+      addSubscription(_overduePaymentsSubscription!);
+    }
   }
 
   /// Load payment statistics
@@ -137,7 +175,10 @@ class GuestPaymentViewModel extends BaseProviderState {
       _paymentStats = await _repository.getPaymentStatsForGuest(guestId);
       notifyListeners();
     } catch (e) {
-      debugPrint('Failed to load payment stats: $e');
+      _analyticsService.logEvent(
+        name: 'payment_stats_load_error',
+        parameters: {'error': e.toString()},
+      );
     }
   }
 
@@ -352,18 +393,18 @@ class GuestPaymentViewModel extends BaseProviderState {
   }
 
   /// Refresh payment data
-  Future<void> refreshPayments(BuildContext context) async {
+  Future<void> refreshPayments([String? guestId]) async {
     await _analyticsService.logEvent(
       name: 'payments_refreshed',
       parameters: {},
     );
-    loadPayments(context);
+    loadPayments(guestId);
   }
 
-  /// Clear error state
   @override
-  void clearError() {
-    setError(false, null);
+  void dispose() {
+    disposeAll(); // Clean up all subscriptions and timers
+    super.dispose();
   }
 
   /// Gets total amount of all payments for summary display

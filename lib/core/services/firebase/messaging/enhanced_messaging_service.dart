@@ -42,7 +42,6 @@ class EnhancedMessagingService {
     // Subscribe to default topics based on user role
     await _subscribeToDefaultTopics();
     
-    print('🔔 Enhanced Messaging Service initialized');
   }
 
   /// Initialize local notifications
@@ -173,27 +172,20 @@ class EnhancedMessagingService {
     
     if (route != null) {
       // TODO: Implement navigation service
-      print('Deep link: route=$route, screen=$screen');
       
       // TODO: Implement navigation based on route
       switch (route) {
         case 'payment':
-          print('Navigate to payments');
           break;
         case 'booking':
-          print('Navigate to PGs');
           break;
         case 'complaint':
-          print('Navigate to complaints');
           break;
         case 'food':
-          print('Navigate to foods');
           break;
         case 'profile':
-          print('Navigate to profile');
           break;
         default:
-          print('Navigate to dashboard');
       }
       
       await _analytics.logEvent(
@@ -381,7 +373,6 @@ class EnhancedMessagingService {
         await _saveNotificationPreferences();
       }
     } catch (e) {
-      print('Error loading notification preferences: $e');
       // Set default preferences on error
       _notificationPreferences = {
         paymentNotification: true,
@@ -400,7 +391,6 @@ class EnhancedMessagingService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_notificationPrefsKey, jsonEncode(_notificationPreferences));
     } catch (e) {
-      print('Error saving notification preferences: $e');
     }
   }
 

@@ -25,22 +25,17 @@ class FirebaseServiceInitializerWithSupabase {
   /// - Verifies service availability
   static Future<void> initialize() async {
     if (_initialized) {
-      print('⚠️ Services already initialized, skipping...');
       return;
     }
 
     try {
-      print('🔥 Starting FIREBASE + SUPABASE Service Initialization...');
-
       // Step 1: Register services in GetIt FIRST
       setupFirebaseDependenciesWithSupabaseStorage();
-      print('✅ Services registered in GetIt');
 
       // Step 2: Initialize Firebase Core
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      print('✅ Firebase Core initialized successfully');
 
       // Step 3: Initialize Supabase
       if (SupabaseConfig.isConfigured) {
@@ -51,16 +46,11 @@ class FirebaseServiceInitializerWithSupabase {
             retryAttempts: 3,
           ),
         );
-        print('✅ Supabase initialized successfully');
 
         // Initialize Supabase Storage bucket
         await getIt.storage.initialize();
-        print('✅ Supabase Storage bucket initialized');
       } else {
-        print(
-            '⚠️ Supabase not configured - using Firebase Storage as fallback');
-        print(
-            '   To use Supabase, update SupabaseConfig with your credentials');
+        // To use Supabase, update SupabaseConfig with your credentials
       }
 
       // Step 4: Initialize individual Firebase services
@@ -70,14 +60,7 @@ class FirebaseServiceInitializerWithSupabase {
       await _verifyServices();
 
       _initialized = true;
-
-      print('==================================================');
-      print('✅ ALL SERVICES READY (Firebase + Supabase Storage)');
-      print('==================================================');
-      print('🎯 Setup complete - Ready to use hybrid services');
-    } catch (e, stackTrace) {
-      print('❌ Service initialization failed: $e');
-      print('Stack trace: $stackTrace');
+    } catch (e) {
       rethrow;
     }
   }
@@ -95,36 +78,15 @@ class FirebaseServiceInitializerWithSupabase {
     await getIt.performance.initialize();
     await getIt.functions.initialize();
     // await getIt.localStorage.initialize();
-
-    print('✅ Firebase core initialized');
   }
 
   /// Verify all services are ready
   static Future<void> _verifyServices() async {
-    print('🔍 Verifying Services...');
-
     // Verify Firebase services
-    print(
-        '  Authentication: ${getIt.auth.isSignedIn ? '✅ SIGNED IN' : '✅ READY'}');
-    print('  Google Sign-In: ✅ READY');
-    print('  Firestore: ✅ READY');
 
     // Verify Supabase Storage
     if (SupabaseConfig.isConfigured) {
-      print('  Supabase Storage: ✅ READY');
-    } else {
-      print('  Storage: ⚠️ Not configured (using fallback)');
-    }
-
-    print('  App Check: ✅ READY');
-    print('  Analytics: ✅ READY');
-    print('  Messaging: ✅ READY');
-    print('  Crashlytics: ✅ READY');
-    print('  Remote Config: ✅ READY');
-    print('  Performance: ✅ READY');
-    print('  Cloud Functions: ✅ READY');
-    print('  Local Storage: ✅ READY');
-    print('  Navigation: ✅ READY');
+    } else {}
   }
 
   /// Reset initialization state (for testing)

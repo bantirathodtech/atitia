@@ -2,6 +2,10 @@
 
 /// Model representing a payment made by a guest.
 /// Includes rent payments, security deposits, and other charges
+library;
+
+import '../../../../../common/utils/date/converter/date_service_converter.dart';
+
 class GuestPaymentModel {
   final String paymentId;
   final String bookingId;
@@ -50,11 +54,11 @@ class GuestPaymentModel {
       pgId: map['pgId'] ?? '',
       ownerId: map['ownerId'] ?? '',
       amount: (map['amount'] ?? 0).toDouble(),
-      paymentDate: map['paymentDate'] != null 
-          ? DateTime.parse(map['paymentDate']) 
+      paymentDate: map['paymentDate'] != null
+          ? DateServiceConverter.fromService(map['paymentDate'])
           : DateTime.now(),
-      dueDate: map['dueDate'] != null 
-          ? DateTime.parse(map['dueDate']) 
+      dueDate: map['dueDate'] != null
+          ? DateServiceConverter.fromService(map['dueDate'])
           : DateTime.now().add(const Duration(days: 30)),
       status: map['status'] ?? 'Pending',
       paymentMethod: map['paymentMethod'] ?? 'UPI',
@@ -62,14 +66,14 @@ class GuestPaymentModel {
       upiReferenceId: map['upiReferenceId'],
       paymentType: map['paymentType'] ?? 'Rent',
       description: map['description'] ?? '',
-      metadata: map['metadata'] != null 
-          ? Map<String, dynamic>.from(map['metadata']) 
+      metadata: map['metadata'] != null
+          ? Map<String, dynamic>.from(map['metadata'])
           : null,
-      createdAt: map['createdAt'] != null 
-          ? DateTime.parse(map['createdAt']) 
+      createdAt: map['createdAt'] != null
+          ? DateServiceConverter.fromService(map['createdAt'])
           : DateTime.now(),
-      updatedAt: map['updatedAt'] != null 
-          ? DateTime.parse(map['updatedAt']) 
+      updatedAt: map['updatedAt'] != null
+          ? DateServiceConverter.fromService(map['updatedAt'])
           : null,
     );
   }
@@ -83,8 +87,8 @@ class GuestPaymentModel {
       'pgId': pgId,
       'ownerId': ownerId,
       'amount': amount,
-      'paymentDate': paymentDate.toIso8601String(),
-      'dueDate': dueDate.toIso8601String(),
+      'paymentDate': DateServiceConverter.toService(paymentDate),
+      'dueDate': DateServiceConverter.toService(dueDate),
       'status': status,
       'paymentMethod': paymentMethod,
       'transactionId': transactionId,
@@ -92,8 +96,10 @@ class GuestPaymentModel {
       'paymentType': paymentType,
       'description': description,
       'metadata': metadata,
-      'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'createdAt':
+          createdAt != null ? DateServiceConverter.toService(createdAt!) : null,
+      'updatedAt':
+          updatedAt != null ? DateServiceConverter.toService(updatedAt!) : null,
     };
   }
 

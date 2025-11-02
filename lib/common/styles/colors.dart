@@ -254,10 +254,10 @@ class AppColors {
     assert(percent >= 0 && percent <= 100);
     final factor = 1 - percent / 100;
     return Color.fromARGB(
-      color.alpha,
-      (color.red * factor).round(),
-      (color.green * factor).round(),
-      (color.blue * factor).round(),
+      (color.a * 255.0).round() & 0xff,
+      ((color.r * 255.0).round() * factor).round(),
+      ((color.g * 255.0).round() * factor).round(),
+      ((color.b * 255.0).round() * factor).round(),
     );
   }
 
@@ -266,19 +266,19 @@ class AppColors {
     assert(percent >= 0 && percent <= 100);
     final factor = 1 + percent / 100;
     return Color.fromARGB(
-      color.alpha,
-      (color.red * factor).round().clamp(0, 255),
-      (color.green * factor).round().clamp(0, 255),
-      (color.blue * factor).round().clamp(0, 255),
+      (color.a * 255.0).round() & 0xff,
+      ((color.r * 255.0).round() * factor).round().clamp(0, 255),
+      ((color.g * 255.0).round() * factor).round().clamp(0, 255),
+      ((color.b * 255.0).round() * factor).round().clamp(0, 255),
     );
   }
 
   /// Get contrasting text color for background
   static Color getContrastText(Color backgroundColor) {
     // Calculate the perceptive luminance
-    final luminance = (0.299 * backgroundColor.red +
-            0.587 * backgroundColor.green +
-            0.114 * backgroundColor.blue) /
+    final luminance = (0.299 * (backgroundColor.r * 255.0).round() +
+            0.587 * (backgroundColor.g * 255.0).round() +
+            0.114 * (backgroundColor.b * 255.0).round()) /
         255;
 
     // Return black or white depending on luminance

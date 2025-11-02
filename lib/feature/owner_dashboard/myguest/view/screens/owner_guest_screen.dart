@@ -2,23 +2,33 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
-import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/chips/filter_chip.dart';
-import '../../../../auth/logic/auth_provider.dart';
+import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../shared/widgets/owner_drawer.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../../shared/widgets/pg_selector_dropdown.dart';
+import '../../../shared/widgets/add_pg_action_button.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 import '../widgets/booking_list_widget.dart';
 import '../widgets/guest_list_widget.dart';
 import '../widgets/interactive_bed_map_widget.dart';
+import '../widgets/booking_request_action_dialog.dart';
+import '../widgets/payment_list_widget.dart';
+import '../widgets/record_payment_dialog.dart';
+import '../widgets/bed_change_request_widget.dart';
+import '../../data/models/owner_booking_request_model.dart';
 
 /// Owner Guest Management Screen
 /// Displays comprehensive view of guests, bookings, payments, and bed occupancy
@@ -38,19 +48,298 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _initializeViewModel();
+    _tabController = TabController(length: 6, vsync: this);
+    // Use postFrameCallback to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeViewModel();
+    });
+  }
+
+  /// Builds the requests tab with booking requests and bed change requests
+  Widget _buildBookingRequestsTab(
+      BuildContext context, OwnerGuestViewModel viewModel) {
+    final bookingRequests = viewModel.bookingRequests;
+    final bedChangeRequests = viewModel.bedChangeRequests;
+    final pendingBedChangeRequests = viewModel.pendingBedChangeRequests;
+
+    if (bookingRequests.isEmpty && bedChangeRequests.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.request_page_outlined, size: 64, color: Colors.grey),
+            SizedBox(height: AppSpacing.paddingM),
+            HeadingMedium(
+              text: 'No Requests',
+              align: TextAlign.center,
+            ),
+            SizedBox(height: AppSpacing.paddingS),
+            BodyText(
+              text: 'Booking and bed change requests will appear here',
+              align: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          TabBar(
+            tabs: [
+              Tab(
+                text: 'Booking Requests (${bookingRequests.length})',
+                icon: const Icon(Icons.book_online, size: 16),
+              ),
+              Tab(
+                text:
+                    'Bed Changes (${pendingBedChangeRequests.length} pending)',
+                icon: const Icon(Icons.bed, size: 16),
+              ),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                // Booking requests list
+                ListView.builder(
+                  padding: const EdgeInsets.all(AppSpacing.paddingM),
+                  itemCount: bookingRequests.length,
+                  itemBuilder: (context, index) {
+                    final request = bookingRequests[index];
+                    return Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: AppSpacing.paddingS),
+                      child:
+                          _buildBookingRequestCard(context, request, viewModel),
+                    );
+                  },
+                ),
+                // Bed change requests list
+                BedChangeRequestWidget(
+                  requests: bedChangeRequests,
+                  viewModel: viewModel,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the complaints tab content
+  Widget _buildComplaintsTab(
+      BuildContext context, OwnerGuestViewModel viewModel) {
+    final complaints = viewModel.filteredComplaints;
+
+    if (complaints.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.report_problem_outlined, size: 64, color: Colors.grey),
+            SizedBox(height: AppSpacing.paddingM),
+            HeadingMedium(text: 'No Complaints'),
+            SizedBox(height: AppSpacing.paddingS),
+            BodyText(
+              text: 'Complaints from guests will appear here',
+              align: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      itemCount: complaints.length,
+      itemBuilder: (context, index) {
+        final c = complaints[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+          child: AdaptiveCard(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.paddingM),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.report_problem,
+                        color: c.isResolved ? Colors.green : Colors.orange,
+                      ),
+                      const SizedBox(width: AppSpacing.paddingS),
+                      Expanded(
+                        child: HeadingSmall(
+                            text: c.title.isEmpty ? 'Complaint' : c.title),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.paddingS, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withValues(alpha: 0.15),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.borderRadiusS),
+                        ),
+                        child: CaptionText(text: c.statusDisplay),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.paddingS),
+                  BodyText(
+                    text: c.description,
+                  ),
+                  const SizedBox(height: AppSpacing.paddingS),
+                  Row(
+                    children: [
+                      Icon(Icons.person, size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      CaptionText(
+                          text: c.guestName.isEmpty ? 'Guest' : c.guestName),
+                      const SizedBox(width: AppSpacing.paddingM),
+                      Icon(Icons.schedule, size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      CaptionText(text: _formatShortDate(c.createdAt)),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.paddingS),
+                  Row(
+                    children: [
+                      SecondaryButton(
+                        label: 'Reply',
+                        onPressed: () => _showComplaintReplyDialog(
+                            context, viewModel, c.complaintId),
+                      ),
+                      const SizedBox(width: AppSpacing.paddingS),
+                      if (!c.isResolved)
+                        PrimaryButton(
+                          label: 'Resolve',
+                          onPressed: () => _resolveComplaint(
+                              context, viewModel, c.complaintId),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _formatShortDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  void _showComplaintReplyDialog(
+      BuildContext context, OwnerGuestViewModel viewModel, String complaintId) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const HeadingSmall(text: 'Reply to Complaint'),
+        content: TextField(
+          controller: controller,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            labelText: 'Reply',
+            hintText: 'Type your reply...',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          PrimaryButton(
+            label: 'Send',
+            onPressed: () async {
+              final text = controller.text.trim();
+              if (text.isEmpty) return;
+              Navigator.of(context).pop();
+              final ok =
+                  await viewModel.addComplaintReply(complaintId, text, 'Owner');
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: BodyText(
+                      text: ok ? 'Reply sent' : 'Failed to send reply',
+                      color: Colors.white,
+                    ),
+                    backgroundColor: ok ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _resolveComplaint(
+      BuildContext context, OwnerGuestViewModel viewModel, String complaintId) {
+    final notes = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const HeadingSmall(text: 'Resolve Complaint'),
+        content: TextField(
+          controller: notes,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            labelText: 'Resolution Notes (optional)',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          PrimaryButton(
+            label: 'Mark Resolved',
+            onPressed: () async {
+              Navigator.of(context).pop();
+              final ok = await viewModel.updateComplaintStatus(
+                complaintId,
+                'resolved',
+                resolutionNotes:
+                    notes.text.trim().isEmpty ? null : notes.text.trim(),
+              );
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: BodyText(
+                      text: ok ? 'Complaint resolved' : 'Failed to resolve',
+                      color: Colors.white,
+                    ),
+                    backgroundColor: ok ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   /// Initializes the ViewModel when screen loads
   Future<void> _initializeViewModel() async {
-    final authProvider = context.read<AuthProvider>();
+    // final authProvider = context.read<AuthProvider>();
     final selectedPgProvider = context.read<SelectedPgProvider>();
     final viewModel = context.read<OwnerGuestViewModel>();
-    
+
     // Use selected PG from provider
     final pgId = selectedPgProvider.selectedPgId;
-    
+
     if (pgId != null && pgId.isNotEmpty) {
       _lastLoadedPgId = pgId;
       await viewModel.initialize([pgId]);
@@ -70,62 +359,64 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     final currentPgId = selectedPgProvider.selectedPgId;
 
     // Auto-reload data when selected PG changes
-    if (_lastLoadedPgId != currentPgId && currentPgId != null && currentPgId.isNotEmpty) {
+    if (_lastLoadedPgId != currentPgId &&
+        currentPgId != null &&
+        currentPgId.isNotEmpty) {
       _lastLoadedPgId = currentPgId;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         viewModel.initialize([currentPgId]);
       });
     }
 
+    // Return complete screen with individual app bar and drawer
     return Scaffold(
-      // =======================================================================
-      // World-Class App Bar using Enhanced AdaptiveAppBar
-      // =======================================================================
       appBar: AdaptiveAppBar(
-        // Left: People icon
-        leadingActions: [
-          Padding(
-            padding: const EdgeInsets.only(left: 12),
-            child: Icon(
-              Icons.people_rounded,
-              color: AppColors.textOnPrimary,
-              size: 24,
-            ),
-          ),
-        ],
-        // Center: PG Selector Dropdown
-        titleWidget: const PgSelectorDropdown(compact: false),
+        // Center: PG Selector dropdown
+        titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
-        // Right: Refresh + Theme Toggle (auto-added)
+
+        // Left: Drawer button
+        showDrawer: true,
+
+        // Right: Add PG + Refresh
         actions: [
-          IconButton(
-            icon: Icon(viewModel.selectionMode ? Icons.close : Icons.checklist),
-            onPressed: viewModel.toggleSelectionMode,
-            tooltip: viewModel.selectionMode ? 'Exit Selection Mode' : 'Select Multiple',
-          ),
+          const AddPgActionButton(),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: viewModel.loading ? null : viewModel.refreshData,
-            tooltip: 'Refresh Data',
+            onPressed: viewModel.refreshData,
+            tooltip: 'Refresh Guest Data',
           ),
         ],
-        showThemeToggle: true,
-        showBackButton: false,
-        // Bottom: Tab bar for Guests/Bookings/Bed Map
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.textOnPrimary,
-          labelColor: AppColors.textOnPrimary,
-          unselectedLabelColor: AppColors.textOnPrimary.withOpacity(0.7),
-          tabs: const [
-            Tab(text: 'Guests', icon: Icon(Icons.people, size: 16)),
-            Tab(text: 'Bookings', icon: Icon(Icons.book_online, size: 16)),
-            Tab(text: 'Bed Map', icon: Icon(Icons.bed, size: 16)),
-          ],
+
+        // Bottom: Guest tab bar
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: TabBar(
+            controller: _tabController,
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            tabs: const [
+              Tab(text: 'Guests', icon: Icon(Icons.people, size: 16)),
+              Tab(text: 'Bookings', icon: Icon(Icons.book_online, size: 16)),
+              Tab(text: 'Payments', icon: Icon(Icons.payment, size: 16)),
+              Tab(
+                  text: 'Complaints',
+                  icon: Icon(Icons.report_problem, size: 16)),
+              Tab(text: 'Requests', icon: Icon(Icons.request_page, size: 16)),
+              Tab(text: 'Bed Map', icon: Icon(Icons.bed, size: 16)),
+            ],
+          ),
         ),
+
+        showBackButton: false,
+        showThemeToggle: false,
       ),
+
+      // Centralized Owner Drawer
+      drawer: const OwnerDrawer(),
+
       body: _buildBody(context, viewModel),
-      floatingActionButton: _buildFAB(context, viewModel),
     );
   }
 
@@ -193,6 +484,9 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                 },
               ),
               BookingListWidget(bookings: viewModel.bookings),
+              _buildPaymentsTab(context, viewModel),
+              _buildComplaintsTab(context, viewModel),
+              _buildBookingRequestsTab(context, viewModel),
               InteractiveBedMapWidget(bookings: viewModel.bookings),
             ],
           ),
@@ -202,21 +496,22 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   }
 
   /// Builds bulk action bar when guests are selected
-  Widget _buildBulkActionBar(BuildContext context, OwnerGuestViewModel viewModel) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+  Widget _buildBulkActionBar(
+      BuildContext context, OwnerGuestViewModel viewModel) {
+    // final theme = Theme.of(context);
+    // final true = theme.brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [theme.primaryColor, theme.primaryColor.withOpacity(0.8)],
+          colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
         ),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         boxShadow: [
           BoxShadow(
-            color: theme.primaryColor.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -231,7 +526,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
               vertical: 4,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: BodyText(
@@ -281,7 +576,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     );
   }
 
-  Future<void> _showBulkStatusDialog(BuildContext context, OwnerGuestViewModel viewModel) async {
+  Future<void> _showBulkStatusDialog(
+      BuildContext context, OwnerGuestViewModel viewModel) async {
     final newStatus = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
@@ -314,7 +610,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Updated ${viewModel.selectedCount} guests to $newStatus'),
+            content:
+                Text('Updated ${viewModel.selectedCount} guests to $newStatus'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -322,7 +619,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     }
   }
 
-  Future<void> _confirmBulkDelete(BuildContext context, OwnerGuestViewModel viewModel) async {
+  Future<void> _confirmBulkDelete(
+      BuildContext context, OwnerGuestViewModel viewModel) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -434,36 +732,36 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   /// Builds filter chips
   /// Builds search bar with debouncing
   Widget _buildSearchBar(BuildContext context, OwnerGuestViewModel viewModel) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    // final theme = Theme.of(context);
+    // final true = theme.brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
+        color: AppColors.darkInputFill,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+          color: AppColors.darkDivider,
         ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.search,
-            color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+            color: AppColors.textTertiary,
           ),
           const SizedBox(width: AppSpacing.paddingS),
           Expanded(
             child: TextField(
               onChanged: viewModel.setSearchQuery,
               style: TextStyle(
-                color: isDarkMode ? AppColors.textOnPrimary : AppColors.textPrimary,
+                color: AppColors.textOnPrimary,
               ),
               decoration: InputDecoration(
-                hintText: 'Search by name or phone...',
+                hintText: 'Search by name, phone, or vehicle...',
                 hintStyle: TextStyle(
-                  color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+                  color: AppColors.textTertiary,
                 ),
                 border: InputBorder.none,
               ),
@@ -473,7 +771,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             IconButton(
               icon: Icon(
                 Icons.clear,
-                color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+                color: AppColors.textTertiary,
               ),
               onPressed: viewModel.clearSearch,
               tooltip: 'Clear search',
@@ -485,62 +783,67 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
 
   Widget _buildFilterChips(
       BuildContext context, OwnerGuestViewModel viewModel) {
-    final filters = ['All', 'Active', 'Pending', 'Inactive'];
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    final filters = ['All', 'Active', 'Pending', 'Inactive', 'Vehicles'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
-          height: 50,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
           child: Row(
             children: [
-              Expanded(
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: filters.length,
-                  itemBuilder: (context, index) {
-                    final filter = filters[index];
-                    final isSelected = viewModel.selectedFilter == filter;
+              // Equally expanded filter chips taking full width
+              ...filters.asMap().entries.map((entry) {
+                final index = entry.key;
+                final filter = entry.value;
+                final isSelected = viewModel.selectedFilter == filter;
 
-                    return Padding(
-                      padding: const EdgeInsets.only(right: AppSpacing.paddingS),
-                      child: CustomFilterChip(
-                        label: filter,
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          viewModel.setFilter(filter);
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      right: index < filters.length - 1 
+                          ? AppSpacing.paddingXS 
+                          : 0,
+                    ),
+                    child: CustomFilterChip(
+                      label: filter,
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        viewModel.setFilter(filter);
+                      },
+                    ),
+                  ),
+                );
+              }).toList(),
               // Results count
-              if (viewModel.searchQuery.isNotEmpty || viewModel.selectedFilter != 'All')
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.paddingM,
-                    vertical: AppSpacing.paddingS,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.info.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-                    border: Border.all(color: AppColors.info.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.check_circle, size: 16, color: AppColors.info),
-                      const SizedBox(width: 4),
-                      BodyText(
-                        text: '${viewModel.filteredGuests.length} found',
-                        color: AppColors.info,
-                        medium: true,
-                      ),
-                    ],
+              if (viewModel.searchQuery.isNotEmpty ||
+                  viewModel.selectedFilter != 'All')
+                Padding(
+                  padding: const EdgeInsets.only(left: AppSpacing.paddingS),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.paddingM,
+                      vertical: AppSpacing.paddingS,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.info.withValues(alpha: 0.1),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.borderRadiusM),
+                      border: Border.all(
+                          color: AppColors.info.withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.check_circle, size: 16, color: AppColors.info),
+                        const SizedBox(width: 4),
+                        BodyText(
+                          text: '${viewModel.filteredGuests.length} found',
+                          color: AppColors.info,
+                          medium: true,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
             ],
@@ -550,39 +853,359 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     );
   }
 
-  /// Builds floating action button based on current tab
-  Widget? _buildFAB(BuildContext context, OwnerGuestViewModel viewModel) {
-    switch (_tabController.index) {
-      case 0: // Guests tab
-        return FloatingActionButton.extended(
-          onPressed: () => _showAddGuestDialog(context),
-          icon: const Icon(Icons.person_add),
-          label: const Text('Add Guest'),
-          backgroundColor: Theme.of(context).primaryColor,
-        );
-      case 1: // Bookings tab
-        return FloatingActionButton.extended(
-          onPressed: () => _showAddBookingDialog(context),
-          icon: const Icon(Icons.add),
-          label: const Text('New Booking'),
-          backgroundColor: Theme.of(context).primaryColor,
-        );
+  /// Builds the payments tab content
+  Widget _buildPaymentsTab(
+      BuildContext context, OwnerGuestViewModel viewModel) {
+    return Column(
+      children: [
+        // Payment stats card
+        _buildPaymentStatsCard(context, viewModel),
+        // Payments list
+        Expanded(
+          child: PaymentListWidget(
+            payments: viewModel.payments,
+            viewModel: viewModel,
+            guests: viewModel.guests,
+            bookings: viewModel.bookings,
+          ),
+        ),
+        // Floating action button to record new payment
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingM),
+          child: PrimaryButton(
+            label: 'Record Payment',
+            icon: Icons.add,
+            onPressed: () => _showRecordPaymentDialog(context, viewModel),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Builds payment statistics card
+  Widget _buildPaymentStatsCard(
+      BuildContext context, OwnerGuestViewModel viewModel) {
+    final pendingPayments = viewModel.pendingPayments;
+    final collectedPayments = viewModel.collectedPayments;
+    final totalPending =
+        pendingPayments.fold(0.0, (sum, p) => sum + p.amountPaid);
+    final totalCollected =
+        collectedPayments.fold(0.0, (sum, p) => sum + p.amountPaid);
+
+    return Container(
+      margin: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: const EdgeInsets.all(AppSpacing.paddingL),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
+        ),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const HeadingMedium(
+            text: 'Payment Summary',
+            color: AppColors.textOnPrimary,
+            align: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildPaymentStatItem('Pending', pendingPayments.length,
+                  totalPending, Colors.orange),
+              _buildPaymentStatItem('Collected', collectedPayments.length,
+                  totalCollected, Colors.green),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds individual payment stat item
+  Widget _buildPaymentStatItem(
+      String label, int count, double amount, Color color) {
+    final formattedAmount = '₹${NumberFormat('#,##0').format(amount)}';
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.paddingM),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+          ),
+          child: Column(
+            children: [
+              Text(
+                count.toString(),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textOnPrimary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                formattedAmount,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textOnPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.paddingS),
+        CaptionText(
+          text: label,
+          color: AppColors.textOnPrimary.withValues(alpha: 0.9),
+        ),
+      ],
+    );
+  }
+
+  /// Shows dialog to record a new payment
+  void _showRecordPaymentDialog(
+      BuildContext context, OwnerGuestViewModel viewModel) {
+    showDialog(
+      context: context,
+      builder: (context) => RecordPaymentDialog(
+        guests: viewModel.guests,
+        bookings: viewModel.bookings,
+      ),
+    );
+  }
+
+  /// Builds individual booking request card
+  Widget _buildBookingRequestCard(BuildContext context,
+      OwnerBookingRequestModel request, OwnerGuestViewModel viewModel) {
+    return AdaptiveCard(
+      onTap: () => _showBookingRequestDetails(context, request, viewModel),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.paddingM),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with guest name and status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: HeadingSmall(text: request.guestDisplayName),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.paddingS,
+                    vertical: AppSpacing.paddingXS,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getRequestStatusColor(request.status)
+                        .withValues(alpha: 0.2),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
+                  ),
+                  child: CaptionText(
+                    text: request.statusDisplay,
+                    color: _getRequestStatusColor(request.status),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.paddingS),
+            // PG name
+            Row(
+              children: [
+                Icon(Icons.apartment, size: 14, color: Colors.grey.shade600),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: BodyText(
+                    text: request.pgName,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.paddingXS),
+            // Contact info
+            Row(
+              children: [
+                Icon(Icons.phone, size: 14, color: Colors.grey.shade600),
+                const SizedBox(width: 4),
+                BodyText(
+                  text: request.guestPhone,
+                  color: Colors.grey.shade600,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.paddingXS),
+            // Request date
+            Row(
+              children: [
+                Icon(Icons.calendar_today,
+                    size: 14, color: Colors.grey.shade600),
+                const SizedBox(width: 4),
+                BodyText(
+                  text: request.formattedCreatedAt,
+                  color: Colors.grey.shade600,
+                ),
+              ],
+            ),
+            if (request.message != null && request.message!.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.paddingS),
+              BodyText(
+                text: request.requestSummary,
+                color: Colors.grey.shade700,
+              ),
+            ],
+            // Action buttons for pending requests
+            if (request.isPending) ...[
+              const SizedBox(height: AppSpacing.paddingM),
+              Row(
+                children: [
+                  Expanded(
+                    child: SecondaryButton(
+                      label: 'Reject',
+                      onPressed: () =>
+                          _showRejectDialog(context, request, viewModel),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  Expanded(
+                    child: PrimaryButton(
+                      label: 'Approve',
+                      onPressed: () =>
+                          _showApproveDialog(context, request, viewModel),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Shows booking request details dialog
+  void _showBookingRequestDetails(BuildContext context,
+      OwnerBookingRequestModel request, OwnerGuestViewModel viewModel) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: HeadingSmall(text: 'Booking Request Details'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow('Guest Name', request.guestDisplayName),
+              _buildDetailRow('Phone', request.guestPhone),
+              _buildDetailRow('Email', request.guestEmail),
+              _buildDetailRow('PG Name', request.pgName),
+              _buildDetailRow('Request Date', request.formattedCreatedAt),
+              _buildDetailRow('Status', request.statusDisplay),
+              if (request.message != null && request.message!.isNotEmpty)
+                _buildDetailRow('Message', request.message!),
+              if (request.responseMessage != null &&
+                  request.responseMessage!.isNotEmpty)
+                _buildDetailRow('Response', request.responseMessage!),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+          if (request.isPending) ...[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _showRejectDialog(context, request, viewModel);
+              },
+              child: const Text('Reject'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _showApproveDialog(context, request, viewModel);
+              },
+              child: const Text('Approve'),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Shows approve dialog
+  void _showApproveDialog(BuildContext context,
+      OwnerBookingRequestModel request, OwnerGuestViewModel viewModel) {
+    showDialog(
+      context: context,
+      builder: (context) => BookingRequestActionDialog(
+        request: request,
+        isApproval: true,
+      ),
+    );
+  }
+
+  /// Shows reject dialog
+  void _showRejectDialog(BuildContext context, OwnerBookingRequestModel request,
+      OwnerGuestViewModel viewModel) {
+    showDialog(
+      context: context,
+      builder: (context) => BookingRequestActionDialog(
+        request: request,
+        isApproval: false,
+      ),
+    );
+  }
+
+  /// Builds a detail row for the dialog
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: BodyText(
+              text: '$label:',
+              medium: true,
+            ),
+          ),
+          Expanded(
+            child: BodyText(text: value),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Gets color for request status
+  Color _getRequestStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return Colors.orange;
+      case 'approved':
+        return Colors.green;
+      case 'rejected':
+        return Colors.red;
       default:
-        return null;
+        return Colors.grey;
     }
   }
 
-  /// Shows add guest dialog (placeholder)
-  void _showAddGuestDialog(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Add guest feature coming soon!')),
-    );
-  }
-
-  /// Shows add booking dialog (placeholder)
-  void _showAddBookingDialog(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Add booking feature coming soon!')),
-    );
-  }
+  // Drawer actions centralized in OwnerDrawer
 }

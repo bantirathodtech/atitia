@@ -1,0 +1,3 @@
+# format-apply
+
+  dart format .

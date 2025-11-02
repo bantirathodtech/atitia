@@ -1,19 +1,34 @@
 // lib/core/repositories/payment_notification_repository.dart
 
-import '../di/firebase/di/firebase_service_locator.dart';
+import '../di/common/unified_service_locator.dart';
 import '../../common/utils/constants/firestore.dart';
+import '../interfaces/analytics/analytics_service_interface.dart';
+import '../interfaces/database/database_service_interface.dart';
 import '../models/payment_notification_model.dart';
+import '../../common/utils/date/converter/date_service_converter.dart';
 
 /// Repository for managing payment notifications
 /// Handles CRUD operations for payment confirmations between guests and owners
+/// Uses interface-based services for dependency injection (swappable backends)
 class PaymentNotificationRepository {
-  final _firestoreService = getIt.firestore;
-  final _analyticsService = getIt.analytics;
+  final IDatabaseService _databaseService;
+  final IAnalyticsService _analyticsService;
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  PaymentNotificationRepository({
+    IDatabaseService? databaseService,
+    IAnalyticsService? analyticsService,
+  })  : _databaseService =
+            databaseService ?? UnifiedServiceLocator.serviceFactory.database,
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Create a new payment notification
-  Future<void> createPaymentNotification(PaymentNotificationModel notification) async {
+  Future<void> createPaymentNotification(
+      PaymentNotificationModel notification) async {
     try {
-      await _firestoreService.setDocument(
+      await _databaseService.setDocument(
         FirestoreConstants.paymentNotifications,
         notification.notificationId,
         notification.toMap(),
@@ -34,52 +49,57 @@ class PaymentNotificationRepository {
   }
 
   /// Get payment notifications for an owner (pending confirmations)
-  Stream<List<PaymentNotificationModel>> streamOwnerPendingNotifications(String ownerId) {
-    return _firestoreService
+  Stream<List<PaymentNotificationModel>> streamOwnerPendingNotifications(
+      String ownerId) {
+    return _databaseService
         .getCollectionStreamWithFilter(
           FirestoreConstants.paymentNotifications,
           'ownerId',
           ownerId,
         )
         .map((snapshot) => snapshot.docs
-            .map((doc) => PaymentNotificationModel.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) => PaymentNotificationModel.fromMap(
+                doc.data() as Map<String, dynamic>))
             .where((notif) => notif.isPending)
             .toList());
   }
 
   /// Get payment notifications for a guest
-  Stream<List<PaymentNotificationModel>> streamGuestNotifications(String guestId) {
-    return _firestoreService
+  Stream<List<PaymentNotificationModel>> streamGuestNotifications(
+      String guestId) {
+    return _databaseService
         .getCollectionStreamWithFilter(
           FirestoreConstants.paymentNotifications,
           'guestId',
           guestId,
         )
         .map((snapshot) => snapshot.docs
-            .map((doc) => PaymentNotificationModel.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) => PaymentNotificationModel.fromMap(
+                doc.data() as Map<String, dynamic>))
             .toList());
   }
 
   /// Confirm a payment notification (owner accepts)
   Future<void> confirmPayment(String notificationId, String ownerId) async {
     try {
-      final notification = await _firestoreService.getDocument(
+      final notification = await _databaseService.getDocument(
         FirestoreConstants.paymentNotifications,
         notificationId,
       );
 
-      final notifModel = PaymentNotificationModel.fromMap(notification.data() as Map<String, dynamic>);
+      final notifModel = PaymentNotificationModel.fromMap(
+          notification.data() as Map<String, dynamic>);
 
       if (notifModel.ownerId != ownerId) {
         throw Exception('Unauthorized: Not the owner of this notification');
       }
 
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.paymentNotifications,
         notificationId,
         {
           'status': 'confirmed',
-          'confirmedAt': DateTime.now().toIso8601String(),
+          'confirmedAt': DateServiceConverter.toService(DateTime.now()),
         },
       );
 
@@ -97,25 +117,27 @@ class PaymentNotificationRepository {
   }
 
   /// Reject a payment notification (owner rejects)
-  Future<void> rejectPayment(String notificationId, String ownerId, String reason) async {
+  Future<void> rejectPayment(
+      String notificationId, String ownerId, String reason) async {
     try {
-      final notification = await _firestoreService.getDocument(
+      final notification = await _databaseService.getDocument(
         FirestoreConstants.paymentNotifications,
         notificationId,
       );
 
-      final notifModel = PaymentNotificationModel.fromMap(notification.data() as Map<String, dynamic>);
+      final notifModel = PaymentNotificationModel.fromMap(
+          notification.data() as Map<String, dynamic>);
 
       if (notifModel.ownerId != ownerId) {
         throw Exception('Unauthorized: Not the owner of this notification');
       }
 
-      await _firestoreService.updateDocument(
+      await _databaseService.updateDocument(
         FirestoreConstants.paymentNotifications,
         notificationId,
         {
           'status': 'rejected',
-          'confirmedAt': DateTime.now().toIso8601String(),
+          'confirmedAt': DateServiceConverter.toService(DateTime.now()),
           'rejectionReason': reason,
         },
       );
@@ -134,9 +156,10 @@ class PaymentNotificationRepository {
   }
 
   /// Get payment history for a booking
-  Future<List<PaymentNotificationModel>> getBookingPaymentHistory(String bookingId) async {
+  Future<List<PaymentNotificationModel>> getBookingPaymentHistory(
+      String bookingId) async {
     try {
-      final snapshot = await _firestoreService
+      final snapshot = await _databaseService
           .getCollectionStreamWithFilter(
             FirestoreConstants.paymentNotifications,
             'bookingId',
@@ -145,11 +168,11 @@ class PaymentNotificationRepository {
           .first;
 
       return snapshot.docs
-          .map((doc) => PaymentNotificationModel.fromMap(doc.data() as Map<String, dynamic>))
+          .map((doc) => PaymentNotificationModel.fromMap(
+              doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
       throw Exception('Failed to get payment history: $e');
     }
   }
 }
-

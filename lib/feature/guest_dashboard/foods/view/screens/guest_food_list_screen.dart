@@ -1,18 +1,21 @@
 // lib/features/guest_dashboard/foods/view/screens/guest_food_list_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
-import '../../../../../common/widgets/loaders/shimmer_loader.dart';
+import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/widgets/drawers/guest_drawer.dart';
+import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
+import '../../../../../common/widgets/loaders/shimmer_loader.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
-import '../../../../../common/widgets/images/adaptive_image.dart';
-import '../../viewmodel/guest_food_viewmodel.dart';
 import '../../../../../feature/owner_dashboard/foods/data/models/owner_food_menu.dart';
+import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../viewmodel/guest_food_viewmodel.dart';
 
 /// 🍽️ **GUEST FOOD MENU SCREEN - PRODUCTION READY**
 ///
@@ -24,6 +27,7 @@ import '../../../../../feature/owner_dashboard/foods/data/models/owner_food_menu
 /// - Special menu notifications
 /// - Theme-aware premium UI
 /// - Pull-to-refresh
+///
 class GuestFoodListScreen extends StatefulWidget {
   const GuestFoodListScreen({super.key});
 
@@ -57,7 +61,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final foodViewModel = Provider.of<GuestFoodViewmodel>(context, listen: false);
+      final foodViewModel =
+          Provider.of<GuestFoodViewmodel>(context, listen: false);
       if (!foodViewModel.loading && foodViewModel.weeklyMenus.isEmpty) {
         foodViewModel.loadGuestMenu();
       }
@@ -74,87 +79,31 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   Widget build(BuildContext context) {
     final foodViewModel = Provider.of<GuestFoodViewmodel>(context);
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      appBar: AdaptiveAppBar(
+        titleWidget: const GuestPgAppBarDisplay(),
+        centerTitle: true,
+        showDrawer: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => foodViewModel.loadGuestMenu(),
+            tooltip: 'Refresh Menu',
+          ),
+        ],
+        showBackButton: false,
+        showThemeToggle: false,
+      ),
+
+      // Centralized Guest Drawer
+      drawer: const GuestDrawer(),
+
       backgroundColor: theme.scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: () async => foodViewModel.loadGuestMenu(),
-        child: CustomScrollView(
-          slivers: [
-            _buildPremiumSliverAppBar(context, isDarkMode, foodViewModel),
-            SliverToBoxAdapter(
-              child: _buildBody(context, foodViewModel),
-            ),
-          ],
-        ),
+        child: _buildBody(context, foodViewModel),
       ),
-    );
-  }
-
-  /// 🎨 Premium Sliver App Bar with gradient
-  Widget _buildPremiumSliverAppBar(
-      BuildContext context, bool isDarkMode, GuestFoodViewmodel foodViewModel) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
-    final today = DateFormat('EEEE').format(DateTime.now());
-
-    return SliverAppBar(
-      expandedHeight: 200,
-      floating: false,
-      pinned: true,
-      stretch: true,
-      backgroundColor: isDarkMode ? AppColors.darkCard : primaryColor,
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
-        title: HeadingMedium(
-          text: 'Weekly Menu',
-          color: AppColors.textOnPrimary,
-        ),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDarkMode
-                  ? [AppColors.darkCard, AppColors.darkCard.withOpacity(0.9)]
-                  : [primaryColor, primaryColor.withOpacity(0.8)],
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              Icon(
-                Icons.restaurant_menu,
-                size: 48,
-                color: AppColors.textOnPrimary.withOpacity(0.9),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Today's Menu",
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: AppColors.textOnPrimary.withOpacity(0.9),
-                ),
-              ),
-              Text(
-                today,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textOnPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.refresh, color: AppColors.textOnPrimary),
-          onPressed: () => foodViewModel.loadGuestMenu(),
-          tooltip: 'Refresh Menu',
-        ),
-      ],
     );
   }
 
@@ -182,66 +131,95 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     final isDarkMode = theme.brightness == Brightness.dark;
     final today = DateFormat('EEEE').format(DateTime.now());
 
-    return Column(
-      children: [
-        // Day tabs
-        Container(
-          color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-          child: TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            indicatorColor: theme.primaryColor,
-            labelColor: theme.primaryColor,
-            unselectedLabelColor:
-                isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
-            tabs: _days.map((day) {
-              final isToday = day == today;
-              return Tab(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.paddingS,
-                    vertical: AppSpacing.paddingXS,
-                  ),
-                  decoration: isToday
-                      ? BoxDecoration(
-                          color: theme.primaryColor.withOpacity(0.1),
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.borderRadiusS),
-                        )
-                      : null,
-                  child: Row(
-                    children: [
-                      if (isToday)
-                        Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.only(right: 4),
-                          decoration: BoxDecoration(
-                            color: theme.primaryColor,
-                            shape: BoxShape.circle,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Day tabs
+          Container(
+            color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              indicatorColor: theme.primaryColor,
+              labelColor: theme.primaryColor,
+              unselectedLabelColor:
+                  isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+              tabs: _days.map((day) {
+                final isToday = day == today;
+                return Tab(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.paddingS,
+                      vertical: AppSpacing.paddingXS,
+                    ),
+                    decoration: isToday
+                        ? BoxDecoration(
+                            color: theme.primaryColor.withValues(alpha: 0.1),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.borderRadiusS),
+                          )
+                        : null,
+                    child: Row(
+                      children: [
+                        if (isToday)
+                          Container(
+                            width: 8,
+                            height: 8,
+                            margin: const EdgeInsets.only(right: 4),
+                            decoration: BoxDecoration(
+                              color: theme.primaryColor,
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                        ),
-                      Text(day),
-                    ],
+                        Text(day),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           ),
-        ),
 
-        // Menu content for selected day
-        SizedBox(
-          height: MediaQuery.of(context).size.height - 350,
-          child: TabBarView(
-            controller: _tabController,
-            children: _days.map((day) {
-              final menu = foodViewModel.getMenuForDay(day);
-              return _buildDayMenu(context, day, menu, isDarkMode);
-            }).toList(),
+          // Menu content for selected day
+          SizedBox(
+            height: MediaQuery.of(context).size.height - 350,
+            child: TabBarView(
+              controller: _tabController,
+              children: _days.map((day) {
+                final menu = foodViewModel.getMenuForDay(day);
+                return _buildDayMenu(context, day, menu, isDarkMode);
+              }).toList(),
+            ),
           ),
-        ),
-      ],
+
+          // Quick feedback for today's overall menu
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingM),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => foodViewModel.submitMealFeedback(
+                    meal: 'lunch',
+                    like: true,
+                  ),
+                  icon: const Icon(Icons.thumb_up_alt_outlined),
+                  label: const Text("Like Today's Menu"),
+                ),
+                const SizedBox(width: AppSpacing.paddingM),
+                OutlinedButton.icon(
+                  onPressed: () => foodViewModel.submitMealFeedback(
+                    meal: 'lunch',
+                    like: false,
+                  ),
+                  icon: const Icon(Icons.thumb_down_alt_outlined),
+                  label: const Text('Dislike'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -329,7 +307,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           Container(
             padding: const EdgeInsets.all(AppSpacing.paddingS),
             decoration: BoxDecoration(
-              color: AppColors.info.withOpacity(0.1),
+              color: AppColors.info.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: Icon(Icons.info_outline, color: AppColors.info, size: 24),
@@ -379,7 +357,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
         ),
         boxShadow: [
           BoxShadow(
@@ -400,8 +378,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  color.withOpacity(0.2),
-                  color.withOpacity(0.1),
+                  color.withValues(alpha: 0.2),
+                  color.withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: const BorderRadius.only(
@@ -414,8 +392,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.paddingS),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                    color: color.withValues(alpha: 0.2),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: Icon(icon, color: color, size: 24),
                 ),
@@ -431,8 +410,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     vertical: AppSpacing.paddingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                    color: color.withValues(alpha: 0.2),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: Text(
                     '${items.length} items',
@@ -462,9 +442,10 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     color: isDarkMode
                         ? AppColors.darkInputFill
                         : AppColors.surfaceVariant,
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
                     border: Border.all(
-                      color: color.withOpacity(0.2),
+                      color: color.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(
@@ -511,7 +492,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             child: Row(
               children: [
-                Icon(Icons.photo_library, color: Theme.of(context).primaryColor),
+                Icon(Icons.photo_library,
+                    color: Theme.of(context).primaryColor),
                 const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
                   text: 'Food Gallery',
@@ -535,7 +517,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   width: 150,
                   margin: const EdgeInsets.only(right: AppSpacing.paddingM),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
                     child: AdaptiveImage(
                       imageUrl: photos[index],
                       width: 150,
@@ -546,7 +529,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                             ? AppColors.darkInputFill
                             : AppColors.surfaceVariant,
                         child: const Center(
-                          child: Icon(Icons.image, size: 32, color: Colors.grey),
+                          child:
+                              Icon(Icons.image, size: 32, color: Colors.grey),
                         ),
                       ),
                     ),
@@ -599,7 +583,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: EmptyState(
         title: 'Error Loading Menu',
-        message: foodViewModel.errorMessage ?? 'Unable to load menu. Please try again.',
+        message: foodViewModel.errorMessage ??
+            'Unable to load menu. Please try again.',
         icon: Icons.error_outline,
         actionLabel: 'Retry',
         onAction: () => foodViewModel.loadGuestMenu(),
@@ -607,18 +592,457 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     );
   }
 
-  /// 📭 Empty state
+  /// 🍽️ Structured empty state with zero-state stats and placeholder rows
   Widget _buildEmptyState(
       BuildContext context, GuestFoodViewmodel foodViewModel) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Zero-state stats section
+          _buildZeroStateStats(context, isDarkMode),
+
+          // Placeholder menu structure
+          _buildPlaceholderMenuStructure(context, isDarkMode),
+
+          // Call to action
+          _buildEmptyStateAction(context, foodViewModel),
+        ],
+      ),
+    );
+  }
+
+  /// 📊 Zero-state stats section
+  Widget _buildZeroStateStats(BuildContext context, bool isDarkMode) {
     return Container(
+      margin: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+        border: Border.all(
+          color:
+              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HeadingMedium(
+            text: 'Food Menu Statistics',
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+
+          // Stats grid
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard(
+                  context,
+                  'Weekly Menus',
+                  '0',
+                  Icons.calendar_view_week,
+                  Colors.blue,
+                  isDarkMode,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.paddingM),
+              Expanded(
+                child: _buildStatCard(
+                  context,
+                  'Total Items',
+                  '0',
+                  Icons.restaurant_menu,
+                  Colors.green,
+                  isDarkMode,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard(
+                  context,
+                  'Breakfast Items',
+                  '0',
+                  Icons.free_breakfast,
+                  Colors.orange,
+                  isDarkMode,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.paddingM),
+              Expanded(
+                child: _buildStatCard(
+                  context,
+                  'Lunch Items',
+                  '0',
+                  Icons.lunch_dining,
+                  Colors.purple,
+                  isDarkMode,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard(
+                  context,
+                  'Dinner Items',
+                  '0',
+                  Icons.dinner_dining,
+                  Colors.red,
+                  isDarkMode,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.paddingM),
+              Expanded(
+                child: _buildStatCard(
+                  context,
+                  'Snack Items',
+                  '0',
+                  Icons.cookie,
+                  Colors.brown,
+                  isDarkMode,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 📊 Individual stat card
+  Widget _buildStatCard(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+    bool isDarkMode,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            color: color,
+            size: 24,
+          ),
+          const SizedBox(height: AppSpacing.paddingS),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🍽️ Placeholder menu structure
+  Widget _buildPlaceholderMenuStructure(BuildContext context, bool isDarkMode) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HeadingMedium(
+            text: 'Weekly Menu Preview',
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+
+          // Placeholder day tabs
+          Container(
+            height: 50,
+            decoration: BoxDecoration(
+              color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+              border: Border.all(
+                color: isDarkMode
+                    ? Colors.white12
+                    : Colors.grey.withValues(alpha: 0.2),
+              ),
+            ),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
+              itemCount: 7,
+              itemBuilder: (context, index) {
+                final days = [
+                  'Monday',
+                  'Tuesday',
+                  'Wednesday',
+                  'Thursday',
+                  'Friday',
+                  'Saturday',
+                  'Sunday'
+                ];
+                return Container(
+                  margin: const EdgeInsets.all(AppSpacing.paddingS),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.paddingM),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
+                  ),
+                  child: Center(
+                    child: Text(
+                      days[index],
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: AppSpacing.paddingM),
+
+          // Placeholder meal sections
+          _buildPlaceholderMealSection(
+            context,
+            'Breakfast',
+            Icons.free_breakfast,
+            Colors.orange,
+            isDarkMode,
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          _buildPlaceholderMealSection(
+            context,
+            'Lunch',
+            Icons.lunch_dining,
+            Colors.purple,
+            isDarkMode,
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          _buildPlaceholderMealSection(
+            context,
+            'Dinner',
+            Icons.dinner_dining,
+            Colors.red,
+            isDarkMode,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🍽️ Placeholder meal section
+  Widget _buildPlaceholderMealSection(
+    BuildContext context,
+    String mealName,
+    IconData icon,
+    Color color,
+    bool isDarkMode,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+        border: Border.all(
+          color:
+              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: 20,
+              ),
+              const SizedBox(width: AppSpacing.paddingS),
+              Text(
+                mealName,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+
+          // Placeholder food items
+          ...List.generate(
+              3, (index) => _buildPlaceholderFoodItem(context, isDarkMode)),
+        ],
+      ),
+    );
+  }
+
+  /// 🍽️ Placeholder food item
+  Widget _buildPlaceholderFoodItem(BuildContext context, bool isDarkMode) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+        border: Border.all(
+          color: Colors.grey.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+            ),
+            child: Icon(
+              Icons.restaurant,
+              color: Colors.grey.withValues(alpha: 0.5),
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.paddingM),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 12,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  height: 8,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 60,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colors.grey.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+            ),
+            child: Center(
+              child: Container(
+                height: 8,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🔄 Empty state action section
+  Widget _buildEmptyStateAction(
+      BuildContext context, GuestFoodViewmodel foodViewModel) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    return Container(
+      margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingL),
-      child: EmptyState(
-        title: 'No Menu Available',
-        message:
-            'Your PG owner hasn\'t set up a weekly menu yet. Please check back later.',
-        icon: Icons.restaurant,
-        actionLabel: 'Refresh',
-        onAction: () => foodViewModel.loadGuestMenu(),
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+        border: Border.all(
+          color:
+              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.restaurant_menu,
+            size: 48,
+            color: isDarkMode ? Colors.white54 : Colors.grey[400],
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          HeadingMedium(
+            text: 'No Menu Available',
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+          const SizedBox(height: AppSpacing.paddingS),
+          Text(
+            'Your PG owner hasn\'t set up a weekly menu yet. The menu will appear here once it\'s configured.',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => foodViewModel.loadGuestMenu(),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Refresh Menu'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primaryColor,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

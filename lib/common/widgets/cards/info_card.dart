@@ -31,8 +31,8 @@ class InfoCard extends AdaptiveStatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             decoration: BoxDecoration(
-              color: iconColor?.withOpacity(0.1) ??
-                  Theme.of(context).primaryColor.withOpacity(0.1),
+              color: iconColor?.withValues(alpha: 0.1) ??
+                  Theme.of(context).primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(

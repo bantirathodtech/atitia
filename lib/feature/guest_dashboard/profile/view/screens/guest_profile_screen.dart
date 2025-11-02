@@ -24,8 +24,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/widgets/drawers/guest_drawer.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
+import '../../../shared/widgets/guest_pg_appbar_display.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../../auth/data/model/user_model.dart';
 import '../../data/models/guest_profile_model.dart';
@@ -68,7 +70,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
   void initState() {
     super.initState();
     _initializeControllers();
-    
+
     // Load profile data after frame is built to avoid setState during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadGuestProfile();
@@ -130,10 +132,10 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
     _fullNameController.text = user.fullName ?? '';
     _emailController.text = user.email ?? '';
     _dobController.text = _formatTimestamp(user.dateOfBirth);
-    
+
     // Use address from UserModel if available, otherwise empty
     _addressController.text = user.pgAddress ?? '';
-    
+
     // Set default values for fields not available in UserModel
     _guardianNameController.text = '';
     _guardianPhoneController.text = '';
@@ -192,7 +194,8 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
 
     if (pickedDate != null && mounted) {
       setState(() {
-        _dobController.text = '${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}';
+        _dobController.text =
+            '${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}';
       });
     }
   }
@@ -308,9 +311,8 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
       email: _emailController.text.trim().isEmpty
           ? null
           : _emailController.text.trim(),
-      dateOfBirth: _dobController.text.isEmpty
-          ? null
-          : _parseDate(_dobController.text),
+      dateOfBirth:
+          _dobController.text.isEmpty ? null : _parseDate(_dobController.text),
       age: _dobController.text.isEmpty
           ? null
           : _calculateAge(_parseDate(_dobController.text)),
@@ -383,10 +385,23 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
       // User can switch Light/Dark/System modes while editing profile
       // =======================================================================
       appBar: AdaptiveAppBar(
-        title: 'My Profile',
-        elevation: 2,
-        showThemeToggle: true,  // Enable theme toggle
+        titleWidget: const GuestPgAppBarDisplay(),
+        centerTitle: true,
+        showDrawer: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: () => _saveProfile(),
+            tooltip: 'Save Profile',
+          ),
+        ],
+        showBackButton: false,
+        showThemeToggle: true, // Enable theme toggle
       ),
+
+      // Centralized Guest Drawer
+      drawer: const GuestDrawer(),
+
       body: _buildBody(context, viewModel),
     );
   }

@@ -34,7 +34,7 @@ class ThemeColors {
   /// Get subtle background based on theme
   static Color getSubtleBackground(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return isDarkMode ? Colors.black.withOpacity(0.3) : Colors.black.withOpacity(0.05);
+    return isDarkMode ? Colors.black.withValues(alpha: 0.3) : Colors.black.withOpacity(0.05);
   }
   
   /// Get overlay color for images based on theme

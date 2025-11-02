@@ -25,17 +25,17 @@ dependencies:
   go_router: ^16.2.4
 
   # Firebase Core and Auth (phone OTP)
-  firebase_core: ^4.1.1
-  firebase_auth: ^6.1.0
-  cloud_firestore: ^6.0.2
-  firebase_storage: ^13.0.2
-  firebase_app_check: ^0.4.1
-  firebase_analytics: ^12.0.2
-  firebase_messaging: ^16.0.2
-  firebase_crashlytics: ^5.0.2
-  firebase_remote_config: ^6.0.2
-  firebase_performance: ^0.11.1
-  cloud_functions: ^6.0.2
+  firebase_core: ^4.2.0
+  firebase_auth: ^6.1.1
+  cloud_firestore: ^6.0.3
+  firebase_storage: ^13.0.3
+  firebase_app_check: ^0.4.1+1
+  firebase_analytics: ^12.0.3
+  firebase_messaging: ^16.0.3
+  firebase_crashlytics: ^5.0.3
+  firebase_remote_config: ^6.1.0
+  firebase_performance: ^0.11.1+1
+  cloud_functions: ^6.0.3
 
   # Supabase Storage (replaces Firebase Storage for cost savings)
   supabase_flutter: ^2.5.0
@@ -43,10 +43,23 @@ dependencies:
   # Localization
   flutter_localizations:
     sdk: flutter
-  # intl is managed by flutter_localizations SDK dependency
+  intl: ^0.20.2
 
   # Image Picker (for profile, Aadhaar)
   image_picker: ^1.2.0
+  
+  # Performance and Caching
+  cached_network_image: ^3.3.1
+  flutter_cache_manager: ^3.3.1
+  path_provider: ^2.1.4
+  
+  # Network and HTTP
+  http: ^1.2.2
+  url_launcher: ^6.3.1
+  
+  # Security and Encryption
+  encrypt: ^5.0.3
+  crypto: ^3.0.5
 
   # Local Notifications
   flutter_local_notifications: ^18.0.1
@@ -59,19 +72,21 @@ dependencies:
   flutter_secure_storage: ^9.2.4
 
   # Utils and Extensions if needed
-  # collection is managed by flutter_localizations SDK dependency
+  collection: ^1.19.1
+
+  # Charts and Analytics
+  fl_chart: ^0.69.0
+
+  # Image Processing
+  image: ^4.1.7
 
   intl_utils: ^2.8.12
 #  firebase_dynamic_links: ^6.1.10
   equatable: ^2.0.7
 
-  google_sign_in: ^7.2.0
-  sign_in_with_apple: ^6.1.2
+  google_sign_in_all_platforms: ^2.0.2
+  sign_in_with_apple: ^6.1.4
   shimmer: 3.0.0
-  
-  # Encryption
-  encrypt: ^5.0.3
-  crypto: ^3.0.5
 
 
 
@@ -79,20 +94,26 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^6.0.0
-
-  # Testing
-  mockito: ^5.4.4
   integration_test:
     sdk: flutter
 
-  # Generate localization code from ARB files
-  flutter_localizations:
-    sdk: flutter
+  flutter_lints: ^6.0.0
 
-  build_runner: ^2.8.0
+  build_runner: ^2.9.0
   flutter_gen_runner: ^5.12.0
+  
+  # Testing Dependencies
+  mockito: ^5.4.2
+  
+  # Performance Dependencies
+  cached_network_image: ^3.3.0
+  image: ^4.1.7
+  flutter_cache_manager: ^3.3.1
+  http: ^1.1.0
+  
+  # Security Dependencies
+  encrypt: ^5.0.1
+  crypto: ^3.0.3
 
 flutter:
   uses-material-design: true

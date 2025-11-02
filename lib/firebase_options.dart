@@ -11,6 +11,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import '../common/constants/environment_config.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -48,49 +49,49 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyArl95qqaPZNtT2_NVg9sY15t06zq5h6dg',
-    appId: '1:665010238088:web:4ab7c29b9112469119a53d',
-    messagingSenderId: '665010238088',
-    projectId: 'atitia-87925',
-    authDomain: 'atitia-87925.firebaseapp.com',
-    storageBucket: 'atitia-87925.firebasestorage.app',
-    measurementId: 'G-SBS8EXZF76',
-  );
+  static FirebaseOptions get web => FirebaseOptions(
+        apiKey: EnvironmentConfig.firebaseWebApiKey,
+        appId: EnvironmentConfig.firebaseWebAppId,
+        messagingSenderId: EnvironmentConfig.firebaseMessagingSenderId,
+        projectId: EnvironmentConfig.firebaseProjectId,
+        authDomain: EnvironmentConfig.firebaseAuthDomain,
+        storageBucket: EnvironmentConfig.firebaseStorageBucket,
+        measurementId: EnvironmentConfig.firebaseWebMeasurementId,
+      );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCWFaZgLfoGlJeLIrLNK_d9xFuYfqp6XtQ',
-    appId: '1:665010238088:android:27a01be236b0ad9d19a53d',
-    messagingSenderId: '665010238088',
-    projectId: 'atitia-87925',
-    storageBucket: 'atitia-87925.firebasestorage.app',
-  );
+  static FirebaseOptions get android => FirebaseOptions(
+        apiKey: EnvironmentConfig.firebaseAndroidApiKey,
+        appId: EnvironmentConfig.firebaseAndroidAppId,
+        messagingSenderId: EnvironmentConfig.firebaseMessagingSenderId,
+        projectId: EnvironmentConfig.firebaseProjectId,
+        storageBucket: EnvironmentConfig.firebaseStorageBucket,
+      );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCzEcqX-xF7EqTWsrqkF0mihRdwBRxUZA8',
-    appId: '1:665010238088:ios:76437d681978a96019a53d',
-    messagingSenderId: '665010238088',
-    projectId: 'atitia-87925',
-    storageBucket: 'atitia-87925.firebasestorage.app',
-    iosBundleId: 'com.avishio.atitia',
-  );
+  static FirebaseOptions get ios => FirebaseOptions(
+        apiKey: EnvironmentConfig.firebaseIosApiKey,
+        appId: EnvironmentConfig.firebaseIosAppId,
+        messagingSenderId: EnvironmentConfig.firebaseMessagingSenderId,
+        projectId: EnvironmentConfig.firebaseProjectId,
+        storageBucket: EnvironmentConfig.firebaseStorageBucket,
+        iosBundleId: EnvironmentConfig.bundleId,
+      );
 
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCzEcqX-xF7EqTWsrqkF0mihRdwBRxUZA8',
-    appId: '1:665010238088:ios:76437d681978a96019a53d',
-    messagingSenderId: '665010238088',
-    projectId: 'atitia-87925',
-    storageBucket: 'atitia-87925.firebasestorage.app',
-    iosBundleId: 'com.avishio.atitia',
-  );
+  static FirebaseOptions get macos => FirebaseOptions(
+        apiKey: EnvironmentConfig.firebaseMacosApiKey,
+        appId: EnvironmentConfig.firebaseMacosAppId,
+        messagingSenderId: EnvironmentConfig.firebaseMessagingSenderId,
+        projectId: EnvironmentConfig.firebaseProjectId,
+        storageBucket: EnvironmentConfig.firebaseStorageBucket,
+        iosBundleId: EnvironmentConfig.bundleId,
+      );
 
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyArl95qqaPZNtT2_NVg9sY15t06zq5h6dg',
-    appId: '1:665010238088:web:128b16317971fd2819a53d',
-    messagingSenderId: '665010238088',
-    projectId: 'atitia-87925',
-    authDomain: 'atitia-87925.firebaseapp.com',
-    storageBucket: 'atitia-87925.firebasestorage.app',
-    measurementId: 'G-CMR3GYQ8GB',
-  );
+  static FirebaseOptions get windows => FirebaseOptions(
+        apiKey: EnvironmentConfig.firebaseWindowsApiKey,
+        appId: EnvironmentConfig.firebaseWindowsAppId,
+        messagingSenderId: EnvironmentConfig.firebaseMessagingSenderId,
+        projectId: EnvironmentConfig.firebaseProjectId,
+        authDomain: EnvironmentConfig.firebaseAuthDomain,
+        storageBucket: EnvironmentConfig.firebaseStorageBucket,
+        measurementId: EnvironmentConfig.firebaseWindowsMeasurementId,
+      );
 }

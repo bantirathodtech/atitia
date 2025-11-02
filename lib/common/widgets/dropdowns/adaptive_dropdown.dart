@@ -9,7 +9,7 @@ class AdaptiveDropdown<T> extends AdaptiveStatefulWidget {
   final String label;
   final T? value;
   final List<DropdownMenuItem<T>> items;
-  final ValueChanged<T?> onChanged;
+  final ValueChanged<T?>? onChanged;
   final String? error;
   final String? hint;
   final bool enabled;
@@ -19,7 +19,7 @@ class AdaptiveDropdown<T> extends AdaptiveStatefulWidget {
     required this.label,
     required this.value,
     required this.items,
-    required this.onChanged,
+    this.onChanged,
     this.error,
     this.hint,
     this.enabled = true,
@@ -31,6 +31,16 @@ class AdaptiveDropdown<T> extends AdaptiveStatefulWidget {
 
 class AdaptiveDropdownState<T>
     extends AdaptiveStatefulWidgetState<AdaptiveDropdown<T>> {
+  /// Safe onChanged handler with null safety and error handling
+  void _safeOnChanged(T? value) {
+    try {
+      widget.onChanged?.call(value);
+    } catch (e) {
+      // Log error but don't crash the app
+      debugPrint('Error in AdaptiveDropdown onChanged: $e');
+    }
+  }
+
   @override
   Widget buildAdaptive(BuildContext context) {
     final theme = Theme.of(context);
@@ -66,7 +76,7 @@ class AdaptiveDropdownState<T>
             child: DropdownButton<T>(
               value: widget.value,
               items: widget.items,
-              onChanged: widget.enabled ? widget.onChanged : null,
+              onChanged: widget.enabled ? _safeOnChanged : null,
               isExpanded: true,
               hint: widget.hint != null
                   ? Padding(

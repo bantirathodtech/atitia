@@ -12,20 +12,26 @@ class GuestAmenitiesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     if (amenities.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: isDark 
+              ? colorScheme.surfaceVariant 
+              : colorScheme.surface.withOpacity(0.7),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            Icon(Icons.info_outline, color: Colors.grey.shade600),
+            Icon(Icons.info_outline, color: colorScheme.onSurfaceVariant),
             const SizedBox(width: AppSpacing.paddingS),
             BodyText(
               text: 'No amenities listed for this PG',
-              color: Colors.grey.shade600,
+              color: colorScheme.onSurfaceVariant,
             ),
           ],
         ),
@@ -35,7 +41,9 @@ class GuestAmenitiesList extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: isDark 
+            ? colorScheme.surfaceVariant 
+            : colorScheme.surface.withOpacity(0.7),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Wrap(
@@ -48,15 +56,15 @@ class GuestAmenitiesList extends StatelessWidget {
                     vertical: AppSpacing.paddingS / 2,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color: colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Theme.of(context).primaryColor.withOpacity(0.2),
+                      color: colorScheme.primary.withOpacity(0.3),
                     ),
                   ),
                   child: BodyText(
                     text: amenity,
-                    color: Theme.of(context).primaryColor,
+                    color: colorScheme.onPrimaryContainer,
                   ),
                 ))
             .toList(),

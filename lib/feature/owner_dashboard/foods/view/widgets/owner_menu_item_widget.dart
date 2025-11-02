@@ -49,7 +49,7 @@ class OwnerMenuItemWidget extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: BodyText(
@@ -67,7 +67,7 @@ class OwnerMenuItemWidget extends StatelessWidget {
             )
           else
             ...items.asMap().entries.map((entry) {
-              final index = entry.key;
+              // final index = entry.key;
               final item = entry.value;
               return Padding(
                 padding: const EdgeInsets.symmetric(
@@ -96,17 +96,17 @@ class OwnerMenuItemWidget extends StatelessWidget {
     );
   }
 
-  /// Gets icon based on meal type
-  IconData _getIconForMealType(String title) {
-    switch (title.toLowerCase()) {
-      case 'breakfast':
-        return Icons.free_breakfast;
-      case 'lunch':
-        return Icons.lunch_dining;
-      case 'dinner':
-        return Icons.dinner_dining;
-      default:
-        return Icons.restaurant;
-    }
-  }
+  /// Gets icon based on meal type (unused method)
+  // IconData _getIconForMealType(String title) {
+  //   switch (title.toLowerCase()) {
+  //     case 'breakfast':
+  //       return Icons.free_breakfast;
+  //     case 'lunch':
+  //       return Icons.lunch_dining;
+  //     case 'dinner':
+  //       return Icons.dinner_dining;
+  //     default:
+  //       return Icons.restaurant;
+  //   }
+  // }
 }

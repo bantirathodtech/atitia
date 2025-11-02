@@ -31,7 +31,11 @@ android {
     }
 
     defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.avishio.atitia"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+//        minSdk = flutter.minSdkVersion
         minSdk = flutter.minSdkVersion  // Changed from flutter.minSdkVersion to 21 for Play Integrity
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -50,9 +54,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            signingConfig = signingConfigs.getByName("debug")
-        }
         release {
             // Use release signing config if available, otherwise fallback to debug
             signingConfig = if (keystorePropertiesFile.exists()) {
@@ -60,12 +61,17 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
-            isMinifyEnabled = false
-            isShrinkResources = false
+            
+            // Optimizations for release builds
+            isMinifyEnabled = false  // Set to true if you add ProGuard rules
+            isShrinkResources = false  // Set to true if isMinifyEnabled is true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }

@@ -62,7 +62,7 @@ class RegistrationScreen extends StatefulWidget {
 class _RegistrationScreenState extends State<RegistrationScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final _formKey = GlobalKey<FormState>();
+  // final _formKey = GlobalKey<FormState>();
   // ImagePicker no longer needed - using ImagePickerHelper instead
 
   // Current step for progress indicator
@@ -112,16 +112,11 @@ class _RegistrationScreenState extends State<RegistrationScreen>
       final phoneNumber = authProvider.user?.phoneNumber;
 
       // Debug log
-      print('📱 Registration: Phone number from auth provider: $phoneNumber');
 
       if (phoneNumber != null && phoneNumber.isNotEmpty) {
         _phoneController.text = phoneNumber;
         _phoneNumberInitialized = true;
-        print(
-            '✅ Registration: Phone number initialized: ${_phoneController.text}');
-      } else {
-        print('❌ Registration: Phone number is null or empty!');
-      }
+      } else {}
     }
   }
 
@@ -341,10 +336,13 @@ class _RegistrationScreenState extends State<RegistrationScreen>
           ? null
           : DateManager.calculateAge(_dobController.text);
 
+      // CRITICAL: Use the role from currentUser (which should already have the selected role from verifyOTP)
+      // currentUser.role is non-nullable and should already have the role set by verifyOTP using _selectedRole
       final newUser = UserModel(
         userId: currentUser.userId,
         phoneNumber: currentUser.phoneNumber,
-        role: currentUser.role,
+        role: currentUser
+            .role, // Should already have _selectedRole from verifyOTP
         fullName: _nameController.text.trim(),
         dateOfBirth: _dobController.text.isEmpty
             ? null
@@ -368,13 +366,29 @@ class _RegistrationScreenState extends State<RegistrationScreen>
 
       _showSnackBar('🎉 Registration completed successfully!');
 
-      // Navigate to dashboard
+      // STRICT: Navigate to dashboard based on role - NO FALLBACK
       await Future.delayed(const Duration(milliseconds: 500));
       final navigationService = getIt<NavigationService>();
-      if (newUser.role == 'guest') {
+      final userRole = newUser.role.toLowerCase().trim();
+
+      // STRICT ROLE CHECK: Only navigate if role is explicitly 'guest' or 'owner'
+      if (userRole == 'guest') {
+        debugPrint(
+            '✅ Registration: Role is guest - navigating to guest dashboard');
         navigationService.goToGuestHome();
-      } else {
+      } else if (userRole == 'owner') {
+        debugPrint(
+            '✅ Registration: Role is owner - navigating to owner dashboard');
         navigationService.goToOwnerHome();
+      } else {
+        // Invalid role - redirect to role selection
+        debugPrint(
+            '⚠️ Registration: Invalid role "$userRole" - redirecting to role selection');
+        if (mounted) {
+          _showSnackBar('Please select a valid role (Guest or Owner)',
+              isError: true);
+          navigationService.goToRoleSelection();
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -416,8 +430,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
     final scaffoldBg = theme.scaffoldBackgroundColor;
     final surfaceColor = theme.colorScheme.surface;
     final primaryColor = theme.colorScheme.primary;
-    final textColor =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
+    // final AppColors.textPrimary =
+    //     theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
 
     return Scaffold(
       // Use theme background color for proper day/night visibility
@@ -484,8 +498,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final primaryColor = theme.colorScheme.primary;
-    final textColor =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
+    // final AppColors.textPrimary =
+    //     theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
 
     return FadeInAnimation(
       child: SingleChildScrollView(
@@ -513,7 +527,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                 readOnly: true,
                 enabled: false,
                 style: TextStyle(
-                  color: textColor, // Make sure text is visible
+                  color: AppColors.textPrimary, // Make sure text is visible
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
@@ -525,8 +539,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   border: const OutlineInputBorder(),
                   filled: true,
                   fillColor: isDarkMode
-                      ? AppColors.darkCard.withOpacity(0.5)
-                      : AppColors.surfaceVariant.withOpacity(0.5),
+                      ? AppColors.darkCard.withValues(alpha: 0.5)
+                      : AppColors.surfaceVariant.withValues(alpha: 0.5),
                   helperText: '✓ Verified during login',
                   helperStyle: TextStyle(
                     color: AppColors.success,
@@ -535,7 +549,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   // Ensure disabled text is visible
                   disabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: AppColors.success.withOpacity(0.5),
+                      color: AppColors.success.withValues(alpha: 0.5),
                       width: 1.5,
                     ),
                   ),
@@ -657,7 +671,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                       children: [
                         Icon(Icons.male, color: AppColors.info),
                         const SizedBox(width: 8),
-                        Text('Male', style: TextStyle(color: textColor)),
+                        Text('Male',
+                            style: TextStyle(color: AppColors.textPrimary)),
                       ],
                     ),
                   ),
@@ -667,7 +682,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                       children: [
                         Icon(Icons.female, color: AppColors.secondary),
                         const SizedBox(width: 8),
-                        Text('Female', style: TextStyle(color: textColor)),
+                        Text('Female',
+                            style: TextStyle(color: AppColors.textPrimary)),
                       ],
                     ),
                   ),
@@ -677,7 +693,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                       children: [
                         Icon(Icons.transgender, color: AppColors.purple),
                         const SizedBox(width: 8),
-                        Text('Other', style: TextStyle(color: textColor)),
+                        Text('Other',
+                            style: TextStyle(color: AppColors.textPrimary)),
                       ],
                     ),
                   ),
@@ -837,8 +854,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
     // ==========================================================================
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final textColor =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
+    // final AppColors.textPrimary =
+    //     theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
 
     return FadeInAnimation(
       child: SingleChildScrollView(
@@ -925,31 +942,38 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                 items: [
                   DropdownMenuItem(
                     value: 'Father',
-                    child: Text('Father', style: TextStyle(color: textColor)),
+                    child: Text('Father',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ),
                   DropdownMenuItem(
                     value: 'Mother',
-                    child: Text('Mother', style: TextStyle(color: textColor)),
+                    child: Text('Mother',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ),
                   DropdownMenuItem(
                     value: 'Brother',
-                    child: Text('Brother', style: TextStyle(color: textColor)),
+                    child: Text('Brother',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ),
                   DropdownMenuItem(
                     value: 'Sister',
-                    child: Text('Sister', style: TextStyle(color: textColor)),
+                    child: Text('Sister',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ),
                   DropdownMenuItem(
                     value: 'Spouse',
-                    child: Text('Spouse', style: TextStyle(color: textColor)),
+                    child: Text('Spouse',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ),
                   DropdownMenuItem(
                     value: 'Friend',
-                    child: Text('Friend', style: TextStyle(color: textColor)),
+                    child: Text('Friend',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ),
                   DropdownMenuItem(
                     value: 'Other',
-                    child: Text('Other', style: TextStyle(color: textColor)),
+                    child: Text('Other',
+                        style: TextStyle(color: AppColors.textPrimary)),
                   ),
                 ],
                 onChanged: (value) {
@@ -988,11 +1012,11 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   decoration: BoxDecoration(
                     // Theme-aware success gradient
                     color: isDarkMode
-                        ? AppColors.successContainer.withOpacity(0.2)
+                        ? AppColors.successContainer.withValues(alpha: 0.2)
                         : AppColors.successContainer,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.success.withOpacity(0.3),
+                      color: AppColors.success.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -1005,7 +1029,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                         child: BodyText(
                           text:
                               'All required fields completed! Ready to submit.',
-                          color: textColor,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ],
@@ -1034,7 +1058,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
           BoxShadow(
             // Theme-aware shadow
             color: isDarkMode
-                ? Colors.black.withOpacity(0.3) // Darker shadow in dark mode
+                ? Colors.black
+                    .withValues(alpha: 0.3) // Darker shadow in dark mode
                 : Colors.black.withOpacity(0.05), // Light shadow in light mode
             blurRadius: 10,
             offset: const Offset(0, -2),

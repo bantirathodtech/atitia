@@ -67,7 +67,7 @@ class UploadCard extends AdaptiveStatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: hasImage
-            ? BorderSide(color: accent.withOpacity(0.3), width: 2)
+            ? BorderSide(color: accent.withValues(alpha: 0.3), width: 2)
             : BorderSide.none,
       ),
       child: InkWell(
@@ -84,7 +84,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
-                      color: accent.withOpacity(0.1),
+                      color: accent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(icon, color: accent, size: 28),
@@ -179,11 +179,14 @@ class UploadCard extends AdaptiveStatelessWidget {
                       imageFile != null
                           ? _buildImagePreview(imageFile!)
                           : imageUrl != null
-                              ? AdaptiveImage(
-                                  imageUrl: imageUrl!,
-                                  height: 200,
+                              ? SizedBox(
                                   width: double.infinity,
-                                  fit: BoxFit.cover,
+                                  height: 200,
+                                  child: AdaptiveImage(
+                                    imageUrl: imageUrl!,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                  ),
                                 )
                               : const SizedBox.shrink(),
 
@@ -194,7 +197,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
+                            color: Colors.black.withValues(alpha: 0.6),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
@@ -248,8 +251,8 @@ class UploadCard extends AdaptiveStatelessWidget {
                       Icon(
                         Icons.cloud_upload,
                         size: 48,
-                        color:
-                            theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
+                        color: theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.5),
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       BodyText(

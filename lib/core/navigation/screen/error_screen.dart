@@ -54,7 +54,7 @@ class ErrorScreen extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.7),
+                        .withValues(alpha: 0.7),
                   ),
               textAlign: TextAlign.center,
             ),
@@ -101,24 +101,21 @@ class ErrorScreen extends StatelessWidget {
   }
 
   /// Navigate to appropriate home screen based on user role
+  /// STRICT: Uses role-based navigation - NO DEFAULT FALLBACK
   void _goToHome() {
     final navigationService = GetIt.I<NavigationService>();
 
-    // TODO: Add logic to determine user role and navigate accordingly
-    // For now, navigate to guest home as default
-    navigationService.goToGuestHome();
-
-    // Future enhancement: Check user authentication status and role
-    // final authProvider = GetIt.I<AuthService>();
-    // if (authProvider.isAuthenticated) {
-    //   if (authProvider.isOwner) {
-    //     navigationService.goToOwnerHome();
-    //   } else {
-    //     navigationService.goToGuestHome();
-    //   }
-    // } else {
-    //   navigationService.goToSignIn();
-    // }
+    // STRICT: Try to get user role from context/Provider
+    // If role cannot be determined, redirect to role selection (not guest as default)
+    try {
+      // Note: This requires BuildContext access to Provider, but since this is a StatelessWidget,
+      // we'll use the navigation service's role-based method or redirect to role selection
+      // The safest approach is to redirect to role selection if we can't determine role
+      navigationService.goToRoleSelection();
+    } catch (e) {
+      // If we can't determine role, always redirect to role selection
+      navigationService.goToRoleSelection();
+    }
   }
 
   /// Navigate back to previous screen

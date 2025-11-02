@@ -99,7 +99,7 @@ class GuestComplaintCard extends StatelessWidget {
               color: isDarkMode ? AppColors.darkCard : AppColors.surface,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
               border: Border.all(
-                color: _statusColor.withOpacity(0.3),
+                color: _statusColor.withValues(alpha: 0.3),
               ),
               boxShadow: [
                 BoxShadow(
@@ -120,8 +120,8 @@ class GuestComplaintCard extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        _statusColor.withOpacity(0.2),
-                        _statusColor.withOpacity(0.1),
+                        _statusColor.withValues(alpha: 0.2),
+                        _statusColor.withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: const BorderRadius.only(
@@ -134,7 +134,7 @@ class GuestComplaintCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.paddingS),
                         decoration: BoxDecoration(
-                          color: _statusColor.withOpacity(0.2),
+                          color: _statusColor.withValues(alpha: 0.2),
                           borderRadius:
                               BorderRadius.circular(AppSpacing.borderRadiusS),
                         ),
@@ -155,7 +155,7 @@ class GuestComplaintCard extends StatelessWidget {
                           vertical: AppSpacing.paddingXS,
                         ),
                         decoration: BoxDecoration(
-                          color: _statusColor.withOpacity(0.2),
+                          color: _statusColor.withValues(alpha: 0.2),
                           borderRadius:
                               BorderRadius.circular(AppSpacing.borderRadiusS),
                         ),
@@ -206,7 +206,7 @@ class GuestComplaintCard extends StatelessWidget {
                               borderRadius:
                                   BorderRadius.circular(AppSpacing.borderRadiusS),
                               border: Border.all(
-                                color: theme.primaryColor.withOpacity(0.3),
+                                color: theme.primaryColor.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(

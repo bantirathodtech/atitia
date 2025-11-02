@@ -13,8 +13,14 @@ import '../../data/repositories/owner_pg_management_repository.dart';
 /// Extends BaseProviderState for automatic service access and state management
 /// Handles beds, rooms, floors, bookings, and revenue tracking with analytics
 class OwnerPgManagementViewModel extends BaseProviderState {
-  final OwnerPgManagementRepository _repository = OwnerPgManagementRepository();
+  final OwnerPgManagementRepository _repository;
   final _analyticsService = getIt.analytics;
+
+  /// Constructor with dependency injection
+  /// If repository is not provided, creates it with default services
+  OwnerPgManagementViewModel({
+    OwnerPgManagementRepository? repository,
+  }) : _repository = repository ?? OwnerPgManagementRepository();
 
   List<OwnerBed> _beds = [];
   List<OwnerRoom> _rooms = [];
@@ -86,6 +92,15 @@ class OwnerPgManagementViewModel extends BaseProviderState {
       setError(true, 'Failed to initialize PG management: $e');
     } finally {
       setLoading(false);
+    }
+  }
+
+  /// Fetch latest draft (isDraft==true) for an owner
+  Future<Map<String, dynamic>?> fetchLatestDraftForOwner(String ownerId) async {
+    try {
+      return await _repository.fetchLatestDraftForOwner(ownerId);
+    } catch (_) {
+      return null;
     }
   }
 
@@ -205,14 +220,12 @@ class OwnerPgManagementViewModel extends BaseProviderState {
         }
       }
 
-      debugPrint(
-          '✅ Parsed PG structure: ${_floors.length} floors, ${_rooms.length} rooms, ${_beds.length} beds');
+      debugPrint('Parsed ${_beds.length} beds from floor plan');
 
       // Update occupancy report based on parsed beds
       _updateOccupancyReport();
     } catch (e) {
       // If parsing fails, keep empty lists
-      debugPrint('⚠️ Failed to parse floor structure: $e');
       _beds = [];
       _rooms = [];
       _floors = [];

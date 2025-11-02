@@ -23,7 +23,6 @@ class EnhancedAnalyticsService {
   Future<void> initialize() async {
     await _analytics.setAnalyticsCollectionEnabled(true);
     await _trackSessionStart();
-    print('📊 Enhanced Analytics Service initialized');
   }
 
   /// Track session start

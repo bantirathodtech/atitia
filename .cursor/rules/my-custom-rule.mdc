@@ -1,0 +1,39 @@
+---
+alwaysApply: false
+---
+Code structure: lib/ split into core/ (theme, env, utils), features/<name>/ (data, domain, presentation), shared/ (widgets, services). Keep feature modules self-contained; avoid cross-feature imports except via shared/ or core/.
+Architecture: Use clean architecture boundaries. UI -> state -> use cases -> repositories -> data sources. Keep platform channels isolated in core/platform/.
+State management: Prefer Riverpod/Bloc/Cubit; one pattern per project. Use feature-scoped providers/blocs; avoid global mutable state.
+Theming: Enforce light/dark and high-contrast. Centralize color tokens, typography, spacing, radius in core/theme/. Enable Material 3 (useMaterial3: true) with semantic color roles.
+Design tokens: Expose spacing/typography through a single source of truth (e.g., AppTheme, AppBreakpoints). No hardcoded paddings/sizes in widgets.
+Breakpoints: Define canonical breakpoints (xs, sm, md, lg, xl). Scale paddings, gutters, and typography by breakpoint. Respect MediaQuery.textScaler.
+Adaptivity: Use responsive scaffolds (bottom nav for compact, navigation rail for medium, drawer/rail for expanded). Ensure desktop/web get keyboard/focus support.
+Navigation: Type-safe routes; support deep links and web URLs. Maintain back stack parity across platforms. Centralize route guards (auth/permissions).
+Layout: Prefer Sliver* for scroll-heavy screens; avoid nested scrollables. Keep build methods under ~200 lines; extract sub-widgets.
+Accessibility: Meet WCAG AA contrast. Tap targets ≥ 48dp. Provide Semantics labels/roles. RTL support; test with Directionality.rtl. Keyboard navigation with Shortcuts/Actions.
+Internationalization: All strings via intl and flutter_localizations. No raw strings in widgets. Require locale screenshots for critical screens.
+Assets: Use flutter_gen. Provide 1x/2x/3x. Prefer SVGs for icons. Use cacheWidth/cacheHeight to match render size. Precache critical assets.
+Data layer: Use dio (or http) with interceptors for auth, retry, logging (redact PII). DTOs with json_serializable/freezed. Strict timeouts and robust error mapping.
+Offline-first: Cache selective reads; resilient to airplane mode. Show clear offline banners and retry paths.
+Error handling: Centralize FlutterError.onError and runZonedGuarded. Map errors to user-friendly states. Never crash silently.
+Security: Store secrets outside VCS; use secure storage for tokens. TLS 1.2+. Obfuscate release builds. Review permissions and reduce attack surface.
+Performance: Maintain 60fps. Use const, selectors, memoization. Avoid heavy Intrinsic* widgets. Profile critical screens on phone + tablet. Add RepaintBoundary only when measured helpful.
+Rendering: Use AnimatedSwitcher/AnimatedSize for transitions. Avoid rebuilding entire lists; use ListView.builder/SliverList and item-level listeners.
+Web/desktop: Test with CanvasKit and HTML renderers. Provide hover, tooltips, and native shortcuts. Ensure window resizing is handled.
+Analytics/monitoring: Centralize analytics events with typed APIs. Add crash reporting with non-PII breadcrumbs. Feature flags behind a single interface.
+Testing: Unit, widget, and golden tests for xs/md/lg and multiple text scales. Integration smoke tests per feature. Require golden updates when UI changes.
+CI/CD: Gates: analyze clean, formatted, tests/goldens pass, coverage threshold. Build size checks for APK/IPA/Web. Artifact retention for diffs.
+Codegen: Use build_runner (--delete-conflicting-outputs) for freezed, json_serializable, riverpod_generator, flutter_gen_runner.
+Linting/style: Use flutter_lints + project-specific strict rules. Enforce dart format. No TODOs left in merged code.
+Dependencies: Keep minimal; audit licenses; pin versions for apps. Avoid abandoned packages. Regularly run dart pub outdated.
+Versioning/releases: Semantic versioning. Changelog per release. Use flavors (dev, staging, prod) with separate icons/bundles.
+Configuration: Centralize env in core/env/ with typed accessors. Separate config per flavor; no env logic in widgets.
+Logging: Structured logs with levels; disable verbose logs in release. Redact sensitive fields by default.
+UX resilience: Provide skeletons/placeholders. Graceful empty/error states with retry. Debounce/throttle rapid user inputs.
+Migrations: Document non-trivial changes in docs/decisions/ (ADR style). Include rollback strategy.
+Code review: PRs must include screenshots for compact/medium/expanded, light/dark, and RTL when applicable. Explain performance risks and mitigations.
+Git workflow: SSH only; work on updates; feature branches feat/<short-task>, PRs into updates, squash-merge, auto-delete; PR updates → main when stable .
+Compliance: No PII in logs, analytics, or crash reports. Respect platform privacy requirements (e.g., App Tracking Transparency if used).
+App size budgets: Set max APK/IPA/web size budgets; track diffs in CI. Lazy-load heavy assets where possible.
+Documentation: Maintain README, CONTRIBUTING, RUNBOOK (debugging/profiling), and TESTING guides. Keep feature-level READMEs updated.
+Build determinism: Reproducible builds; lock files committed for apps. Ensure fonts/assets checksums stable across CI.

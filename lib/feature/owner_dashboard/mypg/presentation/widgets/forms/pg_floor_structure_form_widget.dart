@@ -54,21 +54,21 @@ class _PgFloorStructureFormWidgetState
     final List<OwnerRoom> newRooms = [];
     final List<OwnerBed> newBeds = [];
 
-    // Always start with Ground Floor
+    // Always start with Ground
     newFloors.add(OwnerFloor(
       id: 'floor_${DateTime.now().millisecondsSinceEpoch}_0',
-      floorName: 'Ground Floor',
+      floorName: 'Ground',
       floorNumber: 0,
       totalRooms: 0,
     ));
 
     // Add regular floors based on input
-    // Input "1 floor" = Ground + Floor 1 + Terrace
-    // Input "2 floors" = Ground + Floor 1 + Floor 2 + Terrace
+    // Input "1 floor" = Ground + First + Terrace
+    // Input "2 floors" = Ground + First + Second + Terrace
     for (int i = 1; i <= inputFloors; i++) {
       newFloors.add(OwnerFloor(
         id: 'floor_${DateTime.now().millisecondsSinceEpoch}_$i',
-        floorName: 'Floor $i',
+        floorName: _ordinalLabel(i), // First, Second, Third, Fourth, ...
         floorNumber: i,
         totalRooms: 0,
       ));
@@ -112,16 +112,34 @@ class _PgFloorStructureFormWidgetState
     _generateBedsForRoom(room);
   }
 
+  /// Returns ordinal label for floor numbers per finalized naming scheme
+  String _ordinalLabel(int n) {
+    switch (n) {
+      case 1:
+        return 'First';
+      case 2:
+        return 'Second';
+      case 3:
+        return 'Third';
+      case 4:
+        return 'Fourth';
+      case 5:
+        return 'Fifth';
+      default:
+        return 'Floor $n';
+    }
+  }
+
   String _generateRoomNumber(OwnerFloor floor, int roomIndex) {
     if (floor.floorNumber == 0) {
-      // Ground Floor: G001, G002, G003...
-      return 'G${roomIndex.toString().padLeft(3, '0')}';
+      // Ground: 001, 002, 003...
+      return roomIndex.toString().padLeft(3, '0');
     } else if (floor.floorName == 'Terrace') {
-      // Terrace: T001, T002, T003...
-      return 'T${roomIndex.toString().padLeft(3, '0')}';
+      // Terrace: (N+1)01, (N+1)02...
+      return '${floor.floorNumber}${roomIndex.toString().padLeft(2, '0')}';
     } else {
-      // Regular Floors: F101, F102, F103... (F = Floor)
-      return 'F${floor.floorNumber}${roomIndex.toString().padLeft(2, '0')}';
+      // Regular floors: n01, n02, n03... (e.g., First → 101, 102)
+      return '${floor.floorNumber}${roomIndex.toString().padLeft(2, '0')}';
     }
   }
 
@@ -133,7 +151,7 @@ class _PgFloorStructureFormWidgetState
         id: 'bed_${DateTime.now().millisecondsSinceEpoch}_$i',
         roomId: room.id,
         floorId: room.floorId,
-        bedNumber: 'Bed $i', // Bed 1, Bed 2, Bed 3...
+          bedNumber: 'Bed-$i', // Bed-1, Bed-2, Bed-3...
         status: 'vacant',
       );
       newBeds.add(bed);
@@ -167,7 +185,7 @@ class _PgFloorStructureFormWidgetState
           id: 'bed_${DateTime.now().millisecondsSinceEpoch}_$i',
           roomId: room.id,
           floorId: room.floorId,
-          bedNumber: 'Bed $i',
+          bedNumber: 'Bed-$i',
           status: 'vacant',
         );
         roomBeds.add(bed);
@@ -326,7 +344,7 @@ class _PgFloorStructureFormWidgetState
                             ],
                           ),
                         );
-                      }).toList(),
+                      }),
 
                       if (floorRooms.isEmpty)
                         const Padding(
@@ -346,7 +364,7 @@ class _PgFloorStructureFormWidgetState
               const SizedBox(height: AppSpacing.paddingM),
             ],
           );
-        }).toList(),
+        }),
 
         if (widget.floors.isEmpty)
           AdaptiveCard(

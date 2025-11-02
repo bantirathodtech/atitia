@@ -9,9 +9,15 @@ import '../repositories/payment_notification_repository.dart';
 /// ViewModel for managing payment notifications
 /// Used by both guests (to send) and owners (to confirm/reject)
 class PaymentNotificationViewModel extends ChangeNotifier {
-  final PaymentNotificationRepository _repository = PaymentNotificationRepository();
+  final PaymentNotificationRepository _repository;
   final _analyticsService = getIt.analytics;
   final _storageService = getIt.storage;
+
+  /// Constructor with dependency injection
+  /// If repository is not provided, creates it with default services
+  PaymentNotificationViewModel({
+    PaymentNotificationRepository? repository,
+  }) : _repository = repository ?? PaymentNotificationRepository();
 
   List<PaymentNotificationModel> _notifications = [];
   bool _loading = false;
@@ -43,7 +49,6 @@ class PaymentNotificationViewModel extends ChangeNotifier {
         _error = error.toString();
         _loading = false;
         notifyListeners();
-        debugPrint('❌ Error streaming owner notifications: $error');
       },
     );
   }
@@ -63,7 +68,6 @@ class PaymentNotificationViewModel extends ChangeNotifier {
         _error = error.toString();
         _loading = false;
         notifyListeners();
-        debugPrint('❌ Error streaming guest notifications: $error');
       },
     );
   }
@@ -90,7 +94,8 @@ class PaymentNotificationViewModel extends ChangeNotifier {
       if (paymentScreenshot != null) {
         final filename = 'payment_${DateTime.now().millisecondsSinceEpoch}.jpg';
         final folderPath = 'payment_screenshots/$guestId';
-        screenshotUrl = await _storageService.uploadFile(paymentScreenshot, folderPath, filename);
+        screenshotUrl = await _storageService.uploadFile(
+            paymentScreenshot, folderPath, filename);
       }
 
       // Create notification
@@ -127,7 +132,6 @@ class PaymentNotificationViewModel extends ChangeNotifier {
       _error = e.toString();
       _sending = false;
       notifyListeners();
-      debugPrint('❌ Error sending payment notification: $e');
       return false;
     }
   }
@@ -141,7 +145,8 @@ class PaymentNotificationViewModel extends ChangeNotifier {
       await _repository.confirmPayment(notificationId, ownerId);
 
       // Update local state
-      final index = _notifications.indexWhere((n) => n.notificationId == notificationId);
+      final index =
+          _notifications.indexWhere((n) => n.notificationId == notificationId);
       if (index != -1) {
         _notifications[index] = _notifications[index].copyWith(
           status: 'confirmed',
@@ -162,13 +167,13 @@ class PaymentNotificationViewModel extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       notifyListeners();
-      debugPrint('❌ Error confirming payment: $e');
       return false;
     }
   }
 
   /// Reject payment (owner action)
-  Future<bool> rejectPayment(String notificationId, String ownerId, String reason) async {
+  Future<bool> rejectPayment(
+      String notificationId, String ownerId, String reason) async {
     _error = null;
     notifyListeners();
 
@@ -176,7 +181,8 @@ class PaymentNotificationViewModel extends ChangeNotifier {
       await _repository.rejectPayment(notificationId, ownerId, reason);
 
       // Update local state
-      final index = _notifications.indexWhere((n) => n.notificationId == notificationId);
+      final index =
+          _notifications.indexWhere((n) => n.notificationId == notificationId);
       if (index != -1) {
         _notifications[index] = _notifications[index].copyWith(
           status: 'rejected',
@@ -199,7 +205,6 @@ class PaymentNotificationViewModel extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       notifyListeners();
-      debugPrint('❌ Error rejecting payment: $e');
       return false;
     }
   }
@@ -218,7 +223,6 @@ class PaymentNotificationViewModel extends ChangeNotifier {
       _error = e.toString();
       _loading = false;
       notifyListeners();
-      debugPrint('❌ Error loading payment history: $e');
     }
   }
 
@@ -237,4 +241,3 @@ class PaymentNotificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 }
-

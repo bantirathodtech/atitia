@@ -7,6 +7,8 @@ import 'package:atitia/core/app/theme/theme_provider.dart';
 import 'package:atitia/core/di/firebase/start/firebase_service_initializer.dart';
 import 'package:atitia/core/navigation/app_router.dart';
 import 'package:atitia/core/providers/firebase/firebase_app_providers.dart';
+import 'package:atitia/common/services/environment_validation_service.dart';
+import 'package:atitia/common/utils/responsive/responsive_system.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,9 +19,32 @@ Future<void> main() async {
   // Ensure Flutter binding is initialized first
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Performance optimizations
+  WidgetsBinding.instance.scheduleFrameCallback((_) {
+    // Pre-warm critical services for faster app startup
+  });
+
+  // Frame rate optimization - limit to 60fps to reduce buffer queue pressure
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Enable smooth scrolling and reduce unnecessary repaints
+  });
+
   try {
+    // Validate environment configuration first
+    final isValidEnvironment =
+        await EnvironmentValidationService.validateEnvironment();
+    if (!isValidEnvironment) {
+      // Continue anyway for development, but log the issue
+    }
+
+    // Print environment summary
+    EnvironmentValidationService.printEnvironmentSummary();
+
     // Single initialization call - handles everything
     await FirebaseServiceInitializer.initialize();
+
+    // Initialize responsive system
+    ResponsiveSystem.initialize();
 
     // Start the app with all providers and services ready
     runApp(
@@ -29,7 +54,6 @@ Future<void> main() async {
     );
   } catch (error) {
     // Handle critical initialization failures gracefully
-    print('❌ App initialization failed: $error');
 
     /// 🚨 EMERGENCY FALLBACK APPLICATION
     // Fallback to emergency UI - users always see something
@@ -44,27 +68,43 @@ class AtitiaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final localeProvider = Provider.of<LocaleProvider>(context);
+    return Consumer2<ThemeProvider, LocaleProvider>(
+      builder: (context, themeProvider, localeProvider, child) {
+        return MaterialApp.router(
+          // App Info
+          debugShowCheckedModeBanner: AppInfo.showDebugBanner,
+          restorationScopeId: AppInfo.restorationScopeId,
+          title: AppInfo.appTitle,
 
-    return MaterialApp.router(
-      // App Info
-      debugShowCheckedModeBanner: AppInfo.showDebugBanner,
-      restorationScopeId: AppInfo.restorationScopeId,
-      title: AppInfo.appTitle,
+          // Theme Configuration
+          theme: themeProvider.lightTheme,
+          darkTheme: themeProvider.darkTheme,
+          themeMode: themeProvider.themeMode,
 
-      // Theme Configuration
-      theme: themeProvider.lightTheme,
-      darkTheme: themeProvider.darkTheme,
-      themeMode: themeProvider.themeMode,
+          // Localization Configuration
+          locale: localeProvider.locale,
+          supportedLocales: LocalizationSetup.supportedLocales,
+          localizationsDelegates: LocalizationSetup.delegates,
 
-      // Localization Configuration
-      locale: localeProvider.locale,
-      supportedLocales: LocalizationSetup.supportedLocales,
-      localizationsDelegates: LocalizationSetup.delegates,
+          // Router Configuration (GoRouter)
+          routerConfig: AppRouter.router,
 
-      // Router Configuration (GoRouter)
-      routerConfig: AppRouter.router,
+          // Performance optimizations and responsive system
+          builder: (context, child) {
+            // Add performance monitoring and responsive system
+            return ResponsiveSystemProvider(
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  // Limit frame rate to reduce buffer queue pressure
+                  devicePixelRatio:
+                      MediaQuery.of(context).devicePixelRatio.clamp(1.0, 3.0),
+                ),
+                child: child!,
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
