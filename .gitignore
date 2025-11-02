@@ -46,3 +46,24 @@ app.*.map.json
 
 # Cursor IDE files
 .cursor/
+
+# ==================================================
+# 🔐 SECURITY - Firebase & API Keys
+# ==================================================
+# GoogleService-Info.plist files (iOS/macOS Firebase config)
+# Note: While API keys in these files are client-side public keys,
+# best practice is to gitignore them and generate during CI/CD
+**/GoogleService-Info.plist
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
+
+# Google Services JSON (Android Firebase config)
+# Note: Similar to plist files, contains client-side public keys
+android/app/google-services.json
+
+# Environment files with secrets
+.env
+.env.local
+.env.production
+.env.development
+secrets.json
