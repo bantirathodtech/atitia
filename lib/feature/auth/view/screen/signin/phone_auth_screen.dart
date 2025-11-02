@@ -1,9 +1,8 @@
 // lib/features/auth/view/screen/phone_auth_screen.dart
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'platform_helper.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/constants/validation.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
@@ -27,6 +26,11 @@ class PhoneAuthScreen extends StatefulWidget {
   @override
   State<PhoneAuthScreen> createState() => _PhoneAuthScreenState();
 }
+
+/// Helper function to check if running on macOS (web-safe)
+/// Returns false on web, true only on actual macOS desktop
+/// Uses platform_helper.dart for safe Platform detection
+bool get _isMacOS => isMacOSSafe;
 
 class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   final _phoneController = TextEditingController();
@@ -300,7 +304,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               const SizedBox(height: AppSpacing.xl),
               
               // Phone input field - Disabled on macOS
-              if (!Platform.isMacOS) ...[
+              if (!_isMacOS) ...[
                 TextInput(
                   controller: _phoneController,
                   label: loc.phoneNumber,
@@ -356,7 +360,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ],
               
               // OTP input field (shown after OTP is sent) - Not available on macOS
-              if (_otpSent && !Platform.isMacOS) ...[
+              if (_otpSent && !_isMacOS) ...[
                 const SizedBox(height: AppSpacing.lg),
                 TextInput(
                   controller: _otpController,
@@ -382,7 +386,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               const SizedBox(height: AppSpacing.xl),
               
               // Action button (Send OTP / Verify) - Not available on macOS
-              if (!Platform.isMacOS) ...[
+              if (!_isMacOS) ...[
                 PrimaryButton(
                   onPressed: _loading
                       ? null
@@ -395,7 +399,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ],
               
               // Change number option - Not available on macOS
-              if (_otpSent && !Platform.isMacOS) ...[
+              if (_otpSent && !_isMacOS) ...[
                 const SizedBox(height: AppSpacing.md),
                 SecondaryButton(
                   onPressed: _loading
@@ -415,7 +419,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               const SizedBox(height: AppSpacing.lg),
               
               // Divider - Only show when both methods are available
-              if (!Platform.isMacOS) ...[
+              if (!_isMacOS) ...[
                 Row(
                   children: [
                     const Expanded(child: Divider()),
@@ -433,7 +437,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ],
               
               // Google sign-in - Prominent for macOS
-              if (Platform.isMacOS) ...[
+              if (_isMacOS) ...[
                 const SizedBox(height: AppSpacing.md),
                 const CaptionText(
                   text: 'Phone OTP is not available on macOS. Please use Google Sign-In:',
@@ -443,7 +447,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ],
               PrimaryButton(
                 onPressed: _loading ? null : _signInWithGoogle,
-                label: Platform.isMacOS ? 'Sign in with Google (Recommended)' : 'Continue with Google',
+                label: _isMacOS ? 'Sign in with Google (Recommended)' : 'Continue with Google',
                 icon: Icons.g_mobiledata,
               ),
             ],
