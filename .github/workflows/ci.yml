@@ -70,17 +70,24 @@ jobs:
           channel: stable
           cache: true
 
+      - name: 📦 Cache Pub Dependencies
+        uses: actions/cache@v4
+        id: pub-cache
+        with:
+          path: |
+            ${{ runner.tool_cache }}/flutter/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - name: 🔧 Get Dependencies
         run: |
           echo "📦 Resolving dependencies..."
-          flutter pub get || {
-            echo "❌ Dependency resolution failed - showing error details"
-            flutter pub get --verbose 2>&1 | tail -100
-            echo "🔍 Attempting to resolve with retry..."
-            flutter clean
-            flutter pub cache repair || true
-            flutter pub get || {
-              echo "❌ Dependency resolution failed after retry"
+          flutter pub get --no-example || {
+            echo "⚠️ First attempt failed, retrying..."
+            flutter pub get --verbose 2>&1 | tail -50 || {
+              echo "❌ Dependency resolution failed"
               exit 1
             }
           }
