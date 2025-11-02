@@ -59,7 +59,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
 
   # Utils and Extensions if needed
-  collection: ^1.19.1
+  # collection is managed by flutter_localizations SDK dependency
 
   intl_utils: ^2.8.12
 #  firebase_dynamic_links: ^6.1.10
