@@ -1,0 +1,787 @@
+[
+  {
+    "id": "TC001",
+    "title": "Role Selection Screen Loads Correctly",
+    "description": "Verify that the role selection screen displays options for Guest and Owner and allows selection.",
+    "category": "ui",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Launch the app and wait for splash screen to complete initialization"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the role selection screen is shown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that both Guest and Owner roles are presented as selectable options"
+      },
+      {
+        "type": "action",
+        "description": "Select Guest role"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selection is registered and user can proceed to authentication flow"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Authentication via Phone OTP Success",
+    "description": "Verify user can authenticate successfully using phone number with OTP for both Guest and Owner roles.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Select role (Guest or Owner) on role selection screen"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to phone authentication screen"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid phone number"
+      },
+      {
+        "type": "action",
+        "description": "Request OTP and receive it"
+      },
+      {
+        "type": "action",
+        "description": "Input correct OTP"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user is authenticated and redirected to corresponding dashboard"
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Authentication via Phone OTP Failure on Incorrect OTP",
+    "description": "Verify user cannot authenticate if an incorrect OTP is entered and appropriate error message is displayed.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Select role (Guest or Owner)"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to phone authentication screen"
+      },
+      {
+        "type": "action",
+        "description": "Enter valid phone number"
+      },
+      {
+        "type": "action",
+        "description": "Request OTP"
+      },
+      {
+        "type": "action",
+        "description": "Input incorrect OTP"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify authentication fails with an error message indicating invalid OTP"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Authentication via Google Sign-in Success",
+    "description": "Verify user can authenticate successfully using Google Sign-in for both roles.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Select role (Guest or Owner)"
+      },
+      {
+        "type": "action",
+        "description": "Click on Google Sign-in button"
+      },
+      {
+        "type": "action",
+        "description": "Complete Google Sign-in flow with valid Google account"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user is authenticated and redirected to correct dashboard"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Authentication via Apple Sign-in Success",
+    "description": "Verify user can authenticate successfully using Apple Sign-in on supported devices.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Select role (Guest or Owner)"
+      },
+      {
+        "type": "action",
+        "description": "Click on Apple Sign-in button"
+      },
+      {
+        "type": "action",
+        "description": "Complete Apple Sign-in flow with valid Apple ID"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user is authenticated and redirected to correct dashboard"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Guest Dashboard - Browse PG Listings with Search",
+    "description": "Verify guest users can browse PG listings, use advanced search filters, and view full listing details.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Guest user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to guest PG listings screen"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify listings are displayed with correct details including photos and amenities"
+      },
+      {
+        "type": "action",
+        "description": "Use advanced search filters (e.g., location, price, amenities)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify filtered listings match criteria"
+      },
+      {
+        "type": "action",
+        "description": "Select a PG listing to view details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify PG details show correct information, photos, and food menu"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Guest Booking - Successful Booking with Real-time Availability",
+    "description": "Verify a guest can successfully book a bed in a PG showing real-time availability without conflicts.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Guest user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to a PG listing with available beds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify availability is shown accurately for beds"
+      },
+      {
+        "type": "action",
+        "description": "Initiate booking process and select available bed"
+      },
+      {
+        "type": "action",
+        "description": "Complete booking form and confirm booking"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify booking is successful and availability is updated accordingly"
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Guest Booking - Booking Rejected on No Availability",
+    "description": "Verify booking attempt fails gracefully when a selected bed is no longer available and shows appropriate message.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Guest user"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to a PG listing where beds are fully booked"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to book a bed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify attempt to book a fully booked bed fails with user-friendly error message"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Guest Dashboard - Food Menu Viewing",
+    "description": "Verify guest can view available food menu, navigate food categories, and view item details.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Guest"
+      },
+      {
+        "type": "action",
+        "description": "Go to food menu section from PG listing or guest dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify food items for selected PG are displayed with photos and descriptions"
+      },
+      {
+        "type": "action",
+        "description": "Select food category"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify items filter according to category"
+      },
+      {
+        "type": "action",
+        "description": "Select a food item to view details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify detailed food item information is displayed"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Guest Dashboard - Payment Tracking",
+    "description": "Verify guest can view payment history, payment statuses, and billing details.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Guest"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to payments section on guest dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify payment list shows all past transactions with correct status"
+      },
+      {
+        "type": "action",
+        "description": "Select a payment to view detailed billing information"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify billing details are accurate and match backend records"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Guest Dashboard - Complaint Submission and Status Tracking",
+    "description": "Verify guests can submit complaints and track their statuses with notifications on updates.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Guest"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to complaints section"
+      },
+      {
+        "type": "action",
+        "description": "Submit a new complaint with required details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify complaint is recorded and visible in complaint list with 'Open' status"
+      },
+      {
+        "type": "action",
+        "description": "Simulate complaint status update (e.g. through backend or owner action)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify guest receives notification and complaint status updates in real-time"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Owner Dashboard - CRUD Operations on PG Properties",
+    "description": "Verify that owners can create, read, update, and delete PG properties, floors, rooms, and beds.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Owner"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to PG management screen"
+      },
+      {
+        "type": "action",
+        "description": "Create a new PG property with all fields filled"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new PG property is listed"
+      },
+      {
+        "type": "action",
+        "description": "Add floors, rooms, and beds to the PG property"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all additions are visible and editable"
+      },
+      {
+        "type": "action",
+        "description": "Update PG property details and save"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify updates persist and are shown correctly"
+      },
+      {
+        "type": "action",
+        "description": "Delete a room or bed from PG property configuration"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify deletion is confirmed and no longer visible in UI or backend"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Owner Dashboard - Manage Guest Bookings and Approvals",
+    "description": "Verify owner can view guest bookings, approve or reject requests, and track check-in and check-out.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Owner"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to guest management screen"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify list of guest bookings is displayed with correct information"
+      },
+      {
+        "type": "action",
+        "description": "Select a pending booking request"
+      },
+      {
+        "type": "action",
+        "description": "Approve the booking request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify booking status changes to approved and user is notified"
+      },
+      {
+        "type": "action",
+        "description": "Select another booking request and reject it"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify booking status changes to rejected and user is notified"
+      },
+      {
+        "type": "action",
+        "description": "Mark a guest check-in and check-out"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify guest status updates correctly and records are consistent"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Owner Dashboard - Financial Metrics and Analytics Reports",
+    "description": "Verify owner can view revenue, expenses, payments, occupancy rate, and generate correct analytic reports.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Owner"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to overview analytics screen"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify revenue, expenses, payments, and occupancy data are displayed and pulled from backend"
+      },
+      {
+        "type": "action",
+        "description": "Generate revenue projection report"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify generated report data matches backend records and calculations"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Multi-language Support - English and Telugu",
+    "description": "Verify app interface adapts correctly between English and Telugu including formatting of dates and numbers.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Launch app and authenticate as Guest"
+      },
+      {
+        "type": "action",
+        "description": "Set app language to English in preferences"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all UI elements and labels display text in English"
+      },
+      {
+        "type": "action",
+        "description": "Toggle app language to Telugu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all UI text changes to Telugu accurately with correct locale specific formats"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Theme Switching - Light and Dark Mode",
+    "description": "Verify user can toggle between light mode, dark mode, and system default themes and UI updates accordingly.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Launch app and authenticate"
+      },
+      {
+        "type": "action",
+        "description": "Open settings and select light theme"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify UI colors render in light mode throughout all app screens"
+      },
+      {
+        "type": "action",
+        "description": "Switch theme setting to dark mode"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify UI updates to dark mode colors seamlessly"
+      },
+      {
+        "type": "action",
+        "description": "Select system default theme"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify app theme changes dynamically based on system settings"
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Secure Data Storage and Transmission",
+    "description": "Verify that user data is encrypted in transit and at rest and cannot be accessed without authorization.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as a user and perform actions involving sensitive data (e.g. payments, profile updates)"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify network requests contain encrypted data using HTTPS/TLS"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify sensitive data stored locally is encrypted using secure storage"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access protected data without authentication or with invalid credentials"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify unauthorized access is denied and does not expose sensitive information"
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Interactive PG Floor Map Rendering and Updates",
+    "description": "Verify owner dashboard renders multi-floor, room, bed maps interactively with accurate status and allows updates.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Owner"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to floor management widget of a multi-floor PG property"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify floor map is rendered with rooms and beds visually displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify bed statuses correspond to real-time data (booked, vacant, maintenance)"
+      },
+      {
+        "type": "action",
+        "description": "Update bed status and save changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updates reflect visually and persist in backend"
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Push Notification Delivery and Handling",
+    "description": "Verify that app receives real-time notifications for payments, complaints, bookings, and status updates.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Guest and Owner in separate devices"
+      },
+      {
+        "type": "action",
+        "description": "Trigger backend event for payment confirmation, booking approval, or complaint update"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify relevant user receives push notification timely with correct content"
+      },
+      {
+        "type": "action",
+        "description": "Tap the notification to open the app"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify app navigates to the related screen and displays updated data"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "Performance - App Launch Time Under 3 Seconds",
+    "description": "Verify app loads and transition from splash to main dashboard within 3 seconds on supported devices.",
+    "category": "performance",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Launch app on supported iOS and Android devices under normal network conditions"
+      },
+      {
+        "type": "assertion",
+        "description": "Measure time from app start to user seeing dashboard screen"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify total load time is less than or equal to 3 seconds"
+      }
+    ]
+  },
+  {
+    "id": "TC021",
+    "title": "Performance - API Response Times Under 2 Seconds",
+    "description": "Verify backend API responses for booking, payments, and property management complete within 2 seconds.",
+    "category": "performance",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Perform various API requests (e.g. fetch PG listings, create booking, update payment status)"
+      },
+      {
+        "type": "assertion",
+        "description": "Measure response time for each API call"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all response times are less than or equal to 2 seconds"
+      }
+    ]
+  },
+  {
+    "id": "TC022",
+    "title": "Navigation - Role-Based and Nested Routing",
+    "description": "Verify that navigation routes are correctly restricted and nested by user role and app section.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate as Guest"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to navigate to Owner-only dashboard screens via URL or deep link"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user is redirected or access denied to Owner dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Authenticate as Owner"
+      },
+      {
+        "type": "action",
+        "description": "Navigate through nested routes for PG management, including multi-floor views"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all nested screens load correctly and navigation back works without errors"
+      }
+    ]
+  },
+  {
+    "id": "TC023",
+    "title": "Complaint System - Concurrent Updates Handling",
+    "description": "Verify that simultaneous complaint updates by owner and guest do not cause data conflicts or loss.",
+    "category": "error handling",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in simultaneously as Guest and Owner on different devices"
+      },
+      {
+        "type": "action",
+        "description": "Guest submits a complaint"
+      },
+      {
+        "type": "action",
+        "description": "Owner updates complaint status concurrently while Guest views the complaint"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify complaint status updates in real-time for Guest without data inconsistency"
+      },
+      {
+        "type": "action",
+        "description": "Both try to update complaint notes concurrently"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify system prevents conflicting overwrites and merges changes accurately"
+      }
+    ]
+  },
+  {
+    "id": "TC024",
+    "title": "Localization - Date and Number Format Accuracy",
+    "description": "Verify dates, currencies, and numbers are formatted correctly for English and Telugu locales.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Set app language to English"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to payments and booking detail screens"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dates appear in DD/MM/YYYY or locale appropriate English format"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify currency and number values appear correctly"
+      },
+      {
+        "type": "action",
+        "description": "Set app language to Telugu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dates and numbers appear formatted correctly for Telugu locale"
+      }
+    ]
+  },
+  {
+    "id": "TC025",
+    "title": "Data Encryption Verification at Rest and Transit",
+    "description": "Verify all sensitive user data is encrypted when stored locally and during transmission to backend.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Authenticate and perform data operations involving sensitive information"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify local storage data related to sensitive info is encrypted (using secure storage)"
+      },
+      {
+        "type": "assertion",
+        "description": "Capture network traffic and verify all communication uses encrypted protocols (TLS/SSL)"
+      }
+    ]
+  }
+]

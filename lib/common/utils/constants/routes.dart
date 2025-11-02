@@ -54,6 +54,15 @@ class AppRoutes {
   /// Guest profile management: '/guest/profile'
   static const String guestProfile = '$guestHome/profile';
 
+  /// Guest settings: '/guest/settings'
+  static const String guestSettings = '$guestHome/settings';
+
+  /// Guest help: '/guest/help'
+  static const String guestHelp = '$guestHome/help';
+
+  /// Guest notifications: '/guest/notifications'
+  static const String guestNotifications = '$guestHome/notifications';
+
   // MARK: - Owner Feature Routes
   // ==========================================
 
@@ -74,6 +83,21 @@ class AppRoutes {
 
   /// Owner profile management: '/owner/profile'
   static const String ownerProfile = '$ownerHome/profile';
+
+  /// Owner settings: '/owner/settings'
+  static const String ownerSettings = '$ownerHome/settings';
+
+  /// Owner help: '/owner/help'
+  static const String ownerHelp = '$ownerHome/help';
+
+  /// Owner notifications: '/owner/notifications'
+  static const String ownerNotifications = '$ownerHome/notifications';
+
+  /// Owner analytics: '/owner/analytics'
+  static const String ownerAnalytics = '$ownerHome/analytics';
+
+  /// Owner reports: '/owner/reports'
+  static const String ownerReports = '$ownerHome/reports';
 
   // MARK: - Route Builder Methods
   // ==========================================
@@ -104,7 +128,8 @@ class AppRoutes {
   static String editPG(String pgId) => '$ownerPGs/edit/$pgId';
 
   /// Build route for payment details with dynamic payment ID
-  static String guestPaymentDetails(String paymentId) => '$guestPayments/$paymentId';
+  static String guestPaymentDetails(String paymentId) =>
+      '$guestPayments/$paymentId';
 
   /// Build route for adding a new payment
   static String guestPaymentAdd() => '$guestPayments/add';

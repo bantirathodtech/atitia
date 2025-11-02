@@ -100,4 +100,10 @@ class FirestoreConstants {
 
   /// Notification preferences collection: 'notification_preferences'
   static const String notificationPreferences = 'notification_preferences';
+
+  /// Notifications collection: 'notifications'
+  static const String notifications = 'notifications';
+
+  /// Bed change requests collection: 'bed_change_requests'
+  static const String bedChangeRequests = 'bed_change_requests';
 }

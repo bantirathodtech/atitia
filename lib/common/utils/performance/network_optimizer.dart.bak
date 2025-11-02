@@ -1,0 +1,230 @@
+// lib/common/utils/performance/network_optimizer.dart
+
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+
+/// Network optimization utility for better API performance
+/// Provides request deduplication, caching, and retry mechanisms
+class NetworkOptimizer {
+  static final Map<String, Completer<http.Response>> _pendingRequests = {};
+  static final Map<String, DateTime> _lastRequestTimes = {};
+  static const Duration _requestThrottle = Duration(milliseconds: 500);
+  static const int _maxRetries = 3;
+  static const Duration _retryDelay = Duration(seconds: 1);
+
+  /// Optimized GET request with caching and deduplication
+  static Future<http.Response> get(
+    String url, {
+    Map<String, String>? headers,
+    Duration? cacheDuration,
+    bool forceRefresh = false,
+  }) async {
+    final cacheKey = _generateCacheKey(url, headers);
+
+    // Check for pending request
+    if (_pendingRequests.containsKey(cacheKey)) {
+      return await _pendingRequests[cacheKey]!.future;
+    }
+
+    // Check cache first
+    if (!forceRefresh) {
+      final cachedResponse = await _getCachedResponse(cacheKey);
+      if (cachedResponse != null) {
+        return cachedResponse;
+      }
+    }
+
+    // Throttle requests
+    await _throttleRequest(cacheKey);
+
+    final completer = Completer<http.Response>();
+    _pendingRequests[cacheKey] = completer;
+
+    try {
+      final response = await _executeWithRetry(() async {
+        return await http.get(Uri.parse(url), headers: headers);
+      });
+
+      // Cache successful responses
+      if (response.statusCode == 200) {
+        await _cacheResponse(cacheKey, response, cacheDuration);
+      }
+
+      completer.complete(response);
+      return response;
+    } catch (e) {
+      completer.completeError(e);
+      rethrow;
+    } finally {
+      _pendingRequests.remove(cacheKey);
+    }
+  }
+
+  /// Optimized POST request with deduplication
+  static Future<http.Response> post(
+    String url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
+    final cacheKey = _generateCacheKey(url, headers, body);
+
+    // Check for pending request
+    if (_pendingRequests.containsKey(cacheKey)) {
+      return await _pendingRequests[cacheKey]!.future;
+    }
+
+    // Throttle requests
+    await _throttleRequest(cacheKey);
+
+    final completer = Completer<http.Response>();
+    _pendingRequests[cacheKey] = completer;
+
+    try {
+      final response = await _executeWithRetry(() async {
+        return await http.post(
+          Uri.parse(url),
+          headers: headers,
+          body: body,
+          encoding: encoding,
+        );
+      });
+
+      completer.complete(response);
+      return response;
+    } catch (e) {
+      completer.completeError(e);
+      rethrow;
+    } finally {
+      _pendingRequests.remove(cacheKey);
+    }
+  }
+
+  /// Execute request with retry mechanism
+  static Future<http.Response> _executeWithRetry(
+    Future<http.Response> Function() request,
+  ) async {
+    int attempts = 0;
+
+    while (attempts < _maxRetries) {
+      try {
+        final response = await request();
+
+        // Retry on server errors (5xx)
+        if (response.statusCode >= 500 && attempts < _maxRetries - 1) {
+          attempts++;
+          await Future.delayed(_retryDelay * attempts);
+          continue;
+        }
+
+        return response;
+      } catch (e) {
+        attempts++;
+        if (attempts >= _maxRetries) {
+          rethrow;
+        }
+        await Future.delayed(_retryDelay * attempts);
+      }
+    }
+
+    throw Exception('Max retries exceeded');
+  }
+
+  /// Throttle requests to prevent overwhelming the server
+  static Future<void> _throttleRequest(String cacheKey) async {
+    final lastRequestTime = _lastRequestTimes[cacheKey];
+    if (lastRequestTime != null) {
+      final timeSinceLastRequest = DateTime.now().difference(lastRequestTime);
+      if (timeSinceLastRequest < _requestThrottle) {
+        await Future.delayed(_requestThrottle - timeSinceLastRequest);
+      }
+    }
+    _lastRequestTimes[cacheKey] = DateTime.now();
+  }
+
+  /// Generate cache key for request
+  static String _generateCacheKey(String url, Map<String, String>? headers,
+      [Object? body]) {
+    final keyData = {
+      'url': url,
+      'headers': headers?.toString() ?? '',
+      'body': body?.toString() ?? '',
+    };
+    return base64Encode(utf8.encode(keyData.toString()));
+  }
+
+  /// Get cached response
+  static Future<http.Response?> _getCachedResponse(String cacheKey) async {
+    try {
+      final cacheManager = DefaultCacheManager();
+      final file = await cacheManager.getFileFromCache(cacheKey);
+
+      if (file != null && file.file.existsSync()) {
+        final content = await file.file.readAsString();
+        final responseData = jsonDecode(content);
+
+        return http.Response(
+          responseData['body'],
+          responseData['statusCode'],
+          headers: Map<String, String>.from(responseData['headers']),
+        );
+      }
+    } catch (e) {
+    }
+
+    return null;
+  }
+
+  /// Cache response
+  static Future<void> _cacheResponse(
+    String cacheKey,
+    http.Response response,
+    Duration? cacheDuration,
+  ) async {
+    try {
+      final cacheManager = DefaultCacheManager();
+      final responseData = {
+        'body': response.body,
+        'statusCode': response.statusCode,
+        'headers': response.headers,
+      };
+
+      final content = jsonEncode(responseData);
+      await cacheManager.putFile(
+        cacheKey,
+        utf8.encode(content),
+        fileExtension: 'json',
+        maxAge: cacheDuration ?? const Duration(hours: 1),
+      );
+    } catch (e) {
+    }
+  }
+
+  /// Clear all cached responses
+  static Future<void> clearCache() async {
+    try {
+      final cacheManager = DefaultCacheManager();
+      await cacheManager.emptyCache();
+    } catch (e) {
+    }
+  }
+
+  /// Get cache size
+  static Future<int> getCacheSize() async {
+    try {
+      // For now, return 0 as cache size calculation is complex with current API
+      // TODO: Implement proper cache size calculation when API is stable
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  /// Preload critical resources
+  static Future<void> preloadResources(List<String> urls) async {
+    final futures = urls.map((url) => get(url));
+    await Future.wait(futures);
+  }
+}

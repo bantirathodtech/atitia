@@ -1,0 +1,19 @@
+# Android Production Signing Configuration Template
+# 
+# INSTRUCTIONS:
+# 1. Copy this file to android/key.properties
+# 2. Fill in your actual values (DO NOT commit key.properties to git)
+# 3. Add key.properties to .gitignore
+
+# Store file path (relative to android/app directory)
+storeFile=../keystore.jks
+
+# Keystore password
+storePassword=YOUR_KEYSTORE_PASSWORD
+
+# Key alias name
+keyAlias=atitia-release
+
+# Key password
+keyPassword=YOUR_KEY_PASSWORD
+

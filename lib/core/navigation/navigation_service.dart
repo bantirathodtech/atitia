@@ -46,6 +46,9 @@ class NavigationService {
   void goToGuestComplaintDetails(String complaintId) =>
       _router.go(AppRoutes.guestComplaintDetails(complaintId));
   void goToGuestProfile() => _router.go(AppRoutes.guestProfile);
+  void goToGuestSettings() => _router.go(AppRoutes.guestSettings);
+  void goToGuestHelp() => _router.go(AppRoutes.guestHelp);
+  void goToGuestNotifications() => _router.go(AppRoutes.guestNotifications);
 
   // Owner navigation methods
   void goToOwnerHome() => _router.go(AppRoutes.ownerHome);
@@ -54,6 +57,11 @@ class NavigationService {
   void goToOwnerPGs() => _router.go(AppRoutes.ownerPGs);
   void goToOwnerGuests() => _router.go(AppRoutes.ownerGuests);
   void goToOwnerProfile() => _router.go(AppRoutes.ownerProfile);
+  void goToOwnerSettings() => _router.go(AppRoutes.ownerSettings);
+  void goToOwnerHelp() => _router.go(AppRoutes.ownerHelp);
+  void goToOwnerNotifications() => _router.go(AppRoutes.ownerNotifications);
+  void goToOwnerAnalytics() => _router.go(AppRoutes.ownerAnalytics);
+  void goToOwnerReports() => _router.go(AppRoutes.ownerReports);
 
   // Utility navigation methods
   void goBack() => _router.pop();

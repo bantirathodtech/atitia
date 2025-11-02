@@ -1,0 +1,18 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:8080",
+  "loginUser": "9876543210",
+  "loginPassword": "123456",
+  "executionArgs": {
+    "projectName": "atitia",
+    "projectPath": "/Users/apple/Development/ProjectsFlutter/com.charyatani/atitia",
+    "testIds": [],
+    "additionalInstruction": "The Flutter app is now running on port 8080 with all critical issues fixed. Please test all functionality including authentication, navigation, and core features.",
+    "envs": {
+      "API_KEY": "sk-user-TiGfznAiqixFE4znrltAapOCM7mdG9y9kklXET1xDojta3Fx1OcmAv5TkEdAXRD8SS-CfmqK1i3MfGlXzrgIzeJXkvWQO-UZqzJm3NL_Cf5KM-l2OOogpLooOsvWTSfdCwg"
+    }
+  },
+  "proxy": "http://2fd11f78-30e1-41f8-8b72-cf2f61984201:b7Qq7cPTFY1RJFNb75cWmc9favLtrPf7@tun.testsprite.com:8080"
+}

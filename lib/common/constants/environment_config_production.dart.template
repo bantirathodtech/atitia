@@ -1,0 +1,22 @@
+/// 🌍 PRODUCTION ENVIRONMENT CONFIGURATION TEMPLATE
+/// 
+/// This is a template for production environment configuration.
+/// Copy this file to environment_config_production.dart and fill in your production values.
+/// 
+/// IMPORTANT: Never commit the actual production file to version control!
+
+import 'environment_config.dart';
+
+class ProductionEnvironmentConfig extends EnvironmentConfig {
+  // ==========================================================================
+  // OVERRIDE PRODUCTION VALUES HERE
+  // ==========================================================================
+  
+  // Example overrides for production:
+  // static const String firebaseProjectId = 'your-production-project-id';
+  // static const String firebaseWebApiKey = 'your-production-web-api-key';
+  // static const String googleSignInWebClientId = 'your-production-web-client-id';
+  // static const String recaptchaEnterpriseSiteKey = 'your-production-recaptcha-key';
+  
+  // Add your production-specific overrides here...
+}

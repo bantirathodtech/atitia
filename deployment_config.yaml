@@ -1,0 +1,261 @@
+# Deployment Configuration for Atitia App
+# This file contains deployment settings for different environments
+
+# Environment configurations
+environments:
+  development:
+    api_base_url: "https://dev-api.atitia.com"
+    firebase_project_id: "atitia-dev"
+    supabase_url: "https://atitia-dev.supabase.co"
+    enable_debug_logging: true
+    enable_test_mode: true
+    enable_mock_data: true
+    log_level: "DEBUG"
+    
+  staging:
+    api_base_url: "https://staging-api.atitia.com"
+    firebase_project_id: "atitia-staging"
+    supabase_url: "https://atitia-staging.supabase.co"
+    enable_debug_logging: true
+    enable_test_mode: false
+    enable_mock_data: true
+    log_level: "INFO"
+    
+  production:
+    api_base_url: "https://api.atitia.com"
+    firebase_project_id: "atitia-app"
+    supabase_url: "https://atitia.supabase.co"
+    enable_debug_logging: false
+    enable_test_mode: false
+    enable_mock_data: false
+    log_level: "WARN"
+
+# Firebase configuration
+firebase:
+  project_id: "atitia-app"
+  app_id_android: "com.charyatani.atitia"
+  app_id_ios: "com.charyatani.atitia"
+  api_key: "AIzaSyBxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  auth_domain: "atitia-app.firebaseapp.com"
+  storage_bucket: "atitia-app.appspot.com"
+  messaging_sender_id: "123456789012"
+  app_id: "1:123456789012:web:abcdefghijklmnop"
+
+# Supabase configuration
+supabase:
+  url: "https://atitia.supabase.co"
+  anon_key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  service_role_key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+# API configuration
+api:
+  timeout_seconds: 30
+  max_retry_attempts: 3
+  rate_limit_per_hour: 100
+  rate_limit_strict_per_hour: 20
+
+# Security configuration
+security:
+  enable_encryption: true
+  enable_biometric_auth: true
+  enable_pin_auth: true
+  max_login_attempts: 5
+  lockout_duration_minutes: 15
+  enable_security_monitoring: true
+
+# Performance configuration
+performance:
+  image_cache_size_mb: 100
+  max_image_cache_age_days: 7
+  network_cache_size_mb: 50
+  max_network_cache_age_hours: 24
+  memory_cache_size_mb: 50
+  disk_cache_size_mb: 200
+  max_cache_age_hours: 24
+  enable_cache_compression: true
+
+# Monitoring configuration
+monitoring:
+  enable_analytics: true
+  enable_crashlytics: true
+  enable_performance_monitoring: true
+  enable_error_reporting: true
+  enable_user_tracking: true
+  enable_remote_logging: true
+
+# Logging configuration
+logging:
+  log_level: "INFO"
+  enable_console_logging: true
+  enable_file_logging: true
+  enable_remote_logging: true
+  max_log_file_size_mb: 10
+  max_log_files: 5
+
+# Database configuration
+database:
+  version: 1
+  name: "atitia.db"
+  max_size_mb: 100
+  enable_encryption: true
+
+# Network configuration
+network:
+  connection_timeout_seconds: 30
+  read_timeout_seconds: 30
+  write_timeout_seconds: 30
+  enable_network_logging: true
+  enable_network_caching: true
+
+# UI configuration
+ui:
+  enable_animations: true
+  enable_haptic_feedback: true
+  enable_sound_effects: true
+  enable_accessibility_features: true
+  enable_dark_mode: true
+
+# Testing configuration
+testing:
+  enable_test_mode: false
+  enable_mock_data: false
+  enable_test_analytics: false
+  enable_test_crashlytics: false
+
+# Deployment settings
+deployment:
+  # Android deployment
+  android:
+    package_name: "com.charyatani.atitia"
+    version_code: 1
+    version_name: "1.0.0"
+    min_sdk_version: 21
+    target_sdk_version: 34
+    compile_sdk_version: 34
+    build_tools_version: "34.0.0"
+    
+  # iOS deployment
+  ios:
+    bundle_identifier: "com.charyatani.atitia"
+    version: "1.0.0"
+    build_number: "1"
+    minimum_ios_version: "12.0"
+    target_ios_version: "17.0"
+    
+  # Web deployment
+  web:
+    domain: "atitia.com"
+    subdomain: "app"
+    ssl_enabled: true
+    cdn_enabled: true
+    
+  # Firebase Hosting
+  firebase_hosting:
+    project_id: "atitia-app"
+    site_id: "atitia-app"
+    channel_id: "live"
+    
+  # App Store deployment
+  app_store:
+    apple_id: "1234567890"
+    team_id: "ABCDEFGHIJ"
+    bundle_id: "com.charyatani.atitia"
+    
+  # Google Play deployment
+  google_play:
+    package_name: "com.charyatani.atitia"
+    track: "production"
+    release_status: "completed"
+
+# CI/CD configuration
+cicd:
+  # GitHub Actions
+  github_actions:
+    enabled: true
+    workflow_file: ".github/workflows/ci.yml"
+    
+  # Build configuration
+  build:
+    enable_code_signing: true
+    enable_obfuscation: true
+    enable_shrinking: true
+    enable_proguard: true
+    
+  # Testing
+  testing:
+    enable_unit_tests: true
+    enable_integration_tests: true
+    enable_ui_tests: true
+    enable_performance_tests: true
+    enable_security_tests: true
+    
+  # Quality gates
+  quality_gates:
+    min_test_coverage: 80
+    max_cyclomatic_complexity: 10
+    max_cognitive_complexity: 15
+    max_lines_per_file: 500
+    max_parameters_per_method: 5
+    
+  # Security scanning
+  security:
+    enable_dependency_scan: true
+    enable_code_scan: true
+    enable_secret_scan: true
+    enable_vulnerability_scan: true
+
+# Feature flags
+feature_flags:
+  enable_new_ui: true
+  enable_advanced_analytics: true
+  enable_beta_features: false
+  enable_experimental_features: false
+  enable_debug_menu: false
+  enable_developer_options: false
+
+# Environment variables
+environment_variables:
+  # API Keys
+  API_KEY: "your_api_key_here"
+  FIREBASE_API_KEY: "your_firebase_api_key_here"
+  SUPABASE_ANON_KEY: "your_supabase_anon_key_here"
+  
+  # Database
+  DATABASE_URL: "your_database_url_here"
+  DATABASE_PASSWORD: "your_database_password_here"
+  
+  # Third-party services
+  STRIPE_PUBLISHABLE_KEY: "your_stripe_publishable_key_here"
+  GOOGLE_MAPS_API_KEY: "your_google_maps_api_key_here"
+  SENTRY_DSN: "your_sentry_dsn_here"
+  
+  # Analytics
+  MIXPANEL_TOKEN: "your_mixpanel_token_here"
+  AMPLITUDE_API_KEY: "your_amplitude_api_key_here"
+  
+  # Push notifications
+  FCM_SERVER_KEY: "your_fcm_server_key_here"
+  APNS_KEY_ID: "your_apns_key_id_here"
+  APNS_TEAM_ID: "your_apns_team_id_here"
+
+# Backup configuration
+backup:
+  enable_automatic_backup: true
+  backup_frequency: "daily"
+  backup_retention_days: 30
+  backup_location: "firebase_storage"
+  
+# Disaster recovery
+disaster_recovery:
+  enable_automatic_failover: true
+  failover_threshold: 5
+  recovery_time_objective: "4_hours"
+  recovery_point_objective: "1_hour"
+  
+# Compliance
+compliance:
+  gdpr_compliant: true
+  ccpa_compliant: true
+  hipaa_compliant: false
+  soc2_compliant: true
+  iso27001_compliant: true

@@ -1,0 +1,314 @@
+{
+  "tech_stack": [
+    "Dart",
+    "Flutter",
+    "Firebase",
+    "Provider",
+    "GetIt",
+    "GoRouter",
+    "Firestore",
+    "Firebase Auth",
+    "Firebase Storage",
+    "Firebase Analytics",
+    "Firebase Crashlytics",
+    "Firebase Performance",
+    "Firebase Remote Config",
+    "Firebase Cloud Functions",
+    "Firebase Cloud Messaging",
+    "Supabase",
+    "Google Maps",
+    "Google Sign-in",
+    "Apple Sign-in",
+    "Image Picker",
+    "Local Notifications",
+    "Shared Preferences",
+    "Secure Storage",
+    "Connectivity Plus",
+    "Intl",
+    "Equatable"
+  ],
+  "features": [
+    {
+      "name": "Authentication System",
+      "description": "Complete authentication system with phone OTP, Google Sign-in, Apple Sign-in, role selection, and user registration",
+      "files": [
+        "lib/feature/auth/data/model/user_model.dart",
+        "lib/feature/auth/data/repository/auth_repository.dart",
+        "lib/feature/auth/logic/auth_provider.dart",
+        "lib/feature/auth/view/screen/role_selection/role_selection_screen.dart",
+        "lib/feature/auth/view/screen/signin/phone_auth_screen.dart",
+        "lib/feature/auth/view/screen/signup/registration_screen.dart",
+        "lib/feature/auth/view/screen/splash/splash_screen.dart",
+        "lib/feature/auth/view/widgets/otp_form.dart",
+        "lib/feature/auth/view/widgets/phone_input.dart",
+        "lib/feature/auth/view/widgets/role_selection.dart",
+        "lib/feature/auth/view/widgets/social_login_button.dart"
+      ]
+    },
+    {
+      "name": "Guest Dashboard",
+      "description": "Complete guest interface with PG browsing, food menu, payments, complaints, and profile management",
+      "files": [
+        "lib/feature/guest_dashboard/guest_dashboard.dart",
+        "lib/feature/guest_dashboard/pgs/data/models/guest_pg_model.dart",
+        "lib/feature/guest_dashboard/pgs/data/repository/guest_pg_repository.dart",
+        "lib/feature/guest_dashboard/pgs/view/screens/guest_pg_detail_screen.dart",
+        "lib/feature/guest_dashboard/pgs/view/screens/guest_pg_list_screen.dart",
+        "lib/feature/guest_dashboard/pgs/view/widgets/booking_dialog.dart",
+        "lib/feature/guest_dashboard/pgs/view/widgets/guest_amenities_list.dart",
+        "lib/feature/guest_dashboard/pgs/view/widgets/guest_pg_card.dart",
+        "lib/feature/guest_dashboard/pgs/view/widgets/guest_photo_gallery.dart",
+        "lib/feature/guest_dashboard/pgs/viewmodel/guest_pg_viewmodel.dart",
+        "lib/feature/guest_dashboard/foods/data/models/guest_food_model.dart",
+        "lib/feature/guest_dashboard/foods/data/repository/guest_food_repository.dart",
+        "lib/feature/guest_dashboard/foods/view/screens/guest_food_detail_screen.dart",
+        "lib/feature/guest_dashboard/foods/view/screens/guest_food_list_screen.dart",
+        "lib/feature/guest_dashboard/foods/view/widgets/guest_food_card.dart",
+        "lib/feature/guest_dashboard/foods/viewmodel/guest_food_viewmodel.dart",
+        "lib/feature/guest_dashboard/payments/data/models/guest_payment_model.dart",
+        "lib/feature/guest_dashboard/payments/data/repository/guest_payment_repository.dart",
+        "lib/feature/guest_dashboard/payments/view/screens/guest_payment_detail_screen.dart",
+        "lib/feature/guest_dashboard/payments/view/screens/guest_payment_screen.dart",
+        "lib/feature/guest_dashboard/payments/view/widgets/guest_payment_card_widget.dart",
+        "lib/feature/guest_dashboard/payments/viewmodel/guest_payment_viewmodel.dart",
+        "lib/feature/guest_dashboard/complaints/data/models/guest_complaint_model.dart",
+        "lib/feature/guest_dashboard/complaints/data/repository/guest_complaint_repository.dart",
+        "lib/feature/guest_dashboard/complaints/view/screens/guest_complaint_add_screen.dart",
+        "lib/feature/guest_dashboard/complaints/view/screens/guest_complaint_list_screen.dart",
+        "lib/feature/guest_dashboard/complaints/view/widgets/guest_complaint_card.dart",
+        "lib/feature/guest_dashboard/complaints/viewmodel/guest_complaint_viewmodel.dart",
+        "lib/feature/guest_dashboard/profile/data/models/guest_profile_model.dart",
+        "lib/feature/guest_dashboard/profile/data/repository/guest_profile_repository.dart",
+        "lib/feature/guest_dashboard/profile/view/screens/guest_profile_screen.dart",
+        "lib/feature/guest_dashboard/profile/viewmodel/guest_profile_viewmodel.dart"
+      ]
+    },
+    {
+      "name": "Owner Dashboard",
+      "description": "Complete owner interface with PG management, guest management, food menu management, overview analytics, and profile management",
+      "files": [
+        "lib/feature/owner_dashboard/owner_dashboard.dart",
+        "lib/feature/owner_dashboard/overview/data/models/owner_overview_model.dart",
+        "lib/feature/owner_dashboard/overview/data/repository/owner_overview_repository.dart",
+        "lib/feature/owner_dashboard/overview/view/screens/owner_overview_screen.dart",
+        "lib/feature/owner_dashboard/overview/view/widgets/owner_overview_widget.dart",
+        "lib/feature/owner_dashboard/overview/view/widgets/revenue_chart_widget.dart",
+        "lib/feature/owner_dashboard/overview/viewmodel/owner_overview_view_model.dart",
+        "lib/feature/owner_dashboard/mypg/data/models/owner_pg_management_model.dart",
+        "lib/feature/owner_dashboard/mypg/data/models/pg_bed_model.dart",
+        "lib/feature/owner_dashboard/mypg/data/models/pg_floor_model.dart",
+        "lib/feature/owner_dashboard/mypg/data/models/pg_room_model.dart",
+        "lib/feature/owner_dashboard/mypg/data/repositories/owner_pg_management_repository.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/screens/owner_pg_management_screen.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/viewmodels/owner_pg_management_viewmodel.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/bed_status_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/floor_management_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/pg_basic_info_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/pg_photos_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/room_management_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/amenities_management_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/pg_form_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/pg_list_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/pg_selector_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/revenue_summary_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/occupancy_report_widget.dart",
+        "lib/feature/owner_dashboard/mypg/presentation/widgets/pg_analytics_widget.dart",
+        "lib/feature/owner_dashboard/myguest/data/models/owner_guest_model.dart",
+        "lib/feature/owner_dashboard/myguest/data/repository/owner_guest_repository.dart",
+        "lib/feature/owner_dashboard/myguest/view/screens/owner_guest_screen.dart",
+        "lib/feature/owner_dashboard/myguest/view/widgets/booking_list_widget.dart",
+        "lib/feature/owner_dashboard/myguest/view/widgets/guest_list_widget.dart",
+        "lib/feature/owner_dashboard/myguest/view/widgets/interactive_bed_map_widget.dart",
+        "lib/feature/owner_dashboard/myguest/viewmodel/owner_guest_viewmodel.dart",
+        "lib/feature/owner_dashboard/foods/data/models/owner_food_menu.dart",
+        "lib/feature/owner_dashboard/foods/data/repository/owner_food_repository.dart",
+        "lib/feature/owner_dashboard/foods/view/screens/owner_food_management_screen.dart",
+        "lib/feature/owner_dashboard/foods/view/screens/owner_menu_edit_screen.dart",
+        "lib/feature/owner_dashboard/foods/view/screens/owner_special_menu_screen.dart",
+        "lib/feature/owner_dashboard/foods/view/widgets/owner_current_day_quick_edit_widget.dart",
+        "lib/feature/owner_dashboard/foods/view/widgets/owner_menu_day_tab.dart",
+        "lib/feature/owner_dashboard/foods/view/widgets/owner_menu_item_widget.dart",
+        "lib/feature/owner_dashboard/foods/view/widgets/owner_menu_photo_widget.dart",
+        "lib/feature/owner_dashboard/foods/viewmodel/owner_food_viewmodel.dart",
+        "lib/feature/owner_dashboard/profile/data/models/owner_profile_model.dart",
+        "lib/feature/owner_dashboard/profile/data/repository/owner_profile_repository.dart",
+        "lib/feature/owner_dashboard/profile/view/screens/owner_profile_screen.dart",
+        "lib/feature/owner_dashboard/profile/view/widgets/owner_profile_widget.dart",
+        "lib/feature/owner_dashboard/profile/viewmodel/owner_profile_viewmodel.dart",
+        "lib/feature/owner_dashboard/profile/viewmodel/owner_payment_details_viewmodel.dart",
+        "lib/feature/owner_dashboard/shared/viewmodel/selected_pg_provider.dart",
+        "lib/feature/owner_dashboard/shared/widgets/owner_payment_notifications_badge.dart",
+        "lib/feature/owner_dashboard/shared/widgets/pg_selector_dropdown.dart"
+      ]
+    },
+    {
+      "name": "Navigation System",
+      "description": "Complete navigation system using GoRouter with role-based routing, nested routes, and deep linking",
+      "files": [
+        "lib/core/navigation/app_router.dart",
+        "lib/core/navigation/navigation_service.dart",
+        "lib/core/navigation/screen/error_screen.dart",
+        "lib/common/utils/constants/routes.dart"
+      ]
+    },
+    {
+      "name": "Firebase Services",
+      "description": "Complete Firebase integration including Auth, Firestore, Storage, Analytics, Crashlytics, Performance, Remote Config, Cloud Functions, and Messaging",
+      "files": [
+        "lib/core/di/firebase/container/firebase_dependency_container.dart",
+        "lib/core/di/firebase/di/firebase_service_locator.dart",
+        "lib/core/di/firebase/di/firebase_service_locator_with_supabase.dart",
+        "lib/core/di/firebase/start/firebase_service_initializer.dart",
+        "lib/core/di/firebase/start/firebase_service_initializer_with_supabase.dart",
+        "lib/core/services/firebase/analytics/firebase_analytics_service.dart",
+        "lib/core/services/firebase/auth/firebase_auth_service.dart",
+        "lib/core/services/firebase/crashlytics/firebase_crashlytics_service.dart",
+        "lib/core/services/firebase/database/firestore_database_service.dart",
+        "lib/core/services/firebase/functions/cloud_functions_service.dart",
+        "lib/core/services/firebase/messaging/cloud_messaging_service.dart",
+        "lib/core/services/firebase/messaging/enhanced_messaging_service.dart",
+        "lib/core/services/firebase/performance/performance_monitoring_service.dart",
+        "lib/core/services/firebase/remote_config/remote_config_service.dart",
+        "lib/core/services/firebase/security/app_integrity_service.dart",
+        "lib/core/services/firebase/storage/cloud_storage_service.dart"
+      ]
+    },
+    {
+      "name": "Supabase Integration",
+      "description": "Supabase storage service for cost-effective file storage as alternative to Firebase Storage",
+      "files": [
+        "lib/core/services/supabase/supabase_config.dart",
+        "lib/core/services/supabase/storage/supabase_storage_service.dart"
+      ]
+    },
+    {
+      "name": "External Services",
+      "description": "Integration with Google Maps, Google Sign-in, Apple Sign-in, and other external services",
+      "files": [
+        "lib/core/services/external/google/google_sign_in_service.dart",
+        "lib/core/services/external/apple/apple_sign_in_service.dart",
+        "lib/core/services/external/map/",
+        "lib/core/services/external/payment/"
+      ]
+    },
+    {
+      "name": "State Management",
+      "description": "Provider-based state management with dependency injection using GetIt",
+      "files": [
+        "lib/core/providers/app_providers.dart",
+        "lib/core/providers/firebase/firebase_app_providers.dart",
+        "lib/core/providers/rest/rest_api_app_providers.dart"
+      ]
+    },
+    {
+      "name": "Theme and Localization",
+      "description": "Complete theming system with light/dark modes and multi-language support (English & Telugu)",
+      "files": [
+        "lib/core/app/theme/app_theme.dart",
+        "lib/core/app/theme/theme_provider.dart",
+        "lib/core/app/localization/locale_provider.dart",
+        "lib/core/app/localization/localization_setup.dart",
+        "lib/core/app/info/app_info.dart",
+        "lib/core/app/emergency/emergency_fallback_app.dart",
+        "lib/l10n/app_en.arb",
+        "lib/l10n/app_te.arb",
+        "lib/generated/l10n.dart"
+      ]
+    },
+    {
+      "name": "Common UI Components",
+      "description": "Reusable UI components including buttons, inputs, cards, dialogs, and navigation elements",
+      "files": [
+        "lib/common/widgets/buttons/primary_button.dart",
+        "lib/common/widgets/buttons/secondary_button.dart",
+        "lib/common/widgets/buttons/text_button.dart",
+        "lib/common/widgets/buttons/theme_toggle_button.dart",
+        "lib/common/widgets/inputs/text_input.dart",
+        "lib/common/widgets/inputs/search_input.dart",
+        "lib/common/widgets/cards/adaptive_card.dart",
+        "lib/common/widgets/cards/info_card.dart",
+        "lib/common/widgets/cards/upload_card.dart",
+        "lib/common/widgets/app_bars/adaptive_app_bar.dart",
+        "lib/common/widgets/dialogs/adaptive_dialog.dart",
+        "lib/common/widgets/dialogs/confirmation_dialog.dart",
+        "lib/common/widgets/navigation/app_drawer.dart",
+        "lib/common/widgets/dropdowns/adaptive_dropdown.dart",
+        "lib/common/widgets/dropdowns/language_selector.dart",
+        "lib/common/widgets/loaders/adaptive_loader.dart",
+        "lib/common/widgets/loaders/shimmer_loader.dart",
+        "lib/common/widgets/indicators/empty_state.dart",
+        "lib/common/widgets/indicators/step_indicator.dart"
+      ]
+    },
+    {
+      "name": "Data Models and Entities",
+      "description": "Core data models for users, PGs, bookings, payments, complaints, and analytics",
+      "files": [
+        "lib/core/models/booking_model.dart",
+        "lib/core/models/kyc_verification_model.dart",
+        "lib/core/models/maintenance_task_model.dart",
+        "lib/core/models/notification_preferences_model.dart",
+        "lib/core/models/owner_document_model.dart",
+        "lib/core/models/owner_payment_details_model.dart",
+        "lib/core/models/payment_notification_model.dart",
+        "lib/core/models/review_model.dart",
+        "lib/core/models/analytics/occupancy_trend_model.dart",
+        "lib/core/models/analytics/revenue_projection_model.dart"
+      ]
+    },
+    {
+      "name": "Repository Pattern",
+      "description": "Data access layer using repository pattern for clean architecture",
+      "files": [
+        "lib/core/repositories/booking_repository.dart",
+        "lib/core/repositories/owner_payment_details_repository.dart",
+        "lib/core/repositories/payment_notification_repository.dart",
+        "lib/core/repositories/review_repository.dart"
+      ]
+    },
+    {
+      "name": "Utilities and Helpers",
+      "description": "Common utilities, validators, formatters, and helper functions",
+      "files": [
+        "lib/common/utils/constants/app.dart",
+        "lib/common/utils/constants/assets.dart",
+        "lib/common/utils/constants/firestore.dart",
+        "lib/common/utils/constants/formats.dart",
+        "lib/common/utils/constants/platform.dart",
+        "lib/common/utils/constants/storage.dart",
+        "lib/common/utils/constants/validation.dart",
+        "lib/common/utils/data/indian_states_cities.dart",
+        "lib/common/utils/date/date_manager.dart",
+        "lib/common/utils/date/converter/date_display_converter.dart",
+        "lib/common/utils/date/converter/date_service_converter.dart",
+        "lib/common/utils/date/extensions/datetime_extensions.dart",
+        "lib/common/utils/exceptions/exceptions.dart",
+        "lib/common/utils/extensions/context_extensions.dart",
+        "lib/common/utils/extensions/string_extensions.dart",
+        "lib/common/utils/extensions/widget_extensions.dart",
+        "lib/common/utils/formatters/formatters.dart",
+        "lib/common/utils/helpers/image_picker_helper.dart",
+        "lib/common/utils/helpers/menu_initialization_helper.dart",
+        "lib/common/utils/helpers/utility_helpers.dart",
+        "lib/common/utils/validators/auth_validators.dart",
+        "lib/common/utils/validators/general_validators.dart"
+      ]
+    },
+    {
+      "name": "Security and Storage",
+      "description": "Secure storage and security implementations",
+      "files": [
+        "lib/core/db/flutter_secure_storage.dart",
+        "lib/core/services/offline/offline_service.dart"
+      ]
+    },
+    {
+      "name": "Analytics and Monitoring",
+      "description": "Enhanced analytics service and performance monitoring",
+      "files": [
+        "lib/core/services/analytics/enhanced_analytics_service.dart",
+        "lib/common/widgets/analytics/analytics_dashboard.dart"
+      ]
+    }
+  ]
+}

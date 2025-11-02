@@ -1,0 +1,79 @@
+// lib/common/utils/performance/image_cache_manager.dart
+
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
+/// Custom image cache manager for optimized performance
+/// Provides better cache management for images with size limits and expiration
+class OptimizedImageCacheManager extends CacheManager {
+  static const key = 'optimizedImageCache';
+
+  static OptimizedImageCacheManager? _instance;
+
+  factory OptimizedImageCacheManager() {
+    _instance ??= OptimizedImageCacheManager._();
+    return _instance!;
+  }
+
+  OptimizedImageCacheManager._()
+      : super(
+          Config(
+            key,
+            maxNrOfCacheObjects: 200, // Limit number of cached objects
+            stalePeriod: const Duration(days: 7), // Cache for 7 days
+            repo: JsonCacheInfoRepository(databaseName: key),
+            fileService: HttpFileService(),
+          ),
+        );
+
+  /// Preload images for better performance
+  static Future<void> preloadImages(List<String> imageUrls) async {
+    final cacheManager = OptimizedImageCacheManager();
+
+    for (final url in imageUrls) {
+      try {
+        await cacheManager.downloadFile(url);
+      } catch (e) {
+        // Ignore preload errors
+      }
+    }
+  }
+
+  /// Clear old cache files to free up space
+  static Future<void> clearOldCache() async {
+    final cacheManager = OptimizedImageCacheManager();
+    await cacheManager.emptyCache();
+  }
+
+  /// Get cache size in bytes
+  static Future<int> getCacheSize() async {
+    try {
+      final cacheDir = await getTemporaryDirectory();
+      final imageCacheDir = Directory('${cacheDir.path}/$key');
+
+      if (!imageCacheDir.existsSync()) return 0;
+
+      int totalSize = 0;
+      await for (final file in imageCacheDir.list(recursive: true)) {
+        if (file is File) {
+          totalSize += await file.length();
+        }
+      }
+
+      return totalSize;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  /// Format cache size for display
+  static String formatCacheSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+}

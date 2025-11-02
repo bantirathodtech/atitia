@@ -4,8 +4,10 @@ import 'dart:async';
 
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/repositories/bed_change_request_repository.dart';
 import '../data/models/owner_guest_model.dart';
 import '../data/repository/owner_guest_repository.dart';
+import '../data/repository/owner_booking_request_repository.dart';
 
 /// ViewModel for managing owner's guests, bookings, and payments
 /// Extends BaseProviderState for automatic service access and state management
@@ -595,6 +597,106 @@ class OwnerGuestViewModel extends BaseProviderState {
 
   /// Gets total payments count
   int get totalPayments => _payments.length;
+
+  /// Approves a bed change request
+  Future<bool> approveBedChangeRequest(
+    String requestId, {
+    String? decisionNotes,
+  }) async {
+    try {
+      final repository = BedChangeRequestRepository();
+      await repository.updateStatus(
+        requestId,
+        'approved',
+        decisionNotes: decisionNotes,
+        guestId: '', // Will be extracted from request
+      );
+      _analyticsService.logEvent(
+        name: 'bed_change_request_approved',
+        parameters: {'request_id': requestId},
+      );
+      return true;
+    } catch (e) {
+      setError(true, 'Failed to approve bed change request: $e');
+      return false;
+    }
+  }
+
+  /// Rejects a bed change request
+  Future<bool> rejectBedChangeRequest(
+    String requestId, {
+    String? decisionNotes,
+  }) async {
+    try {
+      final repository = BedChangeRequestRepository();
+      await repository.updateStatus(
+        requestId,
+        'rejected',
+        decisionNotes: decisionNotes,
+        guestId: '', // Will be extracted from request
+      );
+      _analyticsService.logEvent(
+        name: 'bed_change_request_rejected',
+        parameters: {'request_id': requestId},
+      );
+      return true;
+    } catch (e) {
+      setError(true, 'Failed to reject bed change request: $e');
+      return false;
+    }
+  }
+
+  /// Approves a booking request
+  Future<bool> approveBookingRequest(
+    String requestId, {
+    String? responseMessage,
+    String? roomNumber,
+    String? bedNumber,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    try {
+      final repository = OwnerBookingRequestRepository();
+      await repository.approveBookingRequest(
+        requestId,
+        responseMessage: responseMessage,
+        roomNumber: roomNumber,
+        bedNumber: bedNumber,
+        startDate: startDate,
+        endDate: endDate,
+      );
+      _analyticsService.logEvent(
+        name: 'booking_request_approved',
+        parameters: {'request_id': requestId},
+      );
+      return true;
+    } catch (e) {
+      setError(true, 'Failed to approve booking request: $e');
+      return false;
+    }
+  }
+
+  /// Rejects a booking request
+  Future<bool> rejectBookingRequest(
+    String requestId, {
+    String? responseMessage,
+  }) async {
+    try {
+      final repository = OwnerBookingRequestRepository();
+      await repository.rejectBookingRequest(
+        requestId,
+        responseMessage: responseMessage,
+      );
+      _analyticsService.logEvent(
+        name: 'booking_request_rejected',
+        parameters: {'request_id': requestId},
+      );
+      return true;
+    } catch (e) {
+      setError(true, 'Failed to reject booking request: $e');
+      return false;
+    }
+  }
 
   @override
   void dispose() {
