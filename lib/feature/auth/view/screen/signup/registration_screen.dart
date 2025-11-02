@@ -24,10 +24,7 @@
 // - Aadhaar number format validation
 // ============================================================================
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/animations/fade_in.dart';
@@ -46,9 +43,7 @@ import '../../../../../common/widgets/indicators/step_indicator.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/widgets/text/heading_large.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
-import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
 import '../../../data/model/user_model.dart';
@@ -74,7 +69,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
   int _currentStep = 0;
 
   // Text controllers
-  final _phoneController = TextEditingController();  // For displaying verified phone
+  final _phoneController =
+      TextEditingController(); // For displaying verified phone
   final _nameController = TextEditingController();
   final _dobController = TextEditingController();
   final _emailController = TextEditingController();
@@ -93,7 +89,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
   String? _emergencyPhoneError;
 
   String _selectedGender = 'Male';
-  bool _phoneNumberInitialized = false;  // Flag to initialize phone once
+  bool _phoneNumberInitialized = false; // Flag to initialize phone once
 
   @override
   void initState() {
@@ -109,19 +105,20 @@ class _RegistrationScreenState extends State<RegistrationScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    
+
     // Initialize phone number from auth provider (only once)
     if (!_phoneNumberInitialized) {
       final authProvider = context.watch<AuthProvider>();
       final phoneNumber = authProvider.user?.phoneNumber;
-      
+
       // Debug log
       print('📱 Registration: Phone number from auth provider: $phoneNumber');
-      
+
       if (phoneNumber != null && phoneNumber.isNotEmpty) {
         _phoneController.text = phoneNumber;
         _phoneNumberInitialized = true;
-        print('✅ Registration: Phone number initialized: ${_phoneController.text}');
+        print(
+            '✅ Registration: Phone number initialized: ${_phoneController.text}');
       } else {
         print('❌ Registration: Phone number is null or empty!');
       }
@@ -271,7 +268,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
           ? 'Aadhaar number is required'
           : _aadhaarNumberController.text.trim().length != 12
               ? 'Aadhaar must be 12 digits'
-              : !RegExp(r'^\d{12}$').hasMatch(_aadhaarNumberController.text.trim())
+              : !RegExp(r'^\d{12}$')
+                      .hasMatch(_aadhaarNumberController.text.trim())
                   ? 'Aadhaar must contain only digits'
                   : null;
     });
@@ -418,8 +416,9 @@ class _RegistrationScreenState extends State<RegistrationScreen>
     final scaffoldBg = theme.scaffoldBackgroundColor;
     final surfaceColor = theme.colorScheme.surface;
     final primaryColor = theme.colorScheme.primary;
-    final textColor = theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
-    
+    final textColor =
+        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
+
     return Scaffold(
       // Use theme background color for proper day/night visibility
       backgroundColor: scaffoldBg,
@@ -433,13 +432,14 @@ class _RegistrationScreenState extends State<RegistrationScreen>
         title: 'Complete Your Profile',
         centerTitle: true,
         elevation: 0,
-        showThemeToggle: true,  // Theme toggle enabled for user comfort
+        showThemeToggle: true, // Theme toggle enabled for user comfort
       ),
       body: Column(
         children: [
           // Beautiful step indicator with theme-aware background
           Container(
-            color: surfaceColor,  // Adapts to theme (white in light, dark in dark mode)
+            color:
+                surfaceColor, // Adapts to theme (white in light, dark in dark mode)
             child: StepIndicator(
               currentStep: _currentStep,
               totalSteps: 3,
@@ -450,9 +450,9 @@ class _RegistrationScreenState extends State<RegistrationScreen>
           // Progress bar with theme-aware colors
           LinearProgressIndicator(
             value: (_currentStep + 1) / 3,
-            backgroundColor: isDarkMode 
-                ? AppColors.darkDivider  // Dark mode: darker background
-                : AppColors.outline,     // Light mode: light grey
+            backgroundColor: isDarkMode
+                ? AppColors.darkDivider // Dark mode: darker background
+                : AppColors.outline, // Light mode: light grey
             valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
           ),
 
@@ -484,8 +484,9 @@ class _RegistrationScreenState extends State<RegistrationScreen>
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final primaryColor = theme.colorScheme.primary;
-    final textColor = theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
-    
+    final textColor =
+        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
+
     return FadeInAnimation(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -493,12 +494,13 @@ class _RegistrationScreenState extends State<RegistrationScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: AppSpacing.sm),
-            
+
             // Section header
             const HeadingMedium(text: 'Personal Information'),
             const SizedBox(height: AppSpacing.xs),
             const CaptionText(
-              text: 'Please provide your details as per your official documents',
+              text:
+                  'Please provide your details as per your official documents',
             ),
             const SizedBox(height: AppSpacing.lg),
 
@@ -506,22 +508,24 @@ class _RegistrationScreenState extends State<RegistrationScreen>
             SlideInAnimation(
               delay: const Duration(milliseconds: 50),
               child: TextFormField(
-                controller: _phoneController,  // Use controller to show phone number
+                controller:
+                    _phoneController, // Use controller to show phone number
                 readOnly: true,
                 enabled: false,
                 style: TextStyle(
-                  color: textColor,  // Make sure text is visible
+                  color: textColor, // Make sure text is visible
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
                   labelText: 'Phone Number',
                   hintText: 'Your registered phone number',
                   prefixIcon: const Icon(Icons.phone),
-                  suffixIcon: Icon(Icons.verified, color: AppColors.success, size: 20),
+                  suffixIcon:
+                      Icon(Icons.verified, color: AppColors.success, size: 20),
                   border: const OutlineInputBorder(),
                   filled: true,
-                  fillColor: isDarkMode 
-                      ? AppColors.darkCard.withOpacity(0.5) 
+                  fillColor: isDarkMode
+                      ? AppColors.darkCard.withOpacity(0.5)
                       : AppColors.surfaceVariant.withOpacity(0.5),
                   helperText: '✓ Verified during login',
                   helperStyle: TextStyle(
@@ -580,7 +584,9 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   border: const OutlineInputBorder(),
                   filled: true,
                   // Theme-aware fill color
-                  fillColor: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
+                  fillColor: isDarkMode
+                      ? AppColors.darkInputFill
+                      : AppColors.surfaceVariant,
                   errorText: _dobError,
                 ),
               ),
@@ -595,9 +601,9 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                     final age = DateManager.calculateAge(_dobController.text);
                     // Theme-aware success/warning colors
                     final ageColor = age >= 18
-                        ? AppColors.success      // Green for valid age
-                        : AppColors.warning;     // Orange for under 18
-                    
+                        ? AppColors.success // Green for valid age
+                        : AppColors.warning; // Orange for under 18
+
                     return AdaptiveCard(
                       elevation: 1,
                       child: Padding(
@@ -638,9 +644,12 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   border: const OutlineInputBorder(),
                   filled: true,
                   // Theme-aware fill color
-                  fillColor: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
+                  fillColor: isDarkMode
+                      ? AppColors.darkInputFill
+                      : AppColors.surfaceVariant,
                 ),
-                dropdownColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
+                dropdownColor:
+                    isDarkMode ? AppColors.darkCard : AppColors.surface,
                 items: [
                   DropdownMenuItem(
                     value: 'Male',
@@ -722,7 +731,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: AppSpacing.sm),
-            
+
             const HeadingMedium(text: 'Upload Documents'),
             const SizedBox(height: AppSpacing.xs),
             const CaptionText(
@@ -828,8 +837,9 @@ class _RegistrationScreenState extends State<RegistrationScreen>
     // ==========================================================================
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final textColor = theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
-    
+    final textColor =
+        theme.textTheme.bodyMedium?.color ?? AppColors.textPrimary;
+
     return FadeInAnimation(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -837,7 +847,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: AppSpacing.sm),
-            
+
             const HeadingMedium(text: 'Emergency Contact'),
             const SizedBox(height: AppSpacing.xs),
             const CaptionText(
@@ -881,7 +891,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   setState(() {
                     _emergencyPhoneError = v.trim().isEmpty
                         ? 'Contact phone is required'
-                        : !RegExp(ValidationConstants.phoneRegex).hasMatch(v.trim())
+                        : !RegExp(ValidationConstants.phoneRegex)
+                                .hasMatch(v.trim())
                             ? 'Enter valid 10-digit number'
                             : null;
                   });
@@ -904,37 +915,40 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   border: const OutlineInputBorder(),
                   filled: true,
                   // Theme-aware fill color
-                  fillColor: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
+                  fillColor: isDarkMode
+                      ? AppColors.darkInputFill
+                      : AppColors.surfaceVariant,
                 ),
                 // Theme-aware dropdown background
-                dropdownColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
+                dropdownColor:
+                    isDarkMode ? AppColors.darkCard : AppColors.surface,
                 items: [
                   DropdownMenuItem(
-                    value: 'Father', 
+                    value: 'Father',
                     child: Text('Father', style: TextStyle(color: textColor)),
                   ),
                   DropdownMenuItem(
-                    value: 'Mother', 
+                    value: 'Mother',
                     child: Text('Mother', style: TextStyle(color: textColor)),
                   ),
                   DropdownMenuItem(
-                    value: 'Brother', 
+                    value: 'Brother',
                     child: Text('Brother', style: TextStyle(color: textColor)),
                   ),
                   DropdownMenuItem(
-                    value: 'Sister', 
+                    value: 'Sister',
                     child: Text('Sister', style: TextStyle(color: textColor)),
                   ),
                   DropdownMenuItem(
-                    value: 'Spouse', 
+                    value: 'Spouse',
                     child: Text('Spouse', style: TextStyle(color: textColor)),
                   ),
                   DropdownMenuItem(
-                    value: 'Friend', 
+                    value: 'Friend',
                     child: Text('Friend', style: TextStyle(color: textColor)),
                   ),
                   DropdownMenuItem(
-                    value: 'Other', 
+                    value: 'Other',
                     child: Text('Other', style: TextStyle(color: textColor)),
                   ),
                 ],
@@ -973,7 +987,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
                     // Theme-aware success gradient
-                    color: isDarkMode 
+                    color: isDarkMode
                         ? AppColors.successContainer.withOpacity(0.2)
                         : AppColors.successContainer,
                     borderRadius: BorderRadius.circular(12),
@@ -989,7 +1003,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: BodyText(
-                          text: 'All required fields completed! Ready to submit.',
+                          text:
+                              'All required fields completed! Ready to submit.',
                           color: textColor,
                         ),
                       ),
@@ -1018,9 +1033,9 @@ class _RegistrationScreenState extends State<RegistrationScreen>
         boxShadow: [
           BoxShadow(
             // Theme-aware shadow
-            color: isDarkMode 
-                ? Colors.black.withOpacity(0.3)  // Darker shadow in dark mode
-                : Colors.black.withOpacity(0.05),  // Light shadow in light mode
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.3) // Darker shadow in dark mode
+                : Colors.black.withOpacity(0.05), // Light shadow in light mode
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -1040,16 +1055,15 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   icon: Icons.arrow_back,
                 ),
               ),
-            
+
             if (_currentStep > 0) const SizedBox(width: AppSpacing.md),
-            
+
             // Next/Submit button
             Expanded(
               flex: _currentStep == 0 ? 1 : 1,
               child: PrimaryButton(
-                onPressed: authProvider.loading || !canProceed
-                    ? null
-                    : _handleNext,
+                onPressed:
+                    authProvider.loading || !canProceed ? null : _handleNext,
                 label: _currentStep == 2 ? 'Complete Registration' : 'Next',
                 icon: _currentStep == 2 ? Icons.check : Icons.arrow_forward,
                 isLoading: authProvider.loading,

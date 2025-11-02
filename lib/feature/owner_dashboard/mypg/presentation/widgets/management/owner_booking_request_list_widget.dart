@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
-import '../../../../../common/widgets/text/body_text.dart';
-import '../../../../../common/styles/spacing.dart';
-import '../../data/models/owner_pg_management_model.dart';
+import '../../../../../../common/styles/spacing.dart';
+import '../../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../../common/widgets/text/body_text.dart';
+import '../../../../../../common/widgets/text/heading_medium.dart';
+import '../../../data/models/owner_pg_management_model.dart';
 
 /// Widget displaying pending booking requests
 class OwnerBookingRequestListWidget extends StatelessWidget {

@@ -18,7 +18,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 
 import '../../lifecycle/stateless/adaptive_stateless_widget.dart';
@@ -37,7 +36,7 @@ class UploadCard extends AdaptiveStatelessWidget {
   final String description;
   final IconData icon;
   final String? imageUrl;
-  final dynamic imageFile;  // Can be File (mobile) or XFile (web)
+  final dynamic imageFile; // Can be File (mobile) or XFile (web)
   final bool isUploading;
   final bool isRequired;
   final VoidCallback onUpload;
@@ -119,7 +118,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   // Status indicator (theme-aware)
                   if (hasImage && !isUploading)
                     Container(
@@ -187,7 +186,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                                   fit: BoxFit.cover,
                                 )
                               : const SizedBox.shrink(),
-                      
+
                       // Overlay with edit button
                       Positioned(
                         top: 8,
@@ -249,7 +248,8 @@ class UploadCard extends AdaptiveStatelessWidget {
                       Icon(
                         Icons.cloud_upload,
                         size: 48,
-                        color: theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
+                        color:
+                            theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       BodyText(
@@ -331,4 +331,3 @@ class UploadCard extends AdaptiveStatelessWidget {
     }
   }
 }
-

@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/text/heading_small.dart';
-import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/widgets/indicators/empty_state.dart';
-import '../../../../../common/styles/spacing.dart';
-import '../../data/models/owner_pg_management_model.dart';
+import '../../../../../../common/styles/spacing.dart';
+import '../../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../../common/widgets/indicators/empty_state.dart';
+import '../../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../../common/widgets/text/heading_small.dart';
+import '../../../data/models/owner_pg_management_model.dart';
 
 /// Interactive bed map widget showing room and bed occupancy
 class OwnerBedMapWidget extends StatelessWidget {

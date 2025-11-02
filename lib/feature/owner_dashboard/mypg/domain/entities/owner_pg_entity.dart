@@ -14,6 +14,12 @@ class OwnerPgEntity {
   final String contactNumber;
   final String pgType;
   final List<dynamic> floorStructure;
+  final Map<String, dynamic> rentConfig;
+  final double depositAmount;
+  final String maintenanceType;
+  final double maintenanceAmount;
+  final String? googleMapLink;
+  final String? ownerNumber;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -29,6 +35,12 @@ class OwnerPgEntity {
     required this.contactNumber,
     required this.pgType,
     required this.floorStructure,
+    required this.rentConfig,
+    required this.depositAmount,
+    required this.maintenanceType,
+    required this.maintenanceAmount,
+    this.googleMapLink,
+    this.ownerNumber,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -47,6 +59,12 @@ class OwnerPgEntity {
       contactNumber: map['contactNumber'] ?? '',
       pgType: map['pgType'] ?? '',
       floorStructure: List<dynamic>.from(map['floorStructure'] ?? []),
+      rentConfig: Map<String, dynamic>.from(map['rentConfig'] ?? {}),
+      depositAmount: (map['depositAmount'] ?? 0.0).toDouble(),
+      maintenanceType: map['maintenanceType'] ?? 'one_time',
+      maintenanceAmount: (map['maintenanceAmount'] ?? 0.0).toDouble(),
+      googleMapLink: map['googleMapLink'],
+      ownerNumber: map['ownerNumber'],
       createdAt:
           DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
       updatedAt:
@@ -68,6 +86,12 @@ class OwnerPgEntity {
       'contactNumber': contactNumber,
       'pgType': pgType,
       'floorStructure': floorStructure,
+      'rentConfig': rentConfig,
+      'depositAmount': depositAmount,
+      'maintenanceType': maintenanceType,
+      'maintenanceAmount': maintenanceAmount,
+      'googleMapLink': googleMapLink,
+      'ownerNumber': ownerNumber,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -86,6 +110,12 @@ class OwnerPgEntity {
     String? contactNumber,
     String? pgType,
     List<dynamic>? floorStructure,
+    Map<String, dynamic>? rentConfig,
+    double? depositAmount,
+    String? maintenanceType,
+    double? maintenanceAmount,
+    String? googleMapLink,
+    String? ownerNumber,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -101,6 +131,12 @@ class OwnerPgEntity {
       contactNumber: contactNumber ?? this.contactNumber,
       pgType: pgType ?? this.pgType,
       floorStructure: floorStructure ?? this.floorStructure,
+      rentConfig: rentConfig ?? this.rentConfig,
+      depositAmount: depositAmount ?? this.depositAmount,
+      maintenanceType: maintenanceType ?? this.maintenanceType,
+      maintenanceAmount: maintenanceAmount ?? this.maintenanceAmount,
+      googleMapLink: googleMapLink ?? this.googleMapLink,
+      ownerNumber: ownerNumber ?? this.ownerNumber,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

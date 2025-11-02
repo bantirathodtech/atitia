@@ -19,14 +19,14 @@ import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../../shared/widgets/pg_selector_dropdown.dart';
 import '../../data/models/owner_pg_management_model.dart';
-import '../widgets/owner_bed_map_widget.dart';
-import '../widgets/owner_booking_request_list_widget.dart';
-import '../widgets/owner_occupancy_report_widget.dart';
-import '../widgets/owner_pg_info_card.dart';
-import '../widgets/owner_revenue_report_widget.dart';
-import '../widgets/owner_upcoming_vacating_widget.dart';
-import '../screens/owner_pg_create_screen.dart';
+import '../screens/new_pg_setup_screen.dart';
 import '../viewmodels/owner_pg_management_viewmodel.dart';
+import '../widgets/management/owner_bed_map_widget.dart';
+import '../widgets/management/owner_booking_request_list_widget.dart';
+import '../widgets/management/owner_occupancy_report_widget.dart';
+import '../widgets/management/owner_pg_info_card.dart';
+import '../widgets/management/owner_revenue_report_widget.dart';
+import '../widgets/management/owner_upcoming_vacating_widget.dart';
 
 class OwnerPgManagementScreen extends StatefulWidget {
   const OwnerPgManagementScreen({super.key});
@@ -95,11 +95,11 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
         titleWidget: const PgSelectorDropdown(compact: false),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add_business),
-            onPressed: () => _navigateToCreatePG(context),
-            tooltip: 'List New PG',
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.add_business),
+          //   onPressed: () => _navigateToCreatePG(context),
+          //   tooltip: 'List New PG',
+          // ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: viewModel.loading ? null : viewModel.refreshData,
@@ -378,7 +378,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
   Future<void> _navigateToCreatePG(BuildContext context) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const OwnerPgCreateScreen(),
+        builder: (context) => const NewPgSetupScreen(),
       ),
     );
 

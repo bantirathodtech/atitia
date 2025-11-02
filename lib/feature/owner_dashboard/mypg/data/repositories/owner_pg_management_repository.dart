@@ -1,5 +1,6 @@
 // lib/features/owner_dashboard/mypg/data/repositories/owner_pg_management_repository.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../common/utils/constants/firestore.dart';
 import '../models/owner_pg_management_model.dart';
@@ -10,6 +11,7 @@ import '../models/owner_pg_management_model.dart';
 class OwnerPgManagementRepository {
   final _firestoreService = getIt.firestore;
   final _analyticsService = getIt.analytics;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Stream beds real-time by PG ID with validation and analytics
   Stream<List<OwnerBed>> streamBeds(String pgId) {
@@ -33,6 +35,48 @@ class OwnerPgManagementRepository {
 
       return beds;
     });
+  }
+
+  /// Create a new PG document with a generated ID
+  /// Returns the created pgId
+  Future<String> createPG(Map<String, dynamic> pgData) async {
+    try {
+      // Generate a new document ID
+      final String pgId =
+          _firestore.collection(FirestoreConstants.pgs).doc().id;
+
+      final now = DateTime.now();
+      final dataWithMeta = {
+        ...pgData,
+        'pgId': pgId,
+        'createdAt': pgData['createdAt'] ?? now,
+        'updatedAt': now,
+      };
+
+      await _firestoreService.setDocument(
+        FirestoreConstants.pgs,
+        pgId,
+        dataWithMeta,
+      );
+
+      await _analyticsService.logEvent(
+        name: 'owner_pg_created',
+        parameters: {
+          'pg_id': pgId,
+          'owner_uid': pgData['ownerUid'] ?? 'unknown',
+          'pg_name': pgData['pgName'] ?? 'Unknown',
+          'city': pgData['city'] ?? '',
+        },
+      );
+
+      return pgId;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'owner_pg_create_error',
+        parameters: {'error': e.toString()},
+      );
+      throw Exception('Failed to create PG: $e');
+    }
   }
 
   /// Stream rooms real-time by PG ID with validation and analytics
