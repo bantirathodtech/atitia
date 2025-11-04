@@ -143,7 +143,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
       Function(String) onTap) {
     final isSelected = currentFilter == value;
     final theme = Theme.of(context);
-    
+
     return FilterChip(
       label: Text(
         label,
@@ -177,7 +177,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
       Function(String) onTap) {
     final isSelected = currentFilter == value;
     final theme = Theme.of(context);
-    
+
     return FilterChip(
       label: Text(
         label,
@@ -217,7 +217,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   Widget _buildServiceRequestForm(
       BuildContext context, OwnerGuestViewModel guestVM) {
     final isMobile = context.isMobile;
-    
+
     // Collapsed state - show compact button
     if (!_isFormExpanded) {
       return Container(
@@ -285,12 +285,12 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          
+
           // Responsive form layout
           if (isMobile) ...[
             // Mobile: Vertical layout
             DropdownButtonFormField<String>(
-              value: _serviceTypeController.text.isEmpty
+              initialValue: _serviceTypeController.text.isEmpty
                   ? null
                   : _serviceTypeController.text,
               decoration: InputDecoration(
@@ -355,13 +355,14 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 Flexible(
                   flex: 2,
                   child: DropdownButtonFormField<String>(
-                    value: _serviceTypeController.text.isEmpty
+                    initialValue: _serviceTypeController.text.isEmpty
                         ? null
                         : _serviceTypeController.text,
                     decoration: InputDecoration(
                       labelText: 'Service Type',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.borderRadiusS),
                       ),
                       prefixIcon: const Icon(Icons.category_outlined),
                       contentPadding: const EdgeInsets.symmetric(
@@ -499,7 +500,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
     }
 
     final isMobile = context.isMobile;
-    
+
     return Column(
       children: [
         // Stats header
@@ -520,10 +521,11 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
     final isMobile = context.isMobile;
     final pendingCount = guestVM.services.where((s) => !s.isCompleted).length;
     final completedCount = guestVM.services.where((s) => s.isCompleted).length;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
-      padding: EdgeInsets.all(isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+      padding:
+          EdgeInsets.all(isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -637,7 +639,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
 
   /// Builds individual stat card
   Widget _buildStatCard(BuildContext context, String label, String value,
-      IconData icon, Color color, {bool isMobile = false}) {
+      IconData icon, Color color,
+      {bool isMobile = false}) {
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,

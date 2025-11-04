@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/drawers/owner_drawer.dart';
+import '../../../shared/widgets/owner_drawer.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';

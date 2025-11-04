@@ -998,6 +998,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
   /// Get role-based menu items
   List<DrawerMenuItem> _getRoleBasedMenuItems(String role) {
+    // Base items for all roles
     final commonItems = [
       DrawerMenuItem(
         id: 'home',
@@ -1005,26 +1006,51 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
         icon: Icons.home_outlined,
         section: 'user',
       ),
-      DrawerMenuItem(
-        id: 'profile',
-        label: 'My Profile',
-        icon: Icons.person_outline,
-        section: 'user',
-      ),
-      DrawerMenuItem(
-        id: 'notifications',
-        label: 'Notifications',
-        icon: Icons.notifications_outlined,
-        section: 'user',
-        badge: '3', // Example badge
-      ),
-      DrawerMenuItem(
-        id: 'settings',
-        label: 'Settings',
-        icon: Icons.settings_outlined,
-        section: 'user',
-      ),
     ];
+
+    // Owner-specific items (dashboard tabs)
+    final ownerItems = role.toLowerCase() == 'owner'
+        ? [
+            DrawerMenuItem(
+              id: 'food',
+              label: 'Food',
+              icon: Icons.restaurant_menu,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'pgs',
+              label: 'PGs',
+              icon: Icons.home,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'guest',
+              label: 'Guest',
+              icon: Icons.people,
+              section: 'user',
+            ),
+          ]
+        : [
+            // Guest items - keep My Profile, Notifications, Settings for guests
+            DrawerMenuItem(
+              id: 'profile',
+              label: 'My Profile',
+              icon: Icons.person_outline,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'notifications',
+              label: 'Notifications',
+              icon: Icons.notifications_outlined,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'settings',
+              label: 'Settings',
+              icon: Icons.settings_outlined,
+              section: 'user',
+            ),
+          ];
 
     final systemItems = [
       DrawerMenuItem(
@@ -1044,9 +1070,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
     final items = <DrawerMenuItem>[];
     items.addAll(commonItems);
-
-    // Owner items removed - no longer needed
-
+    items.addAll(ownerItems);
     items.addAll(systemItems);
 
     return items;

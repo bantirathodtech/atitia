@@ -15,13 +15,13 @@ class GuestAmenitiesList extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-    
+
     if (amenities.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         decoration: BoxDecoration(
-          color: isDark 
-              ? colorScheme.surfaceVariant 
+          color: isDark
+              ? colorScheme.surfaceContainerHighest
               : colorScheme.surface.withOpacity(0.7),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -41,8 +41,8 @@ class GuestAmenitiesList extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark 
-            ? colorScheme.surfaceVariant 
+        color: isDark
+            ? colorScheme.surfaceContainerHighest
             : colorScheme.surface.withOpacity(0.7),
         borderRadius: BorderRadius.circular(12),
       ),

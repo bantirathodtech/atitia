@@ -801,9 +801,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                 return Expanded(
                   child: Padding(
                     padding: EdgeInsets.only(
-                      right: index < filters.length - 1 
-                          ? AppSpacing.paddingXS 
-                          : 0,
+                      right:
+                          index < filters.length - 1 ? AppSpacing.paddingXS : 0,
                     ),
                     child: CustomFilterChip(
                       label: filter,
@@ -814,7 +813,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                     ),
                   ),
                 );
-              }).toList(),
+              }),
               // Results count
               if (viewModel.searchQuery.isNotEmpty ||
                   viewModel.selectedFilter != 'All')
@@ -835,7 +834,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.check_circle, size: 16, color: AppColors.info),
+                        Icon(Icons.check_circle,
+                            size: 16, color: AppColors.info),
                         const SizedBox(width: 4),
                         BodyText(
                           text: '${viewModel.filteredGuests.length} found',

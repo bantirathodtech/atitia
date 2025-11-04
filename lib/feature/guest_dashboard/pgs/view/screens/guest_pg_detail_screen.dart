@@ -81,7 +81,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
         ],
       ),
       body: _buildBody(context, pgVM, pg),
-      bottomNavigationBar: pg != null ? _buildStickyActionButtons(context, pg) : null,
+      bottomNavigationBar:
+          pg != null ? _buildStickyActionButtons(context, pg) : null,
     );
   }
 
@@ -121,7 +122,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     if (pg == null) {
       return EmptyState(
         title: 'PG Not Found',
-        message: 'The requested PG could not be found or may have been removed.',
+        message:
+            'The requested PG could not be found or may have been removed.',
         icon: Icons.apartment,
         actionLabel: 'Go Back',
         onAction: () => getIt<NavigationService>().goBack(),
@@ -181,7 +183,9 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                     imageUrl: pg.photos[index],
                     fit: BoxFit.cover,
                     placeholder: Container(
-                      color: isDark ? AppColors.darkInputFill : Colors.grey.shade200,
+                      color: isDark
+                          ? AppColors.darkInputFill
+                          : Colors.grey.shade200,
                       child: const Center(
                         child: Icon(Icons.image, size: 64, color: Colors.grey),
                       ),
@@ -218,15 +222,18 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           onTap: () => _openMap(context, pg),
           child: Row(
             children: [
-              Icon(Icons.location_on, size: 18, color: Theme.of(context).colorScheme.primary),
+              Icon(Icons.location_on,
+                  size: 18, color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: AppSpacing.paddingXS),
               Expanded(
                 child: BodyText(
                   text: pg.fullAddress,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
-              Icon(Icons.open_in_new, size: 16, color: Theme.of(context).colorScheme.primary),
+              Icon(Icons.open_in_new,
+                  size: 16, color: Theme.of(context).colorScheme.primary),
             ],
           ),
         ),
@@ -240,33 +247,45 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     final colorScheme = theme.colorScheme;
     final summary = getSharingSummary(pg);
     final pricing = pg.pricing ?? {};
-    
+
     // Get rent config from pg model (primary source)
     final rentConfig = pg.rentConfig ?? {};
-    
+
     // Get deposit and maintenance from pg model or pricing map
-    final deposit = pg.depositAmount ?? pricing['securityDeposit']?.toDouble() ?? 0.0;
-    final maintenanceAmount = pg.maintenanceAmount ?? pricing['maintenance']?.toDouble() ?? 0.0;
+    final deposit =
+        pg.depositAmount ?? pricing['securityDeposit']?.toDouble() ?? 0.0;
+    final maintenanceAmount =
+        pg.maintenanceAmount ?? pricing['maintenance']?.toDouble() ?? 0.0;
     final maintenanceType = pg.maintenanceType ?? 'none';
     final hasMaintenance = maintenanceAmount > 0 && maintenanceType != 'none';
 
     // Build sharing options from rentConfig if available
     final sharingOptions = <MapEntry<String, double>>[];
     if (rentConfig.isNotEmpty) {
-      if (rentConfig['oneShare'] != null && (rentConfig['oneShare'] as num) > 0) {
-        sharingOptions.add(MapEntry('1', (rentConfig['oneShare'] as num).toDouble()));
+      if (rentConfig['oneShare'] != null &&
+          (rentConfig['oneShare'] as num) > 0) {
+        sharingOptions
+            .add(MapEntry('1', (rentConfig['oneShare'] as num).toDouble()));
       }
-      if (rentConfig['twoShare'] != null && (rentConfig['twoShare'] as num) > 0) {
-        sharingOptions.add(MapEntry('2', (rentConfig['twoShare'] as num).toDouble()));
+      if (rentConfig['twoShare'] != null &&
+          (rentConfig['twoShare'] as num) > 0) {
+        sharingOptions
+            .add(MapEntry('2', (rentConfig['twoShare'] as num).toDouble()));
       }
-      if (rentConfig['threeShare'] != null && (rentConfig['threeShare'] as num) > 0) {
-        sharingOptions.add(MapEntry('3', (rentConfig['threeShare'] as num).toDouble()));
+      if (rentConfig['threeShare'] != null &&
+          (rentConfig['threeShare'] as num) > 0) {
+        sharingOptions
+            .add(MapEntry('3', (rentConfig['threeShare'] as num).toDouble()));
       }
-      if (rentConfig['fourShare'] != null && (rentConfig['fourShare'] as num) > 0) {
-        sharingOptions.add(MapEntry('4', (rentConfig['fourShare'] as num).toDouble()));
+      if (rentConfig['fourShare'] != null &&
+          (rentConfig['fourShare'] as num) > 0) {
+        sharingOptions
+            .add(MapEntry('4', (rentConfig['fourShare'] as num).toDouble()));
       }
-      if (rentConfig['fiveShare'] != null && (rentConfig['fiveShare'] as num) > 0) {
-        sharingOptions.add(MapEntry('5', (rentConfig['fiveShare'] as num).toDouble()));
+      if (rentConfig['fiveShare'] != null &&
+          (rentConfig['fiveShare'] as num) > 0) {
+        sharingOptions
+            .add(MapEntry('5', (rentConfig['fiveShare'] as num).toDouble()));
       }
     }
 
@@ -287,15 +306,18 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                   const SizedBox(height: AppSpacing.paddingM),
                   ...sharingOptions.map((entry) {
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+                      padding:
+                          const EdgeInsets.only(bottom: AppSpacing.paddingS),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.bed, size: 18, color: colorScheme.primary),
+                              Icon(Icons.bed,
+                                  size: 18, color: colorScheme.primary),
                               const SizedBox(width: AppSpacing.paddingXS),
-                              BodyText(text: '${entry.key} Sharing', medium: true),
+                              BodyText(
+                                  text: '${entry.key} Sharing', medium: true),
                             ],
                           ),
                           Text(
@@ -325,15 +347,18 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                   ...summary.entries.map((entry) {
                     final sharingType = entry.key.replaceAll('-share', '');
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+                      padding:
+                          const EdgeInsets.only(bottom: AppSpacing.paddingS),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.bed, size: 18, color: colorScheme.primary),
+                              Icon(Icons.bed,
+                                  size: 18, color: colorScheme.primary),
                               const SizedBox(width: AppSpacing.paddingXS),
-                              BodyText(text: '$sharingType Sharing', medium: true),
+                              BodyText(
+                                  text: '$sharingType Sharing', medium: true),
                             ],
                           ),
                           Text(
@@ -352,7 +377,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             ),
             const SizedBox(height: AppSpacing.paddingM),
           ],
-          
+
           // Key Pricing Info Cards
           Wrap(
             spacing: AppSpacing.paddingM,
@@ -374,14 +399,20 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                 ),
             ],
           ),
-          
+
           const SizedBox(height: AppSpacing.paddingM),
-          
+
           // Total Initial Payment Breakdown
-          _buildTotalPaymentBreakdown(pg, pricing, summary, deposit, maintenanceAmount, sharingOptions.isEmpty ? null : sharingOptions),
-          
+          _buildTotalPaymentBreakdown(
+              pg,
+              pricing,
+              summary,
+              deposit,
+              maintenanceAmount,
+              sharingOptions.isEmpty ? null : sharingOptions),
+
           const SizedBox(height: AppSpacing.paddingM),
-          
+
           // Availability Status
           if (summary.isNotEmpty || sharingOptions.isNotEmpty)
             _buildAvailabilityStatus(summary, sharingOptions),
@@ -390,7 +421,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     );
   }
 
-  Widget _buildPricingCard(BuildContext context, String label, String value, IconData icon) {
+  Widget _buildPricingCard(
+      BuildContext context, String label, String value, IconData icon) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Expanded(
@@ -420,7 +452,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     );
   }
 
-  Widget _buildPricingRow(String label, String value, {bool isProminent = false}) {
+  Widget _buildPricingRow(String label, String value,
+      {bool isProminent = false}) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Row(
@@ -444,23 +477,30 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     );
   }
 
-  Widget _buildTotalPaymentBreakdown(dynamic pg, Map pricing, SharingSummary summary, double deposit, double maintenance, List<MapEntry<String, double>>? sharingOptions) {
+  Widget _buildTotalPaymentBreakdown(
+      dynamic pg,
+      Map pricing,
+      SharingSummary summary,
+      double deposit,
+      double maintenance,
+      List<MapEntry<String, double>>? sharingOptions) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
-    
+
     // Get minimum rent from sharing options or summary
     double firstMonthRent = 0.0;
     if (sharingOptions != null && sharingOptions.isNotEmpty) {
-      firstMonthRent = sharingOptions.map((e) => e.value).reduce((a, b) => a < b ? a : b);
+      firstMonthRent =
+          sharingOptions.map((e) => e.value).reduce((a, b) => a < b ? a : b);
     } else if (summary.isNotEmpty) {
       firstMonthRent = _getMonthlyRentValue(pricing, summary);
     }
-    
+
     // Get maintenance type
     final maintenanceType = pg.maintenanceType ?? 'none';
     final isMaintenanceMonthly = maintenanceType == 'monthly';
-    
+
     final total = firstMonthRent + deposit + maintenance;
 
     return AdaptiveCard(
@@ -472,12 +512,14 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             children: [
               Icon(Icons.calculate, color: colorScheme.primary, size: 20),
               const SizedBox(width: AppSpacing.paddingXS),
-              HeadingSmall(text: 'Total Initial Payment', color: colorScheme.primary),
+              HeadingSmall(
+                  text: 'Total Initial Payment', color: colorScheme.primary),
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
           if (firstMonthRent > 0)
-            _buildPricingRow('First Month Rent', '₹${_formatCurrency(firstMonthRent)}'),
+            _buildPricingRow(
+                'First Month Rent', '₹${_formatCurrency(firstMonthRent)}'),
           if (firstMonthRent > 0 && deposit > 0)
             const SizedBox(height: AppSpacing.paddingXS),
           if (deposit > 0)
@@ -495,7 +537,9 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               isMaintenanceMonthly ? '(Monthly)' : '(One-time)',
             ),
           if (total > 0) ...[
-            Divider(height: AppSpacing.paddingM, color: colorScheme.outline.withOpacity(0.5)),
+            Divider(
+                height: AppSpacing.paddingM,
+                color: colorScheme.outline.withOpacity(0.5)),
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingS),
               decoration: BoxDecoration(
@@ -591,28 +635,32 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     );
   }
 
-  Widget _buildAvailabilityStatus(SharingSummary summary, List<MapEntry<String, double>> sharingOptions) {
+  Widget _buildAvailabilityStatus(
+      SharingSummary summary, List<MapEntry<String, double>> sharingOptions) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final availableTypes = <String>[];
-    
+
     // Get from sharingOptions first (rentConfig)
     if (sharingOptions.isNotEmpty) {
-      availableTypes.addAll(sharingOptions.map((e) => '${e.key} sharing').toList());
+      availableTypes
+          .addAll(sharingOptions.map((e) => '${e.key} sharing').toList());
     } else if (summary.isNotEmpty) {
       // Fallback to summary
-      availableTypes.addAll(summary.keys.map((k) => k.replaceAll('-share', '') + ' sharing').toList());
+      availableTypes.addAll(summary.keys
+          .map((k) => '${k.replaceAll('-share', '')} sharing')
+          .toList());
     }
-    
+
     availableTypes.sort();
-    
+
     if (availableTypes.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    final successColor = colorScheme.tertiaryContainer != colorScheme.surface 
-        ? colorScheme.tertiary 
-        : Theme.of(context).brightness == Brightness.dark 
+    final successColor = colorScheme.tertiaryContainer != colorScheme.surface
+        ? colorScheme.tertiary
+        : Theme.of(context).brightness == Brightness.dark
             ? const Color(0xFF4CAF50)
             : const Color(0xFF2E7D32);
 
@@ -679,7 +727,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     if (!pg.hasAmenities) {
       return const SizedBox.shrink();
     }
-    
+
     return SectionContainer(
       title: 'Facilities & Amenities',
       icon: Icons.room_service,
@@ -692,10 +740,12 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
 
   /// Section 5: Food & Meal Information
   Widget _buildFoodSection(BuildContext context, dynamic pg) {
-    if (pg.mealType == null && pg.mealTimings == null && pg.foodQuality == null) {
+    if (pg.mealType == null &&
+        pg.mealTimings == null &&
+        pg.foodQuality == null) {
       return const SizedBox.shrink();
     }
-    
+
     return SectionContainer(
       title: 'Food & Meal Information',
       icon: Icons.restaurant,
@@ -705,11 +755,14 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (pg.mealType != null) _buildInfoRow('Meal Type', pg.mealType!),
-            if (pg.mealType != null && (pg.mealTimings != null || pg.foodQuality != null))
+            if (pg.mealType != null &&
+                (pg.mealTimings != null || pg.foodQuality != null))
               const SizedBox(height: AppSpacing.paddingS),
             if (pg.mealTimings != null && pg.mealTimings!.isNotEmpty)
               _buildInfoRow('Meal Timings', pg.mealTimings!),
-            if (pg.mealTimings != null && pg.foodQuality != null && pg.foodQuality!.isNotEmpty)
+            if (pg.mealTimings != null &&
+                pg.foodQuality != null &&
+                pg.foodQuality!.isNotEmpty)
               const SizedBox(height: AppSpacing.paddingS),
             if (pg.foodQuality != null && pg.foodQuality!.isNotEmpty)
               _buildInfoRow('Food Quality', pg.foodQuality!),
@@ -734,31 +787,38 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (pg.rules!['entryTimings'] != null) ...[
-              _buildInfoRow('Entry Timings', pg.rules!['entryTimings'].toString()),
+              _buildInfoRow(
+                  'Entry Timings', pg.rules!['entryTimings'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['exitTimings'] != null) ...[
-              _buildInfoRow('Exit Timings', pg.rules!['exitTimings'].toString()),
+              _buildInfoRow(
+                  'Exit Timings', pg.rules!['exitTimings'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['guestPolicy'] != null) ...[
-              _buildInfoRow('Guest Policy', pg.rules!['guestPolicy'].toString()),
+              _buildInfoRow(
+                  'Guest Policy', pg.rules!['guestPolicy'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['smokingPolicy'] != null) ...[
-              _buildInfoRow('Smoking Policy', pg.rules!['smokingPolicy'].toString()),
+              _buildInfoRow(
+                  'Smoking Policy', pg.rules!['smokingPolicy'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['alcoholPolicy'] != null) ...[
-              _buildInfoRow('Alcohol Policy', pg.rules!['alcoholPolicy'].toString()),
+              _buildInfoRow(
+                  'Alcohol Policy', pg.rules!['alcoholPolicy'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['refundPolicy'] != null) ...[
-              _buildInfoRow('Refund Policy', pg.rules!['refundPolicy'].toString()),
+              _buildInfoRow(
+                  'Refund Policy', pg.rules!['refundPolicy'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['noticePeriod'] != null)
-              _buildInfoRow('Notice Period', pg.rules!['noticePeriod'].toString()),
+              _buildInfoRow(
+                  'Notice Period', pg.rules!['noticePeriod'].toString()),
           ],
         ),
       ),
@@ -770,7 +830,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     if (pg.ownerName == null && pg.contactNumber == null && pg.email == null) {
       return const SizedBox.shrink();
     }
-    
+
     return SectionContainer(
       title: 'Contact & Owner Information',
       icon: Icons.person,
@@ -786,7 +846,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             if (pg.contactNumber != null) ...[
               GestureDetector(
                 onTap: () => _callOwner(pg.contactNumber!),
-                child: _buildInfoRow('Contact Number', pg.contactNumber!, isClickable: true),
+                child: _buildInfoRow('Contact Number', pg.contactNumber!,
+                    isClickable: true),
               ),
               const SizedBox(height: AppSpacing.paddingS),
             ],
@@ -820,11 +881,13 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (bankDetails['accountHolderName'] != null) ...[
-                  _buildInfoRow('Account Holder', bankDetails['accountHolderName'].toString()),
+                  _buildInfoRow('Account Holder',
+                      bankDetails['accountHolderName'].toString()),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
                 if (bankDetails['accountNumber'] != null) ...[
-                  _buildInfoRow('Account Number', bankDetails['accountNumber'].toString()),
+                  _buildInfoRow('Account Number',
+                      bankDetails['accountNumber'].toString()),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
                 if (bankDetails['IFSC'] != null) ...[
@@ -866,9 +929,10 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
         pg.pgType != null ||
         (pg.parkingDetails != null && pg.parkingDetails!.isNotEmpty) ||
         (pg.securityMeasures != null && pg.securityMeasures!.isNotEmpty) ||
-        (pg.paymentInstructions != null && pg.paymentInstructions!.isNotEmpty) ||
+        (pg.paymentInstructions != null &&
+            pg.paymentInstructions!.isNotEmpty) ||
         (pg.nearbyPlaces != null && pg.nearbyPlaces!.isNotEmpty);
-    
+
     if (!hasInfo) {
       return const SizedBox.shrink();
     }
@@ -892,16 +956,19 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                   _buildInfoRow('PG Type', pg.pgType!),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
-                if (pg.parkingDetails != null && pg.parkingDetails!.isNotEmpty) ...[
+                if (pg.parkingDetails != null &&
+                    pg.parkingDetails!.isNotEmpty) ...[
                   _buildInfoRow('Parking Details', pg.parkingDetails!),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
-                if (pg.securityMeasures != null && pg.securityMeasures!.isNotEmpty)
+                if (pg.securityMeasures != null &&
+                    pg.securityMeasures!.isNotEmpty)
                   _buildInfoRow('Security Measures', pg.securityMeasures!),
               ],
             ),
           ),
-          if (pg.paymentInstructions != null && pg.paymentInstructions!.isNotEmpty) ...[
+          if (pg.paymentInstructions != null &&
+              pg.paymentInstructions!.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.paddingM),
             AdaptiveCard(
               padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -910,7 +977,9 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.payment, size: 18, color: Theme.of(context).colorScheme.primary),
+                      Icon(Icons.payment,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: AppSpacing.paddingXS),
                       const HeadingSmall(text: 'Payment Instructions'),
                     ],
@@ -930,18 +999,23 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.location_on, size: 18, color: Theme.of(context).colorScheme.primary),
+                      Icon(Icons.location_on,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: AppSpacing.paddingXS),
                       const HeadingSmall(text: 'Nearby Places'),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
                   ...pg.nearbyPlaces!.map((place) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+                        padding:
+                            const EdgeInsets.only(bottom: AppSpacing.paddingS),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.place, size: 16, color: Theme.of(context).colorScheme.primary),
+                            Icon(Icons.place,
+                                size: 16,
+                                color: Theme.of(context).colorScheme.primary),
                             const SizedBox(width: AppSpacing.paddingXS),
                             Expanded(child: BodyText(text: place)),
                           ],
@@ -1030,7 +1104,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             child: Text(
               value,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isClickable ? colorScheme.primary : colorScheme.onSurface,
+                color:
+                    isClickable ? colorScheme.primary : colorScheme.onSurface,
                 fontWeight: isClickable ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -1043,9 +1118,9 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
   /// Helper: Format currency
   String _formatCurrency(double amount) {
     return amount.toStringAsFixed(0).replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]},',
-    );
+          RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
   }
 
   /// Helper: Get monthly rent value
@@ -1064,7 +1139,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     String url;
 
     if (pg.hasLocation) {
-      url = 'https://www.google.com/maps/search/?api=1&query=${pg.latitude},${pg.longitude}';
+      url =
+          'https://www.google.com/maps/search/?api=1&query=${pg.latitude},${pg.longitude}';
     } else if (pg.googleMapLink != null && pg.googleMapLink!.isNotEmpty) {
       url = pg.googleMapLink!;
     } else if (pg.metadata?['googleMapLink'] != null) {
