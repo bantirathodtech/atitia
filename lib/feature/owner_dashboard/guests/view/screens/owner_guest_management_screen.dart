@@ -102,13 +102,11 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
         // Center: PG Selector dropdown
         titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
-        leadingActions: [
-          IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-            tooltip: 'Menu',
-          ),
-        ],
+
+        // Left: Drawer button (automatic with showDrawer: true)
+        showDrawer: true,
+
+        // Right: Refresh button
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
