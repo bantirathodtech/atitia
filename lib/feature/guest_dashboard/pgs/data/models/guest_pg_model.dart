@@ -28,7 +28,8 @@ class GuestPgModel {
   final double? longitude;
   final String? description;
   final Map<String, dynamic>? pricing;
-  final Map<String, dynamic>? rentConfig; // oneShare, twoShare, threeShare, fourShare, fiveShare
+  final Map<String, dynamic>?
+      rentConfig; // oneShare, twoShare, threeShare, fourShare, fiveShare
   final double? depositAmount; // Security deposit amount
   final String? maintenanceType; // 'one_time', 'monthly', 'none'
   final double? maintenanceAmount; // Maintenance charges
@@ -102,13 +103,13 @@ class GuestPgModel {
   /// Parse date from various formats (Timestamp, String, DateTime)
   static DateTime? _parseDate(dynamic date) {
     if (date == null) return null;
-    
+
     // If it's already a DateTime, return it
     if (date is DateTime) return date;
-    
+
     // If it's a Firestore Timestamp, convert to DateTime
     if (date is Timestamp) return date.toDate();
-    
+
     // If it's a String (ISO format), parse it
     if (date is String) {
       try {
@@ -122,7 +123,7 @@ class GuestPgModel {
         }
       }
     }
-    
+
     return null;
   }
 
@@ -180,7 +181,8 @@ class GuestPgModel {
       securityMeasures: map['securityMeasures'],
       paymentInstructions: map['paymentInstructions'],
       ownerName: map['ownerName'],
-      googleMapLink: map['googleMapLink'] ?? map['mapLink'], // Support both field names
+      googleMapLink:
+          map['googleMapLink'] ?? map['mapLink'], // Support both field names
       metadata: map['metadata'] != null
           ? Map<String, dynamic>.from(map['metadata'])
           : null,
@@ -292,10 +294,10 @@ class GuestPgModel {
       longitude: longitude ?? this.longitude,
       description: description ?? this.description,
       pricing: pricing ?? this.pricing,
-      rentConfig: rentConfig ?? this.rentConfig,
-      depositAmount: depositAmount ?? this.depositAmount,
-      maintenanceType: maintenanceType ?? this.maintenanceType,
-      maintenanceAmount: maintenanceAmount ?? this.maintenanceAmount,
+      rentConfig: rentConfig ?? rentConfig,
+      depositAmount: depositAmount ?? depositAmount,
+      maintenanceType: maintenanceType ?? maintenanceType,
+      maintenanceAmount: maintenanceAmount ?? maintenanceAmount,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
@@ -305,14 +307,14 @@ class GuestPgModel {
       nearbyPlaces: nearbyPlaces ?? this.nearbyPlaces,
       pgType: pgType ?? this.pgType,
       mealType: mealType ?? this.mealType,
-      mealTimings: mealTimings ?? this.mealTimings,
-      foodQuality: foodQuality ?? this.foodQuality,
+      mealTimings: mealTimings ?? mealTimings,
+      foodQuality: foodQuality ?? foodQuality,
       parkingAvailable: parkingAvailable ?? this.parkingAvailable,
-      parkingDetails: parkingDetails ?? this.parkingDetails,
+      parkingDetails: parkingDetails ?? parkingDetails,
       wifiAvailable: wifiAvailable ?? this.wifiAvailable,
       securityAvailable: securityAvailable ?? this.securityAvailable,
-      securityMeasures: securityMeasures ?? this.securityMeasures,
-      paymentInstructions: paymentInstructions ?? this.paymentInstructions,
+      securityMeasures: securityMeasures ?? securityMeasures,
+      paymentInstructions: paymentInstructions ?? paymentInstructions,
       ownerName: ownerName ?? this.ownerName,
       googleMapLink: googleMapLink ?? this.googleMapLink,
       metadata: metadata ?? this.metadata,

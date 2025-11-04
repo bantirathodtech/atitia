@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/drawers/owner_drawer.dart';
+import '../../../shared/widgets/owner_drawer.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 
 /// Reports screen for owners - placeholder

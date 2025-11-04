@@ -3,18 +3,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:atitia/core/services/firebase/auth/firebase_auth_service.dart';
-import 'package:atitia/core/services/firebase/database/firestore_database_service.dart';
-import 'package:atitia/core/services/firebase/analytics/firebase_analytics_service.dart';
-import 'package:atitia/core/services/firebase/messaging/cloud_messaging_service.dart';
-import 'package:atitia/core/services/firebase/crashlytics/firebase_crashlytics_service.dart';
-import 'package:atitia/core/services/firebase/remote_config/remote_config_service.dart';
-import 'package:atitia/core/services/firebase/performance/performance_monitoring_service.dart';
-import 'package:atitia/core/services/firebase/functions/cloud_functions_service.dart';
-import 'package:atitia/core/services/firebase/security/app_integrity_service.dart';
-import 'package:atitia/core/services/supabase/storage/supabase_storage_service.dart';
-import 'package:atitia/core/db/flutter_secure_storage.dart';
-
 /// Mock implementations of Firebase services for testing
 /// These mocks allow us to test ViewModels and Repositories without
 /// actual Firebase connections
@@ -37,6 +25,7 @@ class MockAuthenticationServiceWrapper {
     _isSignedIn = false;
     _mockUser = null;
   }
+
   Future<String?> getIdToken() async => _mockToken;
   Future<void> refreshIdToken() async {}
 
@@ -44,6 +33,7 @@ class MockAuthenticationServiceWrapper {
     _mockUser = user;
     _isSignedIn = user != null;
   }
+
   void setMockToken(String? token) {
     _mockToken = token;
   }
@@ -57,18 +47,22 @@ class MockFirestoreServiceWrapper {
   Future<DocumentSnapshot> getDocument(String collection, String docId) async {
     throw UnimplementedError('Use Firestore emulator for integration tests');
   }
+
   Future<void> setDocument(
       String collection, String docId, Map<String, dynamic> data) async {
     _mockData['$collection/$docId'] = data;
   }
+
   Future<void> updateDocument(
       String collection, String docId, Map<String, dynamic> data) async {
     final key = '$collection/$docId';
     _mockData[key] = {...?_mockData[key], ...data};
   }
+
   Future<void> deleteDocument(String collection, String docId) async {
     _mockData.remove('$collection/$docId');
   }
+
   Stream<DocumentSnapshot> getDocumentStream(String collection, String docId) {
     throw UnimplementedError('Use Firestore emulator for stream tests');
   }
@@ -133,7 +127,9 @@ class MockCloudFunctionsServiceWrapper {
   ) async {
     return {'success': true};
   }
-  Future<void> createUserProfile(String userId, Map<String, dynamic> data) async {}
+
+  Future<void> createUserProfile(
+      String userId, Map<String, dynamic> data) async {}
   Future<void> processPayment(Map<String, dynamic> paymentData) async {}
 }
 
@@ -153,9 +149,11 @@ class MockSupabaseStorageServiceWrapper {
     _files[path] = fileBytes;
     return 'https://mock-storage.url/$path';
   }
+
   Future<void> deleteFile(String path) async {
     _files.remove(path);
   }
+
   Future<String> getDownloadUrl(String path) async {
     return 'https://mock-storage.url/$path';
   }
@@ -168,12 +166,15 @@ class MockLocalStorageService {
   Future<void> write(String key, String value) async {
     _storage[key] = value;
   }
+
   Future<String?> read(String key) async {
     return _storage[key];
   }
+
   Future<void> delete(String key) async {
     _storage.remove(key);
   }
+
   Future<void> deleteAll() async {
     _storage.clear();
   }

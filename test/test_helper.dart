@@ -1,8 +1,7 @@
 // Test helpers for CI/CD environment
-import 'package:flutter_test/flutter_test.dart';
 
 /// Check if running in CI environment
-bool get isCI => 
+bool get isCI =>
     const bool.fromEnvironment('CI', defaultValue: false) ||
     const String.fromEnvironment('GITHUB_ACTIONS', defaultValue: '') == 'true';
 
@@ -13,4 +12,3 @@ void skipIfNoFirebase() {
     // Skip tests that require Firebase
   }
 }
-
