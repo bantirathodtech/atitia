@@ -66,8 +66,8 @@ class GuestSettingsScreen extends StatelessWidget {
                 const SizedBox(height: AppSpacing.paddingS),
                 _buildSwitchTile(
                   context,
-                  title: 'Booking Updates',
-                  subtitle: 'Get updates about your bookings',
+                  title: 'Payment Reminders',
+                  subtitle: 'Get reminders for pending payments',
                   value: true,
                   onChanged: (value) {},
                 ),

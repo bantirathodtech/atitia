@@ -395,7 +395,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
             tooltip: 'Save Profile',
           ),
         ],
-        showBackButton: false,
+        showBackButton: true, // Enable back button like notifications and settings
         showThemeToggle: true, // Enable theme toggle
       ),
 

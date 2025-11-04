@@ -16,6 +16,7 @@ import '../../../feature/guest_dashboard/profile/view/screens/guest_profile_scre
 import '../../../feature/guest_dashboard/settings/view/screens/guest_settings_screen.dart';
 import '../../../feature/guest_dashboard/help/view/screens/guest_help_screen.dart';
 import '../../../common/widgets/notifications/notifications_screen.dart';
+import '../../../feature/guest_dashboard/notifications/view/screens/guest_notifications_screen.dart';
 import '../../../feature/owner_dashboard/foods/view/screens/owner_food_management_screen.dart';
 import '../../../feature/owner_dashboard/guests/view/screens/owner_guest_management_screen.dart';
 import '../../../feature/owner_dashboard/mypg/presentation/screens/owner_pg_management_screen.dart';
@@ -174,7 +175,7 @@ class AppRouter {
           GoRoute(
             path: 'notifications',
             name: AppRoutes.guestNotifications,
-            builder: (context, state) => const NotificationsScreen(),
+            builder: (context, state) => const GuestNotificationsScreen(),
           ),
           // Room/Bed Management Route
           GoRoute(
