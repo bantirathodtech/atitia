@@ -47,9 +47,39 @@ class GuestDrawer extends StatelessWidget {
   void _handleDrawerNavigation(BuildContext context, String item) {
     switch (item) {
       case 'home':
-        // Navigate to guest dashboard home
+        // Navigate to guest dashboard home (PGs tab)
         if (onNavigationTap != null) {
           onNavigationTap!(0); // PG List tab
+        }
+        break;
+      case 'pgs':
+        // Navigate to PGs tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(0); // PGs tab
+        }
+        break;
+      case 'foods':
+        // Navigate to Foods tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(1); // Foods tab
+        }
+        break;
+      case 'payments':
+        // Navigate to Payments tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(2); // Payments tab
+        }
+        break;
+      case 'requests':
+        // Navigate to Requests tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(3); // Requests tab
+        }
+        break;
+      case 'complaints':
+        // Navigate to Complaints tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(4); // Complaints tab
         }
         break;
       case 'profile':
