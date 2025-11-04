@@ -178,7 +178,7 @@ class OwnerDrawer extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            selectedPg.pgName,
+                            selectedPg['pgName'] as String? ?? selectedPg['name'] as String? ?? 'PG',
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.9),
                               fontSize: 14,

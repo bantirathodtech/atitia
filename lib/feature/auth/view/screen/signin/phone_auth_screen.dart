@@ -271,12 +271,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       if (!mounted) return;
 
       final navigation = getIt<NavigationService>();
-<<<<<<< HEAD
-      
-      if (!isExistingUser) {
-        // New user - navigate to registration
-        navigation.goToRegistration();
-=======
 
       // If provider set an error (e.g., role mismatch), show it and return to role selection
       if (authProvider.error) {
@@ -291,7 +285,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           ),
         );
         navigation.goToRoleSelection();
->>>>>>> temp-stash-apply
         return;
       }
 
@@ -362,7 +355,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   }
 
   /// Handles Google sign-in
-<<<<<<< HEAD
   Future<void> _handleGoogleSignIn() async {
     setState(() => _loading = true);
     
@@ -387,32 +379,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       }
     }
   }
-=======
-  // Future<void> _handleGoogleSignIn() async {
-  //   setState(() => _loading = true);
-
-  //   try {
-  //     await context.read<AuthProvider>().signInWithGoogle();
-
-  //     if (!mounted) return;
-
-  //     // Navigation is handled in AuthProvider.signInWithGoogle()
-  //   } catch (e) {
-  //     if (mounted) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: BodyText(text: 'Google sign-in failed: ${e.toString()}'),
-  //           backgroundColor: Colors.red,
-  //         ),
-  //       );
-  //     }
-  //   } finally {
-  //     if (mounted) {
-  //       setState(() => _loading = false);
-  //     }
-  //   }
-  // }
->>>>>>> temp-stash-apply
 
   @override
   Widget build(BuildContext context) {
@@ -458,15 +424,9 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 align: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
-<<<<<<< HEAD
-              
-              // Phone input field - Disabled on macOS
-              if (!_isMacOS) ...[
-=======
 
               // Phone input field - Available on web and mobile, disabled on macOS
               if (_isPhoneAuthAvailable) ...[
->>>>>>> temp-stash-apply
                 TextInput(
                   controller: _phoneController,
                   label: loc.phoneNumber,
@@ -522,11 +482,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ],
               
               // OTP input field (shown after OTP is sent) - Not available on macOS
-<<<<<<< HEAD
-              if (_otpSent && !_isMacOS) ...[
-=======
               if (_otpSent && _isPhoneAuthAvailable) ...[
->>>>>>> temp-stash-apply
                 const SizedBox(height: AppSpacing.lg),
                 TextInput(
                   controller: _otpController,
@@ -552,11 +508,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               const SizedBox(height: AppSpacing.xl),
               
               // Action button (Send OTP / Verify) - Not available on macOS
-<<<<<<< HEAD
-              if (!_isMacOS) ...[
-=======
               if (_isPhoneAuthAvailable) ...[
->>>>>>> temp-stash-apply
                 PrimaryButton(
                   onPressed: _loading
                       ? null
@@ -569,11 +521,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ],
               
               // Change number option - Not available on macOS
-<<<<<<< HEAD
-              if (_otpSent && !_isMacOS) ...[
-=======
               if (_otpSent && _isPhoneAuthAvailable) ...[
->>>>>>> temp-stash-apply
                 const SizedBox(height: AppSpacing.md),
                 SecondaryButton(
                   onPressed: _loading
@@ -593,11 +541,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               const SizedBox(height: AppSpacing.lg),
               
               // Divider - Only show when both methods are available
-<<<<<<< HEAD
-              if (!_isMacOS) ...[
-=======
               if (_isPhoneAuthAvailable) ...[
->>>>>>> temp-stash-apply
                 Row(
                   children: [
                     const Expanded(child: Divider()),
@@ -613,13 +557,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
               ],
-<<<<<<< HEAD
-              
-              // Google sign-in - Prominent for macOS
-=======
-
               // Google sign-in - Available for all platforms
->>>>>>> temp-stash-apply
               if (_isMacOS) ...[
                 const SizedBox(height: AppSpacing.md),
                 const CaptionText(
@@ -628,48 +566,11 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
               ],
-<<<<<<< HEAD
               PrimaryButton(
                 onPressed: _loading ? null : _signInWithGoogle,
                 label: _isMacOS ? 'Sign in with Google (Recommended)' : 'Continue with Google',
                 icon: Icons.g_mobiledata,
               ),
-=======
-              // Google Sign-In - Platform specific implementation
-              if (kIsWeb) ...[
-                // Web platform requires the Google Sign-In button widget
-                const SizedBox(height: AppSpacing.md),
-                const CaptionText(
-                  text: 'Sign in with Google using the button below:',
-                  align: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                // Get the Google Sign-In button widget for web
-                Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
-                    final googleSignInButton =
-                        authProvider.getGoogleSignInButton();
-                    if (googleSignInButton != null) {
-                      return googleSignInButton;
-                    } else {
-                      return const CaptionText(
-                        text: 'Google Sign-In not available on this platform',
-                        align: TextAlign.center,
-                      );
-                    }
-                  },
-                ),
-              ] else ...[
-                // Mobile/Desktop platforms use the regular button
-                PrimaryButton(
-                  onPressed: _loading ? null : _signInWithGoogle,
-                  label: _isMacOS
-                      ? 'Sign in with Google (Recommended)'
-                      : 'Continue with Google',
-                  icon: Icons.g_mobiledata,
-                ),
-              ],
->>>>>>> temp-stash-apply
             ],
           ),
         ),

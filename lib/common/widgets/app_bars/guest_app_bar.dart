@@ -114,7 +114,7 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  selectedPg.pgName,
+                  selectedPg['pgName'] as String? ?? selectedPg['name'] as String? ?? 'PG',
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     fontSize: 14,
