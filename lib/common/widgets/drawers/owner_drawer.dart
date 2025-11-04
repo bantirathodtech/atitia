@@ -4,7 +4,7 @@
 // Displays owner information and navigation options:
 // - Header: Avatar, name, role, current PG
 // - Navigation: Dashboard items
-// - Footer: Personal details, settings, logout
+// - Footer: Dashboard tabs (Home, Food, PGs, Guest), Switch Role, Help & Support, Logout
 // ============================================================================
 
 import 'package:flutter/material.dart';
@@ -261,11 +261,6 @@ class OwnerDrawer extends StatelessWidget {
         title: 'Payments',
         index: -2, // Special item
       ),
-      _DrawerItem(
-        icon: Icons.notifications,
-        title: 'Notifications',
-        index: -3, // Special item
-      ),
     ];
 
     return ListView.builder(
@@ -325,41 +320,107 @@ class OwnerDrawer extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Personal Details
+          // Home (Overview) - Dashboard Tab 0
           ListTile(
             leading: Icon(
-              Icons.person_outline,
-              color: isDark ? AppColors.textSecondary : AppColors.textTertiary,
+              Icons.dashboard,
+              color: currentTabIndex == 0
+                  ? AppColors.primary
+                  : (isDark ? AppColors.textSecondary : AppColors.textTertiary),
             ),
             title: Text(
-              'Personal Details',
+              'Home',
               style: TextStyle(
-                color: isDark ? AppColors.textPrimary : AppColors.textPrimary,
+                color: currentTabIndex == 0
+                    ? AppColors.primary
+                    : (isDark ? AppColors.textPrimary : AppColors.textPrimary),
+                fontWeight: currentTabIndex == 0 ? FontWeight.w600 : FontWeight.normal,
                 fontSize: 14,
               ),
             ),
             onTap: () {
               Navigator.of(context).pop();
-              // TODO: Navigate to personal details screen
+              if (onNavigationTap != null) {
+                onNavigationTap!(0); // Navigate to Overview tab
+              }
             },
           ),
 
-          // Settings
+          // Food - Dashboard Tab 1
           ListTile(
             leading: Icon(
-              Icons.settings_outlined,
-              color: isDark ? AppColors.textSecondary : AppColors.textTertiary,
+              Icons.restaurant_menu,
+              color: currentTabIndex == 1
+                  ? AppColors.primary
+                  : (isDark ? AppColors.textSecondary : AppColors.textTertiary),
             ),
             title: Text(
-              'Settings',
+              'Food',
               style: TextStyle(
-                color: isDark ? AppColors.textPrimary : AppColors.textPrimary,
+                color: currentTabIndex == 1
+                    ? AppColors.primary
+                    : (isDark ? AppColors.textPrimary : AppColors.textPrimary),
+                fontWeight: currentTabIndex == 1 ? FontWeight.w600 : FontWeight.normal,
                 fontSize: 14,
               ),
             ),
             onTap: () {
               Navigator.of(context).pop();
-              // TODO: Navigate to settings screen
+              if (onNavigationTap != null) {
+                onNavigationTap!(1); // Navigate to Food tab
+              }
+            },
+          ),
+
+          // PGs - Dashboard Tab 2
+          ListTile(
+            leading: Icon(
+              Icons.home,
+              color: currentTabIndex == 2
+                  ? AppColors.primary
+                  : (isDark ? AppColors.textSecondary : AppColors.textTertiary),
+            ),
+            title: Text(
+              'PGs',
+              style: TextStyle(
+                color: currentTabIndex == 2
+                    ? AppColors.primary
+                    : (isDark ? AppColors.textPrimary : AppColors.textPrimary),
+                fontWeight: currentTabIndex == 2 ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              if (onNavigationTap != null) {
+                onNavigationTap!(2); // Navigate to PGs tab
+              }
+            },
+          ),
+
+          // Guest - Dashboard Tab 3
+          ListTile(
+            leading: Icon(
+              Icons.people,
+              color: currentTabIndex == 3
+                  ? AppColors.primary
+                  : (isDark ? AppColors.textSecondary : AppColors.textTertiary),
+            ),
+            title: Text(
+              'Guest',
+              style: TextStyle(
+                color: currentTabIndex == 3
+                    ? AppColors.primary
+                    : (isDark ? AppColors.textPrimary : AppColors.textPrimary),
+                fontWeight: currentTabIndex == 3 ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              if (onNavigationTap != null) {
+                onNavigationTap!(3); // Navigate to Guest tab
+              }
             },
           ),
 
@@ -430,10 +491,6 @@ class OwnerDrawer extends StatelessWidget {
       case -2: // Payments
         // TODO: Navigate to payments screen
         debugPrint('💰 Navigate to Payments');
-        break;
-      case -3: // Notifications
-        // TODO: Navigate to notifications screen
-        debugPrint('🔔 Navigate to Notifications');
         break;
     }
   }
