@@ -54,6 +54,24 @@ class OwnerDrawer extends StatelessWidget {
           onNavigationTap!(0); // Overview tab
         }
         break;
+      case 'food':
+        // Navigate to Food tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(1); // Food tab
+        }
+        break;
+      case 'pgs':
+        // Navigate to PGs tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(2); // PGs tab
+        }
+        break;
+      case 'guest':
+        // Navigate to Guest tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(3); // Guest tab
+        }
+        break;
       case 'profile':
         // Navigate to owner profile screen
         _handleProfileTap(context);
