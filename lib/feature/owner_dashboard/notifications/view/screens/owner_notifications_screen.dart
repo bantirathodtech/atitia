@@ -50,7 +50,7 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
             builder: (context, viewModel, _) {
               return IconButton(
                 icon: const Icon(Icons.mark_email_read),
-                onPressed: viewModel.isLoading
+                onPressed: viewModel.loading
                     ? null
                     : () async {
                         await viewModel.markAllAsRead();
@@ -66,11 +66,11 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
       ),
       body: Consumer<NotificationViewModel>(
         builder: (context, viewModel, _) {
-          if (viewModel.isLoading && viewModel.notifications.isEmpty) {
+          if (viewModel.loading && viewModel.notifications.isEmpty) {
             return const AdaptiveLoader();
           }
 
-          if (viewModel.hasError) {
+          if (viewModel.error) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
