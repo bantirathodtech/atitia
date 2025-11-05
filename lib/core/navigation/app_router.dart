@@ -15,7 +15,6 @@ import '../../../feature/guest_dashboard/pgs/view/screens/guest_room_bed_screen.
 import '../../../feature/guest_dashboard/profile/view/screens/guest_profile_screen.dart';
 import '../../../feature/guest_dashboard/settings/view/screens/guest_settings_screen.dart';
 import '../../../feature/guest_dashboard/help/view/screens/guest_help_screen.dart';
-import '../../../common/widgets/notifications/notifications_screen.dart';
 import '../../../feature/guest_dashboard/notifications/view/screens/guest_notifications_screen.dart';
 import '../../../feature/owner_dashboard/foods/view/screens/owner_food_management_screen.dart';
 import '../../../feature/owner_dashboard/guests/view/screens/owner_guest_management_screen.dart';
@@ -84,12 +83,13 @@ class AppRouter {
           // But don't redirect if we're navigating to a detail route
           final matched = state.matchedLocation;
           final fullPath = state.uri.path;
-          
+
           // Don't redirect if we're on a detail route (has :pgId, :paymentId, etc.)
           if (fullPath.contains('/pgs/') && fullPath.split('/').length > 3) {
             return null; // This is a detail route, don't redirect
           }
-          if (fullPath.contains('/payments/') && fullPath.split('/').length > 3) {
+          if (fullPath.contains('/payments/') &&
+              fullPath.split('/').length > 3) {
             return null; // This is a detail route, don't redirect
           }
           if (fullPath.contains('/complaints/add') ||
@@ -98,9 +98,10 @@ class AppRouter {
               fullPath.contains('/room-bed')) {
             return null; // These are full-screen routes, don't redirect
           }
-          
+
           // Only redirect if we're exactly at /guest
-          if (matched == AppRoutes.guestHome || matched == '${AppRoutes.guestHome}/') {
+          if (matched == AppRoutes.guestHome ||
+              matched == '${AppRoutes.guestHome}/') {
             return AppRoutes.guestPGs;
           }
           return null;
