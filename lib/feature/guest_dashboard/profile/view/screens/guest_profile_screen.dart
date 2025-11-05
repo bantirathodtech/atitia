@@ -24,12 +24,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/drawers/guest_drawer.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
-import '../../../shared/widgets/guest_pg_appbar_display.dart';
-import '../../../../auth/logic/auth_provider.dart';
 import '../../../../auth/data/model/user_model.dart';
+import '../../../../auth/logic/auth_provider.dart';
+import '../../../shared/widgets/guest_pg_appbar_display.dart';
 import '../../data/models/guest_profile_model.dart';
 import '../../viewmodel/guest_profile_viewmodel.dart';
 
@@ -387,7 +386,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
       appBar: AdaptiveAppBar(
         titleWidget: const GuestPgAppBarDisplay(),
         centerTitle: true,
-        showDrawer: true,
+        showDrawer: false, // No drawer on profile screen
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
@@ -395,12 +394,9 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
             tooltip: 'Save Profile',
           ),
         ],
-        showBackButton: true, // Enable back button like notifications and settings
+        showBackButton: true, // Back button to go back
         showThemeToggle: true, // Enable theme toggle
       ),
-
-      // Centralized Guest Drawer
-      drawer: const GuestDrawer(),
 
       body: _buildBody(context, viewModel),
     );
