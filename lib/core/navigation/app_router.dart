@@ -28,6 +28,8 @@ import '../../../feature/owner_dashboard/notifications/view/screens/owner_notifi
 import '../../../feature/owner_dashboard/help/view/screens/owner_help_screen.dart';
 import '../../../feature/owner_dashboard/analytics/screens/owner_analytics_dashboard.dart';
 import '../../../feature/owner_dashboard/reports/view/screens/owner_reports_screen.dart';
+import '../../common/screens/privacy_policy_screen.dart';
+import '../../common/screens/terms_of_service_screen.dart';
 import '../../common/utils/constants/routes.dart';
 import '../../common/utils/logging/logging_helper.dart';
 import '../../../feature/auth/logic/auth_provider.dart';
@@ -265,6 +267,18 @@ class AppRouter {
             builder: (context, state) => const OwnerReportsScreen(),
           ),
         ],
+      ),
+
+      // Common screens (accessible from both guest and owner)
+      GoRoute(
+        path: AppRoutes.privacyPolicy,
+        name: AppRoutes.privacyPolicy,
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.termsOfService,
+        name: AppRoutes.termsOfService,
+        builder: (context, state) => const TermsOfServiceScreen(),
       ),
     ],
 

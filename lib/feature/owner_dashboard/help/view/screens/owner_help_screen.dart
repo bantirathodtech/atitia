@@ -5,10 +5,12 @@
 // ============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../shared/widgets/owner_drawer.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
@@ -66,8 +68,20 @@ class OwnerHelpScreen extends StatelessWidget {
             icon: Icons.video_library,
             title: 'Video Tutorials',
             subtitle: 'Watch step-by-step guides',
-            onTap: () {
-              // TODO: Navigate to video tutorials
+            onTap: () async {
+              // Open video tutorials URL
+              final Uri url = Uri.parse('https://www.youtube.com/@atitia');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              } else {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Unable to open video tutorials'),
+                    ),
+                  );
+                }
+              }
             },
           ),
           const SizedBox(height: AppSpacing.paddingS),
@@ -76,8 +90,20 @@ class OwnerHelpScreen extends StatelessWidget {
             icon: Icons.article,
             title: 'Documentation',
             subtitle: 'Read comprehensive guides',
-            onTap: () {
-              // TODO: Navigate to documentation
+            onTap: () async {
+              // Open documentation URL
+              final Uri url = Uri.parse('https://docs.atitia.com');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              } else {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Unable to open documentation'),
+                    ),
+                  );
+                }
+              }
             },
           ),
         ],
@@ -189,9 +215,37 @@ class OwnerHelpScreen extends StatelessWidget {
             context,
             icon: Icons.chat,
             title: 'Live Chat',
-            subtitle: 'Available 24/7',
-            onTap: () {
-              // TODO: Open live chat
+            subtitle: 'WhatsApp: +91 7020797849',
+            onTap: () async {
+              // Try WhatsApp first
+              final Uri whatsappUrl = Uri.parse('https://wa.me/917020797849');
+              bool whatsappLaunched = false;
+              
+              if (await canLaunchUrl(whatsappUrl)) {
+                try {
+                  await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+                  whatsappLaunched = true;
+                } catch (e) {
+                  // WhatsApp failed, try fallback
+                  whatsappLaunched = false;
+                }
+              }
+              
+              // Fallback to web chat if WhatsApp is not available
+              if (!whatsappLaunched) {
+                final Uri webChatUrl = Uri.parse('https://chat.atitia.com');
+                if (await canLaunchUrl(webChatUrl)) {
+                  await launchUrl(webChatUrl, mode: LaunchMode.externalApplication);
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Unable to open chat. Please try WhatsApp: +91 7020797849'),
+                      ),
+                    );
+                  }
+                }
+              }
             },
           ),
         ],
@@ -211,7 +265,7 @@ class OwnerHelpScreen extends StatelessWidget {
             label: 'Privacy Policy',
             icon: Icons.privacy_tip,
             onPressed: () {
-              // TODO: Show privacy policy
+              context.push(AppRoutes.privacyPolicy);
             },
           ),
           const SizedBox(height: AppSpacing.paddingS),
@@ -219,7 +273,7 @@ class OwnerHelpScreen extends StatelessWidget {
             label: 'Terms of Service',
             icon: Icons.description,
             onPressed: () {
-              // TODO: Show terms of service
+              context.push(AppRoutes.termsOfService);
             },
           ),
         ],

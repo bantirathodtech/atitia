@@ -66,6 +66,12 @@ class AppRoutes {
   /// Guest help & support: '/guest/help'
   static const String guestHelp = '$guestHome/help';
 
+  /// Privacy Policy: '/privacy-policy'
+  static const String privacyPolicy = '/privacy-policy';
+
+  /// Terms of Service: '/terms-of-service'
+  static const String termsOfService = '/terms-of-service';
+
   // MARK: - Owner Feature Routes
   // ==========================================
 
