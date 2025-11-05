@@ -31,7 +31,9 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // Application ID - Must match EnvironmentConfig.packageName
+        // This ID uniquely identifies your app on the Google Play Store
+        // Reference: lib/common/constants/environment_config.dart
         applicationId = "com.avishio.atitia"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
