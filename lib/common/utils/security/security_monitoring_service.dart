@@ -2,6 +2,8 @@
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/di/firebase/di/firebase_service_locator.dart';
+
 /// Security monitoring service for threat detection and security event logging
 class SecurityMonitoringService {
   static final SecurityMonitoringService _instance =
@@ -16,7 +18,10 @@ class SecurityMonitoringService {
 
   // Security thresholds
   static const int _maxFailedAttempts = 5;
+  // TODO: Implement rate limiting using these thresholds
+  // ignore: unused_field
   static const Duration _failedAttemptWindow = Duration(minutes: 15);
+  // ignore: unused_field
   static const Duration _alertCooldown = Duration(minutes: 5);
 
   /// Log a security event
@@ -351,18 +356,84 @@ class SecurityMonitoringService {
     return 'alert_${DateTime.now().millisecondsSinceEpoch}_${_securityAlerts.length}';
   }
 
-  /// Send event to security service (placeholder)
+  /// Send event to security service
   void _sendToSecurityService(SecurityEvent event) {
-    // In production, this should send to a real security monitoring service
-    // For now, we'll just log it
-    if (kDebugMode) {}
+    // Send security events to Firebase Analytics for monitoring
+    try {
+      final analytics = getIt.analytics;
+
+      // Log security event to analytics
+      analytics.logEvent(
+        name: 'security_event',
+        parameters: {
+          'event_type': event.eventType,
+          'description': event.description,
+          'level': event.level.toString(),
+          'timestamp': event.timestamp.toIso8601String(),
+          if (event.userId != null) 'user_id': event.userId!,
+          if (event.deviceId != null) 'device_id': event.deviceId!,
+          ...event.metadata,
+        },
+      );
+
+      // In debug mode, also log to console
+      if (kDebugMode) {
+        debugPrint('Security Event: ${event.eventType} - ${event.description}');
+      }
+    } catch (e) {
+      // If analytics fails, at least log to console in debug mode
+      if (kDebugMode) {
+        debugPrint('Failed to send security event to analytics: $e');
+      }
+    }
   }
 
-  /// Send alert to security service (placeholder)
+  /// Send alert to security service
   void _sendAlertToSecurityService(SecurityAlert alert) {
-    // In production, this should send to a real security monitoring service
-    // For now, we'll just log it
-    if (kDebugMode) {}
+    // Send security alerts to Firebase Analytics and Crashlytics
+    try {
+      final analytics = getIt.analytics;
+      final crashlytics = getIt.crashlytics;
+
+      // Log security alert to analytics
+      analytics.logEvent(
+        name: 'security_alert',
+        parameters: {
+          'alert_type': alert.alertType,
+          'description': alert.description,
+          'severity': alert.severity.toString(),
+          'timestamp': alert.timestamp.toIso8601String(),
+          if (alert.userId != null) 'user_id': alert.userId!,
+          if (alert.deviceId != null) 'device_id': alert.deviceId!,
+          ...alert.metadata,
+        },
+      );
+
+      // Log to Crashlytics for high-severity alerts
+      if (alert.severity == SecuritySeverity.high ||
+          alert.severity == SecuritySeverity.critical) {
+        crashlytics.log(
+          'Security Alert: ${alert.alertType} - ${alert.description}',
+        );
+
+        // Set custom key for tracking
+        crashlytics.setCustomKey('security_alert_type', alert.alertType);
+        crashlytics.setCustomKey(
+            'security_alert_severity', alert.severity.toString());
+      }
+
+      // In debug mode, also log to console
+      if (kDebugMode) {
+        debugPrint(
+          'Security Alert [${alert.severity}]: ${alert.alertType} - ${alert.description}',
+        );
+      }
+    } catch (e) {
+      // If services fail, at least log to console in debug mode
+      if (kDebugMode) {
+        debugPrint('Failed to send security alert to services: $e');
+      }
+    }
   }
 
   /// Get security events

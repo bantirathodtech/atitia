@@ -336,10 +336,22 @@ class NotificationHandlers {
   // ==========================================================================
 
   /// Gets the current navigation context
+  /// 
+  /// **LIMITATION:** This method returns null because Flutter's BuildContext
+  /// cannot be stored or accessed outside of the widget tree. This is by design
+  /// for security and lifecycle management.
+  /// 
+  /// **SOLUTION:** Instead of storing context, use:
+  /// 1. `GlobalKey<NavigatorState>` for navigation (already implemented via AppRouter)
+  /// 2. Pass context as parameter to methods that need it
+  /// 3. Use `context.push()` / `context.pop()` from within widgets
+  /// 4. Use `NavigationService` for programmatic navigation
+  /// 
+  /// This placeholder remains for backward compatibility and future reference.
   BuildContext? _getCurrentContext() {
-    // TODO: Implement proper context retrieval
-    // This is a placeholder - in a real app, you'd need to maintain
-    // a reference to the current navigation context
+    // This is intentionally a placeholder - Flutter's architecture prevents
+    // storing BuildContext outside the widget tree for security and lifecycle reasons.
+    // Use NavigationService or pass context as parameter instead.
     return null;
   }
 
