@@ -2,7 +2,7 @@ name: 🚀 CI/CD Pipeline - Enterprise Grade
 
 on:
   push:
-    branches: [main, updates]
+    branches: [main, updates, staging, dev]
     paths-ignore:
       - '**.md'
       - '.gitignore'
@@ -10,7 +10,7 @@ on:
       - '*.md'
       - 'README*.md'
   pull_request:
-    branches: [main, updates]
+    branches: [main, updates, staging, dev]
     paths-ignore:
       - '**.md'
       - '.gitignore'
