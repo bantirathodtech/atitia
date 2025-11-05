@@ -9,12 +9,11 @@ import 'package:flutter/material.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/drawers/guest_drawer.dart';
-import '../../../../../common/widgets/text/body_text.dart';
-import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
-import '../../../../../common/widgets/chips/filter_chip.dart';
+import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../shared/widgets/guest_drawer.dart';
 
 /// Notifications screen for guests
 class GuestNotificationsScreen extends StatefulWidget {
@@ -28,47 +27,79 @@ class GuestNotificationsScreen extends StatefulWidget {
 class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
   String _selectedFilter = 'All';
 
-  // Sample notifications data based on guest usage
+  // Sample notifications data - Guest receives notifications FROM owner
   final List<Map<String, dynamic>> _notifications = [
     {
       'id': '1',
       'title': 'Booking Request Approved',
-      'body': 'Your booking request for Room 101 has been approved',
-      'type': 'booking',
+      'body': 'Your booking request for Room 101 has been approved by owner',
+      'type': 'booking_approved',
       'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
       'read': false,
     },
     {
       'id': '2',
-      'title': 'Payment Reminder',
-      'body': 'Your rent payment of ₹5,000 is due in 3 days',
-      'type': 'payment',
-      'timestamp': DateTime.now().subtract(const Duration(days: 1)),
+      'title': 'Booking Request Rejected',
+      'body': 'Your booking request for Room 205 has been rejected due to unavailability',
+      'type': 'booking_rejected',
+      'timestamp': DateTime.now().subtract(const Duration(hours: 12)),
       'read': false,
     },
     {
       'id': '3',
-      'title': 'Complaint Response',
-      'body': 'Owner has responded to your complaint about Room 205',
-      'type': 'complaint',
-      'timestamp': DateTime.now().subtract(const Duration(days: 2)),
-      'read': true,
+      'title': 'Payment Reminder',
+      'body': 'Your rent payment of ₹5,000 is due in 3 days',
+      'type': 'payment_reminder',
+      'timestamp': DateTime.now().subtract(const Duration(days: 1)),
+      'read': false,
     },
     {
       'id': '4',
-      'title': 'PG Announcement',
-      'body': 'New food menu available for this week',
-      'type': 'pg_update',
-      'timestamp': DateTime.now().subtract(const Duration(days: 3)),
-      'read': false,
+      'title': 'Payment Confirmed',
+      'body': 'Owner has confirmed your payment of ₹5,000 for November rent',
+      'type': 'payment_confirmed',
+      'timestamp': DateTime.now().subtract(const Duration(hours: 6)),
+      'read': true,
     },
     {
       'id': '5',
       'title': 'Payment Overdue',
       'body': 'Your payment of ₹5,000 is now overdue. Please pay immediately',
-      'type': 'payment',
+      'type': 'payment_overdue',
       'timestamp': DateTime.now().subtract(const Duration(days: 5)),
       'read': false,
+    },
+    {
+      'id': '6',
+      'title': 'Complaint Response',
+      'body': 'Owner has responded to your complaint about Wi-Fi connectivity',
+      'type': 'complaint_response',
+      'timestamp': DateTime.now().subtract(const Duration(days: 2)),
+      'read': true,
+    },
+    {
+      'id': '7',
+      'title': 'Bed Change Approved',
+      'body': 'Your bed change request from Room 101 to Room 205 has been approved',
+      'type': 'bed_change_approved',
+      'timestamp': DateTime.now().subtract(const Duration(hours: 8)),
+      'read': false,
+    },
+    {
+      'id': '8',
+      'title': 'PG Announcement',
+      'body': 'New food menu available for this week. Check the food section',
+      'type': 'pg_announcement',
+      'timestamp': DateTime.now().subtract(const Duration(days: 3)),
+      'read': false,
+    },
+    {
+      'id': '9',
+      'title': 'Service Request Resolved',
+      'body': 'Owner has resolved your service request for AC repair in Room 205',
+      'type': 'service_response',
+      'timestamp': DateTime.now().subtract(const Duration(hours: 4)),
+      'read': true,
     },
   ];
 
@@ -132,7 +163,11 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
             const SizedBox(width: AppSpacing.paddingS),
             _buildFilterChip('Complaints'),
             const SizedBox(width: AppSpacing.paddingS),
+            _buildFilterChip('Bed Changes'),
+            const SizedBox(width: AppSpacing.paddingS),
             _buildFilterChip('PG Updates'),
+            const SizedBox(width: AppSpacing.paddingS),
+            _buildFilterChip('Services'),
           ],
         ),
       ),
@@ -159,19 +194,34 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
       return _notifications.where((n) => !(n['read'] as bool)).toList();
     } else if (_selectedFilter == 'Bookings') {
       return _notifications
-          .where((n) => n['type'] == 'booking')
+          .where((n) =>
+              n['type'] == 'booking_approved' ||
+              n['type'] == 'booking_rejected')
           .toList();
     } else if (_selectedFilter == 'Payments') {
       return _notifications
-          .where((n) => n['type'] == 'payment')
+          .where((n) =>
+              n['type'] == 'payment_reminder' ||
+              n['type'] == 'payment_confirmed' ||
+              n['type'] == 'payment_overdue')
           .toList();
     } else if (_selectedFilter == 'Complaints') {
       return _notifications
-          .where((n) => n['type'] == 'complaint')
+          .where((n) => n['type'] == 'complaint_response')
+          .toList();
+    } else if (_selectedFilter == 'Bed Changes') {
+      return _notifications
+          .where((n) =>
+              n['type'] == 'bed_change_approved' ||
+              n['type'] == 'bed_change_rejected')
           .toList();
     } else if (_selectedFilter == 'PG Updates') {
       return _notifications
-          .where((n) => n['type'] == 'pg_update')
+          .where((n) => n['type'] == 'pg_announcement')
+          .toList();
+    } else if (_selectedFilter == 'Services') {
+      return _notifications
+          .where((n) => n['type'] == 'service_response')
           .toList();
     }
     return _notifications;
@@ -249,13 +299,25 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
 
   Color _getNotificationColor(String type) {
     switch (type) {
-      case 'booking':
-        return AppColors.secondary;
-      case 'payment':
+      case 'booking_approved':
         return Colors.green;
-      case 'complaint':
+      case 'booking_rejected':
+        return Colors.red;
+      case 'payment_reminder':
         return Colors.orange;
-      case 'pg_update':
+      case 'payment_confirmed':
+        return Colors.green;
+      case 'payment_overdue':
+        return Colors.red;
+      case 'complaint_response':
+        return Colors.blue;
+      case 'bed_change_approved':
+        return Colors.green;
+      case 'bed_change_rejected':
+        return Colors.red;
+      case 'pg_announcement':
+        return AppColors.secondary;
+      case 'service_response':
         return Colors.blue;
       default:
         return AppColors.primary;
@@ -264,14 +326,26 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
 
   IconData _getNotificationIcon(String type) {
     switch (type) {
-      case 'booking':
-        return Icons.hotel;
-      case 'payment':
-        return Icons.payment;
-      case 'complaint':
-        return Icons.report_problem;
-      case 'pg_update':
+      case 'booking_approved':
+        return Icons.check_circle;
+      case 'booking_rejected':
+        return Icons.cancel;
+      case 'payment_reminder':
+        return Icons.notifications_active;
+      case 'payment_confirmed':
+        return Icons.verified;
+      case 'payment_overdue':
+        return Icons.warning;
+      case 'complaint_response':
+        return Icons.reply;
+      case 'bed_change_approved':
+        return Icons.check_circle;
+      case 'bed_change_rejected':
+        return Icons.cancel;
+      case 'pg_announcement':
         return Icons.announcement;
+      case 'service_response':
+        return Icons.build;
       default:
         return Icons.notifications;
     }
@@ -300,4 +374,3 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
     });
   }
 }
-

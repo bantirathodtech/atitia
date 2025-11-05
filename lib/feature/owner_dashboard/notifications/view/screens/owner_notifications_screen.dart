@@ -27,13 +27,13 @@ class OwnerNotificationsScreen extends StatefulWidget {
 class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
   String _selectedFilter = 'All';
 
-  // Sample notifications data
+  // Sample notifications data - Owner receives notifications FROM guests
   final List<Map<String, dynamic>> _notifications = [
     {
       'id': '1',
       'title': 'New Booking Request',
       'body': 'Guest John Doe requested booking for Room 101',
-      'type': 'booking',
+      'type': 'booking_request',
       'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
       'read': false,
     },
@@ -41,15 +41,31 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
       'id': '2',
       'title': 'Payment Received',
       'body': 'Payment of ₹5,000 received from Guest ABC',
-      'type': 'payment',
+      'type': 'payment_received',
       'timestamp': DateTime.now().subtract(const Duration(days: 1)),
       'read': false,
     },
     {
       'id': '3',
+      'title': 'Complaint Filed',
+      'body': 'Guest XYZ filed a complaint about Wi-Fi connectivity in Room 205',
+      'type': 'complaint_filed',
+      'timestamp': DateTime.now().subtract(const Duration(hours: 5)),
+      'read': false,
+    },
+    {
+      'id': '4',
+      'title': 'Bed Change Request',
+      'body': 'Guest ABC requested bed change from Room 101 to Room 205',
+      'type': 'bed_change_request',
+      'timestamp': DateTime.now().subtract(const Duration(days: 1)),
+      'read': true,
+    },
+    {
+      'id': '5',
       'title': 'Service Request',
-      'body': 'New service request for Room 205',
-      'type': 'service',
+      'body': 'New service request for Room 205 - AC not working',
+      'type': 'service_request',
       'timestamp': DateTime.now().subtract(const Duration(days: 2)),
       'read': true,
     },
@@ -115,6 +131,10 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
             const SizedBox(width: AppSpacing.paddingS),
             _buildFilterChip('Payments'),
             const SizedBox(width: AppSpacing.paddingS),
+            _buildFilterChip('Complaints'),
+            const SizedBox(width: AppSpacing.paddingS),
+            _buildFilterChip('Bed Changes'),
+            const SizedBox(width: AppSpacing.paddingS),
             _buildFilterChip('Services'),
           ],
         ),
@@ -140,11 +160,28 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
       return _notifications;
     } else if (_selectedFilter == 'Unread') {
       return _notifications.where((n) => !(n['read'] as bool)).toList();
-    } else {
+    } else if (_selectedFilter == 'Bookings') {
       return _notifications
-          .where((n) => n['type'] == _selectedFilter.toLowerCase())
+          .where((n) => n['type'] == 'booking_request')
+          .toList();
+    } else if (_selectedFilter == 'Payments') {
+      return _notifications
+          .where((n) => n['type'] == 'payment_received')
+          .toList();
+    } else if (_selectedFilter == 'Complaints') {
+      return _notifications
+          .where((n) => n['type'] == 'complaint_filed')
+          .toList();
+    } else if (_selectedFilter == 'Bed Changes') {
+      return _notifications
+          .where((n) => n['type'] == 'bed_change_request')
+          .toList();
+    } else if (_selectedFilter == 'Services') {
+      return _notifications
+          .where((n) => n['type'] == 'service_request')
           .toList();
     }
+    return _notifications;
   }
 
   Widget _buildNotificationCard(Map<String, dynamic> notification) {
@@ -219,11 +256,15 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
 
   Color _getNotificationColor(String type) {
     switch (type) {
-      case 'booking':
+      case 'booking_request':
         return AppColors.secondary;
-      case 'payment':
+      case 'payment_received':
         return Colors.green;
-      case 'service':
+      case 'complaint_filed':
+        return Colors.red;
+      case 'bed_change_request':
+        return Colors.blue;
+      case 'service_request':
         return Colors.orange;
       default:
         return AppColors.primary;
@@ -232,11 +273,15 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
 
   IconData _getNotificationIcon(String type) {
     switch (type) {
-      case 'booking':
+      case 'booking_request':
         return Icons.hotel;
-      case 'payment':
+      case 'payment_received':
         return Icons.payment;
-      case 'service':
+      case 'complaint_filed':
+        return Icons.report_problem;
+      case 'bed_change_request':
+        return Icons.bed;
+      case 'service_request':
         return Icons.build;
       default:
         return Icons.notifications;
