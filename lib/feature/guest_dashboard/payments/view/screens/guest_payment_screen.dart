@@ -1221,14 +1221,11 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     showDialog(
       // ignore: use_build_context_synchronously
       context: dialogContext,
-        builder: (context) => SendPaymentDialog(
-          paymentMethod: selectedMethod,
-        ),
+      builder: (context) => SendPaymentDialog(
+        paymentMethod: selectedMethod,
+      ),
     );
-    }
   }
-
-  
 }
 
 /// Dialog for sending payment notification

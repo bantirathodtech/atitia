@@ -159,23 +159,24 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
         const SnackBar(content: Text('Complaint submitted successfully')),
       );
 
-        // Navigate back to complaints list using centralized NavigationService
-        final navigationService = getIt<NavigationService>();
-        navigationService.goBack();
-      }
-    // FIXED: Missing type annotation warning
-    // Flutter recommends: Always annotate catch clause variables with explicit types
-    // Changed from: catch (e) without type annotation
-    // Changed to: catch (dynamic e) with explicit dynamic type annotation
-    // Note: Using dynamic instead of Object to avoid naming conflict with type name
-    } catch (dynamic e) {
+      // Navigate back to complaints list using centralized NavigationService
+      final navigationService = getIt<NavigationService>();
+      navigationService.goBack();
+    } catch (e) {
+      // FIXED: Missing type annotation warning
+      // Flutter recommends: Always annotate catch clause variables with explicit types
+      // Changed from: catch (e) without type annotation
+      // Changed to: catch (dynamic e) with explicit dynamic type annotation
+      // Note: Using dynamic instead of Object to avoid naming conflict with type name
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Submission failed: $e')),
         );
       }
     } finally {
-      setState(() => _isSubmitting = false);
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 

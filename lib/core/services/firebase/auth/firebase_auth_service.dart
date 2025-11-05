@@ -27,9 +27,7 @@ class AuthenticationServiceWrapper {
   late final GoogleSignIn _googleSignIn;
 
   // Private constructor for singleton pattern
-  AuthenticationServiceWrapper._privateConstructor() {
-    _initializeGoogleSignIn();
-  }
+  AuthenticationServiceWrapper._privateConstructor();
   static final AuthenticationServiceWrapper _instance =
       AuthenticationServiceWrapper._privateConstructor();
 
@@ -37,29 +35,85 @@ class AuthenticationServiceWrapper {
   factory AuthenticationServiceWrapper() => _instance;
 
   /// Initialize Google Sign-In with platform-specific configuration
-  void _initializeGoogleSignIn() {
+  /// 
+  /// FIXED: Async credential loading from secure storage
+  /// Flutter recommends: Load credentials from secure storage at runtime
+  /// Changed from: Synchronous initialization with static const values
+  /// Changed to: Async initialization with runtime credential loading
+  /// 
+  /// This method loads credentials from secure storage or environment variables
+  /// before initializing Google Sign-In
+  Future<void> _initializeGoogleSignIn() async {
     try {
+      // Load credentials asynchronously from secure storage or environment
+      final clientId = await _getClientIdAsync();
+      final clientSecret = await _getClientSecretAsync();
+      
       _googleSignIn = GoogleSignIn(
         params: GoogleSignInParams(
-          clientId: _getClientId(),
-          clientSecret: _getClientSecret(),
+          clientId: clientId,
+          clientSecret: clientSecret,
           scopes: ['openid', 'profile', 'email'],
         ),
       );
+      
+      debugPrint('✅ Google Sign-In initialized with credentials loaded from secure storage/environment');
     } catch (e) {
-      debugPrint('Google Sign-In initialization error: $e');
-      // Fallback initialization
-      _googleSignIn = GoogleSignIn(
-        params: GoogleSignInParams(
-          clientId: _getClientId(),
-          scopes: ['openid', 'profile', 'email'],
-        ),
-      );
+      debugPrint('⚠️ Google Sign-In initialization error: $e');
+      debugPrint('   Attempting fallback initialization with environment variables');
+      
+      try {
+        // Fallback: Try with static environment variables (may have placeholders)
+        _googleSignIn = GoogleSignIn(
+          params: GoogleSignInParams(
+            clientId: _getClientIdStatic(),
+            clientSecret: _getClientSecretStatic(),
+            scopes: ['openid', 'profile', 'email'],
+          ),
+        );
+        debugPrint('⚠️ Google Sign-In initialized with fallback credentials (may have placeholders)');
+      } catch (fallbackError) {
+        debugPrint('❌ Google Sign-In fallback initialization failed: $fallbackError');
+        // Create a minimal instance that will fail gracefully when used
+        _googleSignIn = GoogleSignIn(
+          params: GoogleSignInParams(
+            scopes: ['openid', 'profile', 'email'],
+          ),
+        );
+      }
     }
   }
 
-  /// Get client ID based on platform
-  String _getClientId() {
+  /// Get client ID asynchronously from secure storage or environment
+  Future<String> _getClientIdAsync() async {
+    if (isWeb) {
+      return await EnvironmentConfig.getGoogleSignInWebClientIdAsync();
+    } else if (isAndroid) {
+      return await EnvironmentConfig.getGoogleSignInAndroidClientIdAsync();
+    } else if (isIOS || isMacOS) {
+      return await EnvironmentConfig.getGoogleSignInIosClientIdAsync();
+    }
+    // For desktop platforms, use web client ID
+    return await EnvironmentConfig.getGoogleSignInWebClientIdAsync();
+  }
+
+  /// Get client secret asynchronously from secure storage or environment
+  Future<String?> _getClientSecretAsync() async {
+    // Client secret is only required for desktop platforms
+    if (isWeb || isAndroid || isIOS) {
+      return null; // Not required for mobile/web
+    }
+    // For macOS, Windows, Linux - we need the client secret
+    try {
+      return await EnvironmentConfig.getGoogleSignInClientSecretAsync();
+    } catch (e) {
+      debugPrint('⚠️ Could not load client secret: $e');
+      return null; // Allow Google Sign-In to work without client secret if possible
+    }
+  }
+
+  /// Get client ID statically (fallback method)
+  String _getClientIdStatic() {
     if (isWeb) {
       return EnvironmentConfig.googleSignInWebClientId;
     } else if (isAndroid) {
@@ -71,8 +125,8 @@ class AuthenticationServiceWrapper {
     return EnvironmentConfig.googleSignInWebClientId;
   }
 
-  /// Get client secret based on platform
-  String? _getClientSecret() {
+  /// Get client secret statically (fallback method)
+  String? _getClientSecretStatic() {
     // Client secret is only required for desktop platforms
     if (isWeb || isAndroid || isIOS) {
       return null; // Not required for mobile/web
@@ -108,9 +162,15 @@ class AuthenticationServiceWrapper {
   }
 
   /// Initialize authentication service
+  /// 
+  /// FIXED: Async Google Sign-In initialization
+  /// Flutter recommends: Initialize Google Sign-In asynchronously with runtime credentials
+  /// Changed from: Synchronous initialization in constructor
+  /// Changed to: Async initialization with credential loading
   Future<void> initialize() async {
     // Firebase Auth initializes automatically with Firebase.initializeApp()
-    await Future.delayed(Duration.zero);
+    // Initialize Google Sign-In with async credential loading
+    await _initializeGoogleSignIn();
   }
 
   /// Gets the current authenticated user
