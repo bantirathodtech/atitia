@@ -1306,9 +1306,20 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// Dialog: Send payment
   void _showSendPaymentDialog(BuildContext context) async {
-    // For now, assume Razorpay is enabled (can be made configurable later)
-    // TODO: Check owner's payment settings to determine if Razorpay is enabled
-    const razorpayEnabled = true; // Default to true, can be fetched from owner settings
+    // Get owner payment details to check if Razorpay is enabled
+    final pgProvider = context.read<GuestPgSelectionProvider>();
+    final selectedPg = pgProvider.selectedPg;
+    
+    bool razorpayEnabled = false;
+    if (selectedPg != null && selectedPg.ownerUid.isNotEmpty) {
+      try {
+        final paymentDetails = await _ownerPaymentRepo.getPaymentDetails(selectedPg.ownerUid);
+        razorpayEnabled = paymentDetails?.razorpayEnabled ?? false;
+      } catch (e) {
+        // If error fetching, default to false
+        razorpayEnabled = false;
+      }
+    }
     
     // Show payment method selection first
     final selectedMethod = await PaymentMethodSelectionDialog.show(
@@ -1682,6 +1693,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       await _razorpayService.openPayment(
         amount: (amount * 100).toInt(), // Convert to paise
         orderId: orderId,
+        ownerId: selectedPg.ownerUid, // Pass owner ID to fetch Razorpay key
         description: _messageController.text.isEmpty
             ? 'PG Payment'
             : _messageController.text,

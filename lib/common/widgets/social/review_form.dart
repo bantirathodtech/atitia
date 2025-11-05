@@ -10,6 +10,7 @@ import '../../styles/spacing.dart';
 import '../../styles/colors.dart';
 import '../../styles/typography.dart';
 import '../../utils/helpers/image_picker_helper.dart';
+import '../../../core/di/common/unified_service_locator.dart';
 import '../text/heading_small.dart';
 import '../buttons/primary_button.dart';
 import '../buttons/secondary_button.dart';
@@ -413,13 +414,15 @@ class _ReviewFormState extends State<ReviewForm> {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
                     border: Border.all(color: AppColors.border),
                   ),
                   child: Stack(
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.borderRadiusS),
                         child: _buildPhotoPreview(photo),
                       ),
                       Positioned(
@@ -549,31 +552,39 @@ class _ReviewFormState extends State<ReviewForm> {
     _uploadedPhotoUrls.clear();
 
     try {
-      // TODO: Implement actual photo upload to storage
-      // For now, we'll simulate the upload
-      // In production, this should upload to Firebase Storage or Supabase Storage
-      // and get download URLs
-      
-      // Placeholder: In real implementation, upload each photo and get URL
-      // final storageService = getIt.storage;
-      // for (final photo in _selectedPhotos) {
-      //   final fileName = 'review_${DateTime.now().millisecondsSinceEpoch}_${_selectedPhotos.indexOf(photo)}.jpg';
-      //   final url = await storageService.uploadFile(
-      //     photo,
-      //     'review_photos/',
-      //     fileName,
-      //   );
-      //   _uploadedPhotoUrls.add(url);
-      // }
+      // Get storage service from UnifiedServiceLocator
+      final storageService = UnifiedServiceLocator.serviceFactory.storage;
 
-      // Simulate upload delay
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // For now, store placeholder URLs (will be replaced with actual upload)
-      _uploadedPhotoUrls = List.generate(
-        _selectedPhotos.length,
-        (index) => 'placeholder_url_$index',
-      );
+      // Upload each photo to storage
+      for (int i = 0; i < _selectedPhotos.length; i++) {
+        final photo = _selectedPhotos[i];
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final fileName =
+            'review_${widget.pgId}_${widget.guestId}_${timestamp}_$i.jpg';
+        final path = 'review_photos/${widget.pgId}/${widget.guestId}';
+
+        try {
+          final url = await storageService.uploadFile(
+            path: path,
+            file: photo,
+            fileName: fileName,
+          );
+
+          _uploadedPhotoUrls.add(url);
+        } catch (e) {
+          // Log error but continue with other photos
+          debugPrint('Failed to upload photo $i: $e');
+          // Add empty string to maintain index alignment
+          _uploadedPhotoUrls.add('');
+        }
+      }
+
+      // Remove any failed uploads (empty strings)
+      _uploadedPhotoUrls.removeWhere((url) => url.isEmpty);
+
+      if (_uploadedPhotoUrls.isEmpty && _selectedPhotos.isNotEmpty) {
+        throw Exception('All photo uploads failed. Please try again.');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -583,6 +594,8 @@ class _ReviewFormState extends State<ReviewForm> {
           ),
         );
       }
+      // Clear uploaded URLs on error
+      _uploadedPhotoUrls.clear();
     } finally {
       if (mounted) {
         setState(() => _uploadingPhotos = false);

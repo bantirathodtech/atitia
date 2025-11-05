@@ -2,15 +2,19 @@
 
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../../../common/utils/logging/logging_mixin.dart';
+import '../../../core/repositories/owner_payment_details_repository.dart';
 
 /// Razorpay payment service
 /// Handles Razorpay payment processing
 class RazorpayService with LoggingMixin {
   Razorpay? _razorpay;
   String? _currentOrderId;
+  String? _cachedRazorpayKey;
+  String? _cachedOwnerId;
   Function(String, PaymentSuccessResponse)? _onSuccess;
   Function(PaymentFailureResponse)? _onFailure;
   Function(ExternalWalletResponse)? _onExternalWallet;
+  final OwnerPaymentDetailsRepository _paymentDetailsRepo = OwnerPaymentDetailsRepository();
 
   /// Initialize Razorpay
   /// Note: Razorpay key should be stored in environment config
@@ -40,6 +44,7 @@ class RazorpayService with LoggingMixin {
   /// Open Razorpay payment
   /// [amount] - Payment amount in paise (e.g., 10000 = ₹100)
   /// [orderId] - Unique order ID
+  /// [ownerId] - Owner ID to fetch Razorpay key from
   /// [description] - Payment description
   /// [userName] - User name
   /// [userEmail] - User email
@@ -49,6 +54,7 @@ class RazorpayService with LoggingMixin {
   Future<void> openPayment({
     required int amount,
     required String orderId,
+    required String ownerId,
     String? description,
     String? userName,
     String? userEmail,
@@ -61,14 +67,21 @@ class RazorpayService with LoggingMixin {
       await initialize();
     }
 
+    // Set owner ID for key fetching
+    setOwnerId(ownerId);
+
     _currentOrderId = orderId;
     _onSuccess = onSuccess;
     _onFailure = onFailure;
     _onExternalWallet = onExternalWallet;
 
     try {
-      // TODO: Get Razorpay key from owner's payment settings
-      const razorpayKey = 'rzp_test_1DP5mmOlF5G5ag';
+      // Get Razorpay key from owner's payment settings
+      final razorpayKey = await _getRazorpayKey(ownerId: ownerId);
+      
+      if (razorpayKey == null || razorpayKey.isEmpty) {
+        throw Exception('Razorpay key not configured for this owner. Please contact the PG owner.');
+      }
 
       final options = {
         'key': razorpayKey,
@@ -158,11 +171,94 @@ class RazorpayService with LoggingMixin {
     _onExternalWallet = null;
   }
 
+  /// Gets Razorpay key from owner's payment settings
+  /// Caches the key to avoid repeated Firestore calls
+  /// [ownerId] - Owner ID to fetch payment details for
+  Future<String?> _getRazorpayKey({String? ownerId}) async {
+    if (ownerId == null || ownerId.isEmpty) {
+      logError(
+        'Owner ID not provided for Razorpay key fetch',
+        feature: 'payment',
+      );
+      return null;
+    }
+
+    // Use cached key if available and same owner
+    if (_cachedRazorpayKey != null && _cachedOwnerId == ownerId) {
+      return _cachedRazorpayKey;
+    }
+
+    try {
+      final paymentDetails = await _paymentDetailsRepo.getPaymentDetails(ownerId);
+      
+      if (paymentDetails == null) {
+        logError(
+          'Payment details not found for owner',
+          feature: 'payment',
+          metadata: {'owner_id': ownerId},
+        );
+        return null;
+      }
+
+      if (!paymentDetails.razorpayEnabled) {
+        logInfo(
+          'Razorpay is not enabled for this owner',
+          feature: 'payment',
+          metadata: {'owner_id': ownerId},
+        );
+        return null;
+      }
+
+      final razorpayKey = paymentDetails.razorpayKey;
+      
+      if (razorpayKey == null || razorpayKey.isEmpty) {
+        logError(
+          'Razorpay key is empty in payment details',
+          feature: 'payment',
+          metadata: {'owner_id': ownerId},
+        );
+        return null;
+      }
+
+      // Cache the key
+      _cachedRazorpayKey = razorpayKey;
+      _cachedOwnerId = ownerId;
+
+      logInfo(
+        'Razorpay key fetched successfully',
+        feature: 'payment',
+        metadata: {'owner_id': ownerId},
+      );
+
+      return razorpayKey;
+    } catch (e) {
+      logError(
+        'Failed to fetch Razorpay key',
+        feature: 'payment',
+        error: e,
+        metadata: {'owner_id': ownerId},
+      );
+      return null;
+    }
+  }
+
+  /// Sets the owner ID for Razorpay key fetching
+  /// Should be called before opening payment
+  void setOwnerId(String ownerId) {
+    if (_cachedOwnerId != ownerId) {
+      // Clear cache if owner changed
+      _cachedRazorpayKey = null;
+    }
+    _cachedOwnerId = ownerId;
+  }
+
   /// Dispose Razorpay instance
   void dispose() {
     _razorpay?.clear();
     _razorpay = null;
     _clearCallbacks();
+    _cachedRazorpayKey = null;
+    _cachedOwnerId = null;
   }
 }
 
