@@ -21,6 +21,9 @@ import '../../../../../core/models/owner_payment_details_model.dart';
 import '../../../../../core/repositories/owner_payment_details_repository.dart';
 import '../../../../../core/viewmodels/payment_notification_viewmodel.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
+import '../../../../../feature/owner_dashboard/myguest/data/models/owner_booking_request_model.dart';
+import '../../../../../feature/owner_dashboard/myguest/data/repository/owner_booking_request_repository.dart';
+import '../../../shared/viewmodel/guest_pg_selection_provider.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
 
@@ -59,17 +62,31 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
       if (authProvider.user?.userId != null) {
         paymentVM.streamGuestNotifications(authProvider.user!.userId);
-        // TODO: Load owner details from guest's booked PG
-        _loadOwnerPaymentDetails(
-            'blg5v21mbvb6U70xUpzrfKVjYh13'); // Demo owner ID
+        // Load owner details from guest's selected PG
+        _loadOwnerPaymentDetailsFromSelectedPg();
       }
     });
   }
 
-  Future<void> _loadOwnerPaymentDetails(String ownerId) async {
+  /// Loads owner payment details from guest's selected PG
+  Future<void> _loadOwnerPaymentDetailsFromSelectedPg() async {
+    final pgProvider = Provider.of<GuestPgSelectionProvider>(context, listen: false);
+    final selectedPg = pgProvider.selectedPg;
+    
+    if (selectedPg == null || selectedPg.ownerUid.isEmpty) {
+      // No PG selected, clear payment details
+      if (mounted) {
+        setState(() {
+          _ownerPaymentDetails = null;
+          _loadingOwnerDetails = false;
+        });
+      }
+      return;
+    }
+
     setState(() => _loadingOwnerDetails = true);
     try {
-      final details = await _ownerPaymentRepo.getPaymentDetails(ownerId);
+      final details = await _ownerPaymentRepo.getPaymentDetails(selectedPg.ownerUid);
       if (mounted) {
         setState(() {
           _ownerPaymentDetails = details;
@@ -1323,6 +1340,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
   final _amountController = TextEditingController();
   final _messageController = TextEditingController();
   final _transactionIdController = TextEditingController();
+  final _bookingRequestRepo = OwnerBookingRequestRepository();
   String _paymentMethod = 'UPI';
   dynamic _screenshotFile;
   bool _sending = false;
@@ -1471,22 +1489,75 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     }
   }
 
+  /// Gets the first approved booking request ID for the selected PG
+  Future<String> _getApprovedBookingRequestId(String guestId, String pgId) async {
+    try {
+      // Use stream to get booking requests, then take first value
+      final requestsStream = _bookingRequestRepo.streamGuestBookingRequests(guestId);
+      final requests = await requestsStream.first.timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => <OwnerBookingRequestModel>[],
+      );
+      
+      // Find the first approved booking request for the selected PG
+      final approvedRequest = requests.firstWhere(
+        (request) => request.pgId == pgId && request.status == 'approved',
+        orElse: () => throw StateError('No approved booking found'),
+      );
+      return approvedRequest.requestId;
+    } catch (e) {
+      // If no approved booking found, generate a fallback booking ID
+      return 'booking_${guestId}_${pgId}_${DateTime.now().millisecondsSinceEpoch}';
+    }
+  }
+
   Future<void> _sendPayment() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Get PG selection and validate
+    final pgProvider = context.read<GuestPgSelectionProvider>();
+    final selectedPg = pgProvider.selectedPg;
+    final selectedPgId = pgProvider.selectedPgId;
+
+    if (selectedPg == null || selectedPgId == null || selectedPgId.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a PG first to send payment notification'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (selectedPg.ownerUid.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid PG selection. Owner information not available.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
 
     setState(() => _sending = true);
 
     try {
       final authProvider = context.read<AuthProvider>();
       final paymentVM = context.read<PaymentNotificationViewModel>();
+      final guestId = authProvider.user!.userId;
+
+      // Get booking ID from approved booking request (or generate fallback)
+      final bookingId = await _getApprovedBookingRequestId(guestId, selectedPgId);
 
       await paymentVM.sendPaymentNotification(
-        guestId: authProvider.user!.userId,
-        ownerId: 'blg5v21mbvb6U70xUpzrfKVjYh13', // TODO: Get from booking
-        pgId:
-            'blg5v21mbvb6U70xUpzrfKVjYh13_pg_1760205806856', // TODO: Get from booking
-        bookingId:
-            'booking_demo_${DateTime.now().millisecondsSinceEpoch}', // TODO: Get from actual booking
+        guestId: guestId,
+        ownerId: selectedPg.ownerUid,
+        pgId: selectedPgId,
+        bookingId: bookingId,
         amount: double.parse(_amountController.text),
         paymentMethod: _paymentMethod,
         transactionId: _transactionIdController.text.isEmpty
@@ -1522,3 +1593,4 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     }
   }
 }
+
