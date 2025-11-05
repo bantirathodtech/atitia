@@ -97,7 +97,7 @@ class _AdvancedPgSearchWidgetState extends State<AdvancedPgSearchWidget> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.paddingM),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           ),
           child: const Icon(
@@ -366,7 +366,7 @@ class _AdvancedPgSearchWidgetState extends State<AdvancedPgSearchWidget> {
       label: Text(label),
       selected: isSelected,
       onSelected: onChanged,
-      selectedColor: AppColors.primary.withOpacity(0.2),
+      selectedColor: AppColors.primary.withValues(alpha: 0.2),
       checkmarkColor: AppColors.primary,
     );
   }

@@ -229,8 +229,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            primaryColor.withOpacity(isDarkMode ? 0.15 : 0.1),
-            primaryColor.withOpacity(isDarkMode ? 0.08 : 0.05),
+            primaryColor.withValues(alpha: isDarkMode ? 0.15 : 0.1),
+            primaryColor.withValues(alpha: isDarkMode ? 0.08 : 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
@@ -425,7 +425,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(isDarkMode ? 0.15 : 0.1),
+        color: color.withValues(alpha: isDarkMode ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: color.withValues(alpha: 0.3),
@@ -1040,6 +1040,11 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       final allPhotoUrls = [..._photoUrls, ...uploadedPhotoUrls];
 
       // Create updated menu
+      // FIXED: BuildContext async gap warning
+      // Flutter recommends: Store context-dependent values before async operations
+      // Changed from: Using context.read() after async gap (uploadPhoto loop)
+      // Changed to: Check mounted and store values before async operations
+      if (!mounted) return;
       final selectedPgProvider = context.read<SelectedPgProvider>();
       final currentPgId = selectedPgProvider.selectedPgId;
 
@@ -1079,8 +1084,16 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
           // Refresh menus for current PG
           await foodVM.loadMenus(ownerId, pgId: currentPgId);
 
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
+          // FIXED: BuildContext async gap warning
+          // Flutter recommends: Check mounted again after async operations and store context values
+          // Changed from: Using context after async gap with unrelated mounted check
+          // Changed to: Check mounted immediately before using context, store Navigator and ScaffoldMessenger
+          if (!mounted) return;
+          final navigator = Navigator.of(context);
+          final scaffoldMessenger = ScaffoldMessenger.of(context);
+          
+          navigator.pop();
+          scaffoldMessenger.showSnackBar(
             SnackBar(
               content: Text(isEditing
                       ? '${widget.dayLabel} menu updated successfully!' // ✏️ Updated
@@ -1141,6 +1154,11 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         _descriptionController.clear();
       });
 
+      // FIXED: BuildContext async gap warning
+      // Flutter recommends: Check mounted before using context after async operations
+      // Changed from: Using context after async operation (setState)
+      // Changed to: Check mounted before using context
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Menu cleared. Don\'t forget to save changes.'),

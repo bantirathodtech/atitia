@@ -242,6 +242,11 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
           _selectedProfilePhoto = file;
         }
       } catch (e) {
+        // FIXED: BuildContext async gap warning
+        // Flutter recommends: Check mounted after async operations before using context
+        // Changed from: Using context after async operation in catch block
+        // Changed to: Check mounted before using context
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to upload profile photo: $e')),
         );
@@ -277,6 +282,11 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
           _selectedAadhaarPhoto = file;
         }
       } catch (e) {
+        // FIXED: BuildContext async gap warning
+        // Flutter recommends: Check mounted after async operations before using context
+        // Changed from: Using context after async operation in catch block
+        // Changed to: Check mounted before using context
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to upload Aadhaar photo: $e')),
         );

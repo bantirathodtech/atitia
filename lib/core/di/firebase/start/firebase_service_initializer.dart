@@ -23,7 +23,11 @@
 // ============================================================================
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/widgets.dart';
+// FIXED: Unnecessary import warning
+// Flutter recommends: Only import packages that provide unique functionality
+// Changed from: Importing 'package:flutter/foundation.dart' when 'package:flutter/widgets.dart' already provides debugPrint
+// Changed to: Removed unnecessary foundation.dart import, using show debugPrint from widgets.dart
+import 'package:flutter/widgets.dart' show debugPrint;
 
 import '../../../db/flutter_secure_storage.dart';
 import '../../../navigation/navigation_service.dart';
@@ -155,41 +159,59 @@ class FirebaseServiceInitializer {
         clientId: EnvironmentConfig.getGoogleSignInClientId('web'),
         serverClientId: EnvironmentConfig.googleSignInClientSecret,
       );
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Firebase Service Initializer: Google Sign-In initialization failed: $e');
+    }
 
     // Initialize Apple Sign-In service
     try {
       await getIt.appleSignIn.initialize();
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Firebase Service Initializer: Apple Sign-In initialization failed: $e');
+    }
 
     // OPTIONAL Firebase services (failures are logged but don't crash app)
     try {
       await getIt.appCheck.initialize(); // Security & anti-abuse
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Firebase Service Initializer: App Check initialization failed: $e');
+    }
 
     try {
       await getIt.analytics.initialize(); // User behavior tracking
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Firebase Service Initializer: Analytics initialization failed: $e');
+    }
 
     try {
       await getIt.messaging.initialize(); // Push notifications
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Firebase Service Initializer: Messaging initialization failed: $e');
+    }
 
     try {
       await getIt.crashlytics.initialize(); // Crash reporting
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Firebase Service Initializer: Crashlytics initialization failed: $e');
+    }
 
     try {
       await getIt.remoteConfig.initialize(); // Feature flags & A/B testing
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Firebase Service Initializer: Remote Config initialization failed: $e');
+    }
 
     try {
       await getIt.performance.initialize(); // Performance monitoring
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Firebase Service Initializer: Performance initialization failed: $e');
+    }
 
     try {
       await getIt.functions.initialize(); // Cloud functions/backend logic
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Firebase Service Initializer: Cloud Functions initialization failed: $e');
+    }
 
     // Initialize Supabase storage lazily on first access; nothing to do here.
   }

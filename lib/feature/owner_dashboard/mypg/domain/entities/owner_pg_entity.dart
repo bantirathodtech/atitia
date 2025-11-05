@@ -68,7 +68,7 @@ class OwnerPgEntity {
     required this.updatedAt,
   });
 
-  /// Parse photos list from various formats (handles null, empty, List<dynamic>, List<String>)
+  /// Parse photos list from various formats (handles null, empty, List types)
   static List<String> _parsePhotosList(dynamic photos) {
     if (photos == null) return <String>[];
     if (photos is List) {

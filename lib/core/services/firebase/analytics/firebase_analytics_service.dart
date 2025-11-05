@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 
 /// Enhanced Firebase Analytics service with proper error handling and null safety
 class AnalyticsServiceWrapper {
@@ -29,6 +30,7 @@ class AnalyticsServiceWrapper {
         parameters: safeParameters,
       );
     } catch (e) {
+      debugPrint('⚠️ Firebase Analytics: Failed to log event "$name": $e');
     }
   }
 
@@ -79,6 +81,7 @@ class AnalyticsServiceWrapper {
         value: safeValue,
       );
     } catch (e) {
+      debugPrint('⚠️ Firebase Analytics: Failed to set user property "$name": $e');
     }
   }
 
@@ -87,6 +90,7 @@ class AnalyticsServiceWrapper {
     try {
       await _analytics.setUserId(id: userId);
     } catch (e) {
+      debugPrint('⚠️ Firebase Analytics: Failed to set user ID: $e');
     }
   }
 

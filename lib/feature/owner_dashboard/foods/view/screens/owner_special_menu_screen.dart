@@ -276,7 +276,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       backgroundColor: isDarkMode
-          ? AppColors.info.withOpacity(0.15)
+          ? AppColors.info.withValues(alpha: 0.15)
           : AppColors.infoContainer,
       child: Row(
         children: [
@@ -547,8 +547,16 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
           // Refresh menus for current PG
           await foodVM.loadMenus(ownerId, pgId: currentPgId);
 
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
+          // FIXED: BuildContext async gap warning
+          // Flutter recommends: Check mounted again after async operations and store context values
+          // Changed from: Using context after async gap with unrelated mounted check
+          // Changed to: Check mounted immediately before using context, store Navigator and ScaffoldMessenger
+          if (!mounted) return;
+          final navigator = Navigator.of(context);
+          final scaffoldMessenger = ScaffoldMessenger.of(context);
+          
+          navigator.pop();
+          scaffoldMessenger.showSnackBar(
             SnackBar(
               content: const Text('Special menu saved successfully!'),
               backgroundColor: AppColors.success,

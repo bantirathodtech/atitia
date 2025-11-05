@@ -72,7 +72,7 @@ class OwnerPgInfoCard extends StatelessWidget {
               BoxShadow(
                 color: isDarkMode
                     ? Colors.black.withValues(alpha: 0.2)
-                    : theme.primaryColor.withOpacity(0.05),
+                    : theme.primaryColor.withValues(alpha: 0.05),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
@@ -329,7 +329,7 @@ class OwnerPgInfoCard extends StatelessWidget {
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(isDarkMode ? 0.15 : 0.1),
+        color: color.withValues(alpha: isDarkMode ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),

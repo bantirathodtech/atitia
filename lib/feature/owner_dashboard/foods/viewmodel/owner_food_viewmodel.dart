@@ -1,5 +1,8 @@
 // lib/features/owner_dashboard/foods/viewmodel/owner_food_viewmodel.dart
 
+import 'package:flutter/foundation.dart';
+import 'dart:async';
+import 'package:intl/intl.dart';
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../common/utils/helpers/menu_initialization_helper.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
@@ -7,8 +10,6 @@ import '../../../../core/db/flutter_secure_storage.dart';
 import '../data/models/owner_food_menu.dart';
 import '../data/repository/owner_food_repository.dart';
 import '../../../../core/repositories/food_feedback_repository.dart';
-import 'dart:async';
-import 'package:intl/intl.dart';
 
 /// ViewModel for managing owner's food menus and dietary overrides.
 /// Extends BaseProviderState for automatic service access and state management
@@ -147,7 +148,9 @@ class OwnerFoodViewModel extends BaseProviderState {
         await _localStorage.write(
             'food_menu_timestamp_$ownerId', DateTime.now().toIso8601String());
       }
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Owner Food ViewModel: Failed to save menu state: $e');
+    }
   }
 
   /// Clear menu state and force reload
@@ -160,7 +163,9 @@ class OwnerFoodViewModel extends BaseProviderState {
       _weeklyMenus = [];
       _overrides = [];
       notifyListeners();
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Owner Food ViewModel: Failed to clear menu state: $e');
+    }
   }
 
   /// Streams weekly menus for real-time updates

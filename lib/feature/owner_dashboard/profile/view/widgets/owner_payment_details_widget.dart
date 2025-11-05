@@ -239,7 +239,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
               BoxShadow(
                 color: isDarkMode 
                     ? Colors.black.withValues(alpha: 0.3)
-                    : Colors.black.withOpacity(0.05),
+                    : Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),

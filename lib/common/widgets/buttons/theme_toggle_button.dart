@@ -311,9 +311,13 @@ class ThemeModeSelector extends StatelessWidget {
             ),
 
             // Radio button indicator
+            // TODO: Update to RadioGroup when Flutter version supports it
+            // ignore: deprecated_member_use
             Radio<ThemeMode>(
               value: mode,
+              // ignore: deprecated_member_use
               groupValue: provider.themeMode,
+              // ignore: deprecated_member_use
               onChanged: (value) {
                 if (value != null) {
                   provider.setThemeMode(value);

@@ -230,7 +230,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                 child: BodyText(
                   text: pg.fullAddress,
                   color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
               Icon(Icons.open_in_new,
@@ -463,7 +463,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
         Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
             fontWeight: isProminent ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -540,11 +540,11 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           if (total > 0) ...[
             Divider(
                 height: AppSpacing.paddingM,
-                color: colorScheme.outline.withOpacity(0.5)),
+                color: colorScheme.outline.withValues(alpha: 0.5)),
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingS),
               decoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(isDark ? 0.2 : 0.1),
+                color: colorScheme.primary.withValues(alpha: isDark ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
               ),
               child: Row(
@@ -564,10 +564,10 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.paddingS),
             decoration: BoxDecoration(
-              color: colorScheme.secondaryContainer.withOpacity(0.3),
+              color: colorScheme.secondaryContainer.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
               border: Border.all(
-                color: colorScheme.outline.withOpacity(0.2),
+                color: colorScheme.outline.withValues(alpha: 0.2),
               ),
             ),
             child: Row(
@@ -608,7 +608,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             Text(
               label,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.7),
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
                 fontWeight: FontWeight.normal,
               ),
             ),
@@ -627,7 +627,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           child: Text(
             note,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.6),
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
               fontStyle: FontStyle.italic,
             ),
           ),
@@ -1098,7 +1098,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             width: 120,
             child: BodyText(
               text: '$label:',
-              color: colorScheme.onSurface.withOpacity(0.7),
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           Expanded(

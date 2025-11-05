@@ -99,6 +99,7 @@ class MemoryManager {
       PaintingBinding.instance.imageCache.clear();
       PaintingBinding.instance.imageCache.clearLiveImages();
     } catch (e) {
+      debugPrint('⚠️ Memory Manager: Failed to clear image cache: $e');
     }
   }
 }

@@ -72,6 +72,13 @@ web/firebase-config.json
 **/secrets/
 secrets.json
 
+# 🔐 SECURE CREDENTIALS DIRECTORY (NEVER COMMIT)
+# Hidden directory for all sensitive files
+.secrets/
+.secrets/**
+!.secrets/README.md
+!.secrets/.gitkeep
+
 # Sensitive Configuration Files
 config/secrets.dart
 lib/common/constants/environment_config_production.dart
@@ -81,6 +88,11 @@ lib/common/constants/environment_config_staging.dart
 **/api-keys.json
 **/auth-keys.json
 **/config.json
+
+# Google OAuth Client Secret JSON Files (NEVER COMMIT)
+**/client_secret*.json
+**/client_secret_*.json
+**/*client_secret*.json
 
 # Android Signing Keys (NEVER COMMIT)
 android/key.properties

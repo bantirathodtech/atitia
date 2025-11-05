@@ -142,7 +142,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   decoration: BoxDecoration(
-                    color: accent.withOpacity(0.05),
+                    color: accent.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(

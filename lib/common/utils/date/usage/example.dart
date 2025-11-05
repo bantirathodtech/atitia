@@ -12,41 +12,40 @@ void example() {
   final firestoreTimestamp = DateManager.displayToFirestore(displayDate);
 
   // Firestore → Display
-  final backToDisplay = DateManager.firestoreToDisplay(firestoreTimestamp);
+  DateManager.firestoreToDisplay(firestoreTimestamp); // Example usage
 
   // Display → Service
   final serviceFormat = DateManager.displayToService(displayDate);
 
   // Service → Display
-  final backFromService = DateManager.serviceToDisplay(serviceFormat);
+  DateManager.serviceToDisplay(serviceFormat); // Example usage
 
   // Service → Firestore
-  final serviceToFirestore = DateManager.serviceToFirestore(serviceFormat);
+  DateManager.serviceToFirestore(serviceFormat); // Example usage
 
   // Firestore → Service
-  final firestoreToService = DateManager.firestoreToService(firestoreTimestamp);
+  DateManager.firestoreToService(firestoreTimestamp); // Example usage
 
   // Age calculation
-  final age = DateManager.calculateAge(displayDate);
+  DateManager.calculateAge(displayDate); // Example usage
 
   // Validation
-  final validResult = DateManager.validateDisplay('15/08/1990');
-  final invalidResult = DateManager.validateDisplay('32/13/2020');
+  DateManager.validateDisplay('15/08/1990'); // Example usage
+  DateManager.validateDisplay('32/13/2020'); // Example usage
 
   // Using extensions directly
-  final today = DateTime.now();
+  DateTime.now(); // Example usage
 
   // Using Timestamp extensions
-  final timestamp = Timestamp.now();
+  Timestamp.now(); // Example usage
 
   // Business logic
-  final isAdult = DateManager.meetsMinimumAge('15/08/2000');
+  DateManager.meetsMinimumAge('15/08/2000'); // Example usage
 
-  final isChild = DateManager.meetsMinimumAge('15/08/2020');
+  DateManager.meetsMinimumAge('15/08/2020'); // Example usage
 
   // Relative time examples
 
   // Form validation
-  final formError =
-      DateManager.validateFormDate('15/08/2020', minAge: 18, maxAge: 100);
+  DateManager.validateFormDate('15/08/2020', minAge: 18, maxAge: 100); // Example usage
 }

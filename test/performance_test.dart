@@ -1,5 +1,9 @@
 // test/performance_test.dart
 
+// FIXED: Unnecessary import warning
+// Flutter recommends: Only import packages that provide unique functionality
+// Changed from: Importing 'package:flutter/foundation.dart' when 'package:flutter/material.dart' already provides all needed elements
+// Changed to: Removed unnecessary foundation.dart import
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -45,7 +49,7 @@ void main() {
       // Verify performance (should be under 500ms for 100 items)
       expect(buildTime.inMilliseconds, lessThan(500));
 
-      print('OptimizedListView build time: ${buildTime.inMilliseconds}ms');
+      debugPrint('OptimizedListView build time: ${buildTime.inMilliseconds}ms');
     });
 
     testWidgets('AdaptiveImage performance test', (WidgetTester tester) async {
@@ -75,7 +79,7 @@ void main() {
       // Verify performance (should be under 50ms)
       expect(buildTime.inMilliseconds, lessThan(50));
 
-      print('AdaptiveImage build time: ${buildTime.inMilliseconds}ms');
+      debugPrint('AdaptiveImage build time: ${buildTime.inMilliseconds}ms');
     });
 
     test('Performance measurement utility test', () {
@@ -101,7 +105,7 @@ void main() {
       expect(stats['average'], isA<Duration>());
       expect(stats['median'], isA<Duration>());
 
-      print('Performance stats: $stats');
+      debugPrint('Performance stats: $stats');
     });
 
     test('Performance report generation test', () {
@@ -123,7 +127,7 @@ void main() {
       expect(report, contains('operation1'));
       expect(report, contains('operation2'));
 
-      print('Performance report:\n$report');
+      debugPrint('Performance report:\n$report');
     });
 
     test('Performance data export test', () {
@@ -142,7 +146,7 @@ void main() {
       expect(data['export_test'], isA<Map<String, dynamic>>());
       expect(data['export_test']['count'], equals(1));
 
-      print('Exported performance data: $data');
+      debugPrint('Exported performance data: $data');
     });
 
     testWidgets('Memory management mixin test', (WidgetTester tester) async {

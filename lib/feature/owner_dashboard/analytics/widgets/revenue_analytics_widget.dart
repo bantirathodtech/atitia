@@ -57,7 +57,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.paddingM),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           ),
           child: const Icon(
@@ -368,9 +368,9 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -144,19 +144,31 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
       );
 
       // Submit complaint to Firestore
+      // FIXED: BuildContext async gap warning
+      // Flutter recommends: Store context-dependent values before async operations or check mounted after
+      // Changed from: Using context.read() then await, then using context
+      // Changed to: Store ViewModel and ScaffoldMessenger before async, check mounted after
+      if (!mounted) return;
       final complaintVM = context.read<GuestComplaintViewModel>();
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
       await complaintVM.submitComplaint(complaint);
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Complaint submitted successfully')),
-        );
+      // Check if widget is still mounted before using context
+      if (!mounted) return;
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('Complaint submitted successfully')),
+      );
 
         // Navigate back to complaints list using centralized NavigationService
         final navigationService = getIt<NavigationService>();
         navigationService.goBack();
       }
-    } catch (e) {
+    // FIXED: Missing type annotation warning
+    // Flutter recommends: Always annotate catch clause variables with explicit types
+    // Changed from: catch (e) without type annotation
+    // Changed to: catch (dynamic e) with explicit dynamic type annotation
+    // Note: Using dynamic instead of Object to avoid naming conflict with type name
+    } catch (dynamic e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Submission failed: $e')),

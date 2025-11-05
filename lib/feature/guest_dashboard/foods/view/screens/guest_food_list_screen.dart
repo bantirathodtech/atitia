@@ -372,7 +372,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -928,7 +928,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.05),
+        color: Colors.grey.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
         border: Border.all(
           color: Colors.grey.withValues(alpha: 0.1),

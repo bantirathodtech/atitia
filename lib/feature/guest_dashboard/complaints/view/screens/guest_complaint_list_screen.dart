@@ -930,7 +930,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.05),
+              color: Colors.grey.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
             ),
             child: Column(

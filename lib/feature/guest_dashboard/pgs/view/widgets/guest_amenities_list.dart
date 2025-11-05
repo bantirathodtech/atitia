@@ -22,7 +22,7 @@ class GuestAmenitiesList extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark
               ? colorScheme.surfaceContainerHighest
-              : colorScheme.surface.withOpacity(0.7),
+              : colorScheme.surface.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -43,7 +43,7 @@ class GuestAmenitiesList extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark
             ? colorScheme.surfaceContainerHighest
-            : colorScheme.surface.withOpacity(0.7),
+            : colorScheme.surface.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Wrap(
@@ -59,7 +59,7 @@ class GuestAmenitiesList extends StatelessWidget {
                     color: colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: colorScheme.primary.withOpacity(0.3),
+                      color: colorScheme.primary.withValues(alpha: 0.3),
                     ),
                   ),
                   child: BodyText(

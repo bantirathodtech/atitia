@@ -4,6 +4,8 @@
 /// are properly configured before the app starts.
 library;
 
+import 'package:flutter/foundation.dart';
+
 import '../constants/environment_config.dart';
 
 class EnvironmentValidationService {
@@ -17,7 +19,10 @@ class EnvironmentValidationService {
     // Check for missing optional credentials
     final missingCredentials = EnvironmentConfig.getMissingCredentials();
     if (missingCredentials.isNotEmpty) {
-      for (final credential in missingCredentials) {}
+      // Log missing credentials for debugging (non-critical)
+      if (kDebugMode) {
+        debugPrint('⚠️ Missing optional credentials: ${missingCredentials.join(', ')}');
+      }
     }
 
     // Validate Firebase configuration
@@ -105,7 +110,9 @@ class EnvironmentValidationService {
   static void printEnvironmentSummary() {
     final missingCredentials = EnvironmentConfig.getMissingCredentials();
     if (missingCredentials.isNotEmpty) {
-      for (final credential in missingCredentials) {}
-    } else {}
+      debugPrint('⚠️ Missing optional credentials: ${missingCredentials.join(', ')}');
+    } else {
+      debugPrint('✅ All required credentials are configured');
+    }
   }
 }

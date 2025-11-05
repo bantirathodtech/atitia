@@ -285,9 +285,9 @@ class OwnerBedMapWidget extends StatelessWidget {
       margin: const EdgeInsets.all(4),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Column(
         children: [
@@ -340,7 +340,7 @@ class OwnerBedMapWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final border = theme.dividerColor.withValues(alpha: 0.5);
     final muted =
-        theme.textTheme.bodySmall?.color?.withOpacity(0.35) ?? Colors.grey;
+        theme.textTheme.bodySmall?.color?.withValues(alpha: 0.35) ?? Colors.grey;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -366,7 +366,7 @@ class OwnerBedMapWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final statusColor = bed.statusColor;
     final bg = statusColor
-        .withOpacity(theme.brightness == Brightness.dark ? 0.12 : 0.08);
+        .withValues(alpha: theme.brightness == Brightness.dark ? 0.12 : 0.08);
     final border = statusColor;
     final icon = bed.isOccupied
         ? Icons.person
@@ -379,9 +379,11 @@ class OwnerBedMapWidget extends StatelessWidget {
     String statusLabel = 'Vacant';
     if (bed.isOccupied) {
       statusLabel = 'Occupied';
-    } else if (bed.isPending)
+    } else if (bed.isPending) {
       statusLabel = 'Pending';
-    else if (bed.isUnderMaintenance) statusLabel = 'Maint.';
+    } else if (bed.isUnderMaintenance) {
+      statusLabel = 'Maint.';
+    }
 
     final tooltipText = StringBuffer()
       ..write('Bed ${bed.bedNumber} • $statusLabel')
