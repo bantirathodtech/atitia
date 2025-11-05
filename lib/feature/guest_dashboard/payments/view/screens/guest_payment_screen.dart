@@ -3,14 +3,12 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
-import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
@@ -165,134 +163,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     );
   }
 
-  /// 🎨 Premium App Bar (non-sliver version)
-  Widget _buildPremiumAppBar(BuildContext context, bool isDarkMode) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDarkMode
-              ? [
-                  AppColors.primary.withValues(alpha: 0.8),
-                  AppColors.primary.withValues(alpha: 0.6),
-                ]
-              : [
-                  AppColors.primary,
-                  AppColors.primary.withValues(alpha: 0.8),
-                ],
-        ),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Payments',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.history,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      context.push(AppRoutes.guestPaymentHistory);
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Manage your payments',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 🎨 Premium Sliver App Bar (kept for compatibility)
-  Widget _buildPremiumSliverAppBar(BuildContext context, bool isDarkMode) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
-
-    return SliverAppBar(
-      expandedHeight: 180,
-      floating: false,
-      pinned: true,
-      stretch: true,
-      backgroundColor: isDarkMode ? AppColors.darkCard : primaryColor,
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
-        title: HeadingMedium(
-          text: 'Payments',
-          color: AppColors.textOnPrimary,
-        ),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDarkMode
-                  ? [
-                      AppColors.darkCard,
-                      AppColors.darkCard.withValues(alpha: 0.9)
-                    ]
-                  : [primaryColor, primaryColor.withValues(alpha: 0.8)],
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              Icon(
-                Icons.account_balance_wallet,
-                size: 48,
-                color: AppColors.textOnPrimary.withValues(alpha: 0.9),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Payment Management',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: AppColors.textOnPrimary.withValues(alpha: 0.9),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.info_outline, color: AppColors.textOnPrimary),
-          onPressed: () => _showPaymentInfo(context),
-          tooltip: 'Payment Info',
-        ),
-      ],
-    );
-  }
+  
 
   /// 📊 Tab Bar
   Widget _buildTabBar(BuildContext context, bool isDarkMode) {
@@ -1340,32 +1211,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     }
   }
 
-  /// Dialog: Payment info
-  void _showPaymentInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Payment Information'),
-        content: const SingleChildScrollView(
-          child: Text(
-            'To make a payment:\n\n'
-            '1. View owner\'s payment details (UPI/Bank)\n'
-            '2. Make payment using your preferred method\n'
-            '3. Take screenshot of payment confirmation\n'
-            '4. Send payment notification with screenshot\n'
-            '5. Wait for owner confirmation\n\n'
-            'Owner will confirm once they receive the payment.',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Got it'),
-          ),
-        ],
-      ),
-    );
-  }
+  
 }
 
 /// Dialog for sending payment notification

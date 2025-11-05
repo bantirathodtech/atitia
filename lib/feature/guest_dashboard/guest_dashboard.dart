@@ -129,6 +129,7 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
   void _setTabIndex(int index, {bool silent = false}) {
     if (_currentIndex == index) return;
     
+    final oldIndex = _currentIndex;
     setState(() {
       _currentIndex = index;
     });
@@ -138,10 +139,10 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
       
       // Log tab navigation
       LoggingHelper.logNavigation(
-        tabNames[_currentIndex],
+        tabNames[oldIndex],
         tabNames[index],
         metadata: {
-          'oldIndex': _currentIndex,
+          'oldIndex': oldIndex,
           'newIndex': index,
           'tabName': tabNames[index],
         },
@@ -161,19 +162,10 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
   /// Handles bottom navigation tab selection
   /// Updates current index to switch between tab views
   void _onTabSelected(int index) {
-    // Don't navigate if we're on a detail screen - wait for user to go back first
-    try {
-      final navService = getIt.navigation;
-      final currentLocation = navService.getCurrentLocation();
-      // Check if we're on any detail route
-      if (_isOnDetailRoute(currentLocation)) {
-        // We're on a detail screen, don't navigate - let user go back first
-        return;
-      }
-    } catch (e) {
-      // If we can't check, proceed with navigation
-    }
+    // Prevent switching to same tab
+    if (_currentIndex == index) return;
     
+    // Update tab index immediately to change the IndexedStack
     _setTabIndex(index);
     
     // Navigate to the appropriate route to maintain URL consistency
@@ -182,17 +174,8 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
     
     if (index < tabRoutes.length) {
       final targetRoute = tabRoutes[index];
-      try {
-        final navService = getIt.navigation;
-        final currentLocation = navService.getCurrentLocation();
-        // Only navigate if not already on that route
-        if (!currentLocation.contains(targetRoute.replaceAll('/guest', ''))) {
-          router.go(targetRoute);
-        }
-      } catch (e) {
-        // If we can't check current location, just navigate
-        router.go(targetRoute);
-      }
+      // Always navigate to ensure URL is correct
+      router.go(targetRoute);
     }
   }
 
@@ -219,22 +202,6 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Sync tab index with current route on every build
-    // But only if we're not on a detail screen
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        try {
-          final navService = getIt.navigation;
-          final currentLocation = navService.getCurrentLocation();
-          // Don't update if on detail screen - it will cause navigation issues
-          if (!_isOnDetailRoute(currentLocation)) {
-            _updateTabFromRoute();
-          }
-        } catch (e) {
-          // If we can't check, skip update to be safe
-        }
-      }
-    });
     return Scaffold(
       // Main content area with tab preservation
       body: IndexedStack(
