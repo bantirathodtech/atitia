@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/foundation.dart';
+import '../../core/db/flutter_secure_storage.dart';
 
 class EnvironmentConfig {
   // ==========================================================================
@@ -316,25 +317,173 @@ class EnvironmentConfig {
   }
 
   // ==========================================================================
+  // RUNTIME CREDENTIAL LOADING (Secure Storage)
+  // ==========================================================================
+
+  /// Get Google Sign-In Web Client ID from secure storage or environment
+  /// 
+  /// FIXED: Runtime credential loading from secure storage
+  /// Flutter recommends: Load sensitive credentials from secure storage at runtime
+  /// Changed from: Static const with environment variable fallback only
+  /// Changed to: Check secure storage first, then environment variable, then throw error
+  /// 
+  /// Priority:
+  /// 1. Secure storage (if available)
+  /// 2. Environment variable (build-time)
+  /// 3. Throw exception if neither is configured
+  static Future<String> getGoogleSignInWebClientIdAsync() async {
+    try {
+      // Try to load from secure storage first
+      final storage = LocalStorageService();
+      final clientId = await storage.read('google_web_client_id');
+      if (clientId != null && 
+          clientId.isNotEmpty && 
+          !clientId.contains('YOUR_') &&
+          !clientId.contains('REPLACE_WITH')) {
+        return clientId;
+      }
+    } catch (e) {
+      debugPrint('⚠️ EnvironmentConfig: Could not load Google Web Client ID from storage: $e');
+    }
+    
+    // Fallback to environment variable
+    final envClientId = googleSignInWebClientId;
+    if (envClientId.contains('YOUR_') || envClientId.contains('REPLACE_WITH')) {
+      throw Exception(
+        'Google Web Client ID not configured. '
+        'Set GOOGLE_SIGN_IN_WEB_CLIENT_ID environment variable or '
+        'store in secure storage with key "google_web_client_id"'
+      );
+    }
+    return envClientId;
+  }
+
+  /// Get Google Sign-In Android Client ID from secure storage or environment
+  static Future<String> getGoogleSignInAndroidClientIdAsync() async {
+    try {
+      final storage = LocalStorageService();
+      final clientId = await storage.read('google_android_client_id');
+      if (clientId != null && 
+          clientId.isNotEmpty && 
+          !clientId.contains('YOUR_') &&
+          !clientId.contains('REPLACE_WITH')) {
+        return clientId;
+      }
+    } catch (e) {
+      debugPrint('⚠️ EnvironmentConfig: Could not load Google Android Client ID from storage: $e');
+    }
+    
+    final envClientId = googleSignInAndroidClientId;
+    if (envClientId.contains('YOUR_') || envClientId.contains('REPLACE_WITH')) {
+      throw Exception(
+        'Google Android Client ID not configured. '
+        'Set GOOGLE_SIGN_IN_ANDROID_CLIENT_ID environment variable or '
+        'store in secure storage with key "google_android_client_id"'
+      );
+    }
+    return envClientId;
+  }
+
+  /// Get Google Sign-In iOS Client ID from secure storage or environment
+  static Future<String> getGoogleSignInIosClientIdAsync() async {
+    try {
+      final storage = LocalStorageService();
+      final clientId = await storage.read('google_ios_client_id');
+      if (clientId != null && 
+          clientId.isNotEmpty && 
+          !clientId.contains('YOUR_') &&
+          !clientId.contains('REPLACE_WITH')) {
+        return clientId;
+      }
+    } catch (e) {
+      debugPrint('⚠️ EnvironmentConfig: Could not load Google iOS Client ID from storage: $e');
+    }
+    
+    final envClientId = googleSignInIosClientId;
+    if (envClientId.contains('YOUR_') || envClientId.contains('REPLACE_WITH')) {
+      throw Exception(
+        'Google iOS Client ID not configured. '
+        'Set GOOGLE_SIGN_IN_IOS_CLIENT_ID environment variable or '
+        'store in secure storage with key "google_ios_client_id"'
+      );
+    }
+    return envClientId;
+  }
+
+  /// Get Google Sign-In Client Secret from secure storage or environment
+  static Future<String> getGoogleSignInClientSecretAsync() async {
+    try {
+      final storage = LocalStorageService();
+      final clientSecret = await storage.read('google_client_secret');
+      if (clientSecret != null && 
+          clientSecret.isNotEmpty && 
+          !clientSecret.contains('YOUR_') &&
+          !clientSecret.contains('REPLACE_WITH')) {
+        return clientSecret;
+      }
+    } catch (e) {
+      debugPrint('⚠️ EnvironmentConfig: Could not load Google Client Secret from storage: $e');
+    }
+    
+    final envClientSecret = googleSignInClientSecret;
+    if (envClientSecret.contains('YOUR_') || envClientSecret.contains('REPLACE_WITH')) {
+      throw Exception(
+        'Google Client Secret not configured. '
+        'Set GOOGLE_SIGN_IN_CLIENT_SECRET environment variable or '
+        'store in secure storage with key "google_client_secret"'
+      );
+    }
+    return envClientSecret;
+  }
+
+  // ==========================================================================
   // SECURITY VALIDATION
   // ==========================================================================
 
-  /// Validate that all required credentials are present
+  /// Validate that all required credentials are present (static fields)
+  /// 
+  /// Note: For runtime credentials (Google OAuth), use validateCredentialsAsync()
   static bool validateCredentials() {
     final requiredFields = [
       firebaseProjectId,
       firebaseWebApiKey,
       firebaseAndroidApiKey,
       firebaseIosApiKey,
-      googleSignInWebClientId,
-      googleSignInAndroidClientId,
-      googleSignInIosClientId,
       recaptchaEnterpriseSiteKey,
     ];
 
     return requiredFields.every(
       (field) => field.isNotEmpty && !field.contains('REPLACE_WITH'),
     );
+  }
+
+  /// Validate that all required credentials are present (including runtime credentials)
+  /// 
+  /// FIXED: Async credential validation
+  /// Flutter recommends: Validate runtime-loaded credentials asynchronously
+  /// Changed from: Only validating static const fields
+  /// Changed to: Also validate async-loaded Google OAuth credentials
+  static Future<bool> validateCredentialsAsync() async {
+    // Check static credentials first
+    if (!validateCredentials()) {
+      return false;
+    }
+    
+    // Check runtime credentials (Google OAuth)
+    try {
+      final webClientId = await getGoogleSignInWebClientIdAsync();
+      final androidClientId = await getGoogleSignInAndroidClientIdAsync();
+      final iosClientId = await getGoogleSignInIosClientIdAsync();
+      final clientSecret = await getGoogleSignInClientSecretAsync();
+      
+      return !webClientId.contains('YOUR_') &&
+             !androidClientId.contains('YOUR_') &&
+             !iosClientId.contains('YOUR_') &&
+             !clientSecret.contains('YOUR_');
+    } catch (e) {
+      debugPrint('⚠️ EnvironmentConfig: Credential validation error: $e');
+      return false;
+    }
   }
 
   /// Get missing credentials for debugging

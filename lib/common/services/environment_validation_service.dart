@@ -10,13 +10,18 @@ import '../constants/environment_config.dart';
 
 class EnvironmentValidationService {
   /// Validate all environment configuration
+  /// 
+  /// FIXED: Async credential validation
+  /// Flutter recommends: Validate runtime-loaded credentials asynchronously
+  /// Changed from: Only validating static const fields
+  /// Changed to: Also validate async-loaded Google OAuth credentials
   static Future<bool> validateEnvironment() async {
-    // Check if all required credentials are present
+    // Check if all required static credentials are present
     if (!EnvironmentConfig.validateCredentials()) {
       return false;
     }
 
-    // Check for missing optional credentials
+    // Check for missing optional credentials (static fields)
     final missingCredentials = EnvironmentConfig.getMissingCredentials();
     if (missingCredentials.isNotEmpty) {
       // Log missing credentials for debugging (non-critical)
@@ -30,8 +35,8 @@ class EnvironmentValidationService {
       return false;
     }
 
-    // Validate Google Sign-In configuration
-    if (!_validateGoogleSignInConfig()) {
+    // Validate Google Sign-In configuration (async - includes runtime credentials)
+    if (!await _validateGoogleSignInConfigAsync()) {
       return false;
     }
 
@@ -64,21 +69,53 @@ class EnvironmentValidationService {
     return true;
   }
 
-  /// Validate Google Sign-In configuration
-  static bool _validateGoogleSignInConfig() {
-    final requiredFields = [
-      EnvironmentConfig.googleSignInWebClientId,
-      EnvironmentConfig.googleSignInAndroidClientId,
-      EnvironmentConfig.googleSignInIosClientId,
-    ];
-
-    for (final field in requiredFields) {
-      if (field.isEmpty || field.contains('REPLACE_WITH')) {
-        return false;
+  /// Validate Google Sign-In configuration (async)
+  /// 
+  /// FIXED: Async credential validation
+  /// Flutter recommends: Validate runtime-loaded credentials asynchronously
+  /// Changed from: Only validating static const fields
+  /// Changed to: Also validate async-loaded Google OAuth credentials from secure storage
+  static Future<bool> _validateGoogleSignInConfigAsync() async {
+    try {
+      // Use async validation which checks both static and runtime credentials
+      final isValid = await EnvironmentConfig.validateCredentialsAsync();
+      
+      if (!isValid && kDebugMode) {
+        // Log which credentials are missing for debugging
+        try {
+          await EnvironmentConfig.getGoogleSignInWebClientIdAsync();
+          debugPrint('✅ Google Web Client ID: Configured');
+        } catch (e) {
+          debugPrint('❌ Google Web Client ID: Not configured');
+        }
+        
+        try {
+          await EnvironmentConfig.getGoogleSignInAndroidClientIdAsync();
+          debugPrint('✅ Google Android Client ID: Configured');
+        } catch (e) {
+          debugPrint('❌ Google Android Client ID: Not configured');
+        }
+        
+        try {
+          await EnvironmentConfig.getGoogleSignInIosClientIdAsync();
+          debugPrint('✅ Google iOS Client ID: Configured');
+        } catch (e) {
+          debugPrint('❌ Google iOS Client ID: Not configured');
+        }
+        
+        try {
+          await EnvironmentConfig.getGoogleSignInClientSecretAsync();
+          debugPrint('✅ Google Client Secret: Configured');
+        } catch (e) {
+          debugPrint('❌ Google Client Secret: Not configured');
+        }
       }
+      
+      return isValid;
+    } catch (e) {
+      debugPrint('⚠️ Google Sign-In configuration validation error: $e');
+      return false;
     }
-
-    return true;
   }
 
   /// Validate reCAPTCHA configuration

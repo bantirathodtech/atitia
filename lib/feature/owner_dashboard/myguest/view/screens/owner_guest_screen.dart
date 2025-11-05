@@ -612,17 +612,14 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     // Changed from: Using context with mounted check in compound condition after async gap
     // Changed to: Check mounted immediately before context usage
     // Note: ScaffoldMessenger is safe to use after async when mounted check is performed, analyzer flags as false positive
-    if (!success || !mounted) return;
+    if (!success || !this.mounted) return;
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text('Updated ${viewModel.selectedCount} guests to $newStatus'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-      }
-    }
+      SnackBar(
+        content: Text('Updated ${viewModel.selectedCount} guests to $newStatus'),
+        backgroundColor: AppColors.success,
+      ),
+    );
   }
 
   Future<void> _confirmBulkDelete(
@@ -655,16 +652,14 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     // Changed from: Using context with mounted check in compound condition after async gap
     // Changed to: Check mounted immediately before context usage
     // Note: ScaffoldMessenger is safe to use after async when mounted check is performed, analyzer flags as false positive
-    if (!success || !mounted) return;
+    if (!success || !this.mounted) return;
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Guests deleted successfully'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-      }
-    }
+      const SnackBar(
+        content: Text('Guests deleted successfully'),
+        backgroundColor: AppColors.success,
+      ),
+    );
   }
 
   /// Builds statistics card

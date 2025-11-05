@@ -550,14 +550,11 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
     if (!mounted) return;
     // ignore: use_build_context_synchronously
     final viewModel = context.read<OwnerPgManagementViewModel>();
-      final ownerId = authProvider.user?.userId ?? '';
+    final ownerId = authProvider.user?.userId ?? '';
 
-      await viewModel.refreshData();
-      if (ownerId.isNotEmpty) {
-        await selectedPgProvider.refreshPgs();
-      }
+    await viewModel.refreshData();
+    if (ownerId.isNotEmpty) {
+      await selectedPgProvider.refreshPgs();
     }
   }
-
-  // Drawer actions centralized in OwnerDrawer
 }

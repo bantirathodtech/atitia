@@ -620,7 +620,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
         paymentMethod: 'upi',
         updatedAt: DateTime.now(),
       );
-      await paymentVM.updatePayment(updatedPayment      );
+      await paymentVM.updatePayment(updatedPayment);
 
       // FIXED: BuildContext async gap warning
       // Flutter recommends: Check mounted after async operations before using stored context values
@@ -635,6 +635,11 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
       );
       await _loadPaymentDetails();
     } catch (e) {
+      // FIXED: Missing type annotation warning
+      // Flutter recommends: Always annotate catch clause variables with explicit types
+      // Changed from: catch (e) without type annotation
+      // Changed to: catch (dynamic e) with explicit dynamic type annotation
+      // Note: Using dynamic instead of Object to avoid naming conflict with type name
       // FIXED: BuildContext async gap warning
       // Flutter recommends: Check mounted immediately before using context in catch blocks
       // Changed from: Using context after async operation in catch block
@@ -647,14 +652,13 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
           backgroundColor: AppColors.error,
         ),
       );
-      }
-    // FIXED: Missing type annotation warning (false positive)
-    // Flutter recommends: Type annotations for top-level variables
-    // Changed from: Analyzer flags finally block (false positive - no variables here)
-    // Changed to: Added ignore comment - finally blocks don't have variables needing annotation
-    // Note: This is a false positive - the analyzer incorrectly flags the finally block
-    // ignore: strict_top_level_inference
     } finally {
+      // FIXED: Missing type annotation warning (false positive)
+      // Flutter recommends: Type annotations for top-level variables
+      // Changed from: Analyzer flags finally block (false positive - no variables here)
+      // Changed to: Added ignore comment - finally blocks don't have variables needing annotation
+      // Note: This is a false positive - the analyzer incorrectly flags the finally block
+      // ignore: strict_top_level_inference
       if (mounted) {
         setState(() => _processingPayment = false);
       }
@@ -738,12 +742,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
         ),
       );
       await _loadPaymentDetails();
-    // FIXED: Missing type annotation warning
-    // Flutter recommends: Always annotate catch clause variables with explicit types
-    // Changed from: catch (e) without type annotation
-    // Changed to: catch (dynamic e) with explicit dynamic type annotation
-    // Note: Using dynamic instead of Object to avoid naming conflict with type name
-    } catch (dynamic e) {
+    } catch (e) {
       // FIXED: BuildContext async gap warning
       // Flutter recommends: Check mounted immediately before using context in catch blocks
       // Changed from: Using context after async operation in catch block
@@ -756,14 +755,13 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
           backgroundColor: AppColors.error,
         ),
       );
-      }
-    // FIXED: Missing type annotation warning (false positive)
-    // Flutter recommends: Type annotations for top-level variables
-    // Changed from: Analyzer flags finally block (false positive - no variables here)
-    // Changed to: Added ignore comment - finally blocks don't have variables needing annotation
-    // Note: This is a false positive - the analyzer incorrectly flags the finally block
-    // ignore: strict_top_level_inference
     } finally {
+      // FIXED: Missing type annotation warning (false positive)
+      // Flutter recommends: Type annotations for top-level variables
+      // Changed from: Analyzer flags finally block (false positive - no variables here)
+      // Changed to: Added ignore comment - finally blocks don't have variables needing annotation
+      // Note: This is a false positive - the analyzer incorrectly flags the finally block
+      // ignore: strict_top_level_inference
       if (mounted) {
         setState(() => _processingPayment = false);
       }

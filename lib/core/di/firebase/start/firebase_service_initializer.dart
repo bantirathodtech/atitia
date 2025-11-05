@@ -27,7 +27,7 @@ import 'package:firebase_core/firebase_core.dart';
 // Flutter recommends: Only import packages that provide unique functionality
 // Changed from: Importing 'package:flutter/foundation.dart' when 'package:flutter/widgets.dart' already provides debugPrint
 // Changed to: Removed unnecessary foundation.dart import, using show debugPrint from widgets.dart
-import 'package:flutter/widgets.dart' show debugPrint;
+import 'package:flutter/widgets.dart' show debugPrint, WidgetsBinding;
 
 import '../../../db/flutter_secure_storage.dart';
 import '../../../navigation/navigation_service.dart';
@@ -154,13 +154,23 @@ class FirebaseServiceInitializer {
   // ==========================================================================
   static Future<void> _initializeOptionalServices() async {
     // Initialize Google Sign-In service
+    // FIXED: Use async credential loading
+    // Flutter recommends: Load credentials from secure storage at runtime
+    // Changed from: Using static methods that may have placeholders
+    // Changed to: Using async methods that load from secure storage or environment
     try {
+      // Load credentials asynchronously from secure storage or environment
+      final clientId = await EnvironmentConfig.getGoogleSignInWebClientIdAsync();
+      final clientSecret = await EnvironmentConfig.getGoogleSignInClientSecretAsync();
+      
       await getIt.googleSignIn.initialize(
-        clientId: EnvironmentConfig.getGoogleSignInClientId('web'),
-        serverClientId: EnvironmentConfig.googleSignInClientSecret,
+        clientId: clientId,
+        serverClientId: clientSecret,
       );
+      debugPrint('✅ Google Sign-In service initialized with credentials from secure storage');
     } catch (e) {
       debugPrint('⚠️ Firebase Service Initializer: Google Sign-In initialization failed: $e');
+      debugPrint('   App will continue but Google Sign-In may not work');
     }
 
     // Initialize Apple Sign-In service

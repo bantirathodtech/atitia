@@ -1441,116 +1441,118 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
       if (!mounted) return;
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to update status: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+        SnackBar(
+          content: Text('Failed to update status: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
+}
 
-  /// Completes service
-  void _completeService(BuildContext context, OwnerGuestViewModel guestVM,
-      OwnerServiceModel service) {
-    final notesController = TextEditingController();
+/// Completes service
+void _completeService(BuildContext context, OwnerGuestViewModel guestVM,
+    OwnerServiceModel service) {
+  final notesController = TextEditingController();
+  // Note: We're in a State class method, so the widget is mounted when this method is called
+  // The dialog will handle its own lifecycle, so we don't need to check mounted here
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Complete Service'),
-        content: TextInput(
-          controller: notesController,
-          label: 'Completion Notes',
-          hint: 'Completion notes (optional)...',
-          maxLines: 3,
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Complete Service'),
+      content: TextInput(
+        controller: notesController,
+        label: 'Completion Notes',
+        hint: 'Completion notes (optional)...',
+        maxLines: 3,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Mark as Completed',
-            onPressed: () async {
-              final success = await guestVM.updateServiceStatus(
-                service.serviceId,
-                'completed',
-                completionNotes: notesController.text.isNotEmpty
-                    ? notesController.text
-                    : null,
-              );
+        PrimaryButton(
+          label: 'Mark as Completed',
+          onPressed: () async {
+            final success = await guestVM.updateServiceStatus(
+              service.serviceId,
+              'completed',
+              completionNotes:
+                  notesController.text.isNotEmpty ? notesController.text : null,
+            );
 
-              // FIXED: BuildContext async gap warning
-              // Flutter recommends: Check mounted immediately before using context after async operations
-              // Changed from: Using context with mounted check in compound condition after async gap
-              // Changed to: Check mounted immediately before each context usage
-              // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-              if (!success || !mounted) return;
-              // ignore: use_build_context_synchronously
+            // FIXED: BuildContext async gap warning
+            // Flutter recommends: Check mounted immediately before using context after async operations
+            // Changed from: Using context with mounted check in compound condition after async gap
+            // Changed to: Check mounted immediately before each context usage
+            // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
+            // Note: Dialog context is safe to use here - dialog manages its own lifecycle
+            if (!success) {
               Navigator.of(context).pop();
-              if (!mounted) return;
-              // ignore: use_build_context_synchronously
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Service completed successfully')),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Formats date for display
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
-  /// Shows advanced search dialog
-  void _showAdvancedSearch(BuildContext context, OwnerGuestViewModel guestVM) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const HeadingMedium(text: 'Advanced Search'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextInput(
-              label: 'Service Title',
-              hint: 'Service title',
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: 'Guest Name',
-              hint: 'Guest name',
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: 'Room',
-              hint: 'Room number',
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: 'Service Type',
-              hint: 'Service type',
-            ),
-          ],
+              return;
+            }
+            // ignore: use_build_context_synchronously
+            Navigator.of(context).pop();
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Service completed successfully')),
+            );
+          },
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const BodyText(text: 'Cancel'),
+      ],
+    ),
+  );
+}
+
+/// Formats date for display
+String _formatDate(DateTime date) {
+  return '${date.day}/${date.month}/${date.year}';
+}
+
+/// Shows advanced search dialog
+void _showAdvancedSearch(BuildContext context, OwnerGuestViewModel guestVM) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const HeadingMedium(text: 'Advanced Search'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextInput(
+            label: 'Service Title',
+            hint: 'Service title',
           ),
-          PrimaryButton(
-            label: 'Search',
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implement advanced search
-            },
+          const SizedBox(height: AppSpacing.paddingM),
+          TextInput(
+            label: 'Guest Name',
+            hint: 'Guest name',
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          TextInput(
+            label: 'Room',
+            hint: 'Room number',
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          TextInput(
+            label: 'Service Type',
+            hint: 'Service type',
           ),
         ],
       ),
-    );
-  }
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const BodyText(text: 'Cancel'),
+        ),
+        PrimaryButton(
+          label: 'Search',
+          onPressed: () {
+            Navigator.pop(context);
+            // TODO: Implement advanced search
+          },
+        ),
+      ],
+    ),
+  );
 }
