@@ -15,10 +15,13 @@ class GuestPaymentModel {
   final double amount;
   final DateTime paymentDate;
   final DateTime dueDate;
-  final String status; // Pending, Paid, Failed, Refunded
-  final String paymentMethod; // UPI, Card, Cash, Net Banking
+  final String status; // Pending, Paid, Failed, Refunded, Confirmed (for cash/UPI)
+  final String paymentMethod; // 'razorpay', 'upi', 'cash', 'bank_transfer'
   final String? transactionId;
   final String? upiReferenceId;
+  final String? razorpayPaymentId; // Razorpay payment ID
+  final String? razorpayOrderId; // Razorpay order ID
+  final String? paymentScreenshotUrl; // UPI screenshot URL
   final String paymentType; // Rent, Security Deposit, Maintenance, Late Fee
   final String description;
   final Map<String, dynamic>? metadata; // Additional payment details
@@ -38,6 +41,9 @@ class GuestPaymentModel {
     required this.paymentMethod,
     this.transactionId,
     this.upiReferenceId,
+    this.razorpayPaymentId,
+    this.razorpayOrderId,
+    this.paymentScreenshotUrl,
     required this.paymentType,
     required this.description,
     this.metadata,
@@ -61,9 +67,12 @@ class GuestPaymentModel {
           ? DateServiceConverter.fromService(map['dueDate'])
           : DateTime.now().add(const Duration(days: 30)),
       status: map['status'] ?? 'Pending',
-      paymentMethod: map['paymentMethod'] ?? 'UPI',
+      paymentMethod: map['paymentMethod'] ?? 'upi',
       transactionId: map['transactionId'],
       upiReferenceId: map['upiReferenceId'],
+      razorpayPaymentId: map['razorpayPaymentId'],
+      razorpayOrderId: map['razorpayOrderId'],
+      paymentScreenshotUrl: map['paymentScreenshotUrl'],
       paymentType: map['paymentType'] ?? 'Rent',
       description: map['description'] ?? '',
       metadata: map['metadata'] != null
@@ -93,6 +102,9 @@ class GuestPaymentModel {
       'paymentMethod': paymentMethod,
       'transactionId': transactionId,
       'upiReferenceId': upiReferenceId,
+      'razorpayPaymentId': razorpayPaymentId,
+      'razorpayOrderId': razorpayOrderId,
+      'paymentScreenshotUrl': paymentScreenshotUrl,
       'paymentType': paymentType,
       'description': description,
       'metadata': metadata,
@@ -117,6 +129,9 @@ class GuestPaymentModel {
     String? paymentMethod,
     String? transactionId,
     String? upiReferenceId,
+    String? razorpayPaymentId,
+    String? razorpayOrderId,
+    String? paymentScreenshotUrl,
     String? paymentType,
     String? description,
     Map<String, dynamic>? metadata,
@@ -136,6 +151,9 @@ class GuestPaymentModel {
       paymentMethod: paymentMethod ?? this.paymentMethod,
       transactionId: transactionId ?? this.transactionId,
       upiReferenceId: upiReferenceId ?? this.upiReferenceId,
+      razorpayPaymentId: razorpayPaymentId ?? this.razorpayPaymentId,
+      razorpayOrderId: razorpayOrderId ?? this.razorpayOrderId,
+      paymentScreenshotUrl: paymentScreenshotUrl ?? this.paymentScreenshotUrl,
       paymentType: paymentType ?? this.paymentType,
       description: description ?? this.description,
       metadata: metadata ?? this.metadata,

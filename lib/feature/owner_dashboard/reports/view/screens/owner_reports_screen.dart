@@ -220,7 +220,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
 
     final totalRevenue = monthlyBreakdown != null && monthlyBreakdown.isNotEmpty
         ? monthlyBreakdown.values.fold(0.0, (a, b) => a + b)
-        : (overview.totalRevenue ?? 0.0);
+        : overview.totalRevenue;
     final averageRevenue = monthlyBreakdown != null &&
             monthlyBreakdown.values.isNotEmpty
         ? totalRevenue / monthlyBreakdown.values.where((v) => v > 0).length
