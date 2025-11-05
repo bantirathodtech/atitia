@@ -17,6 +17,7 @@ import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/utils/validators/general_validators.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
 import '../../../../auth/logic/auth_provider.dart';
+import '../../../shared/viewmodel/guest_pg_selection_provider.dart';
 import '../../data/models/guest_complaint_model.dart';
 import '../../viewmodel/guest_complaint_viewmodel.dart';
 
@@ -93,13 +94,27 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
 
     final authProvider = context.read<AuthProvider>();
     final guestId = authProvider.user?.userId ?? '';
-    // TODO: Fetch pgId from user profile or context
-    final pgId = '';
-
+    
     // Check user authentication
     if (guestId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('User not authenticated')),
+      );
+      return;
+    }
+
+    // Get PG ID from GuestPgSelectionProvider (guest's selected/booked PG)
+    final pgSelectionProvider = context.read<GuestPgSelectionProvider>();
+    final pgId = pgSelectionProvider.selectedPgId ?? 
+                 pgSelectionProvider.selectedPg?.pgId ?? '';
+
+    // Validate that guest has selected a PG
+    if (pgId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a PG first to file a complaint'),
+          duration: Duration(seconds: 3),
+        ),
       );
       return;
     }
