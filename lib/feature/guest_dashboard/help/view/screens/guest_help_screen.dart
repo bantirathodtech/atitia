@@ -10,12 +10,12 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/drawers/guest_drawer.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../shared/widgets/guest_drawer.dart';
 
 /// Help and support screen for guests
 class GuestHelpScreen extends StatelessWidget {
@@ -290,4 +290,3 @@ class GuestHelpScreen extends StatelessWidget {
     );
   }
 }
-

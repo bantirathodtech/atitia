@@ -7,12 +7,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'adaptive_drawer.dart';
-import '../../../feature/auth/logic/auth_provider.dart';
-import '../../../core/app/theme/theme_provider.dart';
-import '../../../core/app/localization/locale_provider.dart';
-import '../../../core/navigation/navigation_service.dart';
-import '../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../common/widgets/drawers/adaptive_drawer.dart';
+import '../../../../core/app/localization/locale_provider.dart';
+import '../../../../core/app/theme/theme_provider.dart';
+import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/navigation/navigation_service.dart';
+import '../../../auth/logic/auth_provider.dart';
 
 class GuestDrawer extends StatelessWidget {
   /// Navigation callback when drawer items are tapped

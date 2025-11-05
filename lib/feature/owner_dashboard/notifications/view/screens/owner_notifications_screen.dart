@@ -1,19 +1,22 @@
 // ============================================================================
 // Owner Notifications Screen
 // ============================================================================
-// Notifications screen for owner users
+// Notifications screen for owner users with real-time Firestore data
 // ============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../shared/widgets/owner_drawer.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
+import '../../../../../core/viewmodels/notification_viewmodel.dart';
 
 /// Notifications screen for owners
 class OwnerNotificationsScreen extends StatefulWidget {
@@ -27,88 +30,96 @@ class OwnerNotificationsScreen extends StatefulWidget {
 class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
   String _selectedFilter = 'All';
 
-  // Sample notifications data - Owner receives notifications FROM guests
-  final List<Map<String, dynamic>> _notifications = [
-    {
-      'id': '1',
-      'title': 'New Booking Request',
-      'body': 'Guest John Doe requested booking for Room 101',
-      'type': 'booking_request',
-      'timestamp': DateTime.now().subtract(const Duration(hours: 2)),
-      'read': false,
-    },
-    {
-      'id': '2',
-      'title': 'Payment Received',
-      'body': 'Payment of ₹5,000 received from Guest ABC',
-      'type': 'payment_received',
-      'timestamp': DateTime.now().subtract(const Duration(days: 1)),
-      'read': false,
-    },
-    {
-      'id': '3',
-      'title': 'Complaint Filed',
-      'body': 'Guest XYZ filed a complaint about Wi-Fi connectivity in Room 205',
-      'type': 'complaint_filed',
-      'timestamp': DateTime.now().subtract(const Duration(hours: 5)),
-      'read': false,
-    },
-    {
-      'id': '4',
-      'title': 'Bed Change Request',
-      'body': 'Guest ABC requested bed change from Room 101 to Room 205',
-      'type': 'bed_change_request',
-      'timestamp': DateTime.now().subtract(const Duration(days: 1)),
-      'read': true,
-    },
-    {
-      'id': '5',
-      'title': 'Service Request',
-      'body': 'New service request for Room 205 - AC not working',
-      'type': 'service_request',
-      'timestamp': DateTime.now().subtract(const Duration(days: 2)),
-      'read': true,
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Load notifications when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = context.read<NotificationViewModel>();
+      viewModel.loadNotifications();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filteredNotifications = _getFilteredNotifications();
-
     return Scaffold(
       appBar: AdaptiveAppBar(
         title: 'Notifications',
         actions: [
-          IconButton(
-            icon: const Icon(Icons.mark_email_read),
-            onPressed: _markAllAsRead,
-            tooltip: 'Mark all as read',
+          Consumer<NotificationViewModel>(
+            builder: (context, viewModel, _) {
+              return IconButton(
+                icon: const Icon(Icons.mark_email_read),
+                onPressed: viewModel.isLoading
+                    ? null
+                    : () async {
+                        await viewModel.markAllAsRead();
+                      },
+                tooltip: 'Mark all as read',
+              );
+            },
           ),
         ],
       ),
       drawer: const OwnerDrawer(
         currentTabIndex: 0,
       ),
-      body: Column(
-        children: [
-          _buildFilterChips(),
-          Expanded(
-            child: filteredNotifications.isEmpty
-                ? EmptyState(
-                    icon: Icons.notifications_none,
-                    title: 'No Notifications',
-                    message: 'You don\'t have any notifications yet.',
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(AppSpacing.paddingM),
-                    itemCount: filteredNotifications.length,
-                    itemBuilder: (context, index) {
-                      final notification = filteredNotifications[index];
-                      return _buildNotificationCard(notification);
-                    },
+      body: Consumer<NotificationViewModel>(
+        builder: (context, viewModel, _) {
+          if (viewModel.isLoading && viewModel.notifications.isEmpty) {
+            return const AdaptiveLoader();
+          }
+
+          if (viewModel.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: AppSpacing.paddingM),
+                  BodyText(
+                    text: viewModel.errorMessage ?? 'Failed to load notifications',
+                    color: AppColors.textSecondary,
                   ),
-          ),
-        ],
+                  const SizedBox(height: AppSpacing.paddingM),
+                  ElevatedButton(
+                    onPressed: () => viewModel.loadNotifications(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final filteredNotifications =
+              viewModel.getFilteredNotifications(_selectedFilter);
+
+          return Column(
+            children: [
+              _buildFilterChips(),
+              Expanded(
+                child: filteredNotifications.isEmpty
+                    ? EmptyState(
+                        icon: Icons.notifications_none,
+                        title: 'No Notifications',
+                        message: 'You don\'t have any notifications yet.',
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(AppSpacing.paddingM),
+                        itemCount: filteredNotifications.length,
+                        itemBuilder: (context, index) {
+                          final notification = filteredNotifications[index];
+                          return _buildNotificationCard(
+                            context,
+                            notification,
+                            viewModel,
+                          );
+                        },
+                      ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -155,48 +166,25 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
     );
   }
 
-  List<Map<String, dynamic>> _getFilteredNotifications() {
-    if (_selectedFilter == 'All') {
-      return _notifications;
-    } else if (_selectedFilter == 'Unread') {
-      return _notifications.where((n) => !(n['read'] as bool)).toList();
-    } else if (_selectedFilter == 'Bookings') {
-      return _notifications
-          .where((n) => n['type'] == 'booking_request')
-          .toList();
-    } else if (_selectedFilter == 'Payments') {
-      return _notifications
-          .where((n) => n['type'] == 'payment_received')
-          .toList();
-    } else if (_selectedFilter == 'Complaints') {
-      return _notifications
-          .where((n) => n['type'] == 'complaint_filed')
-          .toList();
-    } else if (_selectedFilter == 'Bed Changes') {
-      return _notifications
-          .where((n) => n['type'] == 'bed_change_request')
-          .toList();
-    } else if (_selectedFilter == 'Services') {
-      return _notifications
-          .where((n) => n['type'] == 'service_request')
-          .toList();
-    }
-    return _notifications;
-  }
-
-  Widget _buildNotificationCard(Map<String, dynamic> notification) {
-    final isUnread = !(notification['read'] as bool);
-    final timestamp = notification['timestamp'] as DateTime;
-    final type = notification['type'] as String;
+  Widget _buildNotificationCard(
+    BuildContext context,
+    Map<String, dynamic> notification,
+    NotificationViewModel viewModel,
+  ) {
+    final isUnread = !(notification['read'] as bool? ?? false);
+    final timestamp = notification['timestamp'] as DateTime? ??
+        DateTime.now().subtract(const Duration(days: 1));
+    final type = notification['type'] as String? ?? '';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-      child: AdaptiveCard(
+        child: AdaptiveCard(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         onTap: () {
-          setState(() {
-            notification['read'] = true;
-          });
+          final notificationId = notification['id'] as String?;
+          if (notificationId != null && isUnread) {
+            viewModel.markAsRead(notificationId);
+          }
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +227,9 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  CaptionText(text: notification['body'] as String),
+                  CaptionText(
+                    text: notification['body'] as String? ?? 'No message',
+                  ),
                   const SizedBox(height: 4),
                   CaptionText(
                     text: _formatTimestamp(timestamp),
@@ -303,12 +293,5 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
     }
   }
 
-  void _markAllAsRead() {
-    setState(() {
-      for (var notification in _notifications) {
-        notification['read'] = true;
-      }
-    });
-  }
 }
 

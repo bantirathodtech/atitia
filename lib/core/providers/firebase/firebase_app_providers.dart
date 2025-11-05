@@ -19,6 +19,7 @@ import '../../app/localization/locale_provider.dart';
 import '../../app/theme/theme_provider.dart';
 import '../../di/firebase/container/firebase_dependency_container.dart';
 import '../../viewmodels/payment_notification_viewmodel.dart';
+import '../../viewmodels/notification_viewmodel.dart';
 
 /// Firebase-specific provider configuration.
 /// Uses FirebaseDependencyContainer to create providers with Firebase wiring.
@@ -97,6 +98,11 @@ class FirebaseAppProviders {
         // Payment Notifications - Guest sends, Owner confirms/rejects
         ChangeNotifierProvider<PaymentNotificationViewModel>(
           create: (_) => PaymentNotificationViewModel(),
+        ),
+
+        // Notifications - Real-time in-app notifications for both roles
+        ChangeNotifierProvider<NotificationViewModel>(
+          create: (_) => NotificationViewModel(),
         ),
 
         // Owner Foods - Menu management and special menus

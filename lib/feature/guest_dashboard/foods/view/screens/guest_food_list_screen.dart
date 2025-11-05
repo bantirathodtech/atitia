@@ -7,13 +7,13 @@ import 'package:provider/provider.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/drawers/guest_drawer.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/loaders/shimmer_loader.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../feature/owner_dashboard/foods/data/models/owner_food_menu.dart';
+import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
 import '../../viewmodel/guest_food_viewmodel.dart';
 

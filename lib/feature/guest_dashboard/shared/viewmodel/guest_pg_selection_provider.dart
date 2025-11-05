@@ -9,12 +9,14 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/repositories/notification_repository.dart';
 import '../../pgs/data/models/guest_pg_model.dart';
 
 /// Provider for managing guest PG selection state
 /// Handles PG selection, booking requests, and persistence
 class GuestPgSelectionProvider extends ChangeNotifier {
   final _analyticsService = getIt.analytics;
+  final _notificationRepository = NotificationRepository();
 
   GuestPgModel? _selectedPg;
   String? _selectedPgId;
@@ -166,6 +168,34 @@ class GuestPgSelectionProvider extends ChangeNotifier {
         requestId,
         bookingRequestData,
       );
+
+      // Notify owner about new booking request
+      try {
+        await _notificationRepository.sendUserNotification(
+          userId: pg.ownerUid,
+          type: 'booking_request',
+          title: 'New Booking Request',
+          body: '$guestName requested to join ${pg.pgName}',
+          data: {
+            'requestId': requestId,
+            'pgId': pg.pgId,
+            'pgName': pg.pgName,
+            'guestId': guestId,
+            'guestName': guestName,
+            'guestPhone': guestPhone,
+            'guestEmail': guestEmail,
+          },
+        );
+      } catch (e) {
+        // Log but don't fail the booking request if notification fails
+        _analyticsService.logEvent(
+          name: 'booking_request_notification_failed',
+          parameters: {
+            'request_id': requestId,
+            'error': e.toString(),
+          },
+        );
+      }
 
       _analyticsService.logEvent(
         name: 'guest_booking_request_sent',

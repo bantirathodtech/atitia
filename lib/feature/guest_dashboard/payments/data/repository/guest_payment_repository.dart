@@ -3,6 +3,7 @@ import '../../../../../common/utils/constants/firestore.dart';
 import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
+import '../../../../../core/repositories/notification_repository.dart';
 import '../models/guest_payment_model.dart';
 
 /// Repository layer for guest payments data operations
@@ -11,16 +12,20 @@ import '../models/guest_payment_model.dart';
 class GuestPaymentRepository {
   final IDatabaseService _databaseService;
   final IAnalyticsService _analyticsService;
+  final NotificationRepository _notificationRepository;
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
   GuestPaymentRepository({
     IDatabaseService? databaseService,
     IAnalyticsService? analyticsService,
+    NotificationRepository? notificationRepository,
   })  : _databaseService =
             databaseService ?? UnifiedServiceLocator.serviceFactory.database,
         _analyticsService =
-            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics,
+        _notificationRepository =
+            notificationRepository ?? NotificationRepository();
 
   /// Streams payments for a specific guest with real-time updates
   /// Uses Firestore query to filter payments by guestId, ordered by payment date
@@ -102,6 +107,36 @@ class GuestPaymentRepository {
           'payment_method': payment.paymentMethod,
         },
       );
+
+      // Notify owner about payment received
+      if (payment.ownerId.isNotEmpty && payment.status == 'Paid') {
+        try {
+          await _notificationRepository.sendUserNotification(
+            userId: payment.ownerId,
+            type: 'payment_received',
+            title: 'Payment Received',
+            body: 'Payment of ₹${payment.amount.toStringAsFixed(0)} received from guest',
+            data: {
+              'paymentId': payment.paymentId,
+              'bookingId': payment.bookingId,
+              'guestId': payment.guestId,
+              'pgId': payment.pgId,
+              'amount': payment.amount,
+              'paymentType': payment.paymentType,
+              'paymentMethod': payment.paymentMethod,
+            },
+          );
+        } catch (e) {
+          // Log but don't fail the payment if notification fails
+          await _analyticsService.logEvent(
+            name: 'payment_notification_failed',
+            parameters: {
+              'payment_id': payment.paymentId,
+              'error': e.toString(),
+            },
+          );
+        }
+      }
     } catch (e) {
       // Track error analytics
       await _analyticsService.logEvent(
