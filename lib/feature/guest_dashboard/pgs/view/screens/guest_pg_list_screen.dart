@@ -19,6 +19,7 @@ import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/user_location_display.dart';
 import '../../viewmodel/guest_pg_viewmodel.dart';
 import '../widgets/guest_pg_card.dart';
 
@@ -275,6 +276,16 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
     return SingleChildScrollView(
       child: Column(
         children: [
+          // User Location Display
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.paddingM,
+              AppSpacing.paddingM,
+              AppSpacing.paddingM,
+              AppSpacing.paddingS,
+            ),
+            child: const UserLocationDisplay(),
+          ),
           _buildSearchBar(context, pgVM),
           if (_showFilterPanel) _buildAdvancedFilters(context, pgVM),
           if (pgVM.searchQuery.isNotEmpty ||

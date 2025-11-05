@@ -29,6 +29,7 @@ import '../../../../../core/navigation/navigation_service.dart';
 import '../../../../auth/data/model/user_model.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/user_location_display.dart';
 import '../../data/models/guest_profile_model.dart';
 import '../../viewmodel/guest_profile_viewmodel.dart';
 
@@ -456,6 +457,11 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         key: _formKey,
         child: Column(
           children: [
+            // User Location Display
+            const Padding(
+              padding: EdgeInsets.only(bottom: 16),
+              child: UserLocationDisplay(),
+            ),
             // Profile Photos Section
             _buildPhotosSection(context),
             const SizedBox(height: 24),

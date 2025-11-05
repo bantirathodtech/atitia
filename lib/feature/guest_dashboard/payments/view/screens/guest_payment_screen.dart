@@ -28,6 +28,7 @@ import '../../view/widgets/payment_method_selection_dialog.dart';
 import '../../../shared/viewmodel/guest_pg_selection_provider.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/user_location_display.dart';
 
 /// 💰 **GUEST PAYMENT SCREEN - PRODUCTION READY**
 ///
@@ -331,13 +332,18 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
       return _buildEmptyState(context);
     }
 
-    return ListView.builder(
+    return ListView(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
-      itemCount: paymentVM.notifications.length,
-      itemBuilder: (context, index) {
-        final notification = paymentVM.notifications[index];
-        return _buildPaymentCard(context, notification, isDarkMode);
-      },
+      children: [
+        // User Location Display
+        const Padding(
+          padding: EdgeInsets.only(bottom: AppSpacing.paddingM),
+          child: UserLocationDisplay(),
+        ),
+        ...paymentVM.notifications.map((notification) => 
+          _buildPaymentCard(context, notification, isDarkMode)
+        ),
+      ],
     );
   }
 
@@ -541,6 +547,11 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // User Location Display
+          const Padding(
+            padding: EdgeInsets.only(bottom: AppSpacing.paddingM),
+            child: UserLocationDisplay(),
+          ),
           _buildOwnerPaymentDetails(context),
           const SizedBox(height: AppSpacing.paddingL),
           _buildSendPaymentForm(context),
@@ -1307,12 +1318,12 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     
     if (selectedMethod != null && mounted) {
       // Show payment form based on selected method
-      showDialog(
-        context: context,
+    showDialog(
+      context: context,
         builder: (context) => SendPaymentDialog(
           paymentMethod: selectedMethod,
         ),
-      );
+    );
     }
   }
 
@@ -1375,7 +1386,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       _razorpayService.initialize();
     }
   }
-  
+
   @override
   void dispose() {
     if (widget.paymentMethod == PaymentMethodType.razorpay) {
@@ -1425,18 +1436,18 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
               if (widget.paymentMethod == PaymentMethodType.upi) ...[
                 // UPI: Screenshot (required) - Transaction ID is visible in screenshot
                 _buildScreenshotUpload(context, theme),
-                const SizedBox(height: AppSpacing.paddingM),
+              const SizedBox(height: AppSpacing.paddingM),
                 // Transaction ID field is optional - screenshot already contains it
-                TextFormField(
-                  controller: _transactionIdController,
-                  decoration: const InputDecoration(
-                    labelText: 'Transaction ID (Optional)',
+              TextFormField(
+                controller: _transactionIdController,
+                decoration: const InputDecoration(
+                  labelText: 'Transaction ID (Optional)',
                     hintText: 'Not required - already visible in screenshot',
-                    border: OutlineInputBorder(),
+                  border: OutlineInputBorder(),
                     helperText: 'You can skip this - transaction ID is in the screenshot',
-                  ),
                 ),
-                const SizedBox(height: AppSpacing.paddingM),
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
                 BodyText(
                   text: '💡 Tip: After making payment via PhonePe, Paytm, Google Pay, etc., upload the payment screenshot. The transaction ID is already visible in the screenshot, so you don\'t need to enter it separately.',
                   color: AppColors.textSecondary,
@@ -1517,26 +1528,26 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
   Widget _buildScreenshotUpload(BuildContext context, ThemeData theme) {
     if (_screenshotFile != null) {
       return FutureBuilder<Uint8List>(
-        future: _screenshotFile.readAsBytes(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
+                  future: _screenshotFile.readAsBytes(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
+                        height: 150,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-                    border: Border.all(color: theme.primaryColor),
-                  ),
+                          border: Border.all(color: theme.primaryColor),
+                        ),
                   child: Stack(
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-                        child: Image.memory(
-                          snapshot.data!,
-                          fit: BoxFit.cover,
+                          child: Image.memory(
+                            snapshot.data!,
+                            fit: BoxFit.cover,
                           width: double.infinity,
                           height: 150,
                         ),
@@ -1561,23 +1572,23 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                   small: true,
                 ),
               ],
-            );
-          }
-          return Container(
-            height: 150,
-            width: double.infinity,
-            decoration: BoxDecoration(
+                      );
+                    }
+                    return Container(
+                      height: 150,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: theme.primaryColor),
-            ),
-            child: const Center(child: CircularProgressIndicator()),
-          );
-        },
+                        border: Border.all(color: theme.primaryColor),
+                      ),
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  },
       );
     }
     return OutlinedButton.icon(
-      onPressed: _pickScreenshot,
-      icon: const Icon(Icons.upload_file),
+                  onPressed: _pickScreenshot,
+                  icon: const Icon(Icons.upload_file),
       label: const Text('Upload Payment Screenshot'),
     );
   }

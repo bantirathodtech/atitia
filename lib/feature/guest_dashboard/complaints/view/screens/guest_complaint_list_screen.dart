@@ -15,6 +15,7 @@ import '../../../../../core/navigation/navigation_service.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/user_location_display.dart';
 import '../../viewmodel/guest_complaint_viewmodel.dart';
 import '../widgets/guest_complaint_card.dart';
 
@@ -125,6 +126,11 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
         children: [
+          // User Location Display
+          const Padding(
+            padding: EdgeInsets.only(bottom: AppSpacing.paddingM),
+            child: UserLocationDisplay(),
+          ),
           _buildFilterChips(context, complaintVM),
           const SizedBox(height: AppSpacing.paddingM),
           _buildComplaintsList(context, complaintVM),

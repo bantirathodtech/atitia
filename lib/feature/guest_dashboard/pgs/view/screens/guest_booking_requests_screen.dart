@@ -20,6 +20,7 @@ import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../feature/owner_dashboard/myguest/data/models/owner_booking_request_model.dart';
 import '../../../../../feature/owner_dashboard/myguest/data/repository/owner_booking_request_repository.dart';
 import '../../../shared/widgets/guest_drawer.dart';
+import '../../../shared/widgets/user_location_display.dart';
 
 /// Screen for guests to view their booking request status
 /// Shows all booking requests sent by the guest with their current status
@@ -203,6 +204,16 @@ class _GuestBookingRequestsScreenState
     // Always show structured UI - stats and placeholder rows even when empty
     return Column(
       children: [
+        // User Location Display
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.paddingM,
+            AppSpacing.paddingM,
+            AppSpacing.paddingM,
+            AppSpacing.paddingS,
+          ),
+          child: const UserLocationDisplay(),
+        ),
         _buildStatsCard(),
         Expanded(
           child: _bookingRequests.isEmpty

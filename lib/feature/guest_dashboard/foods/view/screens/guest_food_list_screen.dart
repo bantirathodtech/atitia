@@ -15,6 +15,7 @@ import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../feature/owner_dashboard/foods/data/models/owner_food_menu.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/user_location_display.dart';
 import '../../viewmodel/guest_food_viewmodel.dart';
 
 /// 🍽️ **GUEST FOOD MENU SCREEN - PRODUCTION READY**
@@ -134,6 +135,16 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     return SingleChildScrollView(
       child: Column(
         children: [
+          // User Location Display
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.paddingM,
+              AppSpacing.paddingM,
+              AppSpacing.paddingM,
+              AppSpacing.paddingS,
+            ),
+            child: const UserLocationDisplay(),
+          ),
           // Day tabs
           Container(
             color: isDarkMode ? AppColors.darkCard : AppColors.surface,
