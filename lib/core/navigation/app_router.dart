@@ -10,6 +10,7 @@ import '../../../feature/auth/view/screen/splash/splash_screen.dart';
 import '../../../feature/guest_dashboard/complaints/view/screens/guest_complaint_add_screen.dart';
 import '../../../feature/guest_dashboard/guest_dashboard.dart';
 import '../../../feature/guest_dashboard/payments/view/screens/guest_payment_detail_screen.dart';
+import '../../../feature/guest_dashboard/payments/view/screens/guest_payment_history_screen.dart';
 import '../../../feature/guest_dashboard/pgs/view/screens/guest_pg_detail_screen.dart';
 import '../../../feature/guest_dashboard/pgs/view/screens/guest_room_bed_screen.dart';
 import '../../../feature/guest_dashboard/profile/view/screens/guest_profile_screen.dart';
@@ -137,6 +138,12 @@ class AppRouter {
             name: AppRoutes.guestPayments,
             builder: (context, state) => const GuestDashboardScreen(),
             routes: [
+              // Payment History Route
+              GoRoute(
+                path: 'history',
+                name: AppRoutes.guestPaymentHistory,
+                builder: (context, state) => const GuestPaymentHistoryScreen(),
+              ),
               // Payment Details Route - Nested under payments to properly push on top
               GoRoute(
                 path: ':paymentId',

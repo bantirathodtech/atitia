@@ -143,6 +143,9 @@ class AppRoutes {
   /// Build route for adding a new payment
   static String guestPaymentAdd() => '$guestPayments/add';
 
+  /// Build route for payment history
+  static const String guestPaymentHistory = '$guestPayments/history';
+
   // MARK: - Utility Methods
   // ==========================================
 

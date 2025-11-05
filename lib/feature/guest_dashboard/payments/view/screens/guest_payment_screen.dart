@@ -3,12 +3,14 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
+import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
@@ -212,7 +214,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       color: Colors.white,
                     ),
                     onPressed: () {
-                      // TODO: Navigate to payment history
+                      context.push(AppRoutes.guestPaymentHistory);
                     },
                   ),
                 ],
