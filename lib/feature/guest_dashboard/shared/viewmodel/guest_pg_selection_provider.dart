@@ -5,6 +5,8 @@
 // Provides centralized state management for PG selection and booking requests
 // ============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
@@ -17,6 +19,11 @@ import '../../pgs/data/models/guest_pg_model.dart';
 class GuestPgSelectionProvider extends ChangeNotifier {
   final _analyticsService = getIt.analytics;
   final _notificationRepository = NotificationRepository();
+  final _localStorage = getIt.localStorage;
+  
+  // Storage keys for PG selection persistence
+  static const String _storageKeyPgId = 'guest_selected_pg_id';
+  static const String _storageKeyPgData = 'guest_selected_pg_data';
 
   GuestPgModel? _selectedPg;
   String? _selectedPgId;
@@ -218,21 +225,104 @@ class GuestPgSelectionProvider extends ChangeNotifier {
   }
 
   /// Loads saved PG selection from local storage
+  /// Restores the selected PG from persisted data on app startup
   Future<void> _loadSavedPgSelection() async {
-    // TODO: Implement local storage loading when LocalStorageService is available
-    // For now, we'll skip this functionality
+    try {
+      // Read saved PG data from local storage
+      final savedPgData = await _localStorage.read(_storageKeyPgData);
+      
+      if (savedPgData == null || savedPgData.isEmpty) {
+        // No saved PG selection found
+        return;
+      }
+
+      // Deserialize JSON to Map
+      final pgMap = jsonDecode(savedPgData) as Map<String, dynamic>;
+      
+      // Create GuestPgModel from saved data
+      final savedPg = GuestPgModel.fromMap(pgMap);
+      
+      // Restore selection (without triggering save to avoid loops)
+      _selectedPg = savedPg;
+      _selectedPgId = savedPg.pgId;
+
+      _analyticsService.logEvent(
+        name: 'guest_pg_selection_restored',
+        parameters: {
+          'pg_id': savedPg.pgId,
+          'pg_name': savedPg.pgName,
+        },
+      );
+    } catch (e) {
+      // If loading fails, clear corrupted data
+      await _clearSavedPgSelection();
+      
+      _analyticsService.logEvent(
+        name: 'guest_pg_selection_restore_failed',
+        parameters: {
+          'error': e.toString(),
+        },
+      );
+    }
   }
 
   /// Saves current PG selection to local storage
+  /// Persists the selected PG data for restoration on app restart
   Future<void> _savePgSelection() async {
-    // TODO: Implement local storage saving when LocalStorageService is available
-    // For now, we'll skip this functionality
+    try {
+      if (_selectedPg == null) {
+        // No PG selected, clear saved data
+        await _clearSavedPgSelection();
+        return;
+      }
+
+      // Serialize PG model to JSON
+      final pgMap = _selectedPg!.toMap();
+      final pgJson = jsonEncode(pgMap);
+
+      // Save both ID and full data for redundancy
+      await _localStorage.write(_storageKeyPgId, _selectedPgId!);
+      await _localStorage.write(_storageKeyPgData, pgJson);
+
+      _analyticsService.logEvent(
+        name: 'guest_pg_selection_saved',
+        parameters: {
+          'pg_id': _selectedPgId!,
+          'pg_name': _selectedPg!.pgName,
+        },
+      );
+    } catch (e) {
+      // Log error but don't throw - persistence failure shouldn't break selection
+      _analyticsService.logEvent(
+        name: 'guest_pg_selection_save_failed',
+        parameters: {
+          'error': e.toString(),
+          'pg_id': _selectedPgId ?? 'none',
+        },
+      );
+    }
   }
 
   /// Clears saved PG selection from local storage
+  /// Removes persisted PG data when selection is cleared
   Future<void> _clearSavedPgSelection() async {
-    // TODO: Implement local storage clearing when LocalStorageService is available
-    // For now, we'll skip this functionality
+    try {
+      await _localStorage.delete(_storageKeyPgId);
+      await _localStorage.delete(_storageKeyPgData);
+
+      _analyticsService.logEvent(
+        name: 'guest_pg_selection_cleared_storage',
+        parameters: {},
+      );
+    } catch (e) {
+      // Log error but don't throw - clearing failure is not critical
+      _analyticsService.logEvent(
+        name: 'guest_pg_selection_clear_failed',
+        parameters: {
+          'error': e.toString(),
+        },
+      );
+    }
   }
 
   /// Sets loading state
