@@ -1,7 +1,7 @@
 // ============================================================================
-// Owner Notifications Screen
+// Guest Notifications Screen
 // ============================================================================
-// Notifications screen for owner users with real-time Firestore data
+// Notifications screen for guest users with real-time Firestore data
 // ============================================================================
 
 import 'package:flutter/material.dart';
@@ -11,23 +11,23 @@ import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
-import '../../../shared/widgets/owner_drawer.dart';
-import '../../../../../common/widgets/text/body_text.dart';
-import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
+import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../core/viewmodels/notification_viewmodel.dart';
+import '../../../shared/widgets/guest_drawer.dart';
 
-/// Notifications screen for owners
-class OwnerNotificationsScreen extends StatefulWidget {
-  const OwnerNotificationsScreen({super.key});
+/// Notifications screen for guests
+class GuestNotificationsScreen extends StatefulWidget {
+  const GuestNotificationsScreen({super.key});
 
   @override
-  State<OwnerNotificationsScreen> createState() =>
-      _OwnerNotificationsScreenState();
+  State<GuestNotificationsScreen> createState() =>
+      _GuestNotificationsScreenState();
 }
 
-class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
+class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
   String _selectedFilter = 'All';
 
   @override
@@ -61,9 +61,7 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
           ),
         ],
       ),
-      drawer: const OwnerDrawer(
-        currentTabIndex: 0,
-      ),
+      drawer: const GuestDrawer(),
       body: Consumer<NotificationViewModel>(
         builder: (context, viewModel, _) {
           if (viewModel.loading && viewModel.notifications.isEmpty) {
@@ -145,6 +143,8 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
             _buildFilterChip('Complaints'),
             const SizedBox(width: AppSpacing.paddingS),
             _buildFilterChip('Bed Changes'),
+            const SizedBox(width: AppSpacing.paddingS),
+            _buildFilterChip('PG Updates'),
             const SizedBox(width: AppSpacing.paddingS),
             _buildFilterChip('Services'),
           ],
@@ -246,16 +246,26 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
 
   Color _getNotificationColor(String type) {
     switch (type) {
-      case 'booking_request':
-        return AppColors.secondary;
-      case 'payment_received':
+      case 'booking_approved':
         return Colors.green;
-      case 'complaint_filed':
+      case 'booking_rejected':
         return Colors.red;
-      case 'bed_change_request':
-        return Colors.blue;
-      case 'service_request':
+      case 'payment_reminder':
         return Colors.orange;
+      case 'payment_confirmed':
+        return Colors.green;
+      case 'payment_overdue':
+        return Colors.red;
+      case 'complaint_response':
+        return Colors.blue;
+      case 'bed_change_approved':
+        return Colors.green;
+      case 'bed_change_rejected':
+        return Colors.red;
+      case 'pg_announcement':
+        return AppColors.secondary;
+      case 'service_response':
+        return Colors.blue;
       default:
         return AppColors.primary;
     }
@@ -263,15 +273,25 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
 
   IconData _getNotificationIcon(String type) {
     switch (type) {
-      case 'booking_request':
-        return Icons.hotel;
-      case 'payment_received':
-        return Icons.payment;
-      case 'complaint_filed':
-        return Icons.report_problem;
-      case 'bed_change_request':
-        return Icons.bed;
-      case 'service_request':
+      case 'booking_approved':
+        return Icons.check_circle;
+      case 'booking_rejected':
+        return Icons.cancel;
+      case 'payment_reminder':
+        return Icons.notifications_active;
+      case 'payment_confirmed':
+        return Icons.verified;
+      case 'payment_overdue':
+        return Icons.warning;
+      case 'complaint_response':
+        return Icons.reply;
+      case 'bed_change_approved':
+        return Icons.check_circle;
+      case 'bed_change_rejected':
+        return Icons.cancel;
+      case 'pg_announcement':
+        return Icons.announcement;
+      case 'service_response':
         return Icons.build;
       default:
         return Icons.notifications;
@@ -294,4 +314,3 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
   }
 
 }
-

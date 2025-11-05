@@ -998,11 +998,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
         _showGuestDetails(context, guestVM, guest);
         break;
       case 'edit':
-        // TODO: Navigate to edit guest screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: BodyText(text: 'Edit guest functionality coming soon')),
-        );
+        _editGuest(context, guestVM, guest);
         break;
       case 'message':
         _sendMessageToGuest(context, guestVM, guest);

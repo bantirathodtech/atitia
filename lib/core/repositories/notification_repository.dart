@@ -61,4 +61,86 @@ class NotificationRepository {
       },
     );
   }
+
+  /// Stream notifications for a specific user in real-time
+  /// Returns notifications ordered by creation date (newest first)
+  Stream<List<Map<String, dynamic>>> streamNotificationsForUser(String userId) {
+    return _databaseService
+        .getCollectionStreamWithFilter(
+          FirestoreConstants.notifications,
+          'userId',
+          userId,
+        )
+        .map((snapshot) {
+      final notifications = snapshot.docs
+          .map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return {
+              ...data,
+              'id': data['id'] ?? doc.id,
+              'timestamp': _parseTimestamp(data['createdAt']),
+            };
+          })
+          .toList();
+
+      // Sort by timestamp (newest first)
+      notifications.sort((a, b) {
+        final aTime = a['timestamp'] as DateTime? ?? DateTime(1970);
+        final bTime = b['timestamp'] as DateTime? ?? DateTime(1970);
+        return bTime.compareTo(aTime);
+      });
+
+      return notifications;
+    });
+  }
+
+  /// Mark a notification as read
+  Future<void> markNotificationAsRead(String notificationId) async {
+    await _databaseService.updateDocument(
+      FirestoreConstants.notifications,
+      notificationId,
+      {
+        'read': true,
+        'updatedAt': DateServiceConverter.toService(DateTime.now()),
+      },
+    );
+  }
+
+  /// Mark all notifications as read for a user
+  Future<void> markAllNotificationsAsRead(String userId) async {
+    // Get all notifications for the user
+    final snapshot = await _databaseService.queryDocuments(
+      FirestoreConstants.notifications,
+      field: 'userId',
+      isEqualTo: userId,
+    );
+
+    final batch = <String>[];
+    for (final doc in snapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      if (data['read'] != true) {
+        batch.add(doc.id);
+      }
+    }
+
+    // Update all unread notifications
+    for (final notificationId in batch) {
+      await markNotificationAsRead(notificationId);
+    }
+  }
+
+  /// Parse timestamp from Firestore data
+  DateTime? _parseTimestamp(dynamic timestamp) {
+    if (timestamp == null) return null;
+    if (timestamp is DateTime) return timestamp;
+    if (timestamp is int) return DateTime.fromMillisecondsSinceEpoch(timestamp);
+    if (timestamp is String) {
+      try {
+        return DateTime.parse(timestamp);
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
 }

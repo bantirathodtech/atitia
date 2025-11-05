@@ -136,13 +136,16 @@ class PaymentNotificationModel {
   String get formattedAmount => '₹${amount.toStringAsFixed(2)}';
 
   String get paymentMethodDisplay {
-    switch (paymentMethod) {
+    switch (paymentMethod.toLowerCase()) {
+      case 'razorpay':
+        return 'Razorpay';
+      case 'upi':
       case 'upi_qr':
-        return 'UPI QR Code';
-      case 'bank_transfer':
-        return 'Bank Transfer';
+        return 'UPI Payment';
       case 'cash':
         return 'Cash';
+      case 'bank_transfer':
+        return 'Bank Transfer';
       case 'other':
         return 'Other';
       default:

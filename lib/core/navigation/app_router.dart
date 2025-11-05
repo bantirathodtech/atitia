@@ -10,12 +10,13 @@ import '../../../feature/auth/view/screen/splash/splash_screen.dart';
 import '../../../feature/guest_dashboard/complaints/view/screens/guest_complaint_add_screen.dart';
 import '../../../feature/guest_dashboard/guest_dashboard.dart';
 import '../../../feature/guest_dashboard/payments/view/screens/guest_payment_detail_screen.dart';
+import '../../../feature/guest_dashboard/payments/view/screens/guest_payment_history_screen.dart';
 import '../../../feature/guest_dashboard/pgs/view/screens/guest_pg_detail_screen.dart';
 import '../../../feature/guest_dashboard/pgs/view/screens/guest_room_bed_screen.dart';
 import '../../../feature/guest_dashboard/profile/view/screens/guest_profile_screen.dart';
 import '../../../feature/guest_dashboard/settings/view/screens/guest_settings_screen.dart';
 import '../../../feature/guest_dashboard/help/view/screens/guest_help_screen.dart';
-import '../../../common/widgets/notifications/notifications_screen.dart';
+import '../../../feature/guest_dashboard/notifications/view/screens/guest_notifications_screen.dart';
 import '../../../feature/owner_dashboard/foods/view/screens/owner_food_management_screen.dart';
 import '../../../feature/owner_dashboard/guests/view/screens/owner_guest_management_screen.dart';
 import '../../../feature/owner_dashboard/mypg/presentation/screens/owner_pg_management_screen.dart';
@@ -27,6 +28,8 @@ import '../../../feature/owner_dashboard/notifications/view/screens/owner_notifi
 import '../../../feature/owner_dashboard/help/view/screens/owner_help_screen.dart';
 import '../../../feature/owner_dashboard/analytics/screens/owner_analytics_dashboard.dart';
 import '../../../feature/owner_dashboard/reports/view/screens/owner_reports_screen.dart';
+import '../../common/screens/privacy_policy_screen.dart';
+import '../../common/screens/terms_of_service_screen.dart';
 import '../../common/utils/constants/routes.dart';
 import '../../common/utils/logging/logging_helper.dart';
 import '../../../feature/auth/logic/auth_provider.dart';
@@ -81,12 +84,13 @@ class AppRouter {
           // But don't redirect if we're navigating to a detail route
           final matched = state.matchedLocation;
           final fullPath = state.uri.path;
-          
+
           // Don't redirect if we're on a detail route (has :pgId, :paymentId, etc.)
           if (fullPath.contains('/pgs/') && fullPath.split('/').length > 3) {
             return null; // This is a detail route, don't redirect
           }
-          if (fullPath.contains('/payments/') && fullPath.split('/').length > 3) {
+          if (fullPath.contains('/payments/') &&
+              fullPath.split('/').length > 3) {
             return null; // This is a detail route, don't redirect
           }
           if (fullPath.contains('/complaints/add') ||
@@ -95,9 +99,10 @@ class AppRouter {
               fullPath.contains('/room-bed')) {
             return null; // These are full-screen routes, don't redirect
           }
-          
+
           // Only redirect if we're exactly at /guest
-          if (matched == AppRoutes.guestHome || matched == '${AppRoutes.guestHome}/') {
+          if (matched == AppRoutes.guestHome ||
+              matched == '${AppRoutes.guestHome}/') {
             return AppRoutes.guestPGs;
           }
           return null;
@@ -133,6 +138,12 @@ class AppRouter {
             name: AppRoutes.guestPayments,
             builder: (context, state) => const GuestDashboardScreen(),
             routes: [
+              // Payment History Route
+              GoRoute(
+                path: 'history',
+                name: AppRoutes.guestPaymentHistory,
+                builder: (context, state) => const GuestPaymentHistoryScreen(),
+              ),
               // Payment Details Route - Nested under payments to properly push on top
               GoRoute(
                 path: ':paymentId',
@@ -174,7 +185,7 @@ class AppRouter {
           GoRoute(
             path: 'notifications',
             name: AppRoutes.guestNotifications,
-            builder: (context, state) => const NotificationsScreen(),
+            builder: (context, state) => const GuestNotificationsScreen(),
           ),
           // Room/Bed Management Route
           GoRoute(
@@ -264,6 +275,18 @@ class AppRouter {
             builder: (context, state) => const OwnerReportsScreen(),
           ),
         ],
+      ),
+
+      // Common screens (accessible from both guest and owner)
+      GoRoute(
+        path: AppRoutes.privacyPolicy,
+        name: AppRoutes.privacyPolicy,
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.termsOfService,
+        name: AppRoutes.termsOfService,
+        builder: (context, state) => const TermsOfServiceScreen(),
       ),
     ],
 

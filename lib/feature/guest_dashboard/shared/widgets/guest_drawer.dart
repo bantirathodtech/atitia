@@ -7,12 +7,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'adaptive_drawer.dart';
-import '../../../feature/auth/logic/auth_provider.dart';
-import '../../../core/app/theme/theme_provider.dart';
-import '../../../core/app/localization/locale_provider.dart';
-import '../../../core/navigation/navigation_service.dart';
-import '../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../common/widgets/drawers/adaptive_drawer.dart';
+import '../../../../core/app/localization/locale_provider.dart';
+import '../../../../core/app/theme/theme_provider.dart';
+import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/navigation/navigation_service.dart';
+import '../../../auth/logic/auth_provider.dart';
 
 class GuestDrawer extends StatelessWidget {
   /// Navigation callback when drawer items are tapped
@@ -47,9 +47,39 @@ class GuestDrawer extends StatelessWidget {
   void _handleDrawerNavigation(BuildContext context, String item) {
     switch (item) {
       case 'home':
-        // Navigate to guest dashboard home
+        // Navigate to guest dashboard home (PGs tab)
         if (onNavigationTap != null) {
           onNavigationTap!(0); // PG List tab
+        }
+        break;
+      case 'pgs':
+        // Navigate to PGs tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(0); // PGs tab
+        }
+        break;
+      case 'foods':
+        // Navigate to Foods tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(1); // Foods tab
+        }
+        break;
+      case 'payments':
+        // Navigate to Payments tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(2); // Payments tab
+        }
+        break;
+      case 'requests':
+        // Navigate to Requests tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(3); // Requests tab
+        }
+        break;
+      case 'complaints':
+        // Navigate to Complaints tab
+        if (onNavigationTap != null) {
+          onNavigationTap!(4); // Complaints tab
         }
         break;
       case 'profile':

@@ -14,6 +14,8 @@ class OwnerPaymentDetailsModel {
   final String? ifscCode;
   final String? upiId;
   final String? upiQrCodeUrl; // URL to uploaded QR code image
+  final String? razorpayKey; // Razorpay API key for payment processing
+  final bool razorpayEnabled; // Whether Razorpay is enabled for this owner
   final String? paymentNote; // Additional instructions for guests
   final bool isActive;
   final DateTime? lastUpdated;
@@ -26,6 +28,8 @@ class OwnerPaymentDetailsModel {
     this.ifscCode,
     this.upiId,
     this.upiQrCodeUrl,
+    this.razorpayKey,
+    this.razorpayEnabled = false,
     this.paymentNote,
     this.isActive = true,
     this.lastUpdated,
@@ -40,6 +44,8 @@ class OwnerPaymentDetailsModel {
       ifscCode: map['ifscCode'] as String?,
       upiId: map['upiId'] as String?,
       upiQrCodeUrl: map['upiQrCodeUrl'] as String?,
+      razorpayKey: map['razorpayKey'] as String?,
+      razorpayEnabled: map['razorpayEnabled'] as bool? ?? false,
       paymentNote: map['paymentNote'] as String?,
       isActive: map['isActive'] as bool? ?? true,
       lastUpdated: map['lastUpdated'] != null
@@ -57,6 +63,8 @@ class OwnerPaymentDetailsModel {
       'ifscCode': ifscCode,
       'upiId': upiId,
       'upiQrCodeUrl': upiQrCodeUrl,
+      'razorpayKey': razorpayKey,
+      'razorpayEnabled': razorpayEnabled,
       'paymentNote': paymentNote,
       'isActive': isActive,
       'lastUpdated':
@@ -72,6 +80,8 @@ class OwnerPaymentDetailsModel {
     String? ifscCode,
     String? upiId,
     String? upiQrCodeUrl,
+    String? razorpayKey,
+    bool? razorpayEnabled,
     String? paymentNote,
     bool? isActive,
     DateTime? lastUpdated,
@@ -84,6 +94,8 @@ class OwnerPaymentDetailsModel {
       ifscCode: ifscCode ?? this.ifscCode,
       upiId: upiId ?? this.upiId,
       upiQrCodeUrl: upiQrCodeUrl ?? this.upiQrCodeUrl,
+      razorpayKey: razorpayKey ?? this.razorpayKey,
+      razorpayEnabled: razorpayEnabled ?? this.razorpayEnabled,
       paymentNote: paymentNote ?? this.paymentNote,
       isActive: isActive ?? this.isActive,
       lastUpdated: lastUpdated ?? this.lastUpdated,

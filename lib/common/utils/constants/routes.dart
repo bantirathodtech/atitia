@@ -66,6 +66,12 @@ class AppRoutes {
   /// Guest help & support: '/guest/help'
   static const String guestHelp = '$guestHome/help';
 
+  /// Privacy Policy: '/privacy-policy'
+  static const String privacyPolicy = '/privacy-policy';
+
+  /// Terms of Service: '/terms-of-service'
+  static const String termsOfService = '/terms-of-service';
+
   // MARK: - Owner Feature Routes
   // ==========================================
 
@@ -136,6 +142,9 @@ class AppRoutes {
 
   /// Build route for adding a new payment
   static String guestPaymentAdd() => '$guestPayments/add';
+
+  /// Build route for payment history
+  static const String guestPaymentHistory = '$guestPayments/history';
 
   // MARK: - Utility Methods
   // ==========================================

@@ -1,10 +1,14 @@
 // lib/features/guest_dashboard/payments/view/screens/guest_payment_detail_screen.dart
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/utils/helpers/image_picker_helper.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
@@ -15,8 +19,13 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../core/repositories/owner_payment_details_repository.dart';
+import '../../../../../core/services/payment/razorpay_service.dart';
+import '../../../../../core/viewmodels/payment_notification_viewmodel.dart';
+import '../../../../../feature/auth/logic/auth_provider.dart';
 import '../../data/models/guest_payment_model.dart';
 import '../../viewmodel/guest_payment_viewmodel.dart';
+import '../../view/widgets/payment_method_selection_dialog.dart';
 
 /// Screen displaying detailed information for a specific payment
 /// Shows comprehensive payment details, status, and actions
@@ -37,11 +46,46 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
   GuestPaymentModel? _payment;
   bool _isLoading = true;
   String? _error;
+  bool _processingPayment = false;
+  bool _razorpayEnabled = false;
+  final _razorpayService = RazorpayService();
+  final _ownerPaymentRepo = OwnerPaymentDetailsRepository();
 
   @override
   void initState() {
     super.initState();
     _loadPaymentDetails();
+    _loadOwnerPaymentDetails();
+    _razorpayService.initialize();
+  }
+
+  @override
+  void dispose() {
+    _razorpayService.dispose();
+    super.dispose();
+  }
+
+  /// Load owner payment details to check if Razorpay is enabled
+  Future<void> _loadOwnerPaymentDetails() async {
+    if (_payment == null || _payment!.ownerId.isEmpty) {
+      return;
+    }
+
+    try {
+      final details = await _ownerPaymentRepo.getPaymentDetails(_payment!.ownerId);
+      if (mounted) {
+        setState(() {
+          _razorpayEnabled = details?.razorpayEnabled ?? false;
+        });
+      }
+    } catch (e) {
+      // Silently fail - Razorpay will just be disabled
+      if (mounted) {
+        setState(() {
+          _razorpayEnabled = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadPaymentDetails() async {
@@ -56,6 +100,10 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
           _isLoading = false;
           _error = payment == null ? 'Payment not found' : null;
         });
+        // Load owner payment details after payment is loaded
+        if (payment != null) {
+          _loadOwnerPaymentDetails();
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -334,9 +382,9 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
       children: [
         if (_payment!.status == 'Pending') ...[
           PrimaryButton(
-            onPressed: () => _processPayment(context),
-            label: 'Pay Now',
-            icon: Icons.payment,
+            onPressed: _processingPayment ? null : () => _processPayment(context),
+            label: _processingPayment ? 'Processing...' : 'Pay Now',
+            icon: _processingPayment ? null : Icons.payment,
             width: double.infinity,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -375,65 +423,404 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
   }
 
   void _processPayment(BuildContext context) async {
-    final paymentVM =
-        Provider.of<GuestPaymentViewModel>(context, listen: false);
-
     // Show payment method selection dialog
-    final paymentMethod = await _showPaymentMethodDialog(context);
-    if (paymentMethod != null) {
-      final success =
-          await paymentVM.processPayment(_payment!.paymentId, paymentMethod);
+    final paymentMethod = await PaymentMethodSelectionDialog.show(
+      context,
+      razorpayEnabled: _razorpayEnabled,
+    );
 
+    if (paymentMethod == null) {
+      return;
+    }
+
+    // Process payment based on selected method
+    switch (paymentMethod) {
+      case PaymentMethodType.razorpay:
+        await _processRazorpayPayment(context);
+        break;
+      case PaymentMethodType.upi:
+        await _processUPIPayment(context);
+        break;
+      case PaymentMethodType.cash:
+        await _processCashPayment(context);
+        break;
+    }
+  }
+
+  /// Process Razorpay payment
+  Future<void> _processRazorpayPayment(BuildContext context) async {
+    if (_payment == null || _payment!.ownerId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid payment or owner information not available.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _processingPayment = true);
+
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final amount = _payment!.amount;
+      final orderId = 'order_${_payment!.paymentId}_${DateTime.now().millisecondsSinceEpoch}';
+
+      // Open Razorpay payment
+      await _razorpayService.openPayment(
+        amount: (amount * 100).toInt(), // Convert to paise
+        orderId: orderId,
+        ownerId: _payment!.ownerId,
+        description: _payment!.description,
+        userName: authProvider.user?.fullName ?? 'Guest',
+        userEmail: authProvider.user?.email,
+        userPhone: authProvider.user?.phoneNumber,
+        onSuccess: (orderId, response) async {
+      // Payment successful - update payment with Razorpay details
+      final paymentVM = context.read<GuestPaymentViewModel>();
+      final updatedPayment = _payment!.copyWith(
+        status: 'Paid',
+        transactionId: response.paymentId,
+        razorpayOrderId: orderId,
+        razorpayPaymentId: response.paymentId,
+        paymentMethod: 'razorpay',
+        updatedAt: DateTime.now(),
+      );
+      await paymentVM.updatePayment(updatedPayment);
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Payment successful!'),
+                backgroundColor: AppColors.success,
+              ),
+            );
+            // Refresh payment details
+            await _loadPaymentDetails();
+          }
+        },
+        onFailure: (response) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Payment failed: ${response.message}'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        },
+      );
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success
-                ? 'Payment processed successfully!'
-                : 'Payment failed. Please try again.'),
-            backgroundColor: success ? Colors.green : Colors.red,
+            content: Text('Failed to process payment: $e'),
+            backgroundColor: AppColors.error,
           ),
         );
-
-        if (success) {
-          // Refresh payment details
-          await _loadPaymentDetails();
-        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _processingPayment = false);
       }
     }
   }
 
-  Future<String?> _showPaymentMethodDialog(BuildContext context) async {
-    return showDialog<String>(
+  /// Process UPI payment (requires screenshot)
+  Future<void> _processUPIPayment(BuildContext context) async {
+    // Show dialog to upload screenshot and optionally enter transaction ID
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => _UPIPaymentDialog(
+        payment: _payment!,
+        onConfirm: (screenshot, transactionId) {
+          Navigator.of(context).pop({
+            'screenshot': screenshot,
+            'transactionId': transactionId,
+          });
+        },
+      ),
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    setState(() => _processingPayment = true);
+
+    try {
+      final paymentVM = context.read<GuestPaymentViewModel>();
+      final paymentNotificationVM = context.read<PaymentNotificationViewModel>();
+      final authProvider = context.read<AuthProvider>();
+      final screenshot = result['screenshot'];
+      final transactionId = result['transactionId'] as String?;
+
+      // Send payment notification to owner (handles screenshot upload internally)
+      await paymentNotificationVM.sendPaymentNotification(
+        guestId: authProvider.user!.userId,
+        ownerId: _payment!.ownerId,
+        pgId: _payment!.pgId,
+        bookingId: _payment!.bookingId,
+        amount: _payment!.amount,
+        paymentMethod: 'upi',
+        transactionId: transactionId,
+        paymentScreenshot: screenshot,
+        paymentNote: 'UPI payment made. Please verify and confirm.',
+      );
+
+      // Update payment status as "Confirmed" (pending owner verification)
+      // Screenshot URL will be updated by the notification system
+      final updatedPayment = _payment!.copyWith(
+        status: 'Confirmed', // UPI payments need owner confirmation
+        transactionId: transactionId,
+        paymentMethod: 'upi',
+        updatedAt: DateTime.now(),
+      );
+      await paymentVM.updatePayment(updatedPayment);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('UPI payment notification sent. Owner will verify and confirm.'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        await _loadPaymentDetails();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to process UPI payment: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _processingPayment = false);
+      }
+    }
+  }
+
+  /// Process Cash payment
+  Future<void> _processCashPayment(BuildContext context) async {
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: HeadingMedium(text: 'Select Payment Method'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.account_balance_wallet),
-              title: const Text('UPI'),
-              onTap: () => Navigator.of(context).pop('UPI'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.credit_card),
-              title: const Text('Credit Card'),
-              onTap: () => Navigator.of(context).pop('Credit Card'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_balance),
-              title: const Text('Net Banking'),
-              onTap: () => Navigator.of(context).pop('Net Banking'),
-            ),
-          ],
+        title: const HeadingMedium(text: 'Cash Payment Confirmation'),
+        content: const BodyText(
+          text: 'Have you paid the amount in cash to the owner? Owner will confirm once they receive the payment.',
         ),
         actions: [
           SecondaryButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(context).pop(false),
             label: 'Cancel',
+          ),
+          PrimaryButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            label: 'Yes, Paid',
           ),
         ],
       ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    setState(() => _processingPayment = true);
+
+    try {
+      final paymentVM = context.read<GuestPaymentViewModel>();
+      final paymentNotificationVM = context.read<PaymentNotificationViewModel>();
+      final authProvider = context.read<AuthProvider>();
+
+      // Send cash payment notification to owner
+      await paymentNotificationVM.sendPaymentNotification(
+        guestId: authProvider.user!.userId,
+        ownerId: _payment!.ownerId,
+        pgId: _payment!.pgId,
+        bookingId: _payment!.bookingId,
+        amount: _payment!.amount,
+        paymentMethod: 'cash',
+        paymentNote: 'Cash payment made. Please confirm.',
+      );
+
+      // Update payment status as "Confirmed" (pending owner confirmation)
+      final updatedPayment = _payment!.copyWith(
+        status: 'Confirmed', // Cash payments need owner confirmation
+        paymentMethod: 'cash',
+        updatedAt: DateTime.now(),
+      );
+      await paymentVM.updatePayment(updatedPayment);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cash payment notification sent. Owner will confirm once they receive the payment.'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        await _loadPaymentDetails();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to process cash payment: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _processingPayment = false);
+      }
+    }
+  }
+}
+
+/// UPI Payment Dialog Widget
+class _UPIPaymentDialog extends StatefulWidget {
+  final GuestPaymentModel payment;
+  final Function(dynamic screenshot, String? transactionId) onConfirm;
+
+  const _UPIPaymentDialog({
+    required this.payment,
+    required this.onConfirm,
+  });
+
+  @override
+  State<_UPIPaymentDialog> createState() => _UPIPaymentDialogState();
+}
+
+class _UPIPaymentDialogState extends State<_UPIPaymentDialog> {
+  dynamic _screenshotFile;
+  final _transactionIdController = TextEditingController();
+  bool _uploading = false;
+
+  @override
+  void dispose() {
+    _transactionIdController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickScreenshot() async {
+    try {
+      setState(() => _uploading = true);
+      final file = await ImagePickerHelper.pickImageFromGallery();
+      if (file != null && mounted) {
+        setState(() {
+          _screenshotFile = file;
+          _uploading = false;
+        });
+      } else {
+        if (mounted) {
+          setState(() => _uploading = false);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _uploading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to pick image: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const HeadingMedium(text: 'UPI Payment'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BodyText(
+              text: 'Amount: ${widget.payment.formattedAmount}',
+              medium: true,
+            ),
+            const SizedBox(height: AppSpacing.paddingM),
+            BodyText(
+              text: 'Upload Payment Screenshot',
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(height: AppSpacing.paddingS),
+            if (_screenshotFile != null) ...[
+              Container(
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.outline),
+                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                  child: Image.file(
+                    _screenshotFile is String ? File(_screenshotFile) : _screenshotFile,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.paddingS),
+              TextButton.icon(
+                onPressed: _pickScreenshot,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Change Screenshot'),
+              ),
+            ] else ...[
+              PrimaryButton(
+                onPressed: _uploading ? null : _pickScreenshot,
+                label: _uploading ? 'Uploading...' : 'Upload Screenshot',
+                icon: Icons.upload_file,
+                width: double.infinity,
+              ),
+            ],
+            const SizedBox(height: AppSpacing.paddingM),
+            TextField(
+              controller: _transactionIdController,
+              decoration: const InputDecoration(
+                labelText: 'Transaction ID (Optional)',
+                hintText: 'Transaction ID is visible in screenshot',
+                border: OutlineInputBorder(),
+                helperText: 'You can skip this - transaction ID is in the screenshot',
+              ),
+            ),
+            const SizedBox(height: AppSpacing.paddingS),
+            BodyText(
+              text: '💡 Tip: After making payment via PhonePe, Paytm, Google Pay, etc., upload the payment screenshot. The transaction ID is already visible in the screenshot.',
+              color: AppColors.textSecondary,
+              small: true,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        SecondaryButton(
+          onPressed: () => Navigator.of(context).pop(),
+          label: 'Cancel',
+        ),
+        PrimaryButton(
+          onPressed: _screenshotFile == null
+              ? null
+              : () {
+                  widget.onConfirm(
+                    _screenshotFile,
+                    _transactionIdController.text.isEmpty
+                        ? null
+                        : _transactionIdController.text,
+                  );
+                },
+          label: 'Confirm',
+        ),
+      ],
     );
   }
 }

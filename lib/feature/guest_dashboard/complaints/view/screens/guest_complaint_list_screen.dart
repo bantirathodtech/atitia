@@ -7,14 +7,15 @@ import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/drawers/guest_drawer.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/loaders/shimmer_loader.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
 import '../../../../auth/logic/auth_provider.dart';
+import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/user_location_display.dart';
 import '../../viewmodel/guest_complaint_viewmodel.dart';
 import '../widgets/guest_complaint_card.dart';
 
@@ -125,6 +126,11 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
         children: [
+          // User Location Display
+          const Padding(
+            padding: EdgeInsets.only(bottom: AppSpacing.paddingM),
+            child: UserLocationDisplay(),
+          ),
           _buildFilterChips(context, complaintVM),
           const SizedBox(height: AppSpacing.paddingM),
           _buildComplaintsList(context, complaintVM),

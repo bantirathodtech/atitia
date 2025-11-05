@@ -7,6 +7,7 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/foundation.dart';
 
 import '../../di/firebase/di/firebase_service_locator.dart';
+import '../../../common/constants/environment_config.dart';
 
 /// Security hardening service for advanced security features
 /// Provides encryption, data protection, and security monitoring
@@ -382,8 +383,60 @@ class SecurityHardeningService {
   /// Check for hardcoded secrets (basic implementation)
   bool _hasHardcodedSecrets() {
     // This is a basic check - in production, you'd use more sophisticated tools
-    // In a real implementation, you'd scan the codebase for suspicious patterns
-    return false; // Placeholder
+    // like git-secrets, truffleHog, or similar secret scanning tools
+    
+    // Basic validation: Check if EnvironmentConfig is properly configured
+    // and doesn't contain obvious placeholder values
+    
+    try {
+      // Import EnvironmentConfig to check for secrets
+      // Note: We can't actually scan source code at runtime, so we check
+      // that configuration is properly set up
+      
+      // Check Firebase project configuration
+      final projectId = EnvironmentConfig.firebaseProjectId;
+      
+      // Common patterns that indicate hardcoded secrets or placeholders:
+      // - Empty strings
+      // - "example", "test", "placeholder", "your-project-id"
+      // - API keys that look like placeholders
+      
+      final suspiciousPatterns = [
+        'example',
+        'test',
+        'placeholder',
+        'your-',
+        'demo',
+        'sample',
+        'changeme',
+        'todo',
+      ];
+      
+      // Check if project ID contains suspicious patterns
+      final projectIdLower = projectId.toLowerCase();
+      for (final pattern in suspiciousPatterns) {
+        if (projectIdLower.contains(pattern)) {
+          return true; // Suspicious pattern detected
+        }
+      }
+      
+      // Check if project ID is empty or too short (likely placeholder)
+      if (projectId.isEmpty || projectId.length < 5) {
+        return true; // Invalid project ID
+      }
+      
+      // In a full implementation, you would:
+      // 1. Scan source code files for API key patterns (e.g., "AIza", "sk-", etc.)
+      // 2. Check for hardcoded passwords or tokens
+      // 3. Verify no secrets in version control
+      // 4. Use static analysis tools to detect secrets
+      
+      return false; // No obvious hardcoded secrets detected
+    } catch (e) {
+      // If we can't check, assume there might be issues
+      // In production, this should be logged and investigated
+      return true;
+    }
   }
 
   /// Calculate risk level

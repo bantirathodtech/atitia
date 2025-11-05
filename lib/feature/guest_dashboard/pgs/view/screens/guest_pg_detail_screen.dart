@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../common/styles/spacing.dart';
@@ -1179,11 +1180,77 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     }
   }
 
-  /// Share PG
-  void _sharePG(BuildContext context, dynamic pg) {
-    // TODO: Implement sharing functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sharing functionality coming soon!')),
-    );
+  /// Share PG details using system share
+  Future<void> _sharePG(BuildContext context, dynamic pg) async {
+    if (pg == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('PG information not available')),
+      );
+      return;
+    }
+
+    try {
+      // Build shareable text with PG details
+      final StringBuffer shareText = StringBuffer();
+      shareText.writeln('🏠 ${pg.pgName ?? 'PG Property'}');
+      shareText.writeln();
+      
+      if (pg.pgAddress != null && pg.pgAddress.isNotEmpty) {
+        shareText.writeln('📍 Address: ${pg.pgAddress}');
+      }
+      
+      // Add pricing information if available
+      final pricing = pg.pricing ?? {};
+      final rentConfig = pg.rentConfig ?? {};
+      
+      if (rentConfig.isNotEmpty || pricing.isNotEmpty) {
+        shareText.writeln();
+        shareText.writeln('💰 Pricing:');
+        
+        // Show sharing options from rentConfig
+        if (rentConfig['oneShare'] != null && (rentConfig['oneShare'] as num) > 0) {
+          shareText.writeln('1 Share: ₹${rentConfig['oneShare']}');
+        }
+        if (rentConfig['twoShare'] != null && (rentConfig['twoShare'] as num) > 0) {
+          shareText.writeln('2 Share: ₹${rentConfig['twoShare']}');
+        }
+        if (rentConfig['threeShare'] != null && (rentConfig['threeShare'] as num) > 0) {
+          shareText.writeln('3 Share: ₹${rentConfig['threeShare']}');
+        }
+      }
+      
+      // Add amenities if available
+      if (pg.amenities != null && (pg.amenities as List).isNotEmpty) {
+        shareText.writeln();
+        shareText.writeln('✨ Amenities: ${(pg.amenities as List).join(", ")}');
+      }
+      
+      shareText.writeln();
+      shareText.writeln('Check out this PG on Atitia!');
+      
+      // Share using share_plus
+      await Share.share(
+        shareText.toString(),
+        subject: '${pg.pgName ?? "PG Property"} - Atitia',
+      );
+      
+      // Log analytics
+      getIt.analytics.logEvent(
+        name: 'pg_shared',
+        parameters: {
+          'pg_id': pg.pgId ?? '',
+          'pg_name': pg.pgName ?? '',
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to share: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 }

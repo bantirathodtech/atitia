@@ -1,33 +1,94 @@
 // lib/core/navigation/guards/route_guard.dart
 
+import 'package:flutter/foundation.dart';
 import '../../../../common/utils/constants/routes.dart';
+import '../../../../common/utils/constants/firestore.dart';
 import '../../../core/di/firebase/di/firebase_service_locator.dart' as di;
 
 /// Route guard utility for authentication and role-based access control
 class RouteGuard {
   /// Checks if user is authenticated
+  /// Validates Firebase Auth session exists and is valid
   static bool isAuthenticated() {
     try {
       final authUser = di.getIt.auth.currentUser;
-      return authUser != null;
+      if (authUser == null) {
+        debugPrint('🔒 RouteGuard: No authenticated user found');
+        return false;
+      }
+      
+      // Additional validation: ensure user ID is not empty
+      if (authUser.uid.isEmpty) {
+        debugPrint('🔒 RouteGuard: Invalid user ID (empty)');
+        return false;
+      }
+      
+      return true;
     } catch (e) {
+      debugPrint('🔒 RouteGuard: Authentication check failed: $e');
       return false;
     }
   }
 
-  /// Gets current user role from AuthProvider
-  /// Returns 'guest', 'owner', or null if not authenticated
-  static String? getUserRole() {
+  /// Gets current user role from Firestore
+  /// Returns 'guest', 'owner', or null if not authenticated or role not found
+  /// 
+  /// This method:
+  /// 1. Checks if user is authenticated via Firebase Auth
+  /// 2. Fetches user document from Firestore 'users' collection
+  /// 3. Extracts and returns the 'role' field
+  /// 4. Handles errors gracefully with proper logging
+  static Future<String?> getUserRole() async {
     try {
-      // Try to get role from cached user data
+      // Check authentication first
       final authUser = di.getIt.auth.currentUser;
-      if (authUser == null) return null;
+      if (authUser == null) {
+        debugPrint('🔒 RouteGuard: Cannot get role - user not authenticated');
+        return null;
+      }
 
-      // Get user data from Firestore
-      // For now, we'll need to read from a state/context
-      // This will be enhanced when we have access to AuthProvider context
-      return null; // Placeholder - will be enhanced with AuthProvider access
+      final userId = authUser.uid;
+      if (userId.isEmpty) {
+        debugPrint('🔒 RouteGuard: Cannot get role - invalid user ID');
+        return null;
+      }
+
+      // Get Firestore service and fetch user document
+      final firestoreService = di.getIt.firestore;
+      final userDoc = await firestoreService.getDocument(
+        FirestoreConstants.users,
+        userId,
+      );
+
+      // Check if document exists
+      if (!userDoc.exists) {
+        debugPrint('🔒 RouteGuard: User document not found in Firestore for userId: $userId');
+        return null;
+      }
+
+      // Extract role from document data
+      final userData = userDoc.data() as Map<String, dynamic>?;
+      if (userData == null) {
+        debugPrint('🔒 RouteGuard: User document data is null for userId: $userId');
+        return null;
+      }
+
+      final role = userData['role'] as String?;
+      if (role == null || role.isEmpty) {
+        debugPrint('🔒 RouteGuard: Role field is missing or empty for userId: $userId');
+        return null;
+      }
+
+      // Validate role is either 'guest' or 'owner'
+      if (role != 'guest' && role != 'owner') {
+        debugPrint('🔒 RouteGuard: Invalid role value "$role" for userId: $userId');
+        return null;
+      }
+
+      debugPrint('🔒 RouteGuard: Successfully retrieved role "$role" for userId: $userId');
+      return role;
     } catch (e) {
+      debugPrint('🔒 RouteGuard: Error getting user role: $e');
       return null;
     }
   }

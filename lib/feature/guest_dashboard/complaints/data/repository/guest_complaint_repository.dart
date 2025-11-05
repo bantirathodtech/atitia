@@ -6,6 +6,7 @@ import '../../../../../common/utils/constants/firestore.dart';
 import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/interfaces/storage/storage_service_interface.dart';
+import '../../../../../core/repositories/notification_repository.dart';
 import '../models/guest_complaint_model.dart';
 
 /// Repository layer for guest complaints data operations
@@ -14,16 +15,20 @@ import '../models/guest_complaint_model.dart';
 class GuestComplaintRepository {
   final IDatabaseService _databaseService;
   final IStorageService _storageService;
+  final NotificationRepository _notificationRepository;
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
   GuestComplaintRepository({
     IDatabaseService? databaseService,
     IStorageService? storageService,
+    NotificationRepository? notificationRepository,
   })  : _databaseService =
             databaseService ?? UnifiedServiceLocator.serviceFactory.database,
         _storageService =
-            storageService ?? UnifiedServiceLocator.serviceFactory.storage;
+            storageService ?? UnifiedServiceLocator.serviceFactory.storage,
+        _notificationRepository =
+            notificationRepository ?? NotificationRepository();
 
   /// Streams complaints for a specific guest with real-time updates
   /// Uses Firestore query to filter complaints by guestId
@@ -49,6 +54,39 @@ class GuestComplaintRepository {
       complaint.complaintId,
       complaint.toMap(),
     );
+
+    // Notify owner about new complaint if ownerId is available
+    // Note: ownerId might be null initially, so we'll need to get it from PG
+    if (complaint.pgId.isNotEmpty) {
+      try {
+        // Get owner ID from PG document
+        final pgDoc = await _databaseService.getDocument(
+          FirestoreConstants.pgs,
+          complaint.pgId,
+        );
+        final pgData = pgDoc.data() as Map<String, dynamic>?;
+        final ownerId = pgData?['ownerUid'] as String? ?? pgData?['ownerId'] as String?;
+
+        if (ownerId != null && ownerId.isNotEmpty) {
+          await _notificationRepository.sendUserNotification(
+            userId: ownerId,
+            type: 'complaint_filed',
+            title: 'New Complaint Filed',
+            body: 'Guest filed a complaint: ${complaint.subject}',
+            data: {
+              'complaintId': complaint.complaintId,
+              'pgId': complaint.pgId,
+              'guestId': complaint.guestId,
+              'subject': complaint.subject,
+              'status': complaint.status,
+            },
+          );
+        }
+      } catch (e) {
+        // Log but don't fail the complaint if notification fails
+        // Notification failure is non-critical
+      }
+    }
   }
 
   /// Updates an existing complaint document in Firestore

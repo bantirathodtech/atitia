@@ -1,27 +1,34 @@
 // lib/features/guest_dashboard/payments/view/screens/guest_payment_screen.dart
 
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'dart:typed_data';
 
-import '../../../../../common/styles/spacing.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
 import '../../../../../common/styles/colors.dart';
-import '../../../../../common/widgets/loaders/shimmer_loader.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
-import '../../../../../common/widgets/text/heading_small.dart';
-import '../../../../../common/widgets/text/body_text.dart';
-import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/utils/helpers/image_picker_helper.dart';
+import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
-import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/drawers/guest_drawer.dart';
-import '../../../../../common/utils/helpers/image_picker_helper.dart';
-import '../../../shared/widgets/guest_pg_appbar_display.dart';
-import '../../../../../core/viewmodels/payment_notification_viewmodel.dart';
-import '../../../../../core/repositories/owner_payment_details_repository.dart';
+import '../../../../../common/widgets/loaders/shimmer_loader.dart';
+import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../core/models/owner_payment_details_model.dart';
+import '../../../../../core/repositories/owner_payment_details_repository.dart';
+import '../../../../../core/viewmodels/payment_notification_viewmodel.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
+import '../../../../../feature/owner_dashboard/myguest/data/models/owner_booking_request_model.dart';
+import '../../../../../feature/owner_dashboard/myguest/data/repository/owner_booking_request_repository.dart';
+import '../../../../../core/services/payment/razorpay_service.dart';
+import '../../view/widgets/payment_method_selection_dialog.dart';
+import '../../../shared/viewmodel/guest_pg_selection_provider.dart';
+import '../../../shared/widgets/guest_drawer.dart';
+import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/user_location_display.dart';
 
 /// 💰 **GUEST PAYMENT SCREEN - PRODUCTION READY**
 ///
@@ -58,17 +65,31 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
       if (authProvider.user?.userId != null) {
         paymentVM.streamGuestNotifications(authProvider.user!.userId);
-        // TODO: Load owner details from guest's booked PG
-        _loadOwnerPaymentDetails(
-            'blg5v21mbvb6U70xUpzrfKVjYh13'); // Demo owner ID
+        // Load owner details from guest's selected PG
+        _loadOwnerPaymentDetailsFromSelectedPg();
       }
     });
   }
 
-  Future<void> _loadOwnerPaymentDetails(String ownerId) async {
+  /// Loads owner payment details from guest's selected PG
+  Future<void> _loadOwnerPaymentDetailsFromSelectedPg() async {
+    final pgProvider = Provider.of<GuestPgSelectionProvider>(context, listen: false);
+    final selectedPg = pgProvider.selectedPg;
+    
+    if (selectedPg == null || selectedPg.ownerUid.isEmpty) {
+      // No PG selected, clear payment details
+      if (mounted) {
+        setState(() {
+          _ownerPaymentDetails = null;
+          _loadingOwnerDetails = false;
+        });
+      }
+      return;
+    }
+
     setState(() => _loadingOwnerDetails = true);
     try {
-      final details = await _ownerPaymentRepo.getPaymentDetails(ownerId);
+      final details = await _ownerPaymentRepo.getPaymentDetails(selectedPg.ownerUid);
       if (mounted) {
         setState(() {
           _ownerPaymentDetails = details;
@@ -142,134 +163,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     );
   }
 
-  /// 🎨 Premium App Bar (non-sliver version)
-  Widget _buildPremiumAppBar(BuildContext context, bool isDarkMode) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDarkMode
-              ? [
-                  AppColors.primary.withValues(alpha: 0.8),
-                  AppColors.primary.withValues(alpha: 0.6),
-                ]
-              : [
-                  AppColors.primary,
-                  AppColors.primary.withValues(alpha: 0.8),
-                ],
-        ),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Payments',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.history,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      // TODO: Navigate to payment history
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Manage your payments',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 🎨 Premium Sliver App Bar (kept for compatibility)
-  Widget _buildPremiumSliverAppBar(BuildContext context, bool isDarkMode) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
-
-    return SliverAppBar(
-      expandedHeight: 180,
-      floating: false,
-      pinned: true,
-      stretch: true,
-      backgroundColor: isDarkMode ? AppColors.darkCard : primaryColor,
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
-        title: HeadingMedium(
-          text: 'Payments',
-          color: AppColors.textOnPrimary,
-        ),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDarkMode
-                  ? [
-                      AppColors.darkCard,
-                      AppColors.darkCard.withValues(alpha: 0.9)
-                    ]
-                  : [primaryColor, primaryColor.withValues(alpha: 0.8)],
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              Icon(
-                Icons.account_balance_wallet,
-                size: 48,
-                color: AppColors.textOnPrimary.withValues(alpha: 0.9),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Payment Management',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: AppColors.textOnPrimary.withValues(alpha: 0.9),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.info_outline, color: AppColors.textOnPrimary),
-          onPressed: () => _showPaymentInfo(context),
-          tooltip: 'Payment Info',
-        ),
-      ],
-    );
-  }
+  
 
   /// 📊 Tab Bar
   Widget _buildTabBar(BuildContext context, bool isDarkMode) {
@@ -311,13 +205,18 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
       return _buildEmptyState(context);
     }
 
-    return ListView.builder(
+    return ListView(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
-      itemCount: paymentVM.notifications.length,
-      itemBuilder: (context, index) {
-        final notification = paymentVM.notifications[index];
-        return _buildPaymentCard(context, notification, isDarkMode);
-      },
+      children: [
+        // User Location Display
+        const Padding(
+          padding: EdgeInsets.only(bottom: AppSpacing.paddingM),
+          child: UserLocationDisplay(),
+        ),
+        ...paymentVM.notifications.map((notification) => 
+          _buildPaymentCard(context, notification, isDarkMode)
+        ),
+      ],
     );
   }
 
@@ -521,6 +420,11 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // User Location Display
+          const Padding(
+            padding: EdgeInsets.only(bottom: AppSpacing.paddingM),
+            child: UserLocationDisplay(),
+          ),
           _buildOwnerPaymentDetails(context),
           const SizedBox(height: AppSpacing.paddingL),
           _buildSendPaymentForm(context),
@@ -1274,44 +1178,50 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   }
 
   /// Dialog: Send payment
-  void _showSendPaymentDialog(BuildContext context) {
+  void _showSendPaymentDialog(BuildContext context) async {
+    // Get owner payment details to check if Razorpay is enabled
+    final pgProvider = context.read<GuestPgSelectionProvider>();
+    final selectedPg = pgProvider.selectedPg;
+    
+    bool razorpayEnabled = false;
+    if (selectedPg != null && selectedPg.ownerUid.isNotEmpty) {
+      try {
+        final paymentDetails = await _ownerPaymentRepo.getPaymentDetails(selectedPg.ownerUid);
+        razorpayEnabled = paymentDetails?.razorpayEnabled ?? false;
+      } catch (e) {
+        // If error fetching, default to false
+        razorpayEnabled = false;
+      }
+    }
+    
+    // Show payment method selection first
+    final selectedMethod = await PaymentMethodSelectionDialog.show(
+      context,
+      razorpayEnabled: razorpayEnabled,
+    );
+    
+    if (selectedMethod != null && mounted) {
+      // Show payment form based on selected method
     showDialog(
       context: context,
-      builder: (context) => const SendPaymentDialog(),
+        builder: (context) => SendPaymentDialog(
+          paymentMethod: selectedMethod,
+        ),
     );
+    }
   }
 
-  /// Dialog: Payment info
-  void _showPaymentInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Payment Information'),
-        content: const SingleChildScrollView(
-          child: Text(
-            'To make a payment:\n\n'
-            '1. View owner\'s payment details (UPI/Bank)\n'
-            '2. Make payment using your preferred method\n'
-            '3. Take screenshot of payment confirmation\n'
-            '4. Send payment notification with screenshot\n'
-            '5. Wait for owner confirmation\n\n'
-            'Owner will confirm once they receive the payment.',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Got it'),
-          ),
-        ],
-      ),
-    );
-  }
+  
 }
 
 /// Dialog for sending payment notification
 class SendPaymentDialog extends StatefulWidget {
-  const SendPaymentDialog({super.key});
+  final PaymentMethodType paymentMethod;
+
+  const SendPaymentDialog({
+    super.key,
+    required this.paymentMethod,
+  });
 
   @override
   State<SendPaymentDialog> createState() => _SendPaymentDialogState();
@@ -1322,12 +1232,25 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
   final _amountController = TextEditingController();
   final _messageController = TextEditingController();
   final _transactionIdController = TextEditingController();
-  String _paymentMethod = 'UPI';
+  final _bookingRequestRepo = OwnerBookingRequestRepository();
+  final _razorpayService = RazorpayService();
   dynamic _screenshotFile;
   bool _sending = false;
+  bool _processingRazorpay = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    if (widget.paymentMethod == PaymentMethodType.razorpay) {
+      _razorpayService.initialize();
+    }
+  }
 
   @override
   void dispose() {
+    if (widget.paymentMethod == PaymentMethodType.razorpay) {
+      _razorpayService.dispose();
+    }
     _amountController.dispose();
     _messageController.dispose();
     _transactionIdController.dispose();
@@ -1339,13 +1262,15 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      title: const Text('Send Payment Notification'),
+      title: Text(_getDialogTitle()),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Amount field (required for all methods)
               TextFormField(
                 controller: _amountController,
                 decoration: const InputDecoration(
@@ -1365,31 +1290,47 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                 },
               ),
               const SizedBox(height: AppSpacing.paddingM),
-              DropdownButtonFormField<String>(
-                initialValue: _paymentMethod,
-                decoration: const InputDecoration(
-                  labelText: 'Payment Method',
-                  border: OutlineInputBorder(),
-                ),
-                items: const [
-                  DropdownMenuItem(value: 'UPI', child: Text('UPI')),
-                  DropdownMenuItem(
-                      value: 'Bank Transfer', child: Text('Bank Transfer')),
-                  DropdownMenuItem(value: 'Cash', child: Text('Cash')),
-                ],
-                onChanged: (value) {
-                  setState(() => _paymentMethod = value!);
-                },
-              ),
+              
+              // Method-specific fields
+              if (widget.paymentMethod == PaymentMethodType.upi) ...[
+                // UPI: Screenshot (required) - Transaction ID is visible in screenshot
+                _buildScreenshotUpload(context, theme),
               const SizedBox(height: AppSpacing.paddingM),
+                // Transaction ID field is optional - screenshot already contains it
               TextFormField(
                 controller: _transactionIdController,
                 decoration: const InputDecoration(
                   labelText: 'Transaction ID (Optional)',
+                    hintText: 'Not required - already visible in screenshot',
                   border: OutlineInputBorder(),
+                    helperText: 'You can skip this - transaction ID is in the screenshot',
                 ),
               ),
               const SizedBox(height: AppSpacing.paddingM),
+                BodyText(
+                  text: '💡 Tip: After making payment via PhonePe, Paytm, Google Pay, etc., upload the payment screenshot. The transaction ID is already visible in the screenshot, so you don\'t need to enter it separately.',
+                  color: AppColors.textSecondary,
+                  small: true,
+                ),
+              ] else if (widget.paymentMethod == PaymentMethodType.cash) ...[
+                // Cash: Message only
+                BodyText(
+                  text: 'You will send a cash payment notification to the owner. Owner will confirm once they receive the cash.',
+                  color: AppColors.textSecondary,
+                  small: true,
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+              ] else if (widget.paymentMethod == PaymentMethodType.razorpay) ...[
+                // Razorpay: No additional fields needed
+                BodyText(
+                  text: 'Click "Pay Now" to proceed with secure online payment via Razorpay.',
+                  color: AppColors.textSecondary,
+                  small: true,
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+              ],
+              
+              // Message field (optional for all methods)
               TextFormField(
                 controller: _messageController,
                 decoration: const InputDecoration(
@@ -1398,68 +1339,116 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                 ),
                 maxLines: 3,
               ),
-              const SizedBox(height: AppSpacing.paddingM),
-              if (_screenshotFile != null)
-                FutureBuilder<Uint8List>(
-                  future: _screenshotFile.readAsBytes(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Container(
-                        height: 150,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.borderRadiusM),
-                          border: Border.all(color: theme.primaryColor),
-                        ),
-                        child: ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.borderRadiusM),
-                          child: Image.memory(
-                            snapshot.data!,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    }
-                    return Container(
-                      height: 150,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.borderRadiusM),
-                        border: Border.all(color: theme.primaryColor),
-                      ),
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
-                )
-              else
-                OutlinedButton.icon(
-                  onPressed: _pickScreenshot,
-                  icon: const Icon(Icons.upload_file),
-                  label: const Text('Upload Screenshot'),
-                ),
             ],
           ),
         ),
       ),
       actions: [
         TextButton(
-          onPressed: _sending ? null : () => Navigator.pop(context),
+          onPressed: (_sending || _processingRazorpay) ? null : () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: _sending ? null : _sendPayment,
-          child: _sending
+          onPressed: (_sending || _processingRazorpay) ? null : _handlePayment,
+          child: (_sending || _processingRazorpay)
               ? const SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Send'),
+              : Text(_getButtonText()),
         ),
       ],
+    );
+  }
+  
+  String _getDialogTitle() {
+    switch (widget.paymentMethod) {
+      case PaymentMethodType.razorpay:
+        return 'Pay via Razorpay';
+      case PaymentMethodType.upi:
+        return 'UPI Payment Confirmation';
+      case PaymentMethodType.cash:
+        return 'Cash Payment Notification';
+    }
+  }
+  
+  String _getButtonText() {
+    switch (widget.paymentMethod) {
+      case PaymentMethodType.razorpay:
+        return 'Pay Now';
+      case PaymentMethodType.upi:
+        return 'Send Payment';
+      case PaymentMethodType.cash:
+        return 'Send Notification';
+    }
+  }
+  
+  Widget _buildScreenshotUpload(BuildContext context, ThemeData theme) {
+    if (_screenshotFile != null) {
+      return FutureBuilder<Uint8List>(
+                  future: _screenshotFile.readAsBytes(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                        height: 150,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                          border: Border.all(color: theme.primaryColor),
+                        ),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                          child: Image.memory(
+                            snapshot.data!,
+                            fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 150,
+                        ),
+                      ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () {
+                            setState(() => _screenshotFile = null);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                BodyText(
+                  text: 'Screenshot uploaded',
+                  color: AppColors.success,
+                  small: true,
+                ),
+              ],
+                      );
+                    }
+                    return Container(
+                      height: 150,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                        border: Border.all(color: theme.primaryColor),
+                      ),
+                      child: const Center(child: CircularProgressIndicator()),
+                    );
+                  },
+      );
+    }
+    return OutlinedButton.icon(
+                  onPressed: _pickScreenshot,
+                  icon: const Icon(Icons.upload_file),
+      label: const Text('Upload Payment Screenshot'),
     );
   }
 
@@ -1470,37 +1459,261 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     }
   }
 
-  Future<void> _sendPayment() async {
+  /// Gets the first approved booking request ID for the selected PG
+  Future<String> _getApprovedBookingRequestId(String guestId, String pgId) async {
+    try {
+      // Use stream to get booking requests, then take first value
+      final requestsStream = _bookingRequestRepo.streamGuestBookingRequests(guestId);
+      final requests = await requestsStream.first.timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => <OwnerBookingRequestModel>[],
+      );
+      
+      // Find the first approved booking request for the selected PG
+      final approvedRequest = requests.firstWhere(
+        (request) => request.pgId == pgId && request.status == 'approved',
+        orElse: () => throw StateError('No approved booking found'),
+      );
+      return approvedRequest.requestId;
+    } catch (e) {
+      // If no approved booking found, generate a fallback booking ID
+      return 'booking_${guestId}_${pgId}_${DateTime.now().millisecondsSinceEpoch}';
+    }
+  }
+
+  /// Handle payment based on selected method
+  Future<void> _handlePayment() async {
+    switch (widget.paymentMethod) {
+      case PaymentMethodType.razorpay:
+        await _processRazorpayPayment();
+        break;
+      case PaymentMethodType.upi:
+        await _sendUpiPayment();
+        break;
+      case PaymentMethodType.cash:
+        await _sendCashPayment();
+        break;
+    }
+  }
+  
+  /// Process Razorpay payment
+  Future<void> _processRazorpayPayment() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Get PG selection and validate
+    final pgProvider = context.read<GuestPgSelectionProvider>();
+    final selectedPg = pgProvider.selectedPg;
+    final selectedPgId = pgProvider.selectedPgId;
+
+    if (selectedPg == null || selectedPgId == null || selectedPgId.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a PG first'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (selectedPg.ownerUid.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid PG selection. Owner information not available.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => _processingRazorpay = true);
+
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final guestId = authProvider.user!.userId;
+      final amount = double.parse(_amountController.text);
+      final orderId = 'order_${guestId}_${DateTime.now().millisecondsSinceEpoch}';
+
+      // Open Razorpay payment
+      await _razorpayService.openPayment(
+        amount: (amount * 100).toInt(), // Convert to paise
+        orderId: orderId,
+        ownerId: selectedPg.ownerUid, // Pass owner ID to fetch Razorpay key
+        description: _messageController.text.isEmpty
+            ? 'PG Payment'
+            : _messageController.text,
+        userName: authProvider.user?.fullName ?? 'Guest',
+        userEmail: authProvider.user?.email,
+        userPhone: authProvider.user?.phoneNumber,
+        onSuccess: (orderId, response) async {
+          // Payment successful - create payment record and notification
+          await _sendPaymentNotification(
+            paymentMethod: 'razorpay',
+            transactionId: response.paymentId,
+            razorpayOrderId: orderId,
+            razorpayPaymentId: response.paymentId,
+          );
+          
+          if (mounted) {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Payment successful! Owner will be notified.'),
+                backgroundColor: AppColors.success,
+              ),
+            );
+          }
+        },
+        onFailure: (response) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Payment failed: ${response.message}'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to process payment: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _processingRazorpay = false);
+      }
+    }
+  }
+  
+  /// Send UPI payment notification with screenshot
+  Future<void> _sendUpiPayment() async {
+    if (!_formKey.currentState!.validate()) return;
+    
+    // For UPI, screenshot is required as it contains the transaction ID
+    // Transaction ID field is optional - owner can extract it from screenshot if needed
+    if (_screenshotFile == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please upload payment screenshot. Transaction ID is visible in the screenshot.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    await _sendPaymentNotification(
+      paymentMethod: 'upi',
+      transactionId: _transactionIdController.text.isEmpty
+          ? null
+          : _transactionIdController.text,
+      paymentScreenshot: _screenshotFile,
+    );
+  }
+  
+  /// Send cash payment notification
+  Future<void> _sendCashPayment() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    await _sendPaymentNotification(
+      paymentMethod: 'cash',
+    );
+  }
+  
+  /// Common method to send payment notification
+  Future<void> _sendPaymentNotification({
+    required String paymentMethod,
+    String? transactionId,
+    String? razorpayOrderId,
+    String? razorpayPaymentId,
+    dynamic paymentScreenshot,
+  }) async {
+    // Get PG selection and validate
+    final pgProvider = context.read<GuestPgSelectionProvider>();
+    final selectedPg = pgProvider.selectedPg;
+    final selectedPgId = pgProvider.selectedPgId;
+
+    if (selectedPg == null || selectedPgId == null || selectedPgId.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a PG first'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (selectedPg.ownerUid.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid PG selection. Owner information not available.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
 
     setState(() => _sending = true);
 
     try {
       final authProvider = context.read<AuthProvider>();
       final paymentVM = context.read<PaymentNotificationViewModel>();
+      final guestId = authProvider.user!.userId;
+
+      // Get booking ID from approved booking request (or generate fallback)
+      final bookingId = await _getApprovedBookingRequestId(guestId, selectedPgId);
+
+      // Map payment method type to string
+      String paymentMethodString;
+      switch (widget.paymentMethod) {
+        case PaymentMethodType.razorpay:
+          paymentMethodString = 'razorpay';
+          break;
+        case PaymentMethodType.upi:
+          paymentMethodString = 'upi';
+          break;
+        case PaymentMethodType.cash:
+          paymentMethodString = 'cash';
+          break;
+      }
 
       await paymentVM.sendPaymentNotification(
-        guestId: authProvider.user!.userId,
-        ownerId: 'blg5v21mbvb6U70xUpzrfKVjYh13', // TODO: Get from booking
-        pgId:
-            'blg5v21mbvb6U70xUpzrfKVjYh13_pg_1760205806856', // TODO: Get from booking
-        bookingId:
-            'booking_demo_${DateTime.now().millisecondsSinceEpoch}', // TODO: Get from actual booking
+        guestId: guestId,
+        ownerId: selectedPg.ownerUid,
+        pgId: selectedPgId,
+        bookingId: bookingId,
         amount: double.parse(_amountController.text),
-        paymentMethod: _paymentMethod,
-        transactionId: _transactionIdController.text.isEmpty
+        paymentMethod: paymentMethodString,
+        transactionId: transactionId,
+        paymentNote: _messageController.text.isEmpty
             ? null
-            : _transactionIdController.text,
-        paymentNote:
-            _messageController.text.isEmpty ? null : _messageController.text,
-        paymentScreenshot: _screenshotFile,
+            : _messageController.text,
+        paymentScreenshot: paymentScreenshot,
       );
 
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Payment notification sent successfully'),
+          SnackBar(
+            content: Text(
+              widget.paymentMethod == PaymentMethodType.cash
+                  ? 'Cash payment notification sent. Owner will confirm once they receive the payment.'
+                  : 'Payment notification sent successfully',
+            ),
             backgroundColor: AppColors.success,
           ),
         );
@@ -1520,4 +1733,6 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       }
     }
   }
+
 }
+

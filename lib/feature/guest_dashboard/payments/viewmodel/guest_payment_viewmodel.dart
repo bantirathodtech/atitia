@@ -323,73 +323,28 @@ class GuestPaymentViewModel extends BaseProviderState
     }
   }
 
-  /// Process payment (simulate payment gateway integration)
+  /// Process payment (DEPRECATED - Use real payment gateways instead)
+  /// 
+  /// **⚠️ DEPRECATED:** This method used simulation and has been replaced with
+  /// real payment gateway integration (Razorpay, UPI, Cash).
+  /// 
+  /// **Migration:** Use the payment method selection dialog in payment screens
+  /// which handles real payment gateways:
+  /// - Razorpay: For online payments (if enabled by owner)
+  /// - UPI: With screenshot upload and owner confirmation
+  /// - Cash: With owner confirmation
+  /// 
+  /// This method is kept for backward compatibility but should not be used
+  /// in new code. All payment processing now uses real gateways.
+  @Deprecated('Use real payment gateways (Razorpay/UPI/Cash) instead of simulation')
   Future<bool> processPayment(String paymentId, String paymentMethod) async {
-    try {
-      setLoading(true);
-
-      // Simulate payment processing delay
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Simulate payment success (90% success rate)
-      final isSuccess = DateTime.now().millisecond % 10 < 9;
-
-      if (isSuccess) {
-        // Generate mock transaction ID
-        final transactionId = 'TXN${DateTime.now().millisecondsSinceEpoch}';
-        final upiReferenceId = paymentMethod == 'UPI'
-            ? 'UPI${DateTime.now().millisecondsSinceEpoch}'
-            : null;
-
-        await updatePaymentStatus(
-          paymentId,
-          'Paid',
-          transactionId: transactionId,
-          upiReferenceId: upiReferenceId,
-        );
-
-        // Track successful payment
-        await _analyticsService.logEvent(
-          name: 'payment_processed_successfully',
-          parameters: {
-            'payment_id': paymentId,
-            'payment_method': paymentMethod,
-            'transaction_id': transactionId,
-          },
-        );
-
-        return true;
-      } else {
-        await updatePaymentStatus(paymentId, 'Failed');
-
-        // Track failed payment
-        await _analyticsService.logEvent(
-          name: 'payment_processing_failed',
-          parameters: {
-            'payment_id': paymentId,
-            'payment_method': paymentMethod,
-          },
-        );
-
-        return false;
-      }
-    } catch (e) {
-      setError(true, 'Payment processing failed: $e');
-
-      // Track payment processing error
-      await _analyticsService.logEvent(
-        name: 'payment_processing_error',
-        parameters: {
-          'error': e.toString(),
-          'payment_id': paymentId,
-          'payment_method': paymentMethod,
-        },
-      );
-
-      return false;
-    } finally {
-      setLoading(false);
-    }
+    // This method is deprecated - real payment gateways should be used
+    // For backward compatibility, this now throws an exception
+    throw UnimplementedError(
+      'Payment simulation is deprecated. '
+      'Please use real payment gateways (Razorpay, UPI, or Cash) '
+      'via the payment method selection dialog in payment screens.',
+    );
   }
 
   /// Refresh payment data

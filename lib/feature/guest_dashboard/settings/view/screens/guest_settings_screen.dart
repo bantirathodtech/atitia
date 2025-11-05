@@ -5,18 +5,20 @@
 // ============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/drawers/guest_drawer.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../common/widgets/dropdowns/language_selector.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../core/app/theme/theme_provider.dart';
-import '../../../../../common/widgets/dropdowns/language_selector.dart';
+import '../../../shared/widgets/guest_drawer.dart';
 
 /// Settings screen for guests
 class GuestSettingsScreen extends StatelessWidget {
@@ -66,8 +68,8 @@ class GuestSettingsScreen extends StatelessWidget {
                 const SizedBox(height: AppSpacing.paddingS),
                 _buildSwitchTile(
                   context,
-                  title: 'Booking Updates',
-                  subtitle: 'Get updates about your bookings',
+                  title: 'Payment Reminders',
+                  subtitle: 'Get reminders for pending payments',
                   value: true,
                   onChanged: (value) {},
                 ),
@@ -83,7 +85,7 @@ class GuestSettingsScreen extends StatelessWidget {
                   title: 'Privacy Policy',
                   icon: Icons.privacy_tip_outlined,
                   onTap: () {
-                    // TODO: Navigate to privacy policy
+                    context.push(AppRoutes.privacyPolicy);
                   },
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
@@ -92,7 +94,7 @@ class GuestSettingsScreen extends StatelessWidget {
                   title: 'Terms of Service',
                   icon: Icons.description_outlined,
                   onTap: () {
-                    // TODO: Navigate to terms of service
+                    context.push(AppRoutes.termsOfService);
                   },
                 ),
               ],
@@ -312,4 +314,3 @@ class GuestSettingsScreen extends StatelessWidget {
     );
   }
 }
-

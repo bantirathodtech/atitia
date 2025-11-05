@@ -1031,23 +1031,35 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
             ),
           ]
         : [
-            // Guest items - keep My Profile, Notifications, Settings for guests
+            // Guest dashboard tabs - remove My Profile, Notifications, Settings (already in header)
             DrawerMenuItem(
-              id: 'profile',
-              label: 'My Profile',
-              icon: Icons.person_outline,
+              id: 'pgs',
+              label: 'PGs',
+              icon: Icons.apartment,
               section: 'user',
             ),
             DrawerMenuItem(
-              id: 'notifications',
-              label: 'Notifications',
-              icon: Icons.notifications_outlined,
+              id: 'foods',
+              label: 'Foods',
+              icon: Icons.restaurant_menu,
               section: 'user',
             ),
             DrawerMenuItem(
-              id: 'settings',
-              label: 'Settings',
-              icon: Icons.settings_outlined,
+              id: 'payments',
+              label: 'Payments',
+              icon: Icons.payment,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'requests',
+              label: 'Requests',
+              icon: Icons.request_page,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'complaints',
+              label: 'Complaints',
+              icon: Icons.report_problem,
               section: 'user',
             ),
           ];
