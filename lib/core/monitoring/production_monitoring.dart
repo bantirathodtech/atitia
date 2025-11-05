@@ -115,7 +115,7 @@ class ProductionMonitoring {
 
     // Print to console if debug logging is enabled
     if (ProductionConfig.enableDebugLogging && ProductionConfig.isDevelopment) {
-      print(
+      debugPrint(
           '[${logEntry.level.name.toUpperCase()}] ${logEntry.category}: ${logEntry.message}');
     }
 

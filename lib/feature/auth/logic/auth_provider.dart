@@ -1016,7 +1016,9 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
     try {
       _selectedRole = null;
       notifyListeners();
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Error clearing role selection: $e');
+    }
   }
 
   /// Sends OTP for login - Platform-aware implementation with retry logic
@@ -1454,7 +1456,10 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       try {
         final sampleDataCreator = SampleDataCreator();
         await sampleDataCreator.createSampleData(userId);
-      } catch (e) {}
+      } catch (e) {
+        // Non-critical error - sample data creation failed but login should continue
+        debugPrint('⚠️ Failed to create sample data for guest $userId: $e');
+      }
     });
   }
 }

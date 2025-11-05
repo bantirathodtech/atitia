@@ -1,6 +1,7 @@
 // lib/feature/owner_dashboard/guests/viewmodel/owner_guest_viewmodel.dart
 
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../data/models/owner_guest_model.dart';
@@ -314,7 +315,9 @@ class OwnerGuestViewModel extends BaseProviderState {
     try {
       _stats = await _repository.getGuestStats(ownerId, pgId: pgId);
       notifyListeners();
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('⚠️ Owner Guest ViewModel: Failed to load guest stats: $e');
+    }
   }
 
   // ==========================================================================

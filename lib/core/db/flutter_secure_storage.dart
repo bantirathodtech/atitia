@@ -8,9 +8,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// - Provide simple async get/set/delete methods
 ///
 /// Usage:
+/// ```dart
 /// final storage = ServiceLocator.locator<LocalStorageService>();
 /// await storage.write('user_uid', uid);
 /// final uid = await storage.read('user_uid');
+/// ```
 class LocalStorageService {
   final FlutterSecureStorage _secureStorage;
 

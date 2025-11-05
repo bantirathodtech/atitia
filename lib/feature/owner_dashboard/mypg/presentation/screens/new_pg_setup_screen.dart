@@ -528,7 +528,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           width: 80,
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: theme.disabledColor.withOpacity(0.2),
+            backgroundColor: theme.disabledColor.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(theme.primaryColor),
             minHeight: 4,
           ),
@@ -579,7 +579,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -1009,7 +1009,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),

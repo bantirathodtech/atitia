@@ -263,7 +263,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
             Icon(
               Icons.dashboard_outlined,
               size: 48,
-              color: theme.primaryColor.withOpacity(0.3),
+              color: theme.primaryColor.withValues(alpha: 0.3),
             ),
         ],
       ),

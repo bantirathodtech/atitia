@@ -33,7 +33,7 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       margin: const EdgeInsets.all(AppSpacing.paddingM),
-      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.05),
+      backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -174,8 +174,8 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: itemCount > 0
-                ? AppColors.success.withOpacity(isDarkMode ? 0.15 : 0.1) // Theme-aware
-                : AppColors.warning.withOpacity(isDarkMode ? 0.15 : 0.1), // Theme-aware
+                ? AppColors.success.withValues(alpha: isDarkMode ? 0.15 : 0.1) // Theme-aware
+                : AppColors.warning.withValues(alpha: isDarkMode ? 0.15 : 0.1), // Theme-aware
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
           ),
           child: BodyText(

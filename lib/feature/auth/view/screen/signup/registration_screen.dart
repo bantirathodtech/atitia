@@ -1060,7 +1060,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
             color: isDarkMode
                 ? Colors.black
                     .withValues(alpha: 0.3) // Darker shadow in dark mode
-                : Colors.black.withOpacity(0.05), // Light shadow in light mode
+                : Colors.black.withValues(alpha: 0.05), // Light shadow in light mode
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

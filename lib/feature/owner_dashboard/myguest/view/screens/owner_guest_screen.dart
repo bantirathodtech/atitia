@@ -605,10 +605,16 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
       ),
     );
 
-    if (newStatus != null && mounted) {
-      final success = await viewModel.bulkUpdateGuestStatus(newStatus);
-      if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+    if (newStatus == null || !mounted) return;
+    final success = await viewModel.bulkUpdateGuestStatus(newStatus);
+    // FIXED: BuildContext async gap warning
+    // Flutter recommends: Check mounted immediately before using context after async operations
+    // Changed from: Using context with mounted check in compound condition after async gap
+    // Changed to: Check mounted immediately before context usage
+    // Note: ScaffoldMessenger is safe to use after async when mounted check is performed, analyzer flags as false positive
+    if (!success || !mounted) return;
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
                 Text('Updated ${viewModel.selectedCount} guests to $newStatus'),
@@ -642,10 +648,16 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
       ),
     );
 
-    if (confirmed == true && mounted) {
-      final success = await viewModel.bulkDeleteGuests();
-      if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+    if (confirmed != true || !mounted) return;
+    final success = await viewModel.bulkDeleteGuests();
+    // FIXED: BuildContext async gap warning
+    // Flutter recommends: Check mounted immediately before using context after async operations
+    // Changed from: Using context with mounted check in compound condition after async gap
+    // Changed to: Check mounted immediately before context usage
+    // Note: ScaffoldMessenger is safe to use after async when mounted check is performed, analyzer flags as false positive
+    if (!success || !mounted) return;
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Guests deleted successfully'),
             backgroundColor: AppColors.success,

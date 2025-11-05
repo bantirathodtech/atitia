@@ -108,7 +108,7 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

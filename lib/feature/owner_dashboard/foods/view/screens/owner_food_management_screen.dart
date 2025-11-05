@@ -108,6 +108,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
     try {
       _selectedPgProvider?.removeListener(_onPgSelectionChanged);
     } catch (e) {
+      debugPrint('⚠️ Owner Food Management: Failed to remove listener: $e');
     }
 
     _tabController.dispose();

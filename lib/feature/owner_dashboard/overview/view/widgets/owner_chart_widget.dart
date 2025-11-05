@@ -252,7 +252,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: theme.primaryColor.withOpacity(0.3),
+                      color: theme.primaryColor.withValues(alpha: 0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),

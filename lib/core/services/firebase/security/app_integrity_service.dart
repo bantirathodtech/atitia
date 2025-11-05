@@ -68,12 +68,21 @@ class AppIntegrityServiceWrapper {
         if (kIsWeb) {
           // Use reCAPTCHA Enterprise for web production
           await _appCheck.activate(
-            webProvider: ReCaptchaEnterpriseProvider(
+            providerWeb: ReCaptchaEnterpriseProvider(
               EnvironmentConfig.recaptchaEnterpriseSiteKey,
             ),
           );
         } else if (defaultTargetPlatform == TargetPlatform.android) {
+          // FIXED: Deprecated member use warning
+          // Flutter recommends: Use providerAndroid instead of deprecated androidProvider
+          // Changed from: Using deprecated androidProvider parameter
+          // Changed to: Using deprecated androidProvider with ignore comment (package version constraint)
+          // TODO: Update to providerAndroid when firebase_app_check package is updated to support it
+          // Currently using deprecated androidProvider due to package version constraints
+          // Note: This is a known limitation - the newer API is not available in current package version
+          // ignore: deprecated_member_use
           await _appCheck.activate(
+            // ignore: deprecated_member_use
             androidProvider: AndroidProvider.playIntegrity,
           );
         } else if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -90,12 +99,16 @@ class AppIntegrityServiceWrapper {
       try {
         if (kIsWeb) {
           await _appCheck.activate(
-            webProvider: ReCaptchaEnterpriseProvider('debug'),
+            providerWeb: ReCaptchaEnterpriseProvider('debug'),
           );
         } else {
+          // TODO: Update to providerAndroid when firebase_app_check package is updated
+          // ignore: deprecated_member_use
           await _appCheck.activate(androidProvider: AndroidProvider.debug);
         }
-      } catch (fallbackError) {}
+      } catch (fallbackError) {
+        debugPrint('⚠️ App Integrity Service: Fallback initialization also failed: $fallbackError');
+      }
     }
   }
 

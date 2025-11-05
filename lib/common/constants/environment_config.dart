@@ -112,22 +112,54 @@ class EnvironmentConfig {
   // ==========================================================================
 
   /// Google Sign-In Web Client ID
+  /// ⚠️ SECRET: Store in environment variable or secure storage
+  /// Get from: Google Cloud Console → APIs & Services → Credentials
   static const String googleSignInWebClientId =
-      '665010238088-md8lcd0vv27l3r63edbaoqjcgokbpggj.apps.googleusercontent.com';
+      String.fromEnvironment('GOOGLE_SIGN_IN_WEB_CLIENT_ID',
+          defaultValue: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com');
 
   /// Google Sign-In Android Client ID
+  /// ⚠️ SECRET: Store in environment variable or secure storage
+  /// Get from: Google Cloud Console → APIs & Services → Credentials
   static const String googleSignInAndroidClientId =
-      '665010238088-27a01be236b0ad9d19a53d.apps.googleusercontent.com';
+      String.fromEnvironment('GOOGLE_SIGN_IN_ANDROID_CLIENT_ID',
+          defaultValue: 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com');
 
   /// Google Sign-In iOS Client ID
+  /// ⚠️ SECRET: Store in environment variable or secure storage
+  /// Get from: Google Cloud Console → APIs & Services → Credentials
   static const String googleSignInIosClientId =
-      '665010238088-76437d681978a96019a53d.apps.googleusercontent.com';
+      String.fromEnvironment('GOOGLE_SIGN_IN_IOS_CLIENT_ID',
+          defaultValue: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com');
 
-  /// Google Sign-In Client Secret (for desktop platforms)
-  /// TODO: Replace with your actual client secret from Google Cloud Console
-  /// Get this from: Google Cloud Console → APIs & Services → Credentials → Your Web Client
+  /// Google Sign-In Client Secret (for desktop platforms and server-side flows)
+  ///
+  /// ⚠️ **CRITICAL SECURITY**: This is a sensitive credential - NEVER commit to Git!
+  ///
+  /// **How to configure:**
+  /// 1. Store the actual secret in `.secrets/google-oauth/client_secret_google_oauth.json`
+  /// 2. Or use environment variable: `GOOGLE_SIGN_IN_CLIENT_SECRET`
+  /// 3. Or load from secure storage at runtime
+  ///
+  /// **Where to find/replace this secret:**
+  /// - Google Cloud Console: https://console.cloud.google.com/apis/credentials?project=atitia-87925
+  /// - Click "Web client (auto created by Google Service)"
+  /// - Scroll to "Client secrets" section
+  /// - If you need to reset: Click "ADD SECRET" or "RESET SECRET"
+  ///
+  /// **Important Notes:**
+  /// - This is required for desktop platforms (macOS, Windows, Linux) Google Sign-In
+  /// - Also used for server-side authentication flows
+  /// - Google no longer allows viewing existing secrets - must create new one if lost
+  /// - If resetting, update this value immediately after generation
+  ///
+  /// **Related Documentation:**
+  /// - See `GOOGLE_CLIENT_SECRET_SETUP.md` for setup guide
+  /// - See `GOOGLE_CLIENT_SECRET_CREATE_NEW.md` for creating new secrets
+  /// - See `.secrets/README.md` for secure storage setup
   static const String googleSignInClientSecret =
-      'GOCSPX-REPLACE_WITH_YOUR_ACTUAL_CLIENT_SECRET';
+      String.fromEnvironment('GOOGLE_SIGN_IN_CLIENT_SECRET',
+          defaultValue: 'YOUR_CLIENT_SECRET_HERE');
 
   // ==========================================================================
   // GOOGLE OAUTH JAVASCRIPT ORIGINS (for web development)
@@ -185,10 +217,27 @@ class EnvironmentConfig {
   // SUPABASE CONFIGURATION (if using)
   // ==========================================================================
 
-  /// Supabase URL
+  /// Supabase Project URL
+  ///
+  /// ⚠️ NOTE: Supabase credentials are actually configured in `lib/core/services/supabase/supabase_config.dart`
+  /// This field is kept for backward compatibility but is NOT used by the app.
+  ///
+  /// **To update Supabase credentials:**
+  /// - Edit: `lib/core/services/supabase/supabase_config.dart`
+  /// - The app uses `SupabaseConfig.supabaseUrl` and `SupabaseConfig.supabaseAnonKey`
+  ///
+  /// **Current Supabase Config Location:**
+  /// See: `lib/core/services/supabase/supabase_config.dart` for actual values
   static const String supabaseUrl = 'your_supabase_url_here';
 
-  /// Supabase Anon Key
+  /// Supabase Anonymous Key (Public Key)
+  ///
+  /// ⚠️ NOTE: Supabase credentials are actually configured in `lib/core/services/supabase/supabase_config.dart`
+  /// This field is kept for backward compatibility but is NOT used by the app.
+  ///
+  /// **To update Supabase credentials:**
+  /// - Edit: `lib/core/services/supabase/supabase_config.dart`
+  /// - The app uses `SupabaseConfig.supabaseUrl` and `SupabaseConfig.supabaseAnonKey`
   static const String supabaseAnonKey = 'your_supabase_anon_key_here';
 
   // ==========================================================================
@@ -292,9 +341,10 @@ class EnvironmentConfig {
   static List<String> getMissingCredentials() {
     final missing = <String>[];
 
-    if (googleSignInClientSecret.contains('REPLACE_WITH')) {
-      missing.add('Google Sign-In Client Secret');
-    }
+    // Google Sign-In Client Secret is now configured (no longer a placeholder)
+    // if (googleSignInClientSecret.contains('REPLACE_WITH')) {
+    //   missing.add('Google Sign-In Client Secret');
+    // }
 
     // Skip reCAPTCHA debug token check in development since App Check is disabled
     if (isReleaseMode &&

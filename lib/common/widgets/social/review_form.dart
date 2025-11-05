@@ -11,10 +11,11 @@ import '../../styles/colors.dart';
 import '../../styles/typography.dart';
 import '../../utils/helpers/image_picker_helper.dart';
 import '../../../core/di/common/unified_service_locator.dart';
+import '../../../core/models/review_model.dart';
+import '../../../core/repositories/review_repository.dart';
 import '../text/heading_small.dart';
 import '../buttons/primary_button.dart';
 import '../buttons/secondary_button.dart';
-// import '../../../core/models/review_model.dart';
 
 /// ⭐ **REVIEW FORM - PRODUCTION READY**
 ///
@@ -61,7 +62,7 @@ class _ReviewFormState extends State<ReviewForm> {
 
   bool _submitting = false;
   final List<dynamic> _selectedPhotos = []; // List of File or XFile
-  List<String> _uploadedPhotoUrls = [];
+  final List<String> _uploadedPhotoUrls = [];
   bool _uploadingPhotos = false;
 
   @override
@@ -313,28 +314,28 @@ class _ReviewFormState extends State<ReviewForm> {
       }
 
       // Create review model
-      // final review = ReviewModel(
-      //   reviewId: '${widget.guestId}_${widget.pgId}_${DateTime.now().millisecondsSinceEpoch}',
-      //   guestId: widget.guestId,
-      //   guestName: widget.guestName,
-      //   pgId: widget.pgId,
-      //   pgName: widget.pgName,
-      //   ownerId: widget.ownerId,
-      //   rating: _overallRating,
-      //   comment: _commentController.text.trim(),
-      //   photos: _uploadedPhotoUrls, // Now includes uploaded photo URLs
-      //   cleanlinessRating: _cleanlinessRating,
-      //   amenitiesRating: _amenitiesRating,
-      //   locationRating: _locationRating,
-      //   foodRating: _foodRating,
-      //   staffRating: _staffRating,
-      //   reviewDate: DateTime.now(),
-      //   status: 'pending',
-      // );
+      final review = ReviewModel(
+        reviewId: '${widget.guestId}_${widget.pgId}_${DateTime.now().millisecondsSinceEpoch}',
+        guestId: widget.guestId,
+        guestName: widget.guestName,
+        pgId: widget.pgId,
+        pgName: widget.pgName,
+        ownerId: widget.ownerId,
+        rating: _overallRating,
+        comment: _commentController.text.trim(),
+        photos: _uploadedPhotoUrls, // Now includes uploaded photo URLs
+        cleanlinessRating: _cleanlinessRating,
+        amenitiesRating: _amenitiesRating,
+        locationRating: _locationRating,
+        foodRating: _foodRating,
+        staffRating: _staffRating,
+        reviewDate: DateTime.now(),
+        status: 'pending', // Reviews will be moderated before approval
+      );
 
-      // TODO: Submit to repository
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      // Submit to Firestore via ReviewRepository
+      final reviewRepository = ReviewRepository();
+      await reviewRepository.createReview(review);
 
       if (mounted) {
         Navigator.of(context).pop();

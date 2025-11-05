@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 ///
 /// Usage:
 /// - Wrap with ChangeNotifierProvider in main.dart
-/// - Use context.read<LocaleProvider>().setLocale() to change language
+/// - Use `context.read<LocaleProvider>().setLocale()` to change language
 class LocaleProvider extends ChangeNotifier {
   Locale _locale = const Locale('en');
 

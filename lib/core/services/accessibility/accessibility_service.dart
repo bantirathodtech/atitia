@@ -379,7 +379,10 @@ class AccessibilityService {
       checked: value == groupValue,
       child: Radio<T>(
         value: value,
+        // TODO: Update to RadioGroup when Flutter version supports it
+        // ignore: deprecated_member_use
         groupValue: groupValue,
+        // ignore: deprecated_member_use
         onChanged: onChanged,
         activeColor:
             _isHighContrastEnabled ? Colors.blue.shade800 : Colors.blue,

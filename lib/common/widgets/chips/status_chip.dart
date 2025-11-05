@@ -25,7 +25,7 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = filled ? color.withOpacity(0.16) : color.withOpacity(0.12);
+    final bg = filled ? color.withValues(alpha: 0.16) : color.withValues(alpha: 0.12);
     final border = color.withValues(alpha: 0.3);
     return Container(
       padding: EdgeInsets.symmetric(

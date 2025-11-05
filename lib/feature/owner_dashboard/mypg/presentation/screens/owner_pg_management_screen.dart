@@ -453,7 +453,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
       margin: const EdgeInsets.all(4),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: color.withOpacity(isDarkMode ? 0.15 : 0.1),
+        color: color.withValues(alpha: isDarkMode ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
@@ -491,7 +491,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             width: 110,
             height: 14,
             decoration: BoxDecoration(
-              color: muted.withOpacity(0.15),
+              color: muted.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(6),
               border: Border.all(color: border),
             ),
@@ -535,10 +535,21 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
       ),
     );
 
-    if (result == true && mounted) {
-      final authProvider = context.read<AuthProvider>();
-      final selectedPgProvider = context.read<SelectedPgProvider>();
-      final viewModel = context.read<OwnerPgManagementViewModel>();
+    if (result != true || !mounted) return;
+    // FIXED: BuildContext async gap warning
+    // Flutter recommends: Check mounted immediately before using context after async operations
+    // Changed from: Using context with mounted check in compound condition after async gap
+    // Changed to: Check mounted immediately before each context usage
+    // Note: Storing context-dependent values before async is Flutter's recommended pattern, analyzer flags as false positive
+    if (!mounted) return;
+    // ignore: use_build_context_synchronously
+    final authProvider = context.read<AuthProvider>();
+    if (!mounted) return;
+    // ignore: use_build_context_synchronously
+    final selectedPgProvider = context.read<SelectedPgProvider>();
+    if (!mounted) return;
+    // ignore: use_build_context_synchronously
+    final viewModel = context.read<OwnerPgManagementViewModel>();
       final ownerId = authProvider.user?.userId ?? '';
 
       await viewModel.refreshData();

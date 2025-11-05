@@ -15,12 +15,12 @@ class AppLogger {
 
   AppLogger._internal();
 
-  // Log levels
-  static const String DEBUG = 'DEBUG';
-  static const String INFO = 'INFO';
-  static const String WARNING = 'WARNING';
-  static const String ERROR = 'ERROR';
-  static const String CRITICAL = 'CRITICAL';
+  // Log levels (lowerCamelCase to match Dart style guide)
+  static const String levelDebug = 'DEBUG';
+  static const String levelInfo = 'INFO';
+  static const String levelWarning = 'WARNING';
+  static const String levelError = 'ERROR';
+  static const String levelCritical = 'CRITICAL';
 
   // User context
   String? _currentUserId;
@@ -70,7 +70,7 @@ class AppLogger {
     String? feature,
   }) {
     if (kDebugMode) {
-      _log(DEBUG, message,
+      _log(levelDebug, message,
           action: action, metadata: metadata, feature: feature);
     }
   }
@@ -82,7 +82,7 @@ class AppLogger {
     Map<String, dynamic>? metadata,
     String? feature,
   }) {
-    _log(INFO, message, action: action, metadata: metadata, feature: feature);
+    _log(levelInfo, message, action: action, metadata: metadata, feature: feature);
   }
 
   /// Log warnings
@@ -92,7 +92,7 @@ class AppLogger {
     Map<String, dynamic>? metadata,
     String? feature,
   }) {
-    _log(WARNING, message,
+    _log(levelWarning, message,
         action: action, metadata: metadata, feature: feature);
   }
 
@@ -110,7 +110,7 @@ class AppLogger {
       if (stackTrace != null) 'stackTrace': stackTrace.toString(),
       ...?metadata,
     };
-    _log(ERROR, message,
+    _log(levelError, message,
         action: action, metadata: errorMetadata, feature: feature);
   }
 
@@ -128,7 +128,7 @@ class AppLogger {
       if (stackTrace != null) 'stackTrace': stackTrace.toString(),
       ...?metadata,
     };
-    _log(CRITICAL, message,
+    _log(levelCritical, message,
         action: action, metadata: errorMetadata, feature: feature);
   }
 
@@ -140,7 +140,7 @@ class AppLogger {
     String? screen,
   }) {
     _log(
-      INFO,
+      levelInfo,
       'User action: $action',
       action: action,
       metadata: metadata,
@@ -156,7 +156,7 @@ class AppLogger {
     Map<String, dynamic>? metadata,
   }) {
     _log(
-      INFO,
+      levelInfo,
       'Navigation: $from → $to',
       action: 'navigation',
       metadata: {
@@ -177,7 +177,7 @@ class AppLogger {
     Map<String, dynamic>? metadata,
   }) {
     _log(
-      INFO,
+      levelInfo,
       'API $method $endpoint',
       action: 'api_call',
       metadata: {
@@ -199,7 +199,7 @@ class AppLogger {
     Map<String, dynamic>? metadata,
   }) {
     _log(
-      INFO,
+      levelInfo,
       'State change: $from → $to',
       action: 'state_change',
       metadata: {
@@ -299,15 +299,15 @@ class AppLogger {
   /// Get emoji for log level
   String _getLevelEmoji(String level) {
     switch (level) {
-      case DEBUG:
+      case levelDebug:
         return '🐛';
-      case INFO:
+      case levelInfo:
         return 'ℹ️';
-      case WARNING:
+      case levelWarning:
         return '⚠️';
-      case ERROR:
+      case levelError:
         return '❌';
-      case CRITICAL:
+      case levelCritical:
         return '🚨';
       default:
         return '📝';
@@ -317,15 +317,15 @@ class AppLogger {
   /// Get numeric log level for developer.log
   int _getLogLevel(String level) {
     switch (level) {
-      case DEBUG:
+      case levelDebug:
         return 500;
-      case INFO:
+      case levelInfo:
         return 800;
-      case WARNING:
+      case levelWarning:
         return 900;
-      case ERROR:
+      case levelError:
         return 1000;
-      case CRITICAL:
+      case levelCritical:
         return 1200;
       default:
         return 800;
@@ -337,7 +337,7 @@ class AppLogger {
 
   /// Check if logging is enabled for level
   bool isLoggingEnabled(String level) {
-    if (level == DEBUG) return kDebugMode;
+    if (level == levelDebug) return kDebugMode;
     return true;
   }
 }

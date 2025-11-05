@@ -1,6 +1,7 @@
 // lib/core/services/firebase/messaging/enhanced_messaging_service.dart
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -391,6 +392,7 @@ class EnhancedMessagingService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_notificationPrefsKey, jsonEncode(_notificationPreferences));
     } catch (e) {
+      debugPrint('⚠️ Enhanced Messaging Service: Failed to save notification preferences: $e');
     }
   }
 
