@@ -13,6 +13,7 @@ import '../../../../core/app/theme/theme_provider.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../core/navigation/navigation_service.dart';
 import '../../../auth/logic/auth_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class GuestDrawer extends StatelessWidget {
   /// Navigation callback when drawer items are tapped
@@ -138,15 +139,18 @@ class GuestDrawer extends StatelessWidget {
   }
 
   void _handleLogout(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text(loc.logout),
+        content: Text(loc.areYouSureYouWantToLogout),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -155,7 +159,7 @@ class GuestDrawer extends StatelessWidget {
                   Provider.of<AuthProvider>(context, listen: false);
               authProvider.signOut();
             },
-            child: const Text('Logout'),
+            child: Text(loc.logout),
           ),
         ],
       ),

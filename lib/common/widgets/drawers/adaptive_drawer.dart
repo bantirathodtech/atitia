@@ -49,6 +49,8 @@ import '../../styles/spacing.dart';
 import '../../styles/typography.dart';
 import '../../../feature/auth/logic/auth_provider.dart';
 import '../../../core/app/theme/theme_provider.dart';
+import '../../../core/app/localization/locale_provider.dart';
+import '../../../l10n/app_localizations.dart';
 
 class AdaptiveDrawer extends AdaptiveStatelessWidget {
   // ==========================================================================
@@ -396,33 +398,48 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                 children: [
                   // Profile Button
                   Expanded(
-                    child: _buildQuickActionButton(
-                      context,
-                      icon: Icons.person_outline,
-                      label: 'Profile',
-                      onTap: onProfileTap,
+                    child: Builder(
+                      builder: (context) {
+                        final loc = AppLocalizations.of(context);
+                        return _buildQuickActionButton(
+                          context,
+                          icon: Icons.person_outline,
+                          label: loc?.profile ?? 'Profile',
+                          onTap: onProfileTap,
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(width: AppSpacing.paddingS),
 
                   // Notifications Button
                   Expanded(
-                    child: _buildQuickActionButton(
-                      context,
-                      icon: Icons.notifications_outlined,
-                      label: 'Notifications',
-                      onTap: onNotificationsTap,
+                    child: Builder(
+                      builder: (context) {
+                        final loc = AppLocalizations.of(context);
+                        return _buildQuickActionButton(
+                          context,
+                          icon: Icons.notifications_outlined,
+                          label: loc?.notifications ?? 'Notifications',
+                          onTap: onNotificationsTap,
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(width: AppSpacing.paddingS),
 
                   // Settings Button
                   Expanded(
-                    child: _buildQuickActionButton(
-                      context,
-                      icon: Icons.settings_outlined,
-                      label: 'Settings',
-                      onTap: onSettingsTap,
+                    child: Builder(
+                      builder: (context) {
+                        final loc = AppLocalizations.of(context);
+                        return _buildQuickActionButton(
+                          context,
+                          icon: Icons.settings_outlined,
+                          label: loc?.settings ?? 'Settings',
+                          onTap: onSettingsTap,
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -459,12 +476,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                   ],
                   if (showLanguageSelector) ...[
                     Expanded(
-                      child: _buildToggleButton(
-                        context,
-                        icon: Icons.language,
-                        label: 'Language',
-                        onTap: onLanguageToggle,
-                      ),
+                      child: _buildLanguageSelector(context),
                     ),
                   ],
                 ],
@@ -484,26 +496,36 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
         final role = user?.role ?? 'guest';
 
         // Use custom menu items if provided, otherwise use role-based menu
-        final menuItems = customMenuItems ?? _getRoleBasedMenuItems(role);
+        final menuItems = customMenuItems ?? _getRoleBasedMenuItems(role, context);
 
         return SingleChildScrollView(
           child: Column(
             children: [
               // User Menu Section
-              _buildMenuSection(
-                context,
-                title: 'User Menu',
-                items:
-                    menuItems.where((item) => item.section == 'user').toList(),
+              Builder(
+                builder: (context) {
+                  final loc = AppLocalizations.of(context);
+                  return _buildMenuSection(
+                    context,
+                    title: loc?.userMenu ?? 'User Menu',
+                    items:
+                        menuItems.where((item) => item.section == 'user').toList(),
+                  );
+                },
               ),
 
               // System Menu Section
-              _buildMenuSection(
-                context,
-                title: 'System',
-                items: menuItems
-                    .where((item) => item.section == 'system')
-                    .toList(),
+              Builder(
+                builder: (context) {
+                  final loc = AppLocalizations.of(context);
+                  return _buildMenuSection(
+                    context,
+                    title: loc?.system ?? 'System',
+                    items: menuItems
+                        .where((item) => item.section == 'system')
+                        .toList(),
+                  );
+                },
               ),
             ],
           ),
@@ -647,18 +669,28 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Atitia',
-                      style: AppTypography.titleMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final loc = AppLocalizations.of(context);
+                        return Text(
+                          loc?.appTitle ?? 'Atitia',
+                          style: AppTypography.titleMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        );
+                      },
                     ),
-                    Text(
-                      'PG Management System',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: Theme.of(context).textTheme.bodySmall?.color,
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final loc = AppLocalizations.of(context);
+                        return Text(
+                          loc?.pgManagementSystem ?? 'PG Management System',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -672,34 +704,49 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'v1.0.0',
-                style: AppTypography.bodySmall.copyWith(
-                  color: Theme.of(context).textTheme.bodySmall?.color,
-                ),
+              Builder(
+                builder: (context) {
+                  final loc = AppLocalizations.of(context);
+                  return Text(
+                    '${loc?.version ?? 'Version'} 1.0.0',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
+                  );
+                },
               ),
               Row(
                 children: [
-                  GestureDetector(
-                    onTap: () => _showPrivacyPolicy(context),
-                    child: Text(
-                      'Privacy',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.primary,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
+                  Builder(
+                    builder: (context) {
+                      final loc = AppLocalizations.of(context);
+                      return GestureDetector(
+                        onTap: () => _showPrivacyPolicy(context),
+                        child: Text(
+                          loc?.privacyPolicy ?? 'Privacy',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primary,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(width: AppSpacing.paddingM),
-                  GestureDetector(
-                    onTap: () => _showTermsOfService(context),
-                    child: Text(
-                      'Terms',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.primary,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
+                  Builder(
+                    builder: (context) {
+                      final loc = AppLocalizations.of(context);
+                      return GestureDetector(
+                        onTap: () => _showTermsOfService(context),
+                        child: Text(
+                          loc?.termsOfService ?? 'Terms',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primary,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -709,12 +756,17 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
           const SizedBox(height: AppSpacing.paddingS),
 
           // Made with love
-          Text(
-            'Made with ❤️ by Atitia Team',
-            style: AppTypography.bodySmall.copyWith(
-              color: Theme.of(context).textTheme.bodySmall?.color,
-              fontStyle: FontStyle.italic,
-            ),
+          Builder(
+            builder: (context) {
+              final loc = AppLocalizations.of(context);
+              return Text(
+                loc?.madeWithLoveByAtitiaTeam ?? 'Made with ❤️ by Atitia Team',
+                style: AppTypography.bodySmall.copyWith(
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                  fontStyle: FontStyle.italic,
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -804,6 +856,97 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
     );
   }
 
+  /// Build Language Selector
+  Widget _buildLanguageSelector(BuildContext context) {
+    final localeProvider = context.watch<LocaleProvider>();
+    final localizations = AppLocalizations.of(context);
+    
+    if (localizations == null) {
+      return const SizedBox.shrink();
+    }
+
+    // Get current language display name
+    final currentLang = localeProvider.locale.languageCode == 'te' 
+        ? localizations.telugu 
+        : localizations.english;
+
+    return GestureDetector(
+      onTap: () {
+        // Show language selection dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(localizations.language),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.language),
+                  title: Text(localizations.english),
+                  trailing: localeProvider.locale.languageCode == 'en'
+                      ? const Icon(Icons.check, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    localeProvider.setLocale(const Locale('en'));
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.language),
+                  title: Text(localizations.telugu),
+                  trailing: localeProvider.locale.languageCode == 'te'
+                      ? const Icon(Icons.check, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    localeProvider.setLocale(const Locale('te'));
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(localizations.close),
+              ),
+            ],
+          ),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          vertical: AppSpacing.paddingS,
+          horizontal: AppSpacing.paddingS,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.textOnPrimary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.language,
+              size: 16,
+              color: AppColors.textOnPrimary,
+            ),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                currentLang,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textOnPrimary,
+                  fontSize: 10,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   /// Build Role Switcher
   Widget _buildRoleSwitcher(BuildContext context) {
     return Consumer<AuthProvider>(
@@ -828,12 +971,17 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                 color: AppColors.textOnPrimary,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Role: ${currentRole.toUpperCase()}',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textOnPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
+              Builder(
+                builder: (context) {
+                  final loc = AppLocalizations.of(context);
+                  return Text(
+                    '${loc?.role ?? 'Role'}: ${currentRole.toUpperCase()}',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textOnPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  );
+                },
               ),
               const Spacer(),
               GestureDetector(
@@ -841,24 +989,29 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                   final newRole = currentRole == 'guest' ? 'owner' : 'guest';
                   onRoleSwitch?.call(newRole);
                 },
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.paddingXS,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.textOnPrimary,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.borderRadiusXS),
-                  ),
-                  child: Text(
-                    'SWITCH',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.primary,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                child: Builder(
+                  builder: (context) {
+                    final loc = AppLocalizations.of(context);
+                    return Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.paddingXS,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.textOnPrimary,
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.borderRadiusXS),
+                      ),
+                      child: Text(
+                        (loc?.switchButton ?? 'SWITCH').toUpperCase(),
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.primary,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -997,12 +1150,14 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
   // ==========================================================================
 
   /// Get role-based menu items
-  List<DrawerMenuItem> _getRoleBasedMenuItems(String role) {
+  List<DrawerMenuItem> _getRoleBasedMenuItems(String role, BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    
     // Base items for all roles
     final commonItems = [
       DrawerMenuItem(
         id: 'home',
-        label: 'Home',
+        label: loc?.home ?? 'Home',
         icon: Icons.home_outlined,
         section: 'user',
       ),
@@ -1013,19 +1168,19 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
         ? [
             DrawerMenuItem(
               id: 'food',
-              label: 'Food',
+              label: loc?.food ?? 'Food',
               icon: Icons.restaurant_menu,
               section: 'user',
             ),
             DrawerMenuItem(
               id: 'pgs',
-              label: 'PGs',
+              label: loc?.pgs ?? 'PGs',
               icon: Icons.home,
               section: 'user',
             ),
             DrawerMenuItem(
               id: 'guest',
-              label: 'Guest',
+              label: loc?.guests ?? 'Guest',
               icon: Icons.people,
               section: 'user',
             ),
@@ -1034,31 +1189,31 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
             // Guest dashboard tabs - remove My Profile, Notifications, Settings (already in header)
             DrawerMenuItem(
               id: 'pgs',
-              label: 'PGs',
+              label: loc?.pgs ?? 'PGs',
               icon: Icons.apartment,
               section: 'user',
             ),
             DrawerMenuItem(
               id: 'foods',
-              label: 'Foods',
+              label: loc?.foods ?? 'Foods',
               icon: Icons.restaurant_menu,
               section: 'user',
             ),
             DrawerMenuItem(
               id: 'payments',
-              label: 'Payments',
+              label: loc?.payments ?? 'Payments',
               icon: Icons.payment,
               section: 'user',
             ),
             DrawerMenuItem(
               id: 'requests',
-              label: 'Requests',
+              label: loc?.requests ?? 'Requests',
               icon: Icons.request_page,
               section: 'user',
             ),
             DrawerMenuItem(
               id: 'complaints',
-              label: 'Complaints',
+              label: loc?.complaints ?? 'Complaints',
               icon: Icons.report_problem,
               section: 'user',
             ),
@@ -1067,13 +1222,13 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
     final systemItems = [
       DrawerMenuItem(
         id: 'help',
-        label: 'Help & Support',
+        label: loc?.helpSupport ?? 'Help & Support',
         icon: Icons.help_outline,
         section: 'system',
       ),
       DrawerMenuItem(
         id: 'logout',
-        label: 'Logout',
+        label: loc?.logout ?? 'Logout',
         icon: Icons.logout,
         section: 'system',
         trailingIcon: Icons.arrow_forward_ios,
@@ -1090,15 +1245,16 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
   /// Show Privacy Policy
   void _showPrivacyPolicy(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Privacy Policy'),
-        content: const Text('Privacy Policy content goes here...'),
+        title: Text(loc?.privacyPolicy ?? 'Privacy Policy'),
+        content: Text(loc?.privacyPolicy ?? 'Privacy Policy content goes here...'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(loc?.close ?? 'Close'),
           ),
         ],
       ),
@@ -1107,15 +1263,16 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
   /// Show Terms of Service
   void _showTermsOfService(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Terms of Service'),
-        content: const Text('Terms of Service content goes here...'),
+        title: Text(loc?.termsOfService ?? 'Terms of Service'),
+        content: Text(loc?.termsOfService ?? 'Terms of Service content goes here...'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(loc?.close ?? 'Close'),
           ),
         ],
       ),

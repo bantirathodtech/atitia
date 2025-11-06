@@ -35,6 +35,7 @@ class FirebaseDependencyContainer {
   static ThemeProvider createThemeProvider() => ThemeProvider();
 
   /// Creates LocaleProvider for localization management (language switching)
+  /// Note: Call loadLocale() after creating to restore saved locale preference
   static LocaleProvider createLocaleProvider() => LocaleProvider();
 
   // ==================== AUTH PROVIDER ====================

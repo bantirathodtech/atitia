@@ -46,9 +46,14 @@ Future<void> main() async {
     // Initialize responsive system
     ResponsiveSystem.initialize();
 
+    // Create LocaleProvider and load saved locale preference
+    final localeProvider = LocaleProvider();
+    await localeProvider.loadLocale();
+
     // Start the app with all providers and services ready
     runApp(
       FirebaseAppProviders.buildWithProviders(
+        localeProvider: localeProvider,
         child: const AtitiaApp(),
       ),
     );

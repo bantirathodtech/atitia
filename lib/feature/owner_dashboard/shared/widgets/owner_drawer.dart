@@ -14,6 +14,7 @@ import '../../../../core/navigation/navigation_service.dart';
 import '../../../../core/app/theme/theme_provider.dart';
 import '../../../../core/app/localization/locale_provider.dart';
 import '../../../auth/logic/auth_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class OwnerDrawer extends StatelessWidget {
   /// Navigation callback when drawer items are tapped
@@ -148,15 +149,18 @@ class OwnerDrawer extends StatelessWidget {
   }
 
   void _handleLogout(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text(loc.logout),
+        content: Text(loc.areYouSureYouWantToLogout),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -165,7 +169,7 @@ class OwnerDrawer extends StatelessWidget {
                   Provider.of<AuthProvider>(context, listen: false);
               authProvider.signOut();
             },
-            child: const Text('Logout'),
+            child: Text(loc.logout),
           ),
         ],
       ),

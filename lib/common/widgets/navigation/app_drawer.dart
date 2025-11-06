@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../core/navigation/navigation_service.dart';
 import '../../../feature/auth/logic/auth_provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../styles/spacing.dart';
 import '../../styles/typography.dart';
 import '../buttons/secondary_button.dart';
@@ -14,7 +15,7 @@ import '../text/heading_medium.dart';
 import '../text/heading_small.dart';
 
 /// Production-ready app drawer with user info, navigation, and settings
-/// 
+///
 /// Features:
 /// - User profile header with photo and details
 /// - About app information
@@ -45,34 +46,44 @@ class AppDrawer extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  _buildDrawerItem(
-                    context: context,
-                    icon: Icons.info_outline,
-                    title: 'About App',
-                    onTap: () => _showAboutApp(context),
-                  ),
-                  _buildDrawerItem(
-                    context: context,
-                    icon: Icons.business,
-                    title: 'About Developer',
-                    onTap: () => _showAboutDeveloper(context),
-                  ),
-                  _buildDrawerItem(
-                    context: context,
-                    icon: Icons.swap_horiz,
-                    title: 'Switch Account',
-                    subtitle: user?.isOwner == true
-                        ? 'Switch to Guest'
-                        : 'Switch to Owner',
-                    onTap: () => _showSwitchAccountDialog(context),
-                  ),
-                  const Divider(),
-                  _buildDrawerItem(
-                    context: context,
-                    icon: Icons.logout,
-                    title: 'Logout',
-                    iconColor: Colors.red,
-                    onTap: () => _showLogoutDialog(context),
+                  Builder(
+                    builder: (context) {
+                      final loc = AppLocalizations.of(context);
+                      if (loc == null) return const SizedBox.shrink();
+                      return Column(
+                        children: [
+                          _buildDrawerItem(
+                            context: context,
+                            icon: Icons.info_outline,
+                            title: loc.aboutApp,
+                            onTap: () => _showAboutApp(context),
+                          ),
+                          _buildDrawerItem(
+                            context: context,
+                            icon: Icons.business,
+                            title: loc.aboutDeveloper,
+                            onTap: () => _showAboutDeveloper(context),
+                          ),
+                          _buildDrawerItem(
+                            context: context,
+                            icon: Icons.swap_horiz,
+                            title: loc.switchAccount,
+                            subtitle: user?.isOwner == true
+                                ? loc.switchToGuest
+                                : loc.switchToOwner,
+                            onTap: () => _showSwitchAccountDialog(context),
+                          ),
+                          const Divider(),
+                          _buildDrawerItem(
+                            context: context,
+                            icon: Icons.logout,
+                            title: loc.logout,
+                            iconColor: Colors.red,
+                            onTap: () => _showLogoutDialog(context),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
@@ -93,7 +104,10 @@ class AppDrawer extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [theme.primaryColor, theme.primaryColor.withValues(alpha: 0.7)],
+          colors: [
+            theme.primaryColor,
+            theme.primaryColor.withValues(alpha: 0.7)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -143,7 +157,7 @@ class AppDrawer extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Enhanced User Info
               Expanded(
                 child: Column(
@@ -158,7 +172,8 @@ class AppDrawer extends StatelessWidget {
                     // Phone with icon
                     Row(
                       children: [
-                        const Icon(Icons.phone, size: 14, color: Colors.white70),
+                        const Icon(Icons.phone,
+                            size: 14, color: Colors.white70),
                         const SizedBox(width: 4),
                         BodyText(
                           text: user?.phoneNumber ?? '',
@@ -184,7 +199,9 @@ class AppDrawer extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            user?.isOwner == true ? Icons.business : Icons.person,
+                            user?.isOwner == true
+                                ? Icons.business
+                                : Icons.person,
                             size: 14,
                             color: Colors.white,
                           ),
@@ -201,7 +218,7 @@ class AppDrawer extends StatelessWidget {
               ),
             ],
           ),
-          
+
           // Verification status badge (if owner)
           if (user?.isOwner == true) ...[
             const SizedBox(height: 12),
@@ -223,14 +240,22 @@ class AppDrawer extends StatelessWidget {
                   Icon(
                     user?.isVerified == true ? Icons.verified : Icons.pending,
                     size: 16,
-                    color: user?.isVerified == true 
-                        ? Colors.greenAccent 
+                    color: user?.isVerified == true
+                        ? Colors.greenAccent
                         : Colors.orangeAccent,
                   ),
                   const SizedBox(width: 6),
-                  CaptionText(
-                    text: user?.isVerified == true ? 'Verified Owner' : 'Pending Verification',
-                    color: Colors.white,
+                  Builder(
+                    builder: (context) {
+                      final loc = AppLocalizations.of(context);
+                      return CaptionText(
+                        text: user?.isVerified == true
+                            ? (loc?.verifiedOwner ?? 'Verified Owner')
+                            : (loc?.pendingVerification ??
+                                'Pending Verification'),
+                        color: Colors.white,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -307,11 +332,23 @@ class AppDrawer extends StatelessWidget {
                 color: theme.primaryColor,
               ),
               const SizedBox(width: AppSpacing.xs),
-              const CaptionText(text: 'Powered by Charyatani'),
+              Builder(
+                builder: (context) {
+                  final loc = AppLocalizations.of(context);
+                  return CaptionText(
+                      text:
+                          loc?.poweredByCharyatani ?? 'Powered by Charyatani');
+                },
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
-          const CaptionText(text: 'Version 1.0.0'),
+          Builder(
+            builder: (context) {
+              final loc = AppLocalizations.of(context);
+              return CaptionText(text: '${loc?.version ?? 'Version'} 1.0.0');
+            },
+          ),
         ],
       ),
     );
@@ -319,6 +356,9 @@ class AppDrawer extends StatelessWidget {
 
   /// Shows about app dialog
   void _showAboutApp(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -326,7 +366,7 @@ class AppDrawer extends StatelessWidget {
           children: [
             Icon(Icons.info_outline, color: Theme.of(context).primaryColor),
             const SizedBox(width: AppSpacing.sm),
-            const HeadingMedium(text: 'About Atitia'),
+            HeadingMedium(text: '${loc.aboutApp} - ${loc.appTitle}'),
           ],
         ),
         content: const SingleChildScrollView(
@@ -366,6 +406,9 @@ class AppDrawer extends StatelessWidget {
 
   /// Shows about developer dialog
   void _showAboutDeveloper(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -373,7 +416,7 @@ class AppDrawer extends StatelessWidget {
           children: [
             Icon(Icons.business, color: Theme.of(context).primaryColor),
             const SizedBox(width: AppSpacing.sm),
-            const HeadingMedium(text: 'About Developer'),
+            HeadingMedium(text: loc.aboutDeveloper),
           ],
         ),
         content: const SingleChildScrollView(
@@ -421,9 +464,14 @@ class AppDrawer extends StatelessWidget {
           ),
         ),
         actions: [
-          SecondaryButton(
-            label: 'Close',
-            onPressed: () => Navigator.pop(context),
+          Builder(
+            builder: (context) {
+              final loc = AppLocalizations.of(context);
+              return SecondaryButton(
+                label: loc?.close ?? 'Close',
+                onPressed: () => Navigator.pop(context),
+              );
+            },
           ),
         ],
       ),
@@ -435,17 +483,20 @@ class AppDrawer extends StatelessWidget {
     final authProvider = context.read<AuthProvider>();
     final currentRole = authProvider.user?.role ?? 'guest';
     final newRole = currentRole == 'owner' ? 'guest' : 'owner';
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return;
+
+    final currentRoleDisplay = currentRole == 'owner' ? loc.owner : loc.guest;
+    final newRoleDisplay = newRole == 'owner' ? loc.owner : loc.guest;
 
     showDialog(
       context: context,
       builder: (context) => ConfirmationDialog(
-        title: 'Switch Account',
+        title: loc.switchAccount,
         message:
-            'Are you sure you want to switch from ${currentRole == 'owner' ? 'Owner' : 'Guest'} '
-            'to ${newRole == 'owner' ? 'Owner' : 'Guest'} account?\n\n'
-            'You will need to complete registration for the new role.',
-        confirmText: 'Switch',
-        cancelText: 'Cancel',
+            loc.switchAccountConfirmation(currentRoleDisplay, newRoleDisplay),
+        confirmText: loc.switchButton,
+        cancelText: loc.cancel,
         onConfirm: () async {
           Navigator.pop(context); // Close dialog
           await _switchAccount(context, newRole);
@@ -467,23 +518,28 @@ class AppDrawer extends StatelessWidget {
       navigationService.goToRegistration();
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: BodyText(
-              text: 'Switched to ${newRole == 'owner' ? 'Owner' : 'Guest'} account. '
-                  'Please complete your registration.',
-              color: Colors.white,
+        final loc = AppLocalizations.of(context);
+        if (loc != null) {
+          final roleDisplay = newRole == 'owner' ? loc.owner : loc.guest;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: BodyText(
+                text: loc.switchedToAccount(roleDisplay),
+                color: Colors.white,
+              ),
+              backgroundColor: Colors.green,
             ),
-            backgroundColor: Colors.green,
-          ),
-        );
+          );
+        }
       }
     } catch (e) {
       if (context.mounted) {
+        final loc = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(
-              text: 'Failed to switch account: $e',
+              text:
+                  '${loc?.failedToSwitchAccount ?? 'Failed to switch account'}: $e',
               color: Colors.white,
             ),
             backgroundColor: Colors.red,
@@ -495,13 +551,16 @@ class AppDrawer extends StatelessWidget {
 
   /// Shows logout confirmation dialog
   void _showLogoutDialog(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return;
+
     showDialog(
       context: context,
       builder: (context) => ConfirmationDialog(
-        title: 'Logout',
-        message: 'Are you sure you want to logout?',
-        confirmText: 'Logout',
-        cancelText: 'Cancel',
+        title: loc.logout,
+        message: loc.areYouSureYouWantToLogout,
+        confirmText: loc.logout,
+        cancelText: loc.cancel,
         isDestructive: true,
         onConfirm: () async {
           Navigator.pop(context); // Close dialog
@@ -518,10 +577,11 @@ class AppDrawer extends StatelessWidget {
       await authProvider.signOut();
 
       if (context.mounted) {
+        final loc = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: BodyText(
-              text: 'Logged out successfully',
+              text: loc?.loggedOutSuccessfully ?? 'Logged out successfully',
               color: Colors.white,
             ),
             backgroundColor: Colors.green,
@@ -530,10 +590,11 @@ class AppDrawer extends StatelessWidget {
       }
     } catch (e) {
       if (context.mounted) {
+        final loc = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(
-              text: 'Logout failed: $e',
+              text: '${loc?.logoutFailed ?? 'Logout failed'}: $e',
               color: Colors.white,
             ),
             backgroundColor: Colors.red,
@@ -543,4 +604,3 @@ class AppDrawer extends StatelessWidget {
     }
   }
 }
-

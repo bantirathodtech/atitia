@@ -612,7 +612,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     // Changed from: Using context with mounted check in compound condition after async gap
     // Changed to: Check mounted immediately before context usage
     // Note: ScaffoldMessenger is safe to use after async when mounted check is performed, analyzer flags as false positive
-    if (!success || !this.mounted) return;
+    if (!success || !mounted) return;
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -652,7 +652,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     // Changed from: Using context with mounted check in compound condition after async gap
     // Changed to: Check mounted immediately before context usage
     // Note: ScaffoldMessenger is safe to use after async when mounted check is performed, analyzer flags as false positive
-    if (!success || !this.mounted) return;
+    if (!success || !mounted) return;
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

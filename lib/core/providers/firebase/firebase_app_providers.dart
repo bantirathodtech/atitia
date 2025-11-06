@@ -130,9 +130,29 @@ class FirebaseAppProviders {
       ];
 
   /// Wraps the app with MultiProvider using all Firebase providers
-  static Widget buildWithProviders({required Widget child}) {
+  /// 
+  /// [localeProvider] - Optional pre-initialized LocaleProvider.
+  /// If provided, uses this instance instead of creating a new one.
+  static Widget buildWithProviders({
+    required Widget child,
+    LocaleProvider? localeProvider,
+  }) {
+    final providersList = List<ChangeNotifierProvider>.from(providers);
+    
+    // Replace LocaleProvider if a pre-initialized one is provided
+    if (localeProvider != null) {
+      final localeProviderIndex = providersList.indexWhere(
+        (provider) => provider is ChangeNotifierProvider<LocaleProvider>,
+      );
+      if (localeProviderIndex != -1) {
+        providersList[localeProviderIndex] = ChangeNotifierProvider<LocaleProvider>.value(
+          value: localeProvider,
+        );
+      }
+    }
+    
     return MultiProvider(
-      providers: providers,
+      providers: providersList,
       child: child,
     );
   }

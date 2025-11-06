@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/app/localization/locale_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Language selection dropdown for switching app locale.
 ///
@@ -17,6 +18,7 @@ class LanguageSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeProvider = Provider.of<LocaleProvider>(context);
+    final localizations = AppLocalizations.of(context)!;
 
     return DropdownButton<Locale>(
       value: localeProvider.locale,
@@ -25,14 +27,14 @@ class LanguageSelector extends StatelessWidget {
         DropdownMenuItem(
           value: const Locale('en'),
           child: Text(
-            'English',
+            localizations.english,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
         DropdownMenuItem(
           value: const Locale('te'),
           child: Text(
-            'తెలుగు',
+            localizations.telugu,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
