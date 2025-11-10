@@ -103,19 +103,7 @@ dev_dependencies:
 
   build_runner: ^2.9.0
   flutter_gen_runner: ^5.12.0
-  
-  # Testing Dependencies
   mockito: ^5.4.2
-  
-  # Performance Dependencies
-  cached_network_image: ^3.3.0
-  image: ^4.1.7
-  flutter_cache_manager: ^3.3.1
-  http: ^1.1.0
-  
-  # Security Dependencies
-  encrypt: ^5.0.1
-  crypto: ^3.0.3
 
 flutter:
   uses-material-design: true

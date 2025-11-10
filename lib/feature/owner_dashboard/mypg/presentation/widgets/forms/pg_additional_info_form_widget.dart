@@ -7,6 +7,8 @@ import '../../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../../l10n/app_localizations.dart';
 
 /// Additional Information Form Widget
 class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
@@ -16,6 +18,25 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
   final List<String> nearbyPlaces;
   final Function(List<String>) onNearbyPlacesChanged;
   final Function(String) onAddNearbyPlace;
+
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   const PgAdditionalInfoFormWidget({
     super.key,
@@ -30,20 +51,27 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
   @override
   Widget buildAdaptive(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+    final title =
+        loc?.pgAdditionalInfoTitle ?? _text('pgAdditionalInfoTitle', 'Additional Information');
     final nearbyPlaceController = TextEditingController();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HeadingMedium(text: 'Additional Information'),
+        HeadingMedium(text: title),
         const SizedBox(height: AppSpacing.paddingL),
 
         // Parking Details
         TextInput(
           controller: parkingDetailsController,
-          label: 'Parking Details',
-          hint:
-              'e.g., 2-wheeler parking available, 4-wheeler parking: ₹500/month, Capacity: 20 bikes',
+          label: loc?.pgAdditionalInfoParkingLabel ??
+              _text('pgAdditionalInfoParkingLabel', 'Parking Details'),
+          hint: loc?.pgAdditionalInfoParkingHint ??
+              _text(
+                'pgAdditionalInfoParkingHint',
+                'e.g., 2-wheeler parking available, 4-wheeler parking: ₹500/month, Capacity: 20 bikes',
+              ),
           maxLines: 3,
           keyboardType: TextInputType.multiline,
         ),
@@ -53,9 +81,13 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
         // Security Measures
         TextInput(
           controller: securityMeasuresController,
-          label: 'Security Measures',
-          hint:
-              'e.g., 24/7 Security guard, CCTV surveillance, Biometric access, Fire safety equipment',
+          label: loc?.pgAdditionalInfoSecurityLabel ??
+              _text('pgAdditionalInfoSecurityLabel', 'Security Measures'),
+          hint: loc?.pgAdditionalInfoSecurityHint ??
+              _text(
+                'pgAdditionalInfoSecurityHint',
+                'e.g., 24/7 Security guard, CCTV surveillance, Biometric access, Fire safety equipment',
+              ),
           maxLines: 4,
           keyboardType: TextInputType.multiline,
         ),
@@ -63,10 +95,14 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
         const SizedBox(height: AppSpacing.paddingM),
 
         // Nearby Places
-        HeadingMedium(text: 'Nearby Places'),
+        HeadingMedium(
+            text: loc?.pgAdditionalInfoNearbyPlacesTitle ??
+                _text('pgAdditionalInfoNearbyPlacesTitle', 'Nearby Places')),
         const SizedBox(height: AppSpacing.paddingS),
         BodyText(
-          text: 'Add nearby landmarks, locations, or points of interest',
+          text: loc?.pgAdditionalInfoNearbyPlacesDescription ??
+              _text('pgAdditionalInfoNearbyPlacesDescription',
+                  'Add nearby landmarks, locations, or points of interest'),
           color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
         ),
         const SizedBox(height: AppSpacing.paddingM),
@@ -76,8 +112,13 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
             Expanded(
               child: TextInput(
                 controller: nearbyPlaceController,
-                label: 'Nearby Place',
-                hint: 'e.g., Metro Station, Shopping Mall, Hospital',
+                label: loc?.pgAdditionalInfoNearbyPlaceLabel ??
+                    _text('pgAdditionalInfoNearbyPlaceLabel', 'Nearby Place'),
+                hint: loc?.pgAdditionalInfoNearbyPlaceHint ??
+                    _text(
+                      'pgAdditionalInfoNearbyPlaceHint',
+                      'e.g., Metro Station, Shopping Mall, Hospital',
+                    ),
               ),
             ),
             const SizedBox(width: AppSpacing.paddingM),
@@ -89,7 +130,8 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
                   nearbyPlaceController.clear();
                 }
               },
-              label: 'Add',
+              label: loc?.pgAdditionalInfoAddButton ??
+                  _text('pgAdditionalInfoAddButton', 'Add'),
               icon: Icons.add,
             ),
           ],
@@ -137,9 +179,13 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
         // Payment Instructions
         TextInput(
           controller: paymentInstructionsController,
-          label: 'Payment Instructions',
-          hint:
-              'Instructions for making payments, accepted payment methods, payment schedule, etc.',
+          label: loc?.pgAdditionalInfoPaymentInstructionsLabel ??
+              _text('pgAdditionalInfoPaymentInstructionsLabel', 'Payment Instructions'),
+          hint: loc?.pgAdditionalInfoPaymentInstructionsHint ??
+              _text(
+                'pgAdditionalInfoPaymentInstructionsHint',
+                'Instructions for making payments, accepted payment methods, payment schedule, etc.',
+              ),
           maxLines: 4,
           keyboardType: TextInputType.multiline,
         ),

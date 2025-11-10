@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../common/styles/colors.dart';
 import '../../common/utils/logging/logging_helper.dart';
+import '../../l10n/app_localizations.dart';
 // import '../auth/logic/auth_provider.dart';
 import 'complaints/view/screens/guest_complaint_list_screen.dart';
 import 'foods/view/screens/guest_food_list_screen.dart';
@@ -218,6 +219,7 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
   Widget _buildResponsiveBottomNavigationBar() {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return BottomNavigationBar(
       currentIndex: _currentIndex,
@@ -238,36 +240,36 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
       elevation: 8,
       backgroundColor:
           isDarkMode ? AppColors.darkCard : theme.scaffoldBackgroundColor,
-      items: const [
+      items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.apartment),
-          activeIcon: Icon(Icons.apartment_outlined),
-          label: 'PGs',
-          tooltip: 'Browse PG Accommodations',
+          icon: const Icon(Icons.apartment),
+          activeIcon: const Icon(Icons.apartment_outlined),
+          label: loc?.pgs ?? 'PGs',
+          tooltip: loc?.browsePgAccommodations ?? 'Browse PG Accommodations',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.restaurant_menu),
-          activeIcon: Icon(Icons.restaurant),
-          label: 'Foods',
-          tooltip: 'View Food Menu',
+          icon: const Icon(Icons.restaurant_menu),
+          activeIcon: const Icon(Icons.restaurant),
+          label: loc?.foods ?? 'Foods',
+          tooltip: loc?.viewFoodMenu ?? 'View Food Menu',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.payment),
-          activeIcon: Icon(Icons.payment_outlined),
-          label: 'Payments',
-          tooltip: 'Payment History',
+          icon: const Icon(Icons.payment),
+          activeIcon: const Icon(Icons.payment_outlined),
+          label: loc?.payments ?? 'Payments',
+          tooltip: loc?.paymentHistory ?? 'Payment History',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.request_page),
-          activeIcon: Icon(Icons.request_page_outlined),
-          label: 'Requests',
-          tooltip: 'Booking Requests',
+          icon: const Icon(Icons.request_page),
+          activeIcon: const Icon(Icons.request_page_outlined),
+          label: loc?.requests ?? 'Requests',
+          tooltip: loc?.bookingRequests ?? 'Booking Requests',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.report_problem),
-          activeIcon: Icon(Icons.report_problem_outlined),
-          label: 'Complaints',
-          tooltip: 'Complaints & Requests',
+          icon: const Icon(Icons.report_problem),
+          activeIcon: const Icon(Icons.report_problem_outlined),
+          label: loc?.complaints ?? 'Complaints',
+          tooltip: loc?.complaintsAndRequests ?? 'Complaints & Requests',
         ),
       ],
     );

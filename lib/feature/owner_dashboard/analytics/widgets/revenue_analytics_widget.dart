@@ -1,6 +1,7 @@
 // lib/feature/owner_dashboard/analytics/widgets/revenue_analytics_widget.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
@@ -9,6 +10,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 /// Advanced revenue analytics widget for Owner dashboard
 /// Shows revenue trends, forecasting, and performance metrics
@@ -36,22 +38,23 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeader(context, isDark),
+        _buildHeader(context, isDark, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildMetricsCards(context, isDark),
+        _buildMetricsCards(context, isDark, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildChartSection(context, isDark),
+        _buildChartSection(context, isDark, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildForecastingSection(context, isDark),
+        _buildForecastingSection(context, isDark, loc),
       ],
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark) {
+  Widget _buildHeader(BuildContext context, bool isDark, AppLocalizations loc) {
     return Row(
       children: [
         Container(
@@ -71,11 +74,11 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const HeadingMedium(text: 'Revenue Analytics'),
+              HeadingMedium(text: loc.revenueAnalyticsTitle),
               CaptionText(
                 text: widget.selectedPgId != null
-                    ? 'Performance insights for selected PG'
-                    : 'Overall revenue performance',
+                    ? loc.revenueAnalyticsSelectedPg
+                    : loc.revenueAnalyticsOverall,
                 color: isDark ? Colors.white70 : Colors.grey[600],
               ),
             ],
@@ -85,21 +88,29 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
           IconButton(
             onPressed: widget.onRefresh,
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh Data',
+            tooltip: loc.analyticsRefreshData,
           ),
       ],
     );
   }
 
-  Widget _buildMetricsCards(BuildContext context, bool isDark) {
+  Widget _buildMetricsCards(
+      BuildContext context, bool isDark, AppLocalizations loc) {
     final metrics = _calculateMetrics();
+    final currencyFormatter = _currencyFormatter(loc);
+    final percentFormatter = NumberFormat('###0.0', loc.localeName);
+    final totalRevenueValue =
+        currencyFormatter.format(metrics['totalRevenue'] as num);
+    final monthlyGrowthValue = metrics['monthlyGrowth'] as num;
+    final avgPerGuestValue =
+        currencyFormatter.format(metrics['avgPerGuest'] as num);
 
     return Row(
       children: [
         Expanded(
           child: _buildMetricCard(
-            'Total Revenue',
-            '₹${metrics['totalRevenue']}',
+            loc.revenueMetricTotalRevenue,
+            totalRevenueValue,
             Icons.account_balance_wallet,
             Colors.green,
             isDark,
@@ -108,8 +119,8 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: _buildMetricCard(
-            'Monthly Growth',
-            '${metrics['monthlyGrowth']}%',
+            loc.revenueMetricMonthlyGrowth,
+            '${percentFormatter.format(monthlyGrowthValue)}%',
             Icons.trending_up,
             metrics['monthlyGrowth'] >= 0 ? Colors.green : Colors.red,
             isDark,
@@ -118,8 +129,8 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: _buildMetricCard(
-            'Avg. per Guest',
-            '₹${metrics['avgPerGuest']}',
+            loc.revenueMetricAvgPerGuest,
+            avgPerGuestValue,
             Icons.person,
             Colors.blue,
             isDark,
@@ -165,7 +176,8 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildChartSection(BuildContext context, bool isDark) {
+  Widget _buildChartSection(
+      BuildContext context, bool isDark, AppLocalizations loc) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -174,17 +186,17 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
           children: [
             Row(
               children: [
-                const HeadingSmall(text: 'Revenue Trends'),
+                HeadingSmall(text: loc.revenueTrendsLabel),
                 const Spacer(),
-                _buildPeriodSelector(isDark),
+                _buildPeriodSelector(isDark, loc),
                 const SizedBox(width: AppSpacing.paddingM),
-                _buildMetricSelector(isDark),
+                _buildMetricSelector(isDark, loc),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingL),
             SizedBox(
               height: 300,
-              child: _buildSimpleChart(isDark),
+              child: _buildSimpleChart(isDark, loc),
             ),
           ],
         ),
@@ -192,7 +204,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildPeriodSelector(bool isDark) {
+  Widget _buildPeriodSelector(bool isDark, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -207,10 +219,19 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
           color: isDark ? Colors.white : Colors.black,
           fontSize: 14,
         ),
-        items: const [
-          DropdownMenuItem(value: 'weekly', child: Text('Weekly')),
-          DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
-          DropdownMenuItem(value: 'yearly', child: Text('Yearly')),
+        items: [
+          DropdownMenuItem(
+            value: 'weekly',
+            child: Text(loc.analyticsPeriodWeekly),
+          ),
+          DropdownMenuItem(
+            value: 'monthly',
+            child: Text(loc.analyticsPeriodMonthly),
+          ),
+          DropdownMenuItem(
+            value: 'yearly',
+            child: Text(loc.analyticsPeriodYearly),
+          ),
         ],
         onChanged: (value) {
           setState(() {
@@ -221,7 +242,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildMetricSelector(bool isDark) {
+  Widget _buildMetricSelector(bool isDark, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -236,10 +257,19 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
           color: isDark ? Colors.white : Colors.black,
           fontSize: 14,
         ),
-        items: const [
-          DropdownMenuItem(value: 'revenue', child: Text('Revenue')),
-          DropdownMenuItem(value: 'occupancy', child: Text('Occupancy')),
-          DropdownMenuItem(value: 'guests', child: Text('Guests')),
+        items: [
+          DropdownMenuItem(
+            value: 'revenue',
+            child: Text(loc.analyticsMetricRevenue),
+          ),
+          DropdownMenuItem(
+            value: 'occupancy',
+            child: Text(loc.analyticsMetricOccupancy),
+          ),
+          DropdownMenuItem(
+            value: 'guests',
+            child: Text(loc.analyticsMetricGuests),
+          ),
         ],
         onChanged: (value) {
           setState(() {
@@ -250,11 +280,13 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildSimpleChart(bool isDark) {
+  Widget _buildSimpleChart(bool isDark, AppLocalizations loc) {
     final chartData = _getChartData();
-    final labels = chartData['labels'] as List<String>;
+    final months = chartData['months'] as List<int>;
     final values = chartData['data'] as List<int>;
     final maxValue = chartData['maxValue'] as int;
+    final compactCurrency = _compactCurrencyFormatter(loc);
+    final monthFormatter = DateFormat.MMM(loc.localeName);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -287,7 +319,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      labels[index],
+                      monthFormatter.format(DateTime(2000, months[index])),
                       style: TextStyle(
                         color: isDark ? Colors.white70 : Colors.grey[600],
                         fontSize: 12,
@@ -295,7 +327,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '₹${(value / 1000).toStringAsFixed(0)}k',
+                      compactCurrency.format(value),
                       style: TextStyle(
                         color: isDark ? Colors.white : Colors.black,
                         fontSize: 10,
@@ -308,16 +340,16 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
             ),
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          const BodyText(
-            text: 'Revenue Trend (Last 6 Months)',
-          ),
+          BodyText(text: loc.revenueTrendLastMonths(6)),
         ],
       ),
     );
   }
 
-  Widget _buildForecastingSection(BuildContext context, bool isDark) {
-    final forecast = _calculateForecast();
+  Widget _buildForecastingSection(
+      BuildContext context, bool isDark, AppLocalizations loc) {
+    final forecast = _calculateForecast(loc);
+    final currencyFormatter = _currencyFormatter(loc);
 
     return AdaptiveCard(
       child: Padding(
@@ -325,14 +357,14 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const HeadingSmall(text: 'Revenue Forecast'),
+            HeadingSmall(text: loc.revenueForecastTitle),
             const SizedBox(height: AppSpacing.paddingM),
             Row(
               children: [
                 Expanded(
                   child: _buildForecastCard(
-                    'Next Month',
-                    '₹${forecast['nextMonth']}',
+                    loc.revenueForecastNextMonth,
+                    currencyFormatter.format(forecast['nextMonth']),
                     forecast['nextMonthGrowth'],
                     Colors.blue,
                     isDark,
@@ -341,8 +373,8 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildForecastCard(
-                    'Next Quarter',
-                    '₹${forecast['nextQuarter']}',
+                    loc.revenueForecastNextQuarter,
+                    currencyFormatter.format(forecast['nextQuarter']),
                     forecast['nextQuarterGrowth'],
                     Colors.green,
                     isDark,
@@ -351,7 +383,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            _buildForecastInsights(forecast, isDark),
+            _buildForecastInsights(forecast, isDark, loc),
           ],
         ),
       ),
@@ -404,7 +436,8 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildForecastInsights(Map<String, dynamic> forecast, bool isDark) {
+  Widget _buildForecastInsights(
+      Map<String, dynamic> forecast, bool isDark, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
@@ -414,9 +447,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BodyText(
-            text: 'Forecast Insights',
-          ),
+          BodyText(text: loc.revenueForecastInsightsTitle),
           const SizedBox(height: AppSpacing.paddingS),
           BodyText(
             text: forecast['insights'],
@@ -476,27 +507,27 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
   Map<String, dynamic> _getChartData() {
     // Sample data - replace with actual data from your repository
     final sampleData = [
-      {'month': 'Jan', 'revenue': 50000},
-      {'month': 'Feb', 'revenue': 55000},
-      {'month': 'Mar', 'revenue': 60000},
-      {'month': 'Apr', 'revenue': 58000},
-      {'month': 'May', 'revenue': 65000},
-      {'month': 'Jun', 'revenue': 70000},
+      {'month': 1, 'revenue': 50000},
+      {'month': 2, 'revenue': 55000},
+      {'month': 3, 'revenue': 60000},
+      {'month': 4, 'revenue': 58000},
+      {'month': 5, 'revenue': 65000},
+      {'month': 6, 'revenue': 70000},
     ];
 
-    final labels = sampleData.map((d) => d['month'] as String).toList();
+    final months = sampleData.map((d) => d['month'] as int).toList();
     final values = sampleData.map((d) => d['revenue'] as int).toList();
     final maxValue =
         values.isNotEmpty ? values.reduce((a, b) => a > b ? a : b) : 0;
 
     return {
-      'labels': labels,
+      'months': months,
       'data': values,
       'maxValue': maxValue,
     };
   }
 
-  Map<String, dynamic> _calculateForecast() {
+  Map<String, dynamic> _calculateForecast(AppLocalizations loc) {
     // Simple forecasting based on recent trends
     final recentData = _getChartData()['data'] as List<int>;
     if (recentData.length < 3) {
@@ -505,7 +536,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
         'nextQuarter': 0,
         'nextMonthGrowth': 0.0,
         'nextQuarterGrowth': 0.0,
-        'insights': 'Insufficient data for forecasting',
+        'insights': loc.revenueForecastInsufficientData,
       };
     }
 
@@ -519,17 +550,11 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     final nextMonthGrowth = growthRate * 100;
     final nextQuarterGrowth = growthRate * 300;
 
-    String insights = 'Based on recent trends, ';
-    if (growthRate > 0) {
-      insights +=
-          'revenue is showing positive growth. Consider expanding capacity.';
-    } else if (growthRate < -0.1) {
-      insights +=
-          'revenue is declining. Review pricing and marketing strategies.';
-    } else {
-      insights +=
-          'revenue is stable. Focus on maintaining current performance.';
-    }
+    final insights = growthRate > 0
+        ? loc.revenueForecastPositive
+        : growthRate < -0.1
+            ? loc.revenueForecastDecline
+            : loc.revenueForecastStable;
 
     return {
       'nextMonth': nextMonth,
@@ -538,5 +563,26 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
       'nextQuarterGrowth': nextQuarterGrowth,
       'insights': insights,
     };
+  }
+
+  NumberFormat _currencyFormatter(AppLocalizations loc,
+      {int decimalDigits = 0}) {
+    final symbol =
+        NumberFormat.simpleCurrency(locale: loc.localeName).currencySymbol;
+    return NumberFormat.currency(
+      locale: loc.localeName,
+      symbol: symbol,
+      decimalDigits: decimalDigits,
+    );
+  }
+
+  NumberFormat _compactCurrencyFormatter(AppLocalizations loc) {
+    final symbol =
+        NumberFormat.simpleCurrency(locale: loc.localeName).currencySymbol;
+    return NumberFormat.compactCurrency(
+      locale: loc.localeName,
+      symbol: symbol,
+      decimalDigits: 0,
+    );
   }
 }

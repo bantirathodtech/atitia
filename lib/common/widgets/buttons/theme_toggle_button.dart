@@ -37,6 +37,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/app/theme/theme_provider.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ThemeToggleButton extends StatelessWidget {
   // ==========================================================================
@@ -78,23 +79,32 @@ class ThemeToggleButton extends StatelessWidget {
     // ==========================================================================
     final currentMode = themeProvider.themeMode;
     final icon = themeProvider.themeModeIcon;
-    final modeName = themeProvider.themeModeName;
 
-    // ==========================================================================
-    // Determine next theme mode for tooltip
-    // ==========================================================================
-    String nextModeName;
-    switch (currentMode) {
-      case ThemeMode.light:
-        nextModeName = 'Dark Mode';
-        break;
-      case ThemeMode.dark:
-        nextModeName = 'System Default';
-        break;
-      case ThemeMode.system:
-        nextModeName = 'Light Mode';
-        break;
+    String localizedModeName(ThemeMode mode) {
+      switch (mode) {
+        case ThemeMode.light:
+          return AppLocalizations.of(context)?.lightMode ?? 'Light Mode';
+        case ThemeMode.dark:
+          return AppLocalizations.of(context)?.darkMode ?? 'Dark Mode';
+        case ThemeMode.system:
+          return AppLocalizations.of(context)?.systemDefault ?? 'System Default';
+      }
     }
+
+    ThemeMode nextThemeMode(ThemeMode mode) {
+      switch (mode) {
+        case ThemeMode.light:
+          return ThemeMode.dark;
+        case ThemeMode.dark:
+          return ThemeMode.system;
+        case ThemeMode.system:
+          return ThemeMode.light;
+      }
+    }
+
+    final modeName = localizedModeName(currentMode);
+    final nextMode = nextThemeMode(currentMode);
+    final nextModeName = localizedModeName(nextMode);
 
     // ==========================================================================
     // Get icon color based on current theme
@@ -182,7 +192,9 @@ class ThemeToggleButton extends StatelessWidget {
             size: size,
           ),
         ),
-        tooltip: tooltip ?? 'Theme: $modeName\nTap for $nextModeName',
+        tooltip: tooltip ??
+            AppLocalizations.of(context)?.themeTooltip(modeName, nextModeName) ??
+                'Theme: $modeName\nTap for $nextModeName',
         onPressed: () {
           if (enableHapticFeedback) {
             // Optional: Add haptic feedback
@@ -211,6 +223,18 @@ class ThemeModeSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
+    final loc = AppLocalizations.of(context);
+
+    final title = loc?.themeModeTitle ?? 'Theme Mode';
+    final lightModeLabel = loc?.lightMode ?? 'Light Mode';
+    final darkModeLabel = loc?.darkMode ?? 'Dark Mode';
+    final systemDefaultLabel = loc?.systemDefault ?? 'System Default';
+    final lightModeDescription =
+        loc?.themeLightDescription ?? 'Always use bright theme';
+    final darkModeDescription =
+        loc?.themeDarkDescription ?? 'Always use dark theme';
+    final systemModeDescription =
+        loc?.themeSystemDescription ?? 'Follow device settings';
 
     return Card(
       child: Padding(
@@ -220,7 +244,7 @@ class ThemeModeSelector extends StatelessWidget {
           children: [
             // Section title
             Text(
-              'Theme Mode',
+              title,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -233,8 +257,8 @@ class ThemeModeSelector extends StatelessWidget {
               themeProvider,
               ThemeMode.light,
               Icons.light_mode,
-              'Light Mode',
-              'Always use bright theme',
+              lightModeLabel,
+              lightModeDescription,
             ),
             const Divider(height: 1),
 
@@ -244,8 +268,8 @@ class ThemeModeSelector extends StatelessWidget {
               themeProvider,
               ThemeMode.dark,
               Icons.dark_mode,
-              'Dark Mode',
-              'Always use dark theme',
+              darkModeLabel,
+              darkModeDescription,
             ),
             const Divider(height: 1),
 
@@ -255,8 +279,8 @@ class ThemeModeSelector extends StatelessWidget {
               themeProvider,
               ThemeMode.system,
               Icons.brightness_auto,
-              'System Default',
-              'Follow device settings',
+              systemDefaultLabel,
+              systemModeDescription,
             ),
           ],
         ),

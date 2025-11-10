@@ -2,8 +2,10 @@
 
 import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../common/utils/constants/firestore.dart';
+import '../../../../../common/utils/exceptions/exceptions.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../models/owner_overview_model.dart';
 
 /// Repository to fetch owner overview data from Firestore
@@ -12,6 +14,24 @@ import '../models/owner_overview_model.dart';
 class OwnerOverviewRepository {
   final IDatabaseService _databaseService;
   final IAnalyticsService _analyticsService;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
@@ -55,7 +75,13 @@ class OwnerOverviewRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch owner overview data: $e');
+      throw AppException(
+        message: _text(
+          'ownerOverviewFetchFailed',
+          'Failed to fetch owner overview data',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -86,8 +112,8 @@ class OwnerOverviewRepository {
       // If specific PG selected, filter beds calculation to that PG only
       // But keep totalProperties as all published properties count
       if (pgId != null) {
-        final pgDoc =
-            publishedProperties.where((doc) => doc.id == pgId).firstOrNull;
+      final pgDoc =
+          publishedProperties.where((doc) => doc.id == pgId).firstOrNull;
         if (pgDoc != null) {
           // Don't change totalProperties - keep it as all published properties count
           // totalProperties remains = publishedProperties.length
@@ -230,7 +256,13 @@ class OwnerOverviewRepository {
         vacantBeds: vacantBeds,
       );
     } catch (e) {
-      throw Exception('Failed to aggregate owner data: $e');
+      throw AppException(
+        message: _text(
+          'ownerOverviewAggregateFailed',
+          'Failed to aggregate owner data',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -289,7 +321,13 @@ class OwnerOverviewRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch monthly breakdown: $e');
+      throw AppException(
+        message: _text(
+          'ownerMonthlyBreakdownFailed',
+          'Failed to fetch monthly breakdown',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -315,7 +353,12 @@ class OwnerOverviewRepository {
       for (var propertyDoc in publishedProperties) {
         final pgId = propertyDoc.id;
         final pgData = propertyDoc.data() as Map<String, dynamic>;
-        final pgName = pgData['pgName'] ?? 'Property $pgId';
+        final pgName = pgData['pgName'] ??
+            _text(
+              'ownerPropertyFallbackName',
+              'Property {pgId}',
+              parameters: {'pgId': pgId},
+            );
 
         // Fetch payments for this property
         final paymentsSnapshot = await _databaseService
@@ -354,7 +397,13 @@ class OwnerOverviewRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch property breakdown: $e');
+      throw AppException(
+        message: _text(
+          'ownerPropertyBreakdownFailed',
+          'Failed to fetch property breakdown',
+        ),
+        details: e.toString(),
+      );
     }
   }
 }

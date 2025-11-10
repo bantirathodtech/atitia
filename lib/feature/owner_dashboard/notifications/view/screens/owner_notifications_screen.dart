@@ -11,12 +11,13 @@ import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
-import '../../../shared/widgets/owner_drawer.dart';
-import '../../../../../common/widgets/text/body_text.dart';
-import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
+import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../core/viewmodels/notification_viewmodel.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/owner_drawer.dart';
 
 /// Notifications screen for owners
 class OwnerNotificationsScreen extends StatefulWidget {
@@ -28,7 +29,17 @@ class OwnerNotificationsScreen extends StatefulWidget {
 }
 
 class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
-  String _selectedFilter = 'All';
+  static const List<String> _filterKeys = [
+    'all',
+    'unread',
+    'bookings',
+    'payments',
+    'complaints',
+    'bed_changes',
+    'services',
+  ];
+
+  String _selectedFilter = 'all';
 
   @override
   void initState() {
@@ -42,9 +53,10 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'Notifications',
+        title: loc.ownerNotificationsTitle,
         actions: [
           Consumer<NotificationViewModel>(
             builder: (context, viewModel, _) {
@@ -55,7 +67,7 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
                     : () async {
                         await viewModel.markAllAsRead();
                       },
-                tooltip: 'Mark all as read',
+                tooltip: loc.ownerNotificationsMarkAll,
               );
             },
           ),
@@ -78,13 +90,14 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
                   const Icon(Icons.error_outline, size: 48, color: Colors.red),
                   const SizedBox(height: AppSpacing.paddingM),
                   BodyText(
-                    text: viewModel.errorMessage ?? 'Failed to load notifications',
+                    text: viewModel.errorMessage ??
+                        loc.ownerNotificationsLoadFailed,
                     color: AppColors.textSecondary,
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
                   ElevatedButton(
                     onPressed: () => viewModel.loadNotifications(),
-                    child: const Text('Retry'),
+                    child: Text(loc.retry),
                   ),
                 ],
               ),
@@ -96,13 +109,13 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
 
           return Column(
             children: [
-              _buildFilterChips(),
+              _buildFilterChips(loc),
               Expanded(
                 child: filteredNotifications.isEmpty
                     ? EmptyState(
                         icon: Icons.notifications_none,
-                        title: 'No Notifications',
-                        message: 'You don\'t have any notifications yet.',
+                        title: loc.ownerNotificationsEmptyTitle,
+                        message: loc.ownerNotificationsEmptyMessage,
                       )
                     : ListView.builder(
                         padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -113,6 +126,7 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
                             context,
                             notification,
                             viewModel,
+                            loc,
                           );
                         },
                       ),
@@ -124,7 +138,7 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
     );
   }
 
-  Widget _buildFilterChips() {
+  Widget _buildFilterChips(AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingM,
@@ -133,48 +147,67 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: [
-            _buildFilterChip('All'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Unread'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Bookings'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Payments'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Complaints'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Bed Changes'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Services'),
-          ],
+          children: _filterKeys
+              .map(
+                (key) => Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
+                  child: _buildFilterChip(key, loc),
+                ),
+              )
+              .toList(),
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label) {
-    final isSelected = _selectedFilter == label;
+  Widget _buildFilterChip(String key, AppLocalizations loc) {
+    final isSelected = _selectedFilter == key;
     return FilterChip(
-      label: Text(label),
+      label: Text(_filterLabel(key, loc)),
       selected: isSelected,
       onSelected: (selected) {
         setState(() {
-          _selectedFilter = label;
+          _selectedFilter = key;
         });
       },
     );
+  }
+
+  String _filterLabel(String key, AppLocalizations loc) {
+    switch (key) {
+      case 'unread':
+        return loc.ownerNotificationsFilterUnread;
+      case 'bookings':
+        return loc.ownerNotificationsFilterBookings;
+      case 'payments':
+        return loc.ownerNotificationsFilterPayments;
+      case 'complaints':
+        return loc.ownerNotificationsFilterComplaints;
+      case 'bed_changes':
+        return loc.ownerNotificationsFilterBedChanges;
+      case 'services':
+        return loc.ownerNotificationsFilterServices;
+      case 'all':
+      default:
+        return loc.ownerNotificationsFilterAll;
+    }
   }
 
   Widget _buildNotificationCard(
     BuildContext context,
     Map<String, dynamic> notification,
     NotificationViewModel viewModel,
+    AppLocalizations loc,
   ) {
     final isUnread = !(notification['read'] as bool? ?? false);
     final timestamp = notification['timestamp'] as DateTime? ??
         DateTime.now().subtract(const Duration(days: 1));
     final type = notification['type'] as String? ?? '';
+    final title = notification['title'] as String? ??
+        loc.ownerNotificationsDefaultTitle;
+    final body = notification['body'] as String? ??
+        loc.ownerNotificationsDefaultBody;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
@@ -211,7 +244,7 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
                     children: [
                       Expanded(
                         child: BodyText(
-                          text: notification['title'] as String,
+                          text: title,
                           medium: true,
                         ),
                       ),
@@ -228,11 +261,11 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
                   ),
                   const SizedBox(height: 4),
                   CaptionText(
-                    text: notification['body'] as String? ?? 'No message',
+                    text: body,
                   ),
                   const SizedBox(height: 4),
                   CaptionText(
-                    text: _formatTimestamp(timestamp),
+                    text: _formatTimestamp(timestamp, loc),
                     color: AppColors.textTertiary,
                   ),
                 ],
@@ -278,20 +311,19 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
     }
   }
 
-  String _formatTimestamp(DateTime timestamp) {
+  String _formatTimestamp(DateTime timestamp, AppLocalizations loc) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
 
     if (difference.inDays > 0) {
-      return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+      return loc.ownerNotificationsDaysAgo(difference.inDays);
     } else if (difference.inHours > 0) {
-      return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+      return loc.ownerNotificationsHoursAgo(difference.inHours);
     } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
+      return loc.ownerNotificationsMinutesAgo(difference.inMinutes);
     } else {
-      return 'Just now';
+      return loc.ownerNotificationsJustNow;
     }
   }
-
 }
 

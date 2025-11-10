@@ -1,3 +1,5 @@
+import '../../../core/services/localization/internationalization_service.dart';
+
 /// Application-specific business rules and constants.
 ///
 /// ## Purpose:
@@ -88,11 +90,14 @@ class AppConstants {
   // ==========================================
 
   /// Error message for required fields
-  static const String requiredFieldError = 'This field is required';
+  static String get requiredFieldError =>
+      InternationalizationService.instance.translate('requiredFieldError');
 
   /// Error message for invalid phone numbers
-  static const String invalidPhoneError = 'Please enter a valid phone number';
+  static String get invalidPhoneError =>
+      InternationalizationService.instance.translate('invalidPhoneError');
 
   /// Error message for file size limits
-  static const String fileSizeError = 'File size exceeds maximum limit';
+  static String get fileSizeError =>
+      InternationalizationService.instance.translate('fileSizeExceeded');
 }

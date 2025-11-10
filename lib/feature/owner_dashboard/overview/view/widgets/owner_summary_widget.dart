@@ -6,6 +6,7 @@ import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_overview_model.dart';
 
 /// Widget displaying summary statistics for owner dashboard
@@ -19,6 +20,7 @@ class OwnerSummaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Column(
       children: [
         Row(
@@ -26,7 +28,7 @@ class OwnerSummaryWidget extends StatelessWidget {
             Expanded(
               child: _buildSummaryCard(
                 context,
-                'Total Revenue',
+                loc.totalRevenue,
                 overview.formattedTotalRevenue,
                 Icons.account_balance_wallet,
                 Colors.green,
@@ -36,7 +38,7 @@ class OwnerSummaryWidget extends StatelessWidget {
             Expanded(
               child: _buildSummaryCard(
                 context,
-                'Properties',
+                loc.properties,
                 '${overview.totalProperties}',
                 Icons.apartment,
                 Colors.blue,
@@ -50,7 +52,7 @@ class OwnerSummaryWidget extends StatelessWidget {
             Expanded(
               child: _buildSummaryCard(
                 context,
-                'Active Tenants',
+                loc.activeTenants,
                 '${overview.activeTenants}',
                 Icons.people,
                 Colors.orange,
@@ -60,7 +62,7 @@ class OwnerSummaryWidget extends StatelessWidget {
             Expanded(
               child: _buildSummaryCard(
                 context,
-                'Occupancy',
+                loc.occupancy,
                 overview.formattedOccupancyRate,
                 Icons.bed,
                 Colors.purple,
@@ -76,7 +78,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                 Expanded(
                   child: _buildSummaryCard(
                     context,
-                    'Pending Bookings',
+                    loc.pendingBookings,
                     '${overview.pendingBookings}',
                     Icons.pending_actions,
                     Colors.amber,
@@ -88,7 +90,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                 Expanded(
                   child: _buildSummaryCard(
                     context,
-                    'Pending Complaints',
+                    loc.pendingComplaints,
                     '${overview.pendingComplaints}',
                     Icons.report_problem,
                     Colors.red,

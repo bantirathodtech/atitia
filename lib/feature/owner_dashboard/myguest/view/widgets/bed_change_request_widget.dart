@@ -3,12 +3,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../common/styles/spacing.dart';
-import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/text/heading_small.dart';
-import '../../../../../common/widgets/text/body_text.dart';
-import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/models/bed_change_request_model.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 
@@ -25,20 +26,21 @@ class BedChangeRequestWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations loc = AppLocalizations.of(context)!;
     if (requests.isEmpty) {
-      return const Center(
-        child: Column(
+      return Center(
+      child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.bed_outlined, size: 64, color: Colors.grey),
-            SizedBox(height: AppSpacing.paddingM),
+            const Icon(Icons.bed_outlined, size: 64, color: Colors.grey),
+            const SizedBox(height: AppSpacing.paddingM),
             HeadingSmall(
-              text: 'No Bed Change Requests',
+              text: loc.noBedChangeRequests,
               align: TextAlign.center,
             ),
-            SizedBox(height: AppSpacing.paddingS),
+            const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: 'Bed change requests from guests will appear here',
+              text: loc.bedChangeRequestsEmptyBody,
               align: TextAlign.center,
             ),
           ],
@@ -53,16 +55,20 @@ class BedChangeRequestWidget extends StatelessWidget {
         final request = requests[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-          child: _buildRequestCard(context, request),
+          child: _buildRequestCard(context, request, loc),
         );
       },
     );
   }
 
   Widget _buildRequestCard(
-      BuildContext context, BedChangeRequestModel request) {
+    BuildContext context,
+    BedChangeRequestModel request,
+    AppLocalizations loc,
+  ) {
     final isPending = request.status == 'pending';
     final statusColor = _getStatusColor(request.status);
+    final statusLabel = _statusLabel(request.status, loc);
 
     return AdaptiveCard(
       child: Padding(
@@ -74,7 +80,9 @@ class BedChangeRequestWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const HeadingSmall(text: 'Bed Change Request'),
+                HeadingSmall(
+                  text: loc.bedChangeRequestTitle,
+                ),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.paddingS,
@@ -86,7 +94,7 @@ class BedChangeRequestWidget extends StatelessWidget {
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: CaptionText(
-                    text: request.status.toUpperCase(),
+                    text: statusLabel,
                     color: statusColor,
                   ),
                 ),
@@ -96,23 +104,29 @@ class BedChangeRequestWidget extends StatelessWidget {
             // Current assignment
             _buildInfoRow(
               context,
-              'Current',
+              loc.bedChangeCurrent,
               request.currentRoomNumber != null &&
                       request.currentBedNumber != null
-                  ? 'Room ${request.currentRoomNumber}, Bed ${request.currentBedNumber}'
-                  : 'Not assigned',
+                  ? loc.bedChangeCurrentAssignment(
+                      request.currentRoomNumber!,
+                      request.currentBedNumber!,
+                    )
+                  : loc.notAssigned,
             ),
             // Preferred assignment
             if (request.preferredRoomNumber != null ||
                 request.preferredBedNumber != null)
               _buildInfoRow(
                 context,
-                'Preferred',
-                'Room ${request.preferredRoomNumber ?? 'Any'}, Bed ${request.preferredBedNumber ?? 'Any'}',
+                loc.bedChangePreferred,
+                loc.bedChangePreferredAssignment(
+                  request.preferredRoomNumber ?? loc.anyLabel,
+                  request.preferredBedNumber ?? loc.anyLabel,
+                ),
               ),
             // Reason
             const SizedBox(height: AppSpacing.paddingS),
-            const HeadingSmall(text: 'Reason'),
+            HeadingSmall(text: loc.reasonLabel),
             const SizedBox(height: AppSpacing.paddingXS),
             BodyText(text: request.reason),
             const SizedBox(height: AppSpacing.paddingM),
@@ -122,17 +136,17 @@ class BedChangeRequestWidget extends StatelessWidget {
                 children: [
                   Expanded(
                     child: SecondaryButton(
-                      label: 'Reject',
+                      label: loc.reject,
                       icon: Icons.close,
-                      onPressed: () => _showRejectDialog(context, request),
+                      onPressed: () => _showRejectDialog(context, request, loc),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.paddingM),
                   Expanded(
                     child: PrimaryButton(
-                      label: 'Approve',
+                      label: loc.approve,
                       icon: Icons.check,
-                      onPressed: () => _showApproveDialog(context, request),
+                      onPressed: () => _showApproveDialog(context, request, loc),
                     ),
                   ),
                 ],
@@ -150,7 +164,7 @@ class BedChangeRequestWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CaptionText(
-                      text: 'Decision Notes:',
+                      text: '${loc.decisionNotesLabel}:',
                       color: statusColor,
                     ),
                     const SizedBox(height: AppSpacing.paddingXS),
@@ -191,27 +205,46 @@ class BedChangeRequestWidget extends StatelessWidget {
     }
   }
 
-  void _showApproveDialog(BuildContext context, BedChangeRequestModel request) {
+  String _statusLabel(String status, AppLocalizations? loc) {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return loc?.bedChangeStatusApproved ?? 'APPROVED';
+      case 'rejected':
+        return loc?.bedChangeStatusRejected ?? 'REJECTED';
+      case 'pending':
+        return loc?.bedChangeStatusPending ?? 'PENDING';
+      default:
+        return status.toUpperCase();
+    }
+  }
+
+  void _showApproveDialog(
+    BuildContext context,
+    BedChangeRequestModel request,
+    AppLocalizations loc,
+  ) {
     final notesController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingSmall(text: 'Approve Bed Change Request'),
+        title: HeadingSmall(
+          text: loc.approveBedChangeTitle,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const BodyText(
-              text: 'The guest will be moved to their preferred room/bed.',
+            BodyText(
+              text: loc.approveBedChangeDescription,
             ),
             const SizedBox(height: AppSpacing.paddingM),
             TextField(
               controller: notesController,
-              decoration: const InputDecoration(
-                labelText: 'Notes (Optional)',
-                hintText: 'Add approval notes...',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: loc.notesOptional,
+                hintText: loc.approvalNotesHint,
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -220,10 +253,10 @@ class BedChangeRequestWidget extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           PrimaryButton(
-            label: 'Approve',
+            label: loc.approve,
             onPressed: () async {
               final success = await viewModel.approveBedChangeRequest(
                 request.requestId,
@@ -235,9 +268,11 @@ class BedChangeRequestWidget extends StatelessWidget {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success
-                        ? 'Bed change approved successfully'
-                        : 'Failed to approve bed change'),
+                    content: Text(
+                      success
+                          ? loc.bedChangeApproveSuccess
+                          : loc.bedChangeApproveFailure,
+                    ),
                     backgroundColor: success ? Colors.green : Colors.red,
                   ),
                 );
@@ -249,27 +284,33 @@ class BedChangeRequestWidget extends StatelessWidget {
     );
   }
 
-  void _showRejectDialog(BuildContext context, BedChangeRequestModel request) {
+  void _showRejectDialog(
+    BuildContext context,
+    BedChangeRequestModel request,
+    AppLocalizations loc,
+  ) {
     final notesController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingSmall(text: 'Reject Bed Change Request'),
+        title: HeadingSmall(
+          text: loc.rejectBedChangeTitle,
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const BodyText(
-              text: 'Please provide a reason for rejection.',
+            BodyText(
+              text: loc.rejectBedChangeDescription,
             ),
             const SizedBox(height: AppSpacing.paddingM),
             TextField(
               controller: notesController,
-              decoration: const InputDecoration(
-                labelText: 'Rejection Reason *',
-                hintText: 'Explain why the request is being rejected...',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: loc.rejectionReasonRequired,
+                hintText: loc.rejectionReasonHintDetailed,
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -278,15 +319,15 @@ class BedChangeRequestWidget extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           PrimaryButton(
-            label: 'Reject',
+            label: loc.reject,
             onPressed: () async {
               if (notesController.text.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please provide a rejection reason'),
+                  SnackBar(
+                    content: Text(loc.provideRejectionReason),
                     backgroundColor: Colors.orange,
                   ),
                 );
@@ -300,9 +341,11 @@ class BedChangeRequestWidget extends StatelessWidget {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success
-                        ? 'Bed change rejected'
-                        : 'Failed to reject bed change'),
+                    content: Text(
+                      success
+                          ? loc.bedChangeRejectSuccess
+                          : loc.bedChangeRejectFailure,
+                    ),
                     backgroundColor: success ? Colors.orange : Colors.red,
                   ),
                 );

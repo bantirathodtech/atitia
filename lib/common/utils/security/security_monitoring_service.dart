@@ -2,6 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../../../core/di/firebase/di/firebase_service_locator.dart';
 
 /// Security monitoring service for threat detection and security event logging
@@ -15,6 +16,8 @@ class SecurityMonitoringService {
   final List<SecurityAlert> _securityAlerts = [];
   final Map<String, int> _failedAttempts = {};
   final Map<String, DateTime> _lastFailedAttempt = {};
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   // Security thresholds
   static const int _maxFailedAttempts = 5;
@@ -56,6 +59,22 @@ class SecurityMonitoringService {
     _sendToSecurityService(event);
   }
 
+  String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   /// Log authentication failure
   void logAuthenticationFailure({
     required String userId,
@@ -67,9 +86,18 @@ class SecurityMonitoringService {
     _failedAttempts[key] = (_failedAttempts[key] ?? 0) + 1;
     _lastFailedAttempt[key] = DateTime.now();
 
+    final description = _translate(
+      'securityAuthFailureDescription',
+      'Authentication failed for user {userId}: {failureReason}',
+      parameters: {
+        'userId': userId,
+        'failureReason': failureReason,
+      },
+    );
+
     logSecurityEvent(
       eventType: 'authentication_failure',
-      description: 'Authentication failed for user $userId: $failureReason',
+      description: description,
       userId: userId,
       deviceId: deviceId,
       level: SecurityLevel.warning,
@@ -82,10 +110,14 @@ class SecurityMonitoringService {
 
     // Check if this should trigger a security alert
     if (_failedAttempts[key]! >= _maxFailedAttempts) {
+      final alertDescription = _translate(
+        'securityMultipleFailuresDetected',
+        'Multiple failed authentication attempts detected for user {userId}',
+        parameters: {'userId': userId},
+      );
       _triggerSecurityAlert(
         alertType: 'multiple_failed_attempts',
-        description:
-            'Multiple failed authentication attempts detected for user $userId',
+        description: alertDescription,
         userId: userId,
         deviceId: deviceId,
         severity: SecuritySeverity.high,
@@ -178,7 +210,11 @@ class SecurityMonitoringService {
 
     logSecurityEvent(
       eventType: 'authentication_success',
-      description: 'Successful authentication for user $userId',
+      description: _translate(
+        'securityAuthSuccessDescription',
+        'Successful authentication for user {userId}',
+        parameters: {'userId': userId},
+      ),
       userId: userId,
       deviceId: deviceId,
       level: SecurityLevel.info,
@@ -250,9 +286,14 @@ class SecurityMonitoringService {
 
     final failedAttempts = _getFailedAttemptsForUser(userId);
     if (failedAttempts >= _maxFailedAttempts) {
+      final description = _translate(
+        'securityMultipleFailuresAlertDescription',
+        'Multiple failed authentication attempts for user {userId}',
+        parameters: {'userId': userId},
+      );
       _triggerSecurityAlert(
         alertType: 'multiple_failed_attempts',
-        description: 'Multiple failed authentication attempts for user $userId',
+        description: description,
         userId: userId,
         deviceId: event.deviceId,
         severity: SecuritySeverity.high,
@@ -378,12 +419,27 @@ class SecurityMonitoringService {
 
       // In debug mode, also log to console
       if (kDebugMode) {
-        debugPrint('Security Event: ${event.eventType} - ${event.description}');
+        debugPrint(
+          _translate(
+            'securityEventConsoleLog',
+            'Security Event: {eventType} - {description}',
+            parameters: {
+              'eventType': event.eventType,
+              'description': event.description,
+            },
+          ),
+        );
       }
     } catch (e) {
       // If analytics fails, at least log to console in debug mode
       if (kDebugMode) {
-        debugPrint('Failed to send security event to analytics: $e');
+        debugPrint(
+          _translate(
+            'securityEventSendFailure',
+            'Failed to send security event to analytics: {error}',
+            parameters: {'error': e.toString()},
+          ),
+        );
       }
     }
   }
@@ -424,14 +480,26 @@ class SecurityMonitoringService {
 
       // In debug mode, also log to console
       if (kDebugMode) {
-        debugPrint(
-          'Security Alert [${alert.severity}]: ${alert.alertType} - ${alert.description}',
-        );
+        debugPrint(_translate(
+          'securityAlertConsoleLog',
+          'Security Alert [{severity}]: {alertType} - {description}',
+          parameters: {
+            'severity': alert.severity.toString(),
+            'alertType': alert.alertType,
+            'description': alert.description,
+          },
+        ));
       }
     } catch (e) {
       // If services fail, at least log to console in debug mode
       if (kDebugMode) {
-        debugPrint('Failed to send security alert to services: $e');
+        debugPrint(
+          _translate(
+            'securityAlertSendFailure',
+            'Failed to send security alert to services: {error}',
+            parameters: {'error': e.toString()},
+          ),
+        );
       }
     }
   }

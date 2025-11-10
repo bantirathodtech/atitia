@@ -10,6 +10,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../../shared/widgets/pg_selector_dropdown.dart';
@@ -122,6 +123,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
     final selectedPgProvider = context.watch<SelectedPgProvider>();
     final ownerId = authProvider.user?.userId ?? '';
     final currentPgId = selectedPgProvider.selectedPgId;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AdaptiveAppBar(
@@ -138,17 +140,17 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
             icon: const Icon(Icons.restaurant_menu),
             onPressed: () => _showInitializeMenusDialog(
                 context, foodVM, ownerId, currentPgId),
-            tooltip: 'Create PG Menus',
+            tooltip: loc.createPgMenus,
           ),
           IconButton(
             icon: const Icon(Icons.calendar_month),
             onPressed: () => _showSpecialMenuOptions(context, foodVM, ownerId),
-            tooltip: 'Special Menus',
+            tooltip: loc.specialMenus,
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => foodVM.refreshMenus(ownerId, pgId: currentPgId),
-            tooltip: 'Refresh Menus',
+            tooltip: loc.refreshMenu,
           ),
         ],
 
@@ -172,6 +174,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
   /// Builds appropriate body content based on current state
   Widget _buildBody(BuildContext context, OwnerFoodViewModel foodVM,
       String ownerId, String? currentPgId) {
+    final loc = AppLocalizations.of(context)!;
     if (foodVM.loading && foodVM.weeklyMenus.isEmpty) {
       return Center(
         child: Column(
@@ -179,7 +182,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
           children: [
             const AdaptiveLoader(),
             const SizedBox(height: AppSpacing.paddingM),
-            const BodyText(text: 'Loading menus...'),
+            BodyText(text: loc.loadingMenus),
           ],
         ),
       );
@@ -192,10 +195,10 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: AppSpacing.paddingM),
-            const BodyText(text: 'Failed to load menus'),
+            BodyText(text: loc.failedToLoadMenus),
             const SizedBox(height: AppSpacing.paddingM),
             PrimaryButton(
-              label: 'Retry',
+              label: loc.retry,
               onPressed: () => foodVM.refreshMenus(ownerId, pgId: currentPgId),
             ),
           ],
@@ -210,13 +213,13 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
     return TabBarView(
       controller: _tabController,
       children: [
-        OwnerMenuDayTab(dayLabel: 'Monday'),
-        OwnerMenuDayTab(dayLabel: 'Tuesday'),
-        OwnerMenuDayTab(dayLabel: 'Wednesday'),
-        OwnerMenuDayTab(dayLabel: 'Thursday'),
-        OwnerMenuDayTab(dayLabel: 'Friday'),
-        OwnerMenuDayTab(dayLabel: 'Saturday'),
-        OwnerMenuDayTab(dayLabel: 'Sunday'),
+        OwnerMenuDayTab(dayLabel: loc.monday),
+        OwnerMenuDayTab(dayLabel: loc.tuesday),
+        OwnerMenuDayTab(dayLabel: loc.wednesday),
+        OwnerMenuDayTab(dayLabel: loc.thursday),
+        OwnerMenuDayTab(dayLabel: loc.friday),
+        OwnerMenuDayTab(dayLabel: loc.saturday),
+        OwnerMenuDayTab(dayLabel: loc.sunday),
       ],
     );
   }
@@ -224,22 +227,22 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
   /// Builds empty state when no menus exist
   Widget _buildEmptyState(BuildContext context, OwnerFoodViewModel foodVM,
       String ownerId, String? currentPgId) {
+    final loc = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.restaurant_menu, size: 64, color: Colors.grey),
           const SizedBox(height: AppSpacing.paddingM),
-          const HeadingMedium(text: 'No PG Menus Found'),
+          HeadingMedium(text: loc.noPgMenusFound),
           const SizedBox(height: AppSpacing.paddingS),
-          const BodyText(
-            text: 'Create weekly menus for this PG to get started',
+          BodyText(
+            text: loc.createWeeklyMenusForThisPg,
             align: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.paddingL),
-          const BodyText(
-            text:
-                'Use the "Create PG Menus" button in the app bar to get started',
+          BodyText(
+            text: loc.useCreatePgMenusButton,
             align: TextAlign.center,
           ),
         ],
@@ -250,20 +253,21 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
   /// Shows dialog to initialize default menus
   void _showInitializeMenusDialog(BuildContext context,
       OwnerFoodViewModel foodVM, String ownerId, String? currentPgId) {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Create PG Weekly Menus'),
-        content: const Text(
-          'This will create default menu templates for all 7 days of the week for this PG. You can edit them later.',
+        title: Text(loc.createPgWeeklyMenus),
+        content: Text(
+          loc.thisWillCreateDefaultMenuTemplates,
         ),
         actions: [
           SecondaryButton(
-            label: 'Cancel',
+            label: loc.cancel,
             onPressed: () => Navigator.of(context).pop(),
           ),
           PrimaryButton(
-            label: 'Initialize',
+            label: loc.initialize,
             onPressed: () async {
               Navigator.of(context).pop();
               await _initializeDefaultMenus(foodVM, ownerId, currentPgId);
@@ -277,18 +281,24 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
   /// Initializes default menus for all days
   Future<void> _initializeDefaultMenus(
       OwnerFoodViewModel foodVM, String ownerId, String? currentPgId) async {
+    final loc = AppLocalizations.of(context)!;
     try {
       await foodVM.initializeDefaultMenus(ownerId, pgId: currentPgId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Default menus initialized successfully')),
+          SnackBar(
+            content: Text(loc.defaultMenusInitializedSuccessfully),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to initialize menus: $e')),
+          SnackBar(
+            content: Text(
+              loc.failedToInitializeMenusWithError(e.toString()),
+            ),
+          ),
         );
       }
     }
@@ -297,6 +307,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
   /// Shows special menu options dialog
   void _showSpecialMenuOptions(
       BuildContext context, OwnerFoodViewModel foodVM, String ownerId) {
+    final loc = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       builder: (context) => Container(
@@ -304,12 +315,12 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const HeadingMedium(text: 'Special Menu Options'),
+            HeadingMedium(text: loc.specialMenuOptions),
             const SizedBox(height: AppSpacing.paddingM),
             ListTile(
               leading: const Icon(Icons.calendar_today),
-              title: const Text('Add Festival Menu'),
-              subtitle: const Text('Create special menu for festivals'),
+              title: Text(loc.addFestivalMenu),
+              subtitle: Text(loc.createSpecialMenuForFestivals),
               onTap: () {
                 Navigator.pop(context);
                 _navigateToSpecialMenuScreen(context, 'festival');
@@ -317,8 +328,8 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
             ),
             ListTile(
               leading: const Icon(Icons.event),
-              title: const Text('Add Event Menu'),
-              subtitle: const Text('Create special menu for events'),
+              title: Text(loc.addEventMenu),
+              subtitle: Text(loc.createSpecialMenuForEvents),
               onTap: () {
                 Navigator.pop(context);
                 _navigateToSpecialMenuScreen(context, 'event');
@@ -326,8 +337,8 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
             ),
             ListTile(
               leading: const Icon(Icons.restaurant),
-              title: const Text('View All Special Menus'),
-              subtitle: const Text('Manage existing special menus'),
+              title: Text(loc.viewAllSpecialMenus),
+              subtitle: Text(loc.manageExistingSpecialMenus),
               onTap: () {
                 Navigator.pop(context);
                 _navigateToSpecialMenuScreen(context, 'manage');

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
@@ -11,6 +12,7 @@ import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 import '../../data/models/owner_guest_model.dart';
 
@@ -24,6 +26,25 @@ class GuestListWidget extends StatefulWidget {
 
 class _GuestListWidgetState extends State<GuestListWidget> {
   final TextEditingController _searchController = TextEditingController();
+
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -46,20 +67,21 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   Widget build(BuildContext context) {
     final guestVM = context.watch<OwnerGuestViewModel>();
     final filteredGuests = guestVM.filteredGuests;
+    final loc = AppLocalizations.of(context);
 
     return Column(
       children: [
-        _buildSearchAndFilters(context, guestVM),
+        _buildSearchAndFilters(context, guestVM, loc),
         Expanded(
-          child: _buildGuestList(context, guestVM, filteredGuests),
+          child: _buildGuestList(context, guestVM, filteredGuests, loc),
         ),
       ],
     );
   }
 
   /// Builds search bar and filter controls
-  Widget _buildSearchAndFilters(
-      BuildContext context, OwnerGuestViewModel guestVM) {
+  Widget _buildSearchAndFilters(BuildContext context,
+      OwnerGuestViewModel guestVM, AppLocalizations? loc) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -70,8 +92,11 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               Expanded(
                 child: TextInput(
                   controller: _searchController,
-                  label: 'Search Guests',
-                  hint: 'Search by name, phone, room, or email...',
+                  label: loc?.searchGuestsLabel ??
+                      _text('searchGuestsLabel', 'Search Guests'),
+                  hint: loc?.searchGuestsHint ??
+                      _text('searchGuestsHint',
+                          'Search by name, phone, room, or email...'),
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -89,7 +114,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               IconButton(
                 icon: const Icon(Icons.tune),
                 onPressed: () => _showAdvancedSearch(context, guestVM),
-                tooltip: 'Advanced Search',
+                tooltip: loc?.advancedSearch ??
+                    _text('advancedSearch', 'Advanced Search'),
               ),
             ],
           ),
@@ -100,22 +126,40 @@ class _GuestListWidgetState extends State<GuestListWidget> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip('All', 'all', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc?.all ?? _text('all', 'All'),
+                    'all',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Active', 'active', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc?.active ?? _text('active', 'Active'),
+                    'active',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Inactive', 'inactive', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc?.inactive ?? _text('inactive', 'Inactive'),
+                    'inactive',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Pending', 'pending', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc?.pending ?? _text('pending', 'Pending'),
+                    'pending',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('New', 'new', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc?.statusNew ?? _text('statusNew', 'New'),
+                    'new',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('VIP', 'vip', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc?.statusVip ?? _text('statusVip', 'VIP'),
+                    'vip',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
               ],
             ),
@@ -123,7 +167,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
           const SizedBox(height: AppSpacing.paddingS),
 
           // Quick stats and bulk actions
-          _buildQuickStatsAndActions(context, guestVM),
+          _buildQuickStatsAndActions(context, guestVM, loc),
         ],
       ),
     );
@@ -143,8 +187,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   }
 
   /// Builds quick stats and bulk actions bar
-  Widget _buildQuickStatsAndActions(
-      BuildContext context, OwnerGuestViewModel guestVM) {
+  Widget _buildQuickStatsAndActions(BuildContext context,
+      OwnerGuestViewModel guestVM, AppLocalizations? loc) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingM,
@@ -161,12 +205,19 @@ class _GuestListWidgetState extends State<GuestListWidget> {
           Expanded(
             child: Row(
               children: [
-                _buildStatChip(context, 'Total', '${guestVM.guests.length}'),
+                _buildStatChip(
+                    context,
+                    loc?.total ?? _text('total', 'Total'),
+                    '${guestVM.guests.length}'),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildStatChip(context, 'Active',
+                _buildStatChip(
+                    context,
+                    loc?.active ?? _text('active', 'Active'),
                     '${guestVM.guests.where((g) => g.status == 'active').length}'),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildStatChip(context, 'New',
+                _buildStatChip(
+                    context,
+                    loc?.statusNew ?? _text('statusNew', 'New'),
                     '${guestVM.guests.where((g) => g.status == 'new').length}'),
               ],
             ),
@@ -174,8 +225,9 @@ class _GuestListWidgetState extends State<GuestListWidget> {
           // Bulk actions
           IconButton(
             icon: const Icon(Icons.download),
-            onPressed: () => _exportGuests(context, guestVM),
-            tooltip: 'Export Data',
+            onPressed: () => _exportGuests(context, guestVM, loc),
+            tooltip:
+                loc?.exportData ?? _text('exportData', 'Export Data'),
           ),
         ],
       ),
@@ -205,41 +257,45 @@ class _GuestListWidgetState extends State<GuestListWidget> {
 
   /// Shows advanced search dialog
   void _showAdvancedSearch(BuildContext context, OwnerGuestViewModel guestVM) {
+    final loc = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingMedium(text: 'Advanced Search'),
+        title: HeadingMedium(
+            text:
+                loc?.advancedSearch ?? _text('advancedSearch', 'Advanced Search')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextInput(
-              label: 'Name',
-              hint: 'Guest name',
+              label: loc?.guestName ?? _text('guestName', 'Guest Name'),
+              hint: _text('guestNameHint', 'Guest full name'),
             ),
             const SizedBox(height: AppSpacing.paddingM),
             TextInput(
-              label: 'Phone',
-              hint: 'Phone number',
+              label: loc?.phoneNumber ?? _text('phoneNumber', 'Phone'),
+              hint: _text('phoneNumberHint', 'Phone number'),
             ),
             const SizedBox(height: AppSpacing.paddingM),
             TextInput(
-              label: 'Room',
-              hint: 'Room number',
+              label: _text('roomLabel', 'Room'),
+              hint: _text('roomHint', 'Room number'),
             ),
             const SizedBox(height: AppSpacing.paddingM),
             TextInput(
-              label: 'Email',
-              hint: 'Email address',
+              label: loc?.emailLabel ?? _text('emailLabel', 'Email'),
+              hint: _text('emailHint', 'Email address'),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const BodyText(text: 'Cancel'),
+              child:
+                BodyText(text: loc?.cancel ?? _text('cancel', 'Cancel')),
           ),
           PrimaryButton(
-            label: 'Search',
+            label: loc?.search ?? _text('search', 'Search'),
             onPressed: () {
               Navigator.pop(context);
               // TODO: Implement advanced search
@@ -251,17 +307,23 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   }
 
   /// Exports all guests
-  void _exportGuests(BuildContext context, OwnerGuestViewModel guestVM) {
+  void _exportGuests(BuildContext context, OwnerGuestViewModel guestVM,
+      AppLocalizations? loc) {
     // TODO: Implement export functionality
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: BodyText(text: 'Guest data exported successfully')),
+      SnackBar(
+        content: Text(
+          loc?.guestDataExportedSuccessfully ??
+              _text('guestDataExportedSuccessfully',
+                  'Guest data exported successfully'),
+        ),
+      ),
     );
   }
 
   /// Builds guest list
   Widget _buildGuestList(BuildContext context, OwnerGuestViewModel guestVM,
-      List<OwnerGuestModel> guests) {
+      List<OwnerGuestModel> guests, AppLocalizations? loc) {
     if (guestVM.loading && guests.isEmpty) {
       return const Center(child: AdaptiveLoader());
     }
@@ -269,19 +331,19 @@ class _GuestListWidgetState extends State<GuestListWidget> {
     return Column(
       children: [
         // Stats header
-        _buildStatsHeader(context, guestVM),
+        _buildStatsHeader(context, guestVM, loc),
         const SizedBox(height: AppSpacing.paddingM),
         // Guest list or structured empty state
         Expanded(
           child: guests.isEmpty
-              ? _buildStructuredEmptyState(context, guestVM)
+              ? _buildStructuredEmptyState(context, guestVM, loc)
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.paddingM),
                   itemCount: guests.length,
                   itemBuilder: (context, index) {
                     final guest = guests[index];
-                    return _buildGuestCard(context, guestVM, guest);
+                    return _buildGuestCard(context, guestVM, guest, loc);
                   },
                 ),
         ),
@@ -290,7 +352,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   }
 
   /// Builds stats header
-  Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM) {
+  Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM,
+      AppLocalizations? loc) {
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -310,7 +373,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
           Expanded(
             child: _buildStatCard(
               context,
-              'Total Guests',
+              loc?.totalGuests ?? 'Total Guests',
               guestVM.totalGuests.toString(),
               Icons.people,
               AppColors.primary,
@@ -320,7 +383,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
           Expanded(
             child: _buildStatCard(
               context,
-              'Active',
+              loc?.active ?? 'Active',
               guestVM.activeGuests.toString(),
               Icons.check_circle,
               Colors.green,
@@ -330,7 +393,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
           Expanded(
             child: _buildStatCard(
               context,
-              'Inactive',
+              loc?.inactive ?? 'Inactive',
               (guestVM.totalGuests - guestVM.activeGuests).toString(),
               Icons.pause_circle,
               Colors.orange,
@@ -356,8 +419,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   }
 
   /// Builds structured empty state with placeholder rows
-  Widget _buildStructuredEmptyState(
-      BuildContext context, OwnerGuestViewModel guestVM) {
+  Widget _buildStructuredEmptyState(BuildContext context,
+      OwnerGuestViewModel guestVM, AppLocalizations? loc) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -374,7 +437,9 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               children: [
                 const Icon(Icons.people_outline, size: 20, color: Colors.grey),
                 const SizedBox(width: AppSpacing.paddingS),
-                const BodyText(text: 'Guest List'),
+                BodyText(
+                  text: loc?.guestListTitle ?? 'Guest List',
+                ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -384,7 +449,9 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
-                  child: const BodyText(text: '0 guests'),
+                  child: BodyText(
+                    text: loc?.guestCount(0) ?? '0 guests',
+                  ),
                 ),
               ],
             ),
@@ -413,10 +480,13 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               children: [
                 const Icon(Icons.people_outline, size: 48, color: Colors.grey),
                 const SizedBox(height: AppSpacing.paddingM),
-                const HeadingMedium(text: 'No Guests Yet'),
+                HeadingMedium(
+                  text: loc?.noGuestsYet ?? 'No Guests Yet',
+                ),
                 const SizedBox(height: AppSpacing.paddingS),
-                const BodyText(
-                  text: 'Guests will appear here once they book your PG',
+                BodyText(
+                  text: loc?.guestsAppearAfterBooking ??
+                      'Guests will appear here once they book your PG',
                   align: TextAlign.center,
                 ),
               ],
@@ -498,12 +568,12 @@ class _GuestListWidgetState extends State<GuestListWidget> {
 
   /// Builds individual guest card
   Widget _buildGuestCard(BuildContext context, OwnerGuestViewModel guestVM,
-      OwnerGuestModel guest) {
+      OwnerGuestModel guest, AppLocalizations? loc) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
       child: AdaptiveCard(
         child: InkWell(
-          onTap: () => _showGuestDetails(context, guestVM, guest),
+          onTap: () => _showGuestDetails(context, guestVM, guest, loc),
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -526,7 +596,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                       children: [
                         CircleAvatar(
                           radius: 24,
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                          backgroundColor:
+                              AppColors.primary.withValues(alpha: 0.1),
                           child: Text(
                             guest.guestName.isNotEmpty
                                 ? guest.guestName[0].toUpperCase()
@@ -584,9 +655,9 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                                     color: Colors.green,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: const Text(
-                                    'NEW',
-                                    style: TextStyle(
+                                  child: Text(
+                                    (loc?.statusNew ?? 'New').toUpperCase(),
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
@@ -614,9 +685,9 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                                 color: Colors.amber,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Text(
-                                'VIP',
-                                style: TextStyle(
+                              child: Text(
+                                (loc?.statusVip ?? 'VIP').toUpperCase(),
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -630,50 +701,60 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                     // Status chip and actions
                     Column(
                       children: [
-                        _buildStatusChip(guest.status),
+                        _buildStatusChip(context, guest.status, loc),
                         const SizedBox(height: 4),
                         PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, size: 16),
                           onSelected: (value) => _handleGuestAction(
-                              context, guestVM, guest, value),
+                              context, guestVM, guest, value, loc),
                           itemBuilder: (context) => [
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'view',
                               child: ListTile(
-                                leading: Icon(Icons.visibility, size: 16),
-                                title: Text('View Details'),
+                                leading: const Icon(Icons.visibility, size: 16),
+                                title: Text(
+                                    AppLocalizations.of(context)?.viewDetails ??
+                                        'View Details'),
                                 contentPadding: EdgeInsets.zero,
                               ),
                             ),
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'edit',
                               child: ListTile(
-                                leading: Icon(Icons.edit, size: 16),
-                                title: Text('Edit Guest'),
+                                leading: const Icon(Icons.edit, size: 16),
+                                title: Text(
+                                    AppLocalizations.of(context)?.editGuest ??
+                                        'Edit Guest'),
                                 contentPadding: EdgeInsets.zero,
                               ),
                             ),
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'message',
                               child: ListTile(
-                                leading: Icon(Icons.message, size: 16),
-                                title: Text('Send Message'),
+                                leading: const Icon(Icons.message, size: 16),
+                                title: Text(
+                                    AppLocalizations.of(context)?.sendMessage ??
+                                        'Send Message'),
                                 contentPadding: EdgeInsets.zero,
                               ),
                             ),
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'call',
                               child: ListTile(
-                                leading: Icon(Icons.phone, size: 16),
-                                title: Text('Call Guest'),
+                                leading: const Icon(Icons.phone, size: 16),
+                                title: Text(
+                                    AppLocalizations.of(context)?.callGuest ??
+                                        'Call Guest'),
                                 contentPadding: EdgeInsets.zero,
                               ),
                             ),
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'checkout',
                               child: ListTile(
-                                leading: Icon(Icons.logout, size: 16),
-                                title: Text('Check Out'),
+                                leading: const Icon(Icons.logout, size: 16),
+                                title: Text(
+                                    AppLocalizations.of(context)?.checkOut ??
+                                        'Check Out'),
                                 contentPadding: EdgeInsets.zero,
                               ),
                             ),
@@ -692,14 +773,14 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.phone,
-                        label: 'Phone',
+                        label: loc?.phoneNumber ?? 'Phone',
                         value: guest.phoneNumber,
                       ),
                     ),
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.email,
-                        label: 'Email',
+                        label: loc?.email ?? 'Email',
                         value: guest.email,
                       ),
                     ),
@@ -713,14 +794,14 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.calendar_today,
-                        label: 'Check-in',
+                        label: loc?.checkIn ?? 'Check-in',
                         value: _formatDate(guest.checkInDate),
                       ),
                     ),
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.timer,
-                        label: 'Duration',
+                        label: loc?.duration ?? 'Duration',
                         value: guest.formattedStayDuration,
                       ),
                     ),
@@ -731,7 +812,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                   const SizedBox(height: AppSpacing.paddingS),
                   _buildDetailItem(
                     icon: Icons.emergency,
-                    label: 'Emergency Contact',
+                    label: loc?.emergencyContact ?? 'Emergency Contact',
                     value:
                         '${guest.emergencyContact} (${guest.emergencyPhone})',
                   ),
@@ -782,7 +863,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   }
 
   /// Builds status chip
-  Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(
+      BuildContext context, String status, AppLocalizations? loc) {
     Color chipColor;
     Color textColor;
 
@@ -799,6 +881,14 @@ class _GuestListWidgetState extends State<GuestListWidget> {
         chipColor = Colors.orange.withValues(alpha: 0.1);
         textColor = Colors.orange;
         break;
+      case 'new':
+        chipColor = Colors.blue.withValues(alpha: 0.1);
+        textColor = Colors.blue;
+        break;
+      case 'vip':
+        chipColor = Colors.purple.withValues(alpha: 0.1);
+        textColor = Colors.purple;
+        break;
       default:
         chipColor = Colors.grey.withValues(alpha: 0.1);
         textColor = Colors.grey;
@@ -811,7 +901,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
-        status.toUpperCase(),
+        _localizedStatusLabel(status, loc).toUpperCase(),
         style: TextStyle(
           color: textColor,
           fontSize: 12,
@@ -821,9 +911,26 @@ class _GuestListWidgetState extends State<GuestListWidget> {
     );
   }
 
+  String _localizedStatusLabel(String status, AppLocalizations? loc) {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return loc?.active ?? 'Active';
+      case 'inactive':
+        return loc?.inactive ?? 'Inactive';
+      case 'pending':
+        return loc?.pending ?? 'Pending';
+      case 'new':
+        return loc?.statusNew ?? 'New';
+      case 'vip':
+        return loc?.statusVip ?? 'VIP';
+      default:
+        return status;
+    }
+  }
+
   /// Shows guest details dialog
   void _showGuestDetails(BuildContext context, OwnerGuestViewModel guestVM,
-      OwnerGuestModel guest) {
+      OwnerGuestModel guest, AppLocalizations? loc) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -833,36 +940,42 @@ class _GuestListWidgetState extends State<GuestListWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailRow('Room', guest.roomAssignment),
-              _buildDetailRow('Phone', guest.phoneNumber),
-              _buildDetailRow('Email', guest.email),
-              _buildDetailRow('Check-in', _formatDate(guest.checkInDate)),
+              _buildDetailRow(loc?.room ?? 'Room', guest.roomAssignment),
+              _buildDetailRow(loc?.phoneNumber ?? 'Phone', guest.phoneNumber),
+              _buildDetailRow(loc?.email ?? 'Email', guest.email),
+              _buildDetailRow(
+                  loc?.checkIn ?? 'Check-in', _formatDate(guest.checkInDate)),
               if (guest.checkOutDate != null)
-                _buildDetailRow('Check-out', _formatDate(guest.checkOutDate!)),
-              _buildDetailRow('Duration', guest.formattedStayDuration),
+                _buildDetailRow(loc?.checkOut ?? 'Check-out',
+                    _formatDate(guest.checkOutDate!)),
+              _buildDetailRow(
+                  loc?.duration ?? 'Duration', guest.formattedStayDuration),
               if (guest.emergencyContact.isNotEmpty) ...[
-                _buildDetailRow('Emergency Contact', guest.emergencyContact),
-                _buildDetailRow('Emergency Phone', guest.emergencyPhone),
+                _buildDetailRow(loc?.emergencyContact ?? 'Emergency Contact',
+                    guest.emergencyContact),
+                _buildDetailRow(loc?.emergencyPhone ?? 'Emergency Phone',
+                    guest.emergencyPhone),
               ],
               if (guest.address.isNotEmpty)
-                _buildDetailRow('Address', guest.address),
+                _buildDetailRow(loc?.address ?? 'Address', guest.address),
               if (guest.occupation.isNotEmpty)
-                _buildDetailRow('Occupation', guest.occupation),
+                _buildDetailRow(
+                    loc?.occupation ?? 'Occupation', guest.occupation),
               if (guest.company.isNotEmpty)
-                _buildDetailRow('Company', guest.company),
+                _buildDetailRow(loc?.company ?? 'Company', guest.company),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(loc?.close ?? 'Close'),
           ),
           PrimaryButton(
-            label: 'Edit Guest',
+            label: loc?.editGuest ?? 'Edit Guest',
             onPressed: () {
               Navigator.of(context).pop();
-              _editGuest(context, guestVM, guest);
+              _editGuest(context, guestVM, guest, loc);
             },
           ),
         ],
@@ -894,7 +1007,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
 
   /// Shows edit guest dialog
   void _editGuest(BuildContext context, OwnerGuestViewModel guestVM,
-      OwnerGuestModel guest) {
+      OwnerGuestModel guest, AppLocalizations? loc) {
     final nameController = TextEditingController(text: guest.guestName);
     final phoneController = TextEditingController(text: guest.phoneNumber);
     final emailController = TextEditingController(text: guest.email);
@@ -902,77 +1015,82 @@ class _GuestListWidgetState extends State<GuestListWidget> {
         TextEditingController(text: guest.emergencyContact);
     final emergencyPhoneController =
         TextEditingController(text: guest.emergencyPhone);
+    final messenger = ScaffoldMessenger.of(context);
+    final locOuter = AppLocalizations.of(context) ?? loc;
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Guest'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextInput(
-                controller: nameController,
-                label: 'Guest Name',
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                controller: phoneController,
-                label: 'Phone Number',
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                controller: emailController,
-                label: 'Email',
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                controller: emergencyController,
-                label: 'Emergency Contact',
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                controller: emergencyPhoneController,
-                label: 'Emergency Phone',
-              ),
-            ],
+      builder: (dialogContext) {
+        final locDialog = AppLocalizations.of(dialogContext) ?? locOuter;
+        return AlertDialog(
+          title: Text(locDialog?.editGuest ?? 'Edit Guest'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextInput(
+                  controller: nameController,
+                  label: locDialog?.guestName ?? 'Guest Name',
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: phoneController,
+                  label: locDialog?.phoneNumber ?? 'Phone Number',
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: emailController,
+                  label: locDialog?.email ?? 'Email',
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: emergencyController,
+                  label: locDialog?.emergencyContact ?? 'Emergency Contact',
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: emergencyPhoneController,
+                  label: locDialog?.emergencyPhone ?? 'Emergency Phone',
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Save Changes',
-            onPressed: () async {
-              final updatedGuest = guest.copyWith(
-                guestName: nameController.text,
-                phoneNumber: phoneController.text,
-                email: emailController.text,
-                emergencyContact: emergencyController.text,
-                emergencyPhone: emergencyPhoneController.text,
-                updatedAt: DateTime.now(),
-              );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(locDialog?.cancel ?? 'Cancel'),
+            ),
+            PrimaryButton(
+              label: locDialog?.saveChanges ?? 'Save Changes',
+              onPressed: () async {
+                final navigator = Navigator.of(dialogContext);
+                final updatedGuest = guest.copyWith(
+                  guestName: nameController.text,
+                  phoneNumber: phoneController.text,
+                  email: emailController.text,
+                  emergencyContact: emergencyController.text,
+                  emergencyPhone: emergencyPhoneController.text,
+                  updatedAt: DateTime.now(),
+                );
 
-              final success = await guestVM.updateGuest(updatedGuest);
-              // FIXED: BuildContext async gap warning
-              // Flutter recommends: Check mounted immediately before using context after async operations
-              // Changed from: Using context with mounted check in compound condition after async gap
-              // Changed to: Check mounted immediately before each context usage
-              // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-              if (!success || !mounted) return;
-              // ignore: use_build_context_synchronously
-              Navigator.of(context).pop();
-              if (!mounted) return;
-              // ignore: use_build_context_synchronously
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Guest updated successfully')),
-              );
-            },
-          ),
-        ],
-      ),
+                final success = await guestVM.updateGuest(updatedGuest);
+                if (!success || !mounted) return;
+                navigator.pop();
+                if (!mounted) return;
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      locOuter?.guestUpdatedSuccessfully ??
+                          _text('guestUpdatedSuccessfully',
+                              'Guest updated successfully'),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -999,41 +1117,48 @@ class _GuestListWidgetState extends State<GuestListWidget> {
 
   /// Handles guest action from popup menu
   void _handleGuestAction(BuildContext context, OwnerGuestViewModel guestVM,
-      OwnerGuestModel guest, String action) {
+      OwnerGuestModel guest, String action, AppLocalizations? loc) {
     switch (action) {
       case 'view':
-        _showGuestDetails(context, guestVM, guest);
+        _showGuestDetails(context, guestVM, guest, loc);
         break;
       case 'edit':
-        _editGuest(context, guestVM, guest);
+        _editGuest(context, guestVM, guest, loc);
         break;
       case 'message':
-        _sendMessageToGuest(context, guestVM, guest);
+        _sendMessageToGuest(context, guestVM, guest, loc);
         break;
       case 'call':
         _callGuest(guest);
         break;
       case 'checkout':
-        _checkoutGuest(context, guestVM, guest);
+        _checkoutGuest(context, guestVM, guest, loc);
         break;
     }
   }
 
   /// Sends message to guest
   void _sendMessageToGuest(BuildContext context, OwnerGuestViewModel guestVM,
-      OwnerGuestModel guest) {
+      OwnerGuestModel guest, AppLocalizations? loc) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingMedium(text: 'Send Message'),
+        title: HeadingMedium(
+            text: (AppLocalizations.of(context) ?? loc)?.sendMessage ??
+                'Send Message'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            BodyText(text: 'To: ${guest.displayName}'),
+            BodyText(
+                text: (AppLocalizations.of(context) ?? loc)
+                        ?.messageToGuest(guest.displayName) ??
+                    'To: ${guest.displayName}'),
             const SizedBox(height: AppSpacing.paddingM),
             TextInput(
-              label: 'Message',
-              hint: 'Enter your message...',
+              label:
+                  (AppLocalizations.of(context) ?? loc)?.message ?? 'Message',
+              hint: (AppLocalizations.of(context) ?? loc)?.enterMessageHint ??
+                  'Enter your message...',
               maxLines: 3,
             ),
           ],
@@ -1041,16 +1166,23 @@ class _GuestListWidgetState extends State<GuestListWidget> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const BodyText(text: 'Cancel'),
+            child: BodyText(
+                text:
+                    (AppLocalizations.of(context) ?? loc)?.cancel ?? 'Cancel'),
           ),
           PrimaryButton(
-            label: 'Send',
+            label: (AppLocalizations.of(context) ?? loc)?.send ?? 'Send',
             onPressed: () {
               Navigator.pop(context);
               // TODO: Implement send message
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: BodyText(text: 'Message sent successfully')),
+                SnackBar(
+                  content: BodyText(
+                    text: (AppLocalizations.of(context) ?? loc)
+                            ?.messageSentSuccessfully ??
+                        'Message sent successfully',
+                  ),
+                ),
               );
             },
           ),
@@ -1066,28 +1198,39 @@ class _GuestListWidgetState extends State<GuestListWidget> {
 
   /// Checks out guest
   void _checkoutGuest(BuildContext context, OwnerGuestViewModel guestVM,
-      OwnerGuestModel guest) {
+      OwnerGuestModel guest, AppLocalizations? loc) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingMedium(text: 'Check Out Guest'),
-        content: const BodyText(
-          text:
+        title: HeadingMedium(
+            text: (AppLocalizations.of(context) ?? loc)?.checkOutGuest ??
+                'Check Out Guest'),
+        content: BodyText(
+          text: (AppLocalizations.of(context) ?? loc)
+                  ?.checkOutGuestConfirmation ??
               'Are you sure you want to check out this guest? This action cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const BodyText(text: 'Cancel'),
+            child: BodyText(
+                text:
+                    (AppLocalizations.of(context) ?? loc)?.cancel ?? 'Cancel'),
           ),
           PrimaryButton(
-            label: 'Check Out',
+            label:
+                (AppLocalizations.of(context) ?? loc)?.checkOut ?? 'Check Out',
             onPressed: () {
               Navigator.pop(context);
               // TODO: Implement checkout
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: BodyText(text: 'Guest checked out successfully')),
+                SnackBar(
+                  content: BodyText(
+                    text: (AppLocalizations.of(context) ?? loc)
+                            ?.guestCheckedOutSuccessfully ??
+                        'Guest checked out successfully',
+                  ),
+                ),
               );
             },
           ),

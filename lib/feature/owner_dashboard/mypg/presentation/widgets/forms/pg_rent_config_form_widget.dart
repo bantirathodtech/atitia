@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../../../common/lifecycle/stateless/adaptive_stateless_widget.dart';
 import '../../../../../../common/styles/spacing.dart';
-import '../../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../../common/widgets/dropdowns/adaptive_dropdown.dart';
+import '../../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../../l10n/app_localizations.dart';
 
 /// Rent Configuration Form Widget
 class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
@@ -26,24 +27,26 @@ class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
 
   @override
   Widget buildAdaptive(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HeadingMedium(text: 'Rent Configuration'),
+        HeadingMedium(text: loc.pgRentConfigTitle),
         const SizedBox(height: AppSpacing.paddingL),
 
         // Rent for different sharing types
         ...rentControllers.entries.map((entry) {
           final sharingType = entry.key;
           final controller = entry.value;
-          final displayName = sharingType.replaceAll('-', ' ').toUpperCase();
+          final displayName =
+              loc.pgRentConfigSharingLabel(sharingType.replaceAll('-', ' '));
 
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
             child: TextInput(
               controller: controller,
-              label: 'Rent for $displayName (₹)',
-              hint: 'e.g., 8000',
+              label: loc.pgRentConfigRentLabel(displayName),
+              hint: loc.pgRentConfigRentHint,
               keyboardType: TextInputType.number,
             ),
           );
@@ -54,21 +57,33 @@ class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
         // Security Deposit
         TextInput(
           controller: depositController,
-          label: 'Security Deposit (₹)',
-          hint: 'e.g., 10000',
+          label: loc.pgRentConfigDepositLabel,
+          hint: loc.pgRentConfigDepositHint,
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: AppSpacing.paddingM),
 
         // Maintenance Type
         AdaptiveDropdown<String>(
-          label: 'Maintenance Type',
+          label: loc.pgRentConfigMaintenanceTypeLabel,
           value: maintenanceType,
-          items: const [
-            DropdownMenuItem(value: 'one_time', child: Text('One Time')),
-            DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
-            DropdownMenuItem(value: 'quarterly', child: Text('Quarterly')),
-            DropdownMenuItem(value: 'yearly', child: Text('Yearly')),
+          items: [
+            DropdownMenuItem(
+              value: 'one_time',
+              child: Text(loc.pgRentConfigMaintenanceOneTime),
+            ),
+            DropdownMenuItem(
+              value: 'monthly',
+              child: Text(loc.pgRentConfigMaintenanceMonthly),
+            ),
+            DropdownMenuItem(
+              value: 'quarterly',
+              child: Text(loc.pgRentConfigMaintenanceQuarterly),
+            ),
+            DropdownMenuItem(
+              value: 'yearly',
+              child: Text(loc.pgRentConfigMaintenanceYearly),
+            ),
           ],
           onChanged: (value) {
             if (value != null) {
@@ -81,20 +96,20 @@ class PgRentConfigFormWidget extends AdaptiveStatelessWidget {
         // Maintenance Amount
         TextInput(
           controller: maintenanceAmountController,
-          label: 'Maintenance Amount (₹)',
-          hint: 'e.g., 500',
+          label: loc.pgRentConfigMaintenanceAmountLabel,
+          hint: loc.pgRentConfigMaintenanceAmountHint,
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: AppSpacing.paddingL),
 
         // Deposit Refund Policy
         BodyText(
-          text: 'Deposit Refund Policy:',
+          text: loc.pgRentConfigRefundTitle,
         ),
         const SizedBox(height: AppSpacing.paddingS),
-        const BodyText(text: '• Full refund if notice ≥ 30 days'),
-        const BodyText(text: '• 50% refund if notice ≥ 15 days'),
-        const BodyText(text: '• No refund if notice < 15 days'),
+        BodyText(text: loc.pgRentConfigRefundFull),
+        BodyText(text: loc.pgRentConfigRefundPartial),
+        BodyText(text: loc.pgRentConfigRefundNone),
       ],
     );
   }

@@ -10,6 +10,7 @@ import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/loaders/shimmer_loader.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
 import '../../../../auth/logic/auth_provider.dart';
@@ -36,7 +37,7 @@ class GuestComplaintsListScreen extends StatefulWidget {
 }
 
 class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
-  String _selectedFilter = 'All';
+  String _selectedFilter = 'All'; // Internal key, localized via map
 
   @override
   void initState() {
@@ -71,7 +72,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               getIt<NavigationService>()
                   .goToRoute(AppRoutes.guestComplaintAdd());
             },
-            tooltip: 'Add Complaint',
+            tooltip: AppLocalizations.of(context)?.addComplaint ?? 'Add Complaint',
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -83,7 +84,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                 complaintVM.loadComplaints(guestId);
               }
             },
-            tooltip: 'Refresh',
+            tooltip: AppLocalizations.of(context)?.refresh ?? 'Refresh',
           ),
         ],
         showBackButton: false,
@@ -184,7 +185,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
         title: HeadingMedium(
-          text: 'My Complaints',
+          text: AppLocalizations.of(context)?.myComplaints ?? 'My Complaints',
           color: AppColors.textOnPrimary,
         ),
         background: Container(
@@ -218,7 +219,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               complaintVM.loadComplaints(guestId);
             }
           },
-          tooltip: 'Refresh',
+          tooltip: AppLocalizations.of(context)?.refresh ?? 'Refresh',
         ),
       ],
     );
@@ -238,11 +239,11 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildStatBadge(context, '$total', 'Total', Icons.list_alt,
+        _buildStatBadge(context, '$total', AppLocalizations.of(context)?.total ?? 'Total', Icons.list_alt,
             AppColors.info, isDarkMode),
-        _buildStatBadge(context, '$pending', 'Pending', Icons.pending,
+        _buildStatBadge(context, '$pending', AppLocalizations.of(context)?.pending ?? 'Pending', Icons.pending,
             AppColors.warning, isDarkMode),
-        _buildStatBadge(context, '$resolved', 'Resolved', Icons.check_circle,
+        _buildStatBadge(context, '$resolved', AppLocalizations.of(context)?.resolved ?? 'Resolved', Icons.check_circle,
             AppColors.success, isDarkMode),
       ],
     );
@@ -361,18 +362,29 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
       BuildContext context, GuestComplaintViewModel complaintVM) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+    
+    // Map English filter values to localized display strings
+    final filterMap = {
+      'All': loc?.all ?? 'All',
+      'Pending': loc?.pending ?? 'Pending',
+      'In Progress': loc?.inProgress ?? 'In Progress',
+      'Resolved': loc?.resolved ?? 'Resolved',
+    };
+    
+    final filterKeys = ['All', 'Pending', 'In Progress', 'Resolved'];
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: ['All', 'Pending', 'In Progress', 'Resolved'].map((filter) {
+          children: filterKeys.map((filter) {
             final isSelected = _selectedFilter == filter;
             return Container(
               margin: const EdgeInsets.only(right: AppSpacing.paddingS),
               child: FilterChip(
-                label: Text(filter),
+                label: Text(filterMap[filter] ?? filter),
                 selected: isSelected,
                 onSelected: (selected) {
                   setState(() => _selectedFilter = filter);
@@ -403,13 +415,22 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
     }
 
     if (complaints.isEmpty) {
+      final loc = AppLocalizations.of(context);
+      final filterMap = {
+        'All': '',
+        'Pending': loc?.pending ?? 'Pending',
+        'In Progress': loc?.inProgress ?? 'In Progress',
+        'Resolved': loc?.resolved ?? 'Resolved',
+      };
+      final filterLabel = filterMap[_selectedFilter] ?? '';
       return SliverToBoxAdapter(
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.paddingL),
           child: EmptyState(
-            title:
-                'No ${_selectedFilter == 'All' ? '' : _selectedFilter} Complaints',
-            message: 'No complaints found with the selected filter',
+            title: filterLabel.isEmpty 
+                ? (loc?.noComplaintsFound ?? 'No Complaints Found')
+                : '${loc?.noComplaintsFound ?? 'No Complaints Found'} - $filterLabel',
+            message: loc?.noComplaintsFoundWithSelectedFilter ?? 'No complaints found with the selected filter',
             icon: Icons.filter_list_off,
           ),
         ),
@@ -503,13 +524,14 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
   /// ❌ Error State
   Widget _buildErrorState(
       BuildContext context, GuestComplaintViewModel complaintVM) {
+    final loc = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: EmptyState(
-        title: 'Error Loading Complaints',
-        message: complaintVM.errorMessage ?? 'Unable to load complaints',
+        title: loc?.errorLoadingComplaints ?? 'Error Loading Complaints',
+        message: complaintVM.errorMessage ?? (loc?.unableToLoadComplaints ?? 'Unable to load complaints'),
         icon: Icons.error_outline,
-        actionLabel: 'Retry',
+        actionLabel: loc?.retry ?? 'Retry',
         onAction: () {
           final authProvider =
               Provider.of<AuthProvider>(context, listen: false);
@@ -545,6 +567,8 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
 
   /// 📊 Complaint zero-state stats section
   Widget _buildComplaintZeroStateStats(BuildContext context, bool isDarkMode) {
+    final loc = AppLocalizations.of(context);
+
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -560,7 +584,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Complaint Statistics',
+            text: loc?.complaintStatistics ?? 'Complaint Statistics',
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -571,7 +595,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               Expanded(
                 child: _buildComplaintStatCard(
                   context,
-                  'Total Complaints',
+                  loc?.totalComplaints ?? 'Total Complaints',
                   '0',
                   Icons.report_problem,
                   Colors.blue,
@@ -582,7 +606,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               Expanded(
                 child: _buildComplaintStatCard(
                   context,
-                  'Pending',
+                  loc?.pending ?? 'Pending',
                   '0',
                   Icons.pending,
                   Colors.orange,
@@ -597,7 +621,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               Expanded(
                 child: _buildComplaintStatCard(
                   context,
-                  'In Progress',
+                  loc?.inProgress ?? 'In Progress',
                   '0',
                   Icons.hourglass_empty,
                   Colors.amber,
@@ -608,7 +632,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               Expanded(
                 child: _buildComplaintStatCard(
                   context,
-                  'Resolved',
+                  loc?.resolved ?? 'Resolved',
                   '0',
                   Icons.check_circle,
                   Colors.green,
@@ -623,7 +647,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               Expanded(
                 child: _buildComplaintStatCard(
                   context,
-                  'High Priority',
+                  loc?.highPriority ?? 'High Priority',
                   '0',
                   Icons.priority_high,
                   Colors.red,
@@ -634,7 +658,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               Expanded(
                 child: _buildComplaintStatCard(
                   context,
-                  'This Month',
+                  loc?.thisMonth ?? 'This Month',
                   '0',
                   Icons.calendar_month,
                   Colors.purple,
@@ -700,13 +724,15 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
   /// 📝 Placeholder complaint structure
   Widget _buildPlaceholderComplaintStructure(
       BuildContext context, bool isDarkMode) {
+    final loc = AppLocalizations.of(context);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Recent Complaints Preview',
+            text: loc?.recentComplaintsPreview ?? 'Recent Complaints Preview',
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -891,6 +917,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
   Widget _buildComplaintEmptyStateAction(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
@@ -912,12 +939,12 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
           ),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(
-            text: 'No Complaints Yet',
+            text: AppLocalizations.of(context)?.noComplaintsYet ?? 'No Complaints Yet',
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           const SizedBox(height: AppSpacing.paddingS),
           Text(
-            'You haven\'t submitted any complaints yet. Your complaints and their status will appear here once you submit them.',
+            AppLocalizations.of(context)?.noComplaintsYetDescription ?? 'You haven\'t submitted any complaints yet. Tap the + button to add your first complaint.',
             style: TextStyle(
               color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 14,
@@ -937,7 +964,8 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Common Complaint Categories:',
+                  loc?.commonComplaintCategories ??
+                      'Common Complaint Categories:',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: isDarkMode ? Colors.white : Colors.black87,
@@ -945,16 +973,24 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
                 _buildPlaceholderComplaintCategory(
-                    context, 'Maintenance Issues', isDarkMode),
+                    context,
+                    loc?.maintenanceIssues ?? 'Maintenance Issues',
+                    isDarkMode),
                 const SizedBox(height: AppSpacing.paddingS),
                 _buildPlaceholderComplaintCategory(
-                    context, 'Cleanliness', isDarkMode),
+                    context,
+                    loc?.cleanliness ?? 'Cleanliness',
+                    isDarkMode),
                 const SizedBox(height: AppSpacing.paddingS),
                 _buildPlaceholderComplaintCategory(
-                    context, 'Food Quality', isDarkMode),
+                    context,
+                    loc?.foodQuality ?? 'Food Quality',
+                    isDarkMode),
                 const SizedBox(height: AppSpacing.paddingS),
                 _buildPlaceholderComplaintCategory(
-                    context, 'Noise Complaints', isDarkMode),
+                    context,
+                    loc?.noiseComplaints ?? 'Noise Complaints',
+                    isDarkMode),
               ],
             ),
           ),
@@ -968,7 +1004,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                     .goToRoute(AppRoutes.guestComplaintAdd());
               },
               icon: const Icon(Icons.add),
-              label: const Text('Submit First Complaint'),
+              label: Text(AppLocalizations.of(context)?.submitFirstComplaint ?? 'Submit First Complaint'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
                 foregroundColor: Colors.white,

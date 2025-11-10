@@ -58,6 +58,7 @@ import '../../lifecycle/stateless/adaptive_stateless_widget.dart';
 import '../../styles/spacing.dart';
 import '../../styles/typography.dart';
 import '../buttons/theme_toggle_button.dart';
+import '../../../l10n/app_localizations.dart';
 
 class AdaptiveAppBar extends AdaptiveStatelessWidget
     implements PreferredSizeWidget {
@@ -646,6 +647,8 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
   Widget _buildPlatformBackButton(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+    final backLabel = loc?.back ?? 'Back';
 
     if (_isIOS(context)) {
       return CupertinoButton(
@@ -661,7 +664,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
             ),
             const SizedBox(width: 4),
             Text(
-              'Back',
+              backLabel,
               style: TextStyle(
                 color: isDark ? Colors.white : Colors.black,
                 fontSize: 17,
@@ -678,7 +681,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
           color: isDark ? Colors.white : Colors.black,
         ),
         onPressed: () => Navigator.of(context).pop(),
-        tooltip: 'Back',
+        tooltip: backLabel,
       );
     }
   }
@@ -687,6 +690,8 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
   Widget _buildDrawerButton(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+    final menuLabel = loc?.menu ?? 'Menu';
 
     return IconButton(
       icon: Icon(
@@ -701,7 +706,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
             // Default behavior: open drawer
             Scaffold.of(context).openDrawer();
           },
-      tooltip: 'Menu',
+      tooltip: menuLabel,
     );
   }
 

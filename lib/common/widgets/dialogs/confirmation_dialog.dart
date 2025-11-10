@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../styles/spacing.dart';
 import '../buttons/primary_button.dart';
 import '../buttons/secondary_button.dart';
@@ -16,8 +17,8 @@ import '../text/heading_medium.dart';
 class ConfirmationDialog extends StatelessWidget {
   final String title;
   final String message;
-  final String confirmText;
-  final String cancelText;
+  final String? confirmText;
+  final String? cancelText;
   final VoidCallback? onConfirm;
   final VoidCallback? onCancel;
   final bool isDestructive;
@@ -27,8 +28,8 @@ class ConfirmationDialog extends StatelessWidget {
     super.key,
     required this.title,
     required this.message,
-    this.confirmText = 'Confirm',
-    this.cancelText = 'Cancel',
+    this.confirmText,
+    this.cancelText,
     this.onConfirm,
     this.onCancel,
     this.isDestructive = false,
@@ -38,6 +39,9 @@ class ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
+    final finalConfirmText = confirmText ?? loc?.confirm ?? 'Confirm';
+    final finalCancelText = cancelText ?? loc?.cancel ?? 'Cancel';
 
     return AlertDialog(
       title: Row(
@@ -57,7 +61,7 @@ class ConfirmationDialog extends StatelessWidget {
       content: BodyText(text: message),
       actions: [
         SecondaryButton(
-          label: cancelText,
+          label: finalCancelText,
           onPressed: () {
             Navigator.pop(context);
             onCancel?.call();
@@ -65,7 +69,7 @@ class ConfirmationDialog extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.sm),
         PrimaryButton(
-          label: confirmText,
+          label: finalConfirmText,
           onPressed: () {
             onConfirm?.call();
           },

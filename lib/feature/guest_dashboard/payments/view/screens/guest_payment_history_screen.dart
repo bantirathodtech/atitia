@@ -2,20 +2,22 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
+import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../../../common/widgets/loaders/adaptive_loader.dart';
-import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/widgets/indicators/empty_state.dart';
+import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/utils/constants/routes.dart';
+import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../feature/guest_dashboard/shared/widgets/user_location_display.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../data/models/guest_payment_model.dart';
 import '../../viewmodel/guest_payment_viewmodel.dart';
 
@@ -30,8 +32,26 @@ class GuestPaymentHistoryScreen extends StatefulWidget {
 }
 
 class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
-  String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'Pending', 'Paid', 'Overdue', 'Failed'];
+  String _selectedFilter = 'all';
+  final List<String> _filters = ['all', 'pending', 'paid', 'overdue', 'failed'];
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -47,10 +67,12 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'Payment History',
+        title: loc?.paymentHistory ??
+            _text('paymentHistory', 'Payment History'),
         showBackButton: true,
       ),
       body: Column(
@@ -62,7 +84,7 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
           ),
 
           // Filter Chips
-          _buildFilterSection(context, isDarkMode),
+          _buildFilterSection(context, isDarkMode, loc),
 
           // Payment List
           Expanded(
@@ -73,13 +95,17 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                 }
 
                 if (paymentVM.payments.isEmpty) {
-                  return _buildEmptyState(context);
+                  return _buildEmptyState(context, loc);
                 }
 
                 final filteredPayments = _getFilteredPayments(paymentVM);
 
                 if (filteredPayments.isEmpty) {
-                  return _buildEmptyFilterState(context, _selectedFilter);
+                  return _buildEmptyFilterState(
+                    context,
+                    loc,
+                    _selectedFilter,
+                  );
                 }
 
                 return ListView.builder(
@@ -87,7 +113,12 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                   itemCount: filteredPayments.length,
                   itemBuilder: (context, index) {
                     final payment = filteredPayments[index];
-                    return _buildPaymentCard(context, payment, isDarkMode);
+                    return _buildPaymentCard(
+                      context,
+                      payment,
+                      isDarkMode,
+                      loc,
+                    );
                   },
                 );
               },
@@ -98,7 +129,11 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
     );
   }
 
-  Widget _buildFilterSection(BuildContext context, bool isDarkMode) {
+  Widget _buildFilterSection(
+    BuildContext context,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingM,
@@ -119,10 +154,11 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
         child: Row(
           children: _filters.map((filter) {
             final isSelected = _selectedFilter == filter;
+            final label = _filterLabel(filter, loc);
             return Padding(
               padding: const EdgeInsets.only(right: AppSpacing.paddingS),
               child: FilterChip(
-                label: Text(filter),
+                label: Text(label),
                 selected: isSelected,
                 onSelected: (selected) {
                   setState(() {
@@ -153,10 +189,15 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
   }
 
   Widget _buildPaymentCard(
-      BuildContext context, GuestPaymentModel payment, bool isDarkMode) {
+    BuildContext context,
+    GuestPaymentModel payment,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     final theme = Theme.of(context);
     final statusColor = _getStatusColor(payment.status);
     final statusIcon = _getStatusIcon(payment.status);
+    final statusLabel = _statusLabel(payment.status, loc);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
@@ -188,7 +229,7 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                         color: theme.textTheme.titleMedium?.color,
                       ),
                       CaptionText(
-                        text: _formatDate(payment.paymentDate),
+                        text: _formatDate(payment.paymentDate, loc),
                         color: theme.textTheme.bodySmall?.color,
                       ),
                     ],
@@ -198,7 +239,7 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '₹${payment.amount.toStringAsFixed(2)}',
+                      _formatAmount(payment.amount, loc),
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: statusColor,
@@ -214,7 +255,7 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        payment.status,
+                        statusLabel,
                         style: TextStyle(
                           color: statusColor,
                           fontSize: 12,
@@ -236,8 +277,8 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                 Expanded(
                   child: _buildInfoItem(
                     context,
-                    'Due Date',
-                    _formatDate(payment.dueDate),
+                    loc?.dueDate ?? _text('dueDate', 'Due Date'),
+                    _formatDate(payment.dueDate, loc),
                     Icons.calendar_today,
                   ),
                 ),
@@ -245,7 +286,8 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                   Expanded(
                     child: _buildInfoItem(
                       context,
-                      'Transaction ID',
+                      loc?.transactionId ??
+                          _text('transactionId', 'Transaction ID'),
                       payment.transactionId!.length > 12
                           ? '${payment.transactionId!.substring(0, 12)}...'
                           : payment.transactionId!,
@@ -265,7 +307,17 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                   ),
                   const SizedBox(width: AppSpacing.paddingXS),
                   BodyText(
-                    text: 'Payment Method: ${payment.paymentMethod.toUpperCase()}',
+                    text: loc?.paymentMethodWithValue(
+                          _paymentMethodLabel(payment.paymentMethod, loc),
+                        ) ??
+                        _text(
+                          'paymentMethodWithValue',
+                          'Payment Method: {method}',
+                          parameters: {
+                            'method':
+                                _paymentMethodLabel(payment.paymentMethod, loc),
+                          },
+                        ),
                     small: true,
                     color: theme.textTheme.bodySmall?.color,
                   ),
@@ -305,24 +357,90 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, AppLocalizations? loc) {
     return EmptyState(
-      title: 'No Payments Yet',
-      message: 'You haven\'t made any payments yet. Payments will appear here once you make them.',
+      title: loc?.noPaymentsYet ??
+          _text('noPaymentsYet', 'No Payments Yet'),
+      message: loc?.noPaymentsYetDescription ??
+          _text(
+            'noPaymentsYetDescription',
+            'You haven\'t made any payments yet. Payments will appear here once you make them.',
+          ),
       icon: Icons.account_balance_wallet_outlined,
-      actionLabel: 'Make Payment',
+      actionLabel:
+          loc?.makePayment ?? _text('makePayment', 'Make Payment'),
       onAction: () {
         Navigator.of(context).pop();
       },
     );
   }
 
-  Widget _buildEmptyFilterState(BuildContext context, String filter) {
+  Widget _buildEmptyFilterState(
+    BuildContext context,
+    AppLocalizations? loc,
+    String filter,
+  ) {
+    final filterLabel = _filterLabel(filter, loc);
     return EmptyState(
-      title: 'No $filter Payments',
-      message: 'You don\'t have any $filter.toLowerCase() payments at the moment.',
+      title: loc?.noPaymentsForFilter(filterLabel) ??
+          _text('noPaymentsForFilter', 'No {filter} Payments',
+              parameters: {'filter': filterLabel}),
+      message: loc?.noPaymentsForFilterDescription(filterLabel) ??
+          _text('noPaymentsForFilterDescription',
+              'You don\'t have any {filter} payments at the moment.',
+              parameters: {'filter': filterLabel}),
       icon: Icons.filter_list_outlined,
     );
+  }
+
+  String _filterLabel(String filter, AppLocalizations? loc) {
+    switch (filter.toLowerCase()) {
+      case 'pending':
+        return loc?.pending ?? _text('pending', 'Pending');
+      case 'paid':
+        return loc?.paid ?? _text('paid', 'Paid');
+      case 'overdue':
+        return loc?.overdue ?? _text('overdue', 'Overdue');
+      case 'failed':
+        return loc?.failed ?? _text('failed', 'Failed');
+      default:
+        return loc?.all ?? _text('all', 'All');
+    }
+  }
+
+  String _statusLabel(String status, AppLocalizations? loc) {
+    switch (status.toLowerCase()) {
+      case 'paid':
+        return loc?.paid ?? _text('paid', 'Paid');
+      case 'pending':
+        return loc?.pending ?? _text('pending', 'Pending');
+      case 'overdue':
+        return loc?.overdue ?? _text('overdue', 'Overdue');
+      case 'failed':
+        return loc?.failed ?? _text('failed', 'Failed');
+      case 'refunded':
+        return loc?.refunded ?? _text('refunded', 'Refunded');
+      default:
+        return status;
+    }
+  }
+
+  String _paymentMethodLabel(String method, AppLocalizations? loc) {
+    switch (method.toLowerCase()) {
+      case 'razorpay':
+        return loc?.paymentMethodRazorpay ??
+            _text('paymentMethodRazorpay', 'Razorpay');
+      case 'upi':
+        return loc?.paymentMethodUpi ?? _text('paymentMethodUpi', 'UPI');
+      case 'cash':
+        return loc?.paymentMethodCash ?? _text('paymentMethodCash', 'Cash');
+      case 'bank_transfer':
+        return loc?.paymentMethodBankTransfer ??
+            _text('paymentMethodBankTransfer', 'Bank Transfer');
+      default:
+        return loc?.paymentMethodOther ??
+            _text('paymentMethodOther', 'Other');
+    }
   }
 
   List<GuestPaymentModel> _getFilteredPayments(GuestPaymentViewModel paymentVM) {
@@ -393,8 +511,15 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return DateFormat('MMM dd, yyyy').format(date);
+  String _formatDate(DateTime date, AppLocalizations? loc) {
+    final locale = loc?.localeName ?? 'en_IN';
+    return DateFormat.yMMMd(locale).format(date);
+  }
+
+  String _formatAmount(double amount, AppLocalizations? loc) {
+    final locale = loc?.localeName ?? 'en_IN';
+    final currencySymbol = NumberFormat.simpleCurrency(locale: locale).currencySymbol;
+    return NumberFormat.currency(locale: locale, symbol: currencySymbol).format(amount);
   }
 }
 

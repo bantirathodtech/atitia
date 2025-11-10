@@ -1,5 +1,6 @@
 import 'package:atitia/common/utils/date/extensions/datetime_extensions.dart';
 
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../../constants/app.dart';
 
 /// Handles conversion, parsing, and validation for display date format (DD/MM/YYYY).
@@ -12,6 +13,24 @@ class DateDisplayConverter {
 
   static const int _minYear = 1900;
   static const String _expectedFormat = 'DD/MM/YYYY';
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   // MARK: - Parsing Methods
   // ==========================================
@@ -32,8 +51,14 @@ class DateDisplayConverter {
 
     // Validate format structure
     if (parts.length != 3) {
-      throw FormatException(
-          'Invalid date format. Expected $_expectedFormat but got "$dateString"');
+      throw FormatException(_translate(
+        'dateInvalidFormat',
+        'Invalid date format. Expected {expected} but got "{value}"',
+        parameters: {
+          'expected': _expectedFormat,
+          'value': dateString,
+        },
+      ));
     }
 
     // Parse components with null safety
@@ -42,8 +67,11 @@ class DateDisplayConverter {
     final year = int.tryParse(parts[2]);
 
     if (day == null || month == null || year == null) {
-      throw FormatException(
-          'Date components must be valid numbers: "$dateString"');
+      throw FormatException(_translate(
+        'dateComponentsNotNumbers',
+        'Date components must be valid numbers: "{value}"',
+        parameters: {'value': dateString},
+      ));
     }
 
     // Validate component ranges before creating DateTime
@@ -53,7 +81,11 @@ class DateDisplayConverter {
     try {
       return DateTime(year, month, day);
     } catch (e) {
-      throw FormatException('Invalid calendar date: "$dateString"');
+      throw FormatException(_translate(
+        'dateInvalidCalendar',
+        'Invalid calendar date: "{value}"',
+        parameters: {'value': dateString},
+      ));
     }
   }
 
@@ -100,7 +132,11 @@ class DateDisplayConverter {
 
     // Validate format structure
     if (parts.length != 3) {
-      return 'Enter date as $_expectedFormat';
+      return _translate(
+        'dateEnterAsExpected',
+        'Enter date as {expected}',
+        parameters: {'expected': _expectedFormat},
+      );
     }
 
     try {
@@ -111,7 +147,10 @@ class DateDisplayConverter {
 
       // Check for valid numeric components
       if (day == null || month == null || year == null) {
-        return 'Date must contain only digits';
+        return _translate(
+          'dateDigitsOnly',
+          'Date must contain only digits',
+        );
       }
 
       // Validate component ranges
@@ -121,14 +160,21 @@ class DateDisplayConverter {
       // Validate actual calendar date
       final date = DateTime(year, month, day);
       if (date.year != year || date.month != month || date.day != day) {
-        return 'Enter a valid calendar date';
+        return _translate(
+          'dateCalendarInvalid',
+          'Enter a valid calendar date',
+        );
       }
 
       return null;
     } on FormatException catch (e) {
       return e.message;
     } catch (e) {
-      return 'Enter a valid date ($_expectedFormat)';
+      return _translate(
+        'dateGenericInvalid',
+        'Enter a valid date ({expected})',
+        parameters: {'expected': _expectedFormat},
+      );
     }
   }
 
@@ -170,18 +216,31 @@ class DateDisplayConverter {
   static String? _validateDateComponents(int day, int month, int year) {
     // Validate day range
     if (day < 1 || day > 31) {
-      return 'Day must be between 1 and 31';
+      return _translate(
+        'dateDayRange',
+        'Day must be between 1 and 31',
+      );
     }
 
     // Validate month range
     if (month < 1 || month > 12) {
-      return 'Month must be between 1 and 12';
+      return _translate(
+        'dateMonthRange',
+        'Month must be between 1 and 12',
+      );
     }
 
     // Validate year range (reasonable bounds for most applications)
     final currentYear = DateTime.now().year;
     if (year < _minYear || year > currentYear) {
-      return 'Year must be between $_minYear and $currentYear';
+      return _translate(
+        'dateYearRange',
+        'Year must be between {min} and {max}',
+        parameters: {
+          'min': _minYear,
+          'max': currentYear,
+        },
+      );
     }
 
     return null;

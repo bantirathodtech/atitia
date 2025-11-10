@@ -17,6 +17,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/models/owner_payment_details_model.dart';
 import '../../../../../core/repositories/owner_payment_details_repository.dart';
 import '../../../../../core/viewmodels/payment_notification_viewmodel.dart';
@@ -25,6 +26,7 @@ import '../../../../../feature/owner_dashboard/myguest/data/models/owner_booking
 import '../../../../../feature/owner_dashboard/myguest/data/repository/owner_booking_request_repository.dart';
 import '../../../../../core/services/payment/razorpay_service.dart';
 import '../../view/widgets/payment_method_selection_dialog.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../shared/viewmodel/guest_pg_selection_provider.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
@@ -52,6 +54,24 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   final _ownerPaymentRepo = OwnerPaymentDetailsRepository();
   OwnerPaymentDetailsModel? _ownerPaymentDetails;
   bool _loadingOwnerDetails = false;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -133,7 +153,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _refreshData(),
-            tooltip: 'Refresh',
+            tooltip: AppLocalizations.of(context)?.refresh ??
+                _text('refresh', 'Refresh'),
           ),
         ],
         showBackButton: false,
@@ -168,6 +189,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   /// 📊 Tab Bar
   Widget _buildTabBar(BuildContext context, bool isDarkMode) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
 
     return Container(
       color: isDarkMode ? AppColors.darkCard : AppColors.surface,
@@ -177,14 +199,14 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         labelColor: theme.primaryColor,
         unselectedLabelColor:
             isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
-        tabs: const [
+        tabs: [
           Tab(
-            icon: Icon(Icons.history),
-            text: 'History',
+            icon: const Icon(Icons.history),
+            text: loc?.history ?? _text('history', 'History'),
           ),
           Tab(
-            icon: Icon(Icons.send),
-            text: 'Send Payment',
+            icon: const Icon(Icons.send),
+            text: loc?.sendPayment ?? _text('sendPayment', 'Send Payment'),
           ),
         ],
       ),
@@ -196,13 +218,14 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     final paymentVM = Provider.of<PaymentNotificationViewModel>(context);
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     if (paymentVM.loading && paymentVM.notifications.isEmpty) {
-      return _buildLoadingState(context);
+      return _buildLoadingState(context, loc);
     }
 
     if (paymentVM.notifications.isEmpty) {
-      return _buildEmptyState(context);
+      return _buildEmptyState(context, loc);
     }
 
     return ListView(
@@ -213,8 +236,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           padding: EdgeInsets.only(bottom: AppSpacing.paddingM),
           child: UserLocationDisplay(),
         ),
-        ...paymentVM.notifications.map((notification) => 
-          _buildPaymentCard(context, notification, isDarkMode)
+        ...paymentVM.notifications.map((notification) =>
+          _buildPaymentCard(context, notification, isDarkMode, loc)
         ),
       ],
     );
@@ -222,10 +245,26 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// 💳 Payment Card
   Widget _buildPaymentCard(
-      BuildContext context, dynamic notification, bool isDarkMode) {
+      BuildContext context,
+      dynamic notification,
+      bool isDarkMode,
+      AppLocalizations? loc) {
     final theme = Theme.of(context);
     final statusColor = _getStatusColor(notification.status);
     final statusIcon = _getStatusIcon(notification.status);
+    final statusLabel = _notificationStatusLabel(notification.status, loc);
+    final paymentMethodLabel =
+        notification.paymentMethod != null
+            ? _notificationPaymentMethodLabel(notification.paymentMethod!, loc)
+            : null;
+    final formattedDate =
+        _formatDate(notification.timestamp, loc);
+    final currencyFormatter = NumberFormat.simpleCurrency(
+      locale: loc?.localeName,
+      name: 'INR',
+    );
+    final formattedAmount =
+        currencyFormatter.format(notification.amount);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
@@ -278,14 +317,14 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '₹${notification.amount.toStringAsFixed(2)}',
+                        formattedAmount,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: statusColor,
                         ),
                       ),
                       Text(
-                        _formatDate(notification.timestamp),
+                        formattedDate,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: isDarkMode
                               ? AppColors.textTertiary
@@ -306,7 +345,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: Text(
-                    notification.status.toUpperCase(),
+                    statusLabel,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: statusColor,
                       fontWeight: FontWeight.w600,
@@ -326,8 +365,9 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 if (notification.paymentMethod != null) ...[
                   _buildDetailRow(
                     context,
-                    'Payment Method',
-                    notification.paymentMethod!,
+                    loc?.paymentMethod ??
+                        _text('paymentMethod', 'Payment Method'),
+                    paymentMethodLabel ?? notification.paymentMethod!,
                     Icons.payment,
                     isDarkMode,
                   ),
@@ -336,7 +376,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 if (notification.transactionId != null) ...[
                   _buildDetailRow(
                     context,
-                    'Transaction ID',
+                    loc?.transactionId ??
+                        _text('transactionId', 'Transaction ID'),
                     notification.transactionId!,
                     Icons.tag,
                     isDarkMode,
@@ -346,7 +387,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 if (notification.message != null) ...[
                   _buildDetailRow(
                     context,
-                    'Message',
+                    loc?.message ?? _text('message', 'Message'),
                     notification.message!,
                     Icons.message,
                     isDarkMode,
@@ -389,7 +430,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                                 size: 16, color: theme.primaryColor),
                             const SizedBox(width: 8),
                             Text(
-                              'Owner Response',
+                              loc?.ownerResponse ??
+                                  _text('ownerResponse', 'Owner Response'),
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -437,6 +479,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   Widget _buildOwnerPaymentDetails(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     if (_loadingOwnerDetails) {
       return ShimmerLoader(
@@ -447,7 +490,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     }
 
     if (_ownerPaymentDetails == null) {
-      return _buildOwnerPaymentDetailsEmptyState(context, isDarkMode);
+      return _buildOwnerPaymentDetailsEmptyState(context, loc, isDarkMode);
     }
 
     return Container(
@@ -468,7 +511,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 Icon(Icons.account_balance, color: theme.primaryColor),
                 const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
-                  text: 'Owner Payment Details',
+                  text: loc?.ownerPaymentDetails ??
+                      _text('ownerPaymentDetails', 'Owner Payment Details'),
                   color: theme.textTheme.headlineSmall?.color,
                 ),
               ],
@@ -481,7 +525,9 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  BodyText(text: 'UPI ID', color: AppColors.textSecondary),
+                  BodyText(
+                      text: loc?.upiId ?? _text('upiId', 'UPI ID'),
+                      color: AppColors.textSecondary),
                   const SizedBox(height: 4),
                   Text(
                     _ownerPaymentDetails!.upiId!,
@@ -499,7 +545,10 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  BodyText(text: 'UPI QR Code', color: AppColors.textSecondary),
+                  BodyText(
+                      text: loc?.upiQrCode ??
+                          _text('upiQrCode', 'UPI QR Code'),
+                      color: AppColors.textSecondary),
                   const SizedBox(height: AppSpacing.paddingS),
                   ClipRRect(
                     borderRadius:
@@ -524,6 +573,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   Widget _buildSendPaymentForm(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -538,18 +588,22 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
-            text: 'Send Payment Notification',
+            text: loc?.sendPaymentNotification ??
+                _text('sendPaymentNotification', 'Send Payment Notification'),
             color: theme.textTheme.headlineSmall?.color,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           BodyText(
-            text: 'After making payment, upload screenshot and notify owner',
+            text: loc?.afterMakingPaymentUploadScreenshot ??
+                _text('afterMakingPaymentUploadScreenshot',
+                    'After making payment, upload screenshot and notify owner'),
             color: AppColors.textSecondary,
           ),
           const SizedBox(height: AppSpacing.paddingL),
           PrimaryButton(
             onPressed: () => _showSendPaymentDialog(context),
-            label: 'Send Payment Notification',
+            label: loc?.sendPaymentNotification ??
+                _text('sendPaymentNotification', 'Send Payment Notification'),
             icon: Icons.send,
           ),
         ],
@@ -612,13 +666,48 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     }
   }
 
+  String _notificationStatusLabel(String status, AppLocalizations? loc) {
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+        return loc?.confirmed ?? _text('confirmed', 'Confirmed');
+      case 'rejected':
+        return loc?.rejected ?? _text('rejected', 'Rejected');
+      case 'pending':
+        return loc?.pending ?? _text('pending', 'Pending');
+      default:
+        return status;
+    }
+  }
+
+  String _notificationPaymentMethodLabel(
+      String method, AppLocalizations? loc) {
+    switch (method.toLowerCase()) {
+      case 'razorpay':
+        return loc?.paymentMethodRazorpay ??
+            _text('paymentMethodRazorpay', 'Razorpay');
+      case 'upi':
+        return loc?.paymentMethodUpi ?? _text('paymentMethodUpi', 'UPI');
+      case 'cash':
+        return loc?.paymentMethodCash ?? _text('paymentMethodCash', 'Cash');
+      case 'bank_transfer':
+        return loc?.paymentMethodBankTransfer ??
+            _text('paymentMethodBankTransfer', 'Bank Transfer');
+      default:
+        return loc?.paymentMethodOther ??
+            _text('paymentMethodOther', 'Other');
+    }
+  }
+
   /// Helper: Format date
-  String _formatDate(DateTime date) {
-    return DateFormat('MMM dd, yyyy • hh:mm a').format(date);
+  String _formatDate(DateTime date, AppLocalizations? loc) {
+    final locale = loc?.localeName;
+    final datePart = DateFormat.yMMMd(locale).format(date);
+    final timePart = DateFormat.jm(locale).format(date);
+    return '$datePart • $timePart';
   }
 
   /// ⏳ Loading state
-  Widget _buildLoadingState(BuildContext context) {
+  Widget _buildLoadingState(BuildContext context, AppLocalizations? loc) {
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       itemCount: 3,
@@ -636,7 +725,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   }
 
   /// 💳 Structured empty state with zero-state stats and placeholder data structure
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, AppLocalizations? loc) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
@@ -644,20 +733,21 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
       child: Column(
         children: [
           // Zero-state stats section
-          _buildPaymentZeroStateStats(context, isDarkMode),
+          _buildPaymentZeroStateStats(context, loc, isDarkMode),
 
           // Placeholder payment structure
-          _buildPlaceholderPaymentStructure(context, isDarkMode),
+          _buildPlaceholderPaymentStructure(context, loc, isDarkMode),
 
           // Call to action
-          _buildPaymentEmptyStateAction(context),
+          _buildPaymentEmptyStateAction(context, loc),
         ],
       ),
     );
   }
 
   /// 📊 Payment zero-state stats section
-  Widget _buildPaymentZeroStateStats(BuildContext context, bool isDarkMode) {
+  Widget _buildPaymentZeroStateStats(
+      BuildContext context, AppLocalizations? loc, bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -673,7 +763,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Payment Statistics',
+            text: loc?.paymentStatistics ??
+                _text('paymentStatistics', 'Payment Statistics'),
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -684,7 +775,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               Expanded(
                 child: _buildPaymentStatCard(
                   context,
-                  'Total Payments',
+                  loc?.totalPayments ??
+                      _text('totalPayments', 'Total Payments'),
                   '0',
                   Icons.payment,
                   Colors.blue,
@@ -695,7 +787,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               Expanded(
                 child: _buildPaymentStatCard(
                   context,
-                  'Pending',
+                  loc?.pending ?? _text('pending', 'Pending'),
                   '0',
                   Icons.pending,
                   Colors.orange,
@@ -710,7 +802,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               Expanded(
                 child: _buildPaymentStatCard(
                   context,
-                  'Completed',
+                  loc?.completed ?? _text('completed', 'Completed'),
                   '0',
                   Icons.check_circle,
                   Colors.green,
@@ -721,7 +813,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               Expanded(
                 child: _buildPaymentStatCard(
                   context,
-                  'Failed',
+                  loc?.failed ?? _text('failed', 'Failed'),
                   '0',
                   Icons.error,
                   Colors.red,
@@ -736,7 +828,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               Expanded(
                 child: _buildPaymentStatCard(
                   context,
-                  'Total Amount',
+                  loc?.totalAmount ??
+                      _text('totalAmount', 'Total Amount'),
                   '₹0',
                   Icons.currency_rupee,
                   Colors.purple,
@@ -747,7 +840,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               Expanded(
                 child: _buildPaymentStatCard(
                   context,
-                  'This Month',
+                  loc?.thisMonth ?? _text('thisMonth', 'This Month'),
                   '₹0',
                   Icons.calendar_month,
                   Colors.teal,
@@ -812,28 +905,35 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// 💳 Placeholder payment structure
   Widget _buildPlaceholderPaymentStructure(
-      BuildContext context, bool isDarkMode) {
+      BuildContext context, AppLocalizations? loc, bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Recent Payments Preview',
+            text: loc?.recentPaymentsPreview ??
+                _text('recentPaymentsPreview', 'Recent Payments Preview'),
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
           // Placeholder payment cards
           ...List.generate(
-              3, (index) => _buildPlaceholderPaymentCard(context, isDarkMode)),
+              3,
+              (index) => _buildPlaceholderPaymentCard(
+                    context,
+                    loc,
+                    isDarkMode,
+                  )),
         ],
       ),
     );
   }
 
   /// 💳 Placeholder payment card
-  Widget _buildPlaceholderPaymentCard(BuildContext context, bool isDarkMode) {
+  Widget _buildPlaceholderPaymentCard(
+      BuildContext context, AppLocalizations? loc, bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -916,7 +1016,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Amount',
+                      loc?.amount ?? _text('amount', 'Amount'),
                       style: TextStyle(
                         fontSize: 12,
                         color: isDarkMode ? Colors.white70 : Colors.grey[600],
@@ -939,7 +1039,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Status',
+                      loc?.status ?? _text('status', 'Status'),
                       style: TextStyle(
                         fontSize: 12,
                         color: isDarkMode ? Colors.white70 : Colors.grey[600],
@@ -962,7 +1062,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Date',
+                      loc?.date ?? _text('date', 'Date'),
                       style: TextStyle(
                         fontSize: 12,
                         color: isDarkMode ? Colors.white70 : Colors.grey[600],
@@ -988,7 +1088,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   }
 
   /// 🔄 Payment empty state action section
-  Widget _buildPaymentEmptyStateAction(BuildContext context) {
+  Widget _buildPaymentEmptyStateAction(
+      BuildContext context, AppLocalizations? loc) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
@@ -1012,12 +1113,17 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           ),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(
-            text: 'No Payment History',
+            text: loc?.noPaymentHistory ??
+                _text('noPaymentHistory', 'No Payment History'),
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           const SizedBox(height: AppSpacing.paddingS),
           Text(
-            'Your payment notifications and history will appear here once you make payments.',
+            loc?.noPaymentHistoryDescription ??
+                _text(
+                  'noPaymentHistoryDescription',
+                  'Your payment notifications and history will appear here once you make payments.',
+                ),
             style: TextStyle(
               color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 14,
@@ -1033,7 +1139,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 _tabController.animateTo(1);
               },
               icon: const Icon(Icons.send),
-              label: const Text('Send Payment'),
+              label: Text(loc?.sendPayment ?? _text('sendPayment', 'Send Payment')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
                 foregroundColor: Colors.white,
@@ -1052,7 +1158,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// 🏦 Owner payment details empty state
   Widget _buildOwnerPaymentDetailsEmptyState(
-      BuildContext context, bool isDarkMode) {
+      BuildContext context, AppLocalizations? loc, bool isDarkMode) {
     final theme = Theme.of(context);
 
     return Container(
@@ -1073,7 +1179,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 Icon(Icons.account_balance, color: theme.primaryColor),
                 const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
-                  text: 'Owner Payment Details',
+                  text: loc?.ownerPaymentDetails ??
+                      _text('ownerPaymentDetails', 'Owner Payment Details'),
                   color: theme.textTheme.headlineSmall?.color,
                 ),
               ],
@@ -1091,12 +1198,18 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
                 HeadingMedium(
-                  text: 'Payment Details Not Available',
+                  text: loc?.paymentDetailsNotAvailable ??
+                      _text('paymentDetailsNotAvailable',
+                          'Payment Details Not Available'),
                   color: isDarkMode ? Colors.white : Colors.black87,
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
                 Text(
-                  'Owner payment details are not configured yet. Please contact your PG owner to set up payment information.',
+                  loc?.ownerPaymentDetailsNotConfigured ??
+                      _text(
+                        'ownerPaymentDetailsNotConfigured',
+                        'Owner payment details are not configured yet. Please contact your PG owner to set up payment information.',
+                      ),
                   style: TextStyle(
                     color: isDarkMode ? Colors.white70 : Colors.grey[600],
                     fontSize: 14,
@@ -1117,7 +1230,9 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Payment Methods Preview:',
+                        loc?.paymentMethodsPreview ??
+                            _text('paymentMethodsPreview',
+                                'Payment Methods Preview:'),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: isDarkMode ? Colors.white : Colors.black87,
@@ -1125,13 +1240,22 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       ),
                       const SizedBox(height: AppSpacing.paddingM),
                       _buildPlaceholderPaymentMethod(
-                          context, 'UPI ID', 'Not Available', isDarkMode),
+                          context,
+                          loc?.upiId ?? _text('upiId', 'UPI ID'),
+                          loc?.notAvailable ?? _text('notAvailable', 'Not Available'),
+                          isDarkMode),
                       const SizedBox(height: AppSpacing.paddingS),
                       _buildPlaceholderPaymentMethod(
-                          context, 'Bank Account', 'Not Available', isDarkMode),
+                          context,
+                          loc?.bankAccount ?? _text('bankAccount', 'Bank Account'),
+                          loc?.notAvailable ?? _text('notAvailable', 'Not Available'),
+                          isDarkMode),
                       const SizedBox(height: AppSpacing.paddingS),
                       _buildPlaceholderPaymentMethod(
-                          context, 'Phone Number', 'Not Available', isDarkMode),
+                          context,
+                          loc?.phoneNumber ?? _text('phoneNumber', 'Phone Number'),
+                          loc?.notAvailable ?? _text('notAvailable', 'Not Available'),
+                          isDarkMode),
                     ],
                   ),
                 ),
@@ -1251,6 +1375,24 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
   dynamic _screenshotFile;
   bool _sending = false;
   bool _processingRazorpay = false;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
   
   @override
   void initState() {
@@ -1274,9 +1416,10 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
 
     return AlertDialog(
-      title: Text(_getDialogTitle()),
+      title: Text(_getDialogTitle(loc)),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -1287,18 +1430,20 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
               // Amount field (required for all methods)
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Amount',
+                decoration: InputDecoration(
+                  labelText: loc?.amount ?? _text('amount', 'Amount'),
                   prefixText: '₹ ',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter amount';
+                    return loc?.pleaseEnterAmount ??
+                        _text('pleaseEnterAmount', 'Please enter amount');
                   }
                   if (double.tryParse(value) == null) {
-                    return 'Please enter valid amount';
+                    return loc?.pleaseEnterValidAmount ??
+                        _text('pleaseEnterValidAmount', 'Please enter valid amount');
                   }
                   return null;
                 },
@@ -1308,28 +1453,45 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
               // Method-specific fields
               if (widget.paymentMethod == PaymentMethodType.upi) ...[
                 // UPI: Screenshot (required) - Transaction ID is visible in screenshot
-                _buildScreenshotUpload(context, theme),
+                _buildScreenshotUpload(context, theme, loc),
               const SizedBox(height: AppSpacing.paddingM),
                 // Transaction ID field is optional - screenshot already contains it
-              TextFormField(
-                controller: _transactionIdController,
-                decoration: const InputDecoration(
-                  labelText: 'Transaction ID (Optional)',
-                    hintText: 'Not required - already visible in screenshot',
-                  border: OutlineInputBorder(),
-                    helperText: 'You can skip this - transaction ID is in the screenshot',
-                ),
+              Builder(
+                builder: (context) {
+                  return TextFormField(
+                    controller: _transactionIdController,
+                    decoration: InputDecoration(
+                      labelText: loc?.transactionIdOptional ??
+                          _text('transactionIdOptional', 'Transaction ID (Optional)'),
+                      hintText: loc?.notRequiredAlreadyVisibleInScreenshot ??
+                          _text('notRequiredAlreadyVisibleInScreenshot',
+                              'Not required - already visible in screenshot'),
+                      helperText:
+                          loc?.youCanSkipThisTransactionIdIsInScreenshot ??
+                              _text(
+                                'youCanSkipThisTransactionIdIsInScreenshot',
+                                'You can skip this - transaction ID is in the screenshot',
+                              ),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: AppSpacing.paddingM),
                 BodyText(
-                  text: '💡 Tip: After making payment via PhonePe, Paytm, Google Pay, etc., upload the payment screenshot. The transaction ID is already visible in the screenshot, so you don\'t need to enter it separately.',
+                  text: loc?.upiPaymentTip ??
+                      _text(
+                          'upiPaymentTip',
+                          '💡 Tip: After making payment via PhonePe, Paytm, Google Pay, etc., upload the payment screenshot. The transaction ID is already visible in the screenshot.'),
                   color: AppColors.textSecondary,
                   small: true,
                 ),
               ] else if (widget.paymentMethod == PaymentMethodType.cash) ...[
                 // Cash: Message only
                 BodyText(
-                  text: 'You will send a cash payment notification to the owner. Owner will confirm once they receive the cash.',
+                  text: loc?.cashPaymentNotificationInfo ??
+                      _text(
+                          'cashPaymentNotificationInfo',
+                          'You will send a cash payment notification to the owner. Owner will confirm once they receive the cash.'),
                   color: AppColors.textSecondary,
                   small: true,
                 ),
@@ -1337,7 +1499,9 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
               ] else if (widget.paymentMethod == PaymentMethodType.razorpay) ...[
                 // Razorpay: No additional fields needed
                 BodyText(
-                  text: 'Click "Pay Now" to proceed with secure online payment via Razorpay.',
+                  text: loc?.payViaRazorpayDescription ??
+                      _text('payViaRazorpayDescription',
+                          'Click "Pay Now" to proceed with secure online payment via Razorpay.'),
                   color: AppColors.textSecondary,
                   small: true,
                 ),
@@ -1347,9 +1511,10 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
               // Message field (optional for all methods)
               TextFormField(
                 controller: _messageController,
-                decoration: const InputDecoration(
-                  labelText: 'Message (Optional)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: loc?.messageOptional ??
+                      _text('messageOptional', 'Message (Optional)'),
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 3,
               ),
@@ -1360,7 +1525,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       actions: [
         TextButton(
           onPressed: (_sending || _processingRazorpay) ? null : () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(loc?.cancel ?? _text('cancel', 'Cancel')),
         ),
         ElevatedButton(
           onPressed: (_sending || _processingRazorpay) ? null : _handlePayment,
@@ -1370,35 +1535,40 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                   height: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(_getButtonText()),
+              : Text(_getButtonText(loc)),
         ),
       ],
     );
   }
   
-  String _getDialogTitle() {
+  String _getDialogTitle(AppLocalizations? loc) {
     switch (widget.paymentMethod) {
       case PaymentMethodType.razorpay:
-        return 'Pay via Razorpay';
+        return loc?.payViaRazorpay ??
+            _text('payViaRazorpay', 'Pay via Razorpay');
       case PaymentMethodType.upi:
-        return 'UPI Payment Confirmation';
+        return loc?.upiPaymentConfirmation ??
+            _text('upiPaymentConfirmation', 'UPI Payment Confirmation');
       case PaymentMethodType.cash:
-        return 'Cash Payment Notification';
+        return loc?.cashPaymentNotification ??
+            _text('cashPaymentNotification', 'Cash Payment Notification');
     }
   }
   
-  String _getButtonText() {
+  String _getButtonText(AppLocalizations? loc) {
     switch (widget.paymentMethod) {
       case PaymentMethodType.razorpay:
-        return 'Pay Now';
+        return loc?.payNow ?? _text('payNow', 'Pay Now');
       case PaymentMethodType.upi:
-        return 'Send Payment';
+        return loc?.sendPayment ?? _text('sendPayment', 'Send Payment');
       case PaymentMethodType.cash:
-        return 'Send Notification';
+        return loc?.sendNotification ??
+            _text('sendNotification', 'Send Notification');
     }
   }
   
-  Widget _buildScreenshotUpload(BuildContext context, ThemeData theme) {
+  Widget _buildScreenshotUpload(
+      BuildContext context, ThemeData theme, AppLocalizations? loc) {
     if (_screenshotFile != null) {
       return FutureBuilder<Uint8List>(
                   future: _screenshotFile.readAsBytes(),
@@ -1440,7 +1610,8 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                 ),
                 const SizedBox(height: 8),
                 BodyText(
-                  text: 'Screenshot uploaded',
+                  text: loc?.screenshotUploaded ??
+                      _text('screenshotUploaded', 'Screenshot uploaded'),
                   color: AppColors.success,
                   small: true,
                 ),
@@ -1460,9 +1631,10 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       );
     }
     return OutlinedButton.icon(
-                  onPressed: _pickScreenshot,
-                  icon: const Icon(Icons.upload_file),
-      label: const Text('Upload Payment Screenshot'),
+      onPressed: _pickScreenshot,
+      icon: const Icon(Icons.upload_file),
+      label: Text(loc?.uploadPaymentScreenshot ??
+          _text('uploadPaymentScreenshot', 'Upload Payment Screenshot')),
     );
   }
 
@@ -1522,8 +1694,9 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     if (selectedPg == null || selectedPgId == null || selectedPgId.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a PG first'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)?.pleaseSelectPgFirst ??
+                _text('pleaseSelectPgFirst', 'Please select a PG first')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1534,8 +1707,11 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     if (selectedPg.ownerUid.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid PG selection. Owner information not available.'),
+          SnackBar(
+            content: Text(
+                AppLocalizations.of(context)?.invalidPgSelectionOwnerInfoNotAvailable ??
+                    _text('invalidPgSelectionOwnerInfoNotAvailable',
+                        'Invalid PG selection. Owner information not available.')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1557,9 +1733,11 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
         orderId: orderId,
         ownerId: selectedPg.ownerUid, // Pass owner ID to fetch Razorpay key
         description: _messageController.text.isEmpty
-            ? 'PG Payment'
+            ? (AppLocalizations.of(context)?.pgPayment ??
+                _text('pgPayment', 'PG Payment'))
             : _messageController.text,
-        userName: authProvider.user?.fullName ?? 'Guest',
+        userName: authProvider.user?.fullName ??
+            (AppLocalizations.of(context)?.guest ?? _text('guest', 'Guest')),
         userEmail: authProvider.user?.email,
         userPhone: authProvider.user?.phoneNumber,
         onSuccess: (orderId, response) async {
@@ -1574,8 +1752,11 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
           if (mounted) {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Payment successful! Owner will be notified.'),
+              SnackBar(
+                content: Text(
+                    AppLocalizations.of(context)?.paymentSuccessfulOwnerWillBeNotified ??
+                        _text('paymentSuccessfulOwnerWillBeNotified',
+                            'Payment successful! Owner will be notified.')),
                 backgroundColor: AppColors.success,
               ),
             );
@@ -1585,7 +1766,10 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Payment failed: ${response.message}'),
+                content: Text(
+                    AppLocalizations.of(context)?.paymentFailed(response.message ?? '') ??
+                        _text('paymentFailed', 'Payment failed: {message}',
+                            parameters: {'message': response.message ?? ''})),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1596,7 +1780,10 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to process payment: $e'),
+            content: Text(
+                AppLocalizations.of(context)?.failedToProcessPayment(e.toString()) ??
+                    _text('failedToProcessPayment', 'Failed to process payment: {error}',
+                        parameters: {'error': e.toString()})),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1617,8 +1804,12 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     if (_screenshotFile == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please upload payment screenshot. Transaction ID is visible in the screenshot.'),
+          SnackBar(
+            content: Text(
+                AppLocalizations.of(context)?.pleaseUploadPaymentScreenshot ??
+                    _text(
+                        'pleaseUploadPaymentScreenshot',
+                        'Please upload payment screenshot. Transaction ID is visible in the screenshot.')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1656,12 +1847,14 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     final pgProvider = context.read<GuestPgSelectionProvider>();
     final selectedPg = pgProvider.selectedPg;
     final selectedPgId = pgProvider.selectedPgId;
+    final loc = AppLocalizations.of(context);
 
     if (selectedPg == null || selectedPgId == null || selectedPgId.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a PG first'),
+          SnackBar(
+            content: Text(loc?.pleaseSelectPgFirst ??
+                _text('pleaseSelectPgFirst', 'Please select a PG first')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1672,8 +1865,10 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     if (selectedPg.ownerUid.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid PG selection. Owner information not available.'),
+          SnackBar(
+            content: Text(loc?.invalidPgSelectionOwnerInfoNotAvailable ??
+                _text('invalidPgSelectionOwnerInfoNotAvailable',
+                    'Invalid PG selection. Owner information not available.')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1725,8 +1920,13 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
           SnackBar(
             content: Text(
               widget.paymentMethod == PaymentMethodType.cash
-                  ? 'Cash payment notification sent. Owner will confirm once they receive the payment.'
-                  : 'Payment notification sent successfully',
+                  ? (loc?.cashPaymentNotificationSent ??
+                      _text(
+                          'cashPaymentNotificationSent',
+                          'Cash payment notification sent. Owner will confirm once they receive the payment.'))
+                  : (loc?.paymentNotificationSentSuccessfully ??
+                      _text('paymentNotificationSentSuccessfully',
+                          'Payment notification sent successfully')),
             ),
             backgroundColor: AppColors.success,
           ),
@@ -1736,7 +1936,9 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to send notification: $e'),
+            content: Text(loc?.failedToSendNotification(e.toString()) ??
+                _text('failedToSendNotification', 'Failed to send notification: {error}',
+                    parameters: {'error': e.toString()})),
             backgroundColor: AppColors.error,
           ),
         );

@@ -10,6 +10,7 @@ import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/responsive/responsive_system.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 /// Widget displaying revenue chart (responsive bar chart)
 /// Fully adaptive and responsive using core/common reusable components
@@ -28,6 +29,9 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     final responsive = context.responsive;
     final theme = Theme.of(context);
     final padding = context.responsivePadding;
+    final loc = AppLocalizations.of(context)!;
+    final localeName = loc.localeName;
+    final monthFormatter = DateFormat.MMM(localeName);
 
     // Calculate responsive dimensions
     final chartHeight = _getResponsiveChartHeight(responsive);
@@ -46,17 +50,18 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     // Calculate stats: Total Revenue, Average/Month, Highest Month
     final totalRevenue = data.values.fold(0.0, (sum, value) => sum + value);
     final monthsWithData = data.values.where((v) => v > 0).length;
-    final averagePerMonth = monthsWithData > 0 ? totalRevenue / monthsWithData : 0.0;
-    final highestMonthEntry = data.entries.isEmpty 
-        ? null 
+    final averagePerMonth =
+        monthsWithData > 0 ? totalRevenue / monthsWithData : 0.0;
+    final highestMonthEntry = data.entries.isEmpty
+        ? null
         : data.entries.reduce((a, b) => a.value > b.value ? a : b);
     final highestMonthValue = highestMonthEntry?.value ?? 0.0;
-    final highestMonthNum = highestMonthEntry != null 
+    final highestMonthNum = highestMonthEntry != null
         ? (int.tryParse(highestMonthEntry.key.split('_').last) ?? 1)
         : 0;
-    final highestMonthName = highestMonthNum > 0 
-        ? DateFormat('MMM').format(DateTime(2024, highestMonthNum))
-        : 'N/A';
+    final highestMonthName = highestMonthNum > 0
+        ? monthFormatter.format(DateTime(2024, highestMonthNum))
+        : loc.notAvailable;
 
     return AdaptiveCard(
       padding: padding,
@@ -71,13 +76,15 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
 
           // Stats cards: Total Revenue, Average/Month, Highest Month
           _buildStatsCards(
-            context, 
-            theme, 
+            context,
+            theme,
             responsive,
             totalRevenue,
             averagePerMonth,
             highestMonthValue,
             highestMonthName,
+            loc,
+            localeName,
           ),
           const SizedBox(height: AppSpacing.paddingL),
 
@@ -87,14 +94,15 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
               height: chartHeight,
               child: isScrollable
                   ? _buildScrollableChart(context, theme, barMaxHeight,
-                      maxValue, horizontalSpacing, fontSize)
+                      maxValue, horizontalSpacing, fontSize, monthFormatter)
                   : _buildStaticChart(context, theme, barMaxHeight, maxValue,
-                      horizontalSpacing, fontSize),
+                      horizontalSpacing, fontSize, monthFormatter),
             )
           else
             SizedBox(
               height: chartHeight,
-              child: _buildEmptyChartBars(context, theme, responsive, chartHeight),
+              child: _buildEmptyChartBars(
+                  context, theme, responsive, chartHeight, monthFormatter),
             ),
         ],
       ),
@@ -109,6 +117,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     double maxValue,
     double horizontalSpacing,
     double fontSize,
+    DateFormat monthFormatter,
   ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -116,7 +125,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: _buildBarItemsForScroll(context, theme, barMaxHeight,
-            maxValue, horizontalSpacing, fontSize),
+            maxValue, horizontalSpacing, fontSize, monthFormatter),
       ),
     );
   }
@@ -129,6 +138,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     double maxValue,
     double horizontalSpacing,
     double fontSize,
+    DateFormat monthFormatter,
   ) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalSpacing),
@@ -136,7 +146,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: _buildBarItems(context, theme, barMaxHeight, maxValue,
-            horizontalSpacing, fontSize),
+            horizontalSpacing, fontSize, monthFormatter),
       ),
     );
   }
@@ -149,6 +159,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     double maxValue,
     double horizontalSpacing,
     double fontSize,
+    DateFormat monthFormatter,
   ) {
     return data.entries.map((entry) {
       return _buildBarItem(
@@ -160,6 +171,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
         fontSize,
         entry,
         useExpanded: true,
+        monthFormatter: monthFormatter,
       );
     }).toList();
   }
@@ -172,6 +184,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     double maxValue,
     double horizontalSpacing,
     double fontSize,
+    DateFormat monthFormatter,
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
     // Responsive width: 25% of screen width, min 80px, max 120px
@@ -188,6 +201,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
           fontSize,
           entry,
           useExpanded: false,
+          monthFormatter: monthFormatter,
         ),
       );
     }).toList();
@@ -202,9 +216,11 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
       double horizontalSpacing,
       double fontSize,
       MapEntry<String, double> entry,
-      {required bool useExpanded}) {
+      {required bool useExpanded,
+      required DateFormat monthFormatter}) {
+    final localeName = AppLocalizations.of(context)!.localeName;
     final monthNum = int.tryParse(entry.key.split('_').last) ?? 1;
-    final monthName = DateFormat('MMM').format(DateTime(2024, monthNum));
+    final monthName = monthFormatter.format(DateTime(2024, monthNum));
     final value = entry.value;
     final heightPercent = maxValue > 0 ? (value / maxValue) : 0.0;
     final barHeight = barMaxHeight * heightPercent;
@@ -213,6 +229,9 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     final minBarHeight = 4.0;
     final finalBarHeight =
         barHeight < minBarHeight && value > 0 ? minBarHeight : barHeight;
+
+    final tooltipValue = _formatCurrency(value, localeName, decimalDigits: 2);
+    final labelValue = _formatCompactCurrency(value, localeName);
 
     final content = Padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalSpacing / 2),
@@ -225,9 +244,9 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.paddingXS),
               child: Tooltip(
-                message: '₹${NumberFormat('#,##0.00').format(value)}',
+                message: tooltipValue,
                 child: Text(
-                  '₹${NumberFormat.compact().format(value)}',
+                  labelValue,
                   style: TextStyle(
                     fontSize: fontSize * 0.85,
                     fontWeight: FontWeight.w600,
@@ -284,8 +303,12 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
   }
 
   /// Builds placeholder chart bars (without stats, stats are shown separately now)
-  Widget _buildEmptyChartBars(BuildContext context, ThemeData theme,
-      ResponsiveConfig responsive, double chartHeight) {
+  Widget _buildEmptyChartBars(
+      BuildContext context,
+      ThemeData theme,
+      ResponsiveConfig responsive,
+      double chartHeight,
+      DateFormat monthFormatter) {
     final horizontalSpacing = _getHorizontalSpacing(responsive);
     final fontSize = _getResponsiveFontSize(responsive);
     final barMaxHeight = chartHeight * 0.7;
@@ -296,8 +319,8 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: _buildPlaceholderBars(
-            context, theme, barMaxHeight, horizontalSpacing, fontSize),
+        children: _buildPlaceholderBars(context, theme, barMaxHeight,
+            horizontalSpacing, fontSize, monthFormatter),
       ),
     );
   }
@@ -311,23 +334,30 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
       double totalRevenue,
       double averagePerMonth,
       double highestMonthValue,
-      String highestMonthName) {
+      String highestMonthName,
+      AppLocalizations loc,
+      String localeName) {
+    final totalRevenueValue = _formatCurrency(totalRevenue, localeName);
+    final averagePerMonthValue = _formatCurrency(averagePerMonth, localeName);
+    final highestMonthValueFormatted =
+        _formatCurrency(highestMonthValue, localeName);
+
     final stats = [
       {
-        'label': 'Total Revenue',
-        'value': '₹${NumberFormat('#,##0').format(totalRevenue)}',
+        'label': loc.totalRevenue,
+        'value': totalRevenueValue,
         'icon': Icons.account_balance_wallet_outlined,
         'color': Colors.blue,
       },
       {
-        'label': 'Average/Month',
-        'value': '₹${NumberFormat('#,##0').format(averagePerMonth)}',
+        'label': loc.ownerOverviewAveragePerMonth,
+        'value': averagePerMonthValue,
         'icon': Icons.trending_flat,
         'color': Colors.green,
       },
       {
-        'label': 'Highest Month',
-        'value': '₹${NumberFormat('#,##0').format(highestMonthValue)} ($highestMonthName)',
+        'label': loc.ownerOverviewHighestMonth,
+        'value': '$highestMonthValueFormatted ($highestMonthName)',
         'icon': Icons.trending_up,
         'color': Colors.orange,
       },
@@ -375,7 +405,6 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     );
   }
 
-
   /// Builds placeholder bars for all 12 months
   List<Widget> _buildPlaceholderBars(
     BuildContext context,
@@ -383,11 +412,13 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     double barMaxHeight,
     double horizontalSpacing,
     double fontSize,
+    DateFormat monthFormatter,
   ) {
     final months = List.generate(12, (index) => index + 1);
+    final localeName = AppLocalizations.of(context)!.localeName;
 
     return months.map((monthNum) {
-      final monthName = DateFormat('MMM').format(DateTime(2024, monthNum));
+      final monthName = monthFormatter.format(DateTime(2024, monthNum));
       // Placeholder height - very small for visual consistency
       final placeholderHeight = 8.0;
 
@@ -400,7 +431,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
             children: [
               // Placeholder value label (subtle)
               CaptionText(
-                text: '₹0',
+                text: _formatCurrency(0, localeName),
                 color: Colors.grey.shade400,
               ),
               const SizedBox(height: 4),
@@ -450,5 +481,26 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
     if (responsive.isMobile) return 10.0;
     if (responsive.isTablet) return 12.0;
     return 14.0; // desktop
+  }
+
+  String _formatCurrency(double value, String localeName,
+      {int decimalDigits = 0}) {
+    final symbol =
+        NumberFormat.simpleCurrency(locale: localeName).currencySymbol;
+    return NumberFormat.currency(
+      locale: localeName,
+      symbol: symbol,
+      decimalDigits: decimalDigits,
+    ).format(value);
+  }
+
+  String _formatCompactCurrency(double value, String localeName) {
+    final symbol =
+        NumberFormat.simpleCurrency(locale: localeName).currencySymbol;
+    return NumberFormat.compactCurrency(
+      locale: localeName,
+      symbol: symbol,
+      decimalDigits: 0,
+    ).format(value);
   }
 }

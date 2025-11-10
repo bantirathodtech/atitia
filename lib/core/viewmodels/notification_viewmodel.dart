@@ -139,14 +139,14 @@ class NotificationViewModel extends BaseProviderState
 
   /// Get filtered notifications by type
   List<Map<String, dynamic>> getFilteredNotifications(String filter) {
-    if (filter == 'All') {
+    if (filter == 'all') {
       return _notifications;
-    } else if (filter == 'Unread') {
+    } else if (filter == 'unread') {
       return _notifications
           .where((n) => !(n['read'] as bool? ?? false))
           .toList();
     } else {
-      // Filter by type based on filter name
+      // Filter by type based on filter key
       return _notifications
           .where((n) => _matchesFilter(n['type'] as String? ?? '', filter))
           .toList();
@@ -155,8 +155,7 @@ class NotificationViewModel extends BaseProviderState
 
   /// Check if notification type matches filter
   bool _matchesFilter(String type, String filter) {
-    final filterLower = filter.toLowerCase();
-    switch (filterLower) {
+    switch (filter) {
       case 'bookings':
         return type == 'booking_request' ||
             type == 'booking_approved' ||
@@ -173,14 +172,13 @@ class NotificationViewModel extends BaseProviderState
             type == 'complaint_response' ||
             type == 'complaint_reply' ||
             type == 'complaint_status';
-      case 'bed changes':
+      case 'bed_changes':
         return type == 'bed_change_request' ||
             type == 'bed_change_approved' ||
             type == 'bed_change_rejected';
       case 'services':
         return type == 'service_request' || type == 'service_response';
-      case 'pg updates':
-      case 'pg announcements':
+      case 'pg_updates':
         return type == 'pg_announcement';
       default:
         return false;

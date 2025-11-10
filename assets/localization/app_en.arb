@@ -41,7 +41,7 @@
   "english": "English",
   "telugu": "తెలుగు",
   "loading": "Loading...",
-  "error": "Error",
+  "error": "Error: {error}",
   "success": "Success",
   "warning": "Warning",
   "info": "Information",
@@ -88,6 +88,109 @@
       }
     }
   },
+  "logApiResponseLabel": "RESPONSE",
+  "logAuthEventMessage": "Auth: {event}",
+  "@logAuthEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "logRoleActionMessage": "{role} action: {action}",
+  "@logRoleActionMessage": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logPgActionMessage": "PG {action}",
+  "@logPgActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logPaymentEventMessage": "Payment: {event}",
+  "@logPaymentEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "logFoodActionMessage": "Food {action}",
+  "@logFoodActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logComplaintEventMessage": "Complaint: {event}",
+  "@logComplaintEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "logGuestActionMessage": "Guest {action}",
+  "@logGuestActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logOwnerActionMessage": "Owner {action}",
+  "@logOwnerActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logMethodEntryMessage": "Entering {methodName}",
+  "@logMethodEntryMessage": {
+    "placeholders": {
+      "methodName": {
+        "type": "String"
+      }
+    }
+  },
+  "logMethodExitMessage": "Exiting {methodName}",
+  "@logMethodExitMessage": {
+    "placeholders": {
+      "methodName": {
+        "type": "String"
+      }
+    }
+  },
+  "logPerformanceMessage": "Performance: {operation} took {durationMs}ms",
+  "@logPerformanceMessage": {
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      },
+      "durationMs": {
+        "type": "int"
+      }
+    }
+  },
+  "logBusinessEventMessage": "Business event: {event}",
+  "@logBusinessEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
   "enterPhoneNumberToReceiveOTP": "Enter your phone number to receive OTP",
   "tenDigitMobileNumber": "10-digit mobile number",
   "phoneAuthentication": "Phone Authentication",
@@ -98,492 +201,6 @@
   "personal": "Personal",
   "documents": "Documents",
   "emergency": "Emergency",
-  "personalInformation": "Personal Information",
-  "provideDetailsAsPerDocuments": "Please provide your details as per your official documents",
-  "yourRegisteredPhoneNumber": "Your registered phone number",
-  "verifiedDuringLogin": "✓ Verified during login",
-  "fullName": "Full Name",
-  "enterYourCompleteName": "Enter your complete name",
-  "fullNameRequired": "Full name is required",
-  "nameMustBeAtLeast3Characters": "Name must be at least 3 characters",
-  "dateOfBirth": "Date of Birth",
-  "emailAddressOptional": "Email Address (Optional)",
-  "yourEmailExample": "your.email@example.com",
-  "aadhaarNumber": "Aadhaar Number",
-  "enter12DigitAadhaarNumber": "Enter 12-digit Aadhaar number",
-  "contactName": "Contact Name",
-  "fullNameOfEmergencyContact": "Full name of emergency contact",
-  "contactPhone": "Contact Phone",
-  "tenDigitPhoneNumber": "10-digit phone number",
-  "contactAddressOptional": "Contact Address (Optional)",
-  "fullAddressOfEmergencyContact": "Full address of emergency contact",
-  "profilePhoto": "Profile Photo",
-  "aadhaarDocument": "Aadhaar Document",
-  "aboutApp": "About App",
-  "aboutDeveloper": "About Developer",
-  "switchAccount": "Switch Account",
-  "switchToGuest": "Switch to Guest",
-  "switchToOwner": "Switch to Owner",
-  "pgs": "PGs",
-  "foods": "Foods",
-  "requests": "Requests",
-  "complaints": "Complaints",
-  "overview": "Overview",
-  "food": "Food",
-  "guests": "Guests",
-  "browsePGAccommodations": "Browse PG Accommodations",
-  "viewFoodMenu": "View Food Menu",
-  "paymentHistory": "Payment History",
-  "bookingRequests": "Booking Requests",
-  "complaintsRequests": "Complaints & Requests",
-  "submitNewComplaint": "Submit New Complaint",
-  "briefDescriptionOfComplaint": "Brief description of your complaint",
-  "detailedDescriptionOfComplaint": "Detailed description of your complaint or request",
-  "submitComplaint": "Submit Complaint",
-  "complaintSubmittedSuccessfully": "Complaint submitted successfully",
-  "submissionFailed": "Submission failed",
-  "errorPickingImage": "Error picking image",
-  "userNotAuthenticated": "User not authenticated",
-  "pleaseSelectPGFirst": "Please select a PG first to file a complaint",
-  "paymentDetails": "Payment Details",
-  "paymentNotFound": "Payment Not Found",
-  "sendPayment": "Send Payment",
-  "sendPaymentNotification": "Send Payment Notification",
-  "uploadPaymentScreenshot": "Upload Payment Screenshot",
-  "invalidPGSelection": "Invalid PG selection. Owner information not available.",
-  "paymentSuccessfulOwnerNotified": "Payment successful! Owner will be notified.",
-  "paymentFailed": "Payment failed",
-  "failedToProcessPayment": "Failed to process payment",
-  "pleaseUploadPaymentScreenshot": "Please upload payment screenshot. Transaction ID is visible in the screenshot.",
-  "failedToSendNotification": "Failed to send notification",
-  "invalidPaymentOrOwnerInfo": "Invalid payment or owner information not available.",
-  "paymentSuccessful": "Payment successful!",
-  "upiPaymentNotificationSent": "UPI payment notification sent. Owner will verify and confirm.",
-  "failedToProcessUPIPayment": "Failed to process UPI payment",
-  "cashPaymentNotificationSent": "Cash payment notification sent. Owner will confirm once they receive the payment.",
-  "failedToProcessCashPayment": "Failed to process cash payment",
-  "failedToPickImage": "Failed to pick image",
-  "changeScreenshot": "Change Screenshot",
-  "backToPayments": "Back to Payments",
-  "yesPaid": "Yes, Paid",
-  "noPaymentsYet": "No Payments Yet",
-  "noFilterPayments": "No {filter} Payments",
-  "@noFilterPayments": {
-    "placeholders": {
-      "filter": {
-        "type": "String"
-      }
-    }
-  },
-  "paymentHistoryTitle": "Payment History",
-  "pgNotFound": "PG Not Found",
-  "tryAgain": "Try Again",
-  "pricingAvailability": "Pricing & Availability",
-  "locationVicinity": "Location & Vicinity",
-  "facilitiesAmenities": "Facilities & Amenities",
-  "foodMealInformation": "Food & Meal Information",
-  "rulesPolicies": "Rules & Policies",
-  "contactOwnerInformation": "Contact & Owner Information",
-  "paymentInformation": "Payment Information",
-  "additionalInformation": "Additional Information",
-  "viewOnMap": "View on Map",
-  "callOwner": "Call Owner",
-  "sharePG": "Share PG",
-  "requestBooking": "Request Booking",
-  "couldNotOpenMaps": "Could not open maps",
-  "pgInformationNotAvailable": "PG information not available",
-  "noMenuForDay": "No Menu for {day}",
-  "@noMenuForDay": {
-    "placeholders": {
-      "day": {
-        "type": "String"
-      }
-    }
-  },
-  "errorLoadingMenu": "Error Loading Menu",
-  "foodDetails": "Food Details",
-  "errorLoadingComplaints": "Error Loading Complaints",
-  "myRoomBed": "My Room & Bed",
-  "noActiveBooking": "No Active Booking",
-  "myBookingRequests": "My Booking Requests",
-  "getStartedWithBookingRequests": "Get Started with Booking Requests",
-  "noPGsFound": "No PGs Found",
-  "noPGsAvailable": "No PGs Available",
-  "newBookingRequest": "New Booking Request",
-  "newComplaintFiled": "New Complaint Filed",
-  "paymentReceived": "Payment Received",
-  "razorpay": "Razorpay",
-  "upiPayment": "UPI Payment",
-  "cashPayment": "Cash Payment",
-  "helpSupport": "Help & Support",
-  "videoTutorials": "Watch step-by-step guides",
-  "documentation": "Read comprehensive guides",
-  "emailSupport": "Email Support",
-  "supportEmail": "support@atitia.com",
-  "phoneSupport": "Phone Support",
-  "supportPhone": "+91 1234567890",
-  "liveChat": "Live Chat",
-  "whatsappNumber": "WhatsApp: +91 7020797849",
-  "notifications": "Notifications",
-  "noNotifications": "No Notifications",
-  "appearance": "Appearance",
-  "pushNotifications": "Push Notifications",
-  "receiveNotificationsOnDevice": "Receive notifications on your device",
-  "emailNotifications": "Email Notifications",
-  "receiveNotificationsViaEmail": "Receive notifications via email",
-  "paymentReminders": "Payment Reminders",
-  "getRemindersForPendingPayments": "Get reminders for pending payments",
-  "dataPrivacy": "Data & Privacy",
-  "privacyPolicy": "Privacy Policy",
-  "termsOfService": "Terms of Service",
-  "about": "About",
-  "appVersion": "App Version",
-  "buildNumber": "Build Number",
-  "guest": "Guest",
-  "owner": "Owner",
-  "noRevenueData": "No Revenue Data",
-  "totalRevenue": "Total Revenue",
-  "averagePerMonth": "Average/Month",
-  "monthlyRevenueBreakdown": "Monthly Revenue Breakdown",
-  "totalBookings": "Total Bookings",
-  "approved": "Approved",
-  "rejected": "Rejected",
-  "bedChanges": "Bed Changes",
-  "totalGuests": "Total Guests",
-  "paidCount": "Paid Count",
-  "pendingCount": "Pending Count",
-  "totalComplaints": "Total Complaints",
-  "inProgress": "In Progress",
-  "resolved": "Resolved",
-  "myProfile": "My Profile",
-  "aadhaarPhoto": "Aadhaar Photo",
-  "noBookings": "No Bookings",
-  "noPayments": "No Payments",
-  "noGuests": "No Guests",
-  "ownerRepliedToComplaint": "Owner replied to your complaint",
-  "complaintStatusDisplay": "Complaint {statusDisplay}",
-  "@complaintStatusDisplay": {
-    "placeholders": {
-      "statusDisplay": {
-        "type": "String"
-      }
-    }
-  },
-  "bookingApproved": "Booking Approved",
-  "bookingRejected": "Booking Rejected",
-  "changeStatus": "Change Status",
-  "updatedGuestsToStatus": "Updated {count} guests to {status}",
-  "@updatedGuestsToStatus": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      },
-      "status": {
-        "type": "String"
-      }
-    }
-  },
-  "confirmBulkDelete": "Confirm Bulk Delete",
-  "guestsDeletedSuccessfully": "Guests deleted successfully",
-  "reject": "Reject",
-  "approve": "Approve",
-  "photoSUploadedSuccessfully": "{count} photo(s) uploaded successfully",
-  "@photoSUploadedSuccessfully": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "photoSUploadedFailed": "{successCount} photo(s) uploaded, {failCount} failed",
-  "@photoSUploadedFailed": {
-    "placeholders": {
-      "successCount": {
-        "type": "int"
-      },
-      "failCount": {
-        "type": "int"
-      }
-    }
-  },
-  "failedToSelectPhotos": "Failed to select photos",
-  "maintenance": "Maintenance",
-  "housekeeping": "Housekeeping",
-  "vehicle": "Vehicle",
-  "other": "Other",
-  "start": "Start",
-  "resume": "Resume",
-  "details": "Details",
-  "pleaseFillInAllFields": "Please fill in all fields",
-  "serviceRequestSubmitted": "Service request submitted",
-  "replySentSuccessfully": "Reply sent successfully",
-  "serviceCompletedSuccessfully": "Service completed successfully",
-  "noMessagesYet": "No messages yet",
-  "replyToServiceRequest": "Reply to Service Request",
-  "failedToUpdateStatus": "Failed to update status",
-  "completeService": "Complete Service",
-  "serviceRequest": "Service Request",
-  "monthlyRevenue": "Monthly Revenue",
-  "startBuildingYourPGProfile": "Start Building Your PG Profile",
-  "defineYourPGStructure": "Define Your PG Structure",
-  "bedNumberingGuide": "Bed Numbering Guide",
-  "configureRentalPricing": "Configure Rental Pricing",
-  "addPGAmenities": "Add PG Amenities",
-  "uploadPGPhotos": "Upload PG Photos",
-  "progress": "Progress",
-  "saveDraft": "Save Draft",
-  "pleaseEnterPGNameBeforePublishing": "Please enter PG name before publishing",
-  "pgPublishedSuccessfully": "PG published successfully",
-  "draftSaved": "Draft saved",
-  "viewDetails": "View Details",
-  "editGuest": "Edit Guest",
-  "sendMessage": "Send Message",
-  "callGuest": "Call Guest",
-  "checkOut": "Check Out",
-  "guestUpdatedSuccessfully": "Guest updated successfully",
-  "replyToComplaint": "Reply to Complaint",
-  "resolveComplaint": "Resolve Complaint",
-  "complaintResolvedSuccessfully": "Complaint resolved successfully",
-  "editBike": "Edit Bike",
-  "bikeUpdatedSuccessfully": "Bike updated successfully",
-  "moveBike": "Move Bike",
-  "currentSpot": "Current spot: {spot}",
-  "@currentSpot": {
-    "placeholders": {
-      "spot": {
-        "type": "String"
-      }
-    }
-  },
-  "removeBike": "Remove Bike",
-  "areYouSureRemoveBike": "Are you sure you want to remove {bikeName}?",
-  "@areYouSureRemoveBike": {
-    "placeholders": {
-      "bikeName": {
-        "type": "String"
-      }
-    }
-  },
-  "bikeRemovalRequestCreated": "Bike removal request created",
-  "bikeMovementRequestCreated": "Bike movement request created",
-  "view": "View",
-  "pleaseEnterFestivalEventName": "Please enter festival/event name",
-  "specialMenuSavedSuccessfully": "Special menu saved successfully!",
-  "failedToSaveSpecialMenu": "Failed to save special menu",
-  "errorSavingSpecialMenu": "Error saving special menu",
-  "pleaseAddAtLeastOneMealItem": "Please add at least one meal item",
-  "failedToSaveMenu": "Failed to save menu",
-  "errorSavingMenu": "Error saving menu",
-  "menuCleared": "Menu cleared. Don't forget to save changes.",
-  "clearMenu": "Clear Menu?",
-  "createPGWeeklyMenus": "Create PG Weekly Menus",
-  "defaultMenusInitializedSuccessfully": "Default menus initialized successfully",
-  "failedToInitializeMenus": "Failed to initialize menus",
-  "addFestivalMenu": "Add Festival Menu",
-  "createSpecialMenuForFestivals": "Create special menu for festivals",
-  "addEventMenu": "Add Event Menu",
-  "createSpecialMenuForEvents": "Create special menu for events",
-  "viewAllSpecialMenus": "View All Special Menus",
-  "manageExistingSpecialMenus": "Manage existing special menus",
-  "weekly": "Weekly",
-  "monthly": "Monthly",
-  "yearly": "Yearly",
-  "revenue": "Revenue",
-  "occupancy": "Occupancy",
-  "searchServices": "Search Services",
-  "searchByTitleGuestRoomOrType": "Search by title, guest, room, or type...",
-  "createNewServiceRequest": "Create New Service Request",
-  "serviceDescription": "Service Description",
-  "describeTheServiceNeeded": "Describe the service needed...",
-  "submitRequest": "Submit Request",
-  "type": "Type",
-  "priority": "Priority",
-  "requested": "Requested",
-  "assignedTo": "Assigned To",
-  "complete": "Complete",
-  "reply": "Reply",
-  "sendReply": "Send Reply",
-  "typeYourReply": "Type your reply...",
-  "completionNotes": "Completion Notes",
-  "completionNotesOptional": "Completion notes (optional)...",
-  "markAsCompleted": "Mark as Completed",
-  "serviceTitle": "Service Title",
-  "guestName": "Service Title",
-  "room": "Room",
-  "serviceType": "Service Type",
-  "searchGuests": "Search Guests",
-  "searchByNamePhoneRoomOrEmail": "Search by name, phone, room, or email...",
-  "guestNameLabel": "Guest Name",
-  "phone": "Phone",
-  "phoneNumberLabel": "Phone Number",
-  "emailAddress": "Email Address",
-  "checkIn": "Check-in",
-  "duration": "Duration",
-  "emergencyContact": "Emergency Contact",
-  "emergencyPhone": "Emergency Phone",
-  "saveChanges": "Save Changes",
-  "message": "Message",
-  "enterYourMessage": "Enter your message...",
-  "send": "Send",
-  "searchComplaints": "Search Complaints",
-  "searchByTitleGuestRoomOrDescription": "Search by title, guest, room, or description...",
-  "created": "Created",
-  "resolutionNotes": "Resolution Notes",
-  "resolutionNotesOptional": "Resolution notes (optional)...",
-  "markAsResolved": "Mark as Resolved",
-  "complaintTitle": "Complaint Title",
-  "priorityLevel": "Priority level",
-  "searchBikes": "Search Bikes",
-  "searchByNumberNameGuestOrModel": "Search by number, name, guest, or model...",
-  "parkingSpot": "Parking Spot",
-  "color": "Color",
-  "bikeType": "Type",
-  "registered": "Registered",
-  "lastParked": "Last Parked",
-  "newParkingSpot": "New Parking Spot",
-  "reasonForMove": "Reason for move",
-  "reasonForRemoval": "Reason for removal",
-  "bikeNumber": "Bike Number",
-  "bikeModel": "Model",
-  "bikeColor": "Bike Color",
-  "addMenu": "Add Menu",
-  "saveSpecialMenu": "Save Special Menu",
-  "note": "Note",
-  "addItem": "Add Item",
-  "itemName": "Item Name",
-  "add": "Add",
-  "items": "Items",
-  "breakfast": "Breakfast",
-  "lunch": "Lunch",
-  "dinner": "Dinner",
-  "photos": "Photos",
-  "addPhoto": "Add Photo",
-  "menuDescription": "Menu Description",
-  "addAnySpecialNotesAboutMenu": "Add any special notes about this menu...",
-  "initialize": "Initialize",
-  "clearAll": "Clear All",
-  "saveSearch": "Save Search",
-  "bookNow": "Book Now",
-  "requestChange": "Request Change",
-  "submitRequestLabel": "Submit Request",
-  "editMenu": "Edit Menu",
-  "createMenu": "Create Menu",
-  "addPhotos": "Add Photos",
-  "listYourFirstPG": "List Your First PG",
-  "recordPayment": "Record Payment",
-  "searchByTitleGuestRoomOrTypeLabel": "Search by title, guest, room, or type",
-  "searchByGuestName": "Guest name",
-  "searchByRoomNumber": "Room number",
-  "searchByServiceType": "Service type",
-  "searchByComplaintTitle": "Complaint title",
-  "searchByBikeNumber": "Bike number",
-  "searchByBikeModel": "Bike model",
-  "searchByBikeColor": "Bike Color",
-  "savePaymentDetails": "Save Payment Details",
-  "bankName": "Bank Name",
-  "bankNameHint": "e.g., State Bank of India",
-  "accountHolderName": "Account Holder Name",
-  "nameAsPerBankRecords": "Name as per bank records",
-  "accountNumber": "Account Number",
-  "enterAccountNumber": "Enter account number",
-  "ifscCode": "IFSC Code",
-  "ifscCodeHint": "e.g., SBIN0001234",
-  "upiID": "UPI ID",
-  "upiIDHint": "yourname@paytm",
-  "paymentInstructionsOptional": "Payment Instructions (Optional)",
-  "anySpecialInstructionsForGuests": "Any special instructions for guests",
-  "paymentDetailsSavedSuccessfully": "Payment details saved successfully",
-  "failedToSave": "Failed to save",
-  "enterYourFullName": "Enter your full name",
-  "enterYourEmail": "Enter your email",
-  "enterYourPhoneNumber": "Enter your phone number",
-  "enterYourPGAddress": "Enter your PG address",
-  "enterPincode": "Enter pincode",
-  "selectState": "Select State",
-  "enterBusinessName": "Enter business name",
-  "enterBusinessType": "Enter business type",
-  "enterPANNumber": "Enter PAN number",
-  "enterGSTNumber": "Enter GST number",
-  "fullAddressWithLandmark": "Full address with landmark",
-  "pgNameHint": "e.g., Green Meadows PG",
-  "phoneNumberHint": "e.g., +91 9876543210",
-  "selectCity": "Select City",
-  "addressHint": "e.g., Sector 5, HSR Layout",
-  "selectPGType": "Select PG Type",
-  "selectMealType": "Select Meal Type",
-  "mealTimingsHint": "e.g., Breakfast: 8:00 AM - 10:00 AM, Lunch: 1:00 PM - 2:00 PM, Dinner: 8:00 PM - 9:30 PM",
-  "describeFoodQuality": "Describe the food quality, cuisine type, specialities, etc.",
-  "briefDescriptionOfPG": "Brief description of your PG",
-  "rentAmountHint": "e.g., 8000",
-  "securityDepositHint": "e.g., 10000",
-  "maintenanceFeeHint": "e.g., 500",
-  "visitingHoursHint": "e.g., 6:00 AM - 11:00 PM",
-  "selectPolicy": "Select Policy",
-  "noticePeriodHint": "e.g., 30",
-  "rulesRegardingGuests": "Rules regarding guests, visitors, overnight stays, etc.",
-  "termsAndConditions": "Terms and conditions for refunds, deposits, cancellations, etc.",
-  "nearbyPlacesHint": "e.g., Metro Station, Shopping Mall, Hospital",
-  "occupiedCount": "Occupied {count}",
-  "@occupiedCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "vacantCount": "Vacant {count}",
-  "@vacantCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "pendingCountLabel": "Pending {count}",
-  "@pendingCountLabel": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "maintenanceCount": "Maint. {count}",
-  "@maintenanceCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "publish": "Publish",
-  "totalReceived": "Total Received",
-  "totalPending": "Pending",
-  "notSignedIn": "Not signed in",
-  "userMenu": "User Menu",
-  "system": "System",
-  "watchStepByStepGuides": "Watch step-by-step guides",
-  "readComprehensiveGuides": "Read comprehensive guides",
-  "festivalEventNameHint": "e.g., Diwali, Ugadi, Special Event",
-  "anySpecialInstructionsOrDetails": "Any special instructions or details...",
-  "itemNameHint": "e.g., Special Biryani",
-  "pleaseEnterValidEmailAddress": "Please enter a valid email address",
-  "thisFieldIsRequired": "This field is required",
-  "pleaseEnterValidPhoneNumber": "Please enter a valid phone number",
-  "fileSizeExceedsMaximumLimit": "File size exceeds maximum limit",
-  "noInternetConnection": "No internet connection",
-  "checkYourConnectionAndTryAgain": "Check your connection and try again",
-  "authenticationFailed": "Authentication failed",
-  "pleaseCheckYourCredentialsAndTryAgain": "Please check your credentials and try again",
-  "failedToParseData": "Failed to parse data",
-  "pleaseTryAgainOrContactSupport": "Please try again or contact support if the problem persists",
-  "configurationError": "Configuration error",
-  "pleaseRestartTheAppOrContactSupport": "Please restart the app or contact support",
-  "validationFailed": "Validation failed",
-  "failedToUploadProfilePhoto": "Failed to upload profile photo",
-  "failedToUploadAadhaarPhoto": "Failed to upload Aadhaar photo",
-  "noProfileDataFound": "No profile data found",
-  "profileUpdatedSuccessfully": "Profile updated successfully",
-  "failedToUpdateProfile": "Failed to update profile",
   "areYouSureYouWantToLogout": "Are you sure you want to logout?",
   "loggedOutSuccessfully": "Logged out successfully",
   "logoutFailed": "Logout failed",
@@ -607,7 +224,6 @@
       }
     }
   },
-  "failedToSwitchAccount": "Failed to switch account",
   "switchButton": "Switch",
   "role": "Role",
   "verifiedOwner": "Verified Owner",
@@ -615,5 +231,4891 @@
   "pgManagementSystem": "PG Management System",
   "madeWithLoveByAtitiaTeam": "Made with ❤️ by Atitia Team",
   "version": "Version",
-  "poweredByCharyatani": "Powered by Charyatani"
+  "poweredByCharyatani": "Powered by Charyatani",
+  "chooseHowYouWantToUseTheApp": "Choose how you want to use the app",
+  "findAndBookPgAccommodations": "Find and book PG accommodations",
+  "manageYourPgPropertiesAndGuests": "Manage your PG properties and guests",
+  "requestTimedOutPleaseTryAgain": "Request timed out. Please try again.",
+  "@error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "googleSignInOnWebRequiresButton": "Google Sign-In on web requires the sign-in button. Please use the Google Sign-In button above.",
+  "googleSignInTimedOut": "Google Sign-In timed out. Please try again.",
+  "googleSignInFailed": "Google Sign-In failed: {error}",
+  "@googleSignInFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "briefDescriptionOfYourComplaint": "Brief description of your complaint",
+  "detailedDescriptionOfYourComplaint": "Detailed description of your complaint or request",
+  "subjectRequired": "Subject is required",
+  "descriptionRequired": "Description is required",
+  "imageAttachment": "Image Attachment",
+  "attachImage": "Attach Image",
+  "removeImage": "Remove Image",
+  "requestTimedOut": "Request timed out",
+  "pleaseTryAgain": "Please try again",
+  "phoneNumberIsRequired": "Phone number is required",
+  "pleaseEnterValid10DigitPhoneNumber": "Please enter a valid 10-digit phone number",
+  "otpIsRequired": "OTP is required",
+  "otpMustBe6Digits": "OTP must be 6 digits",
+  "otpMustContainOnlyDigits": "OTP must contain only digits",
+  "authenticationFailedPleaseSelectCorrectRole": "Authentication failed. Please select the correct role.",
+  "userDataNotFound": "User data not found",
+  "invalidUserRolePleaseSelectRole": "Invalid user role. Please select a role.",
+  "verificationFailed": "Verification failed: {error}",
+  "@verificationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "googleSignInFailedError": "Google sign-in failed: {error}",
+  "@googleSignInFailedError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorPickingImage": "Error picking image: {error}",
+  "@errorPickingImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "otpSentSuccessfullyPleaseCheckYourPhone": "OTP sent successfully! Please check your phone.",
+  "failedToSendOtpPleaseTryAgain": "Failed to send OTP. Please try again.",
+  "tooManyRequestsPleaseWaitFewMinutes": "Too many requests. Please wait a few minutes before trying again.",
+  "smsServiceTemporarilyUnavailable": "SMS service temporarily unavailable. Please try again later.",
+  "securityVerificationFailedPleaseTryAgain": "Security verification failed. Please try again.",
+  "optional": "Optional",
+  "attachPhotosOptional": "Attach Photos (Optional)",
+  "userNotAuthenticated": "User not authenticated",
+  "complaintSubmittedSuccessfully": "Complaint submitted successfully",
+  "submissionFailed": "Submission failed",
+  "submitNewComplaint": "Submit New Complaint",
+  "submitComplaint": "Submit Complaint",
+  "personalInformation": "Personal Information",
+  "yourRegisteredPhoneNumber": "Your registered phone number",
+  "verifiedDuringLogin": "✓ Verified during login",
+  "fullName": "Full Name",
+  "fullNameIsRequired": "Full name is required",
+  "nameMustBeAtLeast3Characters": "Name must be at least 3 characters",
+  "dateOfBirth": "Date of Birth",
+  "gender": "Gender",
+  "male": "Male",
+  "female": "Female",
+  "aadhaarNumberIsRequired": "Aadhaar number is required",
+  "aadhaarMustBe12Digits": "Aadhaar must be 12 digits",
+  "aadhaarMustContainOnlyDigits": "Aadhaar must contain only digits",
+  "aadhaarDocumentUploadedSuccessfully": "Aadhaar document uploaded successfully!",
+  "contactNameIsRequired": "Contact name is required",
+  "contactPhoneIsRequired": "Contact phone is required",
+  "pleaseSelectRelationship": "Please select relationship",
+  "contactAddressOptional": "Contact Address (Optional)",
+  "allRequiredFieldsCompletedReadyToSubmit": "All required fields completed! Ready to submit.",
+  "pleaseProvideYourDetailsAsPerOfficialDocuments": "Please provide your details as per your official documents",
+  "profilePhoto": "Profile Photo",
+  "aadhaarDocument": "Aadhaar Document",
+  "yourDocumentsAreSecurelyStored": "Your documents are securely stored and used only for verification purposes",
+  "provideDetailsOfSomeoneWeCanContact": "Provide details of someone we can contact in case of emergency",
+  "continueButton": "Continue",
+  "finish": "Finish",
+  "profileUpdatedSuccessfully": "Profile updated successfully",
+  "errorUpdatingProfile": "Error updating profile",
+  "pgs": "PGs",
+  "foods": "Foods",
+  "requests": "Requests",
+  "browsePgAccommodations": "Browse PG Accommodations",
+  "viewFoodMenu": "View Food Menu",
+  "paymentHistory": "Payment History",
+  "bookingRequests": "Booking Requests",
+  "complaintsAndRequests": "Complaints & Requests",
+  "findYourPg": "Find Your PG",
+  "searchAndFilters": "Search & Filters",
+  "hideFilters": "Hide Filters",
+  "showFilters": "Show Filters",
+  "pgsAvailable": "PGs Available",
+  "cities": "Cities",
+  "amenities": "Amenities",
+  "searchByNameCityArea": "Search by name, city, area...",
+  "filters": "Filters",
+  "clearAll": "Clear All",
+  "activeFilters": "Active Filters",
+  "noPgsFound": "No PGs Found",
+  "noPgsFoundDescription": "Try adjusting your search or filters to find more options.",
+  "monday": "Monday",
+  "tuesday": "Tuesday",
+  "wednesday": "Wednesday",
+  "thursday": "Thursday",
+  "friday": "Friday",
+  "saturday": "Saturday",
+  "sunday": "Sunday",
+  "breakfast": "Breakfast",
+  "lunch": "Lunch",
+  "dinner": "Dinner",
+  "today": "Today",
+  "noMenuAvailable": "No Menu Available",
+  "noMenuAvailableDescription": "Menu will be available soon.",
+  "refresh": "Refresh",
+  "refreshMenu": "Refresh Menu",
+  "likeTodaysMenu": "Like Today's Menu",
+  "dislike": "Dislike",
+  "menuNote": "Menu Note",
+  "foodGallery": "Food Gallery",
+  "noMenuForDay": "No Menu for {day}",
+  "@noMenuForDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerHasntSetMenuForDay": "The owner hasn't set a menu for this day yet.",
+  "errorLoadingMenu": "Error Loading Menu",
+  "unableToLoadMenuPleaseTryAgain": "Unable to load menu. Please try again.",
+  "foodMenuStatistics": "Food Menu Statistics",
+  "weeklyMenus": "Weekly Menus",
+  "like": "Like",
+  "todayMenu": "Today's Menu",
+  "history": "History",
+  "sendPayment": "Send Payment",
+  "paymentMethod": "Payment Method",
+  "transactionId": "Transaction ID",
+  "message": "Message",
+  "ownerResponse": "Owner Response",
+  "ownerPaymentDetails": "Owner Payment Details",
+  "upiId": "UPI ID",
+  "upiQrCode": "UPI QR Code",
+  "sendPaymentNotification": "Send Payment Notification",
+  "afterMakingPaymentUploadScreenshot": "After making payment, upload screenshot and notify owner",
+  "addComplaint": "Add Complaint",
+  "complaints": "Complaints",
+  "noComplaintsFound": "No Complaints Found",
+  "noComplaintsFoundDescription": "You haven't submitted any complaints yet. Tap the + button to add one.",
+  "all": "All",
+  "resolved": "Resolved",
+  "inProgress": "In Progress",
+  "total": "Total",
+  "myComplaints": "My Complaints",
+  "noComplaintsFoundWithSelectedFilter": "No complaints found with the selected filter",
+  "noComplaintsYet": "No Complaints Yet",
+  "noComplaintsYetDescription": "You haven't submitted any complaints yet. Tap the + button to add your first complaint.",
+  "errorLoadingComplaints": "Error Loading Complaints",
+  "unableToLoadComplaints": "Unable to load complaints",
+  "saveProfile": "Save Profile",
+  "loadingYourProfile": "Loading your profile...",
+  "errorLoadingProfile": "Error Loading Profile",
+  "profilePhotos": "Profile Photos",
+  "aadhaarPhoto": "Aadhaar Photo",
+  "failedToUploadProfilePhoto": "Failed to upload profile photo: {error}",
+  "@failedToUploadProfilePhoto": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUploadAadhaarPhoto": "Failed to upload Aadhaar photo: {error}",
+  "@failedToUploadAadhaarPhoto": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noProfileDataFound": "No profile data found",
+  "failedToUpdateProfile": "Failed to update profile",
+  "vegetarian": "Vegetarian",
+  "nonVegetarian": "Non-Vegetarian",
+  "single": "Single",
+  "married": "Married",
+  "foodPreference": "Food Preference",
+  "maritalStatus": "Marital Status",
+  "other": "Other",
+  "contactAndGuardianInformation": "Contact & Guardian Information",
+  "currentAddress": "Current Address",
+  "guardianName": "Guardian Name",
+  "guardianPhone": "Guardian Phone",
+  "preferences": "Preferences",
+  "eggetarian": "Eggetarian",
+  "divorced": "Divorced",
+  "items": "Items",
+  "overview": "Overview",
+  "food": "Food",
+  "guests": "Guests",
+  "totalRevenue": "Total Revenue",
+  "properties": "Properties",
+  "activeTenants": "Active Tenants",
+  "occupancy": "Occupancy",
+  "pendingBookings": "Pending Bookings",
+  "pendingComplaints": "Pending Complaints",
+  "refreshDashboard": "Refresh Dashboard",
+  "loadingDashboard": "Loading dashboard...",
+  "errorLoadingDashboard": "Error Loading Dashboard",
+  "dashboardDataWillAppearHere": "Dashboard data will appear here once you add properties",
+  "welcome": "Welcome",
+  "heresYourBusinessOverview": "Here's your business overview",
+  "performance": "Performance",
+  "monthlyRevenue": "Monthly Revenue",
+  "propertyBreakdown": "Property Breakdown",
+  "quickActions": "Quick Actions",
+  "addProperty": "Add Property",
+  "addTenant": "Add Tenant",
+  "viewReports": "View Reports",
+  "propertyRevenue": "Property Revenue",
+  "totalRevenueWithPgs": "Total Revenue ({count} PGs)",
+  "@totalRevenueWithPgs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createPgMenus": "Create PG Menus",
+  "specialMenus": "Special Menus",
+  "loadingMenus": "Loading menus...",
+  "failedToLoadMenus": "Failed to load menus",
+  "noPgMenusFound": "No PG Menus Found",
+  "createWeeklyMenusForThisPg": "Create weekly menus for this PG to get started",
+  "useCreatePgMenusButton": "Use the \"Create PG Menus\" button in the app bar to get started",
+  "createPgWeeklyMenus": "Create PG Weekly Menus",
+  "thisWillCreateDefaultMenuTemplates": "This will create default menu templates for all 7 days of the week for this PG. You can edit them later.",
+  "initialize": "Initialize",
+  "defaultMenusInitializedSuccessfully": "Default menus initialized successfully",
+  "failedToInitializeMenus": "Failed to initialize menus",
+  "failedToInitializeMenusWithError": "Failed to initialize menus: {error}",
+  "@failedToInitializeMenusWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "specialMenuOptions": "Special Menu Options",
+  "addFestivalMenu": "Add Festival Menu",
+  "createSpecialMenuForFestivals": "Create special menu for festivals",
+  "addEventMenu": "Add Event Menu",
+  "createSpecialMenuForEvents": "Create special menu for events",
+  "viewAllSpecialMenus": "View All Special Menus",
+  "manageExistingSpecialMenus": "Manage existing special menus",
+  "editMenu": "Edit Menu",
+  "guestFeedbackToday": "Guest Feedback (Today)",
+  "breakfastTime": "7:00 AM - 10:00 AM",
+  "lunchTime": "12:00 PM - 3:00 PM",
+  "dinnerTime": "7:00 PM - 10:00 PM",
+  "createMenuForThisDay": "Create a menu for this day to get started",
+  "createMenu": "Create Menu",
+  "special": "Special",
+  "weeklyMenuManagement": "Weekly Menu Management",
+  "manageBreakfastLunchDinnerForAllDays": "Manage breakfast, lunch & dinner for all days",
+  "days": "Days",
+  "photos": "Photos",
+  "festival": "Festival",
+  "ownerFoodNoItemsAddedYet": "No items added yet",
+  "specialMenuLabel": "Special Menu",
+  "dayShortMon": "Mon",
+  "dayShortTue": "Tue",
+  "dayShortWed": "Wed",
+  "dayShortThu": "Thu",
+  "dayShortFri": "Fri",
+  "dayShortSat": "Sat",
+  "dayShortSun": "Sun",
+  "noRequests": "No Requests",
+  "bookingAndBedChangeRequestsWillAppearHere": "Booking and bed change requests will appear here",
+  "bedChanges": "Bed Changes",
+  "complaintsFromGuestsWillAppearHere": "Complaints from guests will appear here",
+  "complaint": "Complaint",
+  "guest": "Guest",
+  "reply": "Reply",
+  "resolve": "Resolve",
+  "replyToComplaint": "Reply to Complaint",
+  "typeYourReply": "Type your reply...",
+  "send": "Send",
+  "replySent": "Reply sent",
+  "failedToSendReply": "Failed to send reply",
+  "resolveComplaint": "Resolve Complaint",
+  "resolutionNotesOptional": "Resolution Notes (optional)",
+  "markResolved": "Mark Resolved",
+  "complaintResolved": "Complaint resolved",
+  "failedToResolve": "Failed to resolve",
+  "refreshGuestData": "Refresh Guest Data",
+  "loadingGuestData": "Loading guest data...",
+  "errorLoadingData": "Error Loading Data",
+  "bedMap": "Bed Map",
+  "dashboard": "Dashboard",
+  "refreshPgData": "Refresh PG Data",
+  "noPgsListedYet": "No PGs Listed Yet",
+  "tapButtonBelowToListFirstPg": "Tap the button below to list your first PG",
+  "listYourFirstPg": "List Your First PG",
+  "loadingPgData": "Loading PG data...",
+  "bookingsOverview": "Bookings Overview",
+  "approved": "Approved",
+  "rejected": "Rejected",
+  "occupied": "Occupied",
+  "vacant": "Vacant",
+  "maintenance": "Maintenance",
+  "approve": "Approve",
+  "reject": "Reject",
+  "noGuests": "No Guests",
+  "guestListWillAppearHereOnceGuestsAreAdded": "Guest list will appear here once guests are added",
+  "selected": "selected",
+  "deselectAll": "Deselect All",
+  "selectAll": "Select All",
+  "changeStatus": "Change Status",
+  "deleteSelected": "Delete Selected",
+  "updatedGuestsToStatus": "Updated {count} guests to {status}",
+  "@updatedGuestsToStatus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmBulkDelete": "Confirm Bulk Delete",
+  "areYouSureYouWantToDeleteGuests": "Are you sure you want to delete {count} guests? This action cannot be undone.",
+  "@areYouSureYouWantToDeleteGuests": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "guestsDeletedSuccessfully": "Guests deleted successfully",
+  "totalGuests": "Total Guests",
+  "activeGuests": "Active Guests",
+  "pendingGuests": "Pending Guests",
+  "found": "found",
+  "guestOverview": "Guest Overview",
+  "recordPayment": "Record Payment",
+  "atitiaIsAComprehensivePgManagementPlatform": "Atitia is a comprehensive PG management platform that connects PG owners with guests, streamlining bookings, payments, and daily operations.",
+  "features": "Features:",
+  "easyPgPropertyManagement": "• Easy PG property management",
+  "secureOnlinePayments": "• Secure online payments",
+  "realTimeNotifications": "• Real-time notifications",
+  "menuManagement": "• Menu management",
+  "complaintTracking": "• Complaint tracking",
+  "visitorManagement": "• Visitor management",
+  "copyrightAtitiaAllRightsReserved": "© 2025 Atitia. All rights reserved.",
+  "charyataniTechnologies": "Charyatani Technologies",
+  "weAreALeadingSoftwareDevelopmentCompany": "We are a leading software development company specializing in mobile and web applications for hospitality and property management.",
+  "contactUs": "Contact Us:",
+  "copyrightCharyataniTechnologies": "© 2025 Charyatani Technologies Pvt. Ltd.",
+  "allRightsReserved": "All rights reserved.",
+  "aboutApp": "About App",
+  "aboutDeveloper": "About Developer",
+  "switchToGuest": "Switch to Guest",
+  "switchToOwner": "Switch to Owner",
+  "owner": "Owner",
+  "failedToSwitchAccount": "Failed to switch account",
+  "notifications": "Notifications",
+  "userMenu": "User Menu",
+  "system": "System",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "helpSupport": "Help & Support",
+  "or": "OR",
+  "googleSignIn": "Continue with Google",
+  "enterYourCompleteName": "Enter your complete name",
+  "age": "Age",
+  "years": "years",
+  "emailAddressOptional": "Email Address (Optional)",
+  "yourEmailExampleCom": "your.email@example.com",
+  "pleaseEnterValidEmail": "Please enter a valid email",
+  "uploadDocuments": "Upload Documents",
+  "uploadClearPhotosOfYourDocuments": "Upload clear photos of your documents for verification",
+  "uploadClearPhotoOfYourself": "Upload a clear photo of yourself",
+  "uploadYourAadhaarCard": "Upload your Aadhaar card (front or back)",
+  "aadhaarNumber": "Aadhaar Number",
+  "enter12DigitAadhaarNumber": "Enter 12-digit Aadhaar number",
+  "emergencyContact": "Emergency Contact",
+  "contactName": "Contact Name",
+  "fullNameOfEmergencyContact": "Full name of emergency contact",
+  "contactRelation": "Relation",
+  "fullAddressOfEmergencyContact": "Full address of emergency contact",
+  "father": "Father",
+  "mother": "Mother",
+  "brother": "Brother",
+  "sister": "Sister",
+  "spouse": "Spouse",
+  "friend": "Friend",
+  "reject": "Reject",
+  "approve": "Approve",
+  "pleaseSelectPgFirst": "Please select a PG first",
+  "invalidPgSelectionOwnerInfoNotAvailable": "Invalid PG selection. Owner information not available.",
+  "paymentSuccessfulOwnerWillBeNotified": "Payment successful! Owner will be notified.",
+  "paymentFailed": "Payment failed: {message}",
+  "@paymentFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToProcessPayment": "Failed to process payment: {error}",
+  "@failedToProcessPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseUploadPaymentScreenshot": "Please upload payment screenshot. Transaction ID is visible in the screenshot.",
+  "failedToSendNotification": "Failed to send notification: {error}",
+  "@failedToSendNotification": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "uploadPaymentScreenshot": "Upload Payment Screenshot",
+  "pleaseSelectPgFirstToFileComplaint": "Please select a PG first to file a complaint",
+  "submitFirstComplaint": "Submit First Complaint",
+  "viewDetails": "View Details",
+  "editGuest": "Edit Guest",
+  "sendMessage": "Send Message",
+  "callGuest": "Call Guest",
+  "checkOut": "Check Out",
+  "guestUpdatedSuccessfully": "Guest updated successfully",
+  "description": "Description:",
+  "messages": "Messages:",
+  "noMessagesYet": "No messages yet",
+  "replyToServiceRequest": "Reply to Service Request",
+  "sendReply": "Send Reply",
+  "pleaseFillInAllFields": "Please fill in all fields",
+  "serviceRequestSubmitted": "Service request submitted",
+  "replySentSuccessfully": "Reply sent successfully",
+  "failedToUpdateStatus": "Failed to update status: {error}",
+  "@failedToUpdateStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "completeService": "Complete Service",
+  "completionNotes": "Completion Notes",
+  "completionNotesOptional": "Completion notes (optional)...",
+  "markAsCompleted": "Mark as Completed",
+  "serviceCompletedSuccessfully": "Service completed successfully",
+  "editBike": "Edit Bike",
+  "bikeUpdatedSuccessfully": "Bike updated successfully",
+  "moveBike": "Move Bike",
+  "currentSpot": "Current spot: {spot}",
+  "@currentSpot": {
+    "placeholders": {
+      "spot": {
+        "type": "String"
+      }
+    }
+  },
+  "removeBike": "Remove Bike",
+  "areYouSureYouWantToRemoveBike": "Are you sure you want to remove {bikeName}?",
+  "@areYouSureYouWantToRemoveBike": {
+    "placeholders": {
+      "bikeName": {
+        "type": "String"
+      }
+    }
+  },
+  "bikeRemovalRequestCreated": "Bike removal request created",
+  "bikeMovementRequestCreated": "Bike movement request created",
+  "invalidPaymentOrOwnerInfoNotAvailable": "Invalid payment or owner information not available.",
+  "paymentSuccessful": "Payment successful!",
+  "upiPaymentNotificationSent": "UPI payment notification sent. Owner will verify and confirm.",
+  "failedToProcessUpiPayment": "Failed to process UPI payment: {error}",
+  "@failedToProcessUpiPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cashPaymentNotificationSent": "Cash payment notification sent. Owner will confirm once they receive the payment.",
+  "failedToProcessCashPayment": "Failed to process cash payment: {error}",
+  "@failedToProcessCashPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToPickImage": "Failed to pick image: {error}",
+  "@failedToPickImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "changeScreenshot": "Change Screenshot",
+  "cashPaymentConfirmation": "Cash Payment Confirmation",
+  "haveYouPaidAmountInCash": "Have you paid the amount in cash to the owner? Owner will confirm once they receive the payment.",
+  "yesPaid": "Yes, Paid",
+  "paymentDetailsSavedSuccessfully": "Payment details saved successfully",
+  "failedToSave": "Failed to save: {error}",
+  "@failedToSave": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownError": "Unknown error",
+  "saveDraft": "Save Draft",
+  "publish": "Publish",
+  "updating": "Updating...",
+  "creating": "Creating...",
+  "updatePg": "Update PG",
+  "createPg": "Create PG",
+  "pleaseEnterPgNameBeforePublishing": "Please enter PG name before publishing",
+  "pgPublishedSuccessfully": "PG published successfully",
+  "draftSaved": "Draft saved",
+  "failedToSelectPhotos": "Failed to select photos: {error}",
+  "@failedToSelectPhotos": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "guestName": "Guest Name",
+  "searchGuestsLabel": "Search Guests",
+  "searchGuestsHint": "Search by name, phone, room, or email...",
+  "statusNew": "New",
+  "statusVip": "VIP",
+  "exportData": "Export Data",
+  "guestDataExportedSuccessfully": "Guest data exported successfully",
+  "guestListTitle": "Guest List",
+  "guestCount": "{count, plural, =0 {0 guests} one {1 guest} other {{count} guests}}",
+  "@guestCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "noGuestsYet": "No Guests Yet",
+  "guestsAppearAfterBooking": "Guests will appear here once they book your PG",
+  "checkIn": "Check-in",
+  "duration": "Duration",
+  "emergencyPhone": "Emergency Phone",
+  "occupation": "Occupation",
+  "company": "Company",
+  "messageToGuest": "To: {name}",
+  "@messageToGuest": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "enterMessageHint": "Enter your message...",
+  "messageSentSuccessfully": "Message sent successfully",
+  "checkOutGuest": "Check Out Guest",
+  "checkOutGuestConfirmation": "Are you sure you want to check out this guest? This action cannot be undone.",
+  "guestCheckedOutSuccessfully": "Guest checked out successfully",
+  "phoneNumberLabel": "Phone Number",
+  "emailLabel": "Email",
+  "emergencyContactLabel": "Emergency Contact",
+  "emergencyPhoneLabel": "Emergency Phone",
+  "saveChanges": "Save Changes",
+  "parkingSpot": "Parking Spot",
+  "notes": "Notes",
+  "reply": "Reply",
+  "complete": "Complete",
+  "resolve": "Resolve",
+  "resolutionNotes": "Resolution Notes",
+  "resolutionNotesOptional": "Resolution notes (optional)...",
+  "markAsResolved": "Mark as Resolved",
+  "complaintResolvedSuccessfully": "Complaint resolved successfully",
+  "serviceType": "Service Type",
+  "serviceDescription": "Service Description",
+  "describeTheServiceNeeded": "Describe the service needed...",
+  "submitRequest": "Submit Request",
+  "replyLabel": "Reply",
+  "typeYourReply": "Type your reply...",
+  "uPI": "UPI Payment",
+  "amountLabel": "Amount:",
+  "weeklyMenuPreview": "Weekly Menu Preview",
+  "totalItems": "Total Items",
+  "breakfastItems": "Breakfast Items",
+  "lunchItems": "Lunch Items",
+  "dinnerItems": "Dinner Items",
+  "snackItems": "Snack Items",
+  "complaintStatistics": "Complaint Statistics",
+  "totalComplaints": "Total Complaints",
+  "highPriority": "High Priority",
+  "thisMonth": "This Month",
+  "recentComplaintsPreview": "Recent Complaints Preview",
+  "category": "Category",
+  "priorityLabel": "Priority",
+  "maintenanceIssues": "Maintenance Issues",
+  "cleanliness": "Cleanliness",
+  "foodQuality": "Food Quality",
+  "noiseComplaints": "Noise Complaints",
+  "backToPayments": "Back to Payments",
+  "payNow": "Pay Now",
+  "processing": "Processing...",
+  "retry": "Retry",
+  "addPhotos": "Add Photos",
+  "paymentDetails": "Payment Details",
+  "paymentNotFound": "Payment Not Found",
+  "theRequestedPaymentCouldNotBeFound": "The requested payment could not be found.",
+  "dueDate": "Due Date",
+  "paymentDate": "Payment Date",
+  "uPIReference": "UPI Reference",
+  "pgId": "PG ID",
+  "ownerId": "Owner ID",
+  "timeline": "Timeline",
+  "created": "Created",
+  "paid": "Paid",
+  "transactionIdOptional": "Transaction ID (Optional)",
+  "transactionIdIsVisibleInScreenshot": "Transaction ID is visible in screenshot",
+  "youCanSkipThisTransactionIdIsInScreenshot": "You can skip this - transaction ID is in the screenshot",
+  "pleaseEnterAmount": "Please enter amount",
+  "pleaseEnterValidAmount": "Please enter valid amount",
+  "notRequiredAlreadyVisibleInScreenshot": "Not required - already visible in screenshot",
+  "messageOptional": "Message (Optional)",
+  "paymentInformation": "Payment Information",
+  "additionalInformation": "Additional Information",
+  "searchServices": "Search Services",
+  "searchByTitleGuestRoomOrType": "Search by title, guest, room, or type...",
+  "createNewServiceRequest": "Create New Service Request",
+  "priority": "Priority",
+  "requested": "Requested",
+  "assignedTo": "Assigned To",
+  "serviceRequest": "Service Request",
+  "serviceTitle": "Service Title",
+  "room": "Room",
+  "roomNumber": "Room number",
+  "maintenance": "Maintenance",
+  "housekeeping": "Housekeeping",
+  "vehicle": "Vehicle",
+  "start": "Start",
+  "resume": "Resume",
+  "details": "Details",
+  "advancedSearch": "Advanced Search",
+  "pgNotFound": "PG Not Found",
+  "pricingAvailability": "Pricing & Availability",
+  "locationVicinity": "Location & Vicinity",
+  "facilitiesAmenities": "Facilities & Amenities",
+  "foodMealInformation": "Food & Meal Information",
+  "rulesPolicies": "Rules & Policies",
+  "contactOwnerInformation": "Contact & Owner Information",
+  "callOwner": "Call Owner",
+  "sharePg": "Share PG",
+  "requestBooking": "Request Booking",
+  "couldNotOpenMaps": "Could not open maps",
+  "pgInformationNotAvailable": "PG information not available",
+  "failedToShare": "Failed to share: {error}",
+  "@failedToShare": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "searchBikes": "Search Bikes",
+  "searchByNumberNameGuestOrModel": "Search by number, name, guest, or model...",
+  "searchComplaints": "Search Complaints",
+  "searchByTitleGuestRoomOrDescription": "Search by title, guest, room, or description...",
+  "yourCurrentResidentialAddress": "Your current residential address",
+  "nameOfYourParentOrGuardian": "Name of your parent or guardian",
+  "tenDigitPhoneNumber": "10-digit phone number",
+  "pleaseEnterValidPhoneNumber": "Please enter valid 10-digit phone number",
+  "bank": "Bank",
+  "uPI": "UPI",
+  "qrCode": "QR Code",
+  "configureHowGuestsCanPayYou": "Configure how guests can pay you",
+  "bankAccountDetails": "Bank Account Details",
+  "addYourBankAccountDetailsForDirectTransfers": "Add your bank account details for direct transfers",
+  "bankName": "Bank Name",
+  "accountHolderName": "Account Holder Name",
+  "enterAccountNumber": "Enter account number",
+  "ifscCode": "IFSC Code",
+  "uPIDetails": "UPI Details",
+  "addYourUpiIdForInstantPayments": "Add your UPI ID for instant payments",
+  "upiID": "UPI ID",
+  "paymentInstructionsOptional": "Payment Instructions (Optional)",
+  "uploadYourUpiQrCodeFromAnyPaymentApp": "Upload your UPI QR code from any payment app",
+  "changeQrCode": "Change QR Code",
+  "uploadQrCode": "Upload QR Code",
+  "savePaymentDetails": "Save Payment Details",
+  "editPg": "Edit PG",
+  "newPgSetup": "New PG Setup",
+  "basic": "Basic",
+  "basicInfo": "Basic Info",
+  "rent": "Rent",
+  "rentConfig": "Rent Config",
+  "structure": "Structure",
+  "floorStructure": "Floor Structure",
+  "rules": "Rules",
+  "additionalInfo": "Additional Info",
+  "summary": "Summary",
+  "startBuildingYourPgProfile": "Start Building Your PG Profile",
+  "defineYourPgStructure": "Define Your PG Structure",
+  "bedNumberingGuide": "Bed Numbering Guide",
+  "configureRentalPricing": "Configure Rental Pricing",
+  "addPgAmenities": "Add PG Amenities",
+  "uploadPgPhotos": "Upload PG Photos",
+  "progress": "Progress",
+  "theRequestedPgCouldNotBeFoundOrMayHaveBeenRemoved": "The requested PG could not be found or may have been removed.",
+  "newParkingSpot": "New Parking Spot",
+  "reasonForMove": "Reason for Move",
+  "reasonForRemoval": "Reason for Removal",
+  "more": "More",
+  "nameAsPerBankRecords": "Name as per bank records",
+  "accountNumber": "Account Number",
+  "anySpecialInstructionsForGuests": "Any special instructions for guests",
+  "appearance": "Appearance",
+  "pushNotifications": "Push Notifications",
+  "pushNotificationsDescription": "Receive notifications on your device",
+  "emailNotifications": "Email Notifications",
+  "emailNotificationsDescription": "Receive notifications via email",
+  "paymentReminders": "Payment Reminders",
+  "paymentRemindersDescription": "Get reminders for pending payments",
+  "dataAndPrivacy": "Data & Privacy",
+  "aboutSection": "About",
+  "appVersion": "App Version",
+  "buildNumber": "Build Number",
+  "theme": "Theme",
+  "themeDescription": "Choose your preferred theme",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "System",
+  "languageDescription": "Select your preferred language",
+  "urgent": "Urgent",
+  "createNewServiceRequest": "Create New Service Request",
+  "createServiceRequest": "Create Service Request",
+  "collapse": "Collapse",
+  "otherServices": "Other Services",
+  "serviceRequests": "Service Requests",
+  "noServiceRequestsYet": "No service requests yet",
+  "serviceRequestsAppearHere": "Guest service requests will appear here when submitted",
+  "serviceStarted": "Service started",
+  "serviceStatusUpdated": "Service status updated",
+  "unreadMessagesCount": "{count} unread messages",
+  "@unreadMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchBikes": "Search Bikes",
+  "searchBikesHint": "Search by number, name, guest, or model...",
+  "registered": "Registered",
+  "violation": "Violation",
+  "violations": "Violations",
+  "expired": "Expired",
+  "premium": "Premium",
+  "totalBikes": "Total Bikes",
+  "bikeRegistry": "Bike Registry",
+  "noBikesRegistered": "No Bikes Registered",
+  "guestBikesWillAppearHere": "Guest bikes will appear here when registered",
+  "bikeCount": "{count} bikes",
+  "@bikeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bikeNumber": "Bike Number",
+  "bikeName": "Bike Name",
+  "bikeType": "Bike Type",
+  "bikeModel": "Bike Model",
+  "bikeColor": "Bike Color",
+  "color": "Color",
+  "typeLabel": "Type",
+  "registeredOn": "Registered",
+  "lastParked": "Last Parked",
+  "removed": "Removed",
+  "violationLabel": "Violation",
+  "notes": "Notes",
+  "ownerRequestedMove": "Owner requested move",
+  "ownerRequestedRemoval": "Owner requested removal",
+  "violationWithReason": "Violation: {reason}",
+  "@violationWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "searchComplaintsHint": "Search by title, guest, room, or description...",
+  "highPriority": "High Priority",
+  "statusInProgress": "In Progress",
+  "statusResolved": "Resolved",
+  "statusClosed": "Closed",
+  "complaintCount": "{count} complaints",
+  "@complaintCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "complaintDataExportedSuccessfully": "Complaint data exported successfully",
+  "complaintTitle": "Complaint Title",
+  "priorityLevel": "Priority Level",
+  "add": "Add",
+  "imagesSelected": "{count} image(s) selected",
+  "@imagesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commonComplaintCategories": "Common Complaint Categories:",
+  "complaintCategoryFood": "Food",
+  "complaintCategoryCleanliness": "Cleanliness",
+  "complaintCategoryMaintenance": "Maintenance",
+  "complaintCategoryWater": "Water",
+  "complaintCategoryElectricity": "Electricity",
+  "complaintCategoryWifi": "Wi-Fi",
+  "complaintCategoryNoise": "Noise",
+  "complaintCategoryGeneral": "General",
+  "todayAt": "Today {time}",
+  "@todayAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "yesterday": "Yesterday",
+  "daysAgo": "{count} days ago",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bookBed": "Book a Bed",
+  "selectFloor": "Select Floor",
+  "selectRoom": "Select Room",
+  "selectBed": "Select Bed",
+  "startDate": "Start Date",
+  "selectStartDate": "Select start date",
+  "bookingSummary": "Booking Summary",
+  "sharing": "Sharing",
+  "notSelected": "Not selected",
+  "legacyBookingMessage": "Please contact the owner directly to book this PG.",
+  "confirmBooking": "Confirm Booking",
+  "bookingRequestSuccess": "Booking request sent! Owner will confirm shortly.",
+  "bookingRequestFailed": "Failed to book: {error}",
+  "@bookingRequestFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "roomOptionLabel": "{roomNumber} ({sharingType}-sharing) - {availableBeds} available",
+  "@roomOptionLabel": {
+    "placeholders": {
+      "roomNumber": {
+        "type": "String"
+      },
+      "sharingType": {
+        "type": "String"
+      },
+      "availableBeds": {
+        "type": "int"
+      }
+    }
+  },
+  "bedLabel": "Bed {number}",
+  "@bedLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "bed": "Bed",
+  "requestToJoinPg": "Request to Join PG",
+  "sendBookingRequestToOwner": "Send a booking request to the owner",
+  "contactInformation": "Contact Information",
+  "enterYourPhoneNumber": "Enter your phone number",
+  "enterYourEmailAddress": "Enter your email address",
+  "messageOptionalHint": "Any additional information for the owner...",
+  "pleaseEnterYourName": "Please enter your name",
+  "pleaseEnterYourPhoneNumber": "Please enter your phone number",
+  "pleaseEnterYourEmailAddress": "Please enter your email address",
+  "pleaseEnterValidEmailAddress": "Please enter a valid email address",
+  "sendRequest": "Send Request",
+  "sending": "Sending...",
+  "monthlyRentDisplay": "₹{amount}/month",
+  "@monthlyRentDisplay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "notAvailable": "Not available",
+  "pgCountSummary": "{filtered} of {total} PGs",
+  "@pgCountSummary": {
+    "placeholders": {
+      "filtered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "errorLoadingPgs": "Error loading PGs",
+  "unknownErrorOccurred": "Unknown error occurred",
+  "tryAgain": "Try Again",
+  "noPgsAvailable": "No PGs Available",
+  "pgListingsWillAppear": "PG listings will appear here once they are added to the platform.",
+  "viewDetails": "View Details",
+  "bookNow": "Book Now",
+  "available": "Available",
+  "unavailable": "Unavailable",
+  "photosBadge": "{count} Photo(s)",
+  "@photosBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noImageAvailable": "No Image Available",
+  "distanceMeters": "{meters}m away",
+  "@distanceMeters": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "distanceKilometers": "{kilometers}km away",
+  "@distanceKilometers": {
+    "placeholders": {
+      "kilometers": {
+        "type": "double"
+      }
+    }
+  },
+  "couldNotOpenMaps": "Could not open maps",
+  "sharingLabel": "{count} Sharing",
+  "@sharingLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pgTypeLabel": "{type}",
+  "@pgTypeLabel": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "mealTypeLabel": "{type}",
+  "@mealTypeLabel": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "noAmenitiesListed": "No amenities listed for this PG",
+  "amenitiesSectionTitle": "Amenities",
+  "amenitiesSectionSubtitle": "Amenities available in this PG",
+  "noPhotosAvailable": "No photos available",
+  "failedToLoadImage": "Failed to load image",
+  "pgDetails": "PG Details",
+  "errorLoadingPgDetails": "Error loading PG details",
+  "sharingOptionsPricing": "Sharing Options & Pricing",
+  "securityDeposit": "Security Deposit",
+  "maintenance": "Maintenance",
+  "perMonth": "Per Month",
+  "oneTime": "one-time",
+  "refundableWhenYouLeave": "(Refundable when you leave)",
+  "monthlyLabel": "(Monthly)",
+  "oneTimeLabel": "(One-time)",
+  "totalInitialPayment": "Total Initial Payment",
+  "firstMonthRent": "First Month Rent",
+  "totalLabel": "Total",
+  "secondMonthRentMaintenance": "From 2nd month onwards: Rent + Maintenance (₹{rent} + ₹{maintenance} = ₹{total})",
+  "@secondMonthRentMaintenance": {
+    "placeholders": {
+      "rent": {
+        "type": "String"
+      },
+      "maintenance": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "secondMonthRentOnly": "From 2nd month onwards: Only Rent (₹{rent})",
+  "@secondMonthRentOnly": {
+    "placeholders": {
+      "rent": {
+        "type": "String"
+      }
+    }
+  },
+  "availableTypes": "Available: {types}",
+  "@availableTypes": {
+    "placeholders": {
+      "types": {
+        "type": "String"
+      }
+    }
+  },
+  "sharingLabelDefault": "{count} Sharing",
+  "@sharingLabelDefault": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "completeAddress": "Complete Address",
+  "areaLabel": "Area",
+  "cityLabel": "City",
+  "stateLabel": "State",
+  "viewOnMap": "View on Map",
+  "mealTypeFieldLabel": "Meal Type",
+  "pgTypeFieldLabel": "PG Type",
+  "mealTimingsFieldLabel": "Meal Timings",
+  "foodQualityFieldLabel": "Food Quality",
+  "entryTimings": "Entry Timings",
+  "exitTimings": "Exit Timings",
+  "guestPolicy": "Guest Policy",
+  "smokingPolicy": "Smoking Policy",
+  "alcoholPolicy": "Alcohol Policy",
+  "refundPolicy": "Refund Policy",
+  "noticePeriod": "Notice Period",
+  "ownerNameLabel": "Owner Name",
+  "contactNumberLabel": "Contact Number",
+  "accountHolder": "Account Holder",
+  "accountNumber": "Account Number",
+  "ifscCode": "IFSC Code",
+  "upiId": "UPI ID",
+  "qrCodeForPayment": "QR Code for Payment",
+  "paymentInstructionsLabel": "Payment Instructions",
+  "parkingDetails": "Parking Details",
+  "securityMeasures": "Security Measures",
+  "descriptionLabel": "Description",
+  "nearbyPlacesLabel": "Nearby Places",
+  "pgProperty": "PG Property",
+  "sharePgHeading": "🏠 {name}",
+  "@sharePgHeading": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sharePgAddressLine": "📍 Address: {address}",
+  "@sharePgAddressLine": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "sharePgPricingHeader": "💰 Pricing:",
+  "sharePgPricingEntry": "{count} Share: ₹{price}",
+  "@sharePgPricingEntry": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "sharePgAmenitiesLine": "✨ Amenities: {amenities}",
+  "@sharePgAmenitiesLine": {
+    "placeholders": {
+      "amenities": {
+        "type": "String"
+      }
+    }
+  },
+  "sharePgFooter": "Check out this PG on Atitia!",
+  "myBookingRequests": "My Booking Requests",
+  "loadingBookingRequests": "Loading booking requests...",
+  "bookingRequestsErrorTitle": "Error Loading Requests",
+  "bookingRequestsIntroTitle": "Get Started with Booking Requests",
+  "bookingRequestsIntroDescription": "Browse PGs and send booking requests. Owners will review and respond to your requests here.",
+  "bookingRequestSummary": "Booking Request Summary",
+  "bookingRequestAuthDebug": "⚠️ No Firebase Auth user found - user might not be authenticated",
+  "bookingRequestLoadingDebug": "🔑 Loading booking requests for guestId: {guestId}",
+  "@bookingRequestLoadingDebug": {
+    "placeholders": {
+      "guestId": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestStreamErrorDebug": "Booking requests stream error: {error}",
+  "@bookingRequestStreamErrorDebug": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestExceptionDebug": "Exception loading booking requests: {error}",
+  "@bookingRequestExceptionDebug": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pgCountSummary": "{filtered} of {total} PGs",
+  "@pgCountSummary": {
+    "placeholders": {
+      "filtered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "pgLocationFallback": "Location unavailable",
+  "stateLabel": "State",
+  "districtLabel": "District",
+  "talukaMandalLabel": "Taluka/Mandal",
+  "areaLabel": "Area",
+  "societyLabel": "Society",
+  "selectPgPrompt": "Please select a PG to view details and manage your stay",
+  "statusMaintenance": "Maintenance",
+  "currencyAmount": "₹{amount}",
+  "@currencyAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenanceAmountWithFrequency": "₹{amount}/{frequency}",
+  "@maintenanceAmountWithFrequency": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "frequency": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestPending": "Pending",
+  "bookingRequestApproved": "Approved",
+  "bookingRequestRejected": "Rejected",
+  "bookingRequestRequestedOn": "Requested: {date}",
+  "@bookingRequestRequestedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestRespondedOn": "Responded: {date}",
+  "@bookingRequestRespondedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestFrom": "Request from: {name}",
+  "@bookingRequestFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestDetailsTitle": "Booking Request Details",
+  "bookingRequestPgName": "PG Name",
+  "bookingRequestStatus": "Status",
+  "bookingRequestDate": "Request Date",
+  "bookingRequestResponseDate": "Response Date",
+  "bookingRequestOwnerResponse": "Owner Response",
+  "close": "Close",
+  "bookingRequestLoadFailed": "Failed to load booking requests",
+  "bookingRequestPermissionDenied": "Permission denied. Please ensure you are logged in correctly.",
+  "bookingRequestNetworkError": "Network error. Please check your connection and try again.",
+  "bookingRequestGeneralError": "Failed to load booking requests: {error}",
+  "@bookingRequestGeneralError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestUserNotAuthenticated": "User not authenticated. Please sign in again.",
+  "myRoomAndBed": "My Room & Bed",
+  "userNotAuthenticatedRoomBed": "User not authenticated. Please sign in again.",
+  "failedToLoadRoomBedInformation": "Failed to load room/bed information: {error}",
+  "@failedToLoadRoomBedInformation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorTitle": "Error",
+  "noActiveBooking": "No Active Booking",
+  "noActiveBookingDescription": "You don't have an active booking yet. Book a PG to get assigned a room and bed.",
+  "roomLabelWithNumber": "Room {number}",
+  "@roomLabelWithNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "bedLabelWithNumber": "Bed {number}",
+  "@bedLabelWithNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "notAssigned": "Not assigned",
+  "bookingInformation": "Booking Information",
+  "endDate": "End Date",
+  "requestBedRoomChange": "Request Bed/Room Change",
+  "requestBedRoomChangeDescription": "Need to change your room or bed? Submit a request and the owner will review it.",
+  "requestChange": "Request Change",
+  "requestRoomBedChangeTitle": "Request Room/Bed Change",
+  "currentAssignment": "Current Assignment:",
+  "preferredRoomNumberOptional": "Preferred Room Number (Optional)",
+  "preferredRoomNumberHint": "Enter preferred room...",
+  "preferredBedNumberOptional": "Preferred Bed Number (Optional)",
+  "preferredBedNumberHint": "Enter preferred bed...",
+  "reasonRequiredLabel": "Reason *",
+  "reasonRequiredHint": "Why do you need to change room/bed?",
+  "provideReasonError": "Please provide a reason for the change",
+  "changeRequestSuccess": "Change request submitted successfully",
+  "bedChangeRequestStatus": "Bed Change Request Status",
+  "failedToLoadBedChangeRequests": "Failed to load bed change requests: {error}",
+  "@failedToLoadBedChangeRequests": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "requestedLabel": "Requested: {date}",
+  "@requestedLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "preferredLabel": "Preferred:",
+  "reasonLabel": "Reason:",
+  "ownerResponseLabel": "Owner Response:",
+  "requestedOnLabel": "Requested: {date}",
+  "@requestedOnLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentHistory": "Payment History",
+  "overdue": "Overdue",
+  "refunded": "Refunded",
+  "paymentMethodWithValue": "Payment Method: {method}",
+  "@paymentMethodWithValue": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentMethodRazorpay": "Razorpay",
+  "paymentMethodUpi": "UPI",
+  "paymentMethodCash": "Cash",
+  "paymentMethodBankTransfer": "Bank Transfer",
+  "paymentMethodOther": "Other",
+  "noPaymentsYet": "No Payments Yet",
+  "noPaymentsYetDescription": "You haven't made any payments yet. Payments will appear here once you make them.",
+  "makePayment": "Make Payment",
+  "noPaymentsForFilter": "No {filter} Payments",
+  "@noPaymentsForFilter": {
+    "placeholders": {
+      "filter": {
+        "type": "String"
+      }
+    }
+  },
+  "noPaymentsForFilterDescription": "You don't have any {filter} payments at the moment.",
+  "@noPaymentsForFilterDescription": {
+    "placeholders": {
+      "filter": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToLoadPaymentDetails": "Failed to load payment details: {error}",
+  "@failedToLoadPaymentDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentNumber": "Payment #{id}",
+  "@paymentNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmed": "Confirmed",
+  "upiPaymentNote": "UPI payment made. Please verify and confirm.",
+  "cashPaymentNote": "Cash payment made. Please confirm.",
+  "upiPaymentTip": "💡 Tip: After making payment via PhonePe, Paytm, Google Pay, etc., upload the payment screenshot. The transaction ID is already visible in the screenshot.",
+  "paymentStatistics": "Payment Statistics",
+  "totalPayments": "Total Payments",
+  "totalAmount": "Total Amount",
+  "recentPaymentsPreview": "Recent Payments Preview",
+  "noPaymentHistory": "No Payment History",
+  "noPaymentHistoryDescription": "Your payment notifications and history will appear here once you make payments.",
+  "paymentDetailsNotAvailable": "Payment Details Not Available",
+  "ownerPaymentDetailsNotConfigured": "Owner payment details are not configured yet. Please contact your PG owner to set up payment information.",
+  "paymentMethodsPreview": "Payment Methods Preview:",
+  "bankAccount": "Bank Account",
+  "cashPaymentNotificationInfo": "You will send a cash payment notification to the owner. Owner will confirm once they receive the cash.",
+  "payViaRazorpayDescription": "Click \"Pay Now\" to proceed with secure online payment via Razorpay.",
+  "payViaRazorpay": "Pay via Razorpay",
+  "upiPaymentConfirmation": "UPI Payment Confirmation",
+  "cashPaymentNotification": "Cash Payment Notification",
+  "sendNotification": "Send Notification",
+  "paymentNotificationSentSuccessfully": "Payment notification sent successfully",
+  "screenshotUploaded": "Screenshot uploaded",
+  "ownerNoPaymentsTitle": "No Payments",
+  "ownerNoPaymentsMessage": "Payment records will appear here once payments are collected.",
+  "unknownGuest": "Unknown Guest",
+  "roomBed": "Room/Bed",
+  "markPaymentCollected": "Mark Payment as Collected",
+  "confirmMarkPaymentCollected": "Are you sure you want to mark this payment of {amount} as collected?",
+  "@confirmMarkPaymentCollected": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "collectedBy": "Collected By",
+  "paymentMarkedCollected": "Payment marked as collected",
+  "failedToUpdatePayment": "Failed to update payment",
+  "rejectPayment": "Reject Payment",
+  "provideRejectionReason": "Please provide a reason for rejecting this payment:",
+  "rejectionReason": "Rejection Reason",
+  "enterRejectionReason": "Enter reason for rejection...",
+  "paymentRejected": "Payment rejected",
+  "failedToRejectPayment": "Failed to reject payment",
+  "paymentRejectedByOwner": "Payment rejected by owner",
+  "rejectedWithReason": "Rejected: {reason}",
+  "@rejectedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "collectedByOwnerFallback": "Owner",
+  "recordPayment": "Record Payment",
+  "recordPaymentDescription": "Manually record a payment received from a guest",
+  "guestAndBooking": "Guest & Booking",
+  "selectGuest": "Select Guest",
+  "pleaseSelectGuest": "Please select a guest",
+  "selectBookingOptional": "Select Booking (Optional)",
+  "paymentAmountLabel": "Payment Amount *",
+  "enterAmountHint": "Enter amount in rupees",
+  "enterTransactionIdHint": "Enter transaction ID or reference number",
+  "notesOptional": "Notes (Optional)",
+  "notesHint": "Any additional notes about this payment",
+  "recording": "Recording...",
+  "recordPaymentSuccess": "Payment recorded successfully!",
+  "recordPaymentFailure": "Failed to record payment",
+  "errorRecordingPayment": "Error recording payment: {error}",
+  "@errorRecordingPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentMethodCard": "Card",
+  "pendingPayments": "Pending Payments",
+  "pendingPaymentsWaiting": "{count} waiting",
+  "@pendingPaymentsWaiting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsCount": "{count} notifications",
+  "@notificationsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "paymentConfirmedSuccessfully": "Payment confirmed successfully",
+  "transactionIdLabel": "TXN: {transactionId}",
+  "@transactionIdLabel": {
+    "placeholders": {
+      "transactionId": {
+        "type": "String"
+      }
+    }
+  },
+  "rejectionReasonHint": "e.g., Incorrect amount, wrong transaction",
+  "ownerNoBookingsTitle": "No Bookings",
+  "ownerNoBookingsMessage": "Booking list will appear here once bookings are created",
+  "durationDays": "{count} days",
+  "@durationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rentLabel": "Rent",
+  "depositLabel": "Deposit",
+  "paidLabel": "Paid",
+  "bookingDetailsTitle": "Booking Details",
+  "roomBedLabel": "Room/Bed",
+  "durationLabel": "Duration",
+  "remainingLabel": "Remaining",
+  "statusLabel": "Status",
+  "paymentStatusLabel": "Payment Status",
+  "notesLabel": "Notes",
+  "noRequestsFound": "No requests found",
+  "bookingRequestAction": "Action",
+  "bookingRequestDialogTitle": "Booking Request",
+  "guestLabel": "Guest",
+  "pgLabel": "PG",
+  "dateLabel": "Date",
+  "approve": "Approve",
+  "unknownPg": "Unknown PG",
+  "unknownValue": "Unknown",
+  "approveBookingRequestTitle": "Approve Booking Request",
+  "rejectBookingRequestTitle": "Reject Booking Request",
+  "approveBookingRequestSubtitle": "Approve this guest's request to join your PG",
+  "rejectBookingRequestSubtitle": "Reject this guest's request to join your PG",
+  "approvalDetails": "Approval Details",
+  "rejectionDetails": "Rejection Details",
+  "welcomeMessageOptional": "Welcome Message (Optional)",
+  "welcomeMessageHint": "Add a welcome message for the guest...",
+  "rejectionReasonOptional": "Reason for Rejection (Optional)",
+  "rejectionReasonHintDetailed": "Explain why the request is being rejected...",
+  "roomNumberLabel": "Room Number *",
+  "enterRoomNumberHint": "Enter room number...",
+  "bedNumberLabel": "Bed Number *",
+  "enterBedNumberHint": "Enter bed number...",
+  "startDateLabel": "Start Date",
+  "endDateLabel": "End Date",
+  "selectStartDate": "Select start date",
+  "selectEndDate": "Select end date",
+  "approving": "Approving...",
+  "rejecting": "Rejecting...",
+  "approveRequest": "Approve Request",
+  "rejectRequest": "Reject Request",
+  "roomBedNumbersRequired": "Room and bed numbers are required for approval",
+  "bookingRequestApprovedSuccess": "Booking request approved successfully!",
+  "bookingRequestRejectedSuccess": "Booking request rejected successfully!",
+  "bookingRequestActionFailed": "Failed to {action} request: {error}",
+  "@bookingRequestActionFailed": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "approveAction": "approve",
+  "rejectAction": "reject",
+  "noBedChangeRequests": "No Bed Change Requests",
+  "bedChangeRequestsEmptyBody": "Bed change requests from guests will appear here",
+  "bedChangeRequestTitle": "Bed Change Request",
+  "bedChangeStatusApproved": "APPROVED",
+  "bedChangeStatusRejected": "REJECTED",
+  "bedChangeStatusPending": "PENDING",
+  "bedChangeCurrent": "Current",
+  "bedChangePreferred": "Preferred",
+  "bedChangeCurrentAssignment": "Room {room}, Bed {bed}",
+  "@bedChangeCurrentAssignment": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      },
+      "bed": {
+        "type": "String"
+      }
+    }
+  },
+  "bedChangePreferredAssignment": "Room {room}, Bed {bed}",
+  "@bedChangePreferredAssignment": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      },
+      "bed": {
+        "type": "String"
+      }
+    }
+  },
+  "anyLabel": "Any",
+  "approveBedChangeTitle": "Approve Bed Change Request",
+  "approveBedChangeDescription": "The guest will be moved to their preferred room/bed.",
+  "approvalNotesHint": "Add approval notes...",
+  "rejectBedChangeTitle": "Reject Bed Change Request",
+  "rejectBedChangeDescription": "Please provide a reason for rejection.",
+  "rejectionReasonRequired": "Rejection Reason *",
+  "bedChangeApproveSuccess": "Bed change approved successfully",
+  "bedChangeApproveFailure": "Failed to approve bed change",
+  "bedChangeRejectSuccess": "Bed change rejected",
+  "bedChangeRejectFailure": "Failed to reject bed change",
+  "decisionNotesLabel": "Decision Notes",
+  "ownerBedMapNoBookingsTitle": "No Bed Occupancy Data",
+  "ownerBedMapNoBookingsMessage": "Bed occupancy map will appear here once bookings are created",
+  "ownerBedMapRoom": "Room {roomNumber}",
+  "@ownerBedMapRoom": {
+    "placeholders": {
+      "roomNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBedMapOccupiedCount": "{occupied}/{total} occupied",
+  "@ownerBedMapOccupiedCount": {
+    "placeholders": {
+      "occupied": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "occupiedLabel": "Occupied",
+  "ownerGuestSearchHint": "Search by name, phone, or vehicle...",
+  "ownerGuestClearSearchTooltip": "Clear search",
+  "ownerGuestFilterAll": "All",
+  "ownerGuestFilterActive": "Active",
+  "ownerGuestFilterPending": "Pending",
+  "ownerGuestFilterInactive": "Inactive",
+  "ownerGuestFilterVehicles": "Vehicles",
+  "ownerGuestPaymentSummaryTitle": "Payment Summary",
+  "ownerGuestPaymentPendingLabel": "Pending",
+  "ownerGuestPaymentCollectedLabel": "Collected",
+  "ownerGuestDetailVehicleNumber": "Vehicle No",
+  "ownerGuestDetailVehicle": "Vehicle",
+  "ownerGuestDetailRoomBed": "Room/Bed",
+  "ownerGuestDetailRent": "Rent",
+  "ownerGuestDetailDeposit": "Deposit",
+  "ownerGuestDetailJoined": "Joined",
+  "ownerGuestDetailStatus": "Status",
+  "ownerGuestUpdateRoomBed": "Update Room/Bed",
+  "ownerGuestUpdateRoomBedTitle": "Update Room/Bed Assignment",
+  "ownerGuestRoomNumberLabel": "Room Number",
+  "ownerGuestRoomNumberHint": "Enter room number",
+  "ownerGuestBedNumberLabel": "Bed Number",
+  "ownerGuestBedNumberHint": "Enter bed number",
+  "ownerGuestUpdateAction": "Update",
+  "ownerGuestRoomBedUpdateSuccess": "Room/Bed updated successfully",
+  "ownerGuestRoomBedUpdateFailure": "Failed to update room/bed",
+  "guestDetailsTitle": "Guest Details",
+  "bikes": "Bikes",
+  "services": "Services",
+  "ownerGuestNoPgSelectedTitle": "No PG Selected",
+  "ownerGuestNoPgSelectedMessage": "Please select a PG to manage guests",
+  "ownerGuestFailedToLoadData": "Failed to load guest data",
+  "bookingRequestDetailsTitle": "Booking Request Details",
+  "bookingRequestGuestNameLabel": "Guest Name",
+  "bookingRequestPhoneLabel": "Phone",
+  "bookingRequestEmailLabel": "Email",
+  "bookingRequestPgNameLabel": "PG Name",
+  "bookingRequestDateLabel": "Request Date",
+  "bookingRequestStatusLabel": "Status",
+  "bookingRequestMessageLabel": "Message",
+  "bookingRequestResponseLabel": "Response",
+  "offlineSyncingActions": "{count, plural, =0{No actions to sync} one{Syncing 1 action...} other{Syncing {count} actions...}}",
+  "@offlineSyncingActions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineStatusOffline": "You're offline",
+  "offlineStatusOfflineShort": "Offline",
+  "offlineTapToSync": "Tap to sync",
+  "offlineSyncQueueTitle": "Sync Queue",
+  "offlineNoPendingActions": "No pending actions to sync",
+  "offlinePendingActions": "{count, plural, one{{count} action pending sync:} other{{count} actions pending sync:}}",
+  "@offlinePendingActions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineSyncAll": "Sync All",
+  "offlineSyncCompleted": "Sync completed successfully!",
+  "offlineSyncFailed": "Sync failed: {error}",
+  "@offlineSyncFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineSyncNow": "Sync Now",
+  "guestBookingProcessedDefault": "Your booking request has been processed",
+  "guestPaymentReminder": "Payment reminder: Please complete your pending payment",
+  "guestFoodMenuUpdated": "Food menu has been updated! Check out the new items",
+  "guestComplaintResponseMessage": "Complaint Response: {response}",
+  "@guestComplaintResponseMessage": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "guestComplaintResponseDefault": "Your complaint has been addressed",
+  "guestAnnouncementDefaultTitle": "Announcement",
+  "guestAnnouncementDefaultMessage": "Important announcement from your PG",
+  "notificationGuestFallbackName": "A guest",
+  "ownerBookingRequestMessage": "New booking request from {guestName}",
+  "@ownerBookingRequestMessage": {
+    "placeholders": {
+      "guestName": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAction": "View",
+  "ownerPaymentReceivedMessage": "Payment received: ₹{amount} from {guestName}",
+  "@ownerPaymentReceivedMessage": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "guestName": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerComplaintSubmittedMessage": "New complaint from {guestName}",
+  "@ownerComplaintSubmittedMessage": {
+    "placeholders": {
+      "guestName": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestCheckInMessage": "{guestName} has checked in",
+  "@ownerGuestCheckInMessage": {
+    "placeholders": {
+      "guestName": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMaintenanceTaskFallback": "maintenance task",
+  "ownerMaintenanceReminderMessage": "Maintenance reminder: {task}",
+  "@ownerMaintenanceReminderMessage": {
+    "placeholders": {
+      "task": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsRefreshData": "Refresh data",
+  "revenueAnalyticsTitle": "Revenue Analytics",
+  "revenueAnalyticsSelectedPg": "Performance insights for selected PG",
+  "revenueAnalyticsOverall": "Overall revenue performance",
+  "revenueMetricTotalRevenue": "Total Revenue",
+  "revenueMetricMonthlyGrowth": "Monthly Growth",
+  "revenueMetricAvgPerGuest": "Avg. per Guest",
+  "analyticsPeriodWeekly": "Weekly",
+  "analyticsPeriodMonthly": "Monthly",
+  "analyticsPeriodYearly": "Yearly",
+  "analyticsMetricRevenue": "Revenue",
+  "analyticsMetricOccupancy": "Occupancy",
+  "analyticsMetricGuests": "Guests",
+  "revenueTrendsLabel": "Revenue Trends",
+  "revenueTrendLastMonths": "Revenue trend (last {months} months)",
+  "@revenueTrendLastMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "revenueForecastTitle": "Revenue Forecast",
+  "revenueForecastNextMonth": "Next Month",
+  "revenueForecastNextQuarter": "Next Quarter",
+  "revenueForecastInsightsTitle": "Forecast Insights",
+  "revenueForecastInsufficientData": "Insufficient data for forecasting",
+  "revenueForecastPositive": "Based on recent trends, revenue is showing positive growth. Consider expanding capacity.",
+  "revenueForecastDecline": "Based on recent trends, revenue is declining. Review pricing and marketing strategies.",
+  "revenueForecastStable": "Based on recent trends, revenue is stable. Focus on maintaining current performance.",
+  "menuTooltip": "Menu",
+  "analyticsTabRevenue": "Revenue",
+  "analyticsTabOccupancy": "Occupancy",
+  "analyticsTabPerformance": "Performance",
+  "analyticsNoPgTitle": "Select a PG",
+  "analyticsNoPgMessage": "Choose a PG from the dropdown above to view analytics",
+  "analyticsLoading": "Loading analytics data...",
+  "analyticsErrorTitle": "Error Loading Data",
+  "analyticsUnknownError": "Unknown error occurred",
+  "analyticsLoadFailed": "Failed to load analytics data: {error}",
+  "@analyticsLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceAnalyticsTitle": "Performance Analytics",
+  "performanceAnalyticsSubtitle": "Comprehensive performance insights and recommendations",
+  "performanceKpiTitle": "Key Performance Indicators",
+  "performanceKpiGuestSatisfaction": "Guest Satisfaction",
+  "performanceKpiGuestSatisfactionValue": "{score}/5",
+  "@performanceKpiGuestSatisfactionValue": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceKpiResponseTime": "Response Time",
+  "performanceKpiResponseTimeValue": "{hours} hrs",
+  "@performanceKpiResponseTimeValue": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceKpiMaintenanceScore": "Maintenance Score",
+  "performanceKpiMaintenanceScoreValue": "{score}/10",
+  "@performanceKpiMaintenanceScoreValue": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceInsightsTitle": "Performance Insights",
+  "performanceInsightsOverall": "Overall Performance: Excellent",
+  "performanceInsightsSummary": "Your PG is performing above industry standards with high guest satisfaction and efficient operations.",
+  "performanceRecommendationsTitle": "Recommendations:",
+  "performanceRecommendationMaintainSchedule": "Continue current maintenance schedule",
+  "performanceRecommendationExpandCapacity": "Consider expanding based on high occupancy",
+  "performanceRecommendationFeedbackSystem": "Implement guest feedback system",
+  "performanceRecommendationOptimizeEnergy": "Optimize energy usage for cost savings",
+  "occupancyAnalyticsTitle": "Occupancy Analytics",
+  "occupancyAnalyticsSelectedPg": "Occupancy insights for selected PG",
+  "occupancyAnalyticsOverall": "Overall occupancy performance",
+  "occupancyMetricCurrent": "Current Occupancy",
+  "occupancyMetricAverage": "Avg. Occupancy",
+  "occupancyMetricPeak": "Peak Occupancy",
+  "occupancyTrendsLabel": "Occupancy Trends",
+  "occupancyViewOverview": "Overview",
+  "occupancyViewByRoom": "By Room",
+  "occupancyViewByFloor": "By Floor",
+  "occupancyTrendLastMonths": "Occupancy trend (last {months} months)",
+  "@occupancyTrendLastMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "occupancyCapacityTitle": "Capacity Analysis",
+  "occupancyCapacityAvailableBeds": "Available Beds",
+  "occupancyCapacityOccupiedBeds": "Occupied Beds",
+  "occupancyCapacityTotal": "Total Capacity",
+  "occupancyInsightsTitle": "Occupancy Insights",
+  "occupancyRecommendationsTitle": "Recommendations:",
+  "occupancyInsightsCurrentRate": "Current occupancy is at {rate}.",
+  "@occupancyInsightsCurrentRate": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "occupancyInsightsNearFull": "Your PG is nearly at full capacity. Consider expanding or opening new rooms.",
+  "occupancyInsightsGood": "Good occupancy rate. Monitor trends and consider marketing strategies.",
+  "occupancyInsightsModerate": "Moderate occupancy. There's room for improvement through better marketing.",
+  "occupancyInsightsLow": "Low occupancy rate. Immediate action needed to improve bookings.",
+  "occupancyRecommendationAddCapacity": "Consider adding more beds or rooms",
+  "occupancyRecommendationReviewPricing": "Review pricing strategy for high demand",
+  "occupancyRecommendationMaintainOccupancy": "Focus on maintaining current occupancy",
+  "occupancyRecommendationSeasonalPricing": "Consider seasonal pricing adjustments",
+  "occupancyRecommendationIncreaseMarketing": "Increase marketing efforts",
+  "occupancyRecommendationImproveAmenities": "Review and improve amenities",
+  "occupancyRecommendationCompetitivePricing": "Consider competitive pricing",
+  "occupancyRecommendationUrgentCampaign": "Urgent marketing campaign needed",
+  "occupancyRecommendationReducePricing": "Review and reduce pricing",
+  "occupancyRecommendationImproveFacilities": "Improve facilities and amenities",
+  "occupancyRecommendationPartnerships": "Consider partnerships with local businesses",
+  "pgBasicInfoTitle": "Basic Information",
+  "pgBasicInfoAddressLabel": "Complete Address",
+  "pgBasicInfoAddressHint": "Full address with landmark",
+  "pgBasicInfoPgNameLabel": "PG Name",
+  "pgBasicInfoPgNameHint": "e.g., Green Meadows PG",
+  "pgBasicInfoContactLabel": "Contact Number",
+  "pgBasicInfoContactHint": "e.g., +91 9876543210",
+  "pgBasicInfoStateLabel": "State",
+  "pgBasicInfoStateHint": "Select State",
+  "pgBasicInfoCityLabel": "City",
+  "pgBasicInfoCityHint": "Select City",
+  "pgBasicInfoAreaLabel": "Area",
+  "pgBasicInfoAreaHint": "e.g., Sector 5, HSR Layout",
+  "pgBasicInfoPgTypeLabel": "PG Type",
+  "pgBasicInfoPgTypeHint": "Select PG Type",
+  "pgBasicInfoPgTypeBoys": "Boys",
+  "pgBasicInfoPgTypeGirls": "Girls",
+  "pgBasicInfoPgTypeCoed": "Co-ed",
+  "pgBasicInfoMealTypeLabel": "Meal Type",
+  "pgBasicInfoMealTypeHint": "Select Meal Type",
+  "pgBasicInfoMealTypeVeg": "Vegetarian",
+  "pgBasicInfoMealTypeNonVeg": "Non-Vegetarian",
+  "pgBasicInfoMealTypeBoth": "Both",
+  "pgBasicInfoFoodSectionTitle": "Food & Meal Details",
+  "pgBasicInfoMealTimingsLabel": "Meal Timings",
+  "pgBasicInfoMealTimingsHint": "e.g., Breakfast: 8:00 AM - 10:00 AM, Lunch: 1:00 PM - 2:00 PM, Dinner: 8:00 PM - 9:30 PM",
+  "pgBasicInfoFoodQualityLabel": "Food Quality Description",
+  "pgBasicInfoFoodQualityHint": "Describe the food quality, cuisine type, specialities, etc.",
+  "pgBasicInfoDescriptionLabel": "Description",
+  "pgBasicInfoDescriptionHint": "Brief description of your PG",
+  "pgFloorStructureTitle": "🏢 Floor Structure",
+  "pgFloorCountLabel": "Number of Regular Floors",
+  "pgFloorCountHint": "e.g., 1",
+  "generateAction": "Generate",
+  "pgFloorGroundLabel": "Ground",
+  "pgFloorTerraceLabel": "Terrace",
+  "pgFloorFirstLabel": "First",
+  "pgFloorSecondLabel": "Second",
+  "pgFloorThirdLabel": "Third",
+  "pgFloorFourthLabel": "Fourth",
+  "pgFloorFifthLabel": "Fifth",
+  "pgFloorNthLabel": "Floor {number}",
+  "@pgFloorNthLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorRoomsBedsSummary": "{rooms} rooms • {beds} beds",
+  "@pgFloorRoomsBedsSummary": {
+    "placeholders": {
+      "rooms": {
+        "type": "int"
+      },
+      "beds": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorAddRoom": "Add Room",
+  "pgFloorCapacityOption": "{capacity}-share",
+  "@pgFloorCapacityOption": {
+    "placeholders": {
+      "capacity": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorBedLabel": "Bed-{index}",
+  "@pgFloorBedLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorRoomLabel": "Room {roomNumber}",
+  "@pgFloorRoomLabel": {
+    "placeholders": {
+      "roomNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "pgFloorBedsList": "Beds: {bedList}",
+  "@pgFloorBedsList": {
+    "placeholders": {
+      "bedList": {
+        "type": "String"
+      }
+    }
+  },
+  "pgFloorNoRoomsMessage": "No rooms added yet. Click \"Add Room\" to get started.",
+  "pgFloorEmptyTitle": "No Floors Generated",
+  "pgFloorEmptyMessage": "Enter the number of floors and click \"Generate\" to create your floor structure.",
+  "pgRentConfigTitle": "Rent Configuration",
+  "pgRentConfigSharingLabel": "Rent ({sharing})",
+  "@pgRentConfigSharingLabel": {
+    "placeholders": {
+      "sharing": {
+        "type": "String"
+      }
+    }
+  },
+  "pgRentConfigRentLabel": "Rent for {sharing} (₹)",
+  "@pgRentConfigRentLabel": {
+    "placeholders": {
+      "sharing": {
+        "type": "String"
+      }
+    }
+  },
+  "pgRentConfigRentHint": "e.g., 8000",
+  "pgRentConfigDepositLabel": "Security Deposit (₹)",
+  "pgRentConfigDepositHint": "e.g., 10000",
+  "pgRentConfigMaintenanceTypeLabel": "Maintenance Type",
+  "pgRentConfigMaintenanceOneTime": "One Time",
+  "pgRentConfigMaintenanceMonthly": "Monthly",
+  "pgRentConfigMaintenanceQuarterly": "Quarterly",
+  "pgRentConfigMaintenanceYearly": "Yearly",
+  "pgRentConfigMaintenanceAmountLabel": "Maintenance Amount (₹)",
+  "pgRentConfigMaintenanceAmountHint": "e.g., 500",
+  "pgRentConfigRefundTitle": "Deposit Refund Policy:",
+  "pgRentConfigRefundFull": "• Full refund if notice ≥ 30 days",
+  "pgRentConfigRefundPartial": "• 50% refund if notice ≥ 15 days",
+  "pgRentConfigRefundNone": "• No refund if notice < 15 days",
+  "pgRulesTitle": "Rules & Policies",
+  "pgRulesEntryTimingsLabel": "Entry Timings",
+  "pgRulesExitTimingsLabel": "Exit Timings",
+  "pgRulesTimingsHint": "e.g., 6:00 AM - 11:00 PM",
+  "pgRulesSmokingPolicyLabel": "Smoking Policy",
+  "pgRulesAlcoholPolicyLabel": "Alcohol Policy",
+  "pgRulesPolicyHint": "Select Policy",
+  "pgRulesPolicyNotAllowed": "Not Allowed",
+  "pgRulesPolicyAllowed": "Allowed",
+  "pgRulesPolicyDesignatedAreas": "Designated Areas Only",
+  "pgRulesNoticePeriodLabel": "Notice Period (Days)",
+  "pgRulesNoticePeriodHint": "e.g., 30",
+  "pgRulesGuestPolicyLabel": "Guest Policy",
+  "pgRulesGuestPolicyHint": "Rules regarding guests, visitors, overnight stays, etc.",
+  "pgRulesRefundPolicyLabel": "Refund Policy",
+  "pgRulesRefundPolicyHint": "Terms and conditions for refunds, deposits, cancellations, etc.",
+  "pgPhotosTitle": "Photos & Gallery",
+  "pgPhotosSubtitle": "Add photos of your PG to attract more guests:",
+  "pgPhotosAddButton": "Add Photos",
+  "pgPhotosLimitHint": "You can select multiple images at once (up to 10)",
+  "pgPhotosUploadSuccess": "{count} photo(s) uploaded successfully",
+  "@pgPhotosUploadSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pgPhotosUploadPartial": "{success} photo(s) uploaded, {fail} failed",
+  "@pgPhotosUploadPartial": {
+    "placeholders": {
+      "success": {
+        "type": "int"
+      },
+      "fail": {
+        "type": "int"
+      }
+    }
+  },
+  "pgPhotosUploadFailed": "Failed to upload photos. Please check your storage configuration and policies.",
+  "pgPhotosEmptyTitle": "No photos added yet",
+  "pgPhotosEmptySubtitle": "Click \"Add Photos\" to upload images",
+  "pgPhotosRemoveAction": "Remove photo",
+  "pgAdditionalInfoTitle": "Additional Information",
+  "pgAdditionalInfoParkingLabel": "Parking Details",
+  "pgAdditionalInfoParkingHint": "e.g., 2-wheeler parking available, 4-wheeler parking: ₹500/month, Capacity: 20 bikes",
+  "pgAdditionalInfoSecurityLabel": "Security Measures",
+  "pgAdditionalInfoSecurityHint": "e.g., 24/7 Security guard, CCTV surveillance, Biometric access, Fire safety equipment",
+  "pgAdditionalInfoNearbyPlacesTitle": "Nearby Places",
+  "pgAdditionalInfoNearbyPlacesDescription": "Add nearby landmarks, locations, or points of interest",
+  "pgAdditionalInfoNearbyPlaceLabel": "Nearby Place",
+  "pgAdditionalInfoNearbyPlaceHint": "e.g., Metro Station, Shopping Mall, Hospital",
+  "pgAdditionalInfoAddButton": "Add",
+  "pgAdditionalInfoPaymentInstructionsLabel": "Payment Instructions",
+  "pgAdditionalInfoPaymentInstructionsHint": "Instructions for making payments, accepted payment methods, payment schedule, etc.",
+  "pgAmenitiesTitle": "Amenities & Facilities",
+  "pgAmenitiesDescription": "Select all amenities available in your PG:",
+  "pgAmenitiesSelectedLabel": "Selected",
+  "pgAmenityWifi": "Wi-Fi",
+  "pgAmenityParking": "Parking",
+  "pgAmenitySecurity": "Security",
+  "pgAmenityCctv": "CCTV",
+  "pgAmenityLaundry": "Laundry",
+  "pgAmenityKitchen": "Kitchen",
+  "pgAmenityAc": "AC",
+  "pgAmenityGeyser": "Geyser",
+  "pgAmenityTv": "TV",
+  "pgAmenityRefrigerator": "Refrigerator",
+  "pgAmenityPowerBackup": "Power Backup",
+  "pgAmenityGym": "Gym",
+  "pgAmenityCurtains": "Curtains",
+  "pgAmenityBucket": "Bucket",
+  "pgAmenityWaterCooler": "Water Cooler",
+  "pgAmenityWashingMachine": "Washing Machine",
+  "pgAmenityMicrowave": "Microwave",
+  "pgAmenityLift": "Lift",
+  "pgAmenityHousekeeping": "Housekeeping",
+  "pgAmenityAttachedBathroom": "Attached Bathroom",
+  "pgAmenityRoWater": "RO Water",
+  "pgAmenityWaterSupply": "24x7 Water Supply",
+  "pgAmenityBedWithMattress": "Bed with Mattress",
+  "pgAmenityWardrobe": "Wardrobe",
+  "pgAmenityStudyTable": "Study Table",
+  "pgAmenityChair": "Chair",
+  "pgAmenityFan": "Fan",
+  "pgAmenityLighting": "Lighting",
+  "pgAmenityBalcony": "Balcony",
+  "pgAmenityCommonArea": "Common Area",
+  "pgAmenityDiningArea": "Dining Area",
+  "pgAmenityInductionStove": "Induction Stove",
+  "pgAmenityCookingAllowed": "Cooking Allowed",
+  "pgAmenityFireExtinguisher": "Fire Extinguisher",
+  "pgAmenityFirstAidKit": "First Aid Kit",
+  "pgAmenitySmokeDetector": "Smoke Detector",
+  "pgAmenityVisitorParking": "Visitor Parking",
+  "pgAmenityIntercom": "Intercom",
+  "pgAmenityMaintenanceStaff": "Maintenance Staff",
+  "pgSummaryTitle": "PG Summary",
+  "pgSummaryBasicInfoTitle": "Basic Information",
+  "pgSummaryRentInfoTitle": "Rent Information",
+  "pgSummaryPhotosTitle": "Photos",
+  "pgSummaryActionCreate": "create",
+  "pgSummaryActionUpdate": "update",
+  "pgSummaryReadyMessage": "Ready to {action} your PG!",
+  "@pgSummaryReadyMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "pgSummaryReviewMessage": "Review all details above and click the save button to proceed.",
+  "pgSummaryNotSpecified": "Not specified",
+  "pgSummaryLocationLabel": "Location",
+  "pgSummaryLocationValue": "{city}, {state}",
+  "@pgSummaryLocationValue": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "pgSummaryTotalFloorsLabel": "Total Floors",
+  "pgSummaryTotalRoomsLabel": "Total Rooms",
+  "pgSummaryTotalBedsLabel": "Total Beds",
+  "pgSummaryEstimatedRevenueLabel": "Estimated Monthly Revenue",
+  "pgSummaryMaintenanceLabel": "Maintenance",
+  "pgSummarySelectedAmenitiesLabel": "Selected Amenities",
+  "pgSummaryListLabel": "List",
+  "pgSummaryUploadedPhotosLabel": "Uploaded Photos",
+  "pgInfoNoPgSelected": "No PG selected",
+  "pgInfoSelectPgPrompt": "Please select a PG from the dropdown above",
+  "pgInfoEditTooltip": "Edit PG details",
+  "pgInfoContactNotProvided": "Not provided",
+  "pgInfoPgTypeFallback": "PG",
+  "pgInfoLocationFallback": "Location not available",
+  "pgInfoStructureOverview": "PG Structure Overview",
+  "pgInfoFloorsLabel": "Floors",
+  "pgInfoRoomsLabel": "Rooms",
+  "pgInfoBedsLabel": "Beds",
+  "pgInfoPotentialLabel": "Potential",
+  "pgInfoFloorRoomDetails": "Floor & Room Details",
+  "pgInfoRoomsSummary": "{count} rooms",
+  "@pgInfoRoomsSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pgInfoRoomChip": "{roomNumber} ({sharingType}, {bedsCount} beds)",
+  "@pgInfoRoomChip": {
+    "placeholders": {
+      "roomNumber": {
+        "type": "String"
+      },
+      "sharingType": {
+        "type": "String"
+      },
+      "bedsCount": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorLabelFallback": "Floor",
+  "ownerBedMapRoomUnknown": "Unknown",
+  "ownerBedMapOccupancySummary": "{occupied}/{total} occupied • Capacity {capacity}",
+  "@ownerBedMapOccupancySummary": {
+    "placeholders": {
+      "occupied": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "capacity": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusChipOccupied": "Occupied {count}",
+  "@ownerBedMapStatusChipOccupied": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusChipVacant": "Vacant {count}",
+  "@ownerBedMapStatusChipVacant": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusChipPending": "Pending {count}",
+  "@ownerBedMapStatusChipPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusChipMaintenance": "Maint. {count}",
+  "@ownerBedMapStatusChipMaintenance": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapBedsOverview": "Beds Overview",
+  "ownerBedMapMiniStatTotal": "Total",
+  "ownerBedMapMiniStatOccupied": "Occupied",
+  "ownerBedMapMiniStatVacant": "Vacant",
+  "ownerBedMapMiniStatPending": "Pending",
+  "ownerBedMapMiniStatMaintenance": "Maint.",
+  "ownerBedMapPlaceholderSummary": "{occupied}/{total} occupied",
+  "@ownerBedMapPlaceholderSummary": {
+    "placeholders": {
+      "occupied": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusOccupiedLabel": "Occupied",
+  "ownerBedMapStatusPendingLabel": "Pending",
+  "ownerBedMapStatusMaintenanceLabel": "Maint.",
+  "ownerBedMapStatusVacantLabel": "Vacant",
+  "ownerBedMapTooltipTitle": "Bed {bedNumber} • {status}",
+  "@ownerBedMapTooltipTitle": {
+    "placeholders": {
+      "bedNumber": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBedMapTooltipGuest": "Guest: {guest}",
+  "@ownerBedMapTooltipGuest": {
+    "placeholders": {
+      "guest": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBedMapTooltipFrom": "From: {date}",
+  "@ownerBedMapTooltipFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBedMapTooltipTill": "Till: {date}",
+  "@ownerBedMapTooltipTill": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerRevenueReportTitle": "Revenue Report",
+  "ownerRevenueReportCollectedLabel": "Collected",
+  "ownerRevenueReportPendingLabel": "Pending",
+  "ownerRevenueReportTotalPaymentsLabel": "Total Payments",
+  "ownerRevenueReportCollectedCountLabel": "Collected Count",
+  "ownerOccupancyReportTitle": "Occupancy Report",
+  "ownerOccupancyReportTotalBedsLabel": "Total Beds",
+  "ownerOccupancyReportOccupiedLabel": "Occupied",
+  "ownerOccupancyReportVacantLabel": "Vacant",
+  "ownerOccupancyReportRateLabel": "Occupancy Rate",
+  "ownerOccupancyReportPendingLabel": "Pending",
+  "ownerOccupancyReportMaintenanceLabel": "Maintenance",
+  "ownerBookingRequestsTitle": "Pending Requests ({count})",
+  "@ownerBookingRequestsTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerUpcomingVacatingTitle": "Upcoming Vacating ({count})",
+  "@ownerUpcomingVacatingTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerServiceZeroRequests": "0 requests",
+  "ownerPaymentUpdateFailed": "Failed to update payment",
+  "guestHelpTitle": "Help & Support",
+  "guestHelpQuickHelp": "Quick Help",
+  "guestHelpHeroSubtitle": "Get instant answers to common questions about booking and managing your PG stay.",
+  "guestHelpVideosTitle": "Video Tutorials",
+  "guestHelpVideosSubtitle": "Watch step-by-step guides",
+  "guestHelpUnableToOpenVideos": "Unable to open video tutorials",
+  "guestHelpDocsTitle": "Documentation",
+  "guestHelpDocsSubtitle": "Read comprehensive guides",
+  "guestHelpUnableToOpenDocs": "Unable to open documentation",
+  "guestHelpFaqTitle": "Frequently Asked Questions",
+  "guestHelpFaqBookQuestion": "How do I book a PG room?",
+  "guestHelpFaqBookAnswer": "Browse available PGs in the \"PGs\" tab, select a PG, and tap \"Book Now\" to submit a booking request.",
+  "guestHelpFaqStatusQuestion": "How do I view my booking status?",
+  "guestHelpFaqStatusAnswer": "Open the \"Requests\" tab to see all your booking requests and their current status.",
+  "guestHelpFaqPaymentQuestion": "How do I make a payment?",
+  "guestHelpFaqPaymentAnswer": "Go to the \"Payments\" tab to view history and make new payments.",
+  "guestHelpFaqProfileQuestion": "How do I update my profile?",
+  "guestHelpFaqProfileAnswer": "Open the drawer menu and tap \"My Profile\" to edit your details.",
+  "guestHelpFaqComplaintQuestion": "How do I file a complaint?",
+  "guestHelpFaqComplaintAnswer": "Navigate to the \"Complaints\" tab and tap \"Add Complaint\" to submit one.",
+  "guestHelpContactTitle": "Contact Support",
+  "guestHelpContactSubtitle": "Need more help? Reach out to our support team.",
+  "guestHelpEmailTitle": "Email Support",
+  "guestHelpPhoneTitle": "Phone Support",
+  "guestHelpChatTitle": "Live Chat",
+  "guestHelpChatSubtitle": "WhatsApp: +91 7020797849",
+  "guestHelpUnableToOpenChat": "Unable to open chat. Please try WhatsApp: +91 7020797849",
+  "guestHelpResourcesTitle": "Resources",
+  "guestHelpPrivacyPolicy": "Privacy Policy",
+  "guestHelpTermsOfService": "Terms of Service",
+  "ownerHelpTitle": "Help & Support",
+  "ownerHelpQuickHelp": "Quick Help",
+  "ownerHelpHeroSubtitle": "Get instant answers to common questions about managing your PG properties.",
+  "ownerHelpVideosTitle": "Video Tutorials",
+  "ownerHelpVideosSubtitle": "Watch step-by-step guides",
+  "ownerHelpUnableToOpenVideos": "Unable to open video tutorials",
+  "ownerHelpDocsTitle": "Documentation",
+  "ownerHelpDocsSubtitle": "Read comprehensive guides",
+  "ownerHelpUnableToOpenDocs": "Unable to open documentation",
+  "ownerHelpFaqTitle": "Frequently Asked Questions",
+  "ownerHelpFaqAddPgQuestion": "How do I add a new PG property?",
+  "ownerHelpFaqAddPgAnswer": "Go to the \"My PGs\" tab and tap \"Add New PG\". Fill in the details and submit.",
+  "ownerHelpFaqBookingsQuestion": "How do I manage guest bookings?",
+  "ownerHelpFaqBookingsAnswer": "Open the \"Guests\" tab to review, approve, or reject booking requests.",
+  "ownerHelpFaqPaymentsQuestion": "How do I view payment history?",
+  "ownerHelpFaqPaymentsAnswer": "Use the \"Overview\" tab to review payments or check individual guests under \"Guests\".",
+  "ownerHelpFaqProfileQuestion": "How do I update my profile?",
+  "ownerHelpFaqProfileAnswer": "Open the drawer menu and tap \"My Profile\" to update your information.",
+  "ownerHelpContactTitle": "Contact Support",
+  "ownerHelpContactSubtitle": "Need more help? Reach out to our support team.",
+  "ownerHelpEmailTitle": "Email Support",
+  "ownerHelpPhoneTitle": "Phone Support",
+  "ownerHelpChatTitle": "Live Chat",
+  "ownerHelpChatSubtitle": "WhatsApp: +91 7020797849",
+  "ownerHelpUnableToOpenChat": "Unable to open chat. Please try WhatsApp: +91 7020797849",
+  "ownerHelpResourcesTitle": "Resources",
+  "ownerHelpPrivacyPolicy": "Privacy Policy",
+  "ownerHelpTermsOfService": "Terms of Service",
+  "guestHelpPrivacyPolicy": "Privacy Policy",
+  "guestHelpTermsOfService": "Terms of Service",
+  "guestNotificationsTitle": "Notifications",
+  "guestNotificationsLoadFailed": "Failed to load notifications",
+  "guestNotificationsEmptyTitle": "No Notifications",
+  "guestNotificationsEmptyMessage": "You don't have any notifications yet.",
+  "guestNotificationsFilterAll": "All",
+  "guestNotificationsFilterUnread": "Unread",
+  "guestNotificationsFilterBookings": "Bookings",
+  "guestNotificationsFilterPayments": "Payments",
+  "guestNotificationsFilterComplaints": "Complaints",
+  "guestNotificationsFilterBedChanges": "Bed Changes",
+  "guestNotificationsFilterPgUpdates": "PG Updates",
+  "guestNotificationsFilterServices": "Services",
+  "guestNotificationsDefaultTitle": "Notification",
+  "guestNotificationsDefaultBody": "No message",
+  "ownerNotificationsTitle": "Notifications",
+  "ownerNotificationsLoadFailed": "Failed to load notifications",
+  "ownerNotificationsEmptyTitle": "No Notifications",
+  "ownerNotificationsEmptyMessage": "You don't have any owner notifications yet.",
+  "ownerNotificationsFilterAll": "All",
+  "ownerNotificationsFilterUnread": "Unread",
+  "ownerNotificationsFilterBookings": "Bookings",
+  "ownerNotificationsFilterPayments": "Payments",
+  "ownerNotificationsFilterComplaints": "Complaints",
+  "ownerNotificationsFilterBedChanges": "Bed Changes",
+  "ownerNotificationsFilterServices": "Services",
+  "ownerNotificationsDefaultTitle": "Notification",
+  "ownerNotificationsDefaultBody": "No message",
+  "ownerNotificationsMarkAll": "Mark all as read",
+  "ownerNotificationsJustNow": "Just now",
+  "ownerNotificationsMinutesAgo": "{count, plural, one {{count} minute ago} other {{count} minutes ago}}",
+  "@ownerNotificationsMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerNotificationsHoursAgo": "{count, plural, one {{count} hour ago} other {{count} hours ago}}",
+  "@ownerNotificationsHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerNotificationsDaysAgo": "{count, plural, one {{count} day ago} other {{count} days ago}}",
+  "@ownerNotificationsDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "drawerDefaultUserName": "PG User",
+  "drawerDefaultInitial": "U",
+  "drawerVersionLabel": "Version {version}",
+  "@drawerVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "drawerContactEmail": "contact@charyatani.com",
+  "drawerContactPhone": "+91 98765 43210",
+  "drawerContactWebsite": "www.charyatani.com",
+  "ownerNotificationsEmptyMessage": "No notifications yet",
+  "ownerSpecialMenuEditTitle": "Edit Special Menu",
+  "ownerSpecialMenuAddTitle": "Add Special Menu",
+  "ownerSpecialMenuSaving": "Saving special menu...",
+  "ownerSpecialMenuSaveButton": "Save Special Menu",
+  "ownerSpecialMenuFestivalHeading": "Festival/Event Name",
+  "ownerSpecialMenuFestivalHint": "e.g., Diwali, Ugadi, Special Event",
+  "ownerSpecialMenuSpecialNoteHeading": "Special Note",
+  "ownerSpecialMenuSpecialNoteLabel": "Note",
+  "ownerSpecialMenuSpecialNoteHint": "Any special instructions or details...",
+  "ownerSpecialMenuFallbackInfo": "Leave meal sections empty to use the default weekly menu for this day",
+  "ownerSpecialMenuOptionalSection": "{meal} (Optional)",
+  "@ownerSpecialMenuOptionalSection": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerSpecialMenuNoItems": "No items added",
+  "ownerSpecialMenuAddItem": "Add Item",
+  "ownerSpecialMenuAddMealItemTitle": "Add {mealType} Item",
+  "@ownerSpecialMenuAddMealItemTitle": {
+    "placeholders": {
+      "mealType": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerSpecialMenuItemNameLabel": "Item Name",
+  "ownerSpecialMenuItemNameHint": "Enter meal item name",
+  "ownerSpecialMenuFestivalRequired": "Please enter festival/event name",
+  "ownerSpecialMenuSaveSuccess": "Special menu saved successfully!",
+  "ownerSpecialMenuSaveFailed": "Failed to save special menu: {error}",
+  "@ownerSpecialMenuSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerSpecialMenuSaveError": "Error saving special menu: {error}",
+  "@ownerSpecialMenuSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditTitleEdit": "Edit {day} Menu",
+  "@ownerMenuEditTitleEdit": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditTitleCreate": "Create {day} Menu",
+  "@ownerMenuEditTitleCreate": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditDeleteTooltip": "Delete Menu",
+  "ownerMenuEditSaving": "Saving menu...",
+  "ownerMenuEditUpdateButton": "Update Menu",
+  "ownerMenuEditCreateButton": "Create Menu",
+  "ownerMenuEditOverviewTitle": "{day} Menu",
+  "@ownerMenuEditOverviewTitle": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditOverviewSubtitle": "Create & manage the daily menu",
+  "ownerMenuEditStatItems": "Items",
+  "ownerMenuEditStatPhotos": "Photos",
+  "ownerMenuEditOptionalSection": "{meal} (Optional)",
+  "@ownerMenuEditOptionalSection": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditLastUpdated": "Last Updated: {timestamp}",
+  "@ownerMenuEditLastUpdated": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditPhotosHeading": "Menu Photos",
+  "ownerMenuEditAddPhoto": "Add Photo",
+  "ownerMenuEditUploadingPhoto": "Uploading photo...",
+  "ownerMenuEditBadgeNew": "NEW",
+  "ownerMenuEditNoPhotos": "No photos added yet",
+  "ownerMenuEditItemsCount": "{count} items",
+  "@ownerMenuEditItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerMenuEditAddItemTooltip": "Add {meal} Item",
+  "@ownerMenuEditAddItemTooltip": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditNoItemsForMeal": "No {meal} items added yet",
+  "@ownerMenuEditNoItemsForMeal": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditRemoveItemTooltip": "Remove Item",
+  "ownerMenuEditDescriptionHeading": "Description (Optional)",
+  "ownerMenuEditDescriptionLabel": "Menu Description",
+  "ownerMenuEditDescriptionHint": "Add any special notes about this menu...",
+  "ownerMenuEditAddMealItemTitle": "Add {mealType} Item",
+  "@ownerMenuEditAddMealItemTitle": {
+    "placeholders": {
+      "mealType": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditItemNameLabel": "Item Name",
+  "ownerMenuEditItemNameHint": "e.g., Idli with Sambar, Dosa, Poha",
+  "ownerMenuEditMealRequired": "Please add at least one meal item",
+  "ownerMenuEditAuthError": "Error: User not authenticated. Please login again.",
+  "ownerMenuEditUpdateSuccess": "{day} menu updated successfully!",
+  "@ownerMenuEditUpdateSuccess": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditCreateSuccess": "{day} menu created successfully!",
+  "@ownerMenuEditCreateSuccess": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditSaveFailed": "Failed to save menu: {error}",
+  "@ownerMenuEditSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditSaveError": "Error saving menu: {error}",
+  "@ownerMenuEditSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditClearTitle": "Clear Menu?",
+  "ownerMenuEditClearMessage": "Are you sure you want to clear this menu? This will remove all items and photos.",
+  "ownerMenuEditClearConfirm": "Clear",
+  "ownerMenuEditClearSnackbar": "Menu cleared. Don't forget to save changes.",
+  "ownerMenuEditImagePickError": "Error picking image: {error}",
+  "@ownerMenuEditImagePickError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseYourPreferredTheme": "Choose your preferred theme",
+  "selectPreferredLanguage": "Select your preferred language",
+  "ownerNotificationsFilterAll": "All",
+  "dataPrivacy": "Data & Privacy",
+  "about": "About",
+  "receiveNotificationsOnYourDevice": "Receive notifications on your device",
+  "receiveNotificationsViaEmail": "Receive notifications via email",
+  "getRemindersForPendingPayments": "Get reminders for pending payments",
+  "ownerReportsSelectPeriod": "Select report period",
+  "ownerReportsSelectDateRange": "Select date range",
+  "ownerReportsRefresh": "Refresh reports",
+  "ownerReportsTabRevenue": "Revenue",
+  "ownerReportsTabBookings": "Bookings",
+  "ownerReportsTabGuests": "Guests",
+  "ownerReportsTabPayments": "Payments",
+  "ownerReportsTabComplaints": "Complaints",
+  "ownerReportsLoading": "Loading reports...",
+  "ownerReportsErrorTitle": "Error loading reports",
+  "ownerReportsNoRevenueData": "No revenue data",
+  "ownerReportsRevenuePlaceholder": "Revenue data will appear here once you have bookings",
+  "ownerReportsAveragePerMonth": "Average / month",
+  "ownerReportsMonthlyRevenueBreakdown": "Monthly revenue breakdown",
+  "ownerReportsTotalBookings": "Total bookings",
+  "ownerReportsPendingRequests": "Pending requests",
+  "ownerReportsTotalReceived": "Total received",
+  "ownerReportsPaidCount": "Paid count",
+  "ownerReportsPendingCount": "Pending count",
+  "ownerReportsChangeDateRange": "Change",
+  "ownerReportsPropertyWiseRevenue": "Property-wise revenue",
+  "ownerReportsPercentageOfTotal": "{percentage}% of total",
+  "@ownerReportsPercentageOfTotal": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerReportsBookingTrends": "Booking trends",
+  "ownerReportsNoBookingData": "No booking data available for the selected period",
+  "ownerReportsBookingsCount": "{count} bookings",
+  "@ownerReportsBookingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerReportsGuestStatistics": "Guest statistics",
+  "ownerReportsPaymentTrends": "Payment trends",
+  "ownerReportsNoPaymentData": "No payment data available for the selected period",
+  "ownerReportsComplaintTrends": "Complaint trends",
+  "ownerReportsNoComplaintData": "No complaint data available for the selected period",
+  "ownerReportsComplaintsCount": "{count} complaints",
+  "@ownerReportsComplaintsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerOverviewOccupancyRate": "Occupancy rate",
+  "ownerOverviewPerformanceExcellent": "Excellent",
+  "ownerOverviewPerformanceGood": "Good",
+  "ownerOverviewPerformanceFair": "Fair",
+  "ownerOverviewPerformanceNeedsAttention": "Needs attention",
+  "ownerOverviewPgLabel": "{index}PG: {name}",
+  "@ownerOverviewPgLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerOverviewAveragePerMonth": "Average / month",
+  "ownerOverviewHighestMonth": "Highest month",
+  "ownerNotificationsFilterAll": "All",
+  "ownerProfileTitle": "My Profile",
+  "ownerProfileSaveTooltip": "Save profile",
+  "ownerProfileTabPersonalInfo": "Personal Info",
+  "ownerProfileTabBusinessInfo": "Business Info",
+  "ownerProfileTabDocuments": "Documents",
+  "ownerProfileFullNameLabel": "Full Name",
+  "ownerProfileFullNameHint": "Enter your full name",
+  "ownerProfileEmailLabel": "Email",
+  "ownerProfileEmailHint": "Enter your email",
+  "ownerProfilePhoneLabel": "Phone Number",
+  "ownerProfilePhoneHint": "Enter your phone number",
+  "ownerProfileAddressLabel": "PG Address",
+  "ownerProfileAddressHint": "Enter your PG address",
+  "ownerProfileStateLabel": "State",
+  "ownerProfileStateHint": "Select state",
+  "ownerProfileCityLabel": "City",
+  "ownerProfileCityHint": "Select city",
+  "ownerProfileCityHintSelectState": "Select state first",
+  "ownerProfilePincodeLabel": "Pincode",
+  "ownerProfilePincodeHint": "Enter pincode",
+  "ownerProfileSavePersonal": "Save Personal Info",
+  "ownerProfileBusinessNameLabel": "Business Name",
+  "ownerProfileBusinessNameHint": "Enter business name",
+  "ownerProfileBusinessTypeLabel": "Business Type",
+  "ownerProfileBusinessTypeHint": "Enter business type",
+  "ownerProfilePanLabel": "PAN Number",
+  "ownerProfilePanHint": "Enter PAN number",
+  "ownerProfileGstLabel": "GST Number",
+  "ownerProfileGstHint": "Enter GST number",
+  "ownerProfileSaveBusiness": "Save Business Info",
+  "ownerProfileDocumentProfileTitle": "Profile Photo",
+  "ownerProfileDocumentProfileDescription": "Upload your profile photo",
+  "ownerProfileDocumentAadhaarTitle": "Aadhaar Photo",
+  "ownerProfileDocumentAadhaarDescription": "Upload your Aadhaar card photo",
+  "ownerProfileDocumentUpload": "Upload",
+  "ownerProfileDocumentUpdate": "Update",
+  "ownerProfilePickImageFailed": "Failed to pick image: {error}",
+  "@ownerProfilePickImageFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerIdNotAvailable": "Owner ID not available",
+  "ownerProfileNotFound": "Profile not found",
+  "ownerProfileLoadFailed": "Failed to load profile",
+  "ownerProfileStreamFailed": "Failed to stream profile",
+  "ownerProfileStreamStartFailed": "Failed to start profile stream",
+  "ownerProfileCreateFailed": "Failed to create profile",
+  "ownerProfileUpdateFailed": "Failed to update profile",
+  "ownerBankDetailsUpdateFailed": "Failed to update bank details",
+  "ownerBusinessInfoUpdateFailed": "Failed to update business information",
+  "ownerProfilePhotoUploadFailed": "Failed to upload profile photo",
+  "ownerAadhaarUploadFailed": "Failed to upload Aadhaar document",
+  "ownerUpiQrUploadFailed": "Failed to upload UPI QR code",
+  "ownerAddPgFailed": "Failed to add PG",
+  "ownerRemovePgFailed": "Failed to remove PG",
+  "ownerProfileVerifyFailed": "Failed to verify profile",
+  "ownerProfileDeactivateFailed": "Failed to deactivate profile",
+  "ownerProfileActivateFailed": "Failed to activate profile",
+  "ownerStateUpdateFailedLog": "Error updating selected state: {error}",
+  "@ownerStateUpdateFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerCityUpdateFailedLog": "Error updating selected city: {error}",
+  "@ownerCityUpdateFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerStateTelangana": "Telangana",
+  "ownerStateAndhraPradesh": "Andhra Pradesh",
+  "ownerProfilePhotoUpdateFailed": "Failed to update profile photo",
+  "ownerAadhaarUpdateFailed": "Failed to update Aadhaar photo",
+  "ownerUpiQrUpdateFailed": "Failed to update UPI QR code",
+  "ownerFileDeleteFailed": "Failed to delete file",
+  "ownerPgFetchFailed": "Failed to fetch owner PG IDs",
+  "ownerOverviewFetchFailed": "Failed to fetch owner overview data",
+  "ownerOverviewAggregateFailed": "Failed to aggregate owner data",
+  "ownerMonthlyBreakdownFailed": "Failed to fetch monthly breakdown",
+  "ownerPropertyBreakdownFailed": "Failed to fetch property breakdown",
+  "ownerPropertyFallbackName": "Property {pgId}",
+  "@ownerPropertyFallbackName": {
+    "placeholders": {
+      "pgId": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerOverviewLoadFailed": "Failed to load overview data",
+  "ownerOverviewLoadFailedWithReason": "Failed to load overview data: {error}",
+  "@ownerOverviewLoadFailedWithReason": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerOverviewStreamFailedWithReason": "Failed to stream overview data: {error}",
+  "@ownerOverviewStreamFailedWithReason": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMonthlyBreakdownLoadFailed": "Failed to load monthly breakdown: {error}",
+  "@ownerMonthlyBreakdownLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPropertyBreakdownLoadFailed": "Failed to load property breakdown: {error}",
+  "@ownerPropertyBreakdownLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestInitializeFailed": "Failed to initialize guest management: {error}",
+  "@ownerGuestInitializeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestStatsLoadFailedLog": "⚠️ Owner Guest ViewModel: Failed to load guest stats: {error}",
+  "@ownerGuestStatsLoadFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestUpdateFailed": "Failed to update guest: {error}",
+  "@ownerGuestUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerComplaintReplyFailed": "Failed to add reply: {error}",
+  "@ownerComplaintReplyFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerComplaintStatusUpdateFailed": "Failed to update complaint status: {error}",
+  "@ownerComplaintStatusUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBikeUpdateFailed": "Failed to update bike: {error}",
+  "@ownerBikeUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBikeMovementRequestFailed": "Failed to create bike movement request: {error}",
+  "@ownerBikeMovementRequestFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerServiceCreateFailed": "Failed to create service request: {error}",
+  "@ownerServiceCreateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerServiceReplyFailed": "Failed to add service reply: {error}",
+  "@ownerServiceReplyFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerServiceStatusUpdateFailed": "Failed to update service status: {error}",
+  "@ownerServiceStatusUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestRefreshFailed": "Failed to refresh data: {error}",
+  "@ownerGuestRefreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBookingApproveFailed": "Failed to approve booking request: {error}",
+  "@ownerBookingApproveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBookingRejectFailed": "Failed to reject booking request: {error}",
+  "@ownerBookingRejectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerResponseNone": "none",
+  "ownerFoodLoadMenusFailed": "Failed to load menus: {error}",
+  "@ownerFoodLoadMenusFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodStreamMenusFailed": "Failed to stream menus: {error}",
+  "@ownerFoodStreamMenusFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodStreamOverridesFailed": "Failed to stream overrides: {error}",
+  "@ownerFoodStreamOverridesFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodSaveMenuFailed": "Failed to save menu: {error}",
+  "@ownerFoodSaveMenuFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodSaveMenusFailed": "Failed to save menus: {error}",
+  "@ownerFoodSaveMenusFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodDeleteMenuFailed": "Failed to delete menu: {error}",
+  "@ownerFoodDeleteMenuFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodSaveOverrideFailed": "Failed to save override: {error}",
+  "@ownerFoodSaveOverrideFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodDeleteOverrideFailed": "Failed to delete override: {error}",
+  "@ownerFoodDeleteOverrideFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodUploadPhotoFailed": "Failed to upload photo: {error}",
+  "@ownerFoodUploadPhotoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodDeletePhotoFailed": "Failed to delete photo: {error}",
+  "@ownerFoodDeletePhotoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodInitializeDefaultsFailed": "Failed to initialize default menus: {error}",
+  "@ownerFoodInitializeDefaultsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodUpdateCurrentMenuFailed": "Failed to update current day menu: {error}",
+  "@ownerFoodUpdateCurrentMenuFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodSaveStateFailedLog": "⚠️ Owner Food ViewModel: Failed to save menu state: {error}",
+  "@ownerFoodSaveStateFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodClearStateFailedLog": "⚠️ Owner Food ViewModel: Failed to clear menu state: {error}",
+  "@ownerFoodClearStateFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodFetchMenuFailed": "Failed to fetch weekly menu",
+  "ownerFoodFetchOverridesFailed": "Failed to fetch menu overrides",
+  "ownerFoodRepositorySaveMenuFailed": "Failed to save weekly menu",
+  "ownerFoodRepositorySaveMenusFailed": "Failed to save weekly menus",
+  "ownerFoodRepositoryDeleteMenuFailed": "Failed to delete weekly menu",
+  "ownerFoodRepositorySaveOverrideFailed": "Failed to save menu override",
+  "ownerFoodRepositoryDeleteOverrideFailed": "Failed to delete menu override",
+  "ownerFoodRepositoryUploadPhotoFailed": "Failed to upload photo",
+  "ownerFoodRepositoryDeletePhotoFailed": "Failed to delete photo",
+  "ownerFoodFetchStatsFailed": "Failed to fetch menu stats",
+  "pgPhotosUploading": "Uploading {count} photo(s)...",
+  "@pgPhotosUploading": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pgPhotosUploadSuccess": "Uploaded {count} photos successfully!",
+  "@pgPhotosUploadSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pgPhotosUploadPartial": "Uploaded {success} photos, {failed} failed.",
+  "@pgPhotosUploadPartial": {
+    "placeholders": {
+      "success": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "pgPhotosUploadFailed": "Failed to upload photos",
+  "pgPhotosSelectFailed": "Failed to select photos: {error}",
+  "@pgPhotosSelectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pgPhotosUploadErrorLog": "Failed to upload image {index}: {error}",
+  "@pgPhotosUploadErrorLog": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pgSupabaseStorageTroubleshoot": "⚠️ Supabase Storage Error: This might be due to:\n1. Storage bucket RLS policies blocking uploads\n2. CORS configuration issues\n3. Authentication required for storage uploads\nPlease check your Supabase Storage policies for the \"atitia-storage\" bucket.",
+  "ownerPgUnknownName": "Unknown PG",
+  "ownerPgInitializeFailed": "Failed to initialize PG management: {error}",
+  "@ownerPgInitializeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgApproveBookingFailed": "Failed to approve booking: {error}",
+  "@ownerPgApproveBookingFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgRejectBookingFailed": "Failed to reject booking: {error}",
+  "@ownerPgRejectBookingFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgRescheduleBookingFailed": "Failed to reschedule booking: {error}",
+  "@ownerPgRescheduleBookingFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgIdNotInitialized": "PG ID not initialized",
+  "ownerPgUpdateBedStatusFailed": "Failed to update bed status: {error}",
+  "@ownerPgUpdateBedStatusFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgRefreshFailed": "Failed to refresh data: {error}",
+  "@ownerPgRefreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgSaveFailed": "Failed to save PG: {error}",
+  "@ownerPgSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgIdNotProvided": "PG ID not provided",
+  "ownerPgUpdateFailed": "Failed to update PG: {error}",
+  "@ownerPgUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgDeleteFailed": "Failed to delete PG: {error}",
+  "@ownerPgDeleteFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgCreateFailed": "Failed to create PG: {error}",
+  "@ownerPgCreateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgRevenueReportFailed": "Failed to get revenue report: {error}",
+  "@ownerPgRevenueReportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgOccupancyReportFailed": "Failed to get occupancy report: {error}",
+  "@ownerPgOccupancyReportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgFetchListFailed": "Failed to fetch PGs: {error}",
+  "@ownerPgFetchListFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgFetchDetailsFailed": "Failed to fetch PG details: {error}",
+  "@ownerPgFetchDetailsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgBasicInfoZeroStateMessage": "Fill in the basic information about your PG to get started.",
+  "ownerPgQuickStatRequired": "Required",
+  "ownerPgQuickStatRentTypes": "Rent Types",
+  "ownerPgQuickStatDeposit": "Deposit",
+  "ownerPgStatusNotSet": "Not Set",
+  "ownerPgStatusSet": "Set",
+  "ownerPgFloorStructureZeroStateMessage": "Set up the floor structure, rooms, and beds for your PG.",
+  "ownerPgQuickStatFloors": "Floors",
+  "ownerPgQuickStatRooms": "Rooms",
+  "ownerPgQuickStatBeds": "Beds",
+  "ownerPgAmenitiesZeroStateMessage": "Select the amenities your PG offers to help guests find you.",
+  "ownerPgPhotosZeroStateMessage": "Add photos of your PG to showcase it to potential guests.",
+  "ownerPgQuickStatSelected": "Selected",
+  "ownerPgBedNumberingDescription": "Number beds consistently based on door position so everyone agrees.",
+  "ownerPgBedNumberingRule": "Rule: Stand at the entrance facing inside → left-to-right, front-to-back (door wall to opposite wall).",
+  "ownerPgBedLayoutTwoByTwo": "2x2 layout",
+  "ownerPgBedLayoutOneByFour": "1x4 along a wall (door → last wall)",
+  "ownerPgBed1NearestLeft": "Bed-1: nearest row, left side",
+  "ownerPgBed2NearestRight": "Bed-2: nearest row, right side",
+  "ownerPgBed3FarLeft": "Bed-3: far row, left side",
+  "ownerPgBed4FarRight": "Bed-4: far row, right side",
+  "ownerPgBed1ClosestDoor": "Bed-1: closest to door",
+  "ownerPgBedNext": "Bed-{number}: next",
+  "@ownerPgBedNext": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerPgBed4Farthest": "Bed-4: farthest from door",
+  "ownerPgRentConfigZeroStateMessage": "Set up rent amounts for different sharing types and maintenance charges.",
+  "ownerPgProgressDescription": "{completed} of {total} sections completed",
+  "@ownerPgProgressDescription": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerPgLoadingDetails": "Loading PG details...",
+  "ownerPgPublishedSuccessfully": "PG published successfully",
+  "ownerPgPublishFailed": "Failed to publish PG",
+  "ownerAnalyticsLoadFailed": "Failed to load analytics data: {error}",
+  "@ownerAnalyticsLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerProfileUpdateSuccess": "Profile updated successfully",
+  "ownerProfileUpdateFailure": "Failed to update profile: {error}",
+  "@ownerProfileUpdateFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "replaceQrCode": "Replace QR Code",
+  "removeQrCode": "Remove QR Code",
+  "previewQrCode": "Preview QR Code",
+  "noQrCodeSelected": "No QR code selected yet",
+  "newQrCodeSelected": "New QR code selected",
+  "existingQrCode": "Existing QR code",
+  "exampleBankName": "e.g., State Bank of India",
+  "exampleIfsc": "e.g., SBIN0001234",
+  "exampleUpiId": "yourname@paytm",
+  "qrCodeInfoText": "You can generate a QR code from any UPI app like PhonePe, Paytm, Google Pay, etc.",
+  "ownerProfileInitialFallback": "O",
+  "ownerProfileVerifiedStatus": "Verified",
+  "ownerProfilePendingVerificationStatus": "Pending Verification",
+  "statusActive": "Active",
+  "statusInactive": "Inactive",
+  "dateFormatDdMmYyyy": "DD/MM/YYYY",
+  "guestUser": "Guest User",
+  "guestInitialsFallback": "GU",
+  "perMonthAmount": "{amount}/month",
+  "@perMonthAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pgPayment": "PG Payment",
+  "paymentTypeRent": "Rent Payment",
+  "paymentTypeSecurityDeposit": "Security Deposit",
+  "paymentTypeMaintenance": "Maintenance Fee",
+  "paymentTypeLateFee": "Late Fee",
+  "paymentTypeOther": "{type} Payment",
+  "@paymentTypeOther": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentCompletedSuccessfully": "Payment completed successfully",
+  "paymentPending": "Payment pending",
+  "paymentOverdue": "Payment overdue — please pay immediately",
+  "paymentFailedMessage": "Payment failed — please try again",
+  "paymentRefunded": "Payment has been refunded",
+  "unknownStatus": "Unknown status",
+  "paymentFilterChangedEvent": "payment_filter_changed",
+  "paymentLoadErrorEvent": "payment_load_error",
+  "pendingPaymentsLoadErrorEvent": "pending_payments_load_error",
+  "overduePaymentsLoadErrorEvent": "overdue_payments_load_error",
+  "paymentStatsLoadErrorEvent": "payment_stats_load_error",
+  "paymentAddedSuccessfullyEvent": "payment_added_successfully",
+  "paymentAddFailedEvent": "payment_add_failed",
+  "paymentUpdatedSuccessfullyEvent": "payment_updated_successfully",
+  "paymentUpdateFailedEvent": "payment_update_failed",
+  "paymentStatusUpdatedSuccessfullyEvent": "payment_status_updated_successfully",
+  "paymentStatusUpdateFailedEvent": "payment_status_update_failed",
+  "paymentDeletedSuccessfullyEvent": "payment_deleted_successfully",
+  "paymentDeletionFailedEvent": "payment_deletion_failed",
+  "paymentsRefreshedEvent": "payments_refreshed",
+  "failedToLoadPayments": "Failed to load payments: {error}",
+  "@failedToLoadPayments": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToAddPayment": "Failed to add payment: {error}",
+  "@failedToAddPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdatePayment": "Failed to update payment: {error}",
+  "@failedToUpdatePayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdatePaymentStatus": "Failed to update payment status: {error}",
+  "@failedToUpdatePaymentStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchPayment": "Failed to fetch payment: {error}",
+  "@failedToFetchPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToDeletePayment": "Failed to delete payment: {error}",
+  "@failedToDeletePayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentSimulationDeprecated": "Payment simulation is deprecated.",
+  "paymentSimulationRecommendation": "Please use real payment gateways (Razorpay, UPI, or Cash) via the payment method selection dialog.",
+  "paymentNotificationReceivedTitle": "Payment Received",
+  "paymentNotificationReceivedBody": "Payment of {amount} received from guest",
+  "selectPaymentMethodTitle": "Select Payment Method",
+  "selectPaymentMethodSubtitle": "Choose how you want to make the payment",
+  "razorpayPaymentDescription": "Secure online payment via Razorpay",
+  "upiPaymentDescription": "Pay via PhonePe, Paytm, Google Pay, etc. and share screenshot",
+  "cashPaymentDescription": "Pay in cash and request owner confirmation",
+  "guestProfileLoadedEvent": "guest_profile_loaded",
+  "guestProfileUpdateSuccessEvent": "guest_profile_update_success",
+  "guestProfileFieldsUpdateSuccessEvent": "guest_profile_fields_update_success",
+  "profilePhotoUploadSuccessEvent": "profile_photo_upload_success",
+  "aadhaarPhotoUploadSuccessEvent": "aadhaar_photo_upload_success",
+  "idProofUploadSuccessEvent": "id_proof_upload_success",
+  "guestStatusUpdateSuccessEvent": "guest_status_update_success",
+  "guestProfileClearedEvent": "guest_profile_cleared",
+  "guestProfileEditStartedEvent": "guest_profile_edit_started",
+  "guestProfileEditCancelledEvent": "guest_profile_edit_cancelled",
+  "guestProfileRefreshedEvent": "guest_profile_refreshed",
+  "guestProfileNotFoundEvent": "guest_profile_not_found",
+  "guestProfileViewedEvent": "guest_profile_viewed",
+  "guestProfileFetchErrorEvent": "guest_profile_fetch_error",
+  "guestProfileUpdatedEvent": "guest_profile_updated",
+  "guestProfileUpdateErrorEvent": "guest_profile_update_error",
+  "guestProfileFieldsUpdatedEvent": "guest_profile_fields_updated",
+  "guestProfileFieldsUpdateErrorEvent": "guest_profile_fields_update_error",
+  "profilePhotoUploadedEvent": "profile_photo_uploaded",
+  "profilePhotoUploadErrorEvent": "profile_photo_upload_error",
+  "aadhaarPhotoUploadedEvent": "aadhaar_photo_uploaded",
+  "aadhaarPhotoUploadErrorEvent": "aadhaar_photo_upload_error",
+  "idProofUploadedEvent": "id_proof_uploaded",
+  "idProofUploadErrorEvent": "id_proof_upload_error",
+  "guestProfileDeletedEvent": "guest_profile_deleted",
+  "guestProfileDeleteErrorEvent": "guest_profile_delete_error",
+  "guestStatusUpdatedEvent": "guest_status_updated",
+  "guestStatusUpdateErrorEvent": "guest_status_update_error",
+  "failedToLoadProfile": "Failed to load profile: {error}",
+  "@failedToLoadProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToStreamProfile": "Failed to stream profile: {error}",
+  "@failedToStreamProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateGuestProfile": "Failed to update guest profile: {error}",
+  "@failedToUpdateGuestProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateProfileFields": "Failed to update profile fields: {error}",
+  "@failedToUpdateProfileFields": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUploadIdProof": "Failed to upload ID proof: {error}",
+  "@failedToUploadIdProof": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateGuestStatus": "Failed to update guest status: {error}",
+  "@failedToUpdateGuestStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchGuestProfile": "Failed to fetch guest profile: {error}",
+  "@failedToFetchGuestProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToDeleteGuestProfile": "Failed to delete guest profile: {error}",
+  "@failedToDeleteGuestProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noChangesToSave": "No changes to save",
+  "pgsLoadedEvent": "pgs_loaded",
+  "pgsLoadErrorEvent": "pgs_load_error",
+  "pgSelectedEvent": "pg_selected",
+  "pgFilterChangedEvent": "pg_filter_changed",
+  "pgSearchQueryChangedEvent": "pg_search_query_changed",
+  "pgAmenitiesFilterChangedEvent": "pg_amenities_filter_changed",
+  "pgCityFilterChangedEvent": "pg_city_filter_changed",
+  "pgTypeFilterChangedEvent": "pg_type_filter_changed",
+  "pgMealTypeFilterChangedEvent": "pg_meal_type_filter_changed",
+  "pgWifiFilterChangedEvent": "pg_wifi_filter_changed",
+  "pgParkingFilterChangedEvent": "pg_parking_filter_changed",
+  "pgFiltersClearedEvent": "pg_filters_cleared",
+  "pgSavedEvent": "pg_saved",
+  "pgDeletedEvent": "pg_deleted",
+  "pgNotFoundEvent": "pg_not_found",
+  "pgViewedEvent": "pg_viewed",
+  "pgFetchErrorEvent": "pg_fetch_error",
+  "pgSaveErrorEvent": "pg_save_error",
+  "pgDeleteErrorEvent": "pg_delete_error",
+  "pgPhotoUploadedEvent": "pg_photo_uploaded",
+  "pgPhotoUploadErrorEvent": "pg_photo_upload_error",
+  "pgSearchPerformedEvent": "pg_search_performed",
+  "pgSearchErrorEvent": "pg_search_error",
+  "ownerPgsFetchedEvent": "owner_pgs_fetched",
+  "ownerPgsFetchErrorEvent": "owner_pgs_fetch_error",
+  "cityPgsFetchedEvent": "city_pgs_fetched",
+  "cityPgsFetchErrorEvent": "city_pgs_fetch_error",
+  "amenityPgsFetchedEvent": "amenity_pgs_fetched",
+  "amenityPgsFetchErrorEvent": "amenity_pgs_fetch_error",
+  "failedToLoadPgs": "Failed to load PGs: {error}",
+  "@failedToLoadPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToLoadPgDetails": "Failed to load PG details: {error}",
+  "@failedToLoadPgDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSavePg": "Failed to save PG: {error}",
+  "@failedToSavePg": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToDeletePg": "Failed to delete PG: {error}",
+  "@failedToDeletePg": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToLoadPgStats": "Failed to load PG statistics: {error}",
+  "@failedToLoadPgStats": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUploadPgPhoto": "Failed to upload PG photo: {error}",
+  "@failedToUploadPgPhoto": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToPerformPgSearch": "Failed to perform search: {error}",
+  "@failedToPerformPgSearch": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchPgDetails": "Failed to fetch PG details: {error}",
+  "@failedToFetchPgDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSearchPgs": "Failed to search PGs: {error}",
+  "@failedToSearchPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchOwnerPgs": "Failed to fetch owner PGs: {error}",
+  "@failedToFetchOwnerPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchCityPgs": "Failed to fetch city PGs: {error}",
+  "@failedToFetchCityPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchAmenityPgs": "Failed to fetch amenity PGs: {error}",
+  "@failedToFetchAmenityPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToGetPgStats": "Failed to get PG stats: {error}",
+  "@failedToGetPgStats": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "guestPgProviderInitializedEvent": "guest_pg_provider_initialized",
+  "guestPgSelectedEvent": "guest_pg_selected",
+  "guestPgClearedEvent": "guest_pg_cleared",
+  "guestPgSelectionRestoredEvent": "guest_pg_selection_restored",
+  "guestPgSelectionRestoreFailedEvent": "guest_pg_selection_restore_failed",
+  "guestPgSelectionSavedEvent": "guest_pg_selection_saved",
+  "guestPgSelectionSaveFailedEvent": "guest_pg_selection_save_failed",
+  "guestPgSelectionClearedStorageEvent": "guest_pg_selection_cleared_storage",
+  "guestPgSelectionClearFailedEvent": "guest_pg_selection_clear_failed",
+  "guestBookingRequestSentEvent": "guest_booking_request_sent",
+  "bookingRequestNotificationFailedEvent": "booking_request_notification_failed",
+  "newBookingRequestTitle": "New Booking Request",
+  "newBookingRequestBody": "{guestName} requested to join {pgName}",
+  "@newBookingRequestBody": {
+    "placeholders": {
+      "guestName": {
+        "type": "String"
+      },
+      "pgName": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToInitializeGuestPgSelection": "Failed to initialize PG selection: {error}",
+  "@failedToInitializeGuestPgSelection": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSelectGuestPg": "Failed to select PG: {error}",
+  "@failedToSelectGuestPg": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToClearGuestPgSelection": "Failed to clear PG selection: {error}",
+  "@failedToClearGuestPgSelection": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSendBookingRequest": "Failed to send booking request: {error}",
+  "@failedToSendBookingRequest": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateBookingStatus": "Failed to update booking status: {error}",
+  "@failedToUpdateBookingStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "privacyPolicyTitle": "Privacy Policy",
+  "privacyPolicyLastUpdatedLabel": "Last Updated",
+  "privacyPolicyLastUpdatedDate": "November 2025",
+  "privacyPolicySection1Title": "1. Information We Collect",
+  "privacyPolicySection1Content": "We collect information that you provide directly to us, including:\n• Personal information (name, email, phone number)\n• PG booking and payment information\n• Profile and preference data\n• Communication records with property owners",
+  "privacyPolicySection2Title": "2. How We Use Your Information",
+  "privacyPolicySection2Content": "We use the information we collect to:\n• Provide, maintain, and improve our services\n• Process transactions and send related information\n• Send technical notices and support messages\n• Respond to your comments and questions",
+  "privacyPolicySection3Title": "3. Information Sharing",
+  "privacyPolicySection3Content": "We do not sell, trade, or rent your personal information. We may share your information only:\n• With property owners for booking purposes\n• To comply with legal obligations\n• To protect our rights and safety",
+  "privacyPolicySection4Title": "4. Data Security",
+  "privacyPolicySection4Content": "We implement appropriate security measures to protect your personal information. However, no method of transmission over the internet is 100% secure.",
+  "privacyPolicySection5Title": "5. Your Rights",
+  "privacyPolicySection5Content": "You have the right to:\n• Access your personal information\n• Correct inaccurate data\n• Request deletion of your data\n• Opt-out of certain communications",
+  "privacyPolicySection6Title": "6. Contact Us",
+  "privacyPolicySection6Content": "If you have questions about this Privacy Policy, please contact us at:\n\nEmail: privacy@atitia.com\nPhone: +91 1234567890",
+  "termsOfServiceTitle": "Terms of Service",
+  "termsOfServiceLastUpdatedLabel": "Last Updated",
+  "termsOfServiceLastUpdatedDate": "November 2025",
+  "termsOfServiceSection1Title": "1. Acceptance of Terms",
+  "termsOfServiceSection1Content": "By accessing and using the Atitia app, you accept and agree to be bound by these Terms of Service. If you do not agree, please do not use our services.",
+  "termsOfServiceSection2Title": "2. User Accounts",
+  "termsOfServiceSection2Content": "You are responsible for:\n• Maintaining the confidentiality of your account\n• All activities that occur under your account\n• Providing accurate and complete information",
+  "termsOfServiceSection3Title": "3. Booking and Payments",
+  "termsOfServiceSection3Content": "• Booking requests are subject to owner approval\n• Payment terms are as agreed with the property owner\n• Refunds are subject to the property's cancellation policy\n• We facilitate transactions but are not a party to the rental agreement",
+  "termsOfServiceSection4Title": "4. Property Owner Responsibilities",
+  "termsOfServiceSection4Content": "Property owners must:\n• Provide accurate property information\n• Honor confirmed bookings\n• Maintain property standards\n• Respond to guest inquiries promptly",
+  "termsOfServiceSection5Title": "5. Prohibited Activities",
+  "termsOfServiceSection5Content": "You agree not to:\n• Use the service for illegal purposes\n• Post false or misleading information\n• Interfere with the app's functionality\n• Attempt unauthorized access to the system",
+  "termsOfServiceSection6Title": "6. Limitation of Liability",
+  "termsOfServiceSection6Content": "Atitia provides the platform \"as is\" and is not liable for:\n• Disputes between guests and property owners\n• Property condition or safety issues\n• Payment disputes or refunds\n• Indirect or consequential damages",
+  "termsOfServiceSection7Title": "7. Changes to Terms",
+  "termsOfServiceSection7Content": "We reserve the right to modify these terms at any time. Continued use of the service constitutes acceptance of modified terms.",
+  "termsOfServiceSection8Title": "8. Contact Information",
+  "termsOfServiceSection8Content": "For questions about these Terms, contact us at:\n\nEmail: legal@atitia.com\nPhone: +91 1234567890",
+  "notificationPreferencesTitle": "Notification Preferences",
+  "notificationPreferencesSubtitle": "Choose which types of notifications you want to receive",
+  "notificationSettingsTitle": "Notification Settings",
+  "notificationCategoryPaymentTitle": "Payment Notifications",
+  "notificationCategoryPaymentSubtitle": "Rent reminders, payment confirmations",
+  "notificationCategoryBookingTitle": "Booking Updates",
+  "notificationCategoryBookingSubtitle": "Booking confirmations, status changes",
+  "notificationCategoryComplaintTitle": "Complaint Updates",
+  "notificationCategoryComplaintSubtitle": "Complaint responses, resolution updates",
+  "notificationCategoryFoodTitle": "Food Notifications",
+  "notificationCategoryFoodSubtitle": "Menu updates, special meals",
+  "notificationCategoryMaintenanceTitle": "Maintenance Alerts",
+  "notificationCategoryMaintenanceSubtitle": "Scheduled maintenance, repairs",
+  "notificationCategoryGeneralTitle": "General Announcements",
+  "notificationCategoryGeneralSubtitle": "Important updates, announcements",
+  "analyticsDashboardTitle": "Analytics Dashboard",
+  "performanceMetricsTitle": "Performance Metrics",
+  "noPerformanceMetricsAvailable": "No performance metrics available",
+  "userJourneyTitle": "User Journey",
+  "userJourneyDescription": "Track user interactions and screen flows",
+  "viewJourneyDetails": "View Journey Details",
+  "businessIntelligenceTitle": "Business Intelligence",
+  "metricTotalSessions": "Total Sessions",
+  "metricActiveUsers": "Active Users",
+  "metricConversionRate": "Conversion Rate",
+  "metricAverageSessionDuration": "Avg Session Duration",
+  "viewInsights": "View Insights",
+  "userJourneyDetailsTitle": "User Journey Details",
+  "userJourneyDetailsDescription": "Detailed user journey visualization would be implemented here with charts and flow diagrams.",
+  "businessInsightsTitle": "Business Insights",
+  "businessInsightsDescription": "Advanced business intelligence dashboard with charts, trends, and predictive analytics would be implemented here.",
+  "analyticsWidgetTitle": "Analytics",
+  "analyticsSessionsLabel": "Sessions",
+  "analyticsAverageTimeLabel": "Avg Time",
+  "networkErrorTryAgain": "Please check your internet connection and try again.",
+  "permissionDeniedMessage": "You don't have permission to perform this action.",
+  "itemNotFoundMessage": "The requested item could not be found.",
+  "requestTimeoutMessage": "The request took too long. Please try again.",
+  "sessionExpiredMessage": "Your session has expired. Please sign in again.",
+  "invalidInputMessage": "Please check your input and try again.",
+  "genericErrorMessage": "Something went wrong. Please try again.",
+  "requiredFieldError": "This field is required",
+  "invalidPhoneError": "Please enter a valid phone number",
+  "fileSizeExceeded": "File size exceeds maximum limit",
+  "workspaceTitle": "Workspace",
+  "defaultCompanyName": "Atitia PG Management",
+  "noSharingInfoAvailable": "No sharing info available.",
+  "sharingAndVacancy": "Sharing & Vacancy",
+  "sharingColumn": "Sharing",
+  "roomsColumn": "Rooms",
+  "vacantBedsColumn": "Vacant beds",
+  "rentPerBedColumn": "Rent / bed",
+  "vacantBedsAvailable": "Available",
+  "sharingPricePerBed": "{amount}/bed",
+  "@sharingPricePerBed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "anonymousGuest": "Anonymous Guest",
+  "locationLabel": "Location",
+  "staffLabel": "Staff",
+  "viewPhotos": "View Photos",
+  "helpfulWithCount": "Helpful ({count})",
+  "@helpfulWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "writeReview": "Write a Review",
+  "overallRating": "Overall Rating",
+  "aspectRatings": "Aspect Ratings",
+  "commentsLabel": "Comments",
+  "shareExperienceHint": "Share your experience...",
+  "optionalAddPhotos": "Optional: Add photos to your review",
+  "submitReview": "Submit Review",
+  "submitting": "Submitting",
+  "pleaseProvideOverallRating": "Please provide an overall rating",
+  "reviewSubmittedSuccessfully": "Review submitted successfully!",
+  "failedToSubmitReview": "Failed to submit review: {error}",
+  "@failedToSubmitReview": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ratingPoor": "Poor",
+  "ratingFair": "Fair",
+  "ratingGood": "Good",
+  "ratingVeryGood": "Very Good",
+  "ratingExcellent": "Excellent",
+  "selectRating": "Select a rating",
+  "photosCountLabel": "Photos ({count}/{max})",
+  "@photosCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "addPhotos": "Add Photos",
+  "uploadingPhotos": "Uploading photos...",
+  "errorPickingPhotos": "Error picking photos: {error}",
+  "@errorPickingPhotos": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "allPhotoUploadsFailed": "All photo uploads failed. Please try again.",
+  "failedToUploadPhotos": "Failed to upload photos: {error}",
+  "@failedToUploadPhotos": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noItemsFound": "No items found",
+  "searchHint": "Search...",
+  "lightMode": "Light Mode",
+  "darkMode": "Dark Mode",
+  "systemDefault": "System Default",
+  "themeTooltip": "Theme: {current}\nTap for {next}",
+  "@themeTooltip": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "next": {
+        "type": "String"
+      }
+    }
+  },
+  "themeModeTitle": "Theme Mode",
+  "themeLightDescription": "Always use bright theme",
+  "themeDarkDescription": "Always use dark theme",
+  "themeSystemDescription": "Follow device settings",
+  "menu": "Menu",
+  "noPgSelected": "No PG Selected",
+  "uploadingStatus": "Uploading...",
+  "documentUploadedSuccessfully": "Document uploaded successfully",
+  "tapToUpload": "Tap to upload",
+  "uploadSupportedFormats": "JPG, PNG up to 10MB",
+  "unsupportedFileType": "Unsupported file type: {type}",
+  "@unsupportedFileType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineActionCreate": "Create",
+  "offlineActionUpdate": "Update",
+  "offlineActionDelete": "Delete",
+  "offlineActionSync": "Sync",
+  "weekday_monday": "Monday",
+  "weekday_tuesday": "Tuesday",
+  "weekday_wednesday": "Wednesday",
+  "weekday_thursday": "Thursday",
+  "weekday_friday": "Friday",
+  "weekday_saturday": "Saturday",
+  "weekday_sunday": "Sunday",
+  "menuDefaultDescription": "Default menu for {day} - customize as needed",
+  "@menuDefaultDescription": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "menuBreakfast_monday": "Idli with Sambar and Coconut Chutney|Vada (2 pieces)|Filter Coffee|Banana",
+  "menuBreakfast_tuesday": "Masala Dosa with Sambar and Chutney|Medu Vada|Tea|Seasonal Fruit",
+  "menuBreakfast_wednesday": "Upma with Coconut Chutney|Vada (2 pieces)|Coffee|Boiled Eggs (2)",
+  "menuBreakfast_thursday": "Poha with Peanuts and Curry Leaves|Banana Chips|Tea|Papaya",
+  "menuBreakfast_friday": "Puri with Potato Bhaji|Halwa|Coffee|Orange",
+  "menuBreakfast_saturday": "Pesarattu (Green Gram Dosa) with Ginger Chutney|Upma|Tea|Seasonal Fruit",
+  "menuBreakfast_sunday": "Special Breakfast - Pongal with Vada|Sweet Pongal|Filter Coffee|Banana",
+  "menuLunch_monday": "Steamed Rice|Sambar|Rasam|Vegetable Curry (Beans Palya)|Curd|Papad|Buttermilk",
+  "menuLunch_tuesday": "Steamed Rice|Dal Tadka|Rasam|Cabbage Poriyal|Brinjal Curry|Curd|Pickle",
+  "menuLunch_wednesday": "Jeera Rice|Sambar|Rasam|Potato Fry|Spinach Dal|Curd|Papad",
+  "menuLunch_thursday": "Steamed Rice|Moong Dal|Rasam|Mixed Vegetable Curry|Beetroot Poriyal|Curd|Buttermilk",
+  "menuLunch_friday": "Lemon Rice|Sambar|Rasam|Okra Fry (Bhendi)|Carrot Poriyal|Curd|Pickle",
+  "menuLunch_saturday": "Steamed Rice|Toor Dal|Rasam|Pumpkin Curry|Green Beans Poriyal|Curd|Papad",
+  "menuLunch_sunday": "Special Lunch - Pulao|Sambar|Rasam|Paneer Butter Masala|Raita|Sweet (Payasam)|Papad",
+  "menuDinner_monday": "Chapati (4 pieces)|Mixed Vegetable Curry|Dal Fry|Rice|Curd",
+  "menuDinner_tuesday": "Chapati (4 pieces)|Palak Paneer|Dal Tadka|Rice|Pickle",
+  "menuDinner_wednesday": "Paratha (3 pieces)|Aloo Gobi|Moong Dal|Rice|Curd",
+  "menuDinner_thursday": "Chapati (4 pieces)|Chana Masala|Tomato Rasam|Rice|Raita",
+  "menuDinner_friday": "Puri (6 pieces)|Aloo Curry|Chana Dal|Rice|Curd",
+  "menuDinner_saturday": "Chapati (4 pieces)|Egg Curry (2 eggs)|Dal Tadka|Rice|Pickle",
+  "menuDinner_sunday": "Special Dinner - Naan (3 pieces)|Paneer Tikka Masala|Dal Makhani|Jeera Rice|Raita|Gulab Jamun (2 pieces)",
+  "menuMealTypeBreakfastDescription": "Morning meal (6:00 AM - 10:00 AM)",
+  "menuMealTypeLunchDescription": "Afternoon meal (12:00 PM - 3:00 PM)",
+  "menuMealTypeDinnerDescription": "Evening meal (7:00 PM - 10:00 PM)",
+  "menuMealTypeGeneric": "Meal",
+  "logButtonClicked": "Button clicked: {buttonName}",
+  "@logButtonClicked": {
+    "placeholders": {
+      "buttonName": {
+        "type": "String"
+      }
+    }
+  },
+  "logFormSubmitted": "Form submitted: {formName}",
+  "@logFormSubmitted": {
+    "placeholders": {
+      "formName": {
+        "type": "String"
+      }
+    }
+  },
+  "logFilterChanged": "Filter changed: {filterType}",
+  "@logFilterChanged": {
+    "placeholders": {
+      "filterType": {
+        "type": "String"
+      }
+    }
+  },
+  "logSearchPerformed": "Search performed",
+  "logScreenViewed": "Screen viewed: {screenName}",
+  "@logScreenViewed": {
+    "placeholders": {
+      "screenName": {
+        "type": "String"
+      }
+    }
+  },
+  "logDataLoading": "Data loading: {dataType}",
+  "@logDataLoading": {
+    "placeholders": {
+      "dataType": {
+        "type": "String"
+      }
+    }
+  },
+  "logErrorOperation": "Error in {operation}: {error}",
+  "@logErrorOperation": {
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "logApiResponseLabel": "RESPONSE",
+  "logAuthEventMessage": "Auth: {event}",
+  "@logAuthEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "logRoleActionMessage": "{role} action: {action}",
+  "@logRoleActionMessage": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logPgActionMessage": "PG {action}",
+  "@logPgActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logPaymentEventMessage": "Payment: {event}",
+  "@logPaymentEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "logFoodActionMessage": "Food {action}",
+  "@logFoodActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logComplaintEventMessage": "Complaint: {event}",
+  "@logComplaintEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "logGuestActionMessage": "Guest {action}",
+  "@logGuestActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logOwnerActionMessage": "Owner {action}",
+  "@logOwnerActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logMethodEntryMessage": "Entering {methodName}",
+  "@logMethodEntryMessage": {
+    "placeholders": {
+      "methodName": {
+        "type": "String"
+      }
+    }
+  },
+  "logMethodExitMessage": "Exiting {methodName}",
+  "@logMethodExitMessage": {
+    "placeholders": {
+      "methodName": {
+        "type": "String"
+      }
+    }
+  },
+  "logPerformanceMessage": "Performance: {operation} took {durationMs}ms",
+  "@logPerformanceMessage": {
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      },
+      "durationMs": {
+        "type": "int"
+      }
+    }
+  },
+  "logBusinessEventMessage": "Business event: {event}",
+  "@logBusinessEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "dateInvalidFormat": "Invalid date format. Expected {expected} but got \"{value}\"",
+  "@dateInvalidFormat": {
+    "placeholders": {
+      "expected": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dateComponentsNotNumbers": "Date components must be valid numbers: \"{value}\"",
+  "@dateComponentsNotNumbers": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dateInvalidCalendar": "Invalid calendar date: \"{value}\"",
+  "@dateInvalidCalendar": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dateEnterAsExpected": "Enter date as {expected}",
+  "@dateEnterAsExpected": {
+    "placeholders": {
+      "expected": {
+        "type": "String"
+      }
+    }
+  },
+  "dateDigitsOnly": "Date must contain only digits",
+  "dateCalendarInvalid": "Enter a valid calendar date",
+  "dateGenericInvalid": "Enter a valid date ({expected})",
+  "@dateGenericInvalid": {
+    "placeholders": {
+      "expected": {
+        "type": "String"
+      }
+    }
+  },
+  "dateDayRange": "Day must be between 1 and 31",
+  "dateMonthRange": "Month must be between 1 and 12",
+  "dateYearRange": "Year must be between {min} and {max}",
+  "@dateYearRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "credentialInvalidWebClientId": "Invalid Google Web Client ID format",
+  "credentialStoredWebClientId": "Google Web Client ID stored in secure storage",
+  "credentialStoreWebClientIdFailure": "Failed to store Google Web Client ID: {error}",
+  "@credentialStoreWebClientIdFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialInvalidAndroidClientId": "Invalid Google Android Client ID format",
+  "credentialStoredAndroidClientId": "Google Android Client ID stored in secure storage",
+  "credentialStoreAndroidClientIdFailure": "Failed to store Google Android Client ID: {error}",
+  "@credentialStoreAndroidClientIdFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialInvalidIosClientId": "Invalid Google iOS Client ID format",
+  "credentialStoredIosClientId": "Google iOS Client ID stored in secure storage",
+  "credentialStoreIosClientIdFailure": "Failed to store Google iOS Client ID: {error}",
+  "@credentialStoreIosClientIdFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialInvalidClientSecret": "Invalid Google Client Secret format",
+  "credentialStoredClientSecret": "Google Client Secret stored in secure storage",
+  "credentialStoreClientSecretFailure": "Failed to store Google Client Secret: {error}",
+  "@credentialStoreClientSecretFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialClearedAll": "All Google OAuth credentials cleared from secure storage",
+  "credentialClearFailure": "Failed to clear credentials: {error}",
+  "@credentialClearFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialCheckFailure": "Failed to check stored credentials: {error}",
+  "@credentialCheckFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securityAuthFailureDescription": "Authentication failed for user {userId}: {failureReason}",
+  "@securityAuthFailureDescription": {
+    "placeholders": {
+      "userId": {
+        "type": "String"
+      },
+      "failureReason": {
+        "type": "String"
+      }
+    }
+  },
+  "securityMultipleFailuresDetected": "Multiple failed authentication attempts detected for user {userId}",
+  "@securityMultipleFailuresDetected": {
+    "placeholders": {
+      "userId": {
+        "type": "String"
+      }
+    }
+  },
+  "securityAuthSuccessDescription": "Successful authentication for user {userId}",
+  "@securityAuthSuccessDescription": {
+    "placeholders": {
+      "userId": {
+        "type": "String"
+      }
+    }
+  },
+  "securityMultipleFailuresAlertDescription": "Multiple failed authentication attempts for user {userId}",
+  "@securityMultipleFailuresAlertDescription": {
+    "placeholders": {
+      "userId": {
+        "type": "String"
+      }
+    }
+  },
+  "securityEventConsoleLog": "Security Event: {eventType} - {description}",
+  "@securityEventConsoleLog": {
+    "placeholders": {
+      "eventType": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "securityEventSendFailure": "Failed to send security event to analytics: {error}",
+  "@securityEventSendFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securityAlertConsoleLog": "Security Alert [{severity}]: {alertType} - {description}",
+  "@securityAlertConsoleLog": {
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "alertType": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "securityAlertSendFailure": "Failed to send security alert to services: {error}",
+  "@securityAlertSendFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securitySuspiciousHeader": "Suspicious header detected: {header}",
+  "@securitySuspiciousHeader": {
+    "placeholders": {
+      "header": {
+        "type": "String"
+      }
+    }
+  },
+  "securitySuspiciousBody": "Suspicious content detected in request body",
+  "securityIpBlocked": "IP blocked: {ip}",
+  "@securityIpBlocked": {
+    "placeholders": {
+      "ip": {
+        "type": "String"
+      }
+    }
+  },
+  "securityRateLimitExceeded": "Rate limit exceeded",
+  "securityInvalidHeaders": "Invalid request headers",
+  "securityInvalidBody": "Invalid request body",
+  "securityUnsupportedMethod": "Unsupported HTTP method: {method}",
+  "@securityUnsupportedMethod": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "securityRequestFailed": "Request failed: {error}",
+  "@securityRequestFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securitySuspiciousResponseHeader": "Suspicious response header: {header}",
+  "@securitySuspiciousResponseHeader": {
+    "placeholders": {
+      "header": {
+        "type": "String"
+      }
+    }
+  },
+  "securityServerErrorResponse": "Server error response: {statusCode}",
+  "@securityServerErrorResponse": {
+    "placeholders": {
+      "statusCode": {
+        "type": "String"
+      }
+    }
+  },
+  "encryptionEncryptFailed": "Failed to encrypt data: {error}",
+  "@encryptionEncryptFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "encryptionDecryptFailed": "Failed to decrypt data: {error}",
+  "@encryptionDecryptFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "encryptionFileEncryptFailed": "Failed to encrypt file data: {error}",
+  "@encryptionFileEncryptFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "encryptionFileDecryptFailed": "Failed to decrypt file data: {error}",
+  "@encryptionFileDecryptFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securityInvalidEmailFormat": "Invalid email format",
+  "securityInvalidPhoneFormat": "Invalid phone number format",
+  "secureStorageStoreFailed": "Failed to store secure data: {error}",
+  "@secureStorageStoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveFailed": "Failed to retrieve secure data: {error}",
+  "@secureStorageRetrieveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreCredentialsFailed": "Failed to store user credentials: {error}",
+  "@secureStorageStoreCredentialsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveCredentialsFailed": "Failed to retrieve user credentials: {error}",
+  "@secureStorageRetrieveCredentialsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreAuthTokenFailed": "Failed to store auth token: {error}",
+  "@secureStorageStoreAuthTokenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveAuthTokenFailed": "Failed to retrieve auth token: {error}",
+  "@secureStorageRetrieveAuthTokenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreSessionFailed": "Failed to store user session: {error}",
+  "@secureStorageStoreSessionFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveSessionFailed": "Failed to retrieve user session: {error}",
+  "@secureStorageRetrieveSessionFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreProfileFailed": "Failed to store user profile: {error}",
+  "@secureStorageStoreProfileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveProfileFailed": "Failed to retrieve user profile: {error}",
+  "@secureStorageRetrieveProfileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreApiKeyFailed": "Failed to store API key: {error}",
+  "@secureStorageStoreApiKeyFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveApiKeyFailed": "Failed to retrieve API key: {error}",
+  "@secureStorageRetrieveApiKeyFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStorePaymentFailed": "Failed to store payment info: {error}",
+  "@secureStorageStorePaymentFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrievePaymentFailed": "Failed to retrieve payment info: {error}",
+  "@secureStorageRetrievePaymentFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreBiometricFailed": "Failed to store biometric data: {error}",
+  "@secureStorageStoreBiometricFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveBiometricFailed": "Failed to retrieve biometric data: {error}",
+  "@secureStorageRetrieveBiometricFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreDeviceSecurityFailed": "Failed to store device security data: {error}",
+  "@secureStorageStoreDeviceSecurityFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveDeviceSecurityFailed": "Failed to retrieve device security data: {error}",
+  "@secureStorageRetrieveDeviceSecurityFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageDeleteFailed": "Failed to delete secure data: {error}",
+  "@secureStorageDeleteFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageDeleteAllFailed": "Failed to delete all secure data: {error}",
+  "@secureStorageDeleteAllFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageGetKeysFailed": "Failed to get all keys: {error}",
+  "@secureStorageGetKeysFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageClearUserDataFailed": "Failed to clear user data: {error}",
+  "@secureStorageClearUserDataFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageGetStatsFailed": "Failed to get storage stats: {error}",
+  "@secureStorageGetStatsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "validationEmailRequired": "Email is required",
+  "validationInvalidEmailFormat": "Invalid email format",
+  "validationEmailInvalidAddress": "Please enter a valid email address",
+  "validationEmailTooLong": "Email address is too long",
+  "validationPhoneRequired": "Phone number is required",
+  "validationInvalidPhoneFormat": "Invalid phone number format",
+  "validationPhoneLength": "Phone number must be 10 digits",
+  "validationPhoneInvalid": "Please enter a valid Indian phone number",
+  "validationNameRequired": "Name is required",
+  "validationInvalidNameFormat": "Invalid name format",
+  "validationNameTooShort": "Name must be at least 2 characters",
+  "validationNameTooLong": "Name must be less than {max} characters",
+  "@validationNameTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationNameInvalid": "Name can only contain letters and spaces",
+  "validationPasswordRequired": "Password is required",
+  "validationInvalidPasswordFormat": "Invalid password format",
+  "validationPasswordTooShort": "Password must be at least {min} characters",
+  "@validationPasswordTooShort": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "validationPasswordTooLong": "Password is too long",
+  "validationPasswordUppercase": "Password must contain at least one uppercase letter",
+  "validationPasswordLowercase": "Password must contain at least one lowercase letter",
+  "validationPasswordDigit": "Password must contain at least one number",
+  "validationPasswordSpecial": "Password must contain at least one special character",
+  "validationPasswordStrength": "Password must include uppercase, lowercase, number, and special character",
+  "validationOtpRequired": "OTP is required",
+  "validationInvalidOtpFormat": "Invalid OTP format",
+  "validationOtpLength": "OTP must be 6 digits",
+  "validationOtpDigitsOnly": "OTP must contain only digits",
+  "validationAddressRequired": "Address is required",
+  "validationInvalidAddressFormat": "Invalid address format",
+  "validationAddressTooShort": "Address must be at least 10 characters",
+  "validationAddressTooLong": "Address must be less than 200 characters",
+  "validationAadhaarRequired": "Aadhaar number is required",
+  "validationInvalidAadhaarFormat": "Invalid Aadhaar number format",
+  "validationAadhaarLength": "Aadhaar number must be 12 digits",
+  "validationPanRequired": "PAN number is required",
+  "validationInvalidPanFormat": "Invalid PAN number format",
+  "validationPanInvalid": "Please enter a valid PAN number",
+  "validationFileRequired": "File is required",
+  "validationFileMissing": "File does not exist",
+  "validationFileSizeExceeded": "File size must be less than {max}MB",
+  "@validationFileSizeExceeded": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFileTypeNotAllowed": "File type not allowed. Allowed types: {types}",
+  "@validationFileTypeNotAllowed": {
+    "placeholders": {
+      "types": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldRequired": "This field is required",
+  "validationFieldNameRequired": "{field} is required",
+  "@validationFieldNameRequired": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationInvalidTextFormat": "Invalid text format",
+  "validationTextTooShort": "Text must be at least {min} characters",
+  "@validationTextTooShort": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "validationTextTooLong": "Text must be less than {max} characters",
+  "@validationTextTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldMinLength": "{field} must be at least {min} characters",
+  "@validationFieldMinLength": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldMaxLength": "{field} must be less than {max} characters",
+  "@validationFieldMaxLength": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldMustBeNumber": "{field} must be a valid number",
+  "@validationFieldMustBeNumber": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldMustBeGreaterThanZero": "{field} must be greater than zero",
+  "@validationFieldMustBeGreaterThanZero": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFileSizeExceededDetailed": "{fileType}File size must be less than {max}MB",
+  "@validationFileSizeExceededDetailed": {
+    "placeholders": {
+      "fileType": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationInvalidInput": "Invalid input",
+  "validationDobRequired": "Date of birth is required",
+  "validationDobFormat": "Please enter date in DD/MM/YYYY format",
+  "validationDobInvalidDate": "Invalid date format",
+  "validationDobFuture": "Date of birth cannot be in the future",
+  "validationDobMinimumAge": "You must be at least 18 years old",
+  "validationDobInvalid": "Invalid date",
+  "appExceptionDefaultMessage": "An error occurred",
+  "appExceptionDefaultRecovery": "Please try again later",
+  "appExceptionDetailsLabel": "Details",
+  "appExceptionSuggestionLabel": "💡 Suggestion",
+  "networkExceptionPrefix": "Network Error",
+  "networkExceptionMessage": "No internet connection",
+  "networkExceptionRecovery": "Check your connection and try again",
+  "authExceptionPrefix": "Auth Error",
+  "authExceptionMessage": "Authentication failed",
+  "authExceptionRecovery": "Please check your credentials and try again",
+  "dataParsingExceptionPrefix": "Parsing Error",
+  "dataParsingExceptionMessage": "Failed to parse data",
+  "dataParsingExceptionRecovery": "Please try again or contact support if the problem persists",
+  "configurationExceptionPrefix": "Config Error",
+  "configurationExceptionMessage": "Configuration error",
+  "configurationExceptionRecovery": "Please restart the app or contact support",
+  "validationExceptionPrefix": "Validation Error",
+  "validationExceptionMessage": "Validation failed for {field}",
+  "@validationExceptionMessage": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationExceptionRecovery": "Please check the entered information",
+  "imagePickerMultipleSelectionError": "Multiple image selection not available, error: {error}",
+  "@imagePickerMultipleSelectionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldDefaultName": "Field",
+  "fileTypeProfilePhoto": "Profile photo",
+  "fileTypeAadhaarDocument": "Aadhaar document",
+  "performanceReportTitle": "=== PERFORMANCE REPORT ===",
+  "performanceReportGenerated": "Generated: {timestamp}",
+  "@performanceReportGenerated": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportOperation": "Operation: {operation}",
+  "@performanceReportOperation": {
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportCount": "  Count: {count}",
+  "@performanceReportCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportMin": "  Min: {value}",
+  "@performanceReportMin": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportMax": "  Max: {value}",
+  "@performanceReportMax": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportAverage": "  Average: {value}",
+  "@performanceReportAverage": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportMedian": "  Median: {value}",
+  "@performanceReportMedian": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "guestPgStartingLoad": "Starting to load PGs",
+  "guestPgLoadSuccess": "PGs loaded successfully",
+  "guestPgLoadFailure": "Failed to load PGs",
+  "guestPgRefreshAction": "Refresh PGs",
+  "guestPgSelectedAction": "PG Selected",
+  "guestPgClearSelectionAction": "Clear Selected PG",
+  "guestPgSearchQueryChangedAction": "Search Query Changed",
+  "failedToFetchPgDetails": "Failed to load PG details: {error}",
+  "@failedToFetchPgDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSavePg": "Failed to save PG: {error}",
+  "@failedToSavePg": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToDeletePg": "Failed to delete PG: {error}",
+  "@failedToDeletePg": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUploadPgPhoto": "Failed to upload PG photo: {error}",
+  "@failedToUploadPgPhoto": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSearchPgs": "Failed to search PGs: {error}",
+  "@failedToSearchPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchOwnerPgs": "Failed to fetch owner PGs: {error}",
+  "@failedToFetchOwnerPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchCityPgs": "Failed to fetch city PGs: {error}",
+  "@failedToFetchCityPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchAmenityPgs": "Failed to fetch amenity PGs: {error}",
+  "@failedToFetchAmenityPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToGetPgStats": "Failed to get PG stats: {error}",
+  "@failedToGetPgStats": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditSaveFailed": "Failed to save menu: {error}",
+  "@ownerMenuEditSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditLogTotalItems": "   - Total items: {count}",
+  "@ownerMenuEditLogTotalItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerMenuEditLogUpdateSuccess": "✅ Menu updated successfully!",
+  "ownerMenuEditLogCreateSuccess": "✅ Menu created successfully!",
+  "ownerMenuEditImagePickError": "Failed to pick image: {error}",
+  "@ownerMenuEditImagePickError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerSettingsBuildNumberValue": "1",
+  "ownerSettingsAppVersionValue": "1.0.0",
+  "ownerOverviewPerformanceNeedsAttention": "Needs attention",
+  "ownerOverviewOwnerFallback": "Owner"
 }

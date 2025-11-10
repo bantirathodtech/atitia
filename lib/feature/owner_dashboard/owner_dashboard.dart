@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 import '../../common/styles/colors.dart';
 import '../../common/utils/logging/logging_helper.dart';
+import '../../l10n/app_localizations.dart';
 import '../auth/logic/auth_provider.dart';
 import 'shared/viewmodel/selected_pg_provider.dart';
 import 'shared/widgets/owner_payment_notifications_badge.dart';
@@ -120,32 +121,43 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
       ),
 
       // Bottom navigation bar with theme support
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Theme.of(context).primaryColor,
-        selectedItemColor: AppColors.textOnPrimary, // White when selected
-        unselectedItemColor: AppColors.textOnPrimary.withValues(
-          alpha: 0.7,
-        ), // Semi-transparent white
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: "Overview",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu),
-            label: "Food",
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "PGs"),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: "Guests"),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.person),
-          //   label: "Profile",
-          // ), // REMOVED - Profile tab removed from bottom nav
-        ],
+      bottomNavigationBar: Builder(
+        builder: (context) {
+          final loc = AppLocalizations.of(context);
+          return BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onTabTapped,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Theme.of(context).primaryColor,
+            selectedItemColor: AppColors.textOnPrimary, // White when selected
+            unselectedItemColor: AppColors.textOnPrimary.withValues(
+              alpha: 0.7,
+            ), // Semi-transparent white
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+            items: [
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.dashboard),
+                label: loc?.overview ?? "Overview",
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.restaurant_menu),
+                label: loc?.food ?? "Food",
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.home),
+                label: loc?.pgs ?? "PGs",
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.people),
+                label: loc?.guests ?? "Guests",
+              ),
+              // BottomNavigationBarItem(
+              //   icon: Icon(Icons.person),
+              //   label: "Profile",
+              // ), // REMOVED - Profile tab removed from bottom nav
+            ],
+          );
+        },
       ),
     );
   }

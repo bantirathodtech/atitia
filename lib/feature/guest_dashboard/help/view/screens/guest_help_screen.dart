@@ -17,6 +17,7 @@ import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 
 /// Help and support screen for guests
@@ -25,9 +26,10 @@ class GuestHelpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: const AdaptiveAppBar(
-        title: 'Help & Support',
+      appBar: AdaptiveAppBar(
+        title: loc.guestHelpTitle,
       ),
       drawer: const GuestDrawer(),
       body: SingleChildScrollView(
@@ -49,23 +51,23 @@ class GuestHelpScreen extends StatelessWidget {
   }
 
   Widget _buildQuickHelpSection(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingMedium(text: 'Quick Help'),
+          HeadingMedium(text: loc.guestHelpQuickHelp),
           const SizedBox(height: AppSpacing.paddingM),
           BodyText(
-            text:
-                'Get instant answers to common questions about booking and managing your PG stay.',
+            text: loc.guestHelpHeroSubtitle,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildHelpItem(
             context,
             icon: Icons.video_library,
-            title: 'Video Tutorials',
-            subtitle: 'Watch step-by-step guides',
+            title: loc.guestHelpVideosTitle,
+            subtitle: loc.guestHelpVideosSubtitle,
             onTap: () async {
               // Open video tutorials URL
               final Uri url = Uri.parse('https://www.youtube.com/@atitia');
@@ -74,8 +76,8 @@ class GuestHelpScreen extends StatelessWidget {
               } else {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Unable to open video tutorials'),
+                    SnackBar(
+                      content: Text(loc.guestHelpUnableToOpenVideos),
                     ),
                   );
                 }
@@ -86,8 +88,8 @@ class GuestHelpScreen extends StatelessWidget {
           _buildHelpItem(
             context,
             icon: Icons.article,
-            title: 'Documentation',
-            subtitle: 'Read comprehensive guides',
+            title: loc.guestHelpDocsTitle,
+            subtitle: loc.guestHelpDocsSubtitle,
             onTap: () async {
               // Open documentation URL
               final Uri url = Uri.parse('https://docs.atitia.com');
@@ -96,8 +98,8 @@ class GuestHelpScreen extends StatelessWidget {
               } else {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Unable to open documentation'),
+                    SnackBar(
+                      content: Text(loc.guestHelpUnableToOpenDocs),
                     ),
                   );
                 }
@@ -110,38 +112,34 @@ class GuestHelpScreen extends StatelessWidget {
   }
 
   Widget _buildFaqSection(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final faqs = [
       {
-        'question': 'How do I book a PG room?',
-        'answer':
-            'Browse available PGs in the "PGs" tab, select a PG, and click "Book Now" to submit a booking request.',
+        'question': loc.guestHelpFaqBookQuestion,
+        'answer': loc.guestHelpFaqBookAnswer,
       },
       {
-        'question': 'How do I view my booking status?',
-        'answer':
-            'Go to the "Requests" tab to see all your booking requests and their current status.',
+        'question': loc.guestHelpFaqStatusQuestion,
+        'answer': loc.guestHelpFaqStatusAnswer,
       },
       {
-        'question': 'How do I make a payment?',
-        'answer':
-            'Navigate to the "Payments" tab to view your payment history and make new payments.',
+        'question': loc.guestHelpFaqPaymentQuestion,
+        'answer': loc.guestHelpFaqPaymentAnswer,
       },
       {
-        'question': 'How do I update my profile?',
-        'answer':
-            'Open the drawer menu and tap on "My Profile" to update your personal information.',
+        'question': loc.guestHelpFaqProfileQuestion,
+        'answer': loc.guestHelpFaqProfileAnswer,
       },
       {
-        'question': 'How do I file a complaint?',
-        'answer':
-            'Go to the "Complaints" tab and click "Add Complaint" to submit a new complaint.',
+        'question': loc.guestHelpFaqComplaintQuestion,
+        'answer': loc.guestHelpFaqComplaintAnswer,
       },
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HeadingMedium(text: 'Frequently Asked Questions'),
+        HeadingMedium(text: loc.guestHelpFaqTitle),
         const SizedBox(height: AppSpacing.paddingM),
         ...faqs.map((faq) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
@@ -173,21 +171,22 @@ class GuestHelpScreen extends StatelessWidget {
   }
 
   Widget _buildContactSection(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingMedium(text: 'Contact Support'),
+          HeadingMedium(text: loc.guestHelpContactTitle),
           const SizedBox(height: AppSpacing.paddingM),
           BodyText(
-            text: 'Need more help? Reach out to our support team.',
+            text: loc.guestHelpContactSubtitle,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildContactItem(
             context,
             icon: Icons.email,
-            title: 'Email Support',
+            title: loc.guestHelpEmailTitle,
             subtitle: 'support@atitia.com',
             onTap: () async {
               final Uri emailUri = Uri(
@@ -204,7 +203,7 @@ class GuestHelpScreen extends StatelessWidget {
           _buildContactItem(
             context,
             icon: Icons.phone,
-            title: 'Phone Support',
+            title: loc.guestHelpPhoneTitle,
             subtitle: '+91 1234567890',
             onTap: () async {
               final Uri phoneUri = Uri(scheme: 'tel', path: '+911234567890');
@@ -217,8 +216,8 @@ class GuestHelpScreen extends StatelessWidget {
           _buildContactItem(
             context,
             icon: Icons.chat,
-            title: 'Live Chat',
-            subtitle: 'WhatsApp: +91 7020797849',
+            title: loc.guestHelpChatTitle,
+            subtitle: loc.guestHelpChatSubtitle,
             onTap: () async {
               // Try WhatsApp first
               final Uri whatsappUrl = Uri.parse('https://wa.me/917020797849');
@@ -242,8 +241,8 @@ class GuestHelpScreen extends StatelessWidget {
                 } else {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Unable to open chat. Please try WhatsApp: +91 7020797849'),
+                      SnackBar(
+                        content: Text(loc.guestHelpUnableToOpenChat),
                       ),
                     );
                   }
@@ -257,15 +256,16 @@ class GuestHelpScreen extends StatelessWidget {
   }
 
   Widget _buildResourcesSection(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingMedium(text: 'Resources'),
+          HeadingMedium(text: loc.guestHelpResourcesTitle),
           const SizedBox(height: AppSpacing.paddingM),
           SecondaryButton(
-            label: 'Privacy Policy',
+            label: loc.guestHelpPrivacyPolicy,
             icon: Icons.privacy_tip,
             onPressed: () {
               context.push(AppRoutes.privacyPolicy);
@@ -273,7 +273,7 @@ class GuestHelpScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.paddingS),
           SecondaryButton(
-            label: 'Terms of Service',
+            label: loc.guestHelpTermsOfService,
             icon: Icons.description,
             onPressed: () {
               context.push(AppRoutes.termsOfService);

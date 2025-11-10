@@ -28,6 +28,7 @@ import '../loaders/adaptive_loader.dart';
 import '../text/body_text.dart';
 import '../text/caption_text.dart';
 import '../text/heading_small.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Beautiful upload card for document/photo uploads
 /// Shows preview, upload progress, and status
@@ -61,6 +62,7 @@ class UploadCard extends AdaptiveStatelessWidget {
     final accent = accentColor ?? theme.primaryColor;
     final hasImage =
         (imageUrl != null && imageUrl!.isNotEmpty) || imageFile != null;
+    final loc = AppLocalizations.of(context);
 
     return Card(
       elevation: hasImage ? 4 : 2,
@@ -150,7 +152,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                       const AdaptiveLoader(),
                       const SizedBox(height: AppSpacing.sm),
                       BodyText(
-                        text: 'Uploading...',
+                        text: loc?.uploadingStatus ?? 'Uploading...',
                         color: accent,
                       ),
                       const SizedBox(height: AppSpacing.xs),
@@ -177,7 +179,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                       // URL: Use AdaptiveImage (network)
                       // =======================================================
                       imageFile != null
-                          ? _buildImagePreview(imageFile!)
+                          ? _buildImagePreview(context, imageFile!)
                           : imageUrl != null
                               ? SizedBox(
                                   width: double.infinity,
@@ -227,7 +229,8 @@ class UploadCard extends AdaptiveStatelessWidget {
                           size: 16, color: AppColors.success),
                       const SizedBox(width: 4),
                       CaptionText(
-                        text: 'Document uploaded successfully',
+                        text: loc?.documentUploadedSuccessfully ??
+                            'Document uploaded successfully',
                         color: AppColors.success,
                       ),
                     ],
@@ -256,12 +259,13 @@ class UploadCard extends AdaptiveStatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       BodyText(
-                        text: 'Tap to upload',
+                        text: loc?.tapToUpload ?? 'Tap to upload',
                         color: theme.textTheme.bodyMedium?.color,
                       ),
                       const SizedBox(height: AppSpacing.xs),
-                      const CaptionText(
-                        text: 'JPG, PNG up to 10MB',
+                      CaptionText(
+                        text: loc?.uploadSupportedFormats ??
+                            'JPG, PNG up to 10MB',
                       ),
                     ],
                   ),
@@ -279,7 +283,8 @@ class UploadCard extends AdaptiveStatelessWidget {
   // ==========================================================================
   // Handles both File (mobile) and XFile (web) for image display
   // ==========================================================================
-  Widget _buildImagePreview(dynamic file) {
+  Widget _buildImagePreview(BuildContext context, dynamic file) {
+    final loc = AppLocalizations.of(context);
     if (file is XFile) {
       // Web: XFile - read as bytes and display with Image.memory()
       return FutureBuilder<List<int>>(
@@ -326,7 +331,8 @@ class UploadCard extends AdaptiveStatelessWidget {
         color: AppColors.errorContainer,
         child: Center(
           child: Text(
-            'Unsupported file type: ${file.runtimeType}',
+            loc?.unsupportedFileType('${file.runtimeType}') ??
+                'Unsupported file type: ${file.runtimeType}',
             style: TextStyle(color: AppColors.error),
           ),
         ),

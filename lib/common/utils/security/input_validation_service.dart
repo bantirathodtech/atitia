@@ -2,6 +2,8 @@
 
 import 'dart:io';
 
+import '../../../../core/services/localization/internationalization_service.dart';
+
 /// Comprehensive input validation and sanitization service
 /// Provides security-focused validation for all user inputs
 class InputValidationService {
@@ -10,24 +12,56 @@ class InputValidationService {
   factory InputValidationService() => _instance;
   InputValidationService._internal();
 
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _message(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
+  ValidationResult _invalid(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) =>
+      ValidationResult.invalid(
+        _message(key, fallback, parameters: parameters),
+      );
+
   /// Validate and sanitize email input
   ValidationResult validateEmail(String? email) {
     if (email == null || email.trim().isEmpty) {
-      return ValidationResult.invalid('Email is required');
+      return _invalid('validationEmailRequired', 'Email is required');
     }
 
     final sanitizedEmail = _sanitizeInput(email.trim());
 
     if (_isSuspiciousInput(sanitizedEmail)) {
-      return ValidationResult.invalid('Invalid email format');
+      return _invalid('validationInvalidEmailFormat', 'Invalid email format');
     }
 
     if (!_isValidEmail(sanitizedEmail)) {
-      return ValidationResult.invalid('Please enter a valid email address');
+      return _invalid('validationEmailInvalidAddress',
+          'Please enter a valid email address');
     }
 
     if (sanitizedEmail.length > 254) {
-      return ValidationResult.invalid('Email address is too long');
+      return _invalid(
+        'validationEmailTooLong',
+        'Email address is too long',
+      );
     }
 
     return ValidationResult.valid(sanitizedEmail);
@@ -36,24 +70,32 @@ class InputValidationService {
   /// Validate and sanitize phone number input
   ValidationResult validatePhone(String? phone) {
     if (phone == null || phone.trim().isEmpty) {
-      return ValidationResult.invalid('Phone number is required');
+      return _invalid('validationPhoneRequired', 'Phone number is required');
     }
 
     final sanitizedPhone = _sanitizeInput(phone.trim());
 
     if (_isSuspiciousInput(sanitizedPhone)) {
-      return ValidationResult.invalid('Invalid phone number format');
+      return _invalid(
+        'validationInvalidPhoneFormat',
+        'Invalid phone number format',
+      );
     }
 
     final digitsOnly = sanitizedPhone.replaceAll(RegExp(r'[^0-9]'), '');
 
     if (digitsOnly.length != 10) {
-      return ValidationResult.invalid('Phone number must be 10 digits');
+      return _invalid(
+        'validationPhoneLength',
+        'Phone number must be 10 digits',
+      );
     }
 
     if (!_isValidPhone(digitsOnly)) {
-      return ValidationResult.invalid(
-          'Please enter a valid Indian phone number');
+      return _invalid(
+        'validationPhoneInvalid',
+        'Please enter a valid Indian phone number',
+      );
     }
 
     return ValidationResult.valid(digitsOnly);
@@ -62,26 +104,34 @@ class InputValidationService {
   /// Validate and sanitize name input
   ValidationResult validateName(String? name) {
     if (name == null || name.trim().isEmpty) {
-      return ValidationResult.invalid('Name is required');
+      return _invalid('validationNameRequired', 'Name is required');
     }
 
     final sanitizedName = _sanitizeInput(name.trim());
 
     if (_isSuspiciousInput(sanitizedName)) {
-      return ValidationResult.invalid('Invalid name format');
+      return _invalid('validationInvalidNameFormat', 'Invalid name format');
     }
 
     if (sanitizedName.length < 2) {
-      return ValidationResult.invalid('Name must be at least 2 characters');
+      return _invalid(
+        'validationNameTooShort',
+        'Name must be at least 2 characters',
+      );
     }
 
     if (sanitizedName.length > 50) {
-      return ValidationResult.invalid('Name must be less than 50 characters');
+      return _invalid(
+        'validationNameTooLong',
+        'Name must be less than 50 characters',
+      );
     }
 
     if (!_isValidName(sanitizedName)) {
-      return ValidationResult.invalid(
-          'Name can only contain letters and spaces');
+      return _invalid(
+        'validationNameInvalid',
+        'Name can only contain letters and spaces',
+      );
     }
 
     return ValidationResult.valid(sanitizedName);
@@ -90,39 +140,56 @@ class InputValidationService {
   /// Validate and sanitize password input
   ValidationResult validatePassword(String? password) {
     if (password == null || password.isEmpty) {
-      return ValidationResult.invalid('Password is required');
+      return _invalid('validationPasswordRequired', 'Password is required');
     }
 
     if (_isSuspiciousInput(password)) {
-      return ValidationResult.invalid('Invalid password format');
+      return _invalid(
+        'validationInvalidPasswordFormat',
+        'Invalid password format',
+      );
     }
 
     if (password.length < 8) {
-      return ValidationResult.invalid('Password must be at least 8 characters');
+      return _invalid(
+        'validationPasswordTooShort',
+        'Password must be at least 8 characters',
+      );
     }
 
     if (password.length > 128) {
-      return ValidationResult.invalid('Password is too long');
+      return _invalid(
+        'validationPasswordTooLong',
+        'Password is too long',
+      );
     }
 
     if (!_hasUpperCase(password)) {
-      return ValidationResult.invalid(
-          'Password must contain at least one uppercase letter');
+      return _invalid(
+        'validationPasswordUppercase',
+        'Password must contain at least one uppercase letter',
+      );
     }
 
     if (!_hasLowerCase(password)) {
-      return ValidationResult.invalid(
-          'Password must contain at least one lowercase letter');
+      return _invalid(
+        'validationPasswordLowercase',
+        'Password must contain at least one lowercase letter',
+      );
     }
 
     if (!_hasDigit(password)) {
-      return ValidationResult.invalid(
-          'Password must contain at least one number');
+      return _invalid(
+        'validationPasswordDigit',
+        'Password must contain at least one number',
+      );
     }
 
     if (!_hasSpecialChar(password)) {
-      return ValidationResult.invalid(
-          'Password must contain at least one special character');
+      return _invalid(
+        'validationPasswordSpecial',
+        'Password must contain at least one special character',
+      );
     }
 
     return ValidationResult.valid(password);
@@ -131,21 +198,27 @@ class InputValidationService {
   /// Validate and sanitize OTP input
   ValidationResult validateOTP(String? otp) {
     if (otp == null || otp.trim().isEmpty) {
-      return ValidationResult.invalid('OTP is required');
+      return _invalid('validationOtpRequired', 'OTP is required');
     }
 
     final sanitizedOTP = _sanitizeInput(otp.trim());
 
     if (_isSuspiciousInput(sanitizedOTP)) {
-      return ValidationResult.invalid('Invalid OTP format');
+      return _invalid('validationInvalidOtpFormat', 'Invalid OTP format');
     }
 
     if (sanitizedOTP.length != 6) {
-      return ValidationResult.invalid('OTP must be 6 digits');
+      return _invalid(
+        'validationOtpLength',
+        'OTP must be 6 digits',
+      );
     }
 
     if (!_isNumeric(sanitizedOTP)) {
-      return ValidationResult.invalid('OTP must contain only digits');
+      return _invalid(
+        'validationOtpDigitsOnly',
+        'OTP must contain only digits',
+      );
     }
 
     return ValidationResult.valid(sanitizedOTP);
@@ -154,22 +227,30 @@ class InputValidationService {
   /// Validate and sanitize address input
   ValidationResult validateAddress(String? address) {
     if (address == null || address.trim().isEmpty) {
-      return ValidationResult.invalid('Address is required');
+      return _invalid('validationAddressRequired', 'Address is required');
     }
 
     final sanitizedAddress = _sanitizeInput(address.trim());
 
     if (_isSuspiciousInput(sanitizedAddress)) {
-      return ValidationResult.invalid('Invalid address format');
+      return _invalid(
+        'validationInvalidAddressFormat',
+        'Invalid address format',
+      );
     }
 
     if (sanitizedAddress.length < 10) {
-      return ValidationResult.invalid('Address must be at least 10 characters');
+      return _invalid(
+        'validationAddressTooShort',
+        'Address must be at least 10 characters',
+      );
     }
 
     if (sanitizedAddress.length > 200) {
-      return ValidationResult.invalid(
-          'Address must be less than 200 characters');
+      return _invalid(
+        'validationAddressTooLong',
+        'Address must be less than 200 characters',
+      );
     }
 
     return ValidationResult.valid(sanitizedAddress);
@@ -178,19 +259,28 @@ class InputValidationService {
   /// Validate and sanitize Aadhaar number input
   ValidationResult validateAadhaar(String? aadhaar) {
     if (aadhaar == null || aadhaar.trim().isEmpty) {
-      return ValidationResult.invalid('Aadhaar number is required');
+      return _invalid(
+        'validationAadhaarRequired',
+        'Aadhaar number is required',
+      );
     }
 
     final sanitizedAadhaar = _sanitizeInput(aadhaar.trim());
 
     if (_isSuspiciousInput(sanitizedAadhaar)) {
-      return ValidationResult.invalid('Invalid Aadhaar number format');
+      return _invalid(
+        'validationInvalidAadhaarFormat',
+        'Invalid Aadhaar number format',
+      );
     }
 
     final digitsOnly = sanitizedAadhaar.replaceAll(RegExp(r'[^0-9]'), '');
 
     if (digitsOnly.length != 12) {
-      return ValidationResult.invalid('Aadhaar number must be 12 digits');
+      return _invalid(
+        'validationAadhaarLength',
+        'Aadhaar number must be 12 digits',
+      );
     }
 
     return ValidationResult.valid(digitsOnly);
@@ -199,17 +289,23 @@ class InputValidationService {
   /// Validate and sanitize PAN number input
   ValidationResult validatePAN(String? pan) {
     if (pan == null || pan.trim().isEmpty) {
-      return ValidationResult.invalid('PAN number is required');
+      return _invalid('validationPanRequired', 'PAN number is required');
     }
 
     final sanitizedPAN = _sanitizeInput(pan.trim().toUpperCase());
 
     if (_isSuspiciousInput(sanitizedPAN)) {
-      return ValidationResult.invalid('Invalid PAN number format');
+      return _invalid(
+        'validationInvalidPanFormat',
+        'Invalid PAN number format',
+      );
     }
 
     if (!_isValidPAN(sanitizedPAN)) {
-      return ValidationResult.invalid('Please enter a valid PAN number');
+      return _invalid(
+        'validationPanInvalid',
+        'Please enter a valid PAN number',
+      );
     }
 
     return ValidationResult.valid(sanitizedPAN);
@@ -219,26 +315,32 @@ class InputValidationService {
   ValidationResult validateFile(File? file,
       {int maxSizeInMB = 10, List<String>? allowedExtensions}) {
     if (file == null) {
-      return ValidationResult.invalid('File is required');
+      return _invalid('validationFileRequired', 'File is required');
     }
 
     if (!file.existsSync()) {
-      return ValidationResult.invalid('File does not exist');
+      return _invalid('validationFileMissing', 'File does not exist');
     }
 
     final fileSizeInBytes = file.lengthSync();
     final fileSizeInMB = fileSizeInBytes / (1024 * 1024);
 
     if (fileSizeInMB > maxSizeInMB) {
-      return ValidationResult.invalid(
-          'File size must be less than ${maxSizeInMB}MB');
+      return _invalid(
+        'validationFileSizeExceeded',
+        'File size must be less than {max}MB',
+        parameters: {'max': maxSizeInMB.toString()},
+      );
     }
 
     if (allowedExtensions != null) {
       final extension = file.path.split('.').last.toLowerCase();
       if (!allowedExtensions.contains(extension)) {
-        return ValidationResult.invalid(
-            'File type not allowed. Allowed types: ${allowedExtensions.join(', ')}');
+        return _invalid(
+          'validationFileTypeNotAllowed',
+          'File type not allowed. Allowed types: {types}',
+          parameters: {'types': allowedExtensions.join(', ')},
+        );
       }
     }
 
@@ -252,23 +354,32 @@ class InputValidationService {
       if (allowEmpty) {
         return ValidationResult.valid('');
       }
-      return ValidationResult.invalid('This field is required');
+      return _invalid('validationFieldRequired', 'This field is required');
     }
 
     if (_isSuspiciousInput(text.trim())) {
-      return ValidationResult.invalid('Invalid text format');
+      return _invalid(
+        'validationInvalidTextFormat',
+        'Invalid text format',
+      );
     }
 
     final sanitizedText = _sanitizeInput(text.trim());
 
     if (minLength != null && sanitizedText.length < minLength) {
-      return ValidationResult.invalid(
-          'Text must be at least $minLength characters');
+      return _invalid(
+        'validationTextTooShort',
+        'Text must be at least {min} characters',
+        parameters: {'min': minLength.toString()},
+      );
     }
 
     if (maxLength != null && sanitizedText.length > maxLength) {
-      return ValidationResult.invalid(
-          'Text must be less than $maxLength characters');
+      return _invalid(
+        'validationTextTooLong',
+        'Text must be less than {max} characters',
+        parameters: {'max': maxLength.toString()},
+      );
     }
 
     return ValidationResult.valid(sanitizedText);
@@ -378,7 +489,13 @@ class ValidationResult {
   /// Get the sanitized value or throw error
   String get value {
     if (!isValid) {
-      throw ValidationException(errorMessage ?? 'Invalid input');
+      throw ValidationException(
+        errorMessage ??
+            _translate(
+              'validationInvalidInput',
+              'Invalid input',
+            ),
+      );
     }
     return sanitizedValue ?? '';
   }
@@ -389,6 +506,23 @@ class ValidationResult {
   /// Get the sanitized value or return default value
   String getValueOrDefault(String defaultValue) =>
       sanitizedValue ?? defaultValue;
+
+  static String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = InternationalizationService.instance
+        .translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 }
 
 /// Custom exception for validation errors

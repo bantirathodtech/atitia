@@ -6,6 +6,7 @@ import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/interfaces/storage/storage_service_interface.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../models/owner_profile_model.dart';
 
 /// Repository for Owner Profile Firestore and Storage operations
@@ -16,6 +17,24 @@ class OwnerProfileRepository {
   final IDatabaseService _databaseService;
   final IStorageService _storageService;
   final IAnalyticsService _analyticsService;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
@@ -58,7 +77,10 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId, 'error': e.toString()},
       );
       throw AppException(
-        message: 'Failed to fetch owner profile',
+        message: _text(
+          'ownerProfileLoadFailed',
+          'Failed to load profile',
+        ),
         details: e.toString(),
       );
     }
@@ -84,7 +106,10 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId, 'error': e.toString()},
       );
       throw AppException(
-        message: 'Failed to stream owner profile',
+        message: _text(
+          'ownerProfileStreamFailed',
+          'Failed to stream profile',
+        ),
         details: e.toString(),
       );
     }
@@ -117,7 +142,10 @@ class OwnerProfileRepository {
         parameters: {'owner_id': profile.ownerId, 'error': e.toString()},
       );
       throw AppException(
-        message: 'Failed to create owner profile',
+        message: _text(
+          'ownerProfileCreateFailed',
+          'Failed to create profile',
+        ),
         details: e.toString(),
       );
     }
@@ -156,7 +184,10 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId, 'error': e.toString()},
       );
       throw AppException(
-        message: 'Failed to update owner profile',
+        message: _text(
+          'ownerProfileUpdateFailed',
+          'Failed to update profile',
+        ),
         details: e.toString(),
       );
     }
@@ -177,7 +208,10 @@ class OwnerProfileRepository {
       );
     } catch (e) {
       throw AppException(
-        message: 'Failed to update profile photo',
+        message: _text(
+          'ownerProfilePhotoUpdateFailed',
+          'Failed to update profile photo',
+        ),
         details: e.toString(),
       );
     }
@@ -198,7 +232,10 @@ class OwnerProfileRepository {
       );
     } catch (e) {
       throw AppException(
-        message: 'Failed to update Aadhaar photo',
+        message: _text(
+          'ownerAadhaarUpdateFailed',
+          'Failed to update Aadhaar photo',
+        ),
         details: e.toString(),
       );
     }
@@ -222,7 +259,10 @@ class OwnerProfileRepository {
       );
     } catch (e) {
       throw AppException(
-        message: 'Failed to update UPI QR code',
+        message: _text(
+          'ownerUpiQrUpdateFailed',
+          'Failed to update UPI QR code',
+        ),
         details: e.toString(),
       );
     }
@@ -249,7 +289,10 @@ class OwnerProfileRepository {
       );
     } catch (e) {
       throw AppException(
-        message: 'Failed to update bank details',
+        message: _text(
+          'ownerBankDetailsUpdateFailed',
+          'Failed to update bank details',
+        ),
         details: e.toString(),
       );
     }
@@ -275,7 +318,10 @@ class OwnerProfileRepository {
       );
     } catch (e) {
       throw AppException(
-        message: 'Failed to update business information',
+        message: _text(
+          'ownerBusinessInfoUpdateFailed',
+          'Failed to update business information',
+        ),
         details: e.toString(),
       );
     }
@@ -312,7 +358,10 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId, 'error': e.toString()},
       );
       throw AppException(
-        message: 'Failed to upload profile photo',
+        message: _text(
+          'ownerProfilePhotoUploadFailed',
+          'Failed to upload profile photo',
+        ),
         details: e.toString(),
       );
     }
@@ -349,7 +398,10 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId, 'error': e.toString()},
       );
       throw AppException(
-        message: 'Failed to upload Aadhaar document',
+        message: _text(
+          'ownerAadhaarUploadFailed',
+          'Failed to upload Aadhaar document',
+        ),
         details: e.toString(),
       );
     }
@@ -386,7 +438,10 @@ class OwnerProfileRepository {
         parameters: {'owner_id': ownerId, 'error': e.toString()},
       );
       throw AppException(
-        message: 'Failed to upload UPI QR code',
+        message: _text(
+          'ownerUpiQrUploadFailed',
+          'Failed to upload UPI QR code',
+        ),
         details: e.toString(),
       );
     }
@@ -398,7 +453,7 @@ class OwnerProfileRepository {
       await _storageService.deleteFile(filePath);
     } catch (e) {
       throw AppException(
-        message: 'Failed to delete file',
+        message: _text('ownerFileDeleteFailed', 'Failed to delete file'),
         details: e.toString(),
       );
     }
@@ -411,7 +466,10 @@ class OwnerProfileRepository {
       return profile?.pgIds ?? [];
     } catch (e) {
       throw AppException(
-        message: 'Failed to fetch owner PG IDs',
+        message: _text(
+          'ownerPgFetchFailed',
+          'Failed to fetch owner PG IDs',
+        ),
         details: e.toString(),
       );
     }
@@ -432,7 +490,7 @@ class OwnerProfileRepository {
       }
     } catch (e) {
       throw AppException(
-        message: 'Failed to add PG to owner',
+        message: _text('ownerAddPgFailed', 'Failed to add PG'),
         details: e.toString(),
       );
     }
@@ -453,7 +511,7 @@ class OwnerProfileRepository {
       }
     } catch (e) {
       throw AppException(
-        message: 'Failed to remove PG from owner',
+        message: _text('ownerRemovePgFailed', 'Failed to remove PG'),
         details: e.toString(),
       );
     }
@@ -470,7 +528,10 @@ class OwnerProfileRepository {
       await updateOwnerProfile(ownerId, {'isVerified': true});
     } catch (e) {
       throw AppException(
-        message: 'Failed to verify owner profile',
+        message: _text(
+          'ownerProfileVerifyFailed',
+          'Failed to verify profile',
+        ),
         details: e.toString(),
       );
     }
@@ -487,7 +548,10 @@ class OwnerProfileRepository {
       await updateOwnerProfile(ownerId, {'isActive': false});
     } catch (e) {
       throw AppException(
-        message: 'Failed to deactivate owner profile',
+        message: _text(
+          'ownerProfileDeactivateFailed',
+          'Failed to deactivate profile',
+        ),
         details: e.toString(),
       );
     }
@@ -504,7 +568,10 @@ class OwnerProfileRepository {
       await updateOwnerProfile(ownerId, {'isActive': true});
     } catch (e) {
       throw AppException(
-        message: 'Failed to activate owner profile',
+        message: _text(
+          'ownerProfileActivateFailed',
+          'Failed to activate profile',
+        ),
         details: e.toString(),
       );
     }

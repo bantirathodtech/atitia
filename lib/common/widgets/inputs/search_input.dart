@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../lifecycle/stateful/adaptive_stateful_widget.dart';
 import '../../styles/colors.dart';
 import '../../styles/spacing.dart';
@@ -8,14 +9,14 @@ import '../../styles/typography.dart';
 class SearchInput extends AdaptiveStatefulWidget {
   final TextEditingController? controller;
   final ValueChanged<String> onChanged;
-  final String hint;
+  final String? hint;
   final VoidCallback? onClear;
 
   const SearchInput({
     super.key,
     this.controller,
     required this.onChanged,
-    this.hint = 'Search...',
+    this.hint,
     this.onClear,
   });
 
@@ -61,7 +62,9 @@ class SearchInputState extends AdaptiveStatefulWidgetState<SearchInput> {
       onChanged: widget.onChanged,
       style: AppTypography.input,
       decoration: InputDecoration(
-        hintText: widget.hint,
+        hintText: widget.hint ??
+            AppLocalizations.of(context)?.searchHint ??
+            'Search...',
         prefixIcon: const Icon(Icons.search),
         suffixIcon: _controller.text.isNotEmpty
             ? IconButton(

@@ -1,11 +1,30 @@
 // lib/common/utils/logging/logging_mixin.dart
 
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../../../../core/services/logging/app_logger.dart';
 
 /// Mixin to add logging capabilities to any class
 /// Provides convenient methods for common logging patterns
 mixin LoggingMixin {
   AppLogger get _logger => AppLogger.instance;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Log debug information
   void logDebug(
@@ -111,8 +130,14 @@ mixin LoggingMixin {
     Map<String, dynamic>? parameters,
     String? feature,
   }) {
+    final message = _translate(
+      'logMethodEntryMessage',
+      'Entering {methodName}',
+      parameters: {'methodName': methodName},
+    );
+
     _logger.debug(
-      'Entering $methodName',
+      message,
       action: 'method_entry',
       metadata: parameters,
       feature: feature,
@@ -125,8 +150,14 @@ mixin LoggingMixin {
     Map<String, dynamic>? result,
     String? feature,
   }) {
+    final message = _translate(
+      'logMethodExitMessage',
+      'Exiting {methodName}',
+      parameters: {'methodName': methodName},
+    );
+
     _logger.debug(
-      'Exiting $methodName',
+      message,
       action: 'method_exit',
       metadata: result,
       feature: feature,
@@ -140,8 +171,17 @@ mixin LoggingMixin {
     Map<String, dynamic>? metadata,
     String? feature,
   }) {
+    final message = _translate(
+      'logPerformanceMessage',
+      'Performance: {operation} took {durationMs}ms',
+      parameters: {
+        'operation': operation,
+        'durationMs': duration.inMilliseconds,
+      },
+    );
+
     _logger.info(
-      'Performance: $operation took ${duration.inMilliseconds}ms',
+      message,
       action: 'performance',
       metadata: {
         'operation': operation,
@@ -158,8 +198,14 @@ mixin LoggingMixin {
     Map<String, dynamic>? metadata,
     String? feature,
   }) {
+    final message = _translate(
+      'logBusinessEventMessage',
+      'Business event: {event}',
+      parameters: {'event': event},
+    );
+
     _logger.info(
-      'Business event: $event',
+      message,
       action: 'business_event',
       metadata: metadata,
       feature: feature,

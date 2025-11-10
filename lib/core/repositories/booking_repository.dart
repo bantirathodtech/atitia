@@ -4,6 +4,7 @@ import '../../core/di/common/unified_service_locator.dart';
 import '../../common/utils/date/converter/date_service_converter.dart';
 import '../../core/interfaces/database/database_service_interface.dart';
 import '../models/booking_model.dart';
+import '../../core/services/localization/internationalization_service.dart';
 
 /// 🏠 **BOOKING REPOSITORY - PRODUCTION READY**
 ///
@@ -15,6 +16,7 @@ import '../models/booking_model.dart';
 /// Uses interface-based services for dependency injection (swappable backends)
 class BookingRepository {
   final IDatabaseService _databaseService;
+  final InternationalizationService _i18n = InternationalizationService.instance;
   static const String _bookingsCollection = 'bookings';
 
   /// Constructor with dependency injection
@@ -34,7 +36,9 @@ class BookingRepository {
       );
       return booking.bookingId;
     } catch (e) {
-      throw Exception('Failed to create booking: $e');
+      throw Exception(_i18n.translate('failedToCreateBooking', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -47,7 +51,9 @@ class BookingRepository {
         booking.toMap(),
       );
     } catch (e) {
-      throw Exception('Failed to update booking: $e');
+      throw Exception(_i18n.translate('failedToUpdateBooking', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -62,7 +68,9 @@ class BookingRepository {
       final data = doc.data() as Map<String, dynamic>;
       return BookingModel.fromMap(data);
     } catch (e) {
-      throw Exception('Failed to get booking: $e');
+      throw Exception(_i18n.translate('failedToGetBooking', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -133,7 +141,9 @@ class BookingRepository {
 
       return null;
     } catch (e) {
-      throw Exception('Failed to get active booking: $e');
+      throw Exception(_i18n.translate('failedToGetActiveBooking', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -151,7 +161,9 @@ class BookingRepository {
         },
       );
     } catch (e) {
-      throw Exception('Failed to cancel booking: $e');
+      throw Exception(_i18n.translate('failedToCancelBooking', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -167,7 +179,9 @@ class BookingRepository {
         },
       );
     } catch (e) {
-      throw Exception('Failed to update booking status: $e');
+      throw Exception(_i18n.translate('failedToUpdateBookingStatus', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 }

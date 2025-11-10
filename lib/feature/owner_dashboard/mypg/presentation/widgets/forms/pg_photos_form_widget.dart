@@ -9,9 +9,11 @@ import '../../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../../common/widgets/loaders/adaptive_loader.dart';
+import '../../../../../../l10n/app_localizations.dart';
 import '../../../../../../common/utils/helpers/image_picker_helper.dart';
 import '../../../../../../common/utils/constants/storage.dart';
 import '../../../../../../core/di/common/unified_service_locator.dart';
+import '../../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../auth/logic/auth_provider.dart';
 
 /// Photos Upload Form Widget
@@ -21,6 +23,24 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
   final List<String> uploadedPhotos;
   final Function(List<String>) onPhotosChanged;
   final String? pgId; // Optional PG ID for edit mode
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   const PgPhotosFormWidget({
     super.key,
@@ -63,7 +83,13 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                 const AdaptiveLoader(),
                 const SizedBox(height: AppSpacing.paddingM),
                 BodyText(
-                  text: 'Uploading ${imageFiles.length} photo(s)...',
+                  text: AppLocalizations.of(context)
+                          ?.pgPhotosUploading(imageFiles.length) ??
+                      _text(
+                        'pgPhotosUploading',
+                        'Uploading {count} photo(s)...',
+                        parameters: {'count': imageFiles.length},
+                      ),
                   color: Colors.grey[700],
                 ),
               ],
@@ -114,16 +140,21 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
         } catch (e) {
           failCount++;
           final errorMsg = e.toString();
-          debugPrint('Failed to upload image $i: $errorMsg');
+          debugPrint(
+            _text(
+              'pgPhotosUploadErrorLog',
+              'Failed to upload image {index}: {error}',
+              parameters: {'index': i, 'error': errorMsg},
+            ),
+          );
           
           // Provide more helpful error messages
           if (errorMsg.contains('Failed to fetch') || errorMsg.contains('CORS')) {
             debugPrint(
-              '⚠️ Supabase Storage Error: This might be due to:\n'
-              '1. Storage bucket RLS policies blocking uploads\n'
-              '2. CORS configuration issues\n'
-              '3. Authentication required for storage uploads\n'
-              'Please check your Supabase Storage policies for the "atitia-storage" bucket.'
+              _text(
+                'pgSupabaseStorageTroubleshoot',
+                '⚠️ Supabase Storage Error: This might be due to:\n1. Storage bucket RLS policies blocking uploads\n2. CORS configuration issues\n3. Authentication required for storage uploads\nPlease check your Supabase Storage policies for the "atitia-storage" bucket.',
+              ),
             );
           }
         }
@@ -143,25 +174,45 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
       // Show success/error message
       if (context.mounted) {
         if (successCount > 0 && failCount == 0) {
+          final loc = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('$successCount photo(s) uploaded successfully'),
+              content: Text(
+                loc?.pgPhotosUploadSuccess(successCount) ??
+                    _text(
+                      'pgPhotosUploadSuccess',
+                      'Uploaded {count} photos successfully!',
+                      parameters: {'count': successCount},
+                    ),
+              ),
               backgroundColor: Colors.green,
             ),
           );
         } else if (successCount > 0 && failCount > 0) {
+          final loc = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('$successCount photo(s) uploaded, $failCount failed'),
+              content: Text(
+                loc?.pgPhotosUploadPartial(successCount, failCount) ??
+                    _text(
+                      'pgPhotosUploadPartial',
+                      'Uploaded {success} photos, {failed} failed.',
+                      parameters: {
+                        'success': successCount,
+                        'failed': failCount,
+                      },
+                    ),
+              ),
               backgroundColor: Colors.orange,
             ),
           );
         } else {
+          final loc = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text(
-                'Failed to upload photos. Please check Supabase Storage configuration.\n'
-                'The storage bucket may require authentication or have restricted policies.',
+              content: Text(
+                loc?.pgPhotosUploadFailed ??
+                    _text('pgPhotosUploadFailed', 'Failed to upload photos'),
               ),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 5),
@@ -175,7 +226,14 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to select photos: ${e.toString()}'),
+            content: Text(
+              AppLocalizations.of(context)?.failedToSelectPhotos(e.toString()) ??
+                  _text(
+                    'pgPhotosSelectFailed',
+                    'Failed to select photos: {error}',
+                    parameters: {'error': e.toString()},
+                  ),
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -190,14 +248,15 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
 
   @override
   Widget buildAdaptive(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HeadingMedium(text: 'Photos & Gallery'),
+        HeadingMedium(text: loc.pgPhotosTitle),
         const SizedBox(height: AppSpacing.paddingL),
 
         BodyText(
-          text: 'Add photos of your PG to attract more guests:',
+          text: loc.pgPhotosSubtitle,
           color: Colors.grey[600],
         ),
         const SizedBox(height: AppSpacing.paddingL),
@@ -205,12 +264,12 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
         // Add Photos Button (supports multiple selection)
         PrimaryButton(
           onPressed: () => _addPhoto(context),
-          label: 'Add Photos',
+          label: loc.pgPhotosAddButton,
           icon: Icons.add_photo_alternate,
         ),
         const SizedBox(height: AppSpacing.paddingS),
         BodyText(
-          text: 'You can select multiple images at once (up to 10)',
+          text: loc.pgPhotosLimitHint,
           color: Colors.grey[500],
           small: true,
         ),
@@ -230,12 +289,12 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
                   BodyText(
-                    text: 'No photos added yet',
+                    text: loc.pgPhotosEmptyTitle,
                     color: Colors.grey[600],
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
                   BodyText(
-                    text: 'Click "Add Photo" to upload images',
+                    text: loc.pgPhotosEmptySubtitle,
                     color: Colors.grey[500],
                   ),
                 ],

@@ -12,12 +12,13 @@ import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
-import '../../../shared/widgets/owner_drawer.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/owner_drawer.dart';
 
 /// Help and support screen for owners
 class OwnerHelpScreen extends StatelessWidget {
@@ -25,9 +26,10 @@ class OwnerHelpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'Help & Support',
+        title: loc.ownerHelpTitle,
       ),
       drawer: const OwnerDrawer(
         currentTabIndex: 0,
@@ -51,23 +53,23 @@ class OwnerHelpScreen extends StatelessWidget {
   }
 
   Widget _buildQuickHelpSection(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingMedium(text: 'Quick Help'),
+          HeadingMedium(text: loc.ownerHelpQuickHelp),
           const SizedBox(height: AppSpacing.paddingM),
           BodyText(
-            text:
-                'Get instant answers to common questions about managing your PG properties.',
+            text: loc.ownerHelpHeroSubtitle,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildHelpItem(
             context,
             icon: Icons.video_library,
-            title: 'Video Tutorials',
-            subtitle: 'Watch step-by-step guides',
+            title: loc.ownerHelpVideosTitle,
+            subtitle: loc.ownerHelpVideosSubtitle,
             onTap: () async {
               // Open video tutorials URL
               final Uri url = Uri.parse('https://www.youtube.com/@atitia');
@@ -76,8 +78,8 @@ class OwnerHelpScreen extends StatelessWidget {
               } else {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Unable to open video tutorials'),
+                    SnackBar(
+                      content: Text(loc.ownerHelpUnableToOpenVideos),
                     ),
                   );
                 }
@@ -88,8 +90,8 @@ class OwnerHelpScreen extends StatelessWidget {
           _buildHelpItem(
             context,
             icon: Icons.article,
-            title: 'Documentation',
-            subtitle: 'Read comprehensive guides',
+            title: loc.ownerHelpDocsTitle,
+            subtitle: loc.ownerHelpDocsSubtitle,
             onTap: () async {
               // Open documentation URL
               final Uri url = Uri.parse('https://docs.atitia.com');
@@ -98,8 +100,8 @@ class OwnerHelpScreen extends StatelessWidget {
               } else {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Unable to open documentation'),
+                    SnackBar(
+                      content: Text(loc.ownerHelpUnableToOpenDocs),
                     ),
                   );
                 }
@@ -112,33 +114,30 @@ class OwnerHelpScreen extends StatelessWidget {
   }
 
   Widget _buildFaqSection(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final faqs = [
       {
-        'question': 'How do I add a new PG property?',
-        'answer':
-            'Go to the "My PGs" tab and click the "Add New PG" button. Fill in all required details and submit.',
+        'question': loc.ownerHelpFaqAddPgQuestion,
+        'answer': loc.ownerHelpFaqAddPgAnswer,
       },
       {
-        'question': 'How do I manage guest bookings?',
-        'answer':
-            'Navigate to the "Guests" tab to view all booking requests, approve/reject them, and manage guest information.',
+        'question': loc.ownerHelpFaqBookingsQuestion,
+        'answer': loc.ownerHelpFaqBookingsAnswer,
       },
       {
-        'question': 'How do I view payment history?',
-        'answer':
-            'Go to the "Overview" tab and scroll down to view payment history, or check the "Guests" tab for individual guest payments.',
+        'question': loc.ownerHelpFaqPaymentsQuestion,
+        'answer': loc.ownerHelpFaqPaymentsAnswer,
       },
       {
-        'question': 'How do I update my profile?',
-        'answer':
-            'Open the drawer menu and tap on "My Profile" to update your personal and business information.',
+        'question': loc.ownerHelpFaqProfileQuestion,
+        'answer': loc.ownerHelpFaqProfileAnswer,
       },
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HeadingMedium(text: 'Frequently Asked Questions'),
+        HeadingMedium(text: loc.ownerHelpFaqTitle),
         const SizedBox(height: AppSpacing.paddingM),
         ...faqs.map((faq) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
@@ -170,21 +169,22 @@ class OwnerHelpScreen extends StatelessWidget {
   }
 
   Widget _buildContactSection(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingMedium(text: 'Contact Support'),
+          HeadingMedium(text: loc.ownerHelpContactTitle),
           const SizedBox(height: AppSpacing.paddingM),
           BodyText(
-            text: 'Need more help? Reach out to our support team.',
+            text: loc.ownerHelpContactSubtitle,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildContactItem(
             context,
             icon: Icons.email,
-            title: 'Email Support',
+            title: loc.ownerHelpEmailTitle,
             subtitle: 'support@atitia.com',
             onTap: () async {
               final Uri emailUri = Uri(
@@ -201,8 +201,8 @@ class OwnerHelpScreen extends StatelessWidget {
           _buildContactItem(
             context,
             icon: Icons.phone,
-            title: 'Phone Support',
-            subtitle: '+91 1234567890',
+            title: loc.ownerHelpPhoneTitle,
+            subtitle: '+91 9876543210',
             onTap: () async {
               final Uri phoneUri = Uri(scheme: 'tel', path: '+911234567890');
               if (await canLaunchUrl(phoneUri)) {
@@ -214,8 +214,8 @@ class OwnerHelpScreen extends StatelessWidget {
           _buildContactItem(
             context,
             icon: Icons.chat,
-            title: 'Live Chat',
-            subtitle: 'WhatsApp: +91 7020797849',
+            title: loc.ownerHelpChatTitle,
+            subtitle: loc.ownerHelpChatSubtitle,
             onTap: () async {
               // Try WhatsApp first
               final Uri whatsappUrl = Uri.parse('https://wa.me/917020797849');
@@ -239,8 +239,8 @@ class OwnerHelpScreen extends StatelessWidget {
                 } else {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Unable to open chat. Please try WhatsApp: +91 7020797849'),
+                      SnackBar(
+                        content: Text(loc.ownerHelpUnableToOpenChat),
                       ),
                     );
                   }
@@ -254,15 +254,16 @@ class OwnerHelpScreen extends StatelessWidget {
   }
 
   Widget _buildResourcesSection(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingMedium(text: 'Resources'),
+          HeadingMedium(text: loc.ownerHelpResourcesTitle),
           const SizedBox(height: AppSpacing.paddingM),
           SecondaryButton(
-            label: 'Privacy Policy',
+            label: loc.ownerHelpPrivacyPolicy,
             icon: Icons.privacy_tip,
             onPressed: () {
               context.push(AppRoutes.privacyPolicy);
@@ -270,7 +271,7 @@ class OwnerHelpScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.paddingS),
           SecondaryButton(
-            label: 'Terms of Service',
+            label: loc.ownerHelpTermsOfService,
             icon: Icons.description,
             onPressed: () {
               context.push(AppRoutes.termsOfService);

@@ -1,6 +1,7 @@
 // lib/features/owner_dashboard/mypg/presentation/widgets/owner_revenue_report_widget.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/styles/spacing.dart';
@@ -8,19 +9,53 @@ import '../../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../../l10n/app_localizations.dart';
 import '../../../data/models/owner_pg_management_model.dart';
 
 /// Widget displaying revenue report with financial statistics
 class OwnerRevenueReportWidget extends StatelessWidget {
   final OwnerRevenueReport report;
 
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
   const OwnerRevenueReportWidget({
     required this.report,
     super.key,
   });
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final currencyFormatter = NumberFormat.currency(
+      locale: loc?.localeName,
+      symbol: '₹',
+      decimalDigits: 0,
+    );
+    final numberFormatter = NumberFormat.decimalPattern(loc?.localeName);
+    final collectedText = currencyFormatter.format(report.collectedAmount);
+    final pendingText = currencyFormatter.format(report.pendingAmount);
+    final totalPaymentsText = numberFormatter.format(report.totalPayments);
+    final collectedCountText =
+        numberFormatter.format(report.collectedPayments);
+
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -33,7 +68,8 @@ class OwnerRevenueReportWidget extends StatelessWidget {
                     color: AppColors.success, size: 20),
                 const SizedBox(width: 8),
                 HeadingMedium(
-                  text: 'Revenue Report',
+                  text: loc?.ownerRevenueReportTitle ??
+                      _text('ownerRevenueReportTitle', 'Revenue Report'),
                   color: AppColors.success,
                 ),
               ],
@@ -43,16 +79,18 @@ class OwnerRevenueReportWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildStatItem(
-                    'Collected',
-                    '₹${report.collectedAmount.toStringAsFixed(0)}',
+                    loc?.ownerRevenueReportCollectedLabel ??
+                        _text('ownerRevenueReportCollectedLabel', 'Collected'),
+                    collectedText,
                     Icons.check_circle,
                     AppColors.success,
                   ),
                 ),
                 Expanded(
                   child: _buildStatItem(
-                    'Pending',
-                    '₹${report.pendingAmount.toStringAsFixed(0)}',
+                    loc?.ownerRevenueReportPendingLabel ??
+                        _text('ownerRevenueReportPendingLabel', 'Pending'),
+                    pendingText,
                     Icons.schedule,
                     AppColors.warning,
                   ),
@@ -64,16 +102,20 @@ class OwnerRevenueReportWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildStatItem(
-                    'Total Payments',
-                    '${report.totalPayments}',
+                    loc?.ownerRevenueReportTotalPaymentsLabel ??
+                        _text('ownerRevenueReportTotalPaymentsLabel',
+                            'Total Payments'),
+                    totalPaymentsText,
                     Icons.receipt,
                     AppColors.info,
                   ),
                 ),
                 Expanded(
                   child: _buildStatItem(
-                    'Collected Count',
-                    '${report.collectedPayments}',
+                    loc?.ownerRevenueReportCollectedCountLabel ??
+                        _text('ownerRevenueReportCollectedCountLabel',
+                            'Collected Count'),
+                    collectedCountText,
                     Icons.paid,
                     AppColors.success,
                   ),

@@ -8,6 +8,7 @@ import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/interfaces/storage/storage_service_interface.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../models/guest_profile_model.dart';
 
 /// Repository handling guest profile data operations and file uploads
@@ -17,6 +18,7 @@ class GuestProfileRepository {
   final IDatabaseService _databaseService;
   final IStorageService _storageService;
   final IAnalyticsService _analyticsService;
+  final InternationalizationService _i18n = InternationalizationService.instance;
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
@@ -43,7 +45,7 @@ class GuestProfileRepository {
 
       if (!doc.exists) {
         await _analyticsService.logEvent(
-          name: 'guest_profile_not_found',
+          name: _i18n.translate('guestProfileNotFoundEvent'),
           parameters: {'user_id': userId},
         );
         return null;
@@ -54,7 +56,7 @@ class GuestProfileRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'guest_profile_viewed',
+        name: _i18n.translate('guestProfileViewedEvent'),
         parameters: {
           'user_id': userId,
           'profile_completion': profile.profileCompletionPercentage,
@@ -64,13 +66,15 @@ class GuestProfileRepository {
       return profile;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'guest_profile_fetch_error',
+        name: _i18n.translate('guestProfileFetchErrorEvent'),
         parameters: {
           'user_id': userId,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch guest profile: $e');
+      throw Exception(_i18n.translate('failedToFetchGuestProfile', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -88,7 +92,7 @@ class GuestProfileRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'guest_profile_updated',
+        name: _i18n.translate('guestProfileUpdatedEvent'),
         parameters: {
           'user_id': guest.userId,
           'profile_completion': guest.profileCompletionPercentage,
@@ -99,13 +103,15 @@ class GuestProfileRepository {
       );
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'guest_profile_update_error',
+        name: _i18n.translate('guestProfileUpdateErrorEvent'),
         parameters: {
           'user_id': guest.userId,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to update guest profile: $e');
+      throw Exception(_i18n.translate('failedToUpdateGuestProfile', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -125,7 +131,7 @@ class GuestProfileRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'guest_profile_fields_updated',
+        name: _i18n.translate('guestProfileFieldsUpdatedEvent'),
         parameters: {
           'user_id': userId,
           'fields_updated': fields.keys.toList(),
@@ -133,13 +139,15 @@ class GuestProfileRepository {
       );
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'guest_profile_fields_update_error',
+        name: _i18n.translate('guestProfileFieldsUpdateErrorEvent'),
         parameters: {
           'user_id': userId,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to update profile fields: $e');
+      throw Exception(_i18n.translate('failedToUpdateProfileFields', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -160,7 +168,7 @@ class GuestProfileRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'profile_photo_uploaded',
+        name: _i18n.translate('profilePhotoUploadedEvent'),
         parameters: {
           'user_id': userId,
           'file_name': fileName,
@@ -170,14 +178,16 @@ class GuestProfileRepository {
       return downloadUrl;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'profile_photo_upload_error',
+        name: _i18n.translate('profilePhotoUploadErrorEvent'),
         parameters: {
           'user_id': userId,
           'file_name': fileName,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to upload profile photo: $e');
+      throw Exception(_i18n.translate('failedToUploadProfilePhoto', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -198,7 +208,7 @@ class GuestProfileRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'aadhaar_photo_uploaded',
+        name: _i18n.translate('aadhaarPhotoUploadedEvent'),
         parameters: {
           'user_id': userId,
           'file_name': fileName,
@@ -208,14 +218,16 @@ class GuestProfileRepository {
       return downloadUrl;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'aadhaar_photo_upload_error',
+        name: _i18n.translate('aadhaarPhotoUploadErrorEvent'),
         parameters: {
           'user_id': userId,
           'file_name': fileName,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to upload Aadhaar photo: $e');
+      throw Exception(_i18n.translate('failedToUploadAadhaarPhoto', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -237,7 +249,7 @@ class GuestProfileRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'id_proof_uploaded',
+        name: _i18n.translate('idProofUploadedEvent'),
         parameters: {
           'user_id': userId,
           'file_name': fileName,
@@ -248,7 +260,7 @@ class GuestProfileRepository {
       return downloadUrl;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'id_proof_upload_error',
+        name: _i18n.translate('idProofUploadErrorEvent'),
         parameters: {
           'user_id': userId,
           'file_name': fileName,
@@ -256,7 +268,9 @@ class GuestProfileRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to upload ID proof: $e');
+      throw Exception(_i18n.translate('failedToUploadIdProof', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -270,18 +284,20 @@ class GuestProfileRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'guest_profile_deleted',
+        name: _i18n.translate('guestProfileDeletedEvent'),
         parameters: {'user_id': userId},
       );
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'guest_profile_delete_error',
+        name: _i18n.translate('guestProfileDeleteErrorEvent'),
         parameters: {
           'user_id': userId,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to delete guest profile: $e');
+      throw Exception(_i18n.translate('failedToDeleteGuestProfile', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -306,7 +322,7 @@ class GuestProfileRepository {
       });
 
       await _analyticsService.logEvent(
-        name: 'guest_status_updated',
+        name: _i18n.translate('guestStatusUpdatedEvent'),
         parameters: {
           'user_id': userId,
           'is_active': isActive,
@@ -314,13 +330,15 @@ class GuestProfileRepository {
       );
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'guest_status_update_error',
+        name: _i18n.translate('guestStatusUpdateErrorEvent'),
         parameters: {
           'user_id': userId,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to update guest status: $e');
+      throw Exception(_i18n.translate('failedToUpdateGuestStatus', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 }

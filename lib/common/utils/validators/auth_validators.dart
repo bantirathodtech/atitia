@@ -1,5 +1,6 @@
 import 'package:atitia/common/utils/extensions/string_extensions.dart';
 
+import '../../../core/services/localization/internationalization_service.dart';
 import '../constants/app.dart';
 import '../constants/validation.dart';
 
@@ -16,6 +17,25 @@ import '../constants/validation.dart';
 /// AuthValidators.validateOtp(otpCode)
 /// ```
 class AuthValidators {
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _msg(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   // MARK: - Phone Validation
   // ==========================================
 
@@ -38,7 +58,10 @@ class AuthValidators {
     final cleanPhone = phone.trim().digitsOnly;
 
     if (cleanPhone.length != 10) {
-      return 'Phone number must be 10 digits';
+      return _msg(
+        'validationPhoneLength',
+        'Phone number must be 10 digits',
+      );
     }
 
     if (!cleanPhone.isValidPhone()) {
@@ -63,17 +86,20 @@ class AuthValidators {
   /// - Error message string if invalid
   static String? validateOtp(String? otp) {
     if (otp == null || otp.trim().isEmpty) {
-      return 'OTP is required';
+      return _msg('validationOtpRequired', 'OTP is required');
     }
 
     final cleanOtp = otp.trim().digitsOnly;
 
     if (cleanOtp.length != 6) {
-      return 'OTP must be 6 digits';
+      return _msg('validationOtpLength', 'OTP must be 6 digits');
     }
 
     if (!RegExp(r'^[0-9]+$').hasMatch(cleanOtp)) {
-      return 'OTP must contain only digits';
+      return _msg(
+        'validationOtpDigitsOnly',
+        'OTP must contain only digits',
+      );
     }
 
     return null;
@@ -97,15 +123,25 @@ class AuthValidators {
   /// - Error message string if invalid
   static String? validatePassword(String? password) {
     if (password == null || password.isEmpty) {
-      return 'Password is required';
+      return _msg('validationPasswordRequired', 'Password is required');
     }
 
     if (password.length < ValidationConstants.minPasswordLength) {
-      return 'Password must be at least ${ValidationConstants.minPasswordLength} characters';
+      return _msg(
+        'validationPasswordTooShort',
+        'Password must be at least ${ValidationConstants.minPasswordLength} characters',
+        parameters: {
+          'min':
+              ValidationConstants.minPasswordLength.toString(),
+        },
+      );
     }
 
     if (!password.isValidPassword()) {
-      return 'Password must include uppercase, lowercase, number, and special character';
+      return _msg(
+        'validationPasswordStrength',
+        'Password must include uppercase, lowercase, number, and special character',
+      );
     }
 
     return null;
@@ -126,17 +162,26 @@ class AuthValidators {
   /// - Error message string if invalid
   static String? validateName(String? name) {
     if (name == null || name.trim().isEmpty) {
-      return 'Name is required';
+      return _msg('validationNameRequired', 'Name is required');
     }
 
     final cleanName = name.trim();
 
     if (cleanName.length > ValidationConstants.maxNameLength) {
-      return 'Name must be less than ${ValidationConstants.maxNameLength} characters';
+      return _msg(
+        'validationNameTooLong',
+        'Name must be less than ${ValidationConstants.maxNameLength} characters',
+        parameters: {
+          'max': ValidationConstants.maxNameLength.toString(),
+        },
+      );
     }
 
     if (!cleanName.isValidName()) {
-      return 'Name can only contain letters and spaces';
+      return _msg(
+        'validationNameInvalid',
+        'Name can only contain letters and spaces',
+      );
     }
 
     return null;
@@ -158,13 +203,19 @@ class AuthValidators {
   /// - Error message string if invalid
   static String? validateDateOfBirth(String? dob) {
     if (dob == null || dob.trim().isEmpty) {
-      return 'Date of birth is required';
+      return _msg(
+        'validationDobRequired',
+        'Date of birth is required',
+      );
     }
 
     // Validate format (DD/MM/YYYY)
     final dateRegex = RegExp(r'^(\d{2})/(\d{2})/(\d{4})$');
     if (!dateRegex.hasMatch(dob)) {
-      return 'Please enter date in DD/MM/YYYY format';
+      return _msg(
+        'validationDobFormat',
+        'Please enter date in DD/MM/YYYY format',
+      );
     }
 
     // Parse the date
@@ -174,7 +225,7 @@ class AuthValidators {
     final year = int.tryParse(parts[2]);
 
     if (day == null || month == null || year == null) {
-      return 'Invalid date format';
+      return _msg('validationDobInvalidDate', 'Invalid date format');
     }
 
     // Check if date is valid
@@ -183,19 +234,25 @@ class AuthValidators {
 
       // Check if date is in future
       if (birthDate.isAfter(DateTime.now())) {
-        return 'Date of birth cannot be in the future';
+        return _msg(
+          'validationDobFuture',
+          'Date of birth cannot be in the future',
+        );
       }
 
       // Check if user is at least 18 years old
       final minimumAgeDate =
           DateTime.now().subtract(const Duration(days: 365 * 18));
       if (birthDate.isAfter(minimumAgeDate)) {
-        return 'You must be at least 18 years old';
+        return _msg(
+          'validationDobMinimumAge',
+          'You must be at least 18 years old',
+        );
       }
 
       return null;
     } catch (e) {
-      return 'Invalid date';
+      return _msg('validationDobInvalid', 'Invalid date');
     }
   }
 }

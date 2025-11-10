@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../data/models/owner_guest_model.dart';
 import '../data/models/owner_complaint_model.dart';
 import '../data/models/owner_bike_model.dart';
@@ -15,6 +16,24 @@ import '../data/repository/owner_guest_repository.dart';
 class OwnerGuestViewModel extends BaseProviderState {
   final OwnerGuestRepository _repository;
   final _analyticsService = getIt.analytics;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If repository is not provided, creates it with default services
@@ -237,7 +256,14 @@ class OwnerGuestViewModel extends BaseProviderState {
 
       setLoading(false);
     } catch (e) {
-      setError(true, 'Failed to initialize guest management: $e');
+      setError(
+        true,
+        _text(
+          'ownerGuestInitializeFailed',
+          'Failed to initialize guest management: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -316,7 +342,13 @@ class OwnerGuestViewModel extends BaseProviderState {
       _stats = await _repository.getGuestStats(ownerId, pgId: pgId);
       notifyListeners();
     } catch (e) {
-      debugPrint('⚠️ Owner Guest ViewModel: Failed to load guest stats: $e');
+      debugPrint(
+        _text(
+          'ownerGuestStatsLoadFailedLog',
+          '⚠️ Owner Guest ViewModel: Failed to load guest stats: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -429,7 +461,14 @@ class OwnerGuestViewModel extends BaseProviderState {
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to update guest: $e');
+      setError(
+        true,
+        _text(
+          'ownerGuestUpdateFailed',
+          'Failed to update guest: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }
@@ -467,7 +506,14 @@ class OwnerGuestViewModel extends BaseProviderState {
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to add reply: $e');
+      setError(
+        true,
+        _text(
+          'ownerComplaintReplyFailed',
+          'Failed to add reply: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }
@@ -494,7 +540,14 @@ class OwnerGuestViewModel extends BaseProviderState {
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to update complaint status: $e');
+      setError(
+        true,
+        _text(
+          'ownerComplaintStatusUpdateFailed',
+          'Failed to update complaint status: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }
@@ -523,7 +576,14 @@ class OwnerGuestViewModel extends BaseProviderState {
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to update bike: $e');
+      setError(
+        true,
+        _text(
+          'ownerBikeUpdateFailed',
+          'Failed to update bike: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }
@@ -548,7 +608,14 @@ class OwnerGuestViewModel extends BaseProviderState {
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to create bike movement request: $e');
+      setError(
+        true,
+        _text(
+          'ownerBikeMovementRequestFailed',
+          'Failed to create bike movement request: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }
@@ -577,7 +644,14 @@ class OwnerGuestViewModel extends BaseProviderState {
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to create service request: $e');
+      setError(
+        true,
+        _text(
+          'ownerServiceCreateFailed',
+          'Failed to create service request: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }
@@ -611,7 +685,14 @@ class OwnerGuestViewModel extends BaseProviderState {
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to add service reply: $e');
+      setError(
+        true,
+        _text(
+          'ownerServiceReplyFailed',
+          'Failed to add service reply: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }
@@ -638,7 +719,14 @@ class OwnerGuestViewModel extends BaseProviderState {
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to update service status: $e');
+      setError(
+        true,
+        _text(
+          'ownerServiceStatusUpdateFailed',
+          'Failed to update service status: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }
@@ -668,7 +756,14 @@ class OwnerGuestViewModel extends BaseProviderState {
 
       setLoading(false);
     } catch (e) {
-      setError(true, 'Failed to refresh data: $e');
+      setError(
+        true,
+        _text(
+          'ownerGuestRefreshFailed',
+          'Failed to refresh data: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
     }
   }
@@ -694,14 +789,22 @@ class OwnerGuestViewModel extends BaseProviderState {
         name: 'owner_booking_request_approved',
         parameters: {
           'request_id': requestId,
-          'response_message': responseMessage ?? 'none',
+          'response_message':
+              responseMessage ?? _text('ownerResponseNone', 'none'),
         },
       );
 
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to approve booking request: $e');
+      setError(
+        true,
+        _text(
+          'ownerBookingApproveFailed',
+          'Failed to approve booking request: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }
@@ -724,14 +827,22 @@ class OwnerGuestViewModel extends BaseProviderState {
         name: 'owner_booking_request_rejected',
         parameters: {
           'request_id': requestId,
-          'response_message': responseMessage ?? 'none',
+          'response_message':
+              responseMessage ?? _text('ownerResponseNone', 'none'),
         },
       );
 
       setLoading(false);
       return true;
     } catch (e) {
-      setError(true, 'Failed to reject booking request: $e');
+      setError(
+        true,
+        _text(
+          'ownerBookingRejectFailed',
+          'Failed to reject booking request: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       setLoading(false);
       return false;
     }

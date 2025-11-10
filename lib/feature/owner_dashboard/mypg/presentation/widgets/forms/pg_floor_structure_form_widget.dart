@@ -8,6 +8,7 @@ import '../../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../../l10n/app_localizations.dart';
 import '../../../data/models/owner_pg_management_model.dart';
 // import 'package:uuid/uuid.dart'; // TODO: Add uuid package to pubspec.yaml
 
@@ -47,6 +48,7 @@ class _PgFloorStructureFormWidgetState
   }
 
   void _generateFloorStructure() {
+    final loc = AppLocalizations.of(context)!;
     final int inputFloors = int.tryParse(_totalFloorsController.text) ?? 0;
     if (inputFloors <= 0) return;
 
@@ -57,7 +59,7 @@ class _PgFloorStructureFormWidgetState
     // Always start with Ground
     newFloors.add(OwnerFloor(
       id: 'floor_${DateTime.now().millisecondsSinceEpoch}_0',
-      floorName: 'Ground',
+      floorName: loc.pgFloorGroundLabel,
       floorNumber: 0,
       totalRooms: 0,
     ));
@@ -68,7 +70,7 @@ class _PgFloorStructureFormWidgetState
     for (int i = 1; i <= inputFloors; i++) {
       newFloors.add(OwnerFloor(
         id: 'floor_${DateTime.now().millisecondsSinceEpoch}_$i',
-        floorName: _ordinalLabel(i), // First, Second, Third, Fourth, ...
+        floorName: _ordinalLabel(i, loc), // First, Second, etc.
         floorNumber: i,
         totalRooms: 0,
       ));
@@ -77,7 +79,7 @@ class _PgFloorStructureFormWidgetState
     // Always end with Terrace
     newFloors.add(OwnerFloor(
       id: 'floor_${DateTime.now().millisecondsSinceEpoch}_${inputFloors + 1}',
-      floorName: 'Terrace',
+      floorName: loc.pgFloorTerraceLabel,
       floorNumber: inputFloors + 1,
       totalRooms: 0,
     ));
@@ -113,28 +115,29 @@ class _PgFloorStructureFormWidgetState
   }
 
   /// Returns ordinal label for floor numbers per finalized naming scheme
-  String _ordinalLabel(int n) {
+  String _ordinalLabel(int n, AppLocalizations loc) {
     switch (n) {
       case 1:
-        return 'First';
+        return loc.pgFloorFirstLabel;
       case 2:
-        return 'Second';
+        return loc.pgFloorSecondLabel;
       case 3:
-        return 'Third';
+        return loc.pgFloorThirdLabel;
       case 4:
-        return 'Fourth';
+        return loc.pgFloorFourthLabel;
       case 5:
-        return 'Fifth';
+        return loc.pgFloorFifthLabel;
       default:
-        return 'Floor $n';
+        return loc.pgFloorNthLabel(n);
     }
   }
 
   String _generateRoomNumber(OwnerFloor floor, int roomIndex) {
+    final loc = AppLocalizations.of(context)!;
     if (floor.floorNumber == 0) {
       // Ground: 001, 002, 003...
       return roomIndex.toString().padLeft(3, '0');
-    } else if (floor.floorName == 'Terrace') {
+    } else if (floor.floorName == loc.pgFloorTerraceLabel) {
       // Terrace: (N+1)01, (N+1)02...
       return '${floor.floorNumber}${roomIndex.toString().padLeft(2, '0')}';
     } else {
@@ -151,7 +154,8 @@ class _PgFloorStructureFormWidgetState
         id: 'bed_${DateTime.now().millisecondsSinceEpoch}_$i',
         roomId: room.id,
         floorId: room.floorId,
-          bedNumber: 'Bed-$i', // Bed-1, Bed-2, Bed-3...
+        bedNumber: AppLocalizations.of(context)!
+            .pgFloorBedLabel(i), // Bed-1, Bed-2, ...
         status: 'vacant',
       );
       newBeds.add(bed);
@@ -185,7 +189,8 @@ class _PgFloorStructureFormWidgetState
           id: 'bed_${DateTime.now().millisecondsSinceEpoch}_$i',
           roomId: room.id,
           floorId: room.floorId,
-          bedNumber: 'Bed-$i',
+          bedNumber:
+              AppLocalizations.of(context)!.pgFloorBedLabel(i),
           status: 'vacant',
         );
         roomBeds.add(bed);
@@ -208,6 +213,7 @@ class _PgFloorStructureFormWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Floor Generation
@@ -217,17 +223,17 @@ class _PgFloorStructureFormWidgetState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                HeadingMedium(text: '🏢 Floor Structure'),
+                HeadingMedium(text: loc.pgFloorStructureTitle),
                 const SizedBox(height: AppSpacing.paddingM),
                 Row(
                   children: [
                     Expanded(
                       child: TextField(
                         controller: _totalFloorsController,
-                        decoration: const InputDecoration(
-                          labelText: 'Number of Regular Floors',
-                          hintText: 'e.g., 1',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: loc.pgFloorCountLabel,
+                          hintText: loc.pgFloorCountHint,
+                          border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
                       ),
@@ -235,7 +241,7 @@ class _PgFloorStructureFormWidgetState
                     const SizedBox(width: AppSpacing.paddingM),
                     PrimaryButton(
                       onPressed: _generateFloorStructure,
-                      label: 'Generate',
+                      label: loc.generateAction,
                       icon: Icons.auto_awesome,
                     ),
                   ],
@@ -271,7 +277,13 @@ class _PgFloorStructureFormWidgetState
                                 const SizedBox(height: 4),
                                 BodyText(
                                   text:
-                                      '${floorRooms.length} rooms • ${floorRooms.fold(0, (sum, room) => sum + room.capacity)} beds',
+                                      loc.pgFloorRoomsBedsSummary(
+                                        floorRooms.length,
+                                        floorRooms.fold(
+                                          0,
+                                          (sum, room) => sum + room.capacity,
+                                        ),
+                                      ),
                                   color: Colors.grey[600],
                                 ),
                                 const SizedBox(height: 2),
@@ -280,7 +292,7 @@ class _PgFloorStructureFormWidgetState
                           ),
                           PrimaryButton(
                             onPressed: () => _addRoomToFloor(floor),
-                            label: 'Add Room',
+                            label: loc.pgFloorAddRoom,
                             icon: Icons.add,
                           ),
                         ],
@@ -309,7 +321,9 @@ class _PgFloorStructureFormWidgetState
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  BodyText(text: 'Room ${room.roomNumber}'),
+                                  BodyText(
+                                    text: loc.pgFloorRoomLabel(room.roomNumber),
+                                  ),
                                   Row(
                                     children: [
                                       DropdownButton<int>(
@@ -318,7 +332,7 @@ class _PgFloorStructureFormWidgetState
                                             .map((capacity) => DropdownMenuItem(
                                                   value: capacity,
                                                   child:
-                                                      Text('$capacity-share'),
+                                                      Text(loc.pgFloorCapacityOption(capacity)),
                                                 ))
                                             .toList(),
                                         onChanged: (capacity) {
@@ -338,7 +352,9 @@ class _PgFloorStructureFormWidgetState
                               ),
                               BodyText(
                                 text:
-                                    'Beds: ${roomBeds.map((b) => b.bedNumber).join(', ')}',
+                                    loc.pgFloorBedsList(
+                                      roomBeds.map((b) => b.bedNumber).join(', '),
+                                    ),
                                 color: Colors.grey[600],
                               ),
                             ],
@@ -347,13 +363,12 @@ class _PgFloorStructureFormWidgetState
                       }),
 
                       if (floorRooms.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.all(AppSpacing.paddingM),
+                        Padding(
+                          padding: const EdgeInsets.all(AppSpacing.paddingM),
                           child: Center(
                             child: BodyText(
-                              text:
-                                  'No rooms added yet. Click "Add Room" to get started.',
-                              color: Colors.grey,
+                              text: loc.pgFloorNoRoomsMessage,
+                              color: Colors.grey[600],
                             ),
                           ),
                         ),
@@ -375,11 +390,10 @@ class _PgFloorStructureFormWidgetState
                   Icon(Icons.home_work_outlined,
                       size: 64, color: Colors.grey[400]),
                   const SizedBox(height: AppSpacing.paddingM),
-                  const HeadingMedium(text: 'No Floors Generated'),
+                  HeadingMedium(text: loc.pgFloorEmptyTitle),
                   const SizedBox(height: AppSpacing.paddingS),
-                  const BodyText(
-                    text:
-                        'Enter the number of floors and click "Generate" to create your floor structure.',
+                  BodyText(
+                    text: loc.pgFloorEmptyMessage,
                   ),
                 ],
               ),

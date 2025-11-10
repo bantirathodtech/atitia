@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../styles/spacing.dart';
 import '../../styles/colors.dart';
 import '../../styles/typography.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/services/offline/offline_service.dart';
 
 /// 📱 **OFFLINE INDICATOR - PRODUCTION READY**
@@ -59,6 +60,10 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
   @override
   Widget build(BuildContext context) {
     // final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
+    if (loc == null) {
+      return const SizedBox.shrink();
+    }
 
     // Don't show indicator when online and no pending actions
     if (_isOnline && _pendingActions == 0) {
@@ -94,8 +99,8 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
           Expanded(
             child: Text(
               _isOnline
-                  ? 'Syncing $_pendingActions action${_pendingActions != 1 ? 's' : ''}...'
-                  : 'You\'re offline',
+                  ? loc.offlineSyncingActions(_pendingActions)
+                  : loc.offlineStatusOffline,
               style: AppTypography.bodySmall.copyWith(
                 color: _isOnline ? AppColors.warning : AppColors.error,
               ),
@@ -107,7 +112,7 @@ class _OfflineIndicatorState extends State<OfflineIndicator> {
                 await _offlineService.processSyncQueue();
               },
               child: Text(
-                'Tap to sync',
+                loc.offlineTapToSync,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.textSecondary,
                   fontWeight: FontWeight.w600,
@@ -144,14 +149,18 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
   }
 
   Future<void> _syncAll() async {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) {
+      return;
+    }
     setState(() => _syncing = true);
     try {
       await _offlineService.processSyncQueue();
       _loadPendingActions();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Sync completed successfully!'),
+          SnackBar(
+            content: Text(loc.offlineSyncCompleted),
             backgroundColor: AppColors.success,
           ),
         );
@@ -161,7 +170,7 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Sync failed: $e'),
+            content: Text(loc.offlineSyncFailed(e.toString())),
             backgroundColor: AppColors.error,
           ),
         );
@@ -177,11 +186,15 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
   Widget build(BuildContext context) {
     // final theme = Theme.of(context);
     // final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+    if (loc == null) {
+      return const SizedBox.shrink();
+    }
 
     return AlertDialog(
       backgroundColor: AppColors.surface,
       title: Text(
-        'Sync Queue',
+        loc.offlineSyncQueueTitle,
         style: AppTypography.headingSmall.copyWith(
           color: AppColors.primary,
         ),
@@ -191,14 +204,14 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
         children: [
           if (_pendingActions.isEmpty)
             Text(
-              'No pending actions to sync',
+              loc.offlineNoPendingActions,
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
               ),
             )
           else ...[
             Text(
-              '${_pendingActions.length} action${_pendingActions.length != 1 ? 's' : ''} pending sync:',
+              loc.offlinePendingActions(_pendingActions.length),
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.textPrimary,
               ),
@@ -234,13 +247,13 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                action.type,
+                                _getActionLabel(loc, action.type),
                                 style: AppTypography.bodyMedium.copyWith(
                                   color: AppColors.textPrimary,
                                 ),
                               ),
                               Text(
-                                DateFormat('MMM dd, HH:mm')
+                                DateFormat('MMM dd, HH:mm', loc.localeName)
                                     .format(action.timestamp),
                                 style: AppTypography.bodySmall.copyWith(
                                   color: AppColors.textSecondary,
@@ -263,7 +276,7 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(
-            'Close',
+            loc.close,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textSecondary,
             ),
@@ -287,7 +300,7 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
                     ),
                   )
                 : Text(
-                    'Sync All',
+                    loc.offlineSyncAll,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.textOnPrimary,
                       fontWeight: FontWeight.w600,
@@ -311,6 +324,22 @@ class _SyncQueueDialogState extends State<SyncQueueDialog> {
         return Icons.delete;
       default:
         return Icons.sync;
+    }
+  }
+
+  String _getActionLabel(AppLocalizations loc, String actionType) {
+    switch (actionType.toLowerCase()) {
+      case 'create':
+      case 'add':
+        return loc.offlineActionCreate;
+      case 'update':
+      case 'edit':
+        return loc.offlineActionUpdate;
+      case 'delete':
+      case 'remove':
+        return loc.offlineActionDelete;
+      default:
+        return loc.offlineActionSync;
     }
   }
 }
@@ -360,6 +389,10 @@ class _SyncStatusBannerState extends State<SyncStatusBanner> {
   Widget build(BuildContext context) {
     // final theme = Theme.of(context);
     // final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+    if (loc == null) {
+      return const SizedBox.shrink();
+    }
 
     // Don't show banner when online and no pending actions
     if (_isOnline && _pendingActions == 0) {
@@ -396,8 +429,8 @@ class _SyncStatusBannerState extends State<SyncStatusBanner> {
           Expanded(
             child: Text(
               _isOnline
-                  ? 'Syncing $_pendingActions action${_pendingActions != 1 ? 's' : ''}...'
-                  : 'Offline',
+                  ? loc.offlineSyncingActions(_pendingActions)
+                  : loc.offlineStatusOfflineShort,
               style: AppTypography.bodyMedium.copyWith(
                 color: _isOnline ? AppColors.warning : AppColors.error,
                 fontWeight: FontWeight.w500,
@@ -410,7 +443,7 @@ class _SyncStatusBannerState extends State<SyncStatusBanner> {
                 await _offlineService.processSyncQueue();
               },
               child: Text(
-                'Sync Now',
+                loc.offlineSyncNow,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.warning,
                   fontWeight: FontWeight.w600,

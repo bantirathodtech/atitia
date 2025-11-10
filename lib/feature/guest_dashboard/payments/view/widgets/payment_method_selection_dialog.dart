@@ -5,6 +5,8 @@ import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 
 /// Payment method types
 enum PaymentMethodType {
@@ -19,6 +21,8 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
   final bool razorpayEnabled;
   final Function(PaymentMethodType) onMethodSelected;
   final VoidCallback? onCancel;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   const PaymentMethodSelectionDialog({
     super.key,
@@ -27,10 +31,27 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
     this.onCancel,
   });
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -44,12 +65,16 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HeadingSmall(
-              text: 'Select Payment Method',
+              text: loc?.selectPaymentMethodTitle ??
+                  _text('selectPaymentMethodTitle', 'Select Payment Method'),
               color: theme.textTheme.titleLarge?.color,
             ),
             const SizedBox(height: AppSpacing.paddingM),
             BodyText(
-              text: 'Choose how you want to make the payment',
+              text: loc?.selectPaymentMethodSubtitle ??
+                  _text(
+                      'selectPaymentMethodSubtitle',
+                      'Choose how you want to make the payment'),
               color: AppColors.textSecondary,
             ),
             const SizedBox(height: AppSpacing.paddingL),
@@ -58,8 +83,11 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
               _buildPaymentMethodOption(
                 context: context,
                 icon: Icons.payment,
-                title: 'Razorpay',
-                description: 'Secure online payment via Razorpay',
+                title: loc?.paymentMethodRazorpay ??
+                    _text('paymentMethodRazorpay', 'Razorpay'),
+                description: loc?.razorpayPaymentDescription ??
+                    _text('razorpayPaymentDescription',
+                        'Secure online payment via Razorpay'),
                 color: Colors.blue,
                 isDark: isDark,
                 onTap: () {
@@ -73,8 +101,11 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
             _buildPaymentMethodOption(
               context: context,
               icon: Icons.qr_code_scanner,
-              title: 'UPI Payment',
-              description: 'Pay via PhonePe, Paytm, Google Pay, etc. and share screenshot',
+              title: loc?.paymentMethodUpi ?? _text('paymentMethodUpi', 'UPI'),
+              description: loc?.upiPaymentDescription ??
+                  _text(
+                      'upiPaymentDescription',
+                      'Pay via PhonePe, Paytm, Google Pay, etc. and share screenshot'),
               color: Colors.green,
               isDark: isDark,
               onTap: () {
@@ -87,8 +118,11 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
             _buildPaymentMethodOption(
               context: context,
               icon: Icons.money,
-              title: 'Cash Payment',
-              description: 'Pay in cash and request owner confirmation',
+              title: loc?.paymentMethodCash ??
+                  _text('paymentMethodCash', 'Cash'),
+              description: loc?.cashPaymentDescription ??
+                  _text('cashPaymentDescription',
+                      'Pay in cash and request owner confirmation'),
               color: Colors.orange,
               isDark: isDark,
               onTap: () {
@@ -106,7 +140,7 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
                     Navigator.of(context).pop();
                     onCancel?.call();
                   },
-                  child: const Text('Cancel'),
+                  child: Text(loc?.cancel ?? _text('cancel', 'Cancel')),
                 ),
               ],
             ),

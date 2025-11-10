@@ -23,8 +23,29 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/services/localization/internationalization_service.dart';
+
 /// A small helper to pick images using image_picker with consistent defaults.
 class ImagePickerHelper {
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   // Static cache for web file bytes (workaround for File limitations on web)
   // static final Map<String, List<int>> _webFileCache = {};
 
@@ -123,7 +144,13 @@ class ImagePickerHelper {
     } catch (e) {
       // If pickMultiImage is not available or fails, fallback to single selection
       // This handles older versions or platforms that don't support multiple selection
-      debugPrint('Multiple image selection not available, error: $e');
+      debugPrint(
+        _translate(
+          'imagePickerMultipleSelectionError',
+          'Multiple image selection not available, error: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return [];
     }
   }

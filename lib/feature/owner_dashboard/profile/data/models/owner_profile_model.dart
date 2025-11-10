@@ -3,11 +3,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../core/services/localization/internationalization_service.dart';
+
 /// Represents the detailed profile of an Owner with business and banking information
 /// Contains personal details, identification documents, banking information,
 /// UPI details, and owned PG property references
 /// Enhanced with timestamps, validation, and helper methods
 class OwnerProfile {
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   final String ownerId;
   final String fullName;
   final String phoneNumber;
@@ -254,9 +275,10 @@ class OwnerProfile {
   bool get hasBusinessInfo =>
       businessName != null && businessName!.isNotEmpty;
 
-  /// Returns owner initials for avatar
   String get initials {
-    if (fullName.isEmpty) return 'O';
+    if (fullName.isEmpty) {
+      return _translate('ownerProfileInitialFallback', 'O');
+    }
     final names = fullName.split(' ');
     if (names.length >= 2) {
       return '${names[0][0]}${names[1][0]}'.toUpperCase();
@@ -271,32 +293,38 @@ class OwnerProfile {
     if (city != null && city!.isNotEmpty) parts.add(city!);
     if (state != null && state!.isNotEmpty) parts.add(state!);
     if (pincode != null && pincode!.isNotEmpty) parts.add(pincode!);
-    return parts.isEmpty ? 'N/A' : parts.join(', ');
+    return parts.isEmpty
+        ? _translate('notAvailable', 'N/A')
+        : parts.join(', ');
   }
 
   /// Returns formatted date of birth
   String get formattedDateOfBirth => dateOfBirth != null
       ? DateFormat('MMM dd, yyyy').format(dateOfBirth!)
-      : 'N/A';
+      : _translate('notAvailable', 'N/A');
 
   /// Returns formatted created date
   String get formattedCreatedAt => createdAt != null
       ? DateFormat('MMM dd, yyyy').format(createdAt!)
-      : 'N/A';
+      : _translate('notAvailable', 'N/A');
 
   /// Returns formatted updated date
   String get formattedUpdatedAt => updatedAt != null
       ? DateFormat('MMM dd, yyyy hh:mm a').format(updatedAt!)
-      : 'N/A';
+      : _translate('notAvailable', 'N/A');
 
   /// Returns display name for UI
   String get displayName => businessName ?? fullName;
 
   /// Returns status display
-  String get statusDisplay => isActive ? 'Active' : 'Inactive';
+  String get statusDisplay => isActive
+      ? _translate('statusActive', 'Active')
+      : _translate('statusInactive', 'Inactive');
 
   /// Returns verification status display
-  String get verificationDisplay => isVerified ? 'Verified' : 'Not Verified';
+  String get verificationDisplay => isVerified
+      ? _translate('ownerProfileVerifiedStatus', 'Verified')
+      : _translate('ownerProfilePendingVerificationStatus', 'Not Verified');
 
   /// Returns profile completion percentage
   int get profileCompletionPercentage {

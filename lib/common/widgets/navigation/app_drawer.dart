@@ -14,6 +14,8 @@ import '../text/caption_text.dart';
 import '../text/heading_medium.dart';
 import '../text/heading_small.dart';
 
+const _appVersion = '1.0.0';
+
 /// Production-ready app drawer with user info, navigation, and settings
 ///
 /// Features:
@@ -100,6 +102,15 @@ class AppDrawer extends StatelessWidget {
   /// Builds premium user profile header with enhanced styling
   Widget _buildProfileHeader(
       BuildContext context, dynamic user, ThemeData theme) {
+    final loc = AppLocalizations.of(context);
+    final displayName = user?.displayName ??
+        loc?.drawerDefaultUserName ??
+        'User';
+    final roleText = user?.roleDisplay ??
+        (user?.isOwner == true
+            ? loc?.owner ?? 'Owner'
+            : loc?.guest ?? 'Guest');
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -150,10 +161,10 @@ class AppDrawer extends StatelessWidget {
                             height: 80,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) =>
-                                _buildDefaultAvatar(user),
+                                _buildDefaultAvatar(context, user),
                           ),
                         )
-                      : _buildDefaultAvatar(user),
+                      : _buildDefaultAvatar(context, user),
                 ),
               ),
               const SizedBox(width: 16),
@@ -165,7 +176,7 @@ class AppDrawer extends StatelessWidget {
                   children: [
                     // Name
                     HeadingMedium(
-                      text: user?.displayName ?? 'User',
+                      text: displayName,
                       color: Colors.white,
                     ),
                     const SizedBox(height: 6),
@@ -207,7 +218,7 @@ class AppDrawer extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           BodyText(
-                            text: user?.roleDisplay ?? 'User',
+                            text: roleText,
                             color: Colors.white,
                           ),
                         ],
@@ -267,7 +278,13 @@ class AppDrawer extends StatelessWidget {
   }
 
   /// Builds default avatar with initials
-  Widget _buildDefaultAvatar(dynamic user) {
+  Widget _buildDefaultAvatar(BuildContext context, dynamic user) {
+    final loc = AppLocalizations.of(context);
+    final initials = (user?.initials as String?)?.trim();
+    final fallbackInitial = loc?.drawerDefaultInitial ?? 'U';
+    final displayInitial =
+        (initials == null || initials.isEmpty) ? fallbackInitial : initials;
+
     return Container(
       width: 64,
       height: 64,
@@ -277,7 +294,7 @@ class AppDrawer extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          user?.initials ?? 'U',
+          displayInitial,
           style: AppTypography.headingLarge.copyWith(
             color: Colors.blue,
           ),
@@ -335,9 +352,10 @@ class AppDrawer extends StatelessWidget {
               Builder(
                 builder: (context) {
                   final loc = AppLocalizations.of(context);
-                  return CaptionText(
-                      text:
-                          loc?.poweredByCharyatani ?? 'Powered by Charyatani');
+                  if (loc == null) {
+                    return const SizedBox.shrink();
+                  }
+                  return CaptionText(text: loc.poweredByCharyatani);
                 },
               ),
             ],
@@ -346,7 +364,10 @@ class AppDrawer extends StatelessWidget {
           Builder(
             builder: (context) {
               final loc = AppLocalizations.of(context);
-              return CaptionText(text: '${loc?.version ?? 'Version'} 1.0.0');
+              if (loc == null) {
+                return const SizedBox.shrink();
+              }
+              return CaptionText(text: loc.drawerVersionLabel(_appVersion));
             },
           ),
         ],
@@ -369,34 +390,32 @@ class AppDrawer extends StatelessWidget {
             HeadingMedium(text: '${loc.aboutApp} - ${loc.appTitle}'),
           ],
         ),
-        content: const SingleChildScrollView(
+        content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               BodyText(
-                text: 'Atitia is a comprehensive PG management platform that '
-                    'connects PG owners with guests, streamlining bookings, '
-                    'payments, and daily operations.',
+                text: loc.atitiaIsAComprehensivePgManagementPlatform,
               ),
               SizedBox(height: AppSpacing.md),
-              HeadingSmall(text: 'Features:'),
+              HeadingSmall(text: loc.features),
               SizedBox(height: AppSpacing.sm),
-              BodyText(text: '• Easy PG property management'),
-              BodyText(text: '• Secure online payments'),
-              BodyText(text: '• Real-time notifications'),
-              BodyText(text: '• Menu management'),
-              BodyText(text: '• Complaint tracking'),
-              BodyText(text: '• Visitor management'),
+              BodyText(text: loc.easyPgPropertyManagement),
+              BodyText(text: loc.secureOnlinePayments),
+              BodyText(text: loc.realTimeNotifications),
+              BodyText(text: loc.menuManagement),
+              BodyText(text: loc.complaintTracking),
+              BodyText(text: loc.visitorManagement),
               SizedBox(height: AppSpacing.md),
-              CaptionText(text: 'Version 1.0.0'),
-              CaptionText(text: '© 2025 Atitia. All rights reserved.'),
+              CaptionText(text: '${loc.version} 1.0.0'),
+              CaptionText(text: loc.copyrightAtitiaAllRightsReserved),
             ],
           ),
         ),
         actions: [
           SecondaryButton(
-            label: 'Close',
+            label: loc.close,
             onPressed: () => Navigator.pop(context),
           ),
         ],
@@ -419,26 +438,24 @@ class AppDrawer extends StatelessWidget {
             HeadingMedium(text: loc.aboutDeveloper),
           ],
         ),
-        content: const SingleChildScrollView(
+        content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HeadingSmall(text: 'Charyatani Technologies'),
+              HeadingSmall(text: loc.charyataniTechnologies),
               SizedBox(height: AppSpacing.sm),
               BodyText(
-                text: 'We are a leading software development company '
-                    'specializing in mobile and web applications for '
-                    'hospitality and property management.',
+                text: loc.weAreALeadingSoftwareDevelopmentCompany,
               ),
               SizedBox(height: AppSpacing.md),
-              HeadingSmall(text: 'Contact Us:'),
+              HeadingSmall(text: loc.contactUs),
               SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
                   Icon(Icons.email, size: 16),
                   SizedBox(width: AppSpacing.xs),
-                  BodyText(text: 'contact@charyatani.com'),
+                  BodyText(text: loc.drawerContactEmail),
                 ],
               ),
               SizedBox(height: AppSpacing.xs),
@@ -446,7 +463,7 @@ class AppDrawer extends StatelessWidget {
                 children: [
                   Icon(Icons.phone, size: 16),
                   SizedBox(width: AppSpacing.xs),
-                  BodyText(text: '+91 98765 43210'),
+                  BodyText(text: loc.drawerContactPhone),
                 ],
               ),
               SizedBox(height: AppSpacing.xs),
@@ -454,12 +471,12 @@ class AppDrawer extends StatelessWidget {
                 children: [
                   Icon(Icons.language, size: 16),
                   SizedBox(width: AppSpacing.xs),
-                  BodyText(text: 'www.charyatani.com'),
+                  BodyText(text: loc.drawerContactWebsite),
                 ],
               ),
               SizedBox(height: AppSpacing.md),
-              CaptionText(text: '© 2025 Charyatani Technologies Pvt. Ltd.'),
-              CaptionText(text: 'All rights reserved.'),
+              CaptionText(text: loc.copyrightCharyataniTechnologies),
+              CaptionText(text: loc.allRightsReserved),
             ],
           ),
         ),
@@ -467,8 +484,11 @@ class AppDrawer extends StatelessWidget {
           Builder(
             builder: (context) {
               final loc = AppLocalizations.of(context);
+              if (loc == null) {
+                return const SizedBox.shrink();
+              }
               return SecondaryButton(
-                label: loc?.close ?? 'Close',
+                label: loc.close,
                 onPressed: () => Navigator.pop(context),
               );
             },
@@ -535,11 +555,13 @@ class AppDrawer extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         final loc = AppLocalizations.of(context);
+        if (loc == null) {
+          return;
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(
-              text:
-                  '${loc?.failedToSwitchAccount ?? 'Failed to switch account'}: $e',
+              text: '${loc.failedToSwitchAccount}: $e',
               color: Colors.white,
             ),
             backgroundColor: Colors.red,
@@ -578,10 +600,13 @@ class AppDrawer extends StatelessWidget {
 
       if (context.mounted) {
         final loc = AppLocalizations.of(context);
+        if (loc == null) {
+          return;
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(
-              text: loc?.loggedOutSuccessfully ?? 'Logged out successfully',
+              text: loc.loggedOutSuccessfully,
               color: Colors.white,
             ),
             backgroundColor: Colors.green,
@@ -591,10 +616,13 @@ class AppDrawer extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         final loc = AppLocalizations.of(context);
+        if (loc == null) {
+          return;
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(
-              text: '${loc?.logoutFailed ?? 'Logout failed'}: $e',
+              text: '${loc.logoutFailed}: $e',
               color: Colors.white,
             ),
             backgroundColor: Colors.red,

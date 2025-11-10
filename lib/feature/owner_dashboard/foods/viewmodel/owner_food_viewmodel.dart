@@ -7,6 +7,7 @@ import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../common/utils/helpers/menu_initialization_helper.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../core/db/flutter_secure_storage.dart';
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../data/models/owner_food_menu.dart';
 import '../data/repository/owner_food_repository.dart';
 import '../../../../core/repositories/food_feedback_repository.dart';
@@ -20,6 +21,24 @@ class OwnerFoodViewModel extends BaseProviderState {
   final _analyticsService = getIt.analytics;
   final LocalStorageService _localStorage = getIt<LocalStorageService>();
   final FoodFeedbackRepository _feedbackRepository;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If repositories are not provided, creates them with default services
@@ -100,7 +119,14 @@ class OwnerFoodViewModel extends BaseProviderState {
       // Notify listeners to update UI
       notifyListeners();
     } catch (e) {
-      setError(true, 'Failed to load menus: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodLoadMenusFailed',
+          'Failed to load menus: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       _weeklyMenus = [];
       _overrides = [];
       notifyListeners();
@@ -149,7 +175,13 @@ class OwnerFoodViewModel extends BaseProviderState {
             'food_menu_timestamp_$ownerId', DateTime.now().toIso8601String());
       }
     } catch (e) {
-      debugPrint('⚠️ Owner Food ViewModel: Failed to save menu state: $e');
+      debugPrint(
+        _text(
+          'ownerFoodSaveStateFailedLog',
+          '⚠️ Owner Food ViewModel: Failed to save menu state: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -164,7 +196,13 @@ class OwnerFoodViewModel extends BaseProviderState {
       _overrides = [];
       notifyListeners();
     } catch (e) {
-      debugPrint('⚠️ Owner Food ViewModel: Failed to clear menu state: $e');
+      debugPrint(
+        _text(
+          'ownerFoodClearStateFailedLog',
+          '⚠️ Owner Food ViewModel: Failed to clear menu state: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -184,7 +222,14 @@ class OwnerFoodViewModel extends BaseProviderState {
         notifyListeners();
       },
       onError: (error) {
-        setError(true, 'Failed to stream menus: $error');
+        setError(
+          true,
+          _text(
+            'ownerFoodStreamMenusFailed',
+            'Failed to stream menus: {error}',
+            parameters: {'error': error.toString()},
+          ),
+        );
         setLoading(false);
       },
     );
@@ -202,7 +247,14 @@ class OwnerFoodViewModel extends BaseProviderState {
         notifyListeners();
       },
       onError: (error) {
-        setError(true, 'Failed to stream overrides: $error');
+        setError(
+          true,
+          _text(
+            'ownerFoodStreamOverridesFailed',
+            'Failed to stream overrides: {error}',
+            parameters: {'error': error.toString()},
+          ),
+        );
       },
     );
   }
@@ -226,7 +278,14 @@ class OwnerFoodViewModel extends BaseProviderState {
       notifyListeners();
       return true;
     } catch (e) {
-      setError(true, 'Failed to save menu: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodSaveMenuFailed',
+          'Failed to save menu: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       notifyListeners();
       return false;
     } finally {
@@ -250,7 +309,14 @@ class OwnerFoodViewModel extends BaseProviderState {
       notifyListeners();
       return true;
     } catch (e) {
-      setError(true, 'Failed to save menus: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodSaveMenusFailed',
+          'Failed to save menus: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       notifyListeners();
       return false;
     } finally {
@@ -272,7 +338,14 @@ class OwnerFoodViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to delete menu: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodDeleteMenuFailed',
+          'Failed to delete menu: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -296,7 +369,14 @@ class OwnerFoodViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to save override: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodSaveOverrideFailed',
+          'Failed to save override: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -317,7 +397,14 @@ class OwnerFoodViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to delete override: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodDeleteOverrideFailed',
+          'Failed to delete override: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -348,7 +435,14 @@ class OwnerFoodViewModel extends BaseProviderState {
 
       return downloadUrl;
     } catch (e) {
-      setError(true, 'Failed to upload photo: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodUploadPhotoFailed',
+          'Failed to upload photo: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return null;
     } finally {
       setLoading(false);
@@ -369,7 +463,14 @@ class OwnerFoodViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to delete photo: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodDeletePhotoFailed',
+          'Failed to delete photo: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -618,7 +719,14 @@ class OwnerFoodViewModel extends BaseProviderState {
       notifyListeners();
       return true;
     } catch (e) {
-      setError(true, 'Failed to initialize default menus: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodInitializeDefaultsFailed',
+          'Failed to initialize default menus: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -670,7 +778,14 @@ class OwnerFoodViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to update current day menu: $e');
+      setError(
+        true,
+        _text(
+          'ownerFoodUpdateCurrentMenuFailed',
+          'Failed to update current day menu: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);

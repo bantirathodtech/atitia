@@ -4,7 +4,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../di/firebase/di/firebase_service_locator.dart';
+import '../../navigation/app_router.dart';
 
 /// Notification handlers for different user roles and notification types
 /// Handles navigation and UI updates based on notification data
@@ -107,23 +109,28 @@ class NotificationHandlers {
 
     // Navigate to booking status or payments screen
     final context = _getCurrentContext();
-    if (context != null) {
-      // Navigate to payments screen to show booking status
-      context.go('/guest/payments');
-
-      // Show success/error message based on response
-      final status = data['status'] ?? 'unknown';
-      final message =
-          data['message'] ?? 'Your booking request has been processed';
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: status == 'approved' ? Colors.green : Colors.orange,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Navigate to payments screen to show booking status
+    context.go('/guest/payments');
+
+    // Show success/error message based on response
+    final status = data['status'] ?? 'unknown';
+    final message = data['message'] ??
+        loc?.guestBookingProcessedDefault ??
+        'Your booking request has been processed';
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+        ),
+        backgroundColor: status == 'approved' ? Colors.green : Colors.orange,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   /// Handles payment reminder notifications for guests
@@ -131,20 +138,24 @@ class NotificationHandlers {
     // Logger not available: _logger.info call removed
 
     final context = _getCurrentContext();
-    if (context != null) {
-      // Navigate to payments screen
-      context.go('/guest/payments');
-
-      // Show payment reminder
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('Payment reminder: Please complete your pending payment'),
-          backgroundColor: Colors.orange,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Navigate to payments screen
+    context.go('/guest/payments');
+
+    // Show payment reminder
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          loc?.guestPaymentReminder ??
+              'Payment reminder: Please complete your pending payment',
+        ),
+        backgroundColor: Colors.orange,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   /// Handles food menu update notifications for guests
@@ -152,19 +163,24 @@ class NotificationHandlers {
     // Logger not available: _logger.info call removed
 
     final context = _getCurrentContext();
-    if (context != null) {
-      // Navigate to food menu screen
-      context.go('/guest/foods');
-
-      // Show menu update notification
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Food menu has been updated! Check out the new items'),
-          backgroundColor: Colors.blue,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Navigate to food menu screen
+    context.go('/guest/foods');
+
+    // Show menu update notification
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          loc?.guestFoodMenuUpdated ??
+              'Food menu has been updated! Check out the new items',
+        ),
+        backgroundColor: Colors.blue,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   /// Handles complaint response notifications for guests
@@ -172,20 +188,29 @@ class NotificationHandlers {
     // Logger not available: _logger.info call removed
 
     final context = _getCurrentContext();
-    if (context != null) {
-      // Navigate to complaints screen
-      context.go('/guest/complaints');
-
-      // Show response notification
-      final response = data['response'] ?? 'Your complaint has been addressed';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Complaint Response: $response'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Navigate to complaints screen
+    context.go('/guest/complaints');
+
+    // Show response notification
+    final response = data['response'] as String?;
+    final message = response != null && response.isNotEmpty
+        ? loc?.guestComplaintResponseMessage(response) ??
+            'Complaint Response: $response'
+        : loc?.guestComplaintResponseDefault ??
+            'Your complaint has been addressed';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   /// Handles general announcement notifications for guests
@@ -194,23 +219,32 @@ class NotificationHandlers {
     // Logger not available: _logger.info call removed
 
     final context = _getCurrentContext();
-    if (context != null) {
-      // Show announcement dialog
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(data['title'] ?? 'Announcement'),
-          content:
-              Text(data['message'] ?? 'Important announcement from your PG'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Show announcement dialog
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          data['title'] ??
+              loc?.guestAnnouncementDefaultTitle ??
+              'Announcement',
+        ),
+        content: Text(
+          data['message'] ??
+              loc?.guestAnnouncementDefaultMessage ??
+              'Important announcement from your PG',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(loc?.ok ?? 'OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   // ==========================================================================
@@ -222,27 +256,34 @@ class NotificationHandlers {
     // Logger not available: _logger.info call removed
 
     final context = _getCurrentContext();
-    if (context != null) {
-      // Navigate to guest management screen (requests tab)
-      context.go('/owner/guests');
-
-      // Show booking request notification
-      final guestName = data['guestName'] ?? 'A guest';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('New booking request from $guestName'),
-          backgroundColor: Colors.blue,
-          behavior: SnackBarBehavior.floating,
-          action: SnackBarAction(
-            label: 'View',
-            onPressed: () {
-              // Navigate to requests tab
-              context.go('/owner/guests?tab=requests');
-            },
-          ),
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Navigate to guest management screen (requests tab)
+    context.go('/owner/guests');
+
+    // Show booking request notification
+    final guestName = data['guestName'] as String? ??
+        loc?.notificationGuestFallbackName ??
+        'A guest';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          loc?.ownerBookingRequestMessage(guestName) ??
+              'New booking request from $guestName',
+        ),
+        backgroundColor: Colors.blue,
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: loc?.viewAction ?? 'View',
+          onPressed: () {
+            // Navigate to requests tab
+            context.go('/owner/guests?tab=requests');
+          },
+        ),
+      ),
+    );
   }
 
   /// Handles payment received notifications for owners
@@ -250,21 +291,29 @@ class NotificationHandlers {
     // Logger not available: _logger.info call removed
 
     final context = _getCurrentContext();
-    if (context != null) {
-      // Navigate to payments screen
-      context.go('/owner/guests?tab=payments');
-
-      // Show payment notification
-      final amount = data['amount'] ?? '0';
-      final guestName = data['guestName'] ?? 'A guest';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Payment received: ₹$amount from $guestName'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Navigate to payments screen
+    context.go('/owner/guests?tab=payments');
+
+    // Show payment notification
+    final rawAmount = data['amount'];
+    final amount = rawAmount == null ? '0' : rawAmount.toString();
+    final guestName = data['guestName'] as String? ??
+        loc?.notificationGuestFallbackName ??
+        'A guest';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          loc?.ownerPaymentReceivedMessage(amount, guestName) ??
+              'Payment received: ₹$amount from $guestName',
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   /// Handles complaint submitted notifications for owners
@@ -272,20 +321,27 @@ class NotificationHandlers {
     // Logger not available: _logger.info call removed
 
     final context = _getCurrentContext();
-    if (context != null) {
-      // Navigate to complaints screen
-      context.go('/owner/guests?tab=complaints');
-
-      // Show complaint notification
-      final guestName = data['guestName'] ?? 'A guest';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('New complaint from $guestName'),
-          backgroundColor: Colors.orange,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Navigate to complaints screen
+    context.go('/owner/guests?tab=complaints');
+
+    // Show complaint notification
+    final guestName = data['guestName'] as String? ??
+        loc?.notificationGuestFallbackName ??
+        'A guest';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          loc?.ownerComplaintSubmittedMessage(guestName) ??
+              'New complaint from $guestName',
+        ),
+        backgroundColor: Colors.orange,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   /// Handles guest check-in notifications for owners
@@ -293,20 +349,27 @@ class NotificationHandlers {
     // Logger not available: _logger.info call removed
 
     final context = _getCurrentContext();
-    if (context != null) {
-      // Navigate to guests screen
-      context.go('/owner/guests');
-
-      // Show check-in notification
-      final guestName = data['guestName'] ?? 'A guest';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$guestName has checked in'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Navigate to guests screen
+    context.go('/owner/guests');
+
+    // Show check-in notification
+    final guestName = data['guestName'] as String? ??
+        loc?.notificationGuestFallbackName ??
+        'A guest';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          loc?.ownerGuestCheckInMessage(guestName) ??
+              '$guestName has checked in',
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   /// Handles maintenance reminder notifications for owners
@@ -315,20 +378,27 @@ class NotificationHandlers {
     // Logger not available: _logger.info call removed
 
     final context = _getCurrentContext();
-    if (context != null) {
-      // Navigate to PG management screen
-      context.go('/owner/pgs');
-
-      // Show maintenance reminder
-      final task = data['task'] ?? 'maintenance task';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Maintenance reminder: $task'),
-          backgroundColor: Colors.amber,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (context == null || !context.mounted) {
+      return;
     }
+    final loc = AppLocalizations.of(context);
+    // Navigate to PG management screen
+    context.go('/owner/pgs');
+
+    // Show maintenance reminder
+    final task = data['task'] as String? ??
+        loc?.ownerMaintenanceTaskFallback ??
+        'maintenance task';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          loc?.ownerMaintenanceReminderMessage(task) ??
+              'Maintenance reminder: $task',
+        ),
+        backgroundColor: Colors.amber,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   // ==========================================================================
@@ -349,10 +419,11 @@ class NotificationHandlers {
   /// 
   /// This placeholder remains for backward compatibility and future reference.
   BuildContext? _getCurrentContext() {
-    // This is intentionally a placeholder - Flutter's architecture prevents
-    // storing BuildContext outside the widget tree for security and lifecycle reasons.
-    // Use NavigationService or pass context as parameter instead.
-    return null;
+    try {
+      return AppRouter.router.routerDelegate.navigatorKey.currentContext;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Shows a custom notification banner
@@ -388,7 +459,8 @@ class NotificationHandlers {
         duration: const Duration(seconds: 4),
         action: onTap != null
             ? SnackBarAction(
-                label: 'View',
+                label:
+                    AppLocalizations.of(context)?.viewAction ?? 'View',
                 textColor: Colors.white,
                 onPressed: onTap,
               )

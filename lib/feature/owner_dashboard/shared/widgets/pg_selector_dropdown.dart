@@ -90,16 +90,17 @@ class PgSelectorDropdown extends StatelessWidget {
           final theme = Theme.of(context);
           final isDark = theme.brightness == Brightness.dark;
           final selectedPgId = provider.selectedPgId;
-          
+
           // Get selected PG name to calculate width dynamically
-          final selectedPgName = selectedPgId != null && pgNameMap.containsKey(selectedPgId)
-              ? pgNameMap[selectedPgId]!
-              : 'Select PG';
+          final selectedPgName =
+              selectedPgId != null && pgNameMap.containsKey(selectedPgId)
+                  ? pgNameMap[selectedPgId]!
+                  : 'Select PG';
 
           return LayoutBuilder(
             builder: (context, constraints) {
               final theme = Theme.of(context);
-              
+
               // Calculate text width based on selected PG name
               final textPainter = TextPainter(
                 text: TextSpan(
@@ -114,29 +115,34 @@ class PgSelectorDropdown extends StatelessWidget {
               );
               textPainter.layout();
               final textWidth = textPainter.size.width;
-              
+
               // Dynamic width calculation: text width + all UI elements
-              final iconSpace = 36.0; // Apartment icon (16) + spacing (8) + extra (12)
+              final iconSpace =
+                  36.0; // Apartment icon (16) + spacing (8) + extra (12)
               final paddingSpace = 48.0; // Horizontal padding on both sides
               final dropdownIconSpace = 36.0; // Dropdown arrow icon + padding
-              final calculatedWidth = textWidth + iconSpace + paddingSpace + dropdownIconSpace;
-              
+              final calculatedWidth =
+                  textWidth + iconSpace + paddingSpace + dropdownIconSpace;
+
               // Screen width constraints to prevent overflow
               final screenWidth = MediaQuery.of(context).size.width;
-              final availableWidth = screenWidth - 256; // Reserve space for leading + actions
-              
+              final availableWidth =
+                  screenWidth - 256; // Reserve space for leading + actions
+
               // Use calculated width, but constrain to available screen space to prevent overflow
+              final minimumWidth = responsive.isMobile ? 140.0 : 160.0;
+              final maximumWidth =
+                  availableWidth > minimumWidth ? availableWidth : minimumWidth;
+
               final effectiveWidth = calculatedWidth.clamp(
-                responsive.isMobile ? 140.0 : 160.0, // Minimum width
-                availableWidth > 0 ? availableWidth : calculatedWidth, // Max: available screen space
+                minimumWidth,
+                maximumWidth,
               );
 
               return Container(
                 width: effectiveWidth,
                 decoration: BoxDecoration(
-                  color: isDark 
-                      ? AppColors.darkInputFill 
-                      : Colors.white,
+                  color: isDark ? AppColors.darkInputFill : Colors.white,
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                   border: Border.all(
                     color: theme.primaryColor.withValues(alpha: 0.2),
@@ -153,7 +159,8 @@ class PgSelectorDropdown extends StatelessWidget {
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
                     onTap: null, // Handled by DropdownButton
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
@@ -168,7 +175,9 @@ class PgSelectorDropdown extends StatelessWidget {
                               Icon(
                                 Icons.apartment,
                                 size: 18,
-                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
                               ),
                               const SizedBox(width: AppSpacing.paddingS),
                               Flexible(
@@ -176,7 +185,9 @@ class PgSelectorDropdown extends StatelessWidget {
                                   text: 'Select PG',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  color: isDark
+                                      ? Colors.grey[400]
+                                      : Colors.grey[600],
                                 ),
                               ),
                             ],
@@ -201,13 +212,13 @@ class PgSelectorDropdown extends StatelessWidget {
                           ),
                         ),
                         iconSize: 24,
-                        dropdownColor: isDark 
-                            ? AppColors.darkCard 
-                            : Colors.white,
+                        dropdownColor:
+                            isDark ? AppColors.darkCard : Colors.white,
                         selectedItemBuilder: (context) {
                           // Custom builder for selected item with icon - show full name
                           return items.map((item) {
-                            final pgName = pgNameMap[item.value] ?? 'Unnamed PG';
+                            final pgName =
+                                pgNameMap[item.value] ?? 'Unnamed PG';
                             return Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: AppSpacing.paddingM,
@@ -252,7 +263,7 @@ class PgSelectorDropdown extends StatelessWidget {
             },
           );
         }
-        
+
         // Non-compact version with Row/Expanded for wider spaces
         return Row(
           children: [

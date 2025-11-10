@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
@@ -11,6 +12,7 @@ import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 import '../../data/models/owner_complaint_model.dart';
 
@@ -25,6 +27,25 @@ class ComplaintManagementWidget extends StatefulWidget {
 
 class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   final TextEditingController _searchController = TextEditingController();
+
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -61,6 +82,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   /// Builds search bar and filter controls
   Widget _buildSearchAndFilters(
       BuildContext context, OwnerGuestViewModel guestVM) {
+    final loc = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -71,8 +94,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
               Expanded(
                 child: TextInput(
                   controller: _searchController,
-                  label: 'Search Complaints',
-                  hint: 'Search by title, guest, room, or description...',
+                  label: loc.searchComplaints,
+                  hint: loc.searchComplaintsHint,
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -90,7 +113,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
               IconButton(
                 icon: const Icon(Icons.tune),
                 onPressed: () => _showAdvancedSearch(context, guestVM),
-                tooltip: 'Advanced Search',
+                tooltip: loc.advancedSearch,
               ),
             ],
           ),
@@ -101,30 +124,42 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip('All', 'all', guestVM.statusFilter,
+                _buildFilterChip(loc.all, 'all', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('New', 'new', guestVM.statusFilter,
-                    guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('In Progress', 'in_progress',
+                _buildFilterChip(loc.statusNew, 'new',
                     guestVM.statusFilter, guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Resolved', 'resolved', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc.statusInProgress,
+                    'in_progress',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Urgent', 'urgent', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc.statusResolved,
+                    'resolved',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('High Priority', 'high_priority',
-                    guestVM.statusFilter, guestVM.setStatusFilter),
+                _buildFilterChip(
+                    loc.urgent,
+                    'urgent',
+                    guestVM.statusFilter,
+                    guestVM.setStatusFilter),
+                const SizedBox(width: AppSpacing.paddingS),
+                _buildFilterChip(
+                    loc.highPriority,
+                    'high_priority',
+                    guestVM.statusFilter,
+                    guestVM.setStatusFilter),
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.paddingS),
 
           // Quick stats and bulk actions
-          _buildQuickStatsAndActions(context, guestVM),
+          _buildQuickStatsAndActions(context, guestVM, loc),
         ],
       ),
     );
@@ -146,6 +181,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   /// Builds complaint list
   Widget _buildComplaintList(BuildContext context, OwnerGuestViewModel guestVM,
       List<OwnerComplaintModel> complaints) {
+    final loc = AppLocalizations.of(context)!;
+
     if (guestVM.loading && complaints.isEmpty) {
       return const Center(child: AdaptiveLoader());
     }
@@ -153,12 +190,12 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
     return Column(
       children: [
         // Stats header
-        _buildStatsHeader(context, guestVM),
+        _buildStatsHeader(context, guestVM, loc),
         const SizedBox(height: AppSpacing.paddingM),
         // Complaint list or structured empty state
         Expanded(
           child: complaints.isEmpty
-              ? _buildStructuredEmptyState(context, guestVM)
+              ? _buildStructuredEmptyState(context, guestVM, loc)
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.paddingM),
@@ -174,7 +211,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   }
 
   /// Builds stats header
-  Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM) {
+  Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM,
+      AppLocalizations loc) {
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -194,7 +232,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
           Expanded(
             child: _buildStatCard(
               context,
-              'Total',
+              loc.total,
               guestVM.totalComplaints.toString(),
               Icons.report_problem,
               AppColors.primary,
@@ -204,7 +242,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
           Expanded(
             child: _buildStatCard(
               context,
-              'New',
+              loc.statusNew,
               guestVM.newComplaints.toString(),
               Icons.new_releases,
               Colors.red,
@@ -214,7 +252,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
           Expanded(
             child: _buildStatCard(
               context,
-              'Resolved',
+              loc.statusResolved,
               guestVM.complaints.where((c) => c.isResolved).length.toString(),
               Icons.check_circle,
               Colors.green,
@@ -241,7 +279,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
 
   /// Builds structured empty state with placeholder rows
   Widget _buildStructuredEmptyState(
-      BuildContext context, OwnerGuestViewModel guestVM) {
+      BuildContext context, OwnerGuestViewModel guestVM,
+      AppLocalizations loc) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -259,7 +298,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                 const Icon(Icons.report_problem_outlined,
                     size: 20, color: Colors.grey),
                 const SizedBox(width: AppSpacing.paddingS),
-                const BodyText(text: 'Complaints'),
+                BodyText(text: loc.complaints),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -269,7 +308,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
-                  child: const BodyText(text: '0 complaints'),
+                  child:
+                      BodyText(text: loc.complaintCount(0)),
                 ),
               ],
             ),
@@ -299,10 +339,10 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                 const Icon(Icons.report_problem_outlined,
                     size: 48, color: Colors.grey),
                 const SizedBox(height: AppSpacing.paddingM),
-                const HeadingMedium(text: 'No Complaints Yet'),
+                HeadingMedium(text: loc.noComplaintsYet),
                 const SizedBox(height: AppSpacing.paddingS),
-                const BodyText(
-                  text: 'Guest complaints will appear here when submitted',
+                BodyText(
+                  text: loc.complaintsFromGuestsWillAppearHere,
                   align: TextAlign.center,
                 ),
               ],
@@ -405,6 +445,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   /// Builds individual complaint card
   Widget _buildComplaintCard(BuildContext context, OwnerGuestViewModel guestVM,
       OwnerComplaintModel complaint) {
+    final loc = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
       child: AdaptiveCard(
@@ -438,7 +480,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${complaint.guestName} - Room ${complaint.roomNumber}',
+                            '${complaint.guestName} - ${loc.room} ${complaint.roomNumber}',
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 14,
@@ -447,7 +489,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                         ],
                       ),
                     ),
-                    _buildStatusChip(complaint.status),
+                    _buildStatusChip(context, complaint.status),
                   ],
                 ),
 
@@ -468,15 +510,15 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                   children: [
                     Expanded(
                       child: _buildDetailItem(
-                        icon: Icons.schedule,
-                        label: 'Created',
+                        icon: Icons.event,
+                        label: loc.created,
                         value: _formatDate(complaint.createdAt),
                       ),
                     ),
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.priority_high,
-                        label: 'Priority',
+                        label: loc.priority,
                         value: complaint.priorityDisplay,
                       ),
                     ),
@@ -493,7 +535,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${complaint.unreadOwnerMessages} unread messages',
+                      loc.unreadMessagesCount(complaint.unreadOwnerMessages),
                       style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 12,
@@ -548,30 +590,38 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   }
 
   /// Builds status chip
-  Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(BuildContext context, String status) {
+    final loc = AppLocalizations.of(context)!;
+
     Color chipColor;
     Color textColor;
+    String label;
 
     switch (status.toLowerCase()) {
       case 'new':
         chipColor = Colors.blue.withValues(alpha: 0.1);
         textColor = Colors.blue;
+        label = loc.statusNew;
         break;
       case 'in_progress':
         chipColor = Colors.orange.withValues(alpha: 0.1);
         textColor = Colors.orange;
+        label = loc.statusInProgress;
         break;
       case 'resolved':
         chipColor = Colors.green.withValues(alpha: 0.1);
         textColor = Colors.green;
+        label = loc.statusResolved;
         break;
       case 'closed':
         chipColor = Colors.grey.withValues(alpha: 0.1);
         textColor = Colors.grey;
+        label = loc.statusClosed;
         break;
       default:
         chipColor = Colors.grey.withValues(alpha: 0.1);
         textColor = Colors.grey;
+        label = status;
     }
 
     return Container(
@@ -581,7 +631,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
-        status.toUpperCase(),
+        label,
         style: TextStyle(
           color: textColor,
           fontSize: 12,
@@ -630,54 +680,63 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
       OwnerComplaintModel complaint) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(complaint.title),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('Guest', complaint.guestName),
-              _buildDetailRow('Room', complaint.roomNumber),
-              _buildDetailRow('Type', complaint.complaintType),
-              _buildDetailRow('Priority', complaint.priorityDisplay),
-              _buildDetailRow('Status', complaint.statusDisplay),
-              _buildDetailRow('Created', _formatDate(complaint.createdAt)),
-              if (complaint.resolvedAt != null)
-                _buildDetailRow('Resolved', _formatDate(complaint.resolvedAt!)),
-              const SizedBox(height: AppSpacing.paddingM),
-              const Text('Description:',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              Text(complaint.description),
-              const SizedBox(height: AppSpacing.paddingM),
-              const Text('Messages:',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              _buildMessagesList(complaint.messages),
+      builder: (dialogContext) {
+        final loc = AppLocalizations.of(dialogContext)!;
+
+        return AlertDialog(
+          title: Text(complaint.title),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildDetailRow(loc.guest, complaint.guestName),
+                _buildDetailRow(loc.room, complaint.roomNumber),
+                _buildDetailRow(loc.complaintTitle,
+                    complaint.title),
+                _buildDetailRow(loc.priority,
+                    complaint.priorityDisplay),
+                _buildDetailRow(loc.status, complaint.statusDisplay),
+                _buildDetailRow(loc.created,
+                    _formatDate(complaint.createdAt)),
+                if (complaint.resolvedAt != null)
+                  _buildDetailRow(loc.statusResolved,
+                      _formatDate(complaint.resolvedAt!)),
+                const SizedBox(height: AppSpacing.paddingM),
+                Text(loc.description,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(complaint.description),
+                const SizedBox(height: AppSpacing.paddingM),
+                Text(loc.messages,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                _buildMessagesList(complaint.messages),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(loc.close),
+            ),
+            if (!complaint.isResolved) ...[
+              PrimaryButton(
+                label: loc.reply,
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  _showReplyDialog(context, guestVM, complaint);
+                },
+              ),
+              PrimaryButton(
+                label: loc.resolve,
+                onPressed: () =>
+                    _resolveComplaint(context, guestVM, complaint),
+              ),
             ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-          if (!complaint.isResolved) ...[
-            PrimaryButton(
-              label: 'Reply',
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showReplyDialog(context, guestVM, complaint);
-              },
-            ),
-            PrimaryButton(
-              label: 'Resolve',
-              onPressed: () => _resolveComplaint(context, guestVM, complaint),
-            ),
           ],
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -706,7 +765,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   /// Builds messages list
   Widget _buildMessagesList(List<ComplaintMessage> messages) {
     if (messages.isEmpty) {
-      return const Text('No messages yet');
+      return Text(AppLocalizations.of(context)!.noMessagesYet);
     }
 
     return Column(
@@ -758,47 +817,47 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reply to Complaint'),
-        content: TextInput(
-          controller: replyController,
-          label: 'Reply',
-          hint: 'Type your reply...',
-          maxLines: 4,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Send Reply',
-            onPressed: () async {
-              if (replyController.text.isNotEmpty) {
-                final success = await guestVM.addComplaintReply(
-                  complaint.complaintId,
-                  replyController.text,
-                  'Owner',
-                );
+      builder: (dialogContext) {
+        final loc = AppLocalizations.of(dialogContext)!;
 
-                // FIXED: BuildContext async gap warning
-                // Flutter recommends: Check mounted immediately before using context after async operations
-                // Changed from: Using context with mounted check in compound condition after async gap
-                // Changed to: Check mounted immediately before each context usage
-                // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-                if (!success || !mounted) return;
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pop();
-                if (!mounted) return;
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Reply sent successfully')),
-                );
-              }
-            },
+        return AlertDialog(
+          title: Text(loc.replyToComplaint),
+          content: TextInput(
+            controller: replyController,
+            label: loc.replyLabel,
+            hint: loc.typeYourReply,
+            maxLines: 4,
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(loc.cancel),
+            ),
+            PrimaryButton(
+              label: loc.sendReply,
+              onPressed: () async {
+                if (replyController.text.isNotEmpty) {
+                  final navigator = Navigator.of(dialogContext);
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  final locOuter = AppLocalizations.of(context)!;
+                  final success = await guestVM.addComplaintReply(
+                    complaint.complaintId,
+                    replyController.text,
+                    locOuter.owner,
+                  );
+
+                  if (!success || !mounted) return;
+                  navigator.pop();
+                  if (!mounted) return;
+                  scaffoldMessenger.showSnackBar(
+                    SnackBar(content: Text(locOuter.replySentSuccessfully)),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -809,48 +868,47 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Resolve Complaint'),
-        content: TextInput(
-          controller: notesController,
-          label: 'Resolution Notes',
-          hint: 'Resolution notes (optional)...',
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Mark as Resolved',
-            onPressed: () async {
-              final success = await guestVM.updateComplaintStatus(
-                complaint.complaintId,
-                'resolved',
-                resolutionNotes: notesController.text.isNotEmpty
-                    ? notesController.text
-                    : null,
-              );
+      builder: (dialogContext) {
+        final loc = AppLocalizations.of(dialogContext)!;
 
-              // FIXED: BuildContext async gap warning
-              // Flutter recommends: Check mounted immediately before using context after async operations
-              // Changed from: Using context with mounted check in compound condition after async gap
-              // Changed to: Check mounted immediately before each context usage
-              // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-              if (!success || !mounted) return;
-              // ignore: use_build_context_synchronously
-              Navigator.of(context).pop();
-              if (!mounted) return;
-              // ignore: use_build_context_synchronously
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Complaint resolved successfully')),
-              );
-            },
+        return AlertDialog(
+          title: Text(loc.resolveComplaint),
+          content: TextInput(
+            controller: notesController,
+            label: loc.resolutionNotes,
+            hint: loc.resolutionNotesOptional,
+            maxLines: 3,
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(loc.cancel),
+            ),
+            PrimaryButton(
+              label: loc.markAsResolved,
+              onPressed: () async {
+                final navigator = Navigator.of(dialogContext);
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                final locOuter = AppLocalizations.of(context)!;
+                final success = await guestVM.updateComplaintStatus(
+                  complaint.complaintId,
+                  'resolved',
+                  resolutionNotes: notesController.text.isNotEmpty
+                      ? notesController.text
+                      : null,
+                );
+
+                if (!success || !mounted) return;
+                navigator.pop();
+                if (!mounted) return;
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(content: Text(locOuter.complaintResolvedSuccessfully)),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -861,7 +919,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
 
   /// Builds quick stats and bulk actions bar
   Widget _buildQuickStatsAndActions(
-      BuildContext context, OwnerGuestViewModel guestVM) {
+      BuildContext context, OwnerGuestViewModel guestVM,
+      AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingM,
@@ -879,12 +938,18 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
             child: Row(
               children: [
                 _buildStatChip(
-                    context, 'Total', '${guestVM.complaints.length}'),
+                    context,
+                    loc.total,
+                    '${guestVM.complaints.length}'),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildStatChip(context, 'New',
+                _buildStatChip(
+                    context,
+                    loc.statusNew,
                     '${guestVM.complaints.where((c) => c.status == 'new').length}'),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildStatChip(context, 'Urgent',
+                _buildStatChip(
+                    context,
+                    loc.urgent,
                     '${guestVM.complaints.where((c) => c.priority == 'urgent').length}'),
               ],
             ),
@@ -893,7 +958,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: () => _exportComplaints(context, guestVM),
-            tooltip: 'Export Data',
+            tooltip: loc.exportData,
           ),
         ],
       ),
@@ -925,55 +990,65 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   void _showAdvancedSearch(BuildContext context, OwnerGuestViewModel guestVM) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const HeadingMedium(text: 'Advanced Search'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextInput(
-              label: 'Title',
-              hint: 'Complaint title',
+      builder: (dialogContext) {
+        final loc = AppLocalizations.of(dialogContext)!;
+
+        return AlertDialog(
+          title: HeadingMedium(text: loc.advancedSearch),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextInput(
+                label: loc.complaintTitle,
+                hint: loc.complaintTitle,
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                label: loc.guestName,
+                hint: loc.guestName,
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                label: loc.room,
+                hint: loc.roomNumber,
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                label: loc.priorityLevel,
+                hint: loc.priorityLevel,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: 'Guest Name',
-              hint: 'Guest name',
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: 'Room',
-              hint: 'Room number',
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: 'Priority',
-              hint: 'Priority level',
+            PrimaryButton(
+              label: AppLocalizations.of(context)!.search,
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                // TODO: Implement advanced search
+              },
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const BodyText(text: 'Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Search',
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implement advanced search
-            },
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   /// Exports all complaints
   void _exportComplaints(BuildContext context, OwnerGuestViewModel guestVM) {
     // TODO: Implement export functionality
+    final loc = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: BodyText(text: 'Complaint data exported successfully')),
+      SnackBar(
+        content: Text(
+          loc?.complaintDataExportedSuccessfully ??
+              _text('complaintDataExportedSuccessfully',
+                  'Complaint data exported successfully'),
+        ),
+      ),
     );
   }
 }

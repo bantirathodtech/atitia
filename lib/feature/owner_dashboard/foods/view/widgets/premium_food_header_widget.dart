@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../viewmodel/owner_food_viewmodel.dart';
 
 class PremiumFoodHeaderWidget extends StatelessWidget
@@ -19,6 +21,25 @@ class PremiumFoodHeaderWidget extends StatelessWidget
     this.tabController,
   });
 
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Size get preferredSize => const Size.fromHeight(230);
 
@@ -27,6 +48,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final foodVM = context.watch<OwnerFoodViewModel>();
+    final loc = AppLocalizations.of(context);
 
     // Day colors for gradient effects - using AppColors for consistency
     final dayColors = [
@@ -122,7 +144,9 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                             ],
                           ).createShader(bounds),
                           child: Text(
-                            'Weekly Menu Management',
+                            loc?.weeklyMenuManagement ??
+                                _text('weeklyMenuManagement',
+                                    'Weekly Menu Management'),
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
@@ -132,7 +156,11 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Manage breakfast, lunch & dinner for all days',
+                          loc?.manageBreakfastLunchDinnerForAllDays ??
+                              _text(
+                                'manageBreakfastLunchDinnerForAllDays',
+                                'Manage breakfast, lunch & dinner for all days',
+                              ),
                           style: TextStyle(
                             fontSize: 13,
                             color: textSecondary,
@@ -145,7 +173,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                 ],
               ),
               const SizedBox(height: 12),
-              _buildStatsRow(foodVM, dayColors[currentTabIndex]),
+              _buildStatsRow(context, foodVM, dayColors[currentTabIndex], loc),
             ],
           ),
         ),
@@ -164,13 +192,14 @@ class PremiumFoodHeaderWidget extends StatelessWidget
             ),
           ),
           child: _buildPremiumTabBar(
-              isDarkMode, surfaceColor, dayColors[currentTabIndex]),
+              isDarkMode, surfaceColor, dayColors[currentTabIndex], loc),
         ),
       ],
     );
   }
 
-  Widget _buildStatsRow(OwnerFoodViewModel foodVM, Color dayColor) {
+  Widget _buildStatsRow(BuildContext context, OwnerFoodViewModel foodVM,
+      Color dayColor, AppLocalizations? loc) {
     final stats = foodVM.menuStats;
     final totalItems = (stats['totalBreakfastItems'] ?? 0) +
         (stats['totalLunchItems'] ?? 0) +
@@ -181,7 +210,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
         Expanded(
           child: _buildStatChip(
             '${stats['totalWeeklyMenus'] ?? 0}',
-            'Days',
+            loc?.days ?? _text('days', 'Days'),
             Icons.calendar_today_rounded,
             dayColor,
           ),
@@ -190,7 +219,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
         Expanded(
           child: _buildStatChip(
             '$totalItems',
-            'Items',
+            loc?.items ?? _text('items', 'Items'),
             Icons.restaurant_rounded,
             dayColor,
           ),
@@ -199,7 +228,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
         Expanded(
           child: _buildStatChip(
             '${stats['totalPhotos'] ?? 0}',
-            'Photos',
+            loc?.photos ?? _text('photos', 'Photos'),
             Icons.photo_library_rounded,
             dayColor,
           ),
@@ -228,7 +257,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                   const SizedBox(width: 2),
                   Flexible(
                     child: Text(
-                      '${stats['upcomingFestivals']} Festival',
+                      '${stats['upcomingFestivals']} ${loc?.festival ?? _text('festival', 'Festival')}',
                       style: TextStyle(
                         color: dayColor,
                         fontSize: 10,
@@ -298,9 +327,17 @@ class PremiumFoodHeaderWidget extends StatelessWidget
     );
   }
 
-  Widget _buildPremiumTabBar(
-      bool isDarkMode, Color surfaceColor, Color dayColor) {
-    final dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  Widget _buildPremiumTabBar(bool isDarkMode, Color surfaceColor,
+      Color dayColor, AppLocalizations? loc) {
+    final dayNames = [
+      loc?.dayShortMon ?? _text('dayShortMon', 'Mon'),
+      loc?.dayShortTue ?? _text('dayShortTue', 'Tue'),
+      loc?.dayShortWed ?? _text('dayShortWed', 'Wed'),
+      loc?.dayShortThu ?? _text('dayShortThu', 'Thu'),
+      loc?.dayShortFri ?? _text('dayShortFri', 'Fri'),
+      loc?.dayShortSat ?? _text('dayShortSat', 'Sat'),
+      loc?.dayShortSun ?? _text('dayShortSun', 'Sun'),
+    ];
     final dayIcons = [
       Icons.monitor_heart_outlined,
       Icons.auto_awesome_outlined,

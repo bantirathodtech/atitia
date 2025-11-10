@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
@@ -11,6 +12,7 @@ import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 import '../../data/models/owner_bike_model.dart';
 
@@ -24,6 +26,25 @@ class BikeManagementWidget extends StatefulWidget {
 
 class _BikeManagementWidgetState extends State<BikeManagementWidget> {
   final TextEditingController _searchController = TextEditingController();
+
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -60,6 +81,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
   /// Builds search bar and filter controls
   Widget _buildSearchAndFilters(
       BuildContext context, OwnerGuestViewModel guestVM) {
+    final loc = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -70,8 +93,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
               Expanded(
                 child: TextInput(
                   controller: _searchController,
-                  label: 'Search Bikes',
-                  hint: 'Search by number, name, guest, or model...',
+                  label: loc.searchBikes,
+                  hint: loc.searchBikesHint,
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -89,7 +112,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
               IconButton(
                 icon: const Icon(Icons.tune),
                 onPressed: () => _showAdvancedSearch(context, guestVM),
-                tooltip: 'Advanced Search',
+                tooltip: loc.advancedSearch,
               ),
             ],
           ),
@@ -100,22 +123,35 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip('All', 'all', guestVM.statusFilter,
+                _buildFilterChip(loc.all, 'all', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Active', 'active', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc.active, 'active', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Registered', 'registered',
-                    guestVM.statusFilter, guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Violation', 'violation', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc.registered,
+                    'registered',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Expired', 'expired', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc.violation,
+                    'violation',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip('Premium', 'premium', guestVM.statusFilter,
+                _buildFilterChip(
+                    loc.expired,
+                    'expired',
+                    guestVM.statusFilter,
+                    guestVM.setStatusFilter),
+                const SizedBox(width: AppSpacing.paddingS),
+                _buildFilterChip(
+                    loc.premium,
+                    'premium',
+                    guestVM.statusFilter,
                     guestVM.setStatusFilter),
               ],
             ),
@@ -141,6 +177,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
   /// Builds bike list
   Widget _buildBikeList(BuildContext context, OwnerGuestViewModel guestVM,
       List<OwnerBikeModel> bikes) {
+    final loc = AppLocalizations.of(context)!;
+
     if (guestVM.loading && bikes.isEmpty) {
       return const Center(child: AdaptiveLoader());
     }
@@ -148,12 +186,12 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
     return Column(
       children: [
         // Stats header
-        _buildStatsHeader(context, guestVM),
+        _buildStatsHeader(context, guestVM, loc),
         const SizedBox(height: AppSpacing.paddingM),
         // Bike list or structured empty state
         Expanded(
           child: bikes.isEmpty
-              ? _buildStructuredEmptyState(context, guestVM)
+              ? _buildStructuredEmptyState(context, guestVM, loc)
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.paddingM),
@@ -169,7 +207,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
   }
 
   /// Builds stats header
-  Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM) {
+  Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM,
+      AppLocalizations loc) {
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -189,7 +228,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
           Expanded(
             child: _buildStatCard(
               context,
-              'Total Bikes',
+              loc.totalBikes,
               guestVM.totalBikes.toString(),
               Icons.two_wheeler,
               AppColors.primary,
@@ -199,7 +238,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
           Expanded(
             child: _buildStatCard(
               context,
-              'Active',
+              loc.active,
               guestVM.activeBikes.toString(),
               Icons.check_circle,
               Colors.green,
@@ -209,7 +248,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
           Expanded(
             child: _buildStatCard(
               context,
-              'Violations',
+              loc.violations,
               guestVM.bikes.where((b) => b.hasViolation).length.toString(),
               Icons.warning,
               Colors.red,
@@ -236,7 +275,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
 
   /// Builds structured empty state with placeholder rows
   Widget _buildStructuredEmptyState(
-      BuildContext context, OwnerGuestViewModel guestVM) {
+      BuildContext context, OwnerGuestViewModel guestVM, AppLocalizations loc) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -254,7 +293,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                 const Icon(Icons.two_wheeler_outlined,
                     size: 20, color: Colors.grey),
                 const SizedBox(width: AppSpacing.paddingS),
-                const BodyText(text: 'Bike Registry'),
+                BodyText(text: loc.bikeRegistry),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -264,7 +303,9 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
-                  child: const BodyText(text: '0 bikes'),
+                  child: BodyText(
+                    text: loc.bikeCount(0),
+                  ),
                 ),
               ],
             ),
@@ -293,10 +334,10 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                 const Icon(Icons.two_wheeler_outlined,
                     size: 48, color: Colors.grey),
                 const SizedBox(height: AppSpacing.paddingM),
-                const HeadingMedium(text: 'No Bikes Registered'),
+                HeadingMedium(text: loc.noBikesRegistered),
                 const SizedBox(height: AppSpacing.paddingS),
-                const BodyText(
-                  text: 'Guest bikes will appear here when registered',
+                BodyText(
+                  text: loc.guestBikesWillAppearHere,
                   align: TextAlign.center,
                 ),
               ],
@@ -390,6 +431,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
   /// Builds individual bike card
   Widget _buildBikeCard(
       BuildContext context, OwnerGuestViewModel guestVM, OwnerBikeModel bike) {
+    final loc = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
       child: AdaptiveCard(
@@ -432,7 +475,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                         ],
                       ),
                     ),
-                    _buildStatusChip(bike.status),
+                    _buildStatusChip(context, bike.status),
                   ],
                 ),
 
@@ -444,14 +487,14 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.local_parking,
-                        label: 'Parking Spot',
+                        label: loc.parkingSpot,
                         value: bike.parkingSpot,
                       ),
                     ),
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.palette,
-                        label: 'Color',
+                        label: loc.color,
                         value: bike.color,
                       ),
                     ),
@@ -465,14 +508,14 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.category,
-                        label: 'Type',
+                        label: loc.bikeType,
                         value: bike.bikeTypeDisplay,
                       ),
                     ),
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.schedule,
-                        label: 'Registered',
+                        label: loc.registeredOn,
                         value: _formatDate(bike.registrationDate),
                       ),
                     ),
@@ -493,7 +536,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Violation: ${bike.violationReason}',
+                            loc.violationWithReason(bike.violationReason!),
                             style: const TextStyle(
                               color: Colors.red,
                               fontSize: 12,
@@ -510,7 +553,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   const SizedBox(height: AppSpacing.paddingS),
                   _buildDetailItem(
                     icon: Icons.timer,
-                    label: 'Last Parked',
+                    label: loc.lastParked,
                     value: bike.lastParkedDisplay,
                   ),
                 ],
@@ -560,30 +603,48 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
   }
 
   /// Builds status chip
-  Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(BuildContext context, String status) {
+    final loc = AppLocalizations.of(context)!;
+
     Color chipColor;
     Color textColor;
+    String statusLabel;
 
     switch (status.toLowerCase()) {
       case 'active':
         chipColor = Colors.green.withValues(alpha: 0.1);
         textColor = Colors.green;
+        statusLabel = loc.active;
         break;
       case 'registered':
         chipColor = Colors.blue.withValues(alpha: 0.1);
         textColor = Colors.blue;
+        statusLabel = loc.registered;
         break;
       case 'violation':
         chipColor = Colors.red.withValues(alpha: 0.1);
         textColor = Colors.red;
+        statusLabel = loc.violation;
+        break;
+      case 'expired':
+        chipColor = Colors.orange.withValues(alpha: 0.1);
+        textColor = Colors.orange;
+        statusLabel = loc.expired;
+        break;
+      case 'premium':
+        chipColor = AppColors.secondary.withValues(alpha: 0.1);
+        textColor = AppColors.secondary;
+        statusLabel = loc.premium;
         break;
       case 'removed':
         chipColor = Colors.grey.withValues(alpha: 0.1);
         textColor = Colors.grey;
+        statusLabel = loc.removed;
         break;
       default:
         chipColor = Colors.grey.withValues(alpha: 0.1);
         textColor = Colors.grey;
+        statusLabel = status;
     }
 
     return Container(
@@ -593,7 +654,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
-        status.toUpperCase(),
+        statusLabel,
         style: TextStyle(
           color: textColor,
           fontSize: 12,
@@ -608,59 +669,66 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
       BuildContext context, OwnerGuestViewModel guestVM, OwnerBikeModel bike) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(bike.fullBikeName),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('Guest', bike.guestInfo),
-              _buildDetailRow('Bike Number', bike.bikeNumber),
-              _buildDetailRow('Bike Name', bike.bikeName),
-              _buildDetailRow('Type', bike.bikeTypeDisplay),
-              _buildDetailRow('Color', bike.color),
-              _buildDetailRow('Parking Spot', bike.parkingSpot),
-              _buildDetailRow('Status', bike.statusDisplay),
-              _buildDetailRow('Registered', _formatDate(bike.registrationDate)),
-              if (bike.lastParkedDate != null)
+      builder: (dialogContext) {
+        final loc = AppLocalizations.of(dialogContext)!;
+
+        return AlertDialog(
+          title: Text(bike.fullBikeName),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildDetailRow(loc.guest, bike.guestInfo),
+                _buildDetailRow(loc.bikeNumber, bike.bikeNumber),
+                _buildDetailRow(loc.bikeName, bike.bikeName),
+                _buildDetailRow(loc.bikeType, bike.bikeTypeDisplay),
+                _buildDetailRow(loc.color, bike.color),
+                _buildDetailRow(loc.parkingSpot, bike.parkingSpot),
+                _buildDetailRow(loc.status, bike.statusDisplay),
                 _buildDetailRow(
-                    'Last Parked', _formatDate(bike.lastParkedDate!)),
-              if (bike.removalDate != null)
-                _buildDetailRow('Removed', _formatDate(bike.removalDate!)),
-              if (bike.violationReason != null)
-                _buildDetailRow('Violation', bike.violationReason!),
-              if (bike.notes != null) _buildDetailRow('Notes', bike.notes!),
-            ],
+                    loc.registeredOn, _formatDate(bike.registrationDate)),
+                if (bike.lastParkedDate != null)
+                  _buildDetailRow(
+                      loc.lastParked, _formatDate(bike.lastParkedDate!)),
+                if (bike.removalDate != null)
+                  _buildDetailRow(
+                      loc.removed, _formatDate(bike.removalDate!)),
+                if (bike.violationReason != null)
+                  _buildDetailRow(loc.violationLabel, bike.violationReason!),
+                if (bike.notes != null)
+                  _buildDetailRow(loc.notes, bike.notes!),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-          PrimaryButton(
-            label: 'Edit Bike',
-            onPressed: () {
-              Navigator.of(context).pop();
-              _editBike(context, guestVM, bike);
-            },
-          ),
-          if (bike.isActive) ...[
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(loc.close),
+            ),
             PrimaryButton(
-              label: 'Move Bike',
+              label: loc.editBike,
               onPressed: () {
-                Navigator.of(context).pop();
-                _moveBike(context, guestVM, bike);
+                Navigator.of(dialogContext).pop();
+                _editBike(context, guestVM, bike);
               },
             ),
-            PrimaryButton(
-              label: 'Remove Bike',
-              onPressed: () => _removeBike(context, guestVM, bike),
-            ),
+            if (bike.isActive) ...[
+              PrimaryButton(
+                label: loc.moveBike,
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  _moveBike(context, guestVM, bike);
+                },
+              ),
+              PrimaryButton(
+                label: loc.removeBike,
+                onPressed: () => _removeBike(context, guestVM, bike),
+              ),
+            ],
           ],
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -694,59 +762,71 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Bike'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextInput(
-                controller: parkingController,
-                label: 'Parking Spot',
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                controller: notesController,
-                label: 'Notes',
-                maxLines: 3,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Save Changes',
-            onPressed: () async {
-              final updatedBike = bike.copyWith(
-                parkingSpot: parkingController.text,
-                notes: notesController.text.isNotEmpty
-                    ? notesController.text
-                    : null,
-                updatedAt: DateTime.now(),
-              );
+      builder: (dialogContext) {
+        final loc = AppLocalizations.of(dialogContext)!;
 
-              final success = await guestVM.updateBike(updatedBike);
-              // FIXED: BuildContext async gap warning
-              // Flutter recommends: Check mounted immediately before using context after async operations
-              // Changed from: Using context with mounted check in compound condition after async gap
-              // Changed to: Check mounted immediately before each context usage
-              // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-              if (!success || !mounted) return;
-              // ignore: use_build_context_synchronously
-              Navigator.of(context).pop();
-              if (!mounted) return;
-              // ignore: use_build_context_synchronously
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Bike updated successfully')),
-              );
-            },
+        return AlertDialog(
+          title: Text(loc.editBike),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextInput(
+                  controller: parkingController,
+                  label: loc.parkingSpot,
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: notesController,
+                  label: loc.notes,
+                  maxLines: 3,
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(loc.cancel),
+            ),
+            PrimaryButton(
+              label: loc.saveChanges,
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final locOuter = AppLocalizations.of(context);
+                final updatedBike = bike.copyWith(
+                  parkingSpot: parkingController.text,
+                  notes: notesController.text.isNotEmpty
+                      ? notesController.text
+                      : null,
+                  updatedAt: DateTime.now(),
+                );
+
+                final success = await guestVM.updateBike(updatedBike);
+                // FIXED: BuildContext async gap warning
+                // Flutter recommends: Check mounted immediately before using context after async operations
+                // Changed from: Using context with mounted check in compound condition after async gap
+                // Changed to: Check mounted immediately before each context usage
+                // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
+                if (!success || !mounted) return;
+                // ignore: use_build_context_synchronously
+                Navigator.of(dialogContext).pop();
+                if (!mounted) return;
+                // ignore: use_build_context_synchronously
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      locOuter?.bikeUpdatedSuccessfully ??
+                          _text('bikeUpdatedSuccessfully',
+                              'Bike updated successfully'),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -758,75 +838,82 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Move Bike'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Current spot: ${bike.parkingSpot}'),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                controller: newSpotController,
-                label: 'New Parking Spot',
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                controller: reasonController,
-                label: 'Reason for move',
-                maxLines: 2,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Move Bike',
-            onPressed: () async {
-              if (newSpotController.text.isNotEmpty) {
-                final request = BikeMovementRequest(
-                  requestId: DateTime.now().millisecondsSinceEpoch.toString(),
-                  bikeId: bike.bikeId,
-                  guestId: bike.guestId,
-                  guestName: bike.guestName,
-                  pgId: bike.pgId,
-                  ownerId: bike.ownerId,
-                  requestType: 'move',
-                  currentSpot: bike.parkingSpot,
-                  newSpot: newSpotController.text,
-                  reason: reasonController.text.isNotEmpty
-                      ? reasonController.text
-                      : 'Owner requested move',
-                  status: 'pending',
-                  requestedAt: DateTime.now(),
-                  isActive: true,
-                );
+      builder: (dialogContext) {
+        final loc = AppLocalizations.of(dialogContext)!;
 
-                final success =
-                    await guestVM.createBikeMovementRequest(request);
-                // FIXED: BuildContext async gap warning
-                // Flutter recommends: Check mounted immediately before using context after async operations
-                // Changed from: Using context with mounted check in compound condition after async gap
-                // Changed to: Check mounted immediately before each context usage
-                // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-                if (!success || !mounted) return;
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pop();
-                if (!mounted) return;
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Bike movement request created')),
-                );
-              }
-            },
+        return AlertDialog(
+          title: Text(loc.moveBike),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(loc.currentSpot(bike.parkingSpot)),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: newSpotController,
+                  label: loc.newParkingSpot,
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: reasonController,
+                  label: loc.reasonForMove,
+                  maxLines: 2,
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(loc.cancel),
+            ),
+            PrimaryButton(
+              label: loc.moveBike,
+              onPressed: () async {
+                if (newSpotController.text.isNotEmpty) {
+                  final navigator = Navigator.of(dialogContext);
+                  final messenger = ScaffoldMessenger.of(context);
+                  final locOuter = AppLocalizations.of(context);
+                  final request = BikeMovementRequest(
+                    requestId: DateTime.now().millisecondsSinceEpoch.toString(),
+                    bikeId: bike.bikeId,
+                    guestId: bike.guestId,
+                    guestName: bike.guestName,
+                    pgId: bike.pgId,
+                    ownerId: bike.ownerId,
+                    requestType: 'move',
+                    currentSpot: bike.parkingSpot,
+                    newSpot: newSpotController.text,
+                    reason: reasonController.text.isNotEmpty
+                        ? reasonController.text
+                        : loc.ownerRequestedMove,
+                    status: 'pending',
+                    requestedAt: DateTime.now(),
+                    isActive: true,
+                  );
+
+                  final success =
+                      await guestVM.createBikeMovementRequest(request);
+                  // FIXED: BuildContext async gap warning
+                  if (!success || !mounted) return;
+                  navigator.pop();
+                  if (!mounted) return;
+                  // ignore: use_build_context_synchronously
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        locOuter?.bikeMovementRequestCreated ??
+                            _text('bikeMovementRequestCreated',
+                                'Bike movement request created'),
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -837,65 +924,74 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Bike'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Are you sure you want to remove ${bike.fullBikeName}?'),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                controller: reasonController,
-                label: 'Reason for removal',
-                maxLines: 2,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Remove Bike',
-            onPressed: () async {
-              final request = BikeMovementRequest(
-                requestId: DateTime.now().millisecondsSinceEpoch.toString(),
-                bikeId: bike.bikeId,
-                guestId: bike.guestId,
-                guestName: bike.guestName,
-                pgId: bike.pgId,
-                ownerId: bike.ownerId,
-                requestType: 'remove',
-                currentSpot: bike.parkingSpot,
-                reason: reasonController.text.isNotEmpty
-                    ? reasonController.text
-                    : 'Owner requested removal',
-                status: 'pending',
-                requestedAt: DateTime.now(),
-                isActive: true,
-              );
+      builder: (dialogContext) {
+        final loc = AppLocalizations.of(dialogContext)!;
 
-              final success = await guestVM.createBikeMovementRequest(request);
-              // FIXED: BuildContext async gap warning
-              // Flutter recommends: Check mounted immediately before using context after async operations
-              // Changed from: Using context with mounted check in compound condition after async gap
-              // Changed to: Check mounted immediately before each context usage
-              // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-              if (!success || !mounted) return;
-              // ignore: use_build_context_synchronously
-              Navigator.of(context).pop();
-              if (!mounted) return;
-              // ignore: use_build_context_synchronously
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Bike removal request created')),
-              );
-            },
+        return AlertDialog(
+          title: Text(loc.removeBike),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(loc.areYouSureYouWantToRemoveBike(bike.fullBikeName)),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: reasonController,
+                  label: loc.reasonForRemoval,
+                  maxLines: 2,
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(loc.cancel),
+            ),
+            PrimaryButton(
+              label: loc.removeBike,
+              onPressed: () async {
+                final navigator = Navigator.of(dialogContext);
+                final messenger = ScaffoldMessenger.of(context);
+                final locOuter = AppLocalizations.of(context);
+                final request = BikeMovementRequest(
+                  requestId: DateTime.now().millisecondsSinceEpoch.toString(),
+                  bikeId: bike.bikeId,
+                  guestId: bike.guestId,
+                  guestName: bike.guestName,
+                  pgId: bike.pgId,
+                  ownerId: bike.ownerId,
+                  requestType: 'remove',
+                  currentSpot: bike.parkingSpot,
+                  reason: reasonController.text.isNotEmpty
+                      ? reasonController.text
+                      : loc.ownerRequestedRemoval,
+                  status: 'pending',
+                  requestedAt: DateTime.now(),
+                  isActive: true,
+                );
+
+                final success =
+                    await guestVM.createBikeMovementRequest(request);
+                // FIXED: BuildContext async gap warning
+                if (!success || !mounted) return;
+                navigator.pop();
+                if (!mounted) return;
+                // ignore: use_build_context_synchronously
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      locOuter?.bikeRemovalRequestCreated ??
+                          _text('bikeRemovalRequestCreated',
+                              'Bike removal request created'),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -908,46 +1004,50 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
   void _showAdvancedSearch(BuildContext context, OwnerGuestViewModel guestVM) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const HeadingMedium(text: 'Advanced Search'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextInput(
-              label: 'Bike Number',
-              hint: 'Bike number',
+      builder: (dialogContext) {
+        final loc = AppLocalizations.of(dialogContext)!;
+
+        return AlertDialog(
+          title: HeadingMedium(text: loc.advancedSearch),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextInput(
+                label: loc.bikeNumber,
+                hint: loc.bikeNumber,
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                label: loc.guestName,
+                hint: loc.guestName,
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                label: loc.bikeModel,
+                hint: loc.bikeModel,
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                label: loc.bikeColor,
+                hint: loc.bikeColor,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(loc.cancel),
             ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: 'Guest Name',
-              hint: 'Guest name',
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: 'Model',
-              hint: 'Bike model',
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: 'Color',
-              hint: 'Bike color',
+            PrimaryButton(
+              label: loc.search,
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                // TODO: Implement advanced search
+              },
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const BodyText(text: 'Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Search',
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implement advanced search
-            },
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

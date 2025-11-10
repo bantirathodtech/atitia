@@ -1,6 +1,7 @@
 // lib/feature/owner_dashboard/analytics/screens/owner_analytics_dashboard.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
@@ -9,6 +10,8 @@ import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../shared/viewmodel/selected_pg_provider.dart';
 import '../../shared/widgets/pg_selector_dropdown.dart';
 import '../../shared/widgets/owner_drawer.dart';
@@ -27,6 +30,25 @@ class OwnerAnalyticsDashboard extends StatefulWidget {
 
 class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
     with SingleTickerProviderStateMixin {
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   late TabController _tabController;
   String? _lastLoadedPgId;
   SelectedPgProvider? _selectedPgProvider;
@@ -93,13 +115,23 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
 
       _lastLoadedPgId = pgId;
     } catch (e) {
-      setState(() {
-        _error = 'Failed to load analytics data: $e';
-      });
+      if (mounted) {
+        final loc = AppLocalizations.of(context);
+        setState(() {
+          _error = loc?.analyticsLoadFailed(e.toString()) ??
+              _text(
+                'ownerAnalyticsLoadFailed',
+                'Failed to load analytics data: {error}',
+                parameters: {'error': e.toString()},
+              );
+        });
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -111,6 +143,12 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget build(BuildContext context) {
     final selectedPgProvider = context.watch<SelectedPgProvider>();
     final currentPgId = selectedPgProvider.selectedPgId;
+    final loc = AppLocalizations.of(context)!;
+    final tabLabels = [
+      loc.analyticsTabRevenue,
+      loc.analyticsTabOccupancy,
+      loc.analyticsTabPerformance,
+    ];
 
     return Scaffold(
       appBar: AdaptiveAppBar(
@@ -120,32 +158,32 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
           IconButton(
             icon: const Icon(Icons.menu),
             onPressed: () => Scaffold.of(context).openDrawer(),
-            tooltip: 'Menu',
+            tooltip: loc.menuTooltip,
           ),
         ],
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _refreshData,
-            tooltip: 'Refresh Analytics',
+            tooltip: loc.analyticsRefreshData,
           ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: TabBar(
             controller: _tabController,
-            tabs: const [
+            tabs: [
               Tab(
-                icon: Icon(Icons.trending_up),
-                text: 'Revenue',
+                icon: const Icon(Icons.trending_up),
+                text: tabLabels[0],
               ),
               Tab(
-                icon: Icon(Icons.bed),
-                text: 'Occupancy',
+                icon: const Icon(Icons.bed),
+                text: tabLabels[1],
               ),
               Tab(
-                icon: Icon(Icons.analytics),
-                text: 'Performance',
+                icon: const Icon(Icons.analytics),
+                text: tabLabels[2],
               ),
             ],
           ),
@@ -182,6 +220,8 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   Widget _buildNoPgSelected(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -192,10 +232,10 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
             color: Colors.grey[400],
           ),
           const SizedBox(height: AppSpacing.paddingL),
-          const HeadingMedium(text: 'Select a PG'),
+          HeadingMedium(text: loc.analyticsNoPgTitle),
           const SizedBox(height: AppSpacing.paddingM),
-          const BodyText(
-            text: 'Choose a PG from the dropdown above to view analytics',
+          BodyText(
+            text: loc.analyticsNoPgMessage,
           ),
         ],
       ),
@@ -203,19 +243,23 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   Widget _buildLoadingState(BuildContext context) {
-    return const Center(
+    final loc = AppLocalizations.of(context)!;
+
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          AdaptiveLoader(),
-          SizedBox(height: AppSpacing.paddingL),
-          BodyText(text: 'Loading analytics data...'),
+          const AdaptiveLoader(),
+          const SizedBox(height: AppSpacing.paddingL),
+          BodyText(text: loc.analyticsLoading),
         ],
       ),
     );
   }
 
   Widget _buildErrorState(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -226,15 +270,15 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
             color: Colors.red[400],
           ),
           const SizedBox(height: AppSpacing.paddingL),
-          const HeadingMedium(text: 'Error Loading Data'),
+          HeadingMedium(text: loc.analyticsErrorTitle),
           const SizedBox(height: AppSpacing.paddingM),
           BodyText(
-            text: _error ?? 'Unknown error occurred',
+            text: _error ?? loc.analyticsUnknownError,
           ),
           const SizedBox(height: AppSpacing.paddingL),
           ElevatedButton(
             onPressed: _refreshData,
-            child: const Text('Retry'),
+            child: Text(loc.retry),
           ),
         ],
       ),
@@ -282,6 +326,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget _buildPerformanceHeader(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context)!;
 
     return Row(
       children: [
@@ -302,9 +347,9 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const HeadingMedium(text: 'Performance Analytics'),
+              HeadingMedium(text: loc.performanceAnalyticsTitle),
               CaptionText(
-                text: 'Comprehensive performance insights and recommendations',
+                text: loc.performanceAnalyticsSubtitle,
                 color: isDark ? Colors.white70 : Colors.grey[600],
               ),
             ],
@@ -317,6 +362,11 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget _buildPerformanceMetrics(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context)!;
+    final decimalFormatter = NumberFormat('0.0', loc.localeName);
+    final guestSatisfactionScore = decimalFormatter.format(4.8);
+    final responseTimeHours = decimalFormatter.format(2.3);
+    final maintenanceScore = decimalFormatter.format(9.2);
 
     return Card(
       child: Padding(
@@ -324,14 +374,16 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const HeadingMedium(text: 'Key Performance Indicators'),
+            HeadingMedium(text: loc.performanceKpiTitle),
             const SizedBox(height: AppSpacing.paddingL),
             Row(
               children: [
                 Expanded(
                   child: _buildKpiCard(
-                    'Guest Satisfaction',
-                    '4.8/5',
+                    loc.performanceKpiGuestSatisfaction,
+                    loc.performanceKpiGuestSatisfactionValue(
+                      guestSatisfactionScore,
+                    ),
                     Icons.star,
                     Colors.amber,
                     isDark,
@@ -340,8 +392,8 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildKpiCard(
-                    'Response Time',
-                    '2.3 hrs',
+                    loc.performanceKpiResponseTime,
+                    loc.performanceKpiResponseTimeValue(responseTimeHours),
                     Icons.timer,
                     Colors.blue,
                     isDark,
@@ -350,8 +402,8 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildKpiCard(
-                    'Maintenance Score',
-                    '9.2/10',
+                    loc.performanceKpiMaintenanceScore,
+                    loc.performanceKpiMaintenanceScoreValue(maintenanceScore),
                     Icons.build,
                     Colors.green,
                     isDark,
@@ -414,6 +466,13 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget _buildPerformanceInsights(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context)!;
+    final recommendations = [
+      loc.performanceRecommendationMaintainSchedule,
+      loc.performanceRecommendationExpandCapacity,
+      loc.performanceRecommendationFeedbackSystem,
+      loc.performanceRecommendationOptimizeEnergy,
+    ];
 
     return Card(
       child: Padding(
@@ -421,7 +480,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const HeadingMedium(text: 'Performance Insights'),
+            HeadingMedium(text: loc.performanceInsightsTitle),
             const SizedBox(height: AppSpacing.paddingM),
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -432,26 +491,45 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const BodyText(
-                    text: 'Overall Performance: Excellent',
+                  BodyText(
+                    text: loc.performanceInsightsOverall,
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
-                  const BodyText(
-                    text:
-                        'Your PG is performing above industry standards with high guest satisfaction and efficient operations.',
+                  BodyText(
+                    text: loc.performanceInsightsSummary,
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
-                  const BodyText(
-                    text: 'Recommendations:',
+                  BodyText(
+                    text: loc.performanceRecommendationsTitle,
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
-                  const BodyText(
-                      text: '• Continue current maintenance schedule'),
-                  const BodyText(
-                      text: '• Consider expanding based on high occupancy'),
-                  const BodyText(text: '• Implement guest feedback system'),
-                  const BodyText(
-                      text: '• Optimize energy usage for cost savings'),
+                  ...recommendations.map(
+                    (rec) => Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: AppSpacing.paddingXS),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '• ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  isDark ? Colors.white70 : Colors.grey[700],
+                            ),
+                          ),
+                          Expanded(
+                            child: BodyText(
+                              text: rec,
+                              color: isDark
+                                  ? Colors.white70
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
