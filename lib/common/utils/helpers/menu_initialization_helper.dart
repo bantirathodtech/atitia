@@ -1,10 +1,188 @@
 // lib/common/utils/helpers/menu_initialization_helper.dart
 
+import '../../../core/services/localization/internationalization_service.dart';
 import '../../../feature/owner_dashboard/foods/data/models/owner_food_menu.dart';
 
 /// Helper class to initialize default weekly menus for new owners
 /// Provides sample menu data for all 7 days with breakfast, lunch, and dinner
 class MenuInitializationHelper {
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static const List<String> _weekdayKeys = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
+
+  static const Map<String, List<String>> _defaultBreakfastMenus = {
+    'monday': [
+      'Idli with Sambar and Coconut Chutney',
+      'Vada (2 pieces)',
+      'Filter Coffee',
+      'Banana',
+    ],
+    'tuesday': [
+      'Masala Dosa with Sambar and Chutney',
+      'Medu Vada',
+      'Tea',
+      'Seasonal Fruit',
+    ],
+    'wednesday': [
+      'Upma with Coconut Chutney',
+      'Vada (2 pieces)',
+      'Coffee',
+      'Boiled Eggs (2)',
+    ],
+    'thursday': [
+      'Poha with Peanuts and Curry Leaves',
+      'Banana Chips',
+      'Tea',
+      'Papaya',
+    ],
+    'friday': [
+      'Puri with Potato Bhaji',
+      'Halwa',
+      'Coffee',
+      'Orange',
+    ],
+    'saturday': [
+      'Pesarattu (Green Gram Dosa) with Ginger Chutney',
+      'Upma',
+      'Tea',
+      'Seasonal Fruit',
+    ],
+    'sunday': [
+      'Special Breakfast - Pongal with Vada',
+      'Sweet Pongal',
+      'Filter Coffee',
+      'Banana',
+    ],
+  };
+
+  static const Map<String, List<String>> _defaultLunchMenus = {
+    'monday': [
+      'Steamed Rice',
+      'Sambar',
+      'Rasam',
+      'Vegetable Curry (Beans Palya)',
+      'Curd',
+      'Papad',
+      'Buttermilk',
+    ],
+    'tuesday': [
+      'Steamed Rice',
+      'Dal Tadka',
+      'Rasam',
+      'Cabbage Poriyal',
+      'Brinjal Curry',
+      'Curd',
+      'Pickle',
+    ],
+    'wednesday': [
+      'Jeera Rice',
+      'Sambar',
+      'Rasam',
+      'Potato Fry',
+      'Spinach Dal',
+      'Curd',
+      'Papad',
+    ],
+    'thursday': [
+      'Steamed Rice',
+      'Moong Dal',
+      'Rasam',
+      'Mixed Vegetable Curry',
+      'Beetroot Poriyal',
+      'Curd',
+      'Buttermilk',
+    ],
+    'friday': [
+      'Lemon Rice',
+      'Sambar',
+      'Rasam',
+      'Okra Fry (Bhendi)',
+      'Carrot Poriyal',
+      'Curd',
+      'Pickle',
+    ],
+    'saturday': [
+      'Steamed Rice',
+      'Toor Dal',
+      'Rasam',
+      'Pumpkin Curry',
+      'Green Beans Poriyal',
+      'Curd',
+      'Papad',
+    ],
+    'sunday': [
+      'Special Lunch - Pulao',
+      'Sambar',
+      'Rasam',
+      'Paneer Butter Masala',
+      'Raita',
+      'Sweet (Payasam)',
+      'Papad',
+    ],
+  };
+
+  static const Map<String, List<String>> _defaultDinnerMenus = {
+    'monday': [
+      'Chapati (4 pieces)',
+      'Mixed Vegetable Curry',
+      'Dal Fry',
+      'Rice',
+      'Curd',
+    ],
+    'tuesday': [
+      'Chapati (4 pieces)',
+      'Palak Paneer',
+      'Dal Tadka',
+      'Rice',
+      'Pickle',
+    ],
+    'wednesday': [
+      'Paratha (3 pieces)',
+      'Aloo Gobi',
+      'Moong Dal',
+      'Rice',
+      'Curd',
+    ],
+    'thursday': [
+      'Chapati (4 pieces)',
+      'Chana Masala',
+      'Tomato Rasam',
+      'Rice',
+      'Raita',
+    ],
+    'friday': [
+      'Puri (6 pieces)',
+      'Aloo Curry',
+      'Chana Dal',
+      'Rice',
+      'Curd',
+    ],
+    'saturday': [
+      'Chapati (4 pieces)',
+      'Egg Curry (2 eggs)',
+      'Dal Tadka',
+      'Rice',
+      'Pickle',
+    ],
+    'sunday': [
+      'Special Dinner - Naan (3 pieces)',
+      'Paneer Tikka Masala',
+      'Dal Makhani',
+      'Jeera Rice',
+      'Raita',
+      'Gulab Jamun (2 pieces)',
+    ],
+  };
+
   /// Creates default weekly menus for a new owner
   /// Returns list of 7 menus (Monday to Sunday) with sample Indian meals
   ///
@@ -13,17 +191,19 @@ class MenuInitializationHelper {
   /// - If pgId is null, creates menus for all PGs (backward compatible)
   static List<OwnerFoodMenu> createDefaultWeeklyMenus(String ownerId,
       {String? pgId}) {
-    final weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
-    ];
+    return _weekdayKeys.map((day) {
+      final dayKey = day.toLowerCase();
+      final translatedDay = _i18n.translate('weekday_$dayKey');
+      final dayDisplay =
+          translatedDay != 'weekday_$dayKey' ? translatedDay : day;
+      final translatedDescription = _i18n.translate(
+        'menuDefaultDescription',
+        parameters: {'day': dayDisplay},
+      );
+      final description = translatedDescription != 'menuDefaultDescription'
+          ? translatedDescription
+          : 'Default menu for $day - customize as needed';
 
-    return weekdays.map((day) {
       return OwnerFoodMenu(
         menuId:
             '${ownerId}_${day.toLowerCase()}_default${pgId != null ? '_$pgId' : ''}',
@@ -35,7 +215,7 @@ class MenuInitializationHelper {
         dinner: _getDefaultDinner(day),
         photoUrls: [],
         isActive: true,
-        description: 'Default menu for $day - customize as needed',
+        description: description,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -44,181 +224,38 @@ class MenuInitializationHelper {
 
   /// Returns default breakfast items based on day
   static List<String> _getDefaultBreakfast(String day) {
-    final breakfastMenus = {
-      'Monday': [
-        'Idli with Sambar and Coconut Chutney',
-        'Vada (2 pieces)',
-        'Filter Coffee',
-        'Banana',
-      ],
-      'Tuesday': [
-        'Masala Dosa with Sambar and Chutney',
-        'Medu Vada',
-        'Tea',
-        'Seasonal Fruit',
-      ],
-      'Wednesday': [
-        'Upma with Coconut Chutney',
-        'Vada (2 pieces)',
-        'Coffee',
-        'Boiled Eggs (2)',
-      ],
-      'Thursday': [
-        'Poha with Peanuts and Curry Leaves',
-        'Banana Chips',
-        'Tea',
-        'Papaya',
-      ],
-      'Friday': [
-        'Puri with Potato Bhaji',
-        'Halwa',
-        'Coffee',
-        'Orange',
-      ],
-      'Saturday': [
-        'Pesarattu (Green Gram Dosa) with Ginger Chutney',
-        'Upma',
-        'Tea',
-        'Seasonal Fruit',
-      ],
-      'Sunday': [
-        'Special Breakfast - Pongal with Vada',
-        'Sweet Pongal',
-        'Filter Coffee',
-        'Banana',
-      ],
-    };
-
-    return breakfastMenus[day] ?? _getDefaultBreakfast('Monday');
+    final key = 'menuBreakfast_${day.toLowerCase()}';
+    final fallback =
+        _defaultBreakfastMenus[day.toLowerCase()] ??
+            _defaultBreakfastMenus['monday']!;
+    return _getMenuItems(
+      key,
+      fallback,
+    );
   }
 
   /// Returns default lunch items based on day
   static List<String> _getDefaultLunch(String day) {
-    final lunchMenus = {
-      'Monday': [
-        'Steamed Rice',
-        'Sambar',
-        'Rasam',
-        'Vegetable Curry (Beans Palya)',
-        'Curd',
-        'Papad',
-        'Buttermilk',
-      ],
-      'Tuesday': [
-        'Steamed Rice',
-        'Dal Tadka',
-        'Rasam',
-        'Cabbage Poriyal',
-        'Brinjal Curry',
-        'Curd',
-        'Pickle',
-      ],
-      'Wednesday': [
-        'Jeera Rice',
-        'Sambar',
-        'Rasam',
-        'Potato Fry',
-        'Spinach Dal',
-        'Curd',
-        'Papad',
-      ],
-      'Thursday': [
-        'Steamed Rice',
-        'Moong Dal',
-        'Rasam',
-        'Mixed Vegetable Curry',
-        'Beetroot Poriyal',
-        'Curd',
-        'Buttermilk',
-      ],
-      'Friday': [
-        'Lemon Rice',
-        'Sambar',
-        'Rasam',
-        'Okra Fry (Bhendi)',
-        'Carrot Poriyal',
-        'Curd',
-        'Pickle',
-      ],
-      'Saturday': [
-        'Steamed Rice',
-        'Toor Dal',
-        'Rasam',
-        'Pumpkin Curry',
-        'Green Beans Poriyal',
-        'Curd',
-        'Papad',
-      ],
-      'Sunday': [
-        'Special Lunch - Pulao',
-        'Sambar',
-        'Rasam',
-        'Paneer Butter Masala',
-        'Raita',
-        'Sweet (Payasam)',
-        'Papad',
-      ],
-    };
-
-    return lunchMenus[day] ?? _getDefaultLunch('Monday');
+    final key = 'menuLunch_${day.toLowerCase()}';
+    final fallback =
+        _defaultLunchMenus[day.toLowerCase()] ??
+            _defaultLunchMenus['monday']!;
+    return _getMenuItems(
+      key,
+      fallback,
+    );
   }
 
   /// Returns default dinner items based on day
   static List<String> _getDefaultDinner(String day) {
-    final dinnerMenus = {
-      'Monday': [
-        'Chapati (4 pieces)',
-        'Mixed Vegetable Curry',
-        'Dal Fry',
-        'Rice',
-        'Curd',
-      ],
-      'Tuesday': [
-        'Chapati (4 pieces)',
-        'Palak Paneer',
-        'Dal Tadka',
-        'Rice',
-        'Pickle',
-      ],
-      'Wednesday': [
-        'Paratha (3 pieces)',
-        'Aloo Gobi',
-        'Moong Dal',
-        'Rice',
-        'Curd',
-      ],
-      'Thursday': [
-        'Chapati (4 pieces)',
-        'Chana Masala',
-        'Tomato Rasam',
-        'Rice',
-        'Raita',
-      ],
-      'Friday': [
-        'Puri (6 pieces)',
-        'Aloo Curry',
-        'Chana Dal',
-        'Rice',
-        'Curd',
-      ],
-      'Saturday': [
-        'Chapati (4 pieces)',
-        'Egg Curry (2 eggs)',
-        'Dal Tadka',
-        'Rice',
-        'Pickle',
-      ],
-      'Sunday': [
-        'Special Dinner - Naan (3 pieces)',
-        'Paneer Tikka Masala',
-        'Dal Makhani',
-        'Jeera Rice',
-        'Raita',
-        'Gulab Jamun (2 pieces)',
-      ],
-    };
-
-    return dinnerMenus[day] ?? _getDefaultDinner('Monday');
+    final key = 'menuDinner_${day.toLowerCase()}';
+    final fallback =
+        _defaultDinnerMenus[day.toLowerCase()] ??
+            _defaultDinnerMenus['monday']!;
+    return _getMenuItems(
+      key,
+      fallback,
+    );
   }
 
   /// Creates an empty menu template for a specific day
@@ -308,13 +345,30 @@ class MenuInitializationHelper {
   static String getMealTypeDescription(String mealType) {
     switch (mealType.toLowerCase()) {
       case 'breakfast':
-        return 'Morning meal (6:00 AM - 10:00 AM)';
+        {
+          final translation =
+              _i18n.translate('menuMealTypeBreakfastDescription');
+          return translation != 'menuMealTypeBreakfastDescription'
+              ? translation
+              : 'Morning meal (6:00 AM - 10:00 AM)';
+        }
       case 'lunch':
-        return 'Afternoon meal (12:00 PM - 3:00 PM)';
+        {
+          final translation = _i18n.translate('menuMealTypeLunchDescription');
+          return translation != 'menuMealTypeLunchDescription'
+              ? translation
+              : 'Afternoon meal (12:00 PM - 3:00 PM)';
+        }
       case 'dinner':
-        return 'Evening meal (7:00 PM - 10:00 PM)';
+        {
+          final translation = _i18n.translate('menuMealTypeDinnerDescription');
+          return translation != 'menuMealTypeDinnerDescription'
+              ? translation
+              : 'Evening meal (7:00 PM - 10:00 PM)';
+        }
       default:
-        return 'Meal';
+        final translation = _i18n.translate('menuMealTypeGeneric');
+        return translation != 'menuMealTypeGeneric' ? translation : 'Meal';
     }
   }
 
@@ -340,15 +394,27 @@ class MenuInitializationHelper {
 
   /// Helper converts DateTime to weekday string
   static String weekdayString(DateTime date) {
-    const weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
-    ];
-    return weekdays[date.weekday - 1];
+    return _weekdayKeys[date.weekday - 1];
+  }
+
+  static List<String> _getMenuItems(String key, List<String> fallback) {
+    final translation = _i18n.translate(key);
+    if (translation.isEmpty || translation == key) {
+      return fallback;
+    }
+
+    final decoded = _splitMenuItems(translation);
+    if (decoded.isEmpty) {
+      return fallback;
+    }
+    return decoded;
+  }
+
+  static List<String> _splitMenuItems(String value) {
+    return value
+        .split('|')
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList();
   }
 }

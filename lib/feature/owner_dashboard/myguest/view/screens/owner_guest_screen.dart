@@ -16,6 +16,7 @@ import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/chips/filter_chip.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/owner_drawer.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../../shared/widgets/pg_selector_dropdown.dart';
@@ -61,21 +62,22 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     final bookingRequests = viewModel.bookingRequests;
     final bedChangeRequests = viewModel.bedChangeRequests;
     final pendingBedChangeRequests = viewModel.pendingBedChangeRequests;
+    final AppLocalizations loc = AppLocalizations.of(context)!;
 
     if (bookingRequests.isEmpty && bedChangeRequests.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.request_page_outlined, size: 64, color: Colors.grey),
-            SizedBox(height: AppSpacing.paddingM),
+            const Icon(Icons.request_page_outlined, size: 64, color: Colors.grey),
+            const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(
-              text: 'No Requests',
+              text: loc.noRequests,
               align: TextAlign.center,
             ),
-            SizedBox(height: AppSpacing.paddingS),
+            const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: 'Booking and bed change requests will appear here',
+              text: loc.bookingAndBedChangeRequestsWillAppearHere,
               align: TextAlign.center,
             ),
           ],
@@ -90,12 +92,12 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           TabBar(
             tabs: [
               Tab(
-                text: 'Booking Requests (${bookingRequests.length})',
+                text: '${loc.bookingRequests} (${bookingRequests.length})',
                 icon: const Icon(Icons.book_online, size: 16),
               ),
               Tab(
                 text:
-                    'Bed Changes (${pendingBedChangeRequests.length} pending)',
+                    '${loc.bedChanges} (${pendingBedChangeRequests.length} ${loc.pending})',
                 icon: const Icon(Icons.bed, size: 16),
               ),
             ],
@@ -134,18 +136,19 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   Widget _buildComplaintsTab(
       BuildContext context, OwnerGuestViewModel viewModel) {
     final complaints = viewModel.filteredComplaints;
+    final AppLocalizations loc = AppLocalizations.of(context)!;
 
     if (complaints.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.report_problem_outlined, size: 64, color: Colors.grey),
-            SizedBox(height: AppSpacing.paddingM),
-            HeadingMedium(text: 'No Complaints'),
-            SizedBox(height: AppSpacing.paddingS),
+            const Icon(Icons.report_problem_outlined, size: 64, color: Colors.grey),
+            const SizedBox(height: AppSpacing.paddingM),
+            HeadingMedium(text: loc.noComplaintsFound),
+            const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: 'Complaints from guests will appear here',
+              text: loc.complaintsFromGuestsWillAppearHere,
               align: TextAlign.center,
             ),
           ],
@@ -175,7 +178,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                       const SizedBox(width: AppSpacing.paddingS),
                       Expanded(
                         child: HeadingSmall(
-                            text: c.title.isEmpty ? 'Complaint' : c.title),
+                            text: c.title.isEmpty ? loc.complaints : c.title),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -199,7 +202,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                       Icon(Icons.person, size: 14, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       CaptionText(
-                          text: c.guestName.isEmpty ? 'Guest' : c.guestName),
+                        text: c.guestName.isEmpty ? loc.guest : c.guestName,
+                      ),
                       const SizedBox(width: AppSpacing.paddingM),
                       Icon(Icons.schedule, size: 14, color: Colors.grey[600]),
                       const SizedBox(width: 4),
@@ -210,14 +214,14 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                   Row(
                     children: [
                       SecondaryButton(
-                        label: 'Reply',
+                        label: loc.reply,
                         onPressed: () => _showComplaintReplyDialog(
                             context, viewModel, c.complaintId),
                       ),
                       const SizedBox(width: AppSpacing.paddingS),
                       if (!c.isResolved)
                         PrimaryButton(
-                          label: 'Resolve',
+                          label: loc.resolve,
                           onPressed: () => _resolveComplaint(
                               context, viewModel, c.complaintId),
                         ),
@@ -239,26 +243,27 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   void _showComplaintReplyDialog(
       BuildContext context, OwnerGuestViewModel viewModel, String complaintId) {
     final controller = TextEditingController();
+    final AppLocalizations loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingSmall(text: 'Reply to Complaint'),
+        title: HeadingSmall(text: loc.replyToComplaint),
         content: TextField(
           controller: controller,
           maxLines: 4,
-          decoration: const InputDecoration(
-            labelText: 'Reply',
-            hintText: 'Type your reply...',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: loc.reply,
+            hintText: loc.typeYourReply,
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           PrimaryButton(
-            label: 'Send',
+            label: loc.send,
             onPressed: () async {
               final text = controller.text.trim();
               if (text.isEmpty) return;
@@ -269,7 +274,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: BodyText(
-                      text: ok ? 'Reply sent' : 'Failed to send reply',
+                      text: ok ? loc.replySent : loc.failedToSendReply,
                       color: Colors.white,
                     ),
                     backgroundColor: ok ? Colors.green : Colors.red,
@@ -286,25 +291,26 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   void _resolveComplaint(
       BuildContext context, OwnerGuestViewModel viewModel, String complaintId) {
     final notes = TextEditingController();
+    final AppLocalizations loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingSmall(text: 'Resolve Complaint'),
+        title: HeadingSmall(text: loc.resolveComplaint),
         content: TextField(
           controller: notes,
           maxLines: 3,
-          decoration: const InputDecoration(
-            labelText: 'Resolution Notes (optional)',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: loc.resolutionNotesOptional,
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           PrimaryButton(
-            label: 'Mark Resolved',
+            label: loc.markResolved,
             onPressed: () async {
               Navigator.of(context).pop();
               final ok = await viewModel.updateComplaintStatus(
@@ -317,7 +323,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: BodyText(
-                      text: ok ? 'Complaint resolved' : 'Failed to resolve',
+                      text: ok ? loc.complaintResolved : loc.failedToResolve,
                       color: Colors.white,
                     ),
                     backgroundColor: ok ? Colors.green : Colors.red,
@@ -357,6 +363,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     final viewModel = context.watch<OwnerGuestViewModel>();
     final selectedPgProvider = context.watch<SelectedPgProvider>();
     final currentPgId = selectedPgProvider.selectedPgId;
+    final AppLocalizations loc = AppLocalizations.of(context)!;
 
     // Auto-reload data when selected PG changes
     if (_lastLoadedPgId != currentPgId &&
@@ -384,7 +391,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: viewModel.refreshData,
-            tooltip: 'Refresh Guest Data',
+            tooltip: loc.refreshGuestData,
           ),
         ],
 
@@ -396,15 +403,15 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             indicatorColor: Colors.white,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
-            tabs: const [
-              Tab(text: 'Guests', icon: Icon(Icons.people, size: 16)),
-              Tab(text: 'Bookings', icon: Icon(Icons.book_online, size: 16)),
-              Tab(text: 'Payments', icon: Icon(Icons.payment, size: 16)),
+            tabs: [
+              Tab(text: loc.guests, icon: const Icon(Icons.people, size: 16)),
+              Tab(text: loc.booking, icon: const Icon(Icons.book_online, size: 16)),
+              Tab(text: loc.payments, icon: const Icon(Icons.payment, size: 16)),
               Tab(
-                  text: 'Complaints',
-                  icon: Icon(Icons.report_problem, size: 16)),
-              Tab(text: 'Requests', icon: Icon(Icons.request_page, size: 16)),
-              Tab(text: 'Bed Map', icon: Icon(Icons.bed, size: 16)),
+                  text: loc.complaints,
+                  icon: const Icon(Icons.report_problem, size: 16)),
+              Tab(text: loc.requests, icon: const Icon(Icons.request_page, size: 16)),
+              Tab(text: loc.bedMap, icon: const Icon(Icons.bed, size: 16)),
             ],
           ),
         ),
@@ -422,6 +429,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
 
   /// Builds appropriate body content based on current state
   Widget _buildBody(BuildContext context, OwnerGuestViewModel viewModel) {
+    final AppLocalizations loc = AppLocalizations.of(context)!;
+
     if (viewModel.loading && viewModel.guests.isEmpty) {
       return Center(
         child: Column(
@@ -429,7 +438,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           children: [
             AdaptiveLoader(),
             const SizedBox(height: AppSpacing.paddingM),
-            const BodyText(text: 'Loading guest data...'),
+            BodyText(text: loc.loadingGuestData),
           ],
         ),
       );
@@ -442,19 +451,19 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: AppSpacing.paddingL),
-            const HeadingMedium(
-              text: 'Error Loading Data',
+            HeadingMedium(
+              text: loc.errorLoadingData,
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: viewModel.errorMessage ?? 'Unknown error occurred',
+              text: viewModel.errorMessage ?? loc.somethingWentWrong,
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingL),
             PrimaryButton(
               onPressed: viewModel.refreshData,
-              label: 'Try Again',
+              label: loc.tryAgain,
               icon: Icons.refresh,
             ),
           ],
@@ -500,6 +509,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
       BuildContext context, OwnerGuestViewModel viewModel) {
     // final theme = Theme.of(context);
     // final true = theme.brightness == Brightness.dark;
+    final AppLocalizations loc = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
@@ -530,7 +540,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: BodyText(
-              text: '${viewModel.selectedCount} selected',
+              text: '${viewModel.selectedCount} ${loc.selected}',
               color: Colors.white,
               medium: true,
             ),
@@ -554,8 +564,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             ),
             label: BodyText(
               text: viewModel.selectedCount == viewModel.filteredGuests.length
-                  ? 'Deselect All'
-                  : 'Select All',
+                  ? loc.deselectAll
+                  : loc.selectAll,
               color: Colors.white,
             ),
           ),
@@ -564,12 +574,12 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () => _showBulkStatusDialog(context, viewModel),
-            tooltip: 'Change Status',
+            tooltip: loc.changeStatus,
           ),
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.white),
             onPressed: () => _confirmBulkDelete(context, viewModel),
-            tooltip: 'Delete Selected',
+            tooltip: loc.deleteSelected,
           ),
         ],
       ),
@@ -578,26 +588,28 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
 
   Future<void> _showBulkStatusDialog(
       BuildContext context, OwnerGuestViewModel viewModel) async {
+    final AppLocalizations loc = AppLocalizations.of(context)!;
+
     final newStatus = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Change Status'),
+        title: Text(loc.changeStatus),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.check_circle, color: AppColors.success),
-              title: const Text('Active'),
+              title: Text(loc.active),
               onTap: () => Navigator.pop(context, 'active'),
             ),
             ListTile(
               leading: const Icon(Icons.pending, color: AppColors.warning),
-              title: const Text('Pending'),
+              title: Text(loc.pending),
               onTap: () => Navigator.pop(context, 'pending'),
             ),
             ListTile(
               leading: const Icon(Icons.cancel, color: AppColors.error),
-              title: const Text('Inactive'),
+              title: Text(loc.inactive),
               onTap: () => Navigator.pop(context, 'inactive'),
             ),
           ],
@@ -616,7 +628,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Updated ${viewModel.selectedCount} guests to $newStatus'),
+        content:
+            Text(loc.updatedGuestsToStatus(viewModel.selectedCount, newStatus)),
         backgroundColor: AppColors.success,
       ),
     );
@@ -624,22 +637,24 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
 
   Future<void> _confirmBulkDelete(
       BuildContext context, OwnerGuestViewModel viewModel) async {
+    final AppLocalizations loc = AppLocalizations.of(context)!;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Bulk Delete'),
+        title: Text(loc.confirmBulkDelete),
         content: Text(
-          'Are you sure you want to delete ${viewModel.selectedCount} guests? This action cannot be undone.',
+          loc.areYouSureYouWantToDeleteGuests(viewModel.selectedCount),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('Delete'),
+            child: Text(loc.delete),
           ),
         ],
       ),
@@ -655,8 +670,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     if (!success || !mounted) return;
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Guests deleted successfully'),
+      SnackBar(
+        content: Text(loc.guestsDeletedSuccessfully),
         backgroundColor: AppColors.success,
       ),
     );
@@ -665,6 +680,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   /// Builds statistics card
   Widget _buildStatsCard(BuildContext context, OwnerGuestViewModel viewModel) {
     final stats = viewModel.guestStats;
+    final AppLocalizations loc = AppLocalizations.of(context)!;
 
     return AdaptiveCard(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
@@ -673,7 +689,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Guest Overview',
+            text: loc.guestOverview,
             color: Theme.of(context).primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -682,19 +698,19 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             children: [
               _buildStatItem(
                 context,
-                'Total',
+                loc.totalGuests,
                 '${stats['totalGuests'] ?? 0}',
                 Icons.people,
               ),
               _buildStatItem(
                 context,
-                'Active',
+                loc.activeGuests,
                 '${stats['activeGuests'] ?? 0}',
                 Icons.check_circle,
               ),
               _buildStatItem(
                 context,
-                'Pending',
+                loc.pendingGuests,
                 '${stats['pendingGuests'] ?? 0}',
                 Icons.pending,
               ),
@@ -741,6 +757,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   Widget _buildSearchBar(BuildContext context, OwnerGuestViewModel viewModel) {
     // final theme = Theme.of(context);
     // final true = theme.brightness == Brightness.dark;
+    final AppLocalizations loc = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
@@ -766,7 +783,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                 color: AppColors.textOnPrimary,
               ),
               decoration: InputDecoration(
-                hintText: 'Search by name, phone, or vehicle...',
+                hintText: loc.ownerGuestSearchHint,
                 hintStyle: TextStyle(
                   color: AppColors.textTertiary,
                 ),
@@ -781,7 +798,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                 color: AppColors.textTertiary,
               ),
               onPressed: viewModel.clearSearch,
-              tooltip: 'Clear search',
+              tooltip: loc.ownerGuestClearSearchTooltip,
             ),
         ],
       ),
@@ -790,6 +807,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
 
   Widget _buildFilterChips(
       BuildContext context, OwnerGuestViewModel viewModel) {
+    final AppLocalizations loc = AppLocalizations.of(context)!;
     final filters = ['All', 'Active', 'Pending', 'Inactive', 'Vehicles'];
 
     return Column(
@@ -812,7 +830,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                           index < filters.length - 1 ? AppSpacing.paddingXS : 0,
                     ),
                     child: CustomFilterChip(
-                      label: filter,
+                      label: _filterLabel(filter, loc),
                       selected: isSelected,
                       onSelected: (selected) {
                         viewModel.setFilter(filter);
@@ -845,7 +863,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                             size: 16, color: AppColors.info),
                         const SizedBox(width: 4),
                         BodyText(
-                          text: '${viewModel.filteredGuests.length} found',
+                          text:
+                              '${viewModel.filteredGuests.length} ${loc.found}',
                           color: AppColors.info,
                           medium: true,
                         ),
@@ -860,9 +879,26 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     );
   }
 
+  String _filterLabel(String filter, AppLocalizations loc) {
+    switch (filter) {
+      case 'Active':
+        return loc.ownerGuestFilterActive;
+      case 'Pending':
+        return loc.ownerGuestFilterPending;
+      case 'Inactive':
+        return loc.ownerGuestFilterInactive;
+      case 'Vehicles':
+        return loc.ownerGuestFilterVehicles;
+      case 'All':
+      default:
+        return loc.ownerGuestFilterAll;
+    }
+  }
+
   /// Builds the payments tab content
   Widget _buildPaymentsTab(
       BuildContext context, OwnerGuestViewModel viewModel) {
+    final AppLocalizations loc = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Payment stats card
@@ -880,7 +916,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         Padding(
           padding: const EdgeInsets.all(AppSpacing.paddingM),
           child: PrimaryButton(
-            label: 'Record Payment',
+            label: loc.recordPayment,
             icon: Icons.add,
             onPressed: () => _showRecordPaymentDialog(context, viewModel),
           ),
@@ -898,6 +934,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         pendingPayments.fold(0.0, (sum, p) => sum + p.amountPaid);
     final totalCollected =
         collectedPayments.fold(0.0, (sum, p) => sum + p.amountPaid);
+    final AppLocalizations loc = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
@@ -917,8 +954,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
       ),
       child: Column(
         children: [
-          const HeadingMedium(
-            text: 'Payment Summary',
+          HeadingMedium(
+            text: loc.ownerGuestPaymentSummaryTitle,
             color: AppColors.textOnPrimary,
             align: TextAlign.center,
           ),
@@ -926,10 +963,20 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildPaymentStatItem('Pending', pendingPayments.length,
-                  totalPending, Colors.orange),
-              _buildPaymentStatItem('Collected', collectedPayments.length,
-                  totalCollected, Colors.green),
+              _buildPaymentStatItem(
+                context,
+                loc.ownerGuestPaymentPendingLabel,
+                pendingPayments.length,
+                totalPending,
+                Colors.orange,
+              ),
+              _buildPaymentStatItem(
+                context,
+                loc.ownerGuestPaymentCollectedLabel,
+                collectedPayments.length,
+                totalCollected,
+                Colors.green,
+              ),
             ],
           ),
         ],
@@ -939,8 +986,11 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
 
   /// Builds individual payment stat item
   Widget _buildPaymentStatItem(
-      String label, int count, double amount, Color color) {
-    final formattedAmount = '₹${NumberFormat('#,##0').format(amount)}';
+      BuildContext context, String label, int count, double amount, Color color) {
+    final localeName = AppLocalizations.of(context)!.localeName;
+    final currencyFormatter =
+        NumberFormat.simpleCurrency(locale: localeName, name: 'INR');
+    final formattedAmount = currencyFormatter.format(amount);
 
     return Column(
       children: [
@@ -995,6 +1045,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   /// Builds individual booking request card
   Widget _buildBookingRequestCard(BuildContext context,
       OwnerBookingRequestModel request, OwnerGuestViewModel viewModel) {
+    final AppLocalizations loc = AppLocalizations.of(context)!;
     return AdaptiveCard(
       onTap: () => _showBookingRequestDetails(context, request, viewModel),
       child: Padding(
@@ -1080,7 +1131,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                 children: [
                   Expanded(
                     child: SecondaryButton(
-                      label: 'Reject',
+                      label: loc.reject,
                       onPressed: () =>
                           _showRejectDialog(context, request, viewModel),
                     ),
@@ -1088,7 +1139,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                   const SizedBox(width: AppSpacing.paddingS),
                   Expanded(
                     child: PrimaryButton(
-                      label: 'Approve',
+                      label: loc.approve,
                       onPressed: () =>
                           _showApproveDialog(context, request, viewModel),
                     ),
@@ -1105,33 +1156,43 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   /// Shows booking request details dialog
   void _showBookingRequestDetails(BuildContext context,
       OwnerBookingRequestModel request, OwnerGuestViewModel viewModel) {
+    final AppLocalizations loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: HeadingSmall(text: 'Booking Request Details'),
+        title: HeadingSmall(
+          text: loc.bookingRequestDetailsTitle,
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('Guest Name', request.guestDisplayName),
-              _buildDetailRow('Phone', request.guestPhone),
-              _buildDetailRow('Email', request.guestEmail),
-              _buildDetailRow('PG Name', request.pgName),
-              _buildDetailRow('Request Date', request.formattedCreatedAt),
-              _buildDetailRow('Status', request.statusDisplay),
+              _buildDetailRow(
+                loc.bookingRequestGuestNameLabel, request.guestDisplayName),
+              _buildDetailRow(
+                  loc.bookingRequestPhoneLabel, request.guestPhone),
+              _buildDetailRow(
+                  loc.bookingRequestEmailLabel, request.guestEmail),
+              _buildDetailRow(loc.bookingRequestPgNameLabel, request.pgName),
+              _buildDetailRow(
+                  loc.bookingRequestDateLabel, request.formattedCreatedAt),
+              _buildDetailRow(
+                  loc.bookingRequestStatusLabel, request.statusDisplay),
               if (request.message != null && request.message!.isNotEmpty)
-                _buildDetailRow('Message', request.message!),
+                _buildDetailRow(
+                    loc.bookingRequestMessageLabel, request.message!),
               if (request.responseMessage != null &&
                   request.responseMessage!.isNotEmpty)
-                _buildDetailRow('Response', request.responseMessage!),
+                _buildDetailRow(
+                    loc.bookingRequestResponseLabel, request.responseMessage!),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(loc.close),
           ),
           if (request.isPending) ...[
             TextButton(
@@ -1139,14 +1200,14 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                 Navigator.of(context).pop();
                 _showRejectDialog(context, request, viewModel);
               },
-              child: const Text('Reject'),
+              child: Text(loc.reject),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _showApproveDialog(context, request, viewModel);
               },
-              child: const Text('Approve'),
+              child: Text(loc.approve),
             ),
           ],
         ],

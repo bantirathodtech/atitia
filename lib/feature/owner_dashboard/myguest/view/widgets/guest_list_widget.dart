@@ -11,6 +11,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_guest_model.dart';
 
 /// Widget displaying guest list with room/bed assignments and booking information
@@ -33,9 +34,9 @@ class GuestListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (guests.isEmpty) {
-      return const EmptyState(
-        title: 'No Guests',
-        message: 'Guest list will appear here once guests are added',
+      return EmptyState(
+        title: AppLocalizations.of(context)?.noGuests ?? 'No Guests',
+        message: AppLocalizations.of(context)?.guestListWillAppearHereOnceGuestsAreAdded ?? 'Guest list will appear here once guests are added',
         icon: Icons.people_outline,
       );
     }
@@ -182,43 +183,51 @@ class GuestListWidget extends StatelessWidget {
   }
 
   /// Shows guest details dialog
-  void _showGuestDetails(BuildContext context, OwnerGuestModel guest) {
-    showDialog(
+  Future<void> _showGuestDetails(BuildContext context, OwnerGuestModel guest) {
+    final loc = AppLocalizations.of(context)!;
+    return showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: HeadingSmall(text: guest.fullName),
+        title: HeadingSmall(text: loc.guestDetailsTitle),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow(context, 'Phone', guest.phoneNumber),
-              if (guest.email != null)
-                _buildDetailRow(context, 'Email', guest.email!),
-              if (guest.vehicleNo != null && guest.vehicleNo!.isNotEmpty)
-                _buildDetailRow(context, 'Vehicle No', guest.vehicleNo!),
-              if (guest.vehicleName != null && guest.vehicleName!.isNotEmpty)
-                _buildDetailRow(context, 'Vehicle', guest.vehicleName!),
+              _buildDetailRow(context, loc.ownerGuestDetailVehicleNumber,
+                  guest.vehicleNo!),
+              if (guest.vehicleName != null &&
+                  guest.vehicleName!.isNotEmpty)
+                _buildDetailRow(context, loc.ownerGuestDetailVehicle,
+                    guest.vehicleName!),
               if (guest.roomNumber != null)
-                _buildDetailRow(context, 'Room/Bed', guest.roomBedDisplay),
+                _buildDetailRow(
+                  context,
+                  loc.ownerGuestDetailRoomBed,
+                  guest.roomBedDisplay,
+                ),
               if (guest.rent != null)
-                _buildDetailRow(context, 'Rent', guest.formattedRent),
+                _buildDetailRow(
+                    context, loc.ownerGuestDetailRent, guest.formattedRent),
               if (guest.deposit != null)
-                _buildDetailRow(context, 'Deposit', guest.formattedDeposit),
+                _buildDetailRow(context, loc.ownerGuestDetailDeposit,
+                    guest.formattedDeposit),
               if (guest.joiningDate != null)
-                _buildDetailRow(context, 'Joined', guest.formattedJoiningDate),
-              _buildDetailRow(context, 'Status', guest.statusDisplay),
+                _buildDetailRow(context, loc.ownerGuestDetailJoined,
+                    guest.formattedJoiningDate),
+              _buildDetailRow(context, loc.ownerGuestDetailStatus,
+                  guest.statusDisplay),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(loc.close),
           ),
           if (guest.roomNumber != null || guest.bedNumber != null)
             PrimaryButton(
-              label: 'Update Room/Bed',
+              label: loc.ownerGuestUpdateRoomBed,
               onPressed: () {
                 Navigator.of(context).pop();
                 _showUpdateRoomBedDialog(context, guest);
@@ -248,34 +257,36 @@ class GuestListWidget extends StatelessWidget {
   }
 
   /// Shows dialog to update guest room/bed assignment
-  void _showUpdateRoomBedDialog(BuildContext context, OwnerGuestModel guest) {
+  Future<void> _showUpdateRoomBedDialog(
+      BuildContext context, OwnerGuestModel guest) {
     final roomController = TextEditingController(text: guest.roomNumber ?? '');
     final bedController = TextEditingController(text: guest.bedNumber ?? '');
+    final loc = AppLocalizations.of(context)!;
 
-    showDialog(
+    return showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: HeadingSmall(text: 'Update Room/Bed Assignment'),
+        title: HeadingSmall(text: loc.ownerGuestUpdateRoomBedTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: roomController,
-              decoration: const InputDecoration(
-                labelText: 'Room Number',
-                hintText: 'Enter room number',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.door_front_door),
+              decoration: InputDecoration(
+                labelText: loc.ownerGuestRoomNumberLabel,
+                hintText: loc.ownerGuestRoomNumberHint,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.door_front_door),
               ),
             ),
             const SizedBox(height: AppSpacing.paddingM),
             TextField(
               controller: bedController,
-              decoration: const InputDecoration(
-                labelText: 'Bed Number',
-                hintText: 'Enter bed number',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.bed),
+              decoration: InputDecoration(
+                labelText: loc.ownerGuestBedNumberLabel,
+                hintText: loc.ownerGuestBedNumberHint,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.bed),
               ),
             ),
           ],
@@ -283,10 +294,10 @@ class GuestListWidget extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           PrimaryButton(
-            label: 'Update',
+            label: loc.ownerGuestUpdateAction,
             onPressed: () async {
               final viewModel =
                   Provider.of<OwnerGuestViewModel>(context, listen: false);
@@ -306,8 +317,8 @@ class GuestListWidget extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(success
-                        ? 'Room/Bed updated successfully'
-                        : 'Failed to update room/bed'),
+                        ? loc.ownerGuestRoomBedUpdateSuccess
+                        : loc.ownerGuestRoomBedUpdateFailure),
                     backgroundColor: success ? Colors.green : Colors.red,
                   ),
                 );

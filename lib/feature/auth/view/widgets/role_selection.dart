@@ -5,6 +5,7 @@ import '../../../../common/styles/spacing.dart';
 import '../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../common/widgets/text/body_text.dart';
 import '../../../../common/widgets/text/heading_medium.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../logic/auth_provider.dart';
 
 /// Role selection widget for choosing between Guest and Owner roles
@@ -18,16 +19,21 @@ class RoleSelectionWidget extends StatelessWidget {
     final authProvider = context.watch<AuthProvider>();
     final selectedRole = authProvider.user?.role;
 
+    final loc = AppLocalizations.of(context);
+    if (loc == null) {
+      return const SizedBox.shrink();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const HeadingMedium(
-          text: 'Select Your Role',
+        HeadingMedium(
+          text: loc.selectRole,
           align: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.sm),
-        const BodyText(
-          text: 'Choose how you want to use the app',
+        BodyText(
+          text: loc.chooseHowYouWantToUseTheApp,
           align: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.lg),
@@ -35,8 +41,8 @@ class RoleSelectionWidget extends StatelessWidget {
         // Guest Role Card
         _buildRoleCard(
           context: context,
-          title: 'Guest',
-          description: 'Find and book PG accommodations',
+          title: loc.guest,
+          description: loc.findAndBookPgAccommodations,
           icon: Icons.person,
           color: Colors.blue,
           isSelected: selectedRole == 'guest',
@@ -48,8 +54,8 @@ class RoleSelectionWidget extends StatelessWidget {
         // Owner Role Card
         _buildRoleCard(
           context: context,
-          title: 'Owner',
-          description: 'Manage your PG properties and guests',
+          title: loc.owner,
+          description: loc.manageYourPgPropertiesAndGuests,
           icon: Icons.business,
           color: Colors.green,
           isSelected: selectedRole == 'owner',

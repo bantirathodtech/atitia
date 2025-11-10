@@ -26,6 +26,7 @@ import 'package:provider/provider.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/data/model/user_model.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
@@ -70,7 +71,6 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
   void initState() {
     super.initState();
     _initializeControllers();
-
     // Load profile data after frame is built to avoid setState during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadGuestProfile();
@@ -141,8 +141,8 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
     _guardianPhoneController.text = '';
 
     _selectedGender = user.gender ?? 'Male';
-    _selectedFoodPreference = 'Vegetarian'; // Default value
-    _selectedMaritalStatus = 'Single'; // Default value
+    _selectedFoodPreference = 'Vegetarian';
+    _selectedMaritalStatus = 'Single';
 
     _uploadedProfilePhotoUrl = user.profilePhotoUrl;
     _uploadedAadhaarPhotoUrl = user.aadhaarPhotoUrl;
@@ -211,7 +211,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error picking image: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)?.errorPickingImage(e.toString()) ?? 'Error picking image: $e')),
         );
       }
       return null;
@@ -248,7 +248,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         // Changed to: Check mounted before using context
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to upload profile photo: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)?.failedToUploadProfilePhoto(e.toString()) ?? 'Failed to upload profile photo: $e')),
         );
       } finally {
         if (mounted) {
@@ -288,7 +288,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         // Changed to: Check mounted before using context
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to upload Aadhaar photo: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)?.failedToUploadAadhaarPhoto(e.toString()) ?? 'Failed to upload Aadhaar photo: $e')),
         );
       } finally {
         if (mounted) {
@@ -307,7 +307,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
 
     if (currentGuest == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No profile data found')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.noProfileDataFound ?? 'No profile data found')),
       );
       return;
     }
@@ -358,7 +358,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
     if (mounted) {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')),
+          SnackBar(content: Text(AppLocalizations.of(context)?.profileUpdatedSuccessfully ?? 'Profile updated successfully')),
         );
 
         // Navigate back using GetIt NavigationService
@@ -366,7 +366,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         navigationService.goBack();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update profile')),
+          SnackBar(content: Text(AppLocalizations.of(context)?.failedToUpdateProfile ?? 'Failed to update profile')),
         );
       }
     }
@@ -402,7 +402,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () => _saveProfile(),
-            tooltip: 'Save Profile',
+            tooltip: AppLocalizations.of(context)?.saveProfile ?? 'Save Profile',
           ),
         ],
         showBackButton: true, // Back button to go back
@@ -416,13 +416,13 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
   /// Builds appropriate body content based on current state
   Widget _buildBody(BuildContext context, GuestProfileViewModel viewModel) {
     if (viewModel.loading && viewModel.guest == null) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Loading your profile...'),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(AppLocalizations.of(context)?.loadingYourProfile ?? 'Loading your profile...'),
           ],
         ),
       );
@@ -436,12 +436,12 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'Error Loading Profile',
+              AppLocalizations.of(context)?.errorLoadingProfile ?? 'Error Loading Profile',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              viewModel.errorMessage ?? 'Unknown error occurred',
+              AppLocalizations.of(context)?.somethingWentWrong ?? 'Unknown error occurred',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey.shade600),
             ),
@@ -451,9 +451,9 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,
               ),
-              child: const Text(
-                'Try Again',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                AppLocalizations.of(context)?.tryAgain ?? 'Try Again',
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],
@@ -497,7 +497,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
     return Column(
       children: [
         Text(
-          'Profile Photos',
+          AppLocalizations.of(context)?.profilePhotos ?? 'Profile Photos',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -508,14 +508,14 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
           children: [
             _buildPhotoUpload(
               context,
-              'Profile Photo',
+              AppLocalizations.of(context)?.profilePhoto ?? 'Profile Photo',
               _uploadedProfilePhotoUrl,
               _selectedProfilePhoto,
               _onProfilePhotoSelected,
             ),
             _buildPhotoUpload(
               context,
-              'Aadhaar Photo',
+              AppLocalizations.of(context)?.aadhaarPhoto ?? 'Aadhaar Photo',
               _uploadedAadhaarPhotoUrl,
               _selectedAadhaarPhoto,
               _onAadhaarPhotoSelected,
@@ -573,11 +573,12 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
 
   /// Builds personal information form section
   Widget _buildPersonalInfoSection(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Personal Information',
+          loc.personalInformation,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -585,22 +586,22 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _fullNameController,
-          decoration: const InputDecoration(
-            labelText: 'Full Name',
-            border: OutlineInputBorder(),
-            hintText: 'Enter your full name',
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.fullName ?? 'Full Name',
+            border: const OutlineInputBorder(),
+            hintText: AppLocalizations.of(context)?.enterYourCompleteName ?? 'Enter your complete name',
           ),
           validator: (value) => value == null || value.trim().isEmpty
-              ? 'Full name is required'
+              ? (AppLocalizations.of(context)?.fullNameIsRequired ?? 'Full name is required')
               : null,
         ),
         const SizedBox(height: 16),
         TextFormField(
           controller: _emailController,
-          decoration: const InputDecoration(
-            labelText: 'Email Address',
-            border: OutlineInputBorder(),
-            hintText: 'your.email@example.com',
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.email ?? 'Email Address',
+            border: const OutlineInputBorder(),
+            hintText: AppLocalizations.of(context)?.yourEmailExampleCom ?? 'your.email@example.com',
           ),
           keyboardType: TextInputType.emailAddress,
         ),
@@ -610,9 +611,9 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
           readOnly: true,
           onTap: _selectDateOfBirth,
           decoration: InputDecoration(
-            labelText: 'Date of Birth',
+            labelText: AppLocalizations.of(context)?.dateOfBirth ?? 'Date of Birth',
             border: const OutlineInputBorder(),
-            hintText: 'DD/MM/YYYY',
+            hintText: loc.dateFormatDdMmYyyy,
             suffixIcon: IconButton(
               icon: const Icon(Icons.calendar_today),
               onPressed: _selectDateOfBirth,
@@ -622,14 +623,17 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
           initialValue: _selectedGender,
-          decoration: const InputDecoration(
-            labelText: 'Gender',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.gender ?? 'Gender',
+            border: const OutlineInputBorder(),
           ),
-          items: const [
-            DropdownMenuItem(value: 'Male', child: Text('Male')),
-            DropdownMenuItem(value: 'Female', child: Text('Female')),
-            DropdownMenuItem(value: 'Other', child: Text('Other')),
+          items: [
+            DropdownMenuItem(
+                value: 'Male', child: Text(AppLocalizations.of(context)?.male ?? 'Male')),
+            DropdownMenuItem(
+                value: 'Female', child: Text(AppLocalizations.of(context)?.female ?? 'Female')),
+            DropdownMenuItem(
+                value: 'Other', child: Text(AppLocalizations.of(context)?.other ?? 'Other')),
           ],
           onChanged: (value) {
             if (value != null) {
@@ -647,7 +651,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Contact & Guardian Information',
+          AppLocalizations.of(context)?.contactAndGuardianInformation ?? 'Contact & Guardian Information',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -655,34 +659,34 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _addressController,
-          decoration: const InputDecoration(
-            labelText: 'Current Address',
-            border: OutlineInputBorder(),
-            hintText: 'Your current residential address',
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.currentAddress ?? 'Current Address',
+            border: const OutlineInputBorder(),
+            hintText: AppLocalizations.of(context)?.yourCurrentResidentialAddress ?? 'Your current residential address',
           ),
           maxLines: 3,
         ),
         const SizedBox(height: 16),
         TextFormField(
           controller: _guardianNameController,
-          decoration: const InputDecoration(
-            labelText: 'Guardian Name',
-            border: OutlineInputBorder(),
-            hintText: 'Name of your parent or guardian',
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.guardianName ?? 'Guardian Name',
+            border: const OutlineInputBorder(),
+            hintText: AppLocalizations.of(context)?.nameOfYourParentOrGuardian ?? 'Name of your parent or guardian',
           ),
         ),
         const SizedBox(height: 16),
         TextFormField(
           controller: _guardianPhoneController,
-          decoration: const InputDecoration(
-            labelText: 'Guardian Phone',
-            border: OutlineInputBorder(),
-            hintText: '10-digit phone number',
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.guardianPhone ?? 'Guardian Phone',
+            border: const OutlineInputBorder(),
+            hintText: AppLocalizations.of(context)?.tenDigitPhoneNumber ?? '10-digit phone number',
           ),
           keyboardType: TextInputType.phone,
           validator: (value) {
             if (value != null && value.isNotEmpty && value.length != 10) {
-              return 'Enter valid 10-digit phone number';
+              return AppLocalizations.of(context)?.pleaseEnterValidPhoneNumber ?? 'Enter valid 10-digit phone number';
             }
             return null;
           },
@@ -697,7 +701,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Preferences',
+          AppLocalizations.of(context)?.preferences ?? 'Preferences',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -705,15 +709,18 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
           initialValue: _selectedFoodPreference,
-          decoration: const InputDecoration(
-            labelText: 'Food Preference',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.foodPreference ?? 'Food Preference',
+            border: const OutlineInputBorder(),
           ),
-          items: const [
-            DropdownMenuItem(value: 'Vegetarian', child: Text('Vegetarian')),
+          items: [
             DropdownMenuItem(
-                value: 'Non-Vegetarian', child: Text('Non-Vegetarian')),
-            DropdownMenuItem(value: 'Eggetarian', child: Text('Eggetarian')),
+                value: 'Vegetarian', child: Text(AppLocalizations.of(context)?.vegetarian ?? 'Vegetarian')),
+            DropdownMenuItem(
+                value: 'Non-Vegetarian',
+                child: Text(AppLocalizations.of(context)?.nonVegetarian ?? 'Non-Vegetarian')),
+            DropdownMenuItem(
+                value: 'Eggetarian', child: Text(AppLocalizations.of(context)?.eggetarian ?? 'Eggetarian')),
           ],
           onChanged: (value) {
             if (value != null) {
@@ -724,14 +731,17 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
           initialValue: _selectedMaritalStatus,
-          decoration: const InputDecoration(
-            labelText: 'Marital Status',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)?.maritalStatus ?? 'Marital Status',
+            border: const OutlineInputBorder(),
           ),
-          items: const [
-            DropdownMenuItem(value: 'Single', child: Text('Single')),
-            DropdownMenuItem(value: 'Married', child: Text('Married')),
-            DropdownMenuItem(value: 'Divorced', child: Text('Divorced')),
+          items: [
+            DropdownMenuItem(
+                value: 'Single', child: Text(AppLocalizations.of(context)?.single ?? 'Single')),
+            DropdownMenuItem(
+                value: 'Married', child: Text(AppLocalizations.of(context)?.married ?? 'Married')),
+            DropdownMenuItem(
+                value: 'Divorced', child: Text(AppLocalizations.of(context)?.divorced ?? 'Divorced')),
           ],
           onChanged: (value) {
             if (value != null) {
@@ -762,9 +772,9 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
                 color: Colors.white,
               ),
             )
-          : const Text(
-              'Save Profile',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          : Text(
+              AppLocalizations.of(context)?.saveProfile ?? 'Save Profile',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
     );
   }

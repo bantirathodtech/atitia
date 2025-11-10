@@ -19,6 +19,8 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../core/repositories/owner_payment_details_repository.dart';
 import '../../../../../core/services/payment/razorpay_service.dart';
 import '../../../../../core/viewmodels/payment_notification_viewmodel.dart';
@@ -50,6 +52,27 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
   bool _razorpayEnabled = false;
   final _razorpayService = RazorpayService();
   final _ownerPaymentRepo = OwnerPaymentDetailsRepository();
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String get _shortPaymentId =>
+      _payment?.paymentId.substring(0, 8).toUpperCase() ?? '';
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -72,7 +95,8 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
     }
 
     try {
-      final details = await _ownerPaymentRepo.getPaymentDetails(_payment!.ownerId);
+      final details =
+          await _ownerPaymentRepo.getPaymentDetails(_payment!.ownerId);
       if (mounted) {
         setState(() {
           _razorpayEnabled = details?.razorpayEnabled ?? false;
@@ -89,6 +113,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
   }
 
   Future<void> _loadPaymentDetails() async {
+    final loc = AppLocalizations.of(context);
     try {
       final paymentVM =
           Provider.of<GuestPaymentViewModel>(context, listen: false);
@@ -98,7 +123,10 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
         setState(() {
           _payment = payment;
           _isLoading = false;
-          _error = payment == null ? 'Payment not found' : null;
+          _error = payment == null
+              ? (loc?.paymentNotFound ??
+                  _text('paymentNotFound', 'Payment not found'))
+              : null;
         });
         // Load owner payment details after payment is loaded
         if (payment != null) {
@@ -109,7 +137,10 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _error = 'Failed to load payment details: $e';
+          _error = loc?.failedToLoadPaymentDetails(e.toString()) ??
+              _text('failedToLoadPaymentDetails',
+                  'Failed to load payment details: {error}',
+                  parameters: {'error': e.toString()});
         });
       }
     }
@@ -119,7 +150,8 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'Payment Details',
+        title: AppLocalizations.of(context)?.paymentDetails ??
+            _text('paymentDetails', 'Payment Details'),
         showBackButton: true,
       ),
       body: _buildBody(context),
@@ -127,17 +159,22 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     if (_isLoading) {
-      return Center(child: AdaptiveLoader());
+      return const Center(child: AdaptiveLoader());
     }
 
     if (_error != null || _payment == null) {
       return Center(
         child: EmptyState(
-          title: 'Payment Not Found',
-          message: _error ?? 'The requested payment could not be found.',
+          title: loc?.paymentNotFound ??
+              _text('paymentNotFound', 'Payment Not Found'),
+          message: _error ??
+              (loc?.theRequestedPaymentCouldNotBeFound ??
+                  _text('theRequestedPaymentCouldNotBeFound',
+                      'The requested payment could not be found.')),
           icon: Icons.error_outline,
-          actionLabel: 'Go Back',
+          actionLabel: loc?.goBack ?? _text('goBack', 'Go Back'),
           onAction: () => Navigator.of(context).pop(),
         ),
       );
@@ -148,23 +185,23 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildPaymentHeader(context),
+          _buildPaymentHeader(context, loc),
           const SizedBox(height: AppSpacing.paddingL),
-          _buildPaymentInfo(context),
+          _buildPaymentInfo(context, loc),
           const SizedBox(height: AppSpacing.paddingL),
-          _buildPaymentTimeline(context),
+          _buildPaymentTimeline(context, loc),
           if (_payment!.metadata != null && _payment!.metadata!.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.paddingL),
-            _buildMetadataSection(context),
+            _buildMetadataSection(context, loc),
           ],
           const SizedBox(height: AppSpacing.paddingL),
-          _buildActionButtons(context),
+          _buildActionButtons(context, loc),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentHeader(BuildContext context) {
+  Widget _buildPaymentHeader(BuildContext context, AppLocalizations? loc) {
     return AdaptiveCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,11 +225,12 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     HeadingMedium(
-                      text: _payment!.paymentType,
+                      text: _paymentTypeLabel(_payment!.paymentType, loc),
                       color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                     CaptionText(
-                      text: 'Payment #${_payment!.paymentId.substring(0, 8)}',
+                      text: loc?.paymentNumber(_shortPaymentId) ??
+                          'Payment #$_shortPaymentId',
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
                   ],
@@ -208,7 +246,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 ),
                 child: Text(
-                  _payment!.status,
+                  _statusLabel(_payment!.status, loc),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -223,13 +261,13 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Amount',
+                loc?.amount ?? _text('amount', 'Amount'),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w500,
                     ),
               ),
               Text(
-                _payment!.formattedAmount,
+                _formatAmount(_payment!.amount, loc),
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).primaryColor,
@@ -242,67 +280,112 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
     );
   }
 
-  Widget _buildPaymentInfo(BuildContext context) {
+  Widget _buildPaymentInfo(BuildContext context, AppLocalizations? loc) {
     return AdaptiveCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
-            text: 'Payment Information',
+            text: loc?.paymentInformation ??
+                _text('paymentInformation', 'Payment Information'),
             color: Theme.of(context).textTheme.titleMedium?.color,
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          _buildInfoRow(context, 'Description', _payment!.description),
-          _buildInfoRow(context, 'Payment Method', _payment!.paymentMethod),
-          _buildInfoRow(context, 'Due Date', _formatDate(_payment!.dueDate)),
           _buildInfoRow(
-              context, 'Payment Date', _formatDate(_payment!.paymentDate)),
+            context,
+            loc?.description ?? _text('description', 'Description'),
+            _payment!.description,
+          ),
+          _buildInfoRow(
+            context,
+            loc?.paymentMethod ?? _text('paymentMethod', 'Payment Method'),
+            _paymentMethodLabel(_payment!.paymentMethod, loc),
+          ),
+          _buildInfoRow(
+            context,
+            loc?.dueDate ?? _text('dueDate', 'Due Date'),
+            _formatDate(_payment!.dueDate, loc),
+          ),
+          _buildInfoRow(
+            context,
+            loc?.paymentDate ?? _text('paymentDate', 'Payment Date'),
+            _formatDate(_payment!.paymentDate, loc),
+          ),
           if (_payment!.transactionId != null)
-            _buildInfoRow(context, 'Transaction ID', _payment!.transactionId!),
+            _buildInfoRow(
+              context,
+              loc?.transactionId ?? _text('transactionId', 'Transaction ID'),
+              _payment!.transactionId!,
+            ),
           if (_payment!.upiReferenceId != null)
-            _buildInfoRow(context, 'UPI Reference', _payment!.upiReferenceId!),
-          _buildInfoRow(context, 'PG ID', _payment!.pgId),
-          _buildInfoRow(context, 'Owner ID', _payment!.ownerId),
+            _buildInfoRow(
+              context,
+              loc?.uPIReference ?? _text('uPIReference', 'UPI Reference'),
+              _payment!.upiReferenceId!,
+            ),
+          _buildInfoRow(
+            context,
+            loc?.pgId ?? _text('pgId', 'PG ID'),
+            _payment!.pgId,
+          ),
+          _buildInfoRow(
+            context,
+            loc?.ownerId ?? _text('ownerId', 'Owner ID'),
+            _payment!.ownerId,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentTimeline(BuildContext context) {
+  Widget _buildPaymentTimeline(BuildContext context, AppLocalizations? loc) {
     return AdaptiveCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
-            text: 'Timeline',
+            text: loc?.timeline ?? _text('timeline', 'Timeline'),
             color: Theme.of(context).textTheme.titleMedium?.color,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildTimelineItem(
             context,
-            'Created',
-            _formatDateTime(_payment!.createdAt ?? _payment!.paymentDate),
+            loc?.created ?? _text('created', 'Created'),
+            _formatDateTime(_payment!.createdAt ?? _payment!.paymentDate, loc),
             Icons.add_circle_outline,
             Colors.blue,
           ),
-          if (_payment!.status == 'Paid') ...[
+          if (_payment!.status.toLowerCase() == 'paid') ...[
             const SizedBox(height: AppSpacing.paddingS),
             _buildTimelineItem(
               context,
-              'Paid',
-              _formatDateTime(_payment!.updatedAt ?? _payment!.paymentDate),
+              loc?.paid ?? _text('paid', 'Paid'),
+              _formatDateTime(
+                  _payment!.updatedAt ?? _payment!.paymentDate, loc),
               Icons.check_circle_outline,
               Colors.green,
             ),
           ],
-          if (_payment!.status == 'Failed') ...[
+          if (_payment!.status.toLowerCase() == 'failed') ...[
             const SizedBox(height: AppSpacing.paddingS),
             _buildTimelineItem(
               context,
-              'Failed',
-              _formatDateTime(_payment!.updatedAt ?? _payment!.paymentDate),
+              loc?.failed ?? _text('failed', 'Failed'),
+              _formatDateTime(
+                  _payment!.updatedAt ?? _payment!.paymentDate, loc),
               Icons.error_outline,
               Colors.red,
+            ),
+          ],
+          if (_payment!.status.toLowerCase() == 'confirmed') ...[
+            const SizedBox(height: AppSpacing.paddingS),
+            _buildTimelineItem(
+              context,
+              loc?.confirmed ?? _text('confirmed', 'Confirmed'),
+              _formatDateTime(
+                  _payment!.updatedAt ?? _payment!.paymentDate, loc),
+              Icons.verified_outlined,
+              Colors.blueGrey,
             ),
           ],
         ],
@@ -310,13 +393,14 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
     );
   }
 
-  Widget _buildMetadataSection(BuildContext context) {
+  Widget _buildMetadataSection(BuildContext context, AppLocalizations? loc) {
     return AdaptiveCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
-            text: 'Additional Information',
+            text: loc?.additionalInformation ??
+                _text('additionalInformation', 'Additional Information'),
             color: Theme.of(context).textTheme.titleMedium?.color,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -377,13 +461,16 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, AppLocalizations? loc) {
     return Column(
       children: [
-        if (_payment!.status == 'Pending') ...[
+        if (_payment!.status.toLowerCase() == 'pending') ...[
           PrimaryButton(
-            onPressed: _processingPayment ? null : () => _processPayment(context),
-            label: _processingPayment ? 'Processing...' : 'Pay Now',
+            onPressed:
+                _processingPayment ? null : () => _processPayment(context),
+            label: _processingPayment
+                ? (loc?.processing ?? _text('processing', 'Processing...'))
+                : (loc?.payNow ?? _text('payNow', 'Pay Now')),
             icon: _processingPayment ? null : Icons.payment,
             width: double.infinity,
           ),
@@ -391,12 +478,47 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
         ],
         SecondaryButton(
           onPressed: () => Navigator.of(context).pop(),
-          label: 'Back to Payments',
+          label: loc?.backToPayments ??
+              _text('backToPayments', 'Back to Payments'),
           icon: Icons.arrow_back,
           width: double.infinity,
         ),
       ],
     );
+  }
+
+  String _statusLabel(String status, AppLocalizations? loc) {
+    switch (status.toLowerCase()) {
+      case 'paid':
+        return loc?.paid ?? _text('paid', 'Paid');
+      case 'pending':
+        return loc?.pending ?? _text('pending', 'Pending');
+      case 'failed':
+        return loc?.failed ?? _text('failed', 'Failed');
+      case 'refunded':
+        return loc?.refunded ?? _text('refunded', 'Refunded');
+      case 'confirmed':
+        return loc?.confirmed ?? _text('confirmed', 'Confirmed');
+      default:
+        return status;
+    }
+  }
+
+  String _paymentMethodLabel(String method, AppLocalizations? loc) {
+    switch (method.toLowerCase()) {
+      case 'razorpay':
+        return loc?.paymentMethodRazorpay ??
+            _text('paymentMethodRazorpay', 'Razorpay');
+      case 'upi':
+        return loc?.paymentMethodUpi ?? _text('paymentMethodUpi', 'UPI');
+      case 'cash':
+        return loc?.paymentMethodCash ?? _text('paymentMethodCash', 'Cash');
+      case 'bank_transfer':
+        return loc?.paymentMethodBankTransfer ??
+            _text('paymentMethodBankTransfer', 'Bank Transfer');
+      default:
+        return loc?.paymentMethodOther ?? _text('paymentMethodOther', 'Other');
+    }
   }
 
   Color _getStatusColor() {
@@ -414,12 +536,42 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return DateFormat('MMM dd, yyyy').format(date);
+  String _formatDate(DateTime date, AppLocalizations? loc) {
+    final locale = loc?.localeName;
+    return DateFormat.yMMMd(locale).format(date);
   }
 
-  String _formatDateTime(DateTime date) {
-    return DateFormat('MMM dd, yyyy • hh:mm a').format(date);
+  String _formatDateTime(DateTime date, AppLocalizations? loc) {
+    final locale = loc?.localeName;
+    final datePart = DateFormat.yMMMd(locale).format(date);
+    final timePart = DateFormat.jm(locale).format(date);
+    return '$datePart • $timePart';
+  }
+
+  String _formatAmount(double amount, AppLocalizations? loc) {
+    final locale = loc?.localeName ?? 'en_IN';
+    final symbol = NumberFormat.simpleCurrency(locale: locale).currencySymbol;
+    return NumberFormat.currency(locale: locale, symbol: symbol).format(amount);
+  }
+
+  String _paymentTypeLabel(String type, AppLocalizations? loc) {
+    switch (type.toLowerCase()) {
+      case 'rent':
+        return loc?.paymentTypeRent ?? _text('paymentTypeRent', 'Rent Payment');
+      case 'security deposit':
+        return loc?.paymentTypeSecurityDeposit ??
+            _text('paymentTypeSecurityDeposit', 'Security Deposit');
+      case 'maintenance':
+        return loc?.paymentTypeMaintenance ??
+            _text('paymentTypeMaintenance', 'Maintenance Fee');
+      case 'late fee':
+        return loc?.paymentTypeLateFee ??
+            _text('paymentTypeLateFee', 'Late Fee');
+      default:
+        return loc?.paymentTypeOther(type) ??
+            _text('paymentTypeOther', '{type} Payment',
+                parameters: {'type': type});
+    }
   }
 
   void _processPayment(BuildContext context) async {
@@ -459,28 +611,30 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
 
   /// Process Razorpay payment
   Future<void> _processRazorpayPayment(BuildContext context) async {
-    // FIXED: BuildContext async gap warning
-    // Flutter recommends: Check mounted before using context, or store values before async
-    // Changed from: Using context immediately after function start
-    // Changed to: Store context-dependent values early, check mounted after async operations
+    final loc = AppLocalizations.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     if (_payment == null || _payment!.ownerId.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid payment or owner information not available.'),
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(loc?.invalidPaymentOrOwnerInfoNotAvailable ??
+              _text('invalidPaymentOrOwnerInfoNotAvailable',
+                  'Invalid payment or owner information not available.')),
           backgroundColor: AppColors.error,
         ),
       );
       return;
     }
 
+    final paymentVM = context.read<GuestPaymentViewModel>();
+    final authProvider = context.read<AuthProvider>();
+
     setState(() => _processingPayment = true);
 
     try {
-      // Store context-dependent values before async operations
-      final authProvider = context.read<AuthProvider>();
       final amount = _payment!.amount;
-      final orderId = 'order_${_payment!.paymentId}_${DateTime.now().millisecondsSinceEpoch}';
+      final orderId =
+          'order_${_payment!.paymentId}_${DateTime.now().millisecondsSinceEpoch}';
 
       // Open Razorpay payment
       await _razorpayService.openPayment(
@@ -488,66 +642,56 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
         orderId: orderId,
         ownerId: _payment!.ownerId,
         description: _payment!.description,
-        userName: authProvider.user?.fullName ?? 'Guest',
+        userName: authProvider.user?.fullName ??
+            (loc?.guest ?? _text('guest', 'Guest')),
         userEmail: authProvider.user?.email,
         userPhone: authProvider.user?.phoneNumber,
         onSuccess: (orderId, response) async {
-      // FIXED: BuildContext async gap warning
-      // Flutter recommends: Store context-dependent values before async operations in callbacks
-      // Changed from: Using context.read() and ScaffoldMessenger after async gap in callback
-      // Changed to: Check mounted and store values first, then use stored values after async
-      if (!mounted) return;
-      
-      // Store context-dependent values before async operations
-      final paymentVM = context.read<GuestPaymentViewModel>();
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-      
-      // Payment successful - update payment with Razorpay details
-      final updatedPayment = _payment!.copyWith(
-        status: 'Paid',
-        transactionId: response.paymentId,
-        razorpayOrderId: orderId,
-        razorpayPaymentId: response.paymentId,
-        paymentMethod: 'razorpay',
-        updatedAt: DateTime.now(),
-      );
-      await paymentVM.updatePayment(updatedPayment);
+          if (!mounted) return;
 
-      // Check mounted again after another async operation
-      if (!mounted) return;
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Payment successful!'),
-          backgroundColor: AppColors.success,
-        ),
-      );
-      // Refresh payment details
-      await _loadPaymentDetails();
+          // Payment successful - update payment with Razorpay details
+          final updatedPayment = _payment!.copyWith(
+            status: 'Paid',
+            transactionId: response.paymentId,
+            razorpayOrderId: orderId,
+            razorpayPaymentId: response.paymentId,
+            paymentMethod: 'razorpay',
+            updatedAt: DateTime.now(),
+          );
+          await paymentVM.updatePayment(updatedPayment);
+
+          // Check mounted again after another async operation
+          if (!mounted) return;
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text(loc?.paymentSuccessful ??
+                  _text('paymentSuccessful', 'Payment successful!')),
+              backgroundColor: AppColors.success,
+            ),
+          );
+          // Refresh payment details
+          await _loadPaymentDetails();
         },
         onFailure: (response) {
-          // FIXED: BuildContext async gap warning
-          // Flutter recommends: Check mounted before using context in async callbacks
-          // Changed from: Using context after async callback without proper check
-          // Changed to: Check mounted before using context
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
+          scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: Text('Payment failed: ${response.message}'),
+              content: Text(loc?.paymentFailed(response.message ?? '') ??
+                  _text('paymentFailed', 'Payment failed: {message}',
+                      parameters: {'message': response.message ?? ''})),
               backgroundColor: AppColors.error,
             ),
           );
         },
       );
     } catch (e) {
-      // FIXED: BuildContext async gap warning
-      // Flutter recommends: Check mounted immediately before using context in catch blocks
-      // Changed from: Using context with unrelated mounted check in catch block
-      // Changed to: Check mounted immediately before context usage
       if (!mounted) return;
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text('Failed to process payment: $e'),
+          content: Text(loc?.failedToProcessPayment(e.toString()) ??
+              _text('failedToProcessPayment',
+                  'Failed to process payment: {error}',
+                  parameters: {'error': e.toString()})),
           backgroundColor: AppColors.error,
         ),
       );
@@ -560,6 +704,12 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
 
   /// Process UPI payment (requires screenshot)
   Future<void> _processUPIPayment(BuildContext context) async {
+    final loc = AppLocalizations.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final paymentVM = context.read<GuestPaymentViewModel>();
+    final paymentNotificationVM = context.read<PaymentNotificationViewModel>();
+    final authProvider = context.read<AuthProvider>();
+
     // Show dialog to upload screenshot and optionally enter transaction ID
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -578,24 +728,11 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
       return;
     }
 
+    if (!mounted) return;
+
     setState(() => _processingPayment = true);
 
     try {
-      // FIXED: BuildContext async gap warning
-      // Flutter recommends: Check mounted and store context-dependent values before async operations
-      // Changed from: Using context.read() after async gap from previous operation
-      // Changed to: Check mounted immediately before each context usage, store ScaffoldMessenger
-      // Note: Storing context-dependent values before async is Flutter's recommended pattern, analyzer flags as false positive
-      if (!mounted) return;
-      // ignore: use_build_context_synchronously
-      final paymentVM = context.read<GuestPaymentViewModel>();
-      // ignore: use_build_context_synchronously
-      final paymentNotificationVM = context.read<PaymentNotificationViewModel>();
-      // ignore: use_build_context_synchronously
-      final authProvider = context.read<AuthProvider>();
-      if (!mounted) return;
-      // ignore: use_build_context_synchronously
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
       final screenshot = result['screenshot'];
       final transactionId = result['transactionId'] as String?;
 
@@ -609,7 +746,9 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
         paymentMethod: 'upi',
         transactionId: transactionId,
         paymentScreenshot: screenshot,
-        paymentNote: 'UPI payment made. Please verify and confirm.',
+        paymentNote: loc?.upiPaymentNote ??
+            _text('upiPaymentNote',
+                'UPI payment made. Please verify and confirm.'),
       );
 
       // Update payment status as "Confirmed" (pending owner verification)
@@ -622,43 +761,28 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
       );
       await paymentVM.updatePayment(updatedPayment);
 
-      // FIXED: BuildContext async gap warning
-      // Flutter recommends: Check mounted after async operations before using stored context values
-      // Changed from: Using context after async operation without proper mounted check
-      // Changed to: Check mounted before using stored ScaffoldMessenger
       if (!mounted) return;
       scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('UPI payment notification sent. Owner will verify and confirm.'),
+        SnackBar(
+          content: Text(loc?.upiPaymentNotificationSent ??
+              _text('upiPaymentNotificationSent',
+                  'UPI payment notification sent. Owner will verify and confirm.')),
           backgroundColor: AppColors.success,
         ),
       );
       await _loadPaymentDetails();
     } catch (e) {
-      // FIXED: Missing type annotation warning
-      // Flutter recommends: Always annotate catch clause variables with explicit types
-      // Changed from: catch (e) without type annotation
-      // Changed to: catch (dynamic e) with explicit dynamic type annotation
-      // Note: Using dynamic instead of Object to avoid naming conflict with type name
-      // FIXED: BuildContext async gap warning
-      // Flutter recommends: Check mounted immediately before using context in catch blocks
-      // Changed from: Using context after async operation in catch block
-      // Changed to: Check mounted immediately before context usage
       if (!mounted) return;
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text('Failed to process UPI payment: $e'),
+          content: Text(loc?.failedToProcessUpiPayment(e.toString()) ??
+              _text('failedToProcessUpiPayment',
+                  'Failed to process UPI payment: {error}',
+                  parameters: {'error': e.toString()})),
           backgroundColor: AppColors.error,
         ),
       );
     } finally {
-      // FIXED: Missing type annotation warning (false positive)
-      // Flutter recommends: Type annotations for top-level variables
-      // Changed from: Analyzer flags finally block (false positive - no variables here)
-      // Changed to: Added ignore comment - finally blocks don't have variables needing annotation
-      // Note: This is a false positive - the analyzer incorrectly flags the finally block
-      // ignore: strict_top_level_inference
       if (mounted) {
         setState(() => _processingPayment = false);
       }
@@ -667,22 +791,32 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
 
   /// Process Cash payment
   Future<void> _processCashPayment(BuildContext context) async {
+    final loc = AppLocalizations.of(context);
+    final paymentVM = context.read<GuestPaymentViewModel>();
+    final paymentNotificationVM = context.read<PaymentNotificationViewModel>();
+    final authProvider = context.read<AuthProvider>();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingMedium(text: 'Cash Payment Confirmation'),
-        content: const BodyText(
-          text: 'Have you paid the amount in cash to the owner? Owner will confirm once they receive the payment.',
+        title: HeadingMedium(
+            text: loc?.cashPaymentConfirmation ??
+                _text('cashPaymentConfirmation', 'Cash Payment Confirmation')),
+        content: BodyText(
+          text: loc?.haveYouPaidAmountInCash ??
+              _text('haveYouPaidAmountInCash',
+                  'Have you paid the amount in cash to the owner? Owner will confirm once they receive the payment.'),
         ),
         actions: [
           SecondaryButton(
             onPressed: () => Navigator.of(context).pop(false),
-            label: 'Cancel',
+            label: loc?.cancel ?? _text('cancel', 'Cancel'),
           ),
           PrimaryButton(
             onPressed: () => Navigator.of(context).pop(true),
-            label: 'Yes, Paid',
+            label: loc?.yesPaid ?? _text('yesPaid', 'Yes, Paid'),
           ),
         ],
       ),
@@ -692,25 +826,11 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
       return;
     }
 
+    if (!mounted) return;
+
     setState(() => _processingPayment = true);
 
     try {
-      // FIXED: BuildContext async gap warning
-      // Flutter recommends: Check mounted and store context-dependent values before async operations
-      // Changed from: Using context.read() after async gap from previous operation
-      // Changed to: Check mounted immediately before each context usage, store ScaffoldMessenger
-      // Note: Storing context-dependent values before async is Flutter's recommended pattern, analyzer flags as false positive
-      if (!mounted) return;
-      // ignore: use_build_context_synchronously
-      final paymentVM = context.read<GuestPaymentViewModel>();
-      // ignore: use_build_context_synchronously
-      final paymentNotificationVM = context.read<PaymentNotificationViewModel>();
-      // ignore: use_build_context_synchronously
-      final authProvider = context.read<AuthProvider>();
-      if (!mounted) return;
-      // ignore: use_build_context_synchronously
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-
       // Send cash payment notification to owner
       await paymentNotificationVM.sendPaymentNotification(
         guestId: authProvider.user!.userId,
@@ -719,7 +839,8 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
         bookingId: _payment!.bookingId,
         amount: _payment!.amount,
         paymentMethod: 'cash',
-        paymentNote: 'Cash payment made. Please confirm.',
+        paymentNote: loc?.cashPaymentNote ??
+            _text('cashPaymentNote', 'Cash payment made. Please confirm.'),
       );
 
       // Update payment status as "Confirmed" (pending owner confirmation)
@@ -730,38 +851,28 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
       );
       await paymentVM.updatePayment(updatedPayment);
 
-      // FIXED: BuildContext async gap warning
-      // Flutter recommends: Check mounted after async operations before using stored context values
-      // Changed from: Using context after async operation without proper mounted check
-      // Changed to: Check mounted before using stored ScaffoldMessenger
       if (!mounted) return;
       scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Cash payment notification sent. Owner will confirm once they receive the payment.'),
+        SnackBar(
+          content: Text(loc?.cashPaymentNotificationSent ??
+              _text('cashPaymentNotificationSent',
+                  'Cash payment notification sent. Owner will confirm once they receive the payment.')),
           backgroundColor: AppColors.success,
         ),
       );
       await _loadPaymentDetails();
     } catch (e) {
-      // FIXED: BuildContext async gap warning
-      // Flutter recommends: Check mounted immediately before using context in catch blocks
-      // Changed from: Using context after async operation in catch block
-      // Changed to: Check mounted immediately before context usage
       if (!mounted) return;
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text('Failed to process cash payment: $e'),
+          content: Text(loc?.failedToProcessCashPayment(e.toString()) ??
+              _text('failedToProcessCashPayment',
+                  'Failed to process cash payment: {error}',
+                  parameters: {'error': e.toString()})),
           backgroundColor: AppColors.error,
         ),
       );
     } finally {
-      // FIXED: Missing type annotation warning (false positive)
-      // Flutter recommends: Type annotations for top-level variables
-      // Changed from: Analyzer flags finally block (false positive - no variables here)
-      // Changed to: Added ignore comment - finally blocks don't have variables needing annotation
-      // Note: This is a false positive - the analyzer incorrectly flags the finally block
-      // ignore: strict_top_level_inference
       if (mounted) {
         setState(() => _processingPayment = false);
       }
@@ -787,6 +898,24 @@ class _UPIPaymentDialogState extends State<_UPIPaymentDialog> {
   dynamic _screenshotFile;
   final _transactionIdController = TextEditingController();
   bool _uploading = false;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void dispose() {
@@ -813,7 +942,10 @@ class _UPIPaymentDialogState extends State<_UPIPaymentDialog> {
         setState(() => _uploading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to pick image: $e'),
+            content: Text(
+                AppLocalizations.of(context)?.failedToPickImage(e.toString()) ??
+                    _text('failedToPickImage', 'Failed to pick image: {error}',
+                        parameters: {'error': e.toString()})),
             backgroundColor: AppColors.error,
           ),
         );
@@ -823,20 +955,23 @@ class _UPIPaymentDialogState extends State<_UPIPaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return AlertDialog(
-      title: const HeadingMedium(text: 'UPI Payment'),
+      title: HeadingMedium(text: loc?.uPI ?? _text('uPI', 'UPI Payment')),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             BodyText(
-              text: 'Amount: ${widget.payment.formattedAmount}',
+              text:
+                  '${loc?.amountLabel ?? _text('amountLabel', 'Amount:')} ${_formatAmount(widget.payment.amount, loc)}',
               medium: true,
             ),
             const SizedBox(height: AppSpacing.paddingM),
             BodyText(
-              text: 'Upload Payment Screenshot',
+              text: loc?.uploadPaymentScreenshot ??
+                  _text('uploadPaymentScreenshot', 'Upload Payment Screenshot'),
               color: AppColors.textSecondary,
             ),
             const SizedBox(height: AppSpacing.paddingS),
@@ -851,7 +986,9 @@ class _UPIPaymentDialogState extends State<_UPIPaymentDialog> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                   child: Image.file(
-                    _screenshotFile is String ? File(_screenshotFile) : _screenshotFile,
+                    _screenshotFile is String
+                        ? File(_screenshotFile)
+                        : _screenshotFile,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -860,29 +997,47 @@ class _UPIPaymentDialogState extends State<_UPIPaymentDialog> {
               TextButton.icon(
                 onPressed: _pickScreenshot,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Change Screenshot'),
+                label: Text(loc?.changeScreenshot ??
+                    _text('changeScreenshot', 'Change Screenshot')),
               ),
             ] else ...[
               PrimaryButton(
                 onPressed: _uploading ? null : _pickScreenshot,
-                label: _uploading ? 'Uploading...' : 'Upload Screenshot',
+                label: _uploading
+                    ? (loc?.processing ?? _text('processing', 'Processing...'))
+                    : (loc?.uploadPaymentScreenshot ??
+                        _text('uploadPaymentScreenshot', 'Upload Screenshot')),
                 icon: Icons.upload_file,
                 width: double.infinity,
               ),
             ],
             const SizedBox(height: AppSpacing.paddingM),
-            TextField(
-              controller: _transactionIdController,
-              decoration: const InputDecoration(
-                labelText: 'Transaction ID (Optional)',
-                hintText: 'Transaction ID is visible in screenshot',
-                border: OutlineInputBorder(),
-                helperText: 'You can skip this - transaction ID is in the screenshot',
-              ),
+            Builder(
+              builder: (context) {
+                final loc = AppLocalizations.of(context);
+                return TextField(
+                  controller: _transactionIdController,
+                  decoration: InputDecoration(
+                    labelText: loc?.transactionIdOptional ??
+                        _text('transactionIdOptional',
+                            'Transaction ID (Optional)'),
+                    hintText: loc?.transactionIdIsVisibleInScreenshot ??
+                        _text('transactionIdIsVisibleInScreenshot',
+                            'Transaction ID is visible in screenshot'),
+                    border: const OutlineInputBorder(),
+                    helperText: loc
+                            ?.youCanSkipThisTransactionIdIsInScreenshot ??
+                        _text('youCanSkipThisTransactionIdIsInScreenshot',
+                            'You can skip this - transaction ID is in the screenshot'),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: '💡 Tip: After making payment via PhonePe, Paytm, Google Pay, etc., upload the payment screenshot. The transaction ID is already visible in the screenshot.',
+              text: loc?.upiPaymentTip ??
+                  _text('upiPaymentTip',
+                      '💡 Tip: After making payment via PhonePe, Paytm, Google Pay, etc., upload the payment screenshot. The transaction ID is already visible in the screenshot.'),
               color: AppColors.textSecondary,
               small: true,
             ),
@@ -892,7 +1047,7 @@ class _UPIPaymentDialogState extends State<_UPIPaymentDialog> {
       actions: [
         SecondaryButton(
           onPressed: () => Navigator.of(context).pop(),
-          label: 'Cancel',
+          label: loc?.cancel ?? _text('cancel', 'Cancel'),
         ),
         PrimaryButton(
           onPressed: _screenshotFile == null
@@ -905,9 +1060,15 @@ class _UPIPaymentDialogState extends State<_UPIPaymentDialog> {
                         : _transactionIdController.text,
                   );
                 },
-          label: 'Confirm',
+          label: loc?.confirm ?? _text('confirm', 'Confirm'),
         ),
       ],
     );
+  }
+
+  String _formatAmount(double amount, AppLocalizations? loc) {
+    final locale = loc?.localeName ?? 'en_IN';
+    final symbol = NumberFormat.simpleCurrency(locale: locale).currencySymbol;
+    return NumberFormat.currency(locale: locale, symbol: symbol).format(amount);
   }
 }

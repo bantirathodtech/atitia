@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../constants/app.dart';
 import '../constants/platform.dart';
 
@@ -111,10 +112,14 @@ extension ContextExtensions on BuildContext {
   Future<bool?> showConfirmDialog({
     required String title,
     required String message,
-    String confirmText = 'Confirm',
-    String cancelText = 'Cancel',
+    String? confirmText,
+    String? cancelText,
     bool destructive = false,
   }) async {
+    final loc = AppLocalizations.of(this);
+    final confirmLabel = confirmText ?? loc?.confirm ?? 'Confirm';
+    final cancelLabel = cancelText ?? loc?.cancel ?? 'Cancel';
+
     return showDialog<bool>(
       context: this,
       builder: (context) => AlertDialog(
@@ -123,14 +128,14 @@ extension ContextExtensions on BuildContext {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(cancelText),
+            child: Text(cancelLabel),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
               foregroundColor: destructive ? colors.error : colors.primary,
             ),
-            child: Text(confirmText),
+            child: Text(confirmLabel),
           ),
         ],
       ),

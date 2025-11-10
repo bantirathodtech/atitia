@@ -3,6 +3,7 @@
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../common/utils/logging/logging_mixin.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../data/models/owner_overview_model.dart';
 import '../data/repository/owner_overview_repository.dart';
 
@@ -12,6 +13,24 @@ import '../data/repository/owner_overview_repository.dart';
 class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
   final OwnerOverviewRepository _repository;
   final _analyticsService = getIt.analytics;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If repository is not provided, creates it with default services
@@ -84,13 +103,22 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
         },
       );
     } catch (e) {
+      final logMessage =
+          _text('ownerOverviewLoadFailed', 'Failed to load overview data');
       logError(
-        'Failed to load overview data',
+        logMessage,
         feature: 'owner_overview',
         error: e,
         metadata: {'ownerId': ownerId, 'pgId': pgId},
       );
-      setError(true, 'Failed to load overview data: $e');
+      setError(
+        true,
+        _text(
+          'ownerOverviewLoadFailedWithReason',
+          'Failed to load overview data: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     } finally {
       setLoading(false);
       logMethodExit('loadOverviewData');
@@ -110,7 +138,14 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
         notifyListeners();
       },
       onError: (error) {
-        setError(true, 'Failed to stream overview data: $error');
+        setError(
+          true,
+          _text(
+            'ownerOverviewStreamFailedWithReason',
+            'Failed to stream overview data: {error}',
+            parameters: {'error': error.toString()},
+          ),
+        );
         setLoading(false);
       },
     );
@@ -134,7 +169,14 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
 
       notifyListeners();
     } catch (e) {
-      setError(true, 'Failed to load monthly breakdown: $e');
+      setError(
+        true,
+        _text(
+          'ownerMonthlyBreakdownLoadFailed',
+          'Failed to load monthly breakdown: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -158,7 +200,14 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
 
       notifyListeners();
     } catch (e) {
-      setError(true, 'Failed to load property breakdown: $e');
+      setError(
+        true,
+        _text(
+          'ownerPropertyBreakdownLoadFailed',
+          'Failed to load property breakdown: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     } finally {
       setLoading(false);
     }

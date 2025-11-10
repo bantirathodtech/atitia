@@ -13,6 +13,7 @@ import '../../utils/helpers/image_picker_helper.dart';
 import '../../../core/di/common/unified_service_locator.dart';
 import '../../../core/models/review_model.dart';
 import '../../../core/repositories/review_repository.dart';
+import '../../../l10n/app_localizations.dart';
 import '../text/heading_small.dart';
 import '../buttons/primary_button.dart';
 import '../buttons/secondary_button.dart';
@@ -75,6 +76,7 @@ class _ReviewFormState extends State<ReviewForm> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Dialog(
       backgroundColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
@@ -91,7 +93,7 @@ class _ReviewFormState extends State<ReviewForm> {
             mainAxisSize: MainAxisSize.min,
             children: [
               HeadingSmall(
-                text: 'Write a Review',
+                text: loc?.writeReview ?? 'Write a Review',
                 color: theme.primaryColor,
               ),
               const SizedBox(height: AppSpacing.paddingS),
@@ -107,19 +109,19 @@ class _ReviewFormState extends State<ReviewForm> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildOverallRatingSection(context),
+                      _buildOverallRatingSection(context, loc),
                       const SizedBox(height: AppSpacing.paddingL),
-                      _buildAspectRatingsSection(context),
+                      _buildAspectRatingsSection(context, loc),
                       const SizedBox(height: AppSpacing.paddingL),
-                      _buildCommentSection(context),
+                      _buildCommentSection(context, loc),
                       const SizedBox(height: AppSpacing.paddingL),
-                      _buildPhotoUploadSection(context),
+                      _buildPhotoUploadSection(context, loc),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: AppSpacing.paddingM),
-              _buildActionButtons(context),
+              _buildActionButtons(context, loc),
             ],
           ),
         ),
@@ -127,12 +129,12 @@ class _ReviewFormState extends State<ReviewForm> {
     );
   }
 
-  Widget _buildOverallRatingSection(BuildContext context) {
+  Widget _buildOverallRatingSection(BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Overall Rating',
+          loc?.overallRating ?? 'Overall Rating',
           style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -159,7 +161,7 @@ class _ReviewFormState extends State<ReviewForm> {
         ),
         const SizedBox(height: AppSpacing.paddingXS),
         Text(
-          _getRatingText(_overallRating),
+          _getRatingText(_overallRating, loc),
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.textSecondary,
           ),
@@ -168,34 +170,40 @@ class _ReviewFormState extends State<ReviewForm> {
     );
   }
 
-  Widget _buildAspectRatingsSection(BuildContext context) {
+  Widget _buildAspectRatingsSection(
+      BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Aspect Ratings',
+          loc?.aspectRatings ?? 'Aspect Ratings',
           style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: AppSpacing.paddingM),
-        _buildAspectRating('Cleanliness', _cleanlinessRating, (value) {
+        _buildAspectRating(
+            loc?.cleanliness ?? 'Cleanliness', _cleanlinessRating, (value) {
           setState(() => _cleanlinessRating = value);
         }),
         const SizedBox(height: AppSpacing.paddingS),
-        _buildAspectRating('Amenities', _amenitiesRating, (value) {
+        _buildAspectRating(
+            loc?.amenities ?? 'Amenities', _amenitiesRating, (value) {
           setState(() => _amenitiesRating = value);
         }),
         const SizedBox(height: AppSpacing.paddingS),
-        _buildAspectRating('Location', _locationRating, (value) {
+        _buildAspectRating(
+            loc?.locationLabel ?? 'Location', _locationRating, (value) {
           setState(() => _locationRating = value);
         }),
         const SizedBox(height: AppSpacing.paddingS),
-        _buildAspectRating('Food Quality', _foodRating, (value) {
+        _buildAspectRating(
+            loc?.foodQuality ?? 'Food Quality', _foodRating, (value) {
           setState(() => _foodRating = value);
         }),
         const SizedBox(height: AppSpacing.paddingS),
-        _buildAspectRating('Staff', _staffRating, (value) {
+        _buildAspectRating(
+            loc?.staffLabel ?? 'Staff', _staffRating, (value) {
           setState(() => _staffRating = value);
         }),
       ],
@@ -236,12 +244,12 @@ class _ReviewFormState extends State<ReviewForm> {
     );
   }
 
-  Widget _buildCommentSection(BuildContext context) {
+  Widget _buildCommentSection(BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Comments',
+          loc?.commentsLabel ?? 'Comments',
           style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
           ),
@@ -251,7 +259,7 @@ class _ReviewFormState extends State<ReviewForm> {
           controller: _commentController,
           maxLines: 4,
           decoration: InputDecoration(
-            hintText: 'Share your experience...',
+            hintText: loc?.shareExperienceHint ?? 'Share your experience...',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
@@ -262,7 +270,7 @@ class _ReviewFormState extends State<ReviewForm> {
         ),
         const SizedBox(height: AppSpacing.paddingS),
         Text(
-          'Optional: Add photos to your review',
+          loc?.optionalAddPhotos ?? 'Optional: Add photos to your review',
           style: AppTypography.bodySmall.copyWith(
             color: AppColors.textSecondary,
           ),
@@ -271,12 +279,12 @@ class _ReviewFormState extends State<ReviewForm> {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, AppLocalizations? loc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         SecondaryButton(
-          label: 'Cancel',
+          label: loc?.cancel ?? 'Cancel',
           onPressed: _submitting
               ? null
               : () {
@@ -286,7 +294,9 @@ class _ReviewFormState extends State<ReviewForm> {
         ),
         const SizedBox(width: AppSpacing.paddingM),
         PrimaryButton(
-          label: _submitting ? 'Submitting...' : 'Submit Review',
+          label: _submitting
+              ? '${loc?.submitting ?? 'Submitting'}...'
+              : (loc?.submitReview ?? 'Submit Review'),
           onPressed: _submitting ? null : _submitReview,
           isLoading: _submitting,
         ),
@@ -295,10 +305,12 @@ class _ReviewFormState extends State<ReviewForm> {
   }
 
   Future<void> _submitReview() async {
+    final loc = AppLocalizations.of(context);
     if (_overallRating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please provide an overall rating'),
+        SnackBar(
+          content:
+              Text(loc?.pleaseProvideOverallRating ?? 'Please provide an overall rating'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -310,7 +322,7 @@ class _ReviewFormState extends State<ReviewForm> {
     try {
       // Upload photos first if any selected
       if (_selectedPhotos.isNotEmpty) {
-        await _uploadPhotos();
+        await _uploadPhotos(loc);
       }
 
       // Create review model
@@ -340,8 +352,9 @@ class _ReviewFormState extends State<ReviewForm> {
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Review submitted successfully!'),
+          SnackBar(
+            content: Text(
+                loc?.reviewSubmittedSuccessfully ?? 'Review submitted successfully!'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -351,7 +364,10 @@ class _ReviewFormState extends State<ReviewForm> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to submit review: $e'),
+            content: Text(
+              loc?.failedToSubmitReview(e.toString()) ??
+                  'Failed to submit review: $e',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -363,24 +379,25 @@ class _ReviewFormState extends State<ReviewForm> {
     }
   }
 
-  String _getRatingText(double rating) {
+  String _getRatingText(double rating, AppLocalizations? loc) {
     switch (rating.toInt()) {
       case 1:
-        return 'Poor';
+        return loc?.ratingPoor ?? 'Poor';
       case 2:
-        return 'Fair';
+        return loc?.ratingFair ?? 'Fair';
       case 3:
-        return 'Good';
+        return loc?.ratingGood ?? 'Good';
       case 4:
-        return 'Very Good';
+        return loc?.ratingVeryGood ?? 'Very Good';
       case 5:
-        return 'Excellent';
+        return loc?.ratingExcellent ?? 'Excellent';
       default:
-        return 'Select a rating';
+        return loc?.selectRating ?? 'Select a rating';
     }
   }
 
-  Widget _buildPhotoUploadSection(BuildContext context) {
+  Widget _buildPhotoUploadSection(
+      BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -388,7 +405,8 @@ class _ReviewFormState extends State<ReviewForm> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Photos (${_selectedPhotos.length}/5)',
+              loc?.photosCountLabel(_selectedPhotos.length, 5) ??
+                  'Photos (${_selectedPhotos.length}/5)',
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -397,7 +415,7 @@ class _ReviewFormState extends State<ReviewForm> {
               TextButton.icon(
                 onPressed: _uploadingPhotos ? null : _pickPhotos,
                 icon: const Icon(Icons.camera_alt, size: 18),
-                label: const Text('Add Photos'),
+                label: Text(loc?.addPhotos ?? 'Add Photos'),
               ),
           ],
         ),
@@ -468,7 +486,7 @@ class _ReviewFormState extends State<ReviewForm> {
                 ),
                 const SizedBox(width: AppSpacing.paddingS),
                 Text(
-                  'Uploading photos...',
+                  loc?.uploadingPhotos ?? 'Uploading photos...',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -520,6 +538,7 @@ class _ReviewFormState extends State<ReviewForm> {
   }
 
   Future<void> _pickPhotos() async {
+    final loc = AppLocalizations.of(context);
     try {
       final photos = await ImagePickerHelper.pickMultipleImagesFromGallery(
         imageQuality: 75,
@@ -535,7 +554,10 @@ class _ReviewFormState extends State<ReviewForm> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error picking photos: ${e.toString()}'),
+            content: Text(
+              loc?.errorPickingPhotos(e.toString()) ??
+                  'Error picking photos: ${e.toString()}',
+            ),
             backgroundColor: AppColors.error,
           ),
         );
@@ -543,7 +565,7 @@ class _ReviewFormState extends State<ReviewForm> {
     }
   }
 
-  Future<void> _uploadPhotos() async {
+  Future<void> _uploadPhotos(AppLocalizations? loc) async {
     if (_selectedPhotos.isEmpty) {
       _uploadedPhotoUrls.clear();
       return;
@@ -584,13 +606,19 @@ class _ReviewFormState extends State<ReviewForm> {
       _uploadedPhotoUrls.removeWhere((url) => url.isEmpty);
 
       if (_uploadedPhotoUrls.isEmpty && _selectedPhotos.isNotEmpty) {
-        throw Exception('All photo uploads failed. Please try again.');
+        throw Exception(
+          loc?.allPhotoUploadsFailed ??
+              'All photo uploads failed. Please try again.',
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to upload photos: ${e.toString()}'),
+            content: Text(
+              loc?.failedToUploadPhotos(e.toString()) ??
+                  'Failed to upload photos: ${e.toString()}',
+            ),
             backgroundColor: AppColors.error,
           ),
         );

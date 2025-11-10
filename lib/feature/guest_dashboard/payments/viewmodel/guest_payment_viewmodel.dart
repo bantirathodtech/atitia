@@ -7,6 +7,7 @@ import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../data/models/guest_payment_model.dart';
 import '../data/repository/guest_payment_repository.dart';
+import '../../../../core/services/localization/internationalization_service.dart';
 
 /// ViewModel for managing guest payments UI state and business logic
 /// Extends BaseProviderState for automatic service access and state management
@@ -16,6 +17,8 @@ class GuestPaymentViewModel extends BaseProviderState
   final GuestPaymentRepository _repository;
   final _authService = getIt.auth;
   final _analyticsService = getIt.analytics;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   /// Constructor with dependency injection
   /// If repository is not provided, creates it with default services
@@ -31,7 +34,7 @@ class GuestPaymentViewModel extends BaseProviderState
   List<GuestPaymentModel> _pendingPayments = [];
   List<GuestPaymentModel> _overduePayments = [];
   Map<String, dynamic> _paymentStats = {};
-  String _selectedFilter = 'All'; // All, Pending, Paid, Overdue
+  String _selectedFilter = 'all'; // all, pending, paid, overdue, failed
 
   /// Read-only list of guest payments for UI consumption
   List<GuestPaymentModel> get payments => _payments;
@@ -79,7 +82,7 @@ class GuestPaymentViewModel extends BaseProviderState
 
     // Track filter usage analytics
     _analyticsService.logEvent(
-      name: 'payment_filter_changed',
+      name: _i18n.translate('paymentFilterChangedEvent'),
       parameters: {
         'filter': filter,
       },
@@ -117,11 +120,15 @@ class GuestPaymentViewModel extends BaseProviderState
         notifyListeners();
       },
       onError: (error) {
-        setError(true, 'Failed to load payments: ${error.toString()}');
+        setError(
+            true,
+            _i18n.translate('failedToLoadPayments', parameters: {
+              'error': error.toString(),
+            }));
         setLoading(false);
         notifyListeners();
         _analyticsService.logEvent(
-          name: 'payment_load_error',
+          name: _i18n.translate('paymentLoadErrorEvent'),
           parameters: {'error': error.toString()},
         );
       },
@@ -137,7 +144,7 @@ class GuestPaymentViewModel extends BaseProviderState
       onError: (error) {
         // Don't set error state for pending payments as it's supplementary data
         _analyticsService.logEvent(
-          name: 'pending_payments_load_error',
+          name: _i18n.translate('pendingPaymentsLoadErrorEvent'),
           parameters: {'error': error.toString()},
         );
       },
@@ -153,7 +160,7 @@ class GuestPaymentViewModel extends BaseProviderState
       onError: (error) {
         // Don't set error state for overdue payments as it's supplementary data
         _analyticsService.logEvent(
-          name: 'overdue_payments_load_error',
+          name: _i18n.translate('overduePaymentsLoadErrorEvent'),
           parameters: {'error': error.toString()},
         );
       },
@@ -176,7 +183,7 @@ class GuestPaymentViewModel extends BaseProviderState
       notifyListeners();
     } catch (e) {
       _analyticsService.logEvent(
-        name: 'payment_stats_load_error',
+        name: _i18n.translate('paymentStatsLoadErrorEvent'),
         parameters: {'error': e.toString()},
       );
     }
@@ -191,18 +198,22 @@ class GuestPaymentViewModel extends BaseProviderState
 
       // Track successful payment creation
       await _analyticsService.logEvent(
-        name: 'payment_added_successfully',
+        name: _i18n.translate('paymentAddedSuccessfullyEvent'),
         parameters: {
           'payment_type': payment.paymentType,
           'amount': payment.amount,
         },
       );
     } catch (e) {
-      setError(true, 'Failed to add payment: $e');
+      setError(
+          true,
+          _i18n.translate('failedToAddPayment', parameters: {
+            'error': e.toString(),
+          }));
 
       // Track failed payment creation
       await _analyticsService.logEvent(
-        name: 'payment_add_failed',
+        name: _i18n.translate('paymentAddFailedEvent'),
         parameters: {
           'error': e.toString(),
           'payment_type': payment.paymentType,
@@ -223,18 +234,22 @@ class GuestPaymentViewModel extends BaseProviderState
 
       // Track successful payment update
       await _analyticsService.logEvent(
-        name: 'payment_updated_successfully',
+        name: _i18n.translate('paymentUpdatedSuccessfullyEvent'),
         parameters: {
           'payment_id': payment.paymentId,
           'status': payment.status,
         },
       );
     } catch (e) {
-      setError(true, 'Failed to update payment: $e');
+      setError(
+          true,
+          _i18n.translate('failedToUpdatePayment', parameters: {
+            'error': e.toString(),
+          }));
 
       // Track failed payment update
       await _analyticsService.logEvent(
-        name: 'payment_update_failed',
+        name: _i18n.translate('paymentUpdateFailedEvent'),
         parameters: {
           'error': e.toString(),
           'payment_id': payment.paymentId,
@@ -260,18 +275,22 @@ class GuestPaymentViewModel extends BaseProviderState
 
       // Track successful status update
       await _analyticsService.logEvent(
-        name: 'payment_status_updated_successfully',
+        name: _i18n.translate('paymentStatusUpdatedSuccessfullyEvent'),
         parameters: {
           'payment_id': paymentId,
           'new_status': status,
         },
       );
     } catch (e) {
-      setError(true, 'Failed to update payment status: $e');
+      setError(
+          true,
+          _i18n.translate('failedToUpdatePaymentStatus', parameters: {
+            'error': e.toString(),
+          }));
 
       // Track failed status update
       await _analyticsService.logEvent(
-        name: 'payment_status_update_failed',
+        name: _i18n.translate('paymentStatusUpdateFailedEvent'),
         parameters: {
           'error': e.toString(),
           'payment_id': paymentId,
@@ -288,7 +307,11 @@ class GuestPaymentViewModel extends BaseProviderState
     try {
       return await _repository.getPaymentById(paymentId);
     } catch (e) {
-      setError(true, 'Failed to fetch payment: $e');
+      setError(
+          true,
+          _i18n.translate('failedToFetchPayment', parameters: {
+            'error': e.toString(),
+          }));
       return null;
     }
   }
@@ -301,17 +324,21 @@ class GuestPaymentViewModel extends BaseProviderState
 
       // Track successful deletion
       await _analyticsService.logEvent(
-        name: 'payment_deleted_successfully',
+        name: _i18n.translate('paymentDeletedSuccessfullyEvent'),
         parameters: {
           'payment_id': paymentId,
         },
       );
     } catch (e) {
-      setError(true, 'Failed to delete payment: $e');
+      setError(
+          true,
+          _i18n.translate('failedToDeletePayment', parameters: {
+            'error': e.toString(),
+          }));
 
       // Track failed deletion
       await _analyticsService.logEvent(
-        name: 'payment_deletion_failed',
+        name: _i18n.translate('paymentDeletionFailedEvent'),
         parameters: {
           'error': e.toString(),
           'payment_id': paymentId,
@@ -324,33 +351,33 @@ class GuestPaymentViewModel extends BaseProviderState
   }
 
   /// Process payment (DEPRECATED - Use real payment gateways instead)
-  /// 
+  ///
   /// **⚠️ DEPRECATED:** This method used simulation and has been replaced with
   /// real payment gateway integration (Razorpay, UPI, Cash).
-  /// 
+  ///
   /// **Migration:** Use the payment method selection dialog in payment screens
   /// which handles real payment gateways:
   /// - Razorpay: For online payments (if enabled by owner)
   /// - UPI: With screenshot upload and owner confirmation
   /// - Cash: With owner confirmation
-  /// 
+  ///
   /// This method is kept for backward compatibility but should not be used
   /// in new code. All payment processing now uses real gateways.
-  @Deprecated('Use real payment gateways (Razorpay/UPI/Cash) instead of simulation')
+  @Deprecated(
+      'Use real payment gateways (Razorpay/UPI/Cash) instead of simulation')
   Future<bool> processPayment(String paymentId, String paymentMethod) async {
     // This method is deprecated - real payment gateways should be used
     // For backward compatibility, this now throws an exception
     throw UnimplementedError(
-      'Payment simulation is deprecated. '
-      'Please use real payment gateways (Razorpay, UPI, or Cash) '
-      'via the payment method selection dialog in payment screens.',
+      '${_i18n.translate('paymentSimulationDeprecated')} '
+      '${_i18n.translate('paymentSimulationRecommendation')}',
     );
   }
 
   /// Refresh payment data
   Future<void> refreshPayments([String? guestId]) async {
     await _analyticsService.logEvent(
-      name: 'payments_refreshed',
+      name: _i18n.translate('paymentsRefreshedEvent'),
       parameters: {},
     );
     loadPayments(guestId);

@@ -3,6 +3,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
+
 /// Performance-optimized ListView with lazy loading and memory management
 /// Provides better performance for large lists with proper disposal patterns
 class OptimizedListView<T> extends StatefulWidget {
@@ -152,15 +154,16 @@ class _OptimizedListViewState<T> extends State<OptimizedListView<T>> {
   }
 
   Widget _buildDefaultEmptyWidget() {
-    return const Center(
+    final loc = AppLocalizations.of(context);
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
+          const Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
           Text(
-            'No items found',
-            style: TextStyle(
+            loc?.noItemsFound ?? 'No items found',
+            style: const TextStyle(
               fontSize: 16,
               color: Colors.grey,
             ),
@@ -327,15 +330,16 @@ class _OptimizedGridViewState<T> extends State<OptimizedGridView<T>> {
   }
 
   Widget _buildDefaultEmptyWidget() {
-    return const Center(
+    final loc = AppLocalizations.of(context);
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.grid_view_outlined, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
+          const Icon(Icons.grid_view_outlined, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
           Text(
-            'No items found',
-            style: TextStyle(
+            loc?.noItemsFound ?? 'No items found',
+            style: const TextStyle(
               fontSize: 16,
               color: Colors.grey,
             ),

@@ -14,7 +14,7 @@
   "guestRegistration": "Guest Registration",
   "ownerRegistration": "Owner Registration",
   "home": "Home",
-  "booking": "Booking",
+  "booking": "బుకింగ్",
   "payments": "Payments",
   "feedback": "Feedback",
   "profile": "Profile",
@@ -24,16 +24,16 @@
   "delete": "Delete",
   "edit": "Edit",
   "submit": "Submit",
-  "confirm": "Confirm",
+  "confirm": "నిర్ధారించండి",
   "yes": "Yes",
   "no": "No",
   "ok": "OK",
   "close": "Close",
-  "back": "Back",
+  "back": "వెనక్కి",
   "next": "Next",
   "previous": "Previous",
   "done": "Done",
-  "search": "Search",
+  "search": "శోధన",
   "filter": "Filter",
   "sort": "Sort",
   "settings": "Settings",
@@ -41,14 +41,14 @@
   "english": "English",
   "telugu": "తెలుగు",
   "loading": "Loading...",
-  "error": "Error",
+  "error": "దోషం: {error}",
   "success": "Success",
   "warning": "Warning",
   "info": "Information",
-  "retry": "Retry",
-  "tryAgain": "Try Again",
+  "retry": "మళ్లీ ప్రయత్నించు",
+  "tryAgain": "మళ్లీ ప్రయత్నించండి",
   "goToHome": "Go to Home",
-  "goBack": "Go Back",
+  "goBack": "వెనక్కి వెళ్లండి",
   "signIn": "Sign In",
   "signOut": "Sign Out",
   "subject": "Subject",
@@ -56,7 +56,7 @@
   "name": "Name",
   "email": "Email",
   "address": "Address",
-  "city": "City",
+  "city": "నగరం",
   "state": "State",
   "pincode": "Pincode",
   "country": "Country",
@@ -68,7 +68,7 @@
   "inactive": "Inactive",
   "pending": "Pending",
   "completed": "Completed",
-  "failed": "Failed",
+  "failed": "విఫలమైనవి",
   "noData": "No Data Available",
   "noInternet": "No Internet Connection",
   "somethingWentWrong": "Something went wrong",
@@ -88,6 +88,109 @@
       }
     }
   },
+  "logApiResponseLabel": "ప్రత్యుత్తరం",
+  "logAuthEventMessage": "ప్రామాణీకరణ: {event}",
+  "@logAuthEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "logRoleActionMessage": "{role} చర్య: {action}",
+  "@logRoleActionMessage": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      },
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logPgActionMessage": "PG {action}",
+  "@logPgActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logPaymentEventMessage": "చెల్లింపు: {event}",
+  "@logPaymentEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "logFoodActionMessage": "ఆహారం {action}",
+  "@logFoodActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logComplaintEventMessage": "ఫిర్యాదు: {event}",
+  "@logComplaintEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
+  "logGuestActionMessage": "అతిథి {action}",
+  "@logGuestActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logOwnerActionMessage": "యజమాని {action}",
+  "@logOwnerActionMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "logMethodEntryMessage": "{methodName} లో ప్రవేశిస్తున్నాం",
+  "@logMethodEntryMessage": {
+    "placeholders": {
+      "methodName": {
+        "type": "String"
+      }
+    }
+  },
+  "logMethodExitMessage": "{methodName} నుండి బయటకు వస్తున్నాం",
+  "@logMethodExitMessage": {
+    "placeholders": {
+      "methodName": {
+        "type": "String"
+      }
+    }
+  },
+  "logPerformanceMessage": "పనితీరు: {operation} పూర్తి కావడానికి {durationMs}ms పట్టింది",
+  "@logPerformanceMessage": {
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      },
+      "durationMs": {
+        "type": "int"
+      }
+    }
+  },
+  "logBusinessEventMessage": "వ్యాపార ఈవెంట్: {event}",
+  "@logBusinessEventMessage": {
+    "placeholders": {
+      "event": {
+        "type": "String"
+      }
+    }
+  },
   "enterPhoneNumberToReceiveOTP": "OTP స్వీకరించడానికి మీ ఫోన్ నంబర్ నమోదు చేయండి",
   "tenDigitMobileNumber": "10 అంకెల మొబైల్ నంబర్",
   "phoneAuthentication": "ఫోన్ ప్రామాణీకరణ",
@@ -98,99 +201,179 @@
   "personal": "వ్యక్తిగత",
   "documents": "పత్రాలు",
   "emergency": "అత్యవసర",
-  "personalInformation": "వ్యక్తిగత సమాచారం",
-  "provideDetailsAsPerDocuments": "దయచేసి మీ అధికారిక పత్రాల ప్రకారం మీ వివరాలను అందించండి",
-  "yourRegisteredPhoneNumber": "మీ నమోదు చేసిన ఫోన్ నంబర్",
-  "verifiedDuringLogin": "✓ లాగిన్ సమయంలో ధృవీకరించబడింది",
-  "fullName": "పూర్తి పేరు",
-  "enterYourCompleteName": "మీ పూర్తి పేరును నమోదు చేయండి",
-  "fullNameRequired": "పూర్తి పేరు అవసరం",
-  "nameMustBeAtLeast3Characters": "పేరు కనీసం 3 అక్షరాలుగా ఉండాలి",
-  "dateOfBirth": "పుట్టిన తేదీ",
-  "emailAddressOptional": "ఇమెయిల్ చిరునామా (ఐచ్ఛికం)",
-  "yourEmailExample": "your.email@example.com",
-  "aadhaarNumber": "ఆధార్ నంబర్",
-  "enter12DigitAadhaarNumber": "12 అంకెల ఆధార్ నంబర్‌ను నమోదు చేయండి",
-  "contactName": "సంప్రదింపు పేరు",
-  "fullNameOfEmergencyContact": "అత్యవసర సంప్రదింపు పూర్తి పేరు",
-  "contactPhone": "సంప్రదింపు ఫోన్",
-  "tenDigitPhoneNumber": "10 అంకెల ఫోన్ నంబర్",
-  "contactAddressOptional": "సంప్రదింపు చిరునామా (ఐచ్ఛికం)",
-  "fullAddressOfEmergencyContact": "అత్యవసర సంప్రదింపు పూర్తి చిరునామా",
-  "profilePhoto": "ప్రొఫైల్ ఫోటో",
-  "aadhaarDocument": "ఆధార్ పత్రం",
-  "aboutApp": "అనువర్తన గురించి",
-  "aboutDeveloper": "డెవలపర్ గురించి",
+  "areYouSureYouWantToLogout": "మీరు లాగ్ అవుట్ చేయాలని ఖచ్చితంగా అనుకుంటున్నారా?",
+  "loggedOutSuccessfully": "విజయవంతంగా లాగ్ అవుట్ చేయబడింది",
+  "logoutFailed": "లాగ్ అవుట్ విఫలమైంది",
   "switchAccount": "ఖాతాను మార్చండి",
-  "switchToGuest": "అతిథిగా మారండి",
-  "switchToOwner": "యజమానిగా మారండి",
-  "pgs": "PGs",
-  "foods": "ఆహారాలు",
-  "requests": "అభ్యర్థనలు",
-  "complaints": "ఫిర్యాదులు",
-  "overview": "అవలోకనం",
-  "food": "ఆహారం",
-  "guests": "అతిథులు",
-  "browsePGAccommodations": "PG వసతులను బ్రౌజ్ చేయండి",
-  "viewFoodMenu": "ఆహార మెనూ చూడండి",
-  "paymentHistory": "చెల్లింపు చరిత్ర",
-  "bookingRequests": "బుకింగ్ అభ్యర్థనలు",
-  "complaintsRequests": "ఫిర్యాదులు & అభ్యర్థనలు",
-  "submitNewComplaint": "కొత్త ఫిర్యాదును సమర్పించండి",
-  "briefDescriptionOfComplaint": "మీ ఫిర్యాదు యొక్క సంక్షిప్త వివరణ",
-  "detailedDescriptionOfComplaint": "మీ ఫిర్యాదు లేదా అభ్యర్థన యొక్క వివరణాత్మక వివరణ",
-  "submitComplaint": "ఫిర్యాదును సమర్పించండి",
-  "complaintSubmittedSuccessfully": "ఫిర్యాదు విజయవంతంగా సమర్పించబడింది",
-  "submissionFailed": "సమర్పణ విఫలమైంది",
-  "errorPickingImage": "చిత్రాన్ని ఎంచుకోవడంలో లోపం",
-  "userNotAuthenticated": "వినియోగదారు ప్రామాణీకరించబడలేదు",
-  "pleaseSelectPGFirst": "ఫిర్యాదు దాఖలు చేయడానికి దయచేసి మొదట PGని ఎంచుకోండి",
-  "paymentDetails": "చెల్లింపు వివరాలు",
-  "paymentNotFound": "చెల్లింపు కనుగొనబడలేదు",
-  "sendPayment": "చెల్లింపు పంపండి",
-  "sendPaymentNotification": "చెల్లింపు నోటిఫికేషన్ పంపండి",
-  "uploadPaymentScreenshot": "చెల్లింపు స్క్రీన్‌షాట్ అప్‌లోడ్ చేయండి",
-  "invalidPGSelection": "చెల్లని PG ఎంపిక. యజమాని సమాచారం అందుబాటులో లేదు.",
-  "paymentSuccessfulOwnerNotified": "చెల్లింపు విజయవంతమైంది! యజమానికి తెలియజేయబడుతుంది.",
-  "paymentFailed": "చెల్లింపు విఫలమైంది",
-  "failedToProcessPayment": "చెల్లింపును ప్రాసెస్ చేయడంలో విఫలమైంది",
-  "pleaseUploadPaymentScreenshot": "దయచేసి చెల్లింపు స్క్రీన్‌షాట్‌ను అప్‌లోడ్ చేయండి. లావాదేవీ ID స్క్రీన్‌షాట్‌లో కనిపిస్తుంది.",
-  "failedToSendNotification": "నోటిఫికేషన్ పంపడంలో విఫలమైంది",
-  "invalidPaymentOrOwnerInfo": "చెల్లని చెల్లింపు లేదా యజమాని సమాచారం అందుబాటులో లేదు.",
-  "paymentSuccessful": "చెల్లింపు విజయవంతమైంది!",
-  "upiPaymentNotificationSent": "UPI చెల్లింపు నోటిఫికేషన్ పంపబడింది. యజమాని ధృవీకరిస్తారు మరియు నిర్ధారిస్తారు.",
-  "failedToProcessUPIPayment": "UPI చెల్లింపును ప్రాసెస్ చేయడంలో విఫలమైంది",
-  "cashPaymentNotificationSent": "నగదు చెల్లింపు నోటిఫికేషన్ పంపబడింది. యజమాని చెల్లింపును స్వీకరించిన తర్వాత నిర్ధారిస్తారు.",
-  "failedToProcessCashPayment": "నగదు చెల్లింపును ప్రాసెస్ చేయడంలో విఫలమైంది",
-  "failedToPickImage": "చిత్రాన్ని ఎంచుకోవడంలో విఫలమైంది",
-  "changeScreenshot": "స్క్రీన్‌షాట్ మార్చండి",
-  "backToPayments": "చెల్లింపులకు తిరిగి వెళ్లండి",
-  "yesPaid": "అవును, చెల్లించారు",
-  "noPaymentsYet": "ఇంకా చెల్లింపులు లేవు",
-  "noFilterPayments": "{filter} చెల్లింపులు లేవు",
-  "@noFilterPayments": {
+  "switchAccountConfirmation": "మీరు {currentRole} నుండి {newRole} ఖాతాకు మారాలని ఖచ్చితంగా అనుకుంటున్నారా?\n\nమీరు కొత్త పాత్ర కోసం నమోదును పూర్తి చేయాలి.",
+  "@switchAccountConfirmation": {
     "placeholders": {
-      "filter": {
+      "currentRole": {
+        "type": "String"
+      },
+      "newRole": {
         "type": "String"
       }
     }
   },
-  "paymentHistoryTitle": "చెల్లింపు చరిత్ర",
-  "pgNotFound": "PG కనుగొనబడలేదు",
-  "pricingAvailability": "ధర & లభ్యత",
-  "locationVicinity": "స్థానం & సమీప ప్రాంతం",
-  "facilitiesAmenities": "సౌకర్యాలు & అనుకూలతలు",
-  "foodMealInformation": "ఆహార & భోజన సమాచారం",
-  "rulesPolicies": "నియమాలు & విధానాలు",
-  "contactOwnerInformation": "సంప్రదింపు & యజమాని సమాచారం",
-  "paymentInformation": "చెల్లింపు సమాచారం",
-  "additionalInformation": "అదనపు సమాచారం",
-  "viewOnMap": "మ్యాప్‌లో చూడండి",
-  "callOwner": "యజమానిని కాల్ చేయండి",
-  "sharePG": "PGని షేర్ చేయండి",
-  "requestBooking": "బుకింగ్ అభ్యర్థించండి",
-  "couldNotOpenMaps": "మ్యాప్‌లను తెరవడం సాధ్యపడలేదు",
-  "pgInformationNotAvailable": "PG సమాచారం అందుబాటులో లేదు",
+  "switchedToAccount": "{role} ఖాతాకు మార్చబడింది. దయచేసి మీ నమోదును పూర్తి చేయండి.",
+  "@switchedToAccount": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "switchButton": "మార్చండి",
+  "role": "పాత్ర",
+  "verifiedOwner": "ధృవీకరించబడిన యజమాని",
+  "pendingVerification": "పెండింగ్ ధృవీకరణ",
+  "pgManagementSystem": "PG నిర్వహణ వ్యవస్థ",
+  "madeWithLoveByAtitiaTeam": "Atitia టీమ్ చేత ❤️తో తయారు చేయబడింది",
+  "version": "వెర్షన్",
+  "poweredByCharyatani": "Charyatani ద్వారా పవర్ చేయబడింది",
+  "chooseHowYouWantToUseTheApp": "మీరు అనువర్తనాన్ని ఎలా ఉపయోగించాలనుకుంటున్నారో ఎంచుకోండి",
+  "findAndBookPgAccommodations": "PG వసతి సౌకర్యాలను కనుగొని బుక్ చేయండి",
+  "manageYourPgPropertiesAndGuests": "మీ PG ఆస్తులు మరియు అతిథులను నిర్వహించండి",
+  "requestTimedOutPleaseTryAgain": "అభ్యర్థన సమయం ముగిసింది. దయచేసి మళ్లీ ప్రయత్నించండి.",
+  "@error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "googleSignInOnWebRequiresButton": "వెబ్‌లో Google సైన్-ఇన్ సైన్-ఇన్ బటన్ అవసరం. దయచేసి పైన ఉన్న Google సైన్-ఇన్ బటన్‌ను ఉపయోగించండి.",
+  "googleSignInTimedOut": "Google సైన్-ఇన్ సమయం ముగిసింది. దయచేసి మళ్లీ ప్రయత్నించండి.",
+  "googleSignInFailed": "Google సైన్-ఇన్ విఫలమైంది: {error}",
+  "@googleSignInFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "briefDescriptionOfYourComplaint": "మీ ఫిర్యాదు యొక్క సంక్షిప్త వివరణ",
+  "detailedDescriptionOfYourComplaint": "మీ ఫిర్యాదు లేదా అభ్యర్థన యొక్క వివరణాత్మక వివరణ",
+  "subjectRequired": "విషయం అవసరం",
+  "descriptionRequired": "వివరణ అవసరం",
+  "imageAttachment": "చిత్ర అటాచ్‌మెంట్",
+  "attachImage": "చిత్రాన్ని అటాచ్ చేయండి",
+  "removeImage": "చిత్రాన్ని తీసివేయండి",
+  "requestTimedOut": "అభ్యర్థన సమయం ముగిసింది",
+  "pleaseTryAgain": "దయచేసి మళ్లీ ప్రయత్నించండి",
+  "phoneNumberIsRequired": "ఫోన్ నంబర్ అవసరం",
+  "pleaseEnterValid10DigitPhoneNumber": "దయచేసి చెల్లుబాటు అయ్యే 10 అంకెల ఫోన్ నంబర్‌ను నమోదు చేయండి",
+  "otpIsRequired": "OTP అవసరం",
+  "otpMustBe6Digits": "OTP 6 అంకెలు ఉండాలి",
+  "otpMustContainOnlyDigits": "OTPలో సంఖ్యలు మాత్రమే ఉండాలి",
+  "authenticationFailedPleaseSelectCorrectRole": "ప్రామాణీకరణ విఫలమైంది. దయచేసి సరైన పాత్రను ఎంచుకోండి.",
+  "userDataNotFound": "వినియోగదారు డేటా కనుగొనబడలేదు",
+  "invalidUserRolePleaseSelectRole": "చెల్లని వినియోగదారు పాత్ర. దయచేసి పాత్రను ఎంచుకోండి.",
+  "verificationFailed": "ధృవీకరణ విఫలమైంది: {error}",
+  "@verificationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "googleSignInFailedError": "Google సైన్-ఇన్ విఫలమైంది: {error}",
+  "@googleSignInFailedError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorPickingImage": "చిత్రాన్ని ఎంచుకోవడంలో దోషం: {error}",
+  "@errorPickingImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "otpSentSuccessfullyPleaseCheckYourPhone": "OTP విజయవంతంగా పంపబడింది! దయచేసి మీ ఫోన్‌ను తనిఖీ చేయండి.",
+  "failedToSendOtpPleaseTryAgain": "OTP పంపడంలో విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.",
+  "tooManyRequestsPleaseWaitFewMinutes": "చాలా అభ్యర్థనలు. దయచేసి మళ్లీ ప్రయత్నించే ముందు కొన్ని నిమిషాలు వేచి ఉండండి.",
+  "smsServiceTemporarilyUnavailable": "SMS సేవ తాత్కాలికంగా అందుబాటులో లేదు. దయచేసి తర్వాత మళ్లీ ప్రయత్నించండి.",
+  "securityVerificationFailedPleaseTryAgain": "భద్రత ధృవీకరణ విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.",
+  "optional": "ఐచ్ఛికం",
+  "attachPhotosOptional": "ఫోటోలను అటాచ్ చేయండి (ఐచ్ఛికం)",
+  "userNotAuthenticated": "వినియోగదారు ప్రామాణీకరించబడలేదు",
+  "complaintSubmittedSuccessfully": "ఫిర్యాదు విజయవంతంగా సమర్పించబడింది",
+  "submissionFailed": "సమర్పణ విఫలమైంది",
+  "submitNewComplaint": "కొత్త ఫిర్యాదును సమర్పించండి",
+  "submitComplaint": "ఫిర్యాదును సమర్పించండి",
+  "personalInformation": "వ్యక్తిగత సమాచారం",
+  "yourRegisteredPhoneNumber": "మీ నమోదు చేసిన ఫోన్ నంబర్",
+  "verifiedDuringLogin": "✓ లాగిన్ సమయంలో ధృవీకరించబడింది",
+  "fullName": "పూర్తి పేరు",
+  "fullNameIsRequired": "పూర్తి పేరు అవసరం",
+  "nameMustBeAtLeast3Characters": "పేరు కనీసం 3 అక్షరాలు ఉండాలి",
+  "dateOfBirth": "పుట్టిన తేదీ",
+  "gender": "లింగం",
+  "male": "పురుషుడు",
+  "female": "స్త్రీ",
+  "aadhaarNumberIsRequired": "ఆధార్ నంబర్ అవసరం",
+  "aadhaarMustBe12Digits": "ఆధార్ 12 అంకెలు ఉండాలి",
+  "aadhaarMustContainOnlyDigits": "ఆధార్‌లో సంఖ్యలు మాత్రమే ఉండాలి",
+  "aadhaarDocumentUploadedSuccessfully": "ఆధార్ పత్రం విజయవంతంగా అప్‌లోడ్ చేయబడింది!",
+  "contactNameIsRequired": "సంప్రదింపు పేరు అవసరం",
+  "contactPhoneIsRequired": "సంప్రదింపు ఫోన్ అవసరం",
+  "pleaseSelectRelationship": "దయచేసి సంబంధాన్ని ఎంచుకోండి",
+  "contactAddressOptional": "సంప్రదింపు చిరునామా (ఐచ్ఛికం)",
+  "allRequiredFieldsCompletedReadyToSubmit": "అన్ని అవసరమైన ఫీల్డ్‌లు పూర్తయ్యాయి! సమర్పించడానికి సిద్ధంగా ఉంది.",
+  "pleaseProvideYourDetailsAsPerOfficialDocuments": "దయచేసి మీ అధికారిక పత్రాల ప్రకారం మీ వివరాలను అందించండి",
+  "profilePhoto": "ప్రొఫైల్ ఫోటో",
+  "aadhaarDocument": "ఆధార్ పత్రం",
+  "yourDocumentsAreSecurelyStored": "మీ పత్రాలు సురక్షితంగా నిల్వ చేయబడతాయి మరియు ధృవీకరణ ప్రయోజనాల కోసం మాత్రమే ఉపయోగించబడతాయి",
+  "provideDetailsOfSomeoneWeCanContact": "అత్యవసర సమయంలో మేము సంప్రదింపు చేయగల వ్యక్తి యొక్క వివరాలను అందించండి",
+  "continueButton": "కొనసాగించు",
+  "finish": "పూర్తి చేయండి",
+  "profileUpdatedSuccessfully": "ప్రొఫైల్ విజయవంతంగా నవీకరించబడింది",
+  "errorUpdatingProfile": "ప్రొఫైల్‌ను నవీకరించడంలో దోషం",
+  "pgs": "PGs",
+  "foods": "ఆహారం",
+  "requests": "అభ్యర్థనలు",
+  "browsePgAccommodations": "PG వసతులను బ్రౌజ్ చేయండి",
+  "viewFoodMenu": "ఆహార మెనూను వీక్షించండి",
+  "paymentHistory": "చెల్లింపు చరిత్ర",
+  "bookingRequests": "బుకింగ్ అభ్యర్థనలు",
+  "complaintsAndRequests": "ఫిర్యాదులు మరియు అభ్యర్థనలు",
+  "findYourPg": "మీ PGని కనుగొనండి",
+  "searchAndFilters": "శోధన మరియు ఫిల్టర్‌లు",
+  "hideFilters": "ఫిల్టర్‌లను దాచండి",
+  "showFilters": "ఫిల్టర్‌లను చూపించండి",
+  "pgsAvailable": "PGs అందుబాటులో ఉన్నాయి",
+  "cities": "నగరాలు",
+  "amenities": "సౌకర్యాలు",
+  "searchByNameCityArea": "పేరు, నగరం, ప్రాంతం ద్వారా శోధించండి...",
+  "filters": "ఫిల్టర్‌లు",
+  "clearAll": "అన్నీ తొలగించు",
+  "activeFilters": "క్రియాశీల ఫిల్టర్‌లు",
+  "noPgsFound": "PGs కనుగొనబడలేదు",
+  "noPgsFoundDescription": "మరిన్ని ఎంపికలను కనుగొనడానికి మీ శోధన లేదా ఫిల్టర్‌లను సర్దుబాటు చేయండి.",
+  "monday": "సోమవారం",
+  "tuesday": "మంగళవారం",
+  "wednesday": "బుధవారం",
+  "thursday": "గురువారం",
+  "friday": "శుక్రవారం",
+  "saturday": "శనివారం",
+  "sunday": "ఆదివారం",
+  "breakfast": "ఉదయ భోజనం",
+  "lunch": "మధ్యాహ్న భోజనం",
+  "dinner": "రాత్రి భోజనం",
+  "today": "ఈరోజు",
+  "noMenuAvailable": "మెనూ అందుబాటులో లేదు",
+  "noMenuAvailableDescription": "మెనూ త్వరలో అందుబాటులో ఉంటుంది.",
+  "refresh": "రిఫ్రెష్",
+  "refreshMenu": "మెనూను రిఫ్రెష్ చేయండి",
+  "likeTodaysMenu": "ఈరోజు మెనూను ఇష్టపడండి",
+  "dislike": "ఇష్టం లేదు",
+  "menuNote": "మెనూ గమనిక",
+  "foodGallery": "ఆహార గ్యాలరీ",
   "noMenuForDay": "{day}కు మెనూ లేదు",
   "@noMenuForDay": {
     "placeholders": {
@@ -199,79 +382,200 @@
       }
     }
   },
-  "errorLoadingMenu": "మెనూ లోడ్ చేయడంలో లోపం",
-  "foodDetails": "ఆహార వివరాలు",
-  "errorLoadingComplaints": "ఫిర్యాదులను లోడ్ చేయడంలో లోపం",
-  "myRoomBed": "నా గది & మంచం",
-  "noActiveBooking": "క్రియాశీల బుకింగ్ లేదు",
-  "myBookingRequests": "నా బుకింగ్ అభ్యర్థనలు",
-  "getStartedWithBookingRequests": "బుకింగ్ అభ్యర్థనలతో ప్రారంభించండి",
-  "noPGsFound": "PGs కనుగొనబడలేదు",
-  "noPGsAvailable": "PGs అందుబాటులో లేవు",
-  "newBookingRequest": "కొత్త బుకింగ్ అభ్యర్థన",
-  "newComplaintFiled": "కొత్త ఫిర్యాదు దాఖలు చేయబడింది",
-  "paymentReceived": "చెల్లింపు స్వీకరించబడింది",
-  "razorpay": "Razorpay",
-  "upiPayment": "UPI చెల్లింపు",
-  "cashPayment": "నగదు చెల్లింపు",
-  "helpSupport": "సహాయం & మద్దతు",
-  "videoTutorials": "దశలవారీ గైడ్‌లను చూడండి",
-  "documentation": "వివరణాత్మక గైడ్‌లను చదవండి",
-  "emailSupport": "ఇమెయిల్ మద్దతు",
-  "supportEmail": "support@atitia.com",
-  "phoneSupport": "ఫోన్ మద్దతు",
-  "supportPhone": "+91 1234567890",
-  "liveChat": "లైవ్ చాట్",
-  "whatsappNumber": "WhatsApp: +91 7020797849",
-  "notifications": "నోటిఫికేషన్‌లు",
-  "noNotifications": "నోటిఫికేషన్‌లు లేవు",
-  "appearance": "దృశ్యం",
-  "pushNotifications": "పుష్ నోటిఫికేషన్‌లు",
-  "receiveNotificationsOnDevice": "మీ పరికరంలో నోటిఫికేషన్‌లను స్వీకరించండి",
-  "emailNotifications": "ఇమెయిల్ నోటిఫికేషన్‌లు",
-  "receiveNotificationsViaEmail": "ఇమెయిల్ ద్వారా నోటిఫికేషన్‌లను స్వీకరించండి",
-  "paymentReminders": "చెల్లింపు రిమైండర్‌లు",
-  "getRemindersForPendingPayments": "పెండింగ్ చెల్లింపుల కోసం రిమైండర్‌లను పొందండి",
-  "dataPrivacy": "డేటా & గోప్యత",
-  "privacyPolicy": "గోప్యతా విధానం",
-  "termsOfService": "సేవా నిబంధనలు",
-  "about": "గురించి",
-  "appVersion": "అనువర్తన వెర్షన్",
-  "buildNumber": "బిల్డ్ నంబర్",
-  "guest": "అతిథి",
-  "owner": "యజమాని",
-  "noRevenueData": "రెవెన్యూ డేటా లేదు",
-  "totalRevenue": "మొత్తం రెవెన్యూ",
-  "averagePerMonth": "సగటు/నెల",
-  "monthlyRevenueBreakdown": "నెలవారీ రెవెన్యూ విభజన",
-  "totalBookings": "మొత్తం బుకింగ్‌లు",
-  "approved": "అనుమతించబడింది",
-  "rejected": "తిరస్కరించబడింది",
-  "bedChanges": "మంచం మార్పులు",
-  "totalGuests": "మొత్తం అతిథులు",
-  "paidCount": "చెల్లించిన సంఖ్య",
-  "pendingCount": "పెండింగ్ సంఖ్య",
-  "totalComplaints": "మొత్తం ఫిర్యాదులు",
-  "inProgress": "ప్రగతిలో ఉంది",
+  "ownerHasntSetMenuForDay": "యజమాని ఈ రోజు కోసం మెనూను ఇంకా సెట్ చేయలేదు.",
+  "errorLoadingMenu": "మెనూను లోడ్ చేయడంలో దోషం",
+  "unableToLoadMenuPleaseTryAgain": "మెనూను లోడ్ చేయడం సాధ్యం కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.",
+  "foodMenuStatistics": "ఆహార మెనూ గణాంకాలు",
+  "weeklyMenus": "వారపు మెనూలు",
+  "like": "ఇష్టం",
+  "todayMenu": "ఈరోజు మెనూ",
+  "history": "చరిత్ర",
+  "sendPayment": "చెల్లింపు పంపండి",
+  "paymentMethod": "చెల్లింపు పద్ధతి",
+  "transactionId": "లావాదేవీ ID",
+  "message": "సందేశం",
+  "ownerResponse": "యజమాని ప్రతిస్పందన",
+  "ownerPaymentDetails": "యజమాని చెల్లింపు వివరాలు",
+  "upiId": "UPI ID",
+  "upiQrCode": "UPI QR కోడ్",
+  "sendPaymentNotification": "చెల్లింపు నోటిఫికేషన్ పంపండి",
+  "afterMakingPaymentUploadScreenshot": "చెల్లింపు చేసిన తర్వాత, స్క్రీన్‌షాట్‌ను అప్‌లోడ్ చేసి యజమానికి తెలియజేయండి",
+  "addComplaint": "ఫిర్యాదు జోడించండి",
+  "complaints": "ఫిర్యాదులు",
+  "noComplaintsFound": "ఫిర్యాదులు కనుగొనబడలేదు",
+  "noComplaintsFoundDescription": "మీరు ఇంకా ఏ ఫిర్యాదులను సమర్పించలేదు. జోడించడానికి + బటన్‌ను నొక్కండి.",
+  "all": "అన్నీ",
   "resolved": "పరిష్కరించబడింది",
-  "myProfile": "నా ప్రొఫైల్",
+  "inProgress": "ప్రగతిలో ఉంది",
+  "total": "మొత్తం",
+  "myComplaints": "నా ఫిర్యాదులు",
+  "noComplaintsFoundWithSelectedFilter": "ఎంచుకున్న ఫిల్టర్‌తో ఫిర్యాదులు కనుగొనబడలేదు",
+  "noComplaintsYet": "ఇంకా ఫిర్యాదులు లేవు",
+  "noComplaintsYetDescription": "మీరు ఇంకా ఏ ఫిర్యాదులను సమర్పించలేదు. మీ మొదటి ఫిర్యాదును జోడించడానికి + బటన్‌ను నొక్కండి.",
+  "errorLoadingComplaints": "ఫిర్యాదులను లోడ్ చేయడంలో దోషం",
+  "unableToLoadComplaints": "ఫిర్యాదులను లోడ్ చేయడం సాధ్యం కాలేదు",
+  "saveProfile": "ప్రొఫైల్ సేవ్ చేయండి",
+  "loadingYourProfile": "మీ ప్రొఫైల్ లోడ్ అవుతోంది...",
+  "errorLoadingProfile": "ప్రొఫైల్ లోడ్ చేయడంలో దోషం",
+  "profilePhotos": "ప్రొఫైల్ ఫోటోలు",
   "aadhaarPhoto": "ఆధార్ ఫోటో",
-  "noBookings": "బుకింగ్‌లు లేవు",
-  "noPayments": "చెల్లింపులు లేవు",
-  "noGuests": "అతిథులు లేరు",
-  "ownerRepliedToComplaint": "యజమాని మీ ఫిర్యాదుకు ప్రత్యుత్తరం ఇచ్చారు",
-  "complaintStatusDisplay": "ఫిర్యాదు {statusDisplay}",
-  "@complaintStatusDisplay": {
+  "failedToUploadProfilePhoto": "ప్రొఫైల్ ఫోటోను అప్‌లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToUploadProfilePhoto": {
     "placeholders": {
-      "statusDisplay": {
+      "error": {
         "type": "String"
       }
     }
   },
-  "bookingApproved": "బుకింగ్ అనుమతించబడింది",
-  "bookingRejected": "బుకింగ్ తిరస్కరించబడింది",
+  "failedToUploadAadhaarPhoto": "ఆధార్ ఫోటోను అప్‌లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToUploadAadhaarPhoto": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noProfileDataFound": "ప్రొఫైల్ డేటా కనుగొనబడలేదు",
+  "failedToUpdateProfile": "ప్రొఫైల్ నవీకరించడంలో విఫలమైంది",
+  "vegetarian": "శాకాహారి",
+  "nonVegetarian": "మాంసాహారి",
+  "single": "ఒంటరి",
+  "married": "వివాహిత",
+  "foodPreference": "ఆహార ప్రాధాన్యత",
+  "maritalStatus": "వివాహ స్థితి",
+  "other": "ఇతర",
+  "contactAndGuardianInformation": "సంప్రదింపు మరియు సంరక్షక సమాచారం",
+  "currentAddress": "ప్రస్తుత చిరునామా",
+  "guardianName": "సంరక్షక పేరు",
+  "guardianPhone": "సంరక్షక ఫోన్",
+  "preferences": "ప్రాధాన్యతలు",
+  "eggetarian": "అండాహారి",
+  "divorced": "విడాకులు",
+  "items": "అంశాలు",
+  "overview": "అవలోకనం",
+  "food": "ఆహారం",
+  "guests": "అతిథులు",
+  "totalRevenue": "మొత్తం ఆదాయం",
+  "properties": "ఆస్తులు",
+  "activeTenants": "క్రియాశీల అద్దెదారులు",
+  "occupancy": "ఆక్యుపెన్సీ",
+  "pendingBookings": "పెండింగ్ బుకింగ్‌లు",
+  "pendingComplaints": "పెండింగ్ ఫిర్యాదులు",
+  "refreshDashboard": "డాష్‌బోర్డ్ రిఫ్రెష్ చేయండి",
+  "loadingDashboard": "డాష్‌బోర్డ్ లోడ్ అవుతోంది...",
+  "errorLoadingDashboard": "డాష్‌బోర్డ్ లోడ్ చేయడంలో దోషం",
+  "dashboardDataWillAppearHere": "మీరు ఆస్తులను జోడించిన తర్వాత డాష్‌బోర్డ్ డేటా ఇక్కడ కనిపిస్తుంది",
+  "welcome": "స్వాగతం",
+  "heresYourBusinessOverview": "ఇది మీ వ్యాపార అవలోకనం",
+  "performance": "పనితీరు",
+  "monthlyRevenue": "నెలవారీ ఆదాయం",
+  "propertyBreakdown": "ఆస్తి విభజన",
+  "quickActions": "త్వరిత చర్యలు",
+  "addProperty": "ఆస్తి జోడించండి",
+  "addTenant": "అద్దెదారుని జోడించండి",
+  "viewReports": "రిపోర్ట్‌లను వీక్షించండి",
+  "propertyRevenue": "ఆస్తి ఆదాయం",
+  "totalRevenueWithPgs": "మొత్తం ఆదాయం ({count} PGs)",
+  "@totalRevenueWithPgs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createPgMenus": "Create PG Menus",
+  "specialMenus": "Special Menus",
+  "loadingMenus": "Loading menus...",
+  "failedToLoadMenus": "Failed to load menus",
+  "noPgMenusFound": "No PG Menus Found",
+  "createWeeklyMenusForThisPg": "Create weekly menus for this PG to get started",
+  "useCreatePgMenusButton": "Use the \"Create PG Menus\" button in the app bar to get started",
+  "createPgWeeklyMenus": "Create PG Weekly Menus",
+  "thisWillCreateDefaultMenuTemplates": "This will create default menu templates for all 7 days of the week for this PG. You can edit them later.",
+  "initialize": "ప్రారంభించు",
+  "defaultMenusInitializedSuccessfully": "డిఫాల్ట్ మెనూలు విజయవంతంగా ప్రారంభించబడ్డాయి",
+  "failedToInitializeMenus": "మెనూలను ప్రారంభించడంలో విఫలమైంది",
+  "failedToInitializeMenusWithError": "మెనూలను ప్రారంభించడంలో విఫలమైంది: {error}",
+  "@failedToInitializeMenusWithError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "specialMenuOptions": "Special Menu Options",
+  "addFestivalMenu": "పండుగ మెనును జోడించండి",
+  "createSpecialMenuForFestivals": "పండుగల కోసం ప్రత్యేక మెనును సృష్టించండి",
+  "addEventMenu": "ఈవెంట్ మెనును జోడించండి",
+  "createSpecialMenuForEvents": "ఈవెంట్‌ల కోసం ప్రత్యేక మెనును సృష్టించండి",
+  "viewAllSpecialMenus": "అన్ని ప్రత్యేక మెనూలను వీక్షించండి",
+  "manageExistingSpecialMenus": "అస్తిత్వంలో ఉన్న ప్రత్యేక మెనూలను నిర్వహించండి",
+  "editMenu": "మెనును సవరించండి",
+  "guestFeedbackToday": "Guest Feedback (Today)",
+  "breakfastTime": "7:00 AM - 10:00 AM",
+  "lunchTime": "12:00 PM - 3:00 PM",
+  "dinnerTime": "7:00 PM - 10:00 PM",
+  "createMenuForThisDay": "Create a menu for this day to get started",
+  "createMenu": "మెనును సృష్టించండి",
+  "special": "Special",
+  "weeklyMenuManagement": "Weekly Menu Management",
+  "manageBreakfastLunchDinnerForAllDays": "Manage breakfast, lunch & dinner for all days",
+  "days": "Days",
+  "photos": "ఫోటోలు",
+  "festival": "Festival",
+  "ownerFoodNoItemsAddedYet": "ఇంకా అంశాలు జోడించలేదు",
+  "specialMenuLabel": "ప్రత్యేక మెనూ",
+  "dayShortMon": "సోమ",
+  "dayShortTue": "మంగళ",
+  "dayShortWed": "బుధ",
+  "dayShortThu": "గురు",
+  "dayShortFri": "శుక్ర",
+  "dayShortSat": "శని",
+  "dayShortSun": "ఆది",
+  "noRequests": "No Requests",
+  "bookingAndBedChangeRequestsWillAppearHere": "Booking and bed change requests will appear here",
+  "bedChanges": "బెడ్ మార్పులు",
+  "complaintsFromGuestsWillAppearHere": "Complaints from guests will appear here",
+  "complaint": "Complaint",
+  "guest": "అతిథి",
+  "reply": "సమాధానం",
+  "resolve": "Resolve",
+  "replyToComplaint": "ఫిర్యాదుకు సమాధానం",
+  "typeYourReply": "మీ సమాధానాన్ని టైప్ చేయండి...",
+  "send": "పంపండి",
+  "replySent": "Reply sent",
+  "failedToSendReply": "Failed to send reply",
+  "resolveComplaint": "ఫిర్యాదును పరిష్కరించండి",
+  "resolutionNotesOptional": "పరిష్కార గమనికలు (ఐచ్ఛికం)",
+  "markResolved": "Mark Resolved",
+  "complaintResolved": "Complaint resolved",
+  "failedToResolve": "Failed to resolve",
+  "refreshGuestData": "Refresh Guest Data",
+  "loadingGuestData": "Loading guest data...",
+  "errorLoadingData": "Error Loading Data",
+  "bedMap": "Bed Map",
+  "dashboard": "Dashboard",
+  "refreshPgData": "Refresh PG Data",
+  "noPgsListedYet": "No PGs Listed Yet",
+  "tapButtonBelowToListFirstPg": "Tap the button below to list your first PG",
+  "listYourFirstPg": "List Your First PG",
+  "loadingPgData": "Loading PG data...",
+  "bookingsOverview": "Bookings Overview",
+  "approved": "అనుమోదించబడింది",
+  "rejected": "తిరస్కరించబడింది",
+  "occupied": "Occupied",
+  "vacant": "Vacant",
+  "maintenance": "నిర్వహణ",
+  "approve": "అనుమోదించు",
+  "reject": "తిరస్కరించు",
+  "noGuests": "అతిథులు లేరు",
+  "guestListWillAppearHereOnceGuestsAreAdded": "Guest list will appear here once guests are added",
+  "selected": "selected",
+  "deselectAll": "Deselect All",
+  "selectAll": "Select All",
   "changeStatus": "స్థితిని మార్చండి",
-  "updatedGuestsToStatus": "{count} అతిథులను {status}కు నవీకరించబడింది",
+  "deleteSelected": "Delete Selected",
+  "updatedGuestsToStatus": "{count} అతిథులను {status}కి నవీకరించబడింది",
   "@updatedGuestsToStatus": {
     "placeholders": {
       "count": {
@@ -283,9 +587,4346 @@
     }
   },
   "confirmBulkDelete": "బల్క్ డిలీట్‌ను నిర్ధారించండి",
+  "areYouSureYouWantToDeleteGuests": "Are you sure you want to delete {count} guests? This action cannot be undone.",
+  "@areYouSureYouWantToDeleteGuests": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "guestsDeletedSuccessfully": "అతిథులు విజయవంతంగా తొలగించబడ్డారు",
-  "reject": "తిరస్కరించండి",
-  "approve": "అనుమతించండి",
+  "totalGuests": "మొత్తం అతిథులు",
+  "activeGuests": "Active Guests",
+  "pendingGuests": "Pending Guests",
+  "found": "found",
+  "guestOverview": "Guest Overview",
+  "recordPayment": "చెల్లింపును రికార్డ్ చేయండి",
+  "atitiaIsAComprehensivePgManagementPlatform": "Atitia is a comprehensive PG management platform that connects PG owners with guests, streamlining bookings, payments, and daily operations.",
+  "features": "Features:",
+  "easyPgPropertyManagement": "• Easy PG property management",
+  "secureOnlinePayments": "• Secure online payments",
+  "realTimeNotifications": "• Real-time notifications",
+  "menuManagement": "• Menu management",
+  "complaintTracking": "• Complaint tracking",
+  "visitorManagement": "• Visitor management",
+  "copyrightAtitiaAllRightsReserved": "© 2025 Atitia. All rights reserved.",
+  "charyataniTechnologies": "Charyatani Technologies",
+  "weAreALeadingSoftwareDevelopmentCompany": "We are a leading software development company specializing in mobile and web applications for hospitality and property management.",
+  "contactUs": "Contact Us:",
+  "copyrightCharyataniTechnologies": "© 2025 Charyatani Technologies Pvt. Ltd.",
+  "allRightsReserved": "All rights reserved.",
+  "aboutApp": "అప్లికేషన్ గురించి",
+  "aboutDeveloper": "డెవలపర్ గురించి",
+  "switchToGuest": "అతిథికి మారండి",
+  "switchToOwner": "యజమానికి మారండి",
+  "owner": "యజమాని",
+  "failedToSwitchAccount": "ఖాతాను మార్చడంలో విఫలమైంది",
+  "notifications": "నోటిఫికేషన్‌లు",
+  "userMenu": "వినియోగదారు మెను",
+  "system": "సిస్టమ్",
+  "privacyPolicy": "గోప్యతా విధానం",
+  "termsOfService": "సేవా నిబంధనలు",
+  "helpSupport": "సహాయం & మద్దతు",
+  "or": "లేదా",
+  "googleSignIn": "Googleతో కొనసాగించండి",
+  "enterYourCompleteName": "మీ పూర్తి పేరును నమోదు చేయండి",
+  "age": "వయస్సు",
+  "years": "సంవత్సరాలు",
+  "emailAddressOptional": "ఇమెయిల్ చిరునామా (ఐచ్ఛికం)",
+  "yourEmailExampleCom": "your.email@example.com",
+  "pleaseEnterValidEmail": "దయచేసి చెల్లుబాటు అయ్యే ఇమెయిల్‌ను నమోదు చేయండి",
+  "uploadDocuments": "పత్రాలను అప్‌లోడ్ చేయండి",
+  "uploadClearPhotosOfYourDocuments": "ధృవీకరణ కోసం మీ పత్రాల స్పష్టమైన ఫోటోలను అప్‌లోడ్ చేయండి",
+  "uploadClearPhotoOfYourself": "మీ స్వంత స్పష్టమైన ఫోటోను అప్‌లోడ్ చేయండి",
+  "uploadYourAadhaarCard": "మీ ఆధార్ కార్డ్‌ను అప్‌లోడ్ చేయండి (ముందు లేదా వెనుక)",
+  "aadhaarNumber": "ఆధార్ సంఖ్య",
+  "enter12DigitAadhaarNumber": "12 అంకెల ఆధార్ సంఖ్యను నమోదు చేయండి",
+  "emergencyContact": "అత్యవసర సంప్రదింపు",
+  "contactName": "సంప్రదింపు పేరు",
+  "fullNameOfEmergencyContact": "అత్యవసర సంప్రదింపు పూర్తి పేరు",
+  "contactRelation": "సంబంధం",
+  "fullAddressOfEmergencyContact": "అత్యవసర సంప్రదింపు పూర్తి చిరునామా",
+  "father": "Father",
+  "mother": "Mother",
+  "brother": "Brother",
+  "sister": "Sister",
+  "spouse": "Spouse",
+  "friend": "Friend",
+  "pleaseSelectPgFirst": "Please select a PG first",
+  "invalidPgSelectionOwnerInfoNotAvailable": "Invalid PG selection. Owner information not available.",
+  "paymentSuccessfulOwnerWillBeNotified": "చెల్లింపు విజయవంతమైంది! యజమానిని తెలియజేస్తాం.",
+  "paymentFailed": "చెల్లింపు విఫలమైంది",
+  "@paymentFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToProcessPayment": "చెల్లింపును ప్రాసెస్ చేయడంలో విఫలమైంది",
+  "@failedToProcessPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseUploadPaymentScreenshot": "దయచేసి చెల్లింపు స్క్రీన్‌షాట్‌ను అప్‌లోడ్ చేయండి. లావాదేవీ ID స్క్రీన్‌షాట్‌లో కనిపిస్తుంది.",
+  "failedToSendNotification": "నోటిఫికేషన్ పంపడంలో విఫలమైంది",
+  "@failedToSendNotification": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "uploadPaymentScreenshot": "చెల్లింపు స్క్రీన్‌షాట్ అప్‌లోడ్ చేయండి",
+  "pleaseSelectPgFirstToFileComplaint": "Please select a PG first to file a complaint",
+  "submitFirstComplaint": "Submit First Complaint",
+  "viewDetails": "వివరాలు చూడండి",
+  "editGuest": "అతిథిని సవరించండి",
+  "sendMessage": "సందేశం పంపండి",
+  "callGuest": "అతిథిని కాల్ చేయండి",
+  "checkOut": "చెక్ అవుట్",
+  "guestUpdatedSuccessfully": "అతిథి విజయవంతంగా నవీకరించబడింది",
+  "messages": "సందేశాలు:",
+  "noMessagesYet": "ఇంకా సందేశాలు లేవు",
+  "replyToServiceRequest": "సేవా అభ్యర్థనకు ప్రత్యుత్తరం ఇవ్వండి",
+  "sendReply": "ప్రత్యుత్తరం పంపండి",
+  "pleaseFillInAllFields": "దయచేసి అన్ని ఫీల్డ్‌లను పూరించండి",
+  "serviceRequestSubmitted": "సేవా అభ్యర్థన సమర్పించబడింది",
+  "replySentSuccessfully": "ప్రత్యుత్తరం విజయవంతంగా పంపబడింది",
+  "failedToUpdateStatus": "స్థితిని నవీకరించడంలో విఫలమైంది",
+  "@failedToUpdateStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "completeService": "సేవను పూర్తి చేయండి",
+  "completionNotes": "పూర్తి నోట్స్",
+  "completionNotesOptional": "పూర్తి నోట్స్ (ఐచ్ఛికం)...",
+  "markAsCompleted": "పూర్తయినదిగా గుర్తించండి",
+  "serviceCompletedSuccessfully": "సేవ విజయవంతంగా పూర్తయింది",
+  "editBike": "బైక్‌ను సవరించండి",
+  "bikeUpdatedSuccessfully": "బైక్ విజయవంతంగా నవీకరించబడింది",
+  "moveBike": "బైక్‌ను తరలించండి",
+  "currentSpot": "ప్రస్తుత స్పాట్: {spot}",
+  "@currentSpot": {
+    "placeholders": {
+      "spot": {
+        "type": "String"
+      }
+    }
+  },
+  "removeBike": "బైక్‌ను తొలగించండి",
+  "areYouSureYouWantToRemoveBike": "మీరు {bikeName}ని తొలగించాలని ఖచ్చితంగా అనుకుంటున్నారా?",
+  "@areYouSureYouWantToRemoveBike": {
+    "placeholders": {
+      "bikeName": {
+        "type": "String"
+      }
+    }
+  },
+  "bikeRemovalRequestCreated": "బైక్ తొలగింపు అభ్యర్థన సృష్టించబడింది",
+  "bikeMovementRequestCreated": "బైక్ తరలింపు అభ్యర్థన సృష్టించబడింది",
+  "invalidPaymentOrOwnerInfoNotAvailable": "చెల్లని చెల్లింపు లేదా యజమాని సమాచారం అందుబాటులో లేదు.",
+  "paymentSuccessful": "చెల్లింపు విజయవంతమైంది!",
+  "upiPaymentNotificationSent": "UPI చెల్లింపు నోటిఫికేషన్ పంపబడింది. యజమాని ధృవీకరిస్తారు మరియు నిర్ధారిస్తారు.",
+  "failedToProcessUpiPayment": "UPI చెల్లింపును ప్రాసెస్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToProcessUpiPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cashPaymentNotificationSent": "నగదు చెల్లింపు నోటిఫికేషన్ పంపబడింది. యజమాని చెల్లింపును స్వీకరించిన తర్వాత నిర్ధారిస్తారు.",
+  "failedToProcessCashPayment": "నగదు చెల్లింపును ప్రాసెస్ చేయడంలో విఫలమైంది",
+  "@failedToProcessCashPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToPickImage": "చిత్రాన్ని ఎంచుకోవడంలో విఫలమైంది",
+  "@failedToPickImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "changeScreenshot": "స్క్రీన్‌షాట్ మార్చండి",
+  "cashPaymentConfirmation": "నగదు చెల్లింపు నిర్ధరణ",
+  "haveYouPaidAmountInCash": "యజమానికి నగదుగా మొత్తం చెల్లించారా? వారు చెల్లింపును స్వీకరించిన తర్వాత నిర్ధారిస్తారు.",
+  "yesPaid": "అవును, చెల్లించారు",
+  "paymentDetailsSavedSuccessfully": "చెల్లింపు వివరాలు విజయవంతంగా సేవ్ చేయబడ్డాయి",
+  "failedToSave": "సేవ్ చేయడంలో విఫలమైంది",
+  "@failedToSave": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownError": "Unknown error",
+  "saveDraft": "డ్రాఫ్ట్‌ను సేవ్ చేయండి",
+  "publish": "ప్రచురించండి",
+  "updating": "Updating...",
+  "creating": "Creating...",
+  "updatePg": "Update PG",
+  "createPg": "Create PG",
+  "pleaseEnterPgNameBeforePublishing": "Please enter PG name before publishing",
+  "pgPublishedSuccessfully": "PG విజయవంతంగా ప్రచురించబడింది",
+  "draftSaved": "డ్రాఫ్ట్ సేవ్ చేయబడింది",
+  "failedToSelectPhotos": "ఫోటోలను ఎంచుకోవడంలో విఫలమైంది",
+  "@failedToSelectPhotos": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "guestName": "అతిథి పేరు",
+  "searchGuestsLabel": "అతిథులను వెతకండి",
+  "searchGuestsHint": "పేరు, ఫోన్, గది లేదా ఇమెయిల్ ద్వారా వెతకండి...",
+  "statusNew": "కొత్త",
+  "statusVip": "విఐపీ",
+  "exportData": "డేటాను ఎగుమతి చేయండి",
+  "guestDataExportedSuccessfully": "అతిథి డేటా విజయవంతంగా ఎగుమతి అయింది",
+  "guestListTitle": "అతిథుల జాబితా",
+  "guestCount": "{count, plural, =0 {0 అతిథులు} one {1 అతిథి} other {{count} అతిథులు}}",
+  "@guestCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "noGuestsYet": "ఇప్పటికీ అతిథులు లేరు",
+  "guestsAppearAfterBooking": "మీ PG బుక్ చేసిన వెంటనే అతిథులు ఇక్కడ కనిపిస్తారు",
+  "checkIn": "చెక్-ఇన్",
+  "duration": "వ్యవధి",
+  "emergencyPhone": "అత్యవసర ఫోన్",
+  "occupation": "వృత్తి",
+  "company": "కంపెనీ",
+  "messageToGuest": "కు: {name}",
+  "@messageToGuest": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "enterMessageHint": "మీ సందేశాన్ని నమోదు చేయండి...",
+  "messageSentSuccessfully": "సందేశం విజయవంతంగా పంపబడింది",
+  "checkOutGuest": "అతిథిని చెక్ అవుట్ చేయండి",
+  "checkOutGuestConfirmation": "ఈ అతిథిని చెక్ అవుట్ చేయాలనుకుంటున్నారా? ఈ చర్యను తిరిగి మార్చలేము.",
+  "guestCheckedOutSuccessfully": "అతిథి విజయవంతంగా చెక్ అవుట్ అయ్యారు",
+  "phoneNumberLabel": "ఫోన్ నంబర్",
+  "emailLabel": "ఇమెయిల్",
+  "emergencyContactLabel": "Emergency Contact",
+  "emergencyPhoneLabel": "Emergency Phone",
+  "saveChanges": "మార్పులను సేవ్ చేయండి",
+  "parkingSpot": "పార్కింగ్ స్పాట్",
+  "notes": "Notes",
+  "complete": "పూర్తి",
+  "resolutionNotes": "పరిష్కార నోట్స్",
+  "markAsResolved": "పరిష్కరించబడినదిగా గుర్తించండి",
+  "complaintResolvedSuccessfully": "ఫిర్యాదు విజయవంతంగా పరిష్కరించబడింది",
+  "serviceType": "సేవా రకం",
+  "serviceDescription": "సేవా వివరణ",
+  "describeTheServiceNeeded": "అవసరమైన సేవను వివరించండి...",
+  "submitRequest": "అభ్యర్థనను సమర్పించండి",
+  "replyLabel": "Reply",
+  "uPI": "UPI",
+  "amountLabel": "Amount:",
+  "weeklyMenuPreview": "Weekly Menu Preview",
+  "totalItems": "Total Items",
+  "breakfastItems": "Breakfast Items",
+  "lunchItems": "Lunch Items",
+  "dinnerItems": "Dinner Items",
+  "snackItems": "Snack Items",
+  "complaintStatistics": "Complaint Statistics",
+  "totalComplaints": "మొత్తం ఫిర్యాదులు",
+  "highPriority": "High Priority",
+  "thisMonth": "This Month",
+  "recentComplaintsPreview": "Recent Complaints Preview",
+  "category": "Category",
+  "priorityLabel": "Priority",
+  "maintenanceIssues": "Maintenance Issues",
+  "cleanliness": "Cleanliness",
+  "foodQuality": "Food Quality",
+  "noiseComplaints": "Noise Complaints",
+  "backToPayments": "చెల్లింపులకు తిరిగి వెళ్లండి",
+  "payNow": "ఇప్పుడు చెల్లించండి",
+  "processing": "ప్రాసెస్ చేస్తున్నాం...",
+  "addPhotos": "ఫోటోలు జోడించండి",
+  "paymentDetails": "చెల్లింపు వివరాలు",
+  "paymentNotFound": "చెల్లింపు కనుగొనబడలేదు",
+  "theRequestedPaymentCouldNotBeFound": "అభ్యర్థించిన చెల్లింపు కనబడలేదు.",
+  "dueDate": "చెల్లించవలసిన తేదీ",
+  "paymentDate": "చెల్లింపు తేదీ",
+  "uPIReference": "UPI Reference",
+  "pgId": "PG ID",
+  "ownerId": "Owner ID",
+  "timeline": "సమయరేఖ",
+  "created": "సృష్టించబడింది",
+  "paid": "చెల్లించబడింది",
+  "transactionIdOptional": "లావాదేవీ ID (ఐచ్చికం)",
+  "transactionIdIsVisibleInScreenshot": "లావాదేవీ ID స్క్రీన్‌షాట్‌లో కనిపిస్తుంది",
+  "youCanSkipThisTransactionIdIsInScreenshot": "మీరు దీనిని దాటవచ్చు - ట్రాన్సాక్షన్ ID స్క్రీన్‌షాట్‌లో ఉంది",
+  "pleaseEnterAmount": "దయచేసి మొత్తాన్ని నమోదు చేయండి",
+  "pleaseEnterValidAmount": "దయచేసి సరైన మొత్తాన్ని నమోదు చేయండి",
+  "notRequiredAlreadyVisibleInScreenshot": "అవసరం లేదు - స్క్రీన్‌షాట్‌లో ఇప్పటికే కనబడుతోంది",
+  "messageOptional": "సందేశం (ఐచ్చికం)",
+  "paymentInformation": "చెల్లింపు సమాచారం",
+  "additionalInformation": "అదనపు సమాచారం",
+  "searchServices": "సేవలను శోధించండి",
+  "searchByTitleGuestRoomOrType": "శీర్షిక, అతిథి, గది లేదా రకం ద్వారా శోధించండి...",
+  "createNewServiceRequest": "కొత్త సేవా అభ్యర్థనను సృష్టించండి",
+  "priority": "ప్రాధాన్యత",
+  "requested": "అభ్యర్థించబడింది",
+  "assignedTo": "కేటాయించబడింది",
+  "serviceRequest": "సేవా అభ్యర్థన",
+  "serviceTitle": "సేవా శీర్షిక",
+  "room": "గది",
+  "roomNumber": "గది సంఖ్య",
+  "housekeeping": "గృహనిర్వహణ",
+  "vehicle": "వాహనం",
+  "start": "ప్రారంభించండి",
+  "resume": "కొనసాగించండి",
+  "details": "వివరాలు",
+  "advancedSearch": "Advanced Search",
+  "pgNotFound": "PG కనుగొనబడలేదు",
+  "pricingAvailability": "ధర & లభ్యత",
+  "locationVicinity": "స్థానం & సమీప ప్రాంతం",
+  "facilitiesAmenities": "సౌకర్యాలు & అనుకూలతలు",
+  "foodMealInformation": "ఆహార & భోజన సమాచారం",
+  "rulesPolicies": "నియమాలు & విధానాలు",
+  "contactOwnerInformation": "సంప్రదింపు & యజమాని సమాచారం",
+  "callOwner": "యజమానిని కాల్ చేయండి",
+  "sharePg": "Share PG",
+  "requestBooking": "బుకింగ్ అభ్యర్థించండి",
+  "couldNotOpenMaps": "మ్యాప్ తెరవలేకపోయాం",
+  "pgInformationNotAvailable": "PG సమాచారం అందుబాటులో లేదు",
+  "failedToShare": "Failed to share: {error}",
+  "@failedToShare": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "searchBikes": "బైక్‌లను శోధించండి",
+  "searchByNumberNameGuestOrModel": "నంబర్, పేరు, అతిథి లేదా మోడల్ ద్వారా శోధించండి...",
+  "searchComplaints": "ఫిర్యాదులను శోధించండి",
+  "searchByTitleGuestRoomOrDescription": "శీర్షిక, అతిథి, గది లేదా వివరణ ద్వారా శోధించండి...",
+  "yourCurrentResidentialAddress": "Your current residential address",
+  "nameOfYourParentOrGuardian": "Name of your parent or guardian",
+  "tenDigitPhoneNumber": "10 అంకెల ఫోన్ నంబర్",
+  "pleaseEnterValidPhoneNumber": "దయచేసి చెల్లుబాటు అయ్యే ఫోన్ నంబర్‌ను నమోదు చేయండి",
+  "bank": "Bank",
+  "qrCode": "QR Code",
+  "configureHowGuestsCanPayYou": "Configure how guests can pay you",
+  "bankAccountDetails": "Bank Account Details",
+  "addYourBankAccountDetailsForDirectTransfers": "Add your bank account details for direct transfers",
+  "bankName": "బ్యాంక్ పేరు",
+  "accountHolderName": "ఖాతాదారు పేరు",
+  "enterAccountNumber": "ఖాతా నంబర్‌ను నమోదు చేయండి",
+  "ifscCode": "IFSC కోడ్",
+  "uPIDetails": "UPI Details",
+  "addYourUpiIdForInstantPayments": "Add your UPI ID for instant payments",
+  "upiID": "UPI ID",
+  "paymentInstructionsOptional": "చెల్లింపు సూచనలు (ఐచ్ఛికం)",
+  "uploadYourUpiQrCodeFromAnyPaymentApp": "ఏదైనా చెల్లింపు అప్లికేషన్ నుండి మీ UPI QR కోడ్‌ను అప్లోడ్ చేయండి",
+  "changeQrCode": "Change QR Code",
+  "uploadQrCode": "QR కోడ్‌ను అప్లోడ్ చేయండి",
+  "savePaymentDetails": "చెల్లింపు వివరాలను సేవ్ చేయండి",
+  "editPg": "Edit PG",
+  "newPgSetup": "New PG Setup",
+  "basic": "Basic",
+  "basicInfo": "Basic Info",
+  "rent": "Rent",
+  "rentConfig": "Rent Config",
+  "structure": "Structure",
+  "floorStructure": "Floor Structure",
+  "rules": "Rules",
+  "additionalInfo": "Additional Info",
+  "summary": "Summary",
+  "startBuildingYourPgProfile": "Start Building Your PG Profile",
+  "defineYourPgStructure": "Define Your PG Structure",
+  "bedNumberingGuide": "మంచం నంబరింగ్ గైడ్",
+  "configureRentalPricing": "అద్దె ధరను కాన్ఫిగర్ చేయండి",
+  "addPgAmenities": "Add PG Amenities",
+  "uploadPgPhotos": "Upload PG Photos",
+  "progress": "ప్రగతి",
+  "theRequestedPgCouldNotBeFoundOrMayHaveBeenRemoved": "అభ్యర్థించిన PG కనుగొనబడలేదు లేదా తొలగించబడింది కావచ్చు.",
+  "newParkingSpot": "కొత్త పార్కింగ్ స్పాట్",
+  "reasonForMove": "తరలింపు కారణం",
+  "reasonForRemoval": "తొలగింపు కారణం",
+  "more": "More",
+  "nameAsPerBankRecords": "బ్యాంక్ రికార్డ్‌ల ప్రకారం పేరు",
+  "accountNumber": "ఖాతా నంబర్",
+  "anySpecialInstructionsForGuests": "అతిథులకు ఏవైనా ప్రత్యేక సూచనలు",
+  "appearance": "దృశ్యం",
+  "pushNotifications": "పుష్ నోటిఫికేషన్‌లు",
+  "pushNotificationsDescription": "Receive notifications on your device",
+  "emailNotifications": "ఇమెయిల్ నోటిఫికేషన్‌లు",
+  "emailNotificationsDescription": "Receive notifications via email",
+  "paymentReminders": "చెల్లింపు రిమైండర్‌లు",
+  "paymentRemindersDescription": "Get reminders for pending payments",
+  "dataAndPrivacy": "Data & Privacy",
+  "aboutSection": "About",
+  "appVersion": "అనువర్తన వెర్షన్",
+  "buildNumber": "బిల్డ్ నంబర్",
+  "theme": "Theme",
+  "themeDescription": "Choose your preferred theme",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "System",
+  "languageDescription": "Select your preferred language",
+  "urgent": "Urgent",
+  "createServiceRequest": "Create Service Request",
+  "collapse": "Collapse",
+  "otherServices": "Other Services",
+  "serviceRequests": "Service Requests",
+  "noServiceRequestsYet": "No service requests yet",
+  "serviceRequestsAppearHere": "Guest service requests will appear here when submitted",
+  "serviceStarted": "Service started",
+  "serviceStatusUpdated": "Service status updated",
+  "unreadMessagesCount": "{count} unread messages",
+  "@unreadMessagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchBikesHint": "Search by number, name, guest, or model...",
+  "registered": "నమోదు చేయబడింది",
+  "violation": "Violation",
+  "violations": "Violations",
+  "expired": "Expired",
+  "premium": "Premium",
+  "totalBikes": "Total Bikes",
+  "bikeRegistry": "Bike Registry",
+  "noBikesRegistered": "No Bikes Registered",
+  "guestBikesWillAppearHere": "Guest bikes will appear here when registered",
+  "bikeCount": "{count} bikes",
+  "@bikeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bikeNumber": "బైక్ నంబర్",
+  "bikeName": "Bike Name",
+  "bikeType": "రకం",
+  "bikeModel": "మోడల్",
+  "bikeColor": "బైక్ రంగు",
+  "color": "రంగు",
+  "typeLabel": "Type",
+  "registeredOn": "Registered",
+  "lastParked": "చివరిగా పార్క్ చేయబడింది",
+  "removed": "Removed",
+  "violationLabel": "Violation",
+  "ownerRequestedMove": "Owner requested move",
+  "ownerRequestedRemoval": "Owner requested removal",
+  "violationWithReason": "Violation: {reason}",
+  "@violationWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "searchComplaintsHint": "Search by title, guest, room, or description...",
+  "statusInProgress": "In Progress",
+  "statusResolved": "Resolved",
+  "statusClosed": "Closed",
+  "complaintCount": "{count} complaints",
+  "@complaintCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "complaintDataExportedSuccessfully": "ఫిర్యాదు వివరాలు విజయవంతంగా ఎగుమతి అయ్యాయి",
+  "complaintTitle": "ఫిర్యాదు శీర్షిక",
+  "priorityLevel": "ప్రాధాన్యత స్థాయి",
+  "add": "జోడించండి",
+  "imagesSelected": "{count} చిత్రాలు ఎంపికయ్యాయి",
+  "@imagesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commonComplaintCategories": "సాధారణ ఫిర్యాదు వర్గాలు:",
+  "complaintCategoryFood": "ఆహారం",
+  "complaintCategoryCleanliness": "శుభ్రత",
+  "complaintCategoryMaintenance": "నిర్వహణ",
+  "complaintCategoryWater": "నీటి సమస్యలు",
+  "complaintCategoryElectricity": "విద్యుత్",
+  "complaintCategoryWifi": "వై-ఫై",
+  "complaintCategoryNoise": "శబ్దం",
+  "complaintCategoryGeneral": "సాధారణ",
+  "todayAt": "ఈ రోజు {time}",
+  "@todayAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "yesterday": "నిన్న",
+  "daysAgo": "{count} రోజుల క్రితం",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bookBed": "బెడ్ బుక్ చేయండి",
+  "selectFloor": "అంతస్తు ఎంచుకోండి",
+  "selectRoom": "గది ఎంచుకోండి",
+  "selectBed": "బెడ్ ఎంచుకోండి",
+  "startDate": "ప్రారంభ తేదీ",
+  "selectStartDate": "ప్రారంభ తేదీని ఎంచుకోండి",
+  "bookingSummary": "బుకింగ్ సారాంశం",
+  "sharing": "షేరింగ్",
+  "notSelected": "ఎంచుకోలేదు",
+  "legacyBookingMessage": "ఈ PG ని బుక్ చేయడానికి దయచేసి యజమానిని నేరుగా సంప్రదించండి.",
+  "confirmBooking": "బుకింగ్ నిర్ధారించండి",
+  "bookingRequestSuccess": "బుకింగ్ అభ్యర్థన పంపబడింది! యజమాని త్వరలో నిర్ధారిస్తారు.",
+  "bookingRequestFailed": "బుకింగ్ విఫలమైంది: {error}",
+  "@bookingRequestFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "roomOptionLabel": "{roomNumber} ({sharingType}-షేరింగ్) - {availableBeds} ఖాళీ",
+  "@roomOptionLabel": {
+    "placeholders": {
+      "roomNumber": {
+        "type": "String"
+      },
+      "sharingType": {
+        "type": "String"
+      },
+      "availableBeds": {
+        "type": "int"
+      }
+    }
+  },
+  "bedLabel": "బెడ్ {number}",
+  "@bedLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "bed": "బెడ్",
+  "requestToJoinPg": "PG కి చేరడానికి అభ్యర్థన",
+  "sendBookingRequestToOwner": "యజమానికి బుకింగ్ అభ్యర్థన పంపండి",
+  "contactInformation": "సంప్రదింపు సమాచారం",
+  "enterYourPhoneNumber": "మీ ఫోన్ నంబర్ నమోదు చేయండి",
+  "enterYourEmailAddress": "మీ ఇమెయిల్ చిరునామాను నమోదు చేయండి",
+  "messageOptionalHint": "యజమానికి అదనపు సమాచారం ఉంటే ఇక్కడ నమోదు చేయండి...",
+  "pleaseEnterYourName": "దయచేసి మీ పేరు నమోదు చేయండి",
+  "pleaseEnterYourPhoneNumber": "దయచేసి మీ ఫోన్ నంబర్ నమోదు చేయండి",
+  "pleaseEnterYourEmailAddress": "దయచేసి మీ ఇమెయిల్ చిరునామాను నమోదు చేయండి",
+  "pleaseEnterValidEmailAddress": "దయచేసి సరైన ఇమెయిల్ చిరునామాను నమోదు చేయండి",
+  "sendRequest": "అభ్యర్థన పంపండి",
+  "sending": "పంపిస్తోంది...",
+  "monthlyRentDisplay": "₹{amount}/నెల",
+  "@monthlyRentDisplay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "notAvailable": "అందుబాటులో లేదు",
+  "pgCountSummary": "{filtered} / {total} PGలు",
+  "@pgCountSummary": {
+    "placeholders": {
+      "filtered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "errorLoadingPgs": "PGలను లోడ్ చేయడంలో లోపం",
+  "unknownErrorOccurred": "తెలియని లోపం జరిగింది",
+  "noPgsAvailable": "PGలు అందుబాటులో లేవు",
+  "pgListingsWillAppear": "PG జాబితాలు ప్లాట్‌ఫారమ్‌లో చేర్చిన వెంటనే ఇక్కడ కనిపిస్తాయి.",
+  "bookNow": "ఇప్పుడు బుక్ చేయండి",
+  "available": "అందుబాటులో ఉంది",
+  "unavailable": "అందుబాటులో లేదు",
+  "photosBadge": "{count} ఫోటోలు",
+  "@photosBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noImageAvailable": "చిత్రం అందుబాటులో లేదు",
+  "distanceMeters": "{meters}మీ దూరంలో",
+  "@distanceMeters": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "distanceKilometers": "{kilometers}కిమీ దూరంలో",
+  "@distanceKilometers": {
+    "placeholders": {
+      "kilometers": {
+        "type": "double"
+      }
+    }
+  },
+  "sharingLabel": "{count} షేరింగ్",
+  "@sharingLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pgTypeLabel": "{type}",
+  "@pgTypeLabel": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "mealTypeLabel": "{type}",
+  "@mealTypeLabel": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "noAmenitiesListed": "ఈ PG కోసం సౌకర్యాలు జాబితా చేయబడలేదు",
+  "amenitiesSectionTitle": "సౌకర్యాలు",
+  "amenitiesSectionSubtitle": "ఈ PG లో అందుబాటులో ఉన్న సౌకర్యాలు",
+  "noPhotosAvailable": "ఫోటోలు అందుబాటులో లేవు",
+  "failedToLoadImage": "చిత్రాన్ని లోడ్ చేయడంలో విఫలమైంది",
+  "pgDetails": "PG వివరాలు",
+  "errorLoadingPgDetails": "PG వివరాలను లోడ్ చేయడంలో లోపం",
+  "sharingOptionsPricing": "షేరింగ్ ఎంపికలు & ధరలు",
+  "securityDeposit": "భద్రతా డిపాజిట్",
+  "perMonth": "నెలకు",
+  "oneTime": "ఒక్కసారి",
+  "refundableWhenYouLeave": "(మీరు వెళ్తే తిరిగి చెల్లిస్తారు)",
+  "monthlyLabel": "(నెలవారీ)",
+  "oneTimeLabel": "(ఒక్కసారి)",
+  "totalInitialPayment": "మొత్తం ప్రారంభ చెల్లింపు",
+  "firstMonthRent": "మొదటి నెల అద్దె",
+  "totalLabel": "మొత్తం",
+  "secondMonthRentMaintenance": "2వ నెల నుండి: అద్దె + నిర్వహణ (₹{rent} + ₹{maintenance} = ₹{total})",
+  "@secondMonthRentMaintenance": {
+    "placeholders": {
+      "rent": {
+        "type": "String"
+      },
+      "maintenance": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "secondMonthRentOnly": "2వ నెల నుండి: కేవలం అద్దె (₹{rent})",
+  "@secondMonthRentOnly": {
+    "placeholders": {
+      "rent": {
+        "type": "String"
+      }
+    }
+  },
+  "availableTypes": "లభ్యమైనవి: {types}",
+  "@availableTypes": {
+    "placeholders": {
+      "types": {
+        "type": "String"
+      }
+    }
+  },
+  "sharingLabelDefault": "{count} షేరింగ్",
+  "@sharingLabelDefault": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "completeAddress": "పూర్తి చిరునామా",
+  "areaLabel": "ప్రాంతం",
+  "cityLabel": "నగరం",
+  "stateLabel": "రాష్ట్రం",
+  "viewOnMap": "మ్యాప్‌లో చూడండి",
+  "mealTypeFieldLabel": "భోజన రకం",
+  "pgTypeFieldLabel": "PG రకం",
+  "mealTimingsFieldLabel": "భోజన సమయాలు",
+  "foodQualityFieldLabel": "ఆహార నాణ్యత",
+  "entryTimings": "ప్రవేశ సమయాలు",
+  "exitTimings": "నిష్క్రమణ సమయాలు",
+  "guestPolicy": "అతిథుల పాలసీ",
+  "smokingPolicy": "పొగతాగు పాలసీ",
+  "alcoholPolicy": "మద్యం పాలసీ",
+  "refundPolicy": "రిఫండ్ పాలసీ",
+  "noticePeriod": "నోటీస్ వ్యవధి",
+  "ownerNameLabel": "యజమాని పేరు",
+  "contactNumberLabel": "సంప్రదింపు సంఖ్య",
+  "accountHolder": "ఖాతా యజమాని",
+  "qrCodeForPayment": "చెల్లింపుకు QR కోడ్",
+  "paymentInstructionsLabel": "చెల్లింపు సూచనలు",
+  "parkingDetails": "పార్కింగ్ వివరాలు",
+  "securityMeasures": "భద్రతా చర్యలు",
+  "descriptionLabel": "వివరణ",
+  "nearbyPlacesLabel": "సమీప ప్రదేశాలు",
+  "pgProperty": "PG ఆస్తి",
+  "sharePgHeading": "🏠 {name}",
+  "@sharePgHeading": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sharePgAddressLine": "📍 చిరునామా: {address}",
+  "@sharePgAddressLine": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "sharePgPricingHeader": "💰 ధరలు:",
+  "sharePgPricingEntry": "{count} షేర్: ₹{price}",
+  "@sharePgPricingEntry": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "sharePgAmenitiesLine": "✨ సౌకర్యాలు: {amenities}",
+  "@sharePgAmenitiesLine": {
+    "placeholders": {
+      "amenities": {
+        "type": "String"
+      }
+    }
+  },
+  "sharePgFooter": "ఈ PGని Atitiaలో చూడండి!",
+  "myBookingRequests": "నా బుకింగ్ అభ్యర్థనలు",
+  "loadingBookingRequests": "Loading booking requests...",
+  "bookingRequestsErrorTitle": "Error Loading Requests",
+  "bookingRequestsIntroTitle": "Get Started with Booking Requests",
+  "bookingRequestsIntroDescription": "Browse PGs and send booking requests. Owners will review and respond to your requests here.",
+  "bookingRequestSummary": "Booking Request Summary",
+  "bookingRequestAuthDebug": "⚠️ Firebase Auth వినియోగదారు లేదు - వినియోగదారు ధృవీకరించబడకపోయి ఉండవచ్చు",
+  "bookingRequestLoadingDebug": "🔑 guestId: {guestId} కోసం బుకింగ్ అభ్యర్థనలను లోడ్ చేస్తున్నాము",
+  "@bookingRequestLoadingDebug": {
+    "placeholders": {
+      "guestId": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestStreamErrorDebug": "బుకింగ్ అభ్యర్థనల స్ట్రీమ్ లోపం: {error}",
+  "@bookingRequestStreamErrorDebug": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestExceptionDebug": "బుకింగ్ అభ్యర్థనలను లోడ్ చేస్తూ wyjąప్తి: {error}",
+  "@bookingRequestExceptionDebug": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pgLocationFallback": "స్థానం అందుబాటులో లేదు",
+  "districtLabel": "జిల్లా",
+  "talukaMandalLabel": "తాలూకా/మండలం",
+  "societyLabel": "సొసైటీ",
+  "selectPgPrompt": "వివరాలను చూడడానికి మరియు మీ గడుపును నిర్వహించడానికి దయచేసి ఒక PGను ఎంచుకోండి",
+  "statusMaintenance": "నిర్వహణలో ఉంది",
+  "currencyAmount": "₹{amount}",
+  "@currencyAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenanceAmountWithFrequency": "₹{amount}/{frequency}",
+  "@maintenanceAmountWithFrequency": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "frequency": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestPending": "Pending",
+  "bookingRequestApproved": "Approved",
+  "bookingRequestRejected": "Rejected",
+  "bookingRequestRequestedOn": "Requested: {date}",
+  "@bookingRequestRequestedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestRespondedOn": "Responded: {date}",
+  "@bookingRequestRespondedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestFrom": "Request from: {name}",
+  "@bookingRequestFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestDetailsTitle": "Booking Request Details",
+  "bookingRequestPgName": "PG Name",
+  "bookingRequestStatus": "Status",
+  "bookingRequestDate": "Request Date",
+  "bookingRequestResponseDate": "Response Date",
+  "bookingRequestOwnerResponse": "Owner Response",
+  "bookingRequestLoadFailed": "Failed to load booking requests",
+  "bookingRequestPermissionDenied": "Permission denied. Please ensure you are logged in correctly.",
+  "bookingRequestNetworkError": "Network error. Please check your connection and try again.",
+  "bookingRequestGeneralError": "Failed to load booking requests: {error}",
+  "@bookingRequestGeneralError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingRequestUserNotAuthenticated": "User not authenticated. Please sign in again.",
+  "myRoomAndBed": "My Room & Bed",
+  "userNotAuthenticatedRoomBed": "User not authenticated. Please sign in again.",
+  "failedToLoadRoomBedInformation": "Failed to load room/bed information: {error}",
+  "@failedToLoadRoomBedInformation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorTitle": "Error",
+  "noActiveBooking": "క్రియాశీల బుకింగ్ లేదు",
+  "noActiveBookingDescription": "You don't have an active booking yet. Book a PG to get assigned a room and bed.",
+  "roomLabelWithNumber": "Room {number}",
+  "@roomLabelWithNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "bedLabelWithNumber": "Bed {number}",
+  "@bedLabelWithNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "notAssigned": "Not assigned",
+  "bookingInformation": "Booking Information",
+  "endDate": "End Date",
+  "requestBedRoomChange": "Request Bed/Room Change",
+  "requestBedRoomChangeDescription": "Need to change your room or bed? Submit a request and the owner will review it.",
+  "requestChange": "మార్పు అభ్యర్థించండి",
+  "requestRoomBedChangeTitle": "Request Room/Bed Change",
+  "currentAssignment": "Current Assignment:",
+  "preferredRoomNumberOptional": "Preferred Room Number (Optional)",
+  "preferredRoomNumberHint": "Enter preferred room...",
+  "preferredBedNumberOptional": "Preferred Bed Number (Optional)",
+  "preferredBedNumberHint": "Enter preferred bed...",
+  "reasonRequiredLabel": "Reason *",
+  "reasonRequiredHint": "Why do you need to change room/bed?",
+  "provideReasonError": "Please provide a reason for the change",
+  "changeRequestSuccess": "Change request submitted successfully",
+  "bedChangeRequestStatus": "Bed Change Request Status",
+  "failedToLoadBedChangeRequests": "పడక మార్పు అభ్యర్థనలను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToLoadBedChangeRequests": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "requestedLabel": "అభ్యర్థించినది: {date}",
+  "@requestedLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "preferredLabel": "Preferred:",
+  "reasonLabel": "Reason:",
+  "ownerResponseLabel": "Owner Response:",
+  "requestedOnLabel": "Requested: {date}",
+  "@requestedOnLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "overdue": "Overdue",
+  "refunded": "Refunded",
+  "paymentMethodWithValue": "చెల్లింపు విధానం: {method}",
+  "@paymentMethodWithValue": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentMethodRazorpay": "రేజర్‌పే",
+  "paymentMethodUpi": "యుపిఐ",
+  "paymentMethodCash": "నగదు",
+  "paymentMethodBankTransfer": "బ్యాంక్ బదిలీ",
+  "paymentMethodOther": "ఇతర",
+  "noPaymentsYet": "ఇప్పటికీ చెల్లింపులు లేవు",
+  "noPaymentsYetDescription": "మీరు ఇంకా చెల్లింపులు చేయలేదు. చెల్లింపులు చేసిన తర్వాత ఇవి ఇక్కడ కనిపిస్తాయి.",
+  "makePayment": "చెల్లింపు చేయండి",
+  "noPaymentsForFilter": "ప్రస్తుతం {filter} చెల్లింపులు లేవు",
+  "@noPaymentsForFilter": {
+    "placeholders": {
+      "filter": {
+        "type": "String"
+      }
+    }
+  },
+  "noPaymentsForFilterDescription": "ప్రస్తుతం మీ వద్ద {filter} చెల్లింపులు లేవు.",
+  "@noPaymentsForFilterDescription": {
+    "placeholders": {
+      "filter": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToLoadPaymentDetails": "చెల్లింపు వివరాలను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToLoadPaymentDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentNumber": "చెల్లింపు #{id}",
+  "@paymentNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmed": "నిర్ధారించబడింది",
+  "upiPaymentNote": "UPI చెల్లింపు పూర్తైంది. దయచేసి తనిఖీ చేసి నిర్ధారించండి.",
+  "cashPaymentNote": "నగదు చెల్లింపు జరిగింది. దయచేసి నిర్ధారించండి.",
+  "upiPaymentTip": "💡 సూచన: PhonePe, Paytm, Google Pay వంటివి ద్వారా చెల్లింపు చేసిన తర్వాత, చెల్లింపు స్క్రీన్‌షాట్‌ను అప్‌లోడ్ చేయండి. ట్రాన్సాక్షన్ ఐడి ఇప్పటికే స్క్రీన్‌షాట్‌లో కనిపిస్తుంది.",
+  "paymentStatistics": "చెల్లింపు గణాంకాలు",
+  "totalPayments": "మొత్తం చెల్లింపులు",
+  "totalAmount": "మొత్తం మొత్తం",
+  "recentPaymentsPreview": "తాజా చెల్లింపుల ప్రివ్యూ",
+  "noPaymentHistory": "చెల్లింపు చరిత్ర లేదు",
+  "noPaymentHistoryDescription": "మీరు చెల్లింపులు చేసిన తర్వాత మీ చెల్లింపు నోటిఫికేషన్‌లు మరియు చరిత్ర ఇక్కడ కనిపిస్తాయి.",
+  "paymentDetailsNotAvailable": "చెల్లింపు వివరాలు అందుబాటులో లేవు",
+  "ownerPaymentDetailsNotConfigured": "యజమాని చెల్లింపు వివరాలు ఇంకా సెటప్ చేయబడలేదు. దయచేసి మీ PG యజమానిని సంప్రదించి చెల్లింపు సమాచారాన్ని ఏర్పాటు చేయమనండి.",
+  "paymentMethodsPreview": "చెల్లింపు విధానాల ప్రివ్యూ:",
+  "bankAccount": "బ్యాంక్ ఖాతా",
+  "cashPaymentNotificationInfo": "మీరు యజమానికి నగదు చెల్లింపు నోటిఫికేషన్ పంపుతారు. వారు చెల్లింపును స్వీకరించిన తర్వాత నిర్ధారిస్తారు.",
+  "payViaRazorpayDescription": "\"Pay Now\" పై నొక్కి Razorpay ద్వారా సురక్షిత ఆన్‌లైన్ చెల్లింపును కొనసాగించండి.",
+  "payViaRazorpay": "రేజర్‌పే ద్వారా చెల్లించండి",
+  "upiPaymentConfirmation": "UPI చెల్లింపు నిర్ధరణ",
+  "cashPaymentNotification": "నగదు చెల్లింపు నోటిఫికేషన్",
+  "sendNotification": "నోటిఫికేషన్ పంపండి",
+  "paymentNotificationSentSuccessfully": "చెల్లింపు నోటిఫికేషన్ విజయవంతంగా పంపబడింది",
+  "screenshotUploaded": "స్క్రీన్‌షాట్ అప్‌లోడ్ అయింది",
+  "ownerNoPaymentsTitle": "చెల్లింపులు లేవు",
+  "ownerNoPaymentsMessage": "చెల్లింపులు సేకరించిన తర్వాత రికార్డులు ఇక్కడ కనిపిస్తాయి.",
+  "unknownGuest": "తెలియని అతిథి",
+  "roomBed": "గది/పడక",
+  "markPaymentCollected": "చెల్లింపును సేకరించబడిందిగా గుర్తించండి",
+  "confirmMarkPaymentCollected": "ఈ {amount} చెల్లింపును సేకరించబడిందిగా గుర్తించాలనుకుంటున్నారా?",
+  "@confirmMarkPaymentCollected": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "collectedBy": "సేకరించిన వ్యక్తి",
+  "paymentMarkedCollected": "చెల్లింపు సేకరించబడిందిగా గుర్తించబడింది",
+  "failedToUpdatePayment": "చెల్లింపును నవీకరించడంలో విఫలమైంది: {error}",
+  "rejectPayment": "చెల్లింపును తిరస్కరించండి",
+  "provideRejectionReason": "ఈ చెల్లింపును తిరస్కరించడానికి కారణాన్ని ఇవ్వండి:",
+  "rejectionReason": "తిరస్కరణ కారణం",
+  "enterRejectionReason": "తిరస్కరణ కారణాన్ని నమోదు చేయండి...",
+  "paymentRejected": "చెల్లింపు తిరస్కరించబడింది",
+  "failedToRejectPayment": "చెల్లింపును తిరస్కరించడంలో విఫలమైంది",
+  "paymentRejectedByOwner": "యజమాని చెల్లింపును తిరస్కరించారు",
+  "rejectedWithReason": "తిరస్కరించబడింది: {reason}",
+  "@rejectedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "collectedByOwnerFallback": "యజమాని",
+  "recordPaymentDescription": "అతిథి నుండి స్వీకరించిన చెల్లింపును చేతితో నమోదు చేయండి",
+  "guestAndBooking": "అతిథి & బుకింగ్",
+  "selectGuest": "అతిథిని ఎంచుకోండి",
+  "pleaseSelectGuest": "దయచేసి ఒక అతిథిని ఎంచుకోండి",
+  "selectBookingOptional": "బుకింగ్ ఎంచుకోండి (ఐచ్చికం)",
+  "paymentAmountLabel": "చెల్లింపు మొత్తం *",
+  "enterAmountHint": "మొత్తాన్ని రూపాయల్లో నమోదు చేయండి",
+  "enterTransactionIdHint": "లావాదేవీ ID లేదా రిఫరెన్స్ నంబర్ నమోదు చేయండి",
+  "notesOptional": "గమనికలు (ఐచ్చికం)",
+  "notesHint": "ఈ చెల్లింపు గురించి అదనపు గమనికలు",
+  "recording": "రికార్డ్ చేస్తున్నాం...",
+  "recordPaymentSuccess": "చెల్లింపు విజయవంతంగా రికార్డ్ చేయబడింది!",
+  "recordPaymentFailure": "చెల్లింపును రికార్డ్ చేయడంలో విఫలమైంది",
+  "errorRecordingPayment": "చెల్లింపును రికార్డ్ చేయడంలో లోపం: {error}",
+  "@errorRecordingPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentMethodCard": "కార్డ్",
+  "pendingPayments": "పెండింగ్ చెల్లింపులు",
+  "pendingPaymentsWaiting": "{count} పెండింగ్‌లో ఉన్నాయి",
+  "@pendingPaymentsWaiting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsCount": "{count} నోటిఫికేషన్లు",
+  "@notificationsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "paymentConfirmedSuccessfully": "చెల్లింపు విజయవంతంగా నిర్ధారించబడింది",
+  "transactionIdLabel": "TXN: {transactionId}",
+  "@transactionIdLabel": {
+    "placeholders": {
+      "transactionId": {
+        "type": "String"
+      }
+    }
+  },
+  "rejectionReasonHint": "ఉదా: తప్పు మొత్తం, తప్పు లావాదేవీ",
+  "ownerNoBookingsTitle": "No Bookings",
+  "ownerNoBookingsMessage": "Booking list will appear here once bookings are created",
+  "durationDays": "{count} days",
+  "@durationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rentLabel": "Rent",
+  "depositLabel": "Deposit",
+  "paidLabel": "Paid",
+  "bookingDetailsTitle": "Booking Details",
+  "roomBedLabel": "Room/Bed",
+  "durationLabel": "Duration",
+  "remainingLabel": "Remaining",
+  "statusLabel": "Status",
+  "paymentStatusLabel": "Payment Status",
+  "notesLabel": "Notes",
+  "noRequestsFound": "No requests found",
+  "bookingRequestAction": "Action",
+  "bookingRequestDialogTitle": "Booking Request",
+  "guestLabel": "Guest",
+  "pgLabel": "PG",
+  "dateLabel": "Date",
+  "unknownPg": "Unknown PG",
+  "unknownValue": "Unknown",
+  "approveBookingRequestTitle": "Approve Booking Request",
+  "rejectBookingRequestTitle": "Reject Booking Request",
+  "approveBookingRequestSubtitle": "Approve this guest's request to join your PG",
+  "rejectBookingRequestSubtitle": "Reject this guest's request to join your PG",
+  "approvalDetails": "Approval Details",
+  "rejectionDetails": "Rejection Details",
+  "welcomeMessageOptional": "Welcome Message (Optional)",
+  "welcomeMessageHint": "Add a welcome message for the guest...",
+  "rejectionReasonOptional": "Reason for Rejection (Optional)",
+  "rejectionReasonHintDetailed": "Explain why the request is being rejected...",
+  "roomNumberLabel": "Room Number *",
+  "enterRoomNumberHint": "Enter room number...",
+  "bedNumberLabel": "Bed Number *",
+  "enterBedNumberHint": "Enter bed number...",
+  "startDateLabel": "Start Date",
+  "endDateLabel": "End Date",
+  "selectEndDate": "Select end date",
+  "approving": "Approving...",
+  "rejecting": "Rejecting...",
+  "approveRequest": "Approve Request",
+  "rejectRequest": "Reject Request",
+  "roomBedNumbersRequired": "Room and bed numbers are required for approval",
+  "bookingRequestApprovedSuccess": "Booking request approved successfully!",
+  "bookingRequestRejectedSuccess": "Booking request rejected successfully!",
+  "bookingRequestActionFailed": "Failed to {action} request: {error}",
+  "@bookingRequestActionFailed": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "approveAction": "approve",
+  "rejectAction": "reject",
+  "noBedChangeRequests": "No Bed Change Requests",
+  "bedChangeRequestsEmptyBody": "Bed change requests from guests will appear here",
+  "bedChangeRequestTitle": "Bed Change Request",
+  "bedChangeStatusApproved": "APPROVED",
+  "bedChangeStatusRejected": "REJECTED",
+  "bedChangeStatusPending": "PENDING",
+  "bedChangeCurrent": "Current",
+  "bedChangePreferred": "Preferred",
+  "bedChangeCurrentAssignment": "Room {room}, Bed {bed}",
+  "@bedChangeCurrentAssignment": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      },
+      "bed": {
+        "type": "String"
+      }
+    }
+  },
+  "bedChangePreferredAssignment": "Room {room}, Bed {bed}",
+  "@bedChangePreferredAssignment": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      },
+      "bed": {
+        "type": "String"
+      }
+    }
+  },
+  "anyLabel": "Any",
+  "approveBedChangeTitle": "Approve Bed Change Request",
+  "approveBedChangeDescription": "The guest will be moved to their preferred room/bed.",
+  "approvalNotesHint": "Add approval notes...",
+  "rejectBedChangeTitle": "Reject Bed Change Request",
+  "rejectBedChangeDescription": "Please provide a reason for rejection.",
+  "rejectionReasonRequired": "Rejection Reason *",
+  "bedChangeApproveSuccess": "Bed change approved successfully",
+  "bedChangeApproveFailure": "Failed to approve bed change",
+  "bedChangeRejectSuccess": "Bed change rejected",
+  "bedChangeRejectFailure": "Failed to reject bed change",
+  "decisionNotesLabel": "Decision Notes",
+  "ownerBedMapNoBookingsTitle": "No Bed Occupancy Data",
+  "ownerBedMapNoBookingsMessage": "Bed occupancy map will appear here once bookings are created",
+  "ownerBedMapRoom": "Room {roomNumber}",
+  "@ownerBedMapRoom": {
+    "placeholders": {
+      "roomNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBedMapOccupiedCount": "{occupied}/{total} occupied",
+  "@ownerBedMapOccupiedCount": {
+    "placeholders": {
+      "occupied": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "occupiedLabel": "Occupied",
+  "ownerGuestSearchHint": "Search by name, phone, or vehicle...",
+  "ownerGuestClearSearchTooltip": "Clear search",
+  "ownerGuestFilterAll": "All",
+  "ownerGuestFilterActive": "Active",
+  "ownerGuestFilterPending": "Pending",
+  "ownerGuestFilterInactive": "Inactive",
+  "ownerGuestFilterVehicles": "Vehicles",
+  "ownerGuestPaymentSummaryTitle": "Payment Summary",
+  "ownerGuestPaymentPendingLabel": "Pending",
+  "ownerGuestPaymentCollectedLabel": "Collected",
+  "ownerGuestDetailVehicleNumber": "వాహనం నం.",
+  "ownerGuestDetailVehicle": "వాహనం",
+  "ownerGuestDetailRoomBed": "గది/పట్టు",
+  "ownerGuestDetailRent": "అద్దె",
+  "ownerGuestDetailDeposit": "డిపాజిట్",
+  "ownerGuestDetailJoined": "చేరిన తేదీ",
+  "ownerGuestDetailStatus": "స్థితి",
+  "ownerGuestUpdateRoomBed": "గది/పట్టు నవీకరించండి",
+  "ownerGuestUpdateRoomBedTitle": "గది/పట్టు కేటాయింపును నవీకరించండి",
+  "ownerGuestRoomNumberLabel": "గది నంబర్",
+  "ownerGuestRoomNumberHint": "గది నంబర్ నమోదు చేయండి",
+  "ownerGuestBedNumberLabel": "పట్టు నంబర్",
+  "ownerGuestBedNumberHint": "పట్టు నంబర్ నమోదు చేయండి",
+  "ownerGuestUpdateAction": "నవీకరించండి",
+  "ownerGuestRoomBedUpdateSuccess": "గది/పట్టు విజయవంతంగా నవీకరించబడింది",
+  "ownerGuestRoomBedUpdateFailure": "గది/పట్టు నవీకరణ విఫలమైంది",
+  "guestDetailsTitle": "అతిథి వివరాలు",
+  "bikes": "బైకులు",
+  "services": "సేవలు",
+  "ownerGuestNoPgSelectedTitle": "ఏ PG ఎన్నుకోలేదు",
+  "ownerGuestNoPgSelectedMessage": "అతిథులను నిర్వహించడానికి దయచేసి ఒక PG ని ఎంచుకోండి",
+  "ownerGuestFailedToLoadData": "అతిథి డేటాను లోడ్ చేయడంలో విఫలమైంది",
+  "bookingRequestGuestNameLabel": "Guest Name",
+  "bookingRequestPhoneLabel": "Phone",
+  "bookingRequestEmailLabel": "Email",
+  "bookingRequestPgNameLabel": "PG Name",
+  "bookingRequestDateLabel": "Request Date",
+  "bookingRequestStatusLabel": "Status",
+  "bookingRequestMessageLabel": "Message",
+  "bookingRequestResponseLabel": "Response",
+  "offlineSyncingActions": "{count, plural, =0{No actions to sync} one{Syncing 1 action...} other{Syncing {count} actions...}}",
+  "@offlineSyncingActions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineStatusOffline": "You're offline",
+  "offlineStatusOfflineShort": "Offline",
+  "offlineTapToSync": "Tap to sync",
+  "offlineSyncQueueTitle": "Sync Queue",
+  "offlineNoPendingActions": "No pending actions to sync",
+  "offlinePendingActions": "{count, plural, one{{count} action pending sync:} other{{count} actions pending sync:}}",
+  "@offlinePendingActions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineSyncAll": "Sync All",
+  "offlineSyncCompleted": "Sync completed successfully!",
+  "offlineSyncFailed": "Sync failed: {error}",
+  "@offlineSyncFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineSyncNow": "Sync Now",
+  "guestBookingProcessedDefault": "Your booking request has been processed",
+  "guestPaymentReminder": "Payment reminder: Please complete your pending payment",
+  "guestFoodMenuUpdated": "Food menu has been updated! Check out the new items",
+  "guestComplaintResponseMessage": "Complaint Response: {response}",
+  "@guestComplaintResponseMessage": {
+    "placeholders": {
+      "response": {
+        "type": "String"
+      }
+    }
+  },
+  "guestComplaintResponseDefault": "Your complaint has been addressed",
+  "guestAnnouncementDefaultTitle": "Announcement",
+  "guestAnnouncementDefaultMessage": "Important announcement from your PG",
+  "notificationGuestFallbackName": "A guest",
+  "ownerBookingRequestMessage": "New booking request from {guestName}",
+  "@ownerBookingRequestMessage": {
+    "placeholders": {
+      "guestName": {
+        "type": "String"
+      }
+    }
+  },
+  "viewAction": "View",
+  "ownerPaymentReceivedMessage": "Payment received: ₹{amount} from {guestName}",
+  "@ownerPaymentReceivedMessage": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "guestName": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerComplaintSubmittedMessage": "New complaint from {guestName}",
+  "@ownerComplaintSubmittedMessage": {
+    "placeholders": {
+      "guestName": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestCheckInMessage": "{guestName} has checked in",
+  "@ownerGuestCheckInMessage": {
+    "placeholders": {
+      "guestName": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMaintenanceTaskFallback": "maintenance task",
+  "ownerMaintenanceReminderMessage": "Maintenance reminder: {task}",
+  "@ownerMaintenanceReminderMessage": {
+    "placeholders": {
+      "task": {
+        "type": "String"
+      }
+    }
+  },
+"analyticsRefreshData": "డేటాను రిఫ్రెష్ చేయి",
+"revenueAnalyticsTitle": "ఆదాయం విశ్లేషణ",
+"revenueAnalyticsSelectedPg": "ఎంచుకున్న PG కోసం పనితీరు అంతర్దృష్టులు",
+"revenueAnalyticsOverall": "మొత్తం ఆదాయం పనితీరు",
+"revenueMetricTotalRevenue": "మొత్తం ఆదాయం",
+"revenueMetricMonthlyGrowth": "నెలవారీ వృద్ధి",
+"revenueMetricAvgPerGuest": "ప్రతి అతిథికి సగటు",
+"analyticsPeriodWeekly": "వారానికి",
+"analyticsPeriodMonthly": "నెలవారీ",
+"analyticsPeriodYearly": "వార్షిక",
+"analyticsMetricRevenue": "ఆదాయం",
+"analyticsMetricOccupancy": "ఆక్రమణ",
+"analyticsMetricGuests": "అతిథులు",
+"revenueTrendsLabel": "ఆదాయం ధోరణులు",
+"revenueTrendLastMonths": "ఆదాయం ధోరణి (గత {months} నెలలు)",
+  "@revenueTrendLastMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+"revenueForecastTitle": "ఆదాయం అంచనా",
+"revenueForecastNextMonth": "తదుపరి నెల",
+"revenueForecastNextQuarter": "తదుపరి త్రైమాసికం",
+"revenueForecastInsightsTitle": "అంచనా అంతర్దృష్టులు",
+"revenueForecastInsufficientData": "అంచనాకు సరిపడా డేటా లేదు",
+"revenueForecastPositive": "ఇటీవల ధోరణుల ఆధారంగా ఆదాయం సానుకూల వృద్ధి చూపుతోంది. సామర్థ్య విస్తరణను పరిగణించండి.",
+"revenueForecastDecline": "ఇటీవల ధోరణుల ఆధారంగా ఆదాయం తగ్గుతోంది. ధరలు, మార్కెటింగ్ వ్యూహాలను సమీక్షించండి.",
+"revenueForecastStable": "ఇటీవల ధోరణుల ప్రకారం ఆదాయం స్థిరంగా ఉంది. ప్రస్తుత పనితీరును కొనసాగించడంపై దృష్టి పెట్టండి.",
+"menuTooltip": "మెను",
+"analyticsTabRevenue": "ఆదాయం",
+"analyticsTabOccupancy": "ఆక్రమణ",
+"analyticsTabPerformance": "పనితీరు",
+"analyticsNoPgTitle": "PG ని ఎంచుకోండి",
+"analyticsNoPgMessage": "విశ్లేషణలు చూడడానికి పై డ్రాప్‌డౌన్ నుండి PG ని ఎంచుకోండి",
+"analyticsLoading": "విశ్లేషణ డేటాను లోడ్ చేస్తున్నాం...",
+"analyticsErrorTitle": "డేటాను లోడ్ చేయడంలో లోపం",
+"analyticsUnknownError": "తెలియని లోపం జరిగింది",
+"analyticsLoadFailed": "విశ్లేషణ డేటాను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@analyticsLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+"performanceAnalyticsTitle": "పనితీరు విశ్లేషణ",
+"performanceAnalyticsSubtitle": "సమగ్ర పనితీరు అంతర్దృష్టులు మరియు సిఫార్సులు",
+"performanceKpiTitle": "ప్రధాన పనితీరు సూచికలు",
+"performanceKpiGuestSatisfaction": "అతిథి సంతృప్తి",
+  "performanceKpiGuestSatisfactionValue": "{score}/5",
+  "@performanceKpiGuestSatisfactionValue": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+"performanceKpiResponseTime": "ప్రతిస్పందన సమయం",
+"performanceKpiResponseTimeValue": "{hours} గం.",
+  "@performanceKpiResponseTimeValue": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+"performanceKpiMaintenanceScore": "నిర్వహణ స్కోరు",
+  "performanceKpiMaintenanceScoreValue": "{score}/10",
+  "@performanceKpiMaintenanceScoreValue": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+"performanceInsightsTitle": "పనితీరు అంతర్దృష్టులు",
+"performanceInsightsOverall": "మొత్తం పనితీరు: అద్భుతం",
+"performanceInsightsSummary": "మీ PG పరిశ్రమ ప్రమాణాల కంటే మెరుగ్గా, అధిక అతిథి సంతృప్తి మరియు సమర్థవంతమైన కార్యకలాపాలతో పనిచేస్తోంది.",
+"performanceRecommendationsTitle": "సిఫార్సులు:",
+"performanceRecommendationMaintainSchedule": "ప్రస్తుత నిర్వహణ షెడ్యూల్‌ను కొనసాగించండి",
+"performanceRecommendationExpandCapacity": "అధిక ఆక్రమణ దృష్ట్యా విస్తరణను పరిగణించండి",
+"performanceRecommendationFeedbackSystem": "అతిథి ప్రతిస్పందన వ్యవస్థను అమలు చేయండి",
+"performanceRecommendationOptimizeEnergy": "ఖర్చు తగ్గించేందుకు ఎనర్జీ వినియోగాన్ని మెరుగుపరచండి",
+"occupancyAnalyticsTitle": "ఆక్రమణ విశ్లేషణ",
+"occupancyAnalyticsSelectedPg": "ఎంచుకున్న PG కోసం ఆక్రమణ అంతర్దృష్టులు",
+"occupancyAnalyticsOverall": "మొత్తం ఆక్రమణ పనితీరు",
+  "occupancyMetricCurrent": "ప్రస్తుత ఆక్రమణ",
+  "occupancyMetricAverage": "సగటు ఆక్రమణ",
+  "occupancyMetricPeak": "శిఖర ఆక్రమణ",
+  "occupancyTrendsLabel": "ఆక్రమణ ధోరణులు",
+  "occupancyViewOverview": "అవలోకనం",
+  "occupancyViewByRoom": "గది వారీగా",
+  "occupancyViewByFloor": "అంతస్తు వారీగా",
+  "occupancyTrendLastMonths": "ఆక్రమణ ధోరణి (గత {months} నెలలు)",
+  "@occupancyTrendLastMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "occupancyCapacityTitle": "సామర్థ్య విశ్లేషణ",
+  "occupancyCapacityAvailableBeds": "లభ్యమైన పడకలు",
+  "occupancyCapacityOccupiedBeds": "ఆక్రమించిన పడకలు",
+  "occupancyCapacityTotal": "మొత్తం సామర్థ్యం",
+  "occupancyInsightsTitle": "ఆక్రమణ అంతర్దృష్టులు",
+  "occupancyRecommendationsTitle": "సిఫార్సులు:",
+  "occupancyInsightsCurrentRate": "ప్రస్తుత ఆక్రమణ {rate} వద్ద ఉంది.",
+  "@occupancyInsightsCurrentRate": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "occupancyInsightsNearFull": "మీ PG దాదాపు పూర్తి సామర్థ్యంతో ఉంది. అదనపు గదులు లేదా పడకలను పరిగణించండి.",
+  "occupancyInsightsGood": "ఆక్రమణ రేటు బాగుంది. ధోరణులను పరిశీలించి మార్కెటింగ్ వ్యూహాలను పరిగణించండి.",
+  "occupancyInsightsModerate": "ఆక్రమణ మోస్తరు స్థాయిలో ఉంది. మెరుగైన మార్కెటింగ్ ద్వారా మెరుగుదలకు అవకాశం ఉంది.",
+  "occupancyInsightsLow": "ఆక్రమణ రేటు తక్కువగా ఉంది. బుకింగ్‌లను పెంచడానికి తక్షణ చర్య అవసరం.",
+  "occupancyRecommendationAddCapacity": "మరిన్ని పడకలు లేదా గదులను చేర్చడాన్ని పరిగణించండి",
+  "occupancyRecommendationReviewPricing": "అధిక డిమాండ్ కోసం ధర వ్యూహాన్ని సమీక్షించండి",
+  "occupancyRecommendationMaintainOccupancy": "ప్రస్తుత ఆక్రమణను కొనసాగించడంపై దృష్టి పెట్టండి",
+  "occupancyRecommendationSeasonalPricing": "ఋతువారీ ధర సర్దుబాట్లను పరిగణించండి",
+  "occupancyRecommendationIncreaseMarketing": "మార్కెటింగ్ ప్రయత్నాలను పెంచండి",
+  "occupancyRecommendationImproveAmenities": "సౌకర్యాలను సమీక్షించి మెరుగుపరచండి",
+  "occupancyRecommendationCompetitivePricing": "స్పర్ధాత్మక ధరలను పరిగణించండి",
+  "occupancyRecommendationUrgentCampaign": "తక్షణ మార్కెటింగ్ ప్రచారం చేపట్టండి",
+  "occupancyRecommendationReducePricing": "ధరలను సమీక్షించి తగ్గించండి",
+  "occupancyRecommendationImproveFacilities": "సౌకర్యాలు మరియు సౌలభ్యాలను మెరుగుపరచండి",
+  "occupancyRecommendationPartnerships": "స్థానిక వ్యాపారాలతో భాగస్వామ్యాలను పరిగణించండి",
+  "pgBasicInfoTitle": "ప్రాథమిక సమాచారం",
+  "pgBasicInfoAddressLabel": "పూర్తి చిరునామా",
+  "pgBasicInfoAddressHint": "ల్యాండ్‌మార్క్‌తో పూర్తి చిరునామా",
+  "pgBasicInfoPgNameLabel": "PG పేరు",
+  "pgBasicInfoPgNameHint": "ఉదా: గ్రీన్ మెడోస్ PG",
+  "pgBasicInfoContactLabel": "సంప్రదించు సంఖ్య",
+  "pgBasicInfoContactHint": "ఉదా: +91 9876543210",
+  "pgBasicInfoStateLabel": "రాష్ట్రం",
+  "pgBasicInfoStateHint": "రాష్ట్రాన్ని ఎంచుకోండి",
+  "pgBasicInfoCityLabel": "నగరం",
+  "pgBasicInfoCityHint": "నగరాన్ని ఎంచుకోండి",
+  "pgBasicInfoAreaLabel": "ప్రాంతం",
+  "pgBasicInfoAreaHint": "ఉదా: సెక్టార్ 5, HSR Layout",
+  "pgBasicInfoPgTypeLabel": "PG రకం",
+  "pgBasicInfoPgTypeHint": "PG రకాన్ని ఎంచుకోండి",
+  "pgBasicInfoPgTypeBoys": "బాయ్స్",
+  "pgBasicInfoPgTypeGirls": "గర్ల్స్",
+  "pgBasicInfoPgTypeCoed": "కో-ఎడ్",
+  "pgBasicInfoMealTypeLabel": "భోజన రకం",
+  "pgBasicInfoMealTypeHint": "భోజన రకాన్ని ఎంచుకోండి",
+  "pgBasicInfoMealTypeVeg": "వెజిటేరియన్",
+  "pgBasicInfoMealTypeNonVeg": "నాన్-వెజిటేరియన్",
+  "pgBasicInfoMealTypeBoth": "రెండూ",
+  "pgBasicInfoFoodSectionTitle": "ఆహారం & భోజన వివరాలు",
+  "pgBasicInfoMealTimingsLabel": "భోజన సమయాలు",
+  "pgBasicInfoMealTimingsHint": "ఉదా: బ్రేక్‌ఫాస్ట్: ఉదయం 8 - 10, లంచ్: మధ్యాహ్నం 1 - 2, డిన్నర్: రాత్రి 8 - 9.30",
+  "pgBasicInfoFoodQualityLabel": "ఆహార నాణ్యత వివరణ",
+  "pgBasicInfoFoodQualityHint": "ఆహార నాణ్యత, వంటకాలు, ప్రత్యేకతలు మొదలైనవిని వివరించండి",
+  "pgBasicInfoDescriptionLabel": "వివరణ",
+  "pgBasicInfoDescriptionHint": "మీ PG గురించి సంక్షిప్త వివరణ",
+  "pgFloorStructureTitle": "🏢 అంతస్తుల నిర్మాణం",
+  "pgFloorCountLabel": "సాధారణ అంతస్తుల సంఖ్య",
+  "pgFloorCountHint": "ఉదా: 1",
+  "generateAction": "సృష్టించు",
+  "pgFloorGroundLabel": "గ్రౌండ్",
+  "pgFloorTerraceLabel": "టెర్రేస్",
+  "pgFloorFirstLabel": "మొదటి",
+  "pgFloorSecondLabel": "రెండవ",
+  "pgFloorThirdLabel": "మూడవ",
+  "pgFloorFourthLabel": "నాలుగవ",
+  "pgFloorFifthLabel": "ఐదవ",
+  "pgFloorNthLabel": "{number}వ అంతస్తు",
+  "@pgFloorNthLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorRoomsBedsSummary": "{rooms} గదులు • {beds} పడకలు",
+  "@pgFloorRoomsBedsSummary": {
+    "placeholders": {
+      "rooms": {
+        "type": "int"
+      },
+      "beds": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorAddRoom": "Add Room",
+  "pgFloorCapacityOption": "{capacity}-share",
+  "@pgFloorCapacityOption": {
+    "placeholders": {
+      "capacity": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorBedLabel": "Bed-{index}",
+  "@pgFloorBedLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorRoomLabel": "గది {roomNumber}",
+  "@pgFloorRoomLabel": {
+    "placeholders": {
+      "roomNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "pgFloorBedsList": "Beds: {bedList}",
+  "@pgFloorBedsList": {
+    "placeholders": {
+      "bedList": {
+        "type": "String"
+      }
+    }
+  },
+  "pgFloorNoRoomsMessage": "No rooms added yet. Click \"Add Room\" to get started.",
+  "pgFloorEmptyTitle": "No Floors Generated",
+  "pgFloorEmptyMessage": "Enter the number of floors and click \"Generate\" to create your floor structure.",
+  "pgRentConfigTitle": "Rent Configuration",
+  "pgRentConfigSharingLabel": "Rent ({sharing})",
+  "@pgRentConfigSharingLabel": {
+    "placeholders": {
+      "sharing": {
+        "type": "String"
+      }
+    }
+  },
+  "pgRentConfigRentLabel": "Rent for {sharing} (₹)",
+  "@pgRentConfigRentLabel": {
+    "placeholders": {
+      "sharing": {
+        "type": "String"
+      }
+    }
+  },
+  "pgRentConfigRentHint": "e.g., 8000",
+  "pgRentConfigDepositLabel": "Security Deposit (₹)",
+  "pgRentConfigDepositHint": "e.g., 10000",
+  "pgRentConfigMaintenanceTypeLabel": "Maintenance Type",
+  "pgRentConfigMaintenanceOneTime": "One Time",
+  "pgRentConfigMaintenanceMonthly": "Monthly",
+  "pgRentConfigMaintenanceQuarterly": "Quarterly",
+  "pgRentConfigMaintenanceYearly": "Yearly",
+  "pgRentConfigMaintenanceAmountLabel": "Maintenance Amount (₹)",
+  "pgRentConfigMaintenanceAmountHint": "e.g., 500",
+  "pgRentConfigRefundTitle": "Deposit Refund Policy:",
+  "pgRentConfigRefundFull": "• Full refund if notice ≥ 30 days",
+  "pgRentConfigRefundPartial": "• 50% refund if notice ≥ 15 days",
+  "pgRentConfigRefundNone": "• No refund if notice < 15 days",
+  "pgRulesTitle": "Rules & Policies",
+  "pgRulesEntryTimingsLabel": "Entry Timings",
+  "pgRulesExitTimingsLabel": "Exit Timings",
+  "pgRulesTimingsHint": "e.g., 6:00 AM - 11:00 PM",
+  "pgRulesSmokingPolicyLabel": "Smoking Policy",
+  "pgRulesAlcoholPolicyLabel": "Alcohol Policy",
+  "pgRulesPolicyHint": "Select Policy",
+  "pgRulesPolicyNotAllowed": "Not Allowed",
+  "pgRulesPolicyAllowed": "Allowed",
+  "pgRulesPolicyDesignatedAreas": "Designated Areas Only",
+  "pgRulesNoticePeriodLabel": "Notice Period (Days)",
+  "pgRulesNoticePeriodHint": "e.g., 30",
+  "pgRulesGuestPolicyLabel": "Guest Policy",
+  "pgRulesGuestPolicyHint": "Rules regarding guests, visitors, overnight stays, etc.",
+  "pgRulesRefundPolicyLabel": "Refund Policy",
+  "pgRulesRefundPolicyHint": "Terms and conditions for refunds, deposits, cancellations, etc.",
+  "pgPhotosTitle": "Photos & Gallery",
+  "pgPhotosSubtitle": "Add photos of your PG to attract more guests:",
+  "pgPhotosAddButton": "Add Photos",
+  "pgPhotosLimitHint": "You can select multiple images at once (up to 10)",
+  "pgPhotosUploadSuccess": "{count} ఫోటోలు విజయవంతంగా అప్లోడ్ అయ్యాయి!",
+  "@pgPhotosUploadSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pgPhotosUploadPartial": "{success} ఫోటోలు అప్లోడ్ అయ్యాయి, {failed} విఫలమయ్యాయి.",
+  "@pgPhotosUploadPartial": {
+    "placeholders": {
+      "success": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "pgPhotosUploadFailed": "ఫోటోల్ని అప్లోడ్ చేయడంలో విఫలమైంది",
+  "pgPhotosEmptyTitle": "No photos added yet",
+  "pgPhotosEmptySubtitle": "Click \"Add Photos\" to upload images",
+  "pgPhotosRemoveAction": "Remove photo",
+  "pgAdditionalInfoTitle": "అదనపు సమాచారం",
+  "pgAdditionalInfoParkingLabel": "పార్కింగ్ వివరాలు",
+  "pgAdditionalInfoParkingHint": "ఉదా., 2-చక్రాల పార్కింగ్ అందుబాటు, 4-చక్రాల పార్కింగ్: ₹500/నెల, సామర్థ్యం: 20 బైకులు",
+  "pgAdditionalInfoSecurityLabel": "భద్రతా చర్యలు",
+  "pgAdditionalInfoSecurityHint": "ఉదా., 24/7 భద్రతా గార్డు, సీసీటీవీ పర్యవేక్షణ, బయోమెట్రిక్ యాక్సెస్, ఫైర్ సేఫ్టీ పరికరాలు",
+  "pgAdditionalInfoNearbyPlacesTitle": "సమీప ప్రదేశాలు",
+  "pgAdditionalInfoNearbyPlacesDescription": "సమీపంలోని గుర్తించదగిన స్థలాలు లేదా ఆసక్తి ప్రదేశాలను జోడించండి",
+  "pgAdditionalInfoNearbyPlaceLabel": "సమీప ప్రదేశం",
+  "pgAdditionalInfoNearbyPlaceHint": "ఉదా., మెట్రో స్టేషన్, షాపింగ్ మాల్, ఆసుపత్రి",
+  "pgAdditionalInfoAddButton": "జోడించండి",
+  "pgAdditionalInfoPaymentInstructionsLabel": "చెల్లింపు సూచనలు",
+  "pgAdditionalInfoPaymentInstructionsHint": "చెల్లింపులు చేసే సూచనలు, అంగీకరించిన చెల్లింపు విధానాలు, చెల్లింపు షెడ్యూల్ మొదలైనవి.",
+  "pgAmenitiesTitle": "సౌకర్యాలు & సదుపాయాలు",
+  "pgAmenitiesDescription": "మీ PGలో అందుబాటులో ఉన్న అన్ని సౌకర్యాలను ఎంపిక చేయండి:",
+  "pgAmenitiesSelectedLabel": "ఎంపిక చేసినవి",
+  "pgAmenityWifi": "వైఫై",
+  "pgAmenityParking": "పార్కింగ్",
+  "pgAmenitySecurity": "భద్రత",
+  "pgAmenityCctv": "సీసీటీవీ",
+  "pgAmenityLaundry": "లాండ్రీ",
+  "pgAmenityKitchen": "వంటగది",
+  "pgAmenityAc": "ఏసీ",
+  "pgAmenityGeyser": "గీజర్",
+  "pgAmenityTv": "టీవీ",
+  "pgAmenityRefrigerator": "ఫ్రిజ్",
+  "pgAmenityPowerBackup": "పవర్ బ్యాకప్",
+  "pgAmenityGym": "జిమ్",
+  "pgAmenityCurtains": "పర్దాలు",
+  "pgAmenityBucket": "బకెట్",
+  "pgAmenityWaterCooler": "వాటర్ కూలర్",
+  "pgAmenityWashingMachine": "వాషింగ్ మెషీన్",
+  "pgAmenityMicrowave": "మైక్రోవేవ్",
+  "pgAmenityLift": "లిఫ్ట్",
+  "pgAmenityHousekeeping": "హౌస్ కీపింగ్",
+  "pgAmenityAttachedBathroom": "అటాచ్‌డ్ బాత్రూమ్",
+  "pgAmenityRoWater": "ఆర్‌ఓ నీరు",
+  "pgAmenityWaterSupply": "24x7 నీటి సరఫరా",
+  "pgAmenityBedWithMattress": "మెట్రెస్‌తో బెడ్",
+  "pgAmenityWardrobe": "వార్డ్రోబ్",
+  "pgAmenityStudyTable": "స్టడీ టేబుల్",
+  "pgAmenityChair": "కుర్చీ",
+  "pgAmenityFan": "ఫ్యాన్",
+  "pgAmenityLighting": "లైటింగ్",
+  "pgAmenityBalcony": "బాల్కనీ",
+  "pgAmenityCommonArea": "కామన్ ఏరియా",
+  "pgAmenityDiningArea": "డైనింగ్ ఏరియా",
+  "pgAmenityInductionStove": "ఇండక్షన్ స్టోవ్",
+  "pgAmenityCookingAllowed": "వంటకు అనుమతి",
+  "pgAmenityFireExtinguisher": "ఫైర్ ఎక్స్టింగ్విషర్",
+  "pgAmenityFirstAidKit": "ఫస్ట్ ఎయిడ్ కిట్",
+  "pgAmenitySmokeDetector": "స్మోక్ డిటెక్టర్",
+  "pgAmenityVisitorParking": "విజిటర్ పార్కింగ్",
+  "pgAmenityIntercom": "ఇంటర్‌కామ్",
+  "pgAmenityMaintenanceStaff": "మెయింటెనెన్స్ సిబ్బంది",
+  "pgSummaryTitle": "PG సమీక్ష",
+  "pgSummaryBasicInfoTitle": "ప్రాథమిక సమాచారం",
+  "pgSummaryRentInfoTitle": "అద్దె సమాచారం",
+  "pgSummaryPhotosTitle": "ఫోటోలు",
+  "pgSummaryActionCreate": "సృష్టించండి",
+  "pgSummaryActionUpdate": "నవీకరించండి",
+  "pgSummaryReadyMessage": "మీ PGని {action} చేయడానికి సిద్ధంగా ఉంది!",
+  "@pgSummaryReadyMessage": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "pgSummaryReviewMessage": "పైన ఉన్న అన్ని వివరాలను సమీక్షించి, సేవ్ బటన్‌ను నొక్కండి.",
+  "pgSummaryNotSpecified": "ఉల్లేఖించలేదు",
+  "pgSummaryLocationLabel": "స్థానం",
+  "pgSummaryLocationValue": "{city}, {state}",
+  "@pgSummaryLocationValue": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "pgSummaryTotalFloorsLabel": "మొత్తం అంతస్తులు",
+  "pgSummaryTotalRoomsLabel": "మొత్తం గదులు",
+  "pgSummaryTotalBedsLabel": "మొత్తం పడకలు",
+  "pgSummaryEstimatedRevenueLabel": "అంచనా నెలవారీ ఆదాయం",
+  "pgSummaryMaintenanceLabel": "నిర్వహణ",
+  "pgSummarySelectedAmenitiesLabel": "ఎంపిక చేసిన సౌకర్యాలు",
+  "pgSummaryListLabel": "జాబితా",
+  "pgSummaryUploadedPhotosLabel": "అప్‌లోడ్ చేసిన ఫోటోలు",
+  "pgInfoNoPgSelected": "ఏ PG ఎంపిక కాలేదు",
+  "pgInfoSelectPgPrompt": "దయచేసి పై డ్రాప్‌డౌన్ నుండి ఒక PGని ఎంపిక చేయండి",
+  "pgInfoEditTooltip": "PG వివరాలను సవరించండి",
+  "pgInfoContactNotProvided": "అందుబాటులో లేదు",
+  "pgInfoPgTypeFallback": "PG",
+  "pgInfoLocationFallback": "స్థానం అందుబాటులో లేదు",
+  "pgInfoStructureOverview": "PG నిర్మాణ అవలోకనం",
+  "pgInfoFloorsLabel": "అంతస్తులు",
+  "pgInfoRoomsLabel": "గదులు",
+  "pgInfoBedsLabel": "పడకలు",
+  "pgInfoPotentialLabel": "సంభావ్యత",
+  "pgInfoFloorRoomDetails": "అంతస్తులు & గదుల వివరాలు",
+  "pgInfoRoomsSummary": "{count} గదులు",
+  "@pgInfoRoomsSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pgInfoRoomChip": "{roomNumber} ({sharingType}, {bedsCount} పడకలు)",
+  "@pgInfoRoomChip": {
+    "placeholders": {
+      "roomNumber": {
+        "type": "String"
+      },
+      "sharingType": {
+        "type": "String"
+      },
+      "bedsCount": {
+        "type": "int"
+      }
+    }
+  },
+  "pgFloorLabelFallback": "అంతస్తు",
+  "ownerBedMapRoomUnknown": "తెలియని",
+  "ownerBedMapOccupancySummary": "{occupied}/{total} ఆక్రమణ • సామర్థ్యం {capacity}",
+  "@ownerBedMapOccupancySummary": {
+    "placeholders": {
+      "occupied": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "capacity": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusChipOccupied": "ఆక్రమణ {count}",
+  "@ownerBedMapStatusChipOccupied": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusChipVacant": "ఖాళీ {count}",
+  "@ownerBedMapStatusChipVacant": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusChipPending": "పెండింగ్ {count}",
+  "@ownerBedMapStatusChipPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusChipMaintenance": "నిర్వహణ {count}",
+  "@ownerBedMapStatusChipMaintenance": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapBedsOverview": "పడకల అవలోకనం",
+  "ownerBedMapMiniStatTotal": "మొత్తం",
+  "ownerBedMapMiniStatOccupied": "ఆక్రమణ",
+  "ownerBedMapMiniStatVacant": "ఖాళీ",
+  "ownerBedMapMiniStatPending": "పెండింగ్",
+  "ownerBedMapMiniStatMaintenance": "నిర్వహణ",
+  "ownerBedMapPlaceholderSummary": "{occupied}/{total} ఆక్రమణ",
+  "@ownerBedMapPlaceholderSummary": {
+    "placeholders": {
+      "occupied": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerBedMapStatusOccupiedLabel": "ఆక్రమణ",
+  "ownerBedMapStatusPendingLabel": "పెండింగ్",
+  "ownerBedMapStatusMaintenanceLabel": "నిర్వహణ",
+  "ownerBedMapStatusVacantLabel": "ఖాళీ",
+  "ownerBedMapTooltipTitle": "పడక {bedNumber} • {status}",
+  "@ownerBedMapTooltipTitle": {
+    "placeholders": {
+      "bedNumber": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBedMapTooltipGuest": "అతిథి: {guest}",
+  "@ownerBedMapTooltipGuest": {
+    "placeholders": {
+      "guest": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBedMapTooltipFrom": "ప్రారంభం: {date}",
+  "@ownerBedMapTooltipFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBedMapTooltipTill": "ముగింపు: {date}",
+  "@ownerBedMapTooltipTill": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "owner": "యజమాని",
+  "ownerRevenueReportTitle": "ఆదాయ నివేదిక",
+  "ownerRevenueReportCollectedLabel": "సేకరించబడినది",
+  "ownerRevenueReportPendingLabel": "పెండింగ్",
+  "ownerRevenueReportTotalPaymentsLabel": "మొత్తం చెల్లింపులు",
+  "ownerRevenueReportCollectedCountLabel": "సేకరించిన సంఖ్య",
+  "ownerOccupancyReportTitle": "ఆక్యుపెన్సీ నివేదిక",
+  "ownerOccupancyReportTotalBedsLabel": "మొత్తం పడకలు",
+  "ownerOccupancyReportOccupiedLabel": "ఆక్రమణలో",
+  "ownerOccupancyReportVacantLabel": "ఖాళీ",
+  "ownerOccupancyReportRateLabel": "ఆక్యుపెన్సీ శాతం",
+  "ownerOccupancyReportPendingLabel": "పెండింగ్",
+  "ownerOccupancyReportMaintenanceLabel": "నిర్వహణ",
+  "ownerBookingRequestsTitle": "పెండింగ్ అభ్యర్థనలు ({count})",
+  "@ownerBookingRequestsTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerUpcomingVacatingTitle": "త్వరలో ఖాళీ అవుతున్నవి ({count})",
+  "@ownerUpcomingVacatingTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerServiceZeroRequests": "0 అభ్యర్ధనలు",
+  "ownerPaymentUpdateFailed": "చెల్లింపును నవీకరించడం విఫలమైంది",
+  "guestHelpTitle": "Help & Support",
+  "guestHelpQuickHelp": "Quick Help",
+  "guestHelpHeroSubtitle": "Get instant answers to common questions about booking and managing your PG stay.",
+  "guestHelpVideosTitle": "Video Tutorials",
+  "guestHelpVideosSubtitle": "Watch step-by-step guides",
+  "guestHelpUnableToOpenVideos": "Unable to open video tutorials",
+  "guestHelpDocsTitle": "Documentation",
+  "guestHelpDocsSubtitle": "Read comprehensive guides",
+  "guestHelpUnableToOpenDocs": "Unable to open documentation",
+  "guestHelpFaqTitle": "Frequently Asked Questions",
+  "guestHelpFaqBookQuestion": "How do I book a PG room?",
+  "guestHelpFaqBookAnswer": "Browse available PGs in the \"PGs\" tab, select a PG, and tap \"Book Now\" to submit a booking request.",
+  "guestHelpFaqStatusQuestion": "How do I view my booking status?",
+  "guestHelpFaqStatusAnswer": "Open the \"Requests\" tab to see all your booking requests and their current status.",
+  "guestHelpFaqPaymentQuestion": "How do I make a payment?",
+  "guestHelpFaqPaymentAnswer": "Go to the \"Payments\" tab to view history and make new payments.",
+  "guestHelpFaqProfileQuestion": "How do I update my profile?",
+  "guestHelpFaqProfileAnswer": "Open the drawer menu and tap \"My Profile\" to edit your details.",
+  "guestHelpFaqComplaintQuestion": "How do I file a complaint?",
+  "guestHelpFaqComplaintAnswer": "Navigate to the \"Complaints\" tab and tap \"Add Complaint\" to submit one.",
+  "guestHelpContactTitle": "Contact Support",
+  "guestHelpContactSubtitle": "Need more help? Reach out to our support team.",
+  "guestHelpEmailTitle": "Email Support",
+  "guestHelpPhoneTitle": "Phone Support",
+  "guestHelpChatTitle": "Live Chat",
+  "guestHelpChatSubtitle": "WhatsApp: +91 7020797849",
+  "guestHelpUnableToOpenChat": "Unable to open chat. Please try WhatsApp: +91 7020797849",
+  "guestHelpResourcesTitle": "Resources",
+  "guestHelpPrivacyPolicy": "Privacy Policy",
+  "guestHelpTermsOfService": "Terms of Service",
+  "ownerHelpTitle": "సహాయం & మద్దతు",
+  "ownerHelpQuickHelp": "త్వరిత సహాయం",
+  "ownerHelpHeroSubtitle": "మీ PG ఆస్తులను నిర్వహించే సాధారణ ప్రశ్నలకు వెంటనే సమాధానాలు పొందండి.",
+  "ownerHelpVideosTitle": "వీడియో ట్యుటోరియల్స్",
+  "ownerHelpVideosSubtitle": "దశలవారీ మార్గదర్శకాలు చూడండి",
+  "ownerHelpUnableToOpenVideos": "వీడియో ట్యుటోరియల్స్ తెరవడం సాధ్యం కాలేదు",
+  "ownerHelpDocsTitle": "డాక్యుమెంటేషన్",
+  "ownerHelpDocsSubtitle": "విస్తృత మార్గదర్శకాలను చదవండి",
+  "ownerHelpUnableToOpenDocs": "డాక్యుమెంటేషన్ తెరవడం సాధ్యం కాలేదు",
+  "ownerHelpFaqTitle": "తరచుగా అడిగే ప్రశ్నలు",
+  "ownerHelpFaqAddPgQuestion": "కొత్త PG ఆస్తిని ఎలా జోడించాలి?",
+  "ownerHelpFaqAddPgAnswer": "\"My PGs\" టాబ్‌కి వెళ్లి \"Add New PG\" పై నొక్కండి. వివరాలను నమోదు చేసి సమర్పించండి.",
+  "ownerHelpFaqBookingsQuestion": "అతిథుల బుకింగ్‌లను ఎలా నిర్వహించాలి?",
+  "ownerHelpFaqBookingsAnswer": "\"Guests\" టాబ్‌ను తెరిచి బుకింగ్ అభ్యర్థనలను పరిశీలించి ఆమోదించండి లేదా తిరస్కరించండి.",
+  "ownerHelpFaqPaymentsQuestion": "చెల్లింపు చరిత్రను ఎలా చూడాలి?",
+  "ownerHelpFaqPaymentsAnswer": "\"Overview\" లేదా \"Guests\" సెక్షన్‌లో అతిథుల వారీగా చెల్లింపులను తనిఖీ చేయండి.",
+  "ownerHelpFaqProfileQuestion": "నా ప్రొఫైల్‌ను ఎలా అప్‌డేట్ చేయాలి?",
+  "ownerHelpFaqProfileAnswer": "డ్రాయర్ మెనూను తెరిచి \"My Profile\" పై నొక్కి మీ సమాచారాన్ని అప్‌డేట్ చేయండి.",
+  "ownerHelpContactTitle": "సపోర్ట్‌ను సంప్రదించండి",
+  "ownerHelpContactSubtitle": "ఇంకా సహాయం కావాలా? మా సపోర్ట్ టీంను సంప్రదించండి.",
+  "ownerHelpEmailTitle": "ఇమెయిల్ సపోర్ట్",
+  "ownerHelpPhoneTitle": "ఫోన్ సపోర్ట్",
+  "ownerHelpChatTitle": "లైవ్ చాట్",
+  "ownerHelpChatSubtitle": "WhatsApp: +91 7020797849",
+  "ownerHelpUnableToOpenChat": "చాట్ తెరవడం సాధ్యం కాలేదు. దయచేసి WhatsApp ప్రయత్నించండి: +91 7020797849",
+  "ownerHelpResourcesTitle": "వనరులు",
+  "ownerHelpPrivacyPolicy": "గోప్యతా విధానం",
+  "ownerHelpTermsOfService": "సేవా నిబంధనలు",
+  "guestNotificationsTitle": "Notifications",
+  "guestNotificationsLoadFailed": "Failed to load notifications",
+  "guestNotificationsEmptyTitle": "No Notifications",
+  "guestNotificationsEmptyMessage": "You don't have any notifications yet.",
+  "guestNotificationsFilterAll": "All",
+  "guestNotificationsFilterUnread": "Unread",
+  "guestNotificationsFilterBookings": "Bookings",
+  "guestNotificationsFilterPayments": "Payments",
+  "guestNotificationsFilterComplaints": "Complaints",
+  "guestNotificationsFilterBedChanges": "Bed Changes",
+  "guestNotificationsFilterPgUpdates": "PG Updates",
+  "guestNotificationsFilterServices": "Services",
+  "guestNotificationsDefaultTitle": "Notification",
+  "guestNotificationsDefaultBody": "No message",
+  "ownerNotificationsTitle": "Notifications",
+  "ownerNotificationsLoadFailed": "Failed to load notifications",
+  "ownerNotificationsEmptyTitle": "No Notifications",
+  "ownerNotificationsEmptyMessage": "నోటిఫికేషన్‌లు లేవు",
+  "ownerNotificationsFilterAll": "అన్నీ",
+  "ownerNotificationsFilterUnread": "Unread",
+  "ownerNotificationsFilterBookings": "Bookings",
+  "ownerNotificationsFilterPayments": "Payments",
+  "ownerNotificationsFilterComplaints": "Complaints",
+  "ownerNotificationsFilterBedChanges": "పడక మార్పులు",
+  "ownerNotificationsFilterServices": "సేవలు",
+  "ownerNotificationsDefaultTitle": "నోటిఫికేషన్",
+  "ownerNotificationsDefaultBody": "సందేశం లేదు",
+  "ownerNotificationsMarkAll": "అన్నింటినీ చదివినట్లు గుర్తించండి",
+  "ownerNotificationsJustNow": "ఇప్పుడే",
+  "ownerNotificationsMinutesAgo": "{count, plural, one {{count} నిమిషం క్రితం} other {{count} నిమిషాల క్రితం}}",
+  "@ownerNotificationsMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerNotificationsHoursAgo": "{count, plural, one {{count} గంట క్రితం} other {{count} గంటల క్రితం}}",
+  "@ownerNotificationsHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerNotificationsDaysAgo": "{count, plural, one {{count} రోజు క్రితం} other {{count} రోజుల క్రితం}}",
+  "@ownerNotificationsDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "drawerDefaultUserName": "వినియోగదారు",
+  "drawerDefaultInitial": "యు",
+  "drawerVersionLabel": "వెర్షన్ {version}",
+  "@drawerVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "drawerContactEmail": "contact@charyatani.com",
+  "drawerContactPhone": "+91 98765 43210",
+  "drawerContactWebsite": "www.charyatani.com",
+  "ownerSpecialMenuEditTitle": "ప్రత్యేక మెను మార్చండి",
+  "ownerSpecialMenuAddTitle": "ప్రత్యేక మెను జోడించండి",
+  "ownerSpecialMenuSaving": "ప్రత్యేక మెను సేవ్ అవుతోంది...",
+  "ownerSpecialMenuSaveButton": "ప్రత్యేక మెను సేవ్ చేయండి",
+  "ownerSpecialMenuFestivalHeading": "పండుగ/ఈవెంట్ పేరు",
+  "ownerSpecialMenuFestivalHint": "ఉదా., దీపావళి, ఉగాది, ప్రత్యేక కార్యక్రమం",
+  "ownerSpecialMenuSpecialNoteHeading": "ప్రత్యేక సూచన",
+  "ownerSpecialMenuSpecialNoteLabel": "గమనిక",
+  "ownerSpecialMenuSpecialNoteHint": "ప్రత్యేక సూచనలు లేదా వివరాలు...",
+  "ownerSpecialMenuFallbackInfo": "ఈ రోజు కోసం డిఫాల్ట్ వారపు మెనును ఉపయోగించడానికి మీల్ విభాగాలను ఖాళీగా ఉంచండి",
+  "ownerSpecialMenuOptionalSection": "{meal} (ఐచ్చికం)",
+  "@ownerSpecialMenuOptionalSection": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerSpecialMenuNoItems": "ఇటమ్స్ ఏవి జోడించలేదు",
+  "ownerSpecialMenuAddItem": "ఇటమ్ జోడించండి",
+  "ownerSpecialMenuAddMealItemTitle": "{mealType} ఐటమ్ జోడించండి",
+  "@ownerSpecialMenuAddMealItemTitle": {
+    "placeholders": {
+      "mealType": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerSpecialMenuItemNameLabel": "ఇటమ్ పేరు",
+  "ownerSpecialMenuItemNameHint": "భోజన అంశం పేరును నమోదు చేయండి",
+  "ownerSpecialMenuFestivalRequired": "దయచేసి పండుగ/ఈవెంట్ పేరు నమోదు చేయండి",
+  "ownerSpecialMenuSaveSuccess": "ప్రత్యేక మెను విజయవంతంగా సేవ్ చేయబడింది!",
+  "ownerSpecialMenuSaveFailed": "ప్రత్యేక మెను సేవ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerSpecialMenuSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerSpecialMenuSaveError": "ప్రత్యేక మెను సేవ్ చేయడంలో లోపం: {error}",
+  "@ownerSpecialMenuSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditTitleEdit": "{day} మెను సవరించండి",
+  "@ownerMenuEditTitleEdit": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditTitleCreate": "{day} మెను సృష్టించండి",
+  "@ownerMenuEditTitleCreate": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditDeleteTooltip": "మెను తొలగించండి",
+  "ownerMenuEditSaving": "మెను సేవ్ అవుతోంది...",
+  "ownerMenuEditUpdateButton": "మెను నవీకరించండి",
+  "ownerMenuEditCreateButton": "మెను సృష్టించండి",
+  "ownerMenuEditOverviewTitle": "{day} మెను",
+  "@ownerMenuEditOverviewTitle": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditOverviewSubtitle": "రోజువారీ మెనూను సృష్టించండి మరియు నిర్వహించండి",
+  "ownerMenuEditStatItems": "అంశాలు",
+  "ownerMenuEditStatPhotos": "ఫోటోలు",
+  "ownerMenuEditOptionalSection": "{meal} (ఐచ్చికం)",
+  "@ownerMenuEditOptionalSection": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditLastUpdated": "చివరిసారి నవీకరించిన తేదీ: {timestamp}",
+  "@ownerMenuEditLastUpdated": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditPhotosHeading": "మెను ఫోటోలు",
+  "ownerMenuEditAddPhoto": "ఫోటో జోడించండి",
+  "ownerMenuEditUploadingPhoto": "ఫోటో అప్లోడ్ అవుతోంది...",
+  "ownerMenuEditBadgeNew": "కొత్త",
+  "ownerMenuEditNoPhotos": "ఇప్పటికీ ఫోటోలు జోడించలేదు",
+  "ownerMenuEditItemsCount": "{count} అంశాలు",
+  "@ownerMenuEditItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerMenuEditAddItemTooltip": "{meal} అంశాన్ని జోడించండి",
+  "@ownerMenuEditAddItemTooltip": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditNoItemsForMeal": "{meal} కోసం ఇంకా అంశాలు జోడించలేదు",
+  "@ownerMenuEditNoItemsForMeal": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditRemoveItemTooltip": "అంశాన్ని తొలగించండి",
+  "ownerMenuEditDescriptionHeading": "వివరణ (ఐచ్చికం)",
+  "ownerMenuEditDescriptionLabel": "మెను వివరణ",
+  "ownerMenuEditDescriptionHint": "ఈ మెనుకు సంబంధించిన ఏదైనా ప్రత్యేక గమనికలను జోడించండి...",
+  "ownerMenuEditAddMealItemTitle": "{mealType} అంశాన్ని జోడించండి",
+  "@ownerMenuEditAddMealItemTitle": {
+    "placeholders": {
+      "mealType": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditItemNameLabel": "అంశం పేరు",
+  "ownerMenuEditItemNameHint": "ఉదా., ఇడ్లీ సాంబార్, దోస, ఉప్మా",
+  "ownerMenuEditMealRequired": "దయచేసి కనీసం ఒక భోజన అంశాన్ని జోడించండి",
+  "ownerMenuEditAuthError": "లోపం: వినియోగదారు ధృవీకరించబడలేదు. దయచేసి మళ్లీ లాగిన్ అవండి.",
+  "ownerMenuEditUpdateSuccess": "{day} మెను విజయవంతంగా నవీకరించబడింది!",
+  "@ownerMenuEditUpdateSuccess": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditCreateSuccess": "{day} మెను విజయవంతంగా సృష్టించబడింది!",
+  "@ownerMenuEditCreateSuccess": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditSaveFailed": "మెనును సేవ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerMenuEditSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditSaveError": "మెనును సేవ్ చేయడంలో లోపం: {error}",
+  "@ownerMenuEditSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditClearTitle": "మెనును క్లియర్ చేయాలా?",
+  "ownerMenuEditClearMessage": "ఈ మెనును నిజంగా క్లియర్ చేయాలనుకుంటున్నారా? దీని వల్ల అన్ని అంశాలు మరియు ఫోటోలు తొలగించబడతాయి.",
+  "ownerMenuEditClearConfirm": "క్లియర్",
+  "ownerMenuEditClearSnackbar": "మెను క్లియర్ చేయబడింది. మార్పులను సేవ్ చేయడం మర్చిపోవద్దు.",
+  "ownerMenuEditSaveFailed": "మెనూ సేవ్ చేయడం విఫలమైంది: {error}",
+  "@ownerMenuEditSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMenuEditLogTotalItems": "   - మొత్తం అంశాలు: {count}",
+  "@ownerMenuEditLogTotalItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerMenuEditLogUpdateSuccess": "✅ మెనూ విజయవంతంగా నవీకరించబడింది!",
+  "ownerMenuEditLogCreateSuccess": "✅ మెనూ విజయవంతంగా సృష్టించబడింది!",
+  "ownerMenuEditImagePickError": "చిత్రాన్ని ఎంచుకోవడం విఫలమైంది: {error}",
+  "@ownerMenuEditImagePickError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerMonthlyBreakdownLoadFailed": "మాసిక వివరాలను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerMonthlyBreakdownLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPropertyBreakdownLoadFailed": "ప్రాపర్టీ వివరాలను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerPropertyBreakdownLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestInitializeFailed": "అతిథుల నిర్వహణను ప్రారంభించడంలో విఫలమైంది: {error}",
+  "@ownerGuestInitializeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestStatsLoadFailedLog": "⚠️ Owner Guest ViewModel: గెస్ట్ గణాంకాలను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerGuestStatsLoadFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestUpdateFailed": "అతిథిని నవీకరించడంలో విఫలమైంది: {error}",
+  "@ownerGuestUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerComplaintReplyFailed": "ఫిర్యాదు ప్రతిస్పందనను జోడించడంలో విఫలమైంది: {error}",
+  "@ownerComplaintReplyFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerComplaintStatusUpdateFailed": "ఫిర్యాదు స్థితిని నవీకరించడంలో విఫలమైంది: {error}",
+  "@ownerComplaintStatusUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBikeUpdateFailed": "బైక్‌ను నవీకరించడంలో విఫలమైంది: {error}",
+  "@ownerBikeUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBikeMovementRequestFailed": "బైక్ మువ్‌మెంట్ అభ్యర్థనను సృష్టించడంలో విఫలమైంది: {error}",
+  "@ownerBikeMovementRequestFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerServiceCreateFailed": "సేవ అభ్యర్థనను సృష్టించడంలో విఫలమైంది: {error}",
+  "@ownerServiceCreateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerServiceReplyFailed": "సేవ ప్రతిస్పందనను జోడించడంలో విఫలమైంది: {error}",
+  "@ownerServiceReplyFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerServiceStatusUpdateFailed": "సేవ స్థితిని నవీకరించడంలో విఫలమైంది: {error}",
+  "@ownerServiceStatusUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerGuestRefreshFailed": "డేటాను రిఫ్రెష్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerGuestRefreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBookingApproveFailed": "బుకింగ్ అభ్యర్థనను ఆమోదించడంలో విఫలమైంది: {error}",
+  "@ownerBookingApproveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerBookingRejectFailed": "బుకింగ్ అభ్యర్థనను తిరస్కరించడంలో విఫలమైంది: {error}",
+  "@ownerBookingRejectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerResponseNone": "ఏదీ లేదు",
+  "ownerFoodLoadMenusFailed": "మెనూను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerFoodLoadMenusFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodStreamMenusFailed": "మెనూను స్ట్రీమ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerFoodStreamMenusFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodStreamOverridesFailed": "ఓవర్‌రైడ్‌లను స్ట్రీమ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerFoodStreamOverridesFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodSaveMenuFailed": "మెనూను సేవ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerFoodSaveMenuFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodSaveMenusFailed": "మెనూలను సేవ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerFoodSaveMenusFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodDeleteMenuFailed": "మెనూను తొలగించడంలో విఫలమైంది: {error}",
+  "@ownerFoodDeleteMenuFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodSaveOverrideFailed": "ఓవర్‌రైడ్‌ను సేవ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerFoodSaveOverrideFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodDeleteOverrideFailed": "ఓవర్‌రైడ్‌ను తొలగించడంలో విఫలమైంది: {error}",
+  "@ownerFoodDeleteOverrideFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodInitializeDefaultsFailed": "డిఫాల్ట్ మెనూలను ఆరంభించడంలో విఫలమైంది: {error}",
+  "@ownerFoodInitializeDefaultsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodUpdateCurrentMenuFailed": "ఈరోజు మెనూను నవీకరించడంలో విఫలమైంది: {error}",
+  "@ownerFoodUpdateCurrentMenuFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodSaveStateFailedLog": "⚠️ Owner Food ViewModel: మెను స్థితిని సేవ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerFoodSaveStateFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodClearStateFailedLog": "⚠️ Owner Food ViewModel: మెను స్థితిని క్లియర్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerFoodClearStateFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodFetchMenuFailed": "సాప్తాహిక మెనూను పొందడంలో విఫలమైంది",
+  "ownerFoodFetchOverridesFailed": "మెను ఓవర్‌రైడ్‌లను పొందడంలో విఫలమైంది",
+  "ownerFoodRepositorySaveMenuFailed": "సాప్తాహిక మెనూను సేవ్ చేయడంలో విఫలమైంది",
+  "ownerFoodRepositorySaveMenusFailed": "సాప్తాహిక మెనూలను సేవ్ చేయడంలో విఫలమైంది",
+  "ownerFoodRepositoryDeleteMenuFailed": "సాప్తాహిక మెనూను తొలగించడంలో విఫలమైంది",
+  "ownerFoodRepositorySaveOverrideFailed": "మెను ఓవర్‌రైడ్‌ను సేవ్ చేయడంలో విఫలమైంది",
+  "ownerFoodRepositoryDeleteOverrideFailed": "మెను ఓవర్‌రైడ్‌ను తొలగించడంలో విఫలమైంది",
+  "ownerFoodRepositoryUploadPhotoFailed": "ఫోటోను అప్లోడ్ చేయడంలో విఫలమైంది",
+  "ownerFoodRepositoryDeletePhotoFailed": "ఫోటోను తొలగించడంలో విఫలమైంది",
+  "ownerFoodFetchStatsFailed": "మెను గణాంకాలను పొందడంలో విఫలమైంది",
+  "pgPhotosUploading": "{count} ఫోటో(లు)ను అప్లోడ్ చేస్తున్నాము...",
+  "@pgPhotosUploading": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pgPhotosSelectFailed": "ఫోటోల్ని ఎంచుకోవడంలో విఫలమైంది: {error}",
+  "@pgPhotosSelectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pgPhotosUploadErrorLog": "ఫోటో {index} అప్లోడ్ విఫలమైంది: {error}",
+  "@pgPhotosUploadErrorLog": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pgSupabaseStorageTroubleshoot": "⚠️ Supabase స్టోరేజ్ లోపం: ఇవి కారణాలై ఉండొచ్చు:\n1. స్టోరేజ్ బకెట్ RLS పాలసీలు అప్లోడ్స్‌ను నిరోధించడం\n2. CORS కాన్ఫిగరేషన్ సమస్యలు\n3. స్టోరేజ్ అప్లోడ్స్‌కు ప్రమాణీకరణ అవసరం\nదయచేసి \"atitia-storage\" బకెట్‌కు సంబంధించిన Supabase స్టోరేజ్ పాలసీలను పరిశీలించండి.",
+  "ownerPgUnknownName": "తెలియని PG",
+  "ownerPgInitializeFailed": "PG నిర్వహణను ప్రారంభించడంలో విఫలమైంది: {error}",
+  "@ownerPgInitializeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgApproveBookingFailed": "బుకింగ్‌ను ఆమోదించడంలో విఫలమైంది: {error}",
+  "@ownerPgApproveBookingFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgRejectBookingFailed": "బుకింగ్‌ను తిరస్కరించడంలో విఫలమైంది: {error}",
+  "@ownerPgRejectBookingFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgRescheduleBookingFailed": "బుకింగ్‌ను మళ్లీ షెడ్యూల్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerPgRescheduleBookingFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgIdNotInitialized": "PG ID ప్రారంభించబడలేదు",
+  "ownerPgUpdateBedStatusFailed": "పడక స్థితిని నవీకరించడంలో విఫలమైంది: {error}",
+  "@ownerPgUpdateBedStatusFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgRefreshFailed": "డేటాను రిఫ్రెష్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerPgRefreshFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgSaveFailed": "PGను సేవ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerPgSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgIdNotProvided": "PG ID అందించబడలేదు",
+  "ownerPgUpdateFailed": "PGను నవీకరించడంలో విఫలమైంది: {error}",
+  "@ownerPgUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgDeleteFailed": "PGను తొలగించడంలో విఫలమైంది: {error}",
+  "@ownerPgDeleteFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgCreateFailed": "PGను సృష్టించడంలో విఫలమైంది: {error}",
+  "@ownerPgCreateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgRevenueReportFailed": "రెవెన్యూ నివేదికను పొందడంలో విఫలమైంది: {error}",
+  "@ownerPgRevenueReportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgOccupancyReportFailed": "ఆక్యుపెన్సీ నివేదికను పొందడంలో విఫలమైంది: {error}",
+  "@ownerPgOccupancyReportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgFetchListFailed": "PGలను పొందడంలో విఫలమైంది: {error}",
+  "@ownerPgFetchListFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgFetchDetailsFailed": "PG వివరాలను పొందడంలో విఫలమైంది: {error}",
+  "@ownerPgFetchDetailsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerPgBasicInfoZeroStateMessage": "మీ PG గురించి మౌలిక సమాచారాన్ని నింపి ప్రారంభించండి.",
+  "ownerPgQuickStatRequired": "అవసరం",
+  "ownerPgQuickStatRentTypes": "అద్దె రకాలూ",
+  "ownerPgQuickStatDeposit": "డిపాజిట్",
+  "ownerPgStatusNotSet": "సెట్ చేయలేదు",
+  "ownerPgStatusSet": "సెట్ చేశారు",
+  "ownerPgFloorStructureZeroStateMessage": "మీ PG కోసం అంతస్తులు, గదులు, పడకలను సెట్ చేయండి.",
+  "ownerPgQuickStatFloors": "అంతస్తులు",
+  "ownerPgQuickStatRooms": "గదులు",
+  "ownerPgQuickStatBeds": "పడకలు",
+  "ownerPgAmenitiesZeroStateMessage": "అతిథులు సులభంగా కనుగొనడానికి మీ PG అందించే సౌకర్యాలను ఎంచుకోండి.",
+  "ownerPgPhotosZeroStateMessage": "మీ PGను ప్రదర్శించేందుకు ఫోటోలను జోడించండి.",
+  "ownerPgQuickStatSelected": "ఎంచుకున్నవి",
+  "ownerPgBedNumberingDescription": "తలుపు స్థానాన్ని ఆధారంగా పడకలకు సంఖ్య ఇవ్వండి ώστε అందరూ ఒప్పుకోగలరు.",
+  "ownerPgBed2NearestRight": "పడక-2: సమీప వరుస, కుడి వైపు",
+  "ownerPgBed3FarLeft": "పడక-3: దూర వరుస, ఎడమ వైపు",
+  "ownerPgBed4FarRight": "పడక-4: దూర వరుస, కుడి వైపు",
+  "ownerPgBed1ClosestDoor": "పడక-1: తలుపుకు అత్యంత దగ్గరగా",
+  "ownerPgBedNext": "పడక-{number}: తరువాతది",
+  "@ownerPgBedNext": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerPgBed4Farthest": "పడక-4: తలుపు నుండి దూరంగా",
+  "ownerPgRentConfigZeroStateMessage": "విభిన్న షేరింగ్ రకాల కోసం అద్దె మొత్తాలు మరియు మెయింటెనెన్స్ చార్జీలను సెట్ చేయండి.",
+  "ownerPgProgressDescription": "{completed} / {total} విభాగాలు పూర్తయ్యాయి",
+  "@ownerPgProgressDescription": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerPgLoadingDetails": "PG వివరాలను లోడ్ చేస్తున్నాం...",
+  "ownerPgPublishedSuccessfully": "PG విజయవంతంగా ప్రచురించబడింది",
+  "ownerPgPublishFailed": "PGని ప్రచురించడంలో విఫలమైంది",
+  "ownerAnalyticsLoadFailed": "అనలిటిక్స్ డేటా లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerAnalyticsLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerReportsSelectPeriod": "రిపోర్ట్ కాలాన్ని ఎంచుకోండి",
+  "ownerReportsSelectDateRange": "తేదీ పరిధిని ఎంచుకోండి",
+  "ownerReportsRefresh": "రిపోర్టులను రిఫ్రెష్ చేయి",
+  "ownerReportsTabRevenue": "ఆదాయం",
+  "ownerReportsTabBookings": "బుకింగ్స్",
+  "ownerReportsTabGuests": "అతిథులు",
+  "ownerReportsTabPayments": "చెల్లింపులు",
+  "ownerReportsTabComplaints": "ఫిర్యాదులు",
+  "ownerReportsLoading": "రిపోర్టులను లోడ్ చేస్తున్నాం...",
+  "ownerReportsErrorTitle": "రిపోర్టులను లోడ్ చేయడంలో లోపం",
+  "ownerReportsNoRevenueData": "ఆదాయం డేటా లేదు",
+  "ownerReportsRevenuePlaceholder": "మీ వద్ద బుకింగ్స్ ఉన్న తర్వాత ఆదాయం డేటా ఇక్కడ కనిపిస్తుంది",
+  "ownerReportsAveragePerMonth": "సగటు / నెల",
+  "ownerReportsMonthlyRevenueBreakdown": "నెలవారీ ఆదాయం విభజన",
+  "ownerReportsTotalBookings": "మొత్తం బుకింగ్స్",
+  "ownerReportsPendingRequests": "పెండింగ్ అభ్యర్థనలు",
+  "ownerReportsTotalReceived": "మొత్తం స్వీకరించబడింది",
+  "ownerReportsPaidCount": "చెల్లించిన సంఖ్య",
+  "ownerReportsPendingCount": "పెండింగ్ సంఖ్య",
+  "ownerReportsChangeDateRange": "మార్చు",
+  "ownerReportsPropertyWiseRevenue": "ఆస్తి వారీ ఆదాయం",
+  "ownerReportsPercentageOfTotal": "మొత్తంలో {percentage}%",
+  "@ownerReportsPercentageOfTotal": {
+    "placeholders": {
+      "percentage": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerReportsBookingTrends": "బుకింగ్ ధోరణులు",
+  "ownerReportsNoBookingData": "ఎంచుకున్న కాలానికి బుకింగ్ డేటా అందుబాటులో లేదు",
+  "ownerReportsBookingsCount": "{count} బుకింగ్స్",
+  "@ownerReportsBookingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerReportsGuestStatistics": "అతిథి గణాంకాలు",
+  "ownerReportsPaymentTrends": "చెల్లింపు ధోరణులు",
+  "ownerReportsNoPaymentData": "ఎంచుకున్న కాలానికి చెల్లింపు డేటా అందుబాటులో లేదు",
+  "ownerReportsComplaintTrends": "ఫిర్యాదు ధోరణులు",
+  "ownerReportsNoComplaintData": "ఎంచుకున్న కాలానికి ఫిర్యాదు డేటా అందుబాటులో లేదు",
+  "ownerReportsComplaintsCount": "{count} ఫిర్యాదులు",
+  "@ownerReportsComplaintsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ownerOverviewOccupancyRate": "ఆక్రమణ రేటు",
+  "ownerOverviewPerformanceExcellent": "అత్యుత్తమం",
+  "ownerOverviewPerformanceGood": "బాగుంది",
+  "ownerOverviewPerformanceFair": "సగటు స్థాయి",
+  "ownerOverviewPerformanceNeedsAttention": "శ్రద్ధ అవసరం",
+  "ownerOverviewPgLabel": "{index}PG: {name}",
+  "@ownerOverviewPgLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerOverviewAveragePerMonth": "సగటు / నెల",
+  "ownerOverviewHighestMonth": "అత్యధిక నెల",
+  "ownerOverviewOwnerFallback": "యజమాని",
+  "ownerProfileTitle": "నా ప్రొఫైల్",
+  "ownerProfileSaveTooltip": "ప్రొఫైల్‌ను సేవ్ చేయండి",
+  "ownerProfileTabPersonalInfo": "వ్యక్తిగత సమాచారం",
+  "ownerProfileTabBusinessInfo": "వ్యాపార సమాచారం",
+  "ownerProfileTabDocuments": "పత్రాలు",
+  "ownerProfileFullNameLabel": "పూర్తి పేరు",
+  "ownerProfileFullNameHint": "మీ పూర్తి పేరును నమోదు చేయండి",
+  "ownerProfileEmailLabel": "ఇమెయిల్",
+  "ownerProfileEmailHint": "మీ ఇమెయిల్‌ను నమోదు చేయండి",
+  "ownerProfilePhoneLabel": "ఫోన్ నంబర్",
+  "ownerProfilePhoneHint": "మీ ఫోన్ నంబర్‌ను నమోదు చేయండి",
+  "ownerProfileAddressLabel": "PG చిరునామా",
+  "ownerProfileAddressHint": "మీ PG చిరునామాను నమోదు చేయండి",
+  "ownerProfileStateLabel": "రాష్ట్రం",
+  "ownerProfileStateHint": "రాష్ట్రాన్ని ఎంచుకోండి",
+  "ownerProfileCityLabel": "నగరం",
+  "ownerProfileCityHint": "నగరాన్ని ఎంచుకోండి",
+  "ownerProfileCityHintSelectState": "ముందు రాష్ట్రాన్ని ఎంచుకోండి",
+  "ownerProfilePincodeLabel": "పిన్‌కోడ్",
+  "ownerProfilePincodeHint": "పిన్‌కోడ్‌ను నమోదు చేయండి",
+  "ownerProfileSavePersonal": "వ్యక్తిగత సమాచారాన్ని సేవ్ చేయండి",
+  "ownerProfileBusinessNameLabel": "వ్యాపార పేరు",
+  "ownerProfileBusinessNameHint": "వ్యాపార పేరును నమోదు చేయండి",
+  "ownerProfileBusinessTypeLabel": "వ్యాపార రకం",
+  "ownerProfileBusinessTypeHint": "వ్యాపార రకాన్ని నమోదు చేయండి",
+  "ownerProfilePanLabel": "PAN నంబర్",
+  "ownerProfilePanHint": "PAN నంబర్‌ను నమోదు చేయండి",
+  "ownerProfileGstLabel": "GST నంబర్",
+  "ownerProfileGstHint": "GST నంబర్‌ను నమోదు చేయండి",
+  "ownerProfileSaveBusiness": "వ్యాపార సమాచారాన్ని సేవ్ చేయండి",
+  "ownerProfileDocumentProfileTitle": "ప్రొఫైల్ ఫోటో",
+  "ownerProfileDocumentProfileDescription": "మీ ప్రొఫైల్ ఫోటోను అప్‌లోడ్ చేయండి",
+  "ownerProfileDocumentAadhaarTitle": "ఆధార్ ఫోటో",
+  "ownerProfileDocumentAadhaarDescription": "మీ ఆధార్ కార్డ్ ఫోటోను అప్‌లోడ్ చేయండి",
+  "ownerProfileDocumentUpload": "అప్‌లోడ్ చేయండి",
+  "ownerProfileDocumentUpdate": "నవీకరించండి",
+  "ownerProfilePickImageFailed": "చిత్రాన్ని ఎంచుకోవడంలో విఫలమైంది: {error}",
+  "@ownerProfilePickImageFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerIdNotAvailable": "యజమాని ID అందుబాటులో లేదు",
+  "ownerProfileNotFound": "ప్రొఫైల్ కనుగొనబడలేదు",
+  "ownerProfileLoadFailed": "ప్రొఫైల్‌ను లోడ్ చేయడంలో విఫలమైంది",
+  "ownerProfileStreamFailed": "ప్రొఫైల్ స్ట్రీమ్ చేయడంలో విఫలమైంది",
+  "ownerProfileStreamStartFailed": "ప్రొఫైల్ స్ట్రీమ్ ప్రారంభించడంలో విఫలమైంది",
+  "ownerProfileCreateFailed": "ప్రొఫైల్ సృష్టించడంలో విఫలమైంది",
+  "ownerProfileUpdateFailed": "ప్రొఫైల్‌ను నవీకరించడంలో విఫలమైంది",
+  "ownerBankDetailsUpdateFailed": "బ్యాంక్ వివరాలను నవీకరించడంలో విఫలమైంది",
+  "ownerBusinessInfoUpdateFailed": "వ్యాపార సమాచారాన్ని నవీకరించడంలో విఫలమైంది",
+  "ownerProfilePhotoUploadFailed": "ప్రొఫైల్ ఫోటోను అప్‌లోడ్ చేయడంలో విఫలమైంది",
+  "ownerAadhaarUploadFailed": "ఆధార్ పత్రాన్ని అప్‌లోడ్ చేయడంలో విఫలమైంది",
+  "ownerUpiQrUploadFailed": "UPI QR కోడ్‌ను అప్‌లోడ్ చేయడంలో విఫలమైంది",
+  "ownerAddPgFailed": "PGని జోడించడంలో విఫలమైంది",
+  "ownerRemovePgFailed": "PGని తొలగించడంలో విఫలమైంది",
+  "ownerProfileVerifyFailed": "ప్రొఫైల్‌ను ధృవీకరించడంలో విఫలమైంది",
+  "ownerProfileDeactivateFailed": "ప్రొఫైల్‌ను నిలిపివేయడంలో విఫలమైంది",
+  "ownerProfileActivateFailed": "ప్రొఫైల్‌ను సక్రియం చేయడంలో విఫలమైంది",
+  "ownerStateUpdateFailedLog": "ఎంచుకున్న రాష్ట్రాన్ని నవీకరించడంలో లోపం: {error}",
+  "@ownerStateUpdateFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerStateTelangana": "తెలంగాణ",
+  "ownerStateAndhraPradesh": "ఆంధ్రప్రదేశ్",
+  "ownerProfilePhotoUpdateFailed": "ప్రొఫైల్ ఫోటోను నవీకరించడంలో విఫలమైంది",
+  "ownerAadhaarUpdateFailed": "ఆధార్ ఫోటోను నవీకరించడంలో విఫలమైంది",
+  "ownerUpiQrUpdateFailed": "UPI QR కోడ్‌ను నవీకరించడంలో విఫలమైంది",
+  "ownerProfileUpdateSuccess": "ప్రొఫైల్ విజయవంతంగా నవీకరించబడింది",
+  "ownerProfileUpdateFailure": "ప్రొఫైల్‌ను నవీకరించడంలో విఫలమైంది: {error}",
+  "@ownerProfileUpdateFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerCityUpdateFailedLog": "ఎంచుకున్న నగరాన్ని నవీకరించడంలో లోపం: {error}",
+  "@ownerCityUpdateFailedLog": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFileDeleteFailed": "ఫైల్‌ను తొలగించడంలో విఫలమైంది",
+  "ownerPgFetchFailed": "యజమాని PG IDలను పొందడంలో విఫలమైంది",
+  "ownerOverviewFetchFailed": "యజమాని అవలోకన డేటాను పొందడంలో విఫలమైంది",
+  "ownerOverviewAggregateFailed": "యజమాని డేటాను సమగ్రపరచడంలో విఫలమైంది",
+  "ownerMonthlyBreakdownFailed": "నెలవారీ విభజనను పొందడంలో విఫలమైంది",
+  "ownerPropertyBreakdownFailed": "ఆస్తి వారీ విభజనను పొందడంలో విఫలమైంది",
+  "ownerPropertyFallbackName": "ఆస్తి {pgId}",
+  "@ownerPropertyFallbackName": {
+    "placeholders": {
+      "pgId": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerOverviewLoadFailed": "అవలోకన డేటాను లోడ్ చేయడంలో విఫలమైంది",
+  "ownerOverviewLoadFailedWithReason": "అవలోకన డేటాను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerOverviewLoadFailedWithReason": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerOverviewStreamFailedWithReason": "అవలోకన డేటాను స్ట్రీమ్ చేయడంలో విఫలమైంది: {error}",
+  "@ownerOverviewStreamFailedWithReason": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerFoodUploadPhotoFailed": "ఆహార ఫోటోను అప్‌లోడ్ చేయడంలో విఫలమైంది",
+  "ownerFoodDeletePhotoFailed": "ఆహార ఫోటోను తొలగించడంలో విఫలమైంది",
+  "ownerPgBedNumberingRule": "ప్రతి గదికి ఎన్నిమంది ఉంటారో నిర్ణయించి, పడకలకు సంఖ్యలు కేటాయించండి (ఉదా: B1, B2)",
+  "ownerPgBedLayoutTwoByTwo": "2x2 లేఅవుట్ (B1-B2 ఎడమ వైపు, B3-B4 కుడి వైపు) వంటి లేఅవుట్లను ఉపయోగించండి",
+  "ownerPgBedLayoutOneByFour": "1x4 లేఅవుట్ (B1 నుండి B4 వరకు వరుసగా) వంటి లేఅవుట్లను చార్ట్‌లో చూపించండి",
+  "ownerPgBed1NearestLeft": "B1ను గది ప్రవేశానికి సమీపమైన ఎడమ మూలలో ఉంచండి",
+  "exampleUpiId": "yourname@paytm",
+  "qrCodeInfoText": "మీరు PhonePe, Paytm, Google Pay వంటి ఏదైనా UPI యాప్ నుండి QR కోడ్‌ను సృష్టించవచ్చు.",
+  "chooseYourPreferredTheme": "మీకు ఇష్టమైన థీమ్‌ను ఎంచుకోండి",
+  "selectPreferredLanguage": "మీకు ఇష్టమైన భాషను ఎంచుకోండి",
+  "dataPrivacy": "డేటా వ్యక్తిగతత",
+  "about": "గురించి",
+  "receiveNotificationsOnYourDevice": "మీ పరికరంలో నోటిఫికేషన్లు పొందండి",
+  "receiveNotificationsViaEmail": "ఇమెయిల్ ద్వారా నోటిఫికేషన్లు పొందండి",
+  "getRemindersForPendingPayments": "పెండింగ్ చెల్లింపుల కోసం రిమైండర్లు పొందండి",
+  "ownerProfileUpdateSuccess": "ప్రొఫైల్ విజయవంతంగా నవీకరించబడింది",
+  "ownerProfileUpdateFailure": "Failed to update profile: {error}",
+  "@ownerProfileUpdateFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "replaceQrCode": "QR కోడ్‌ను మార్చండి",
+  "removeQrCode": "QR కోడ్‌ను తీసివేయండి",
+  "previewQrCode": "QR కోడ్‌ను ముందస్తు వీక్షణ చేయండి",
+  "noQrCodeSelected": "ఇప్పటికీ QR కోడ్ ఎంపిక చేయలేదు",
+  "newQrCodeSelected": "కొత్త QR కోడ్ ఎంపిక చేయబడింది",
+  "existingQrCode": "ఉన్న QR కోడ్",
+  "exampleBankName": "ఉదా., స్టేట్ బ్యాంక్ ఆఫ్ ఇండియా",
+  "exampleIfsc": "ఉదా., SBIN0001234",
+  "exampleUpiId": "yourname@paytm",
+  "qrCodeInfoText": "ఫోన్‌పే, పేటీఎం, గూగుల్ పే వంటి ఏదైనా UPI యాప్ నుండి మీరు QR కోడ్‌ను సృష్టించవచ్చు.",
+  "ownerProfileInitialFallback": "ఓ",
+  "ownerProfileVerifiedStatus": "ధృవీకరించబడింది",
+  "ownerProfilePendingVerificationStatus": "ధృవీకరణ పెండింగ్",
+  "statusActive": "Active",
+  "statusInactive": "Inactive",
+  "dateFormatDdMmYyyy": "DD/MM/YYYY",
+  "guestUser": "అతిథి వినియోగదారు",
+  "guestInitialsFallback": "GU",
+  "perMonthAmount": "{amount}/నెల",
+  "@perMonthAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pgPayment": "PG చెల్లింపు",
+  "paymentTypeRent": "అద్దె చెల్లింపు",
+  "paymentTypeSecurityDeposit": "భద్రతా డిపాజిట్",
+  "paymentTypeMaintenance": "నిర్వహణ రుసుము",
+  "paymentTypeLateFee": "ఆలస్య రుసుము",
+  "paymentTypeOther": "{type} చెల్లింపు",
+  "@paymentTypeOther": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentCompletedSuccessfully": "చెల్లింపు విజయవంతంగా పూర్తయ్యింది",
+  "paymentPending": "చెల్లింపు పెండింగ్‌లో ఉంది",
+  "paymentOverdue": "చెల్లింపు ఆలస్యమైంది — దయచేసి వెంటనే చెల్లించండి",
+  "paymentFailedMessage": "చెల్లింపు విఫలమైంది — దయచేసి మళ్లీ ప్రయత్నించండి",
+  "paymentRefunded": "చెల్లింపు తిరిగి చెల్లించబడింది",
+  "unknownStatus": "తెలియని స్థితి",
+  "paymentFilterChangedEvent": "payment_filter_changed",
+  "paymentLoadErrorEvent": "payment_load_error",
+  "pendingPaymentsLoadErrorEvent": "pending_payments_load_error",
+  "overduePaymentsLoadErrorEvent": "overdue_payments_load_error",
+  "paymentStatsLoadErrorEvent": "payment_stats_load_error",
+  "paymentAddedSuccessfullyEvent": "payment_added_successfully",
+  "paymentAddFailedEvent": "payment_add_failed",
+  "paymentUpdatedSuccessfullyEvent": "payment_updated_successfully",
+  "paymentUpdateFailedEvent": "payment_update_failed",
+  "paymentStatusUpdatedSuccessfullyEvent": "payment_status_updated_successfully",
+  "paymentStatusUpdateFailedEvent": "payment_status_update_failed",
+  "paymentDeletedSuccessfullyEvent": "payment_deleted_successfully",
+  "paymentDeletionFailedEvent": "payment_deletion_failed",
+  "paymentsRefreshedEvent": "payments_refreshed",
+  "failedToLoadPayments": "చెల్లింపులను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToLoadPayments": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToAddPayment": "చెల్లింపును జోడించడంలో విఫలమైంది: {error}",
+  "@failedToAddPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@failedToUpdatePayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdatePaymentStatus": "చెల్లింపు స్థితిని నవీకరించడంలో విఫలమైంది: {error}",
+  "@failedToUpdatePaymentStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchPayment": "చెల్లింపును పొందడంలో విఫలమైంది: {error}",
+  "@failedToFetchPayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToDeletePayment": "చెల్లింపును తొలగించడంలో విఫలమైంది: {error}",
+  "@failedToDeletePayment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentSimulationDeprecated": "చెల్లింపు అనుకరణను విరమించారు.",
+  "paymentSimulationRecommendation": "చెల్లింపు పద్ధతుల ఎంపిక సంభాషణ ద్వారా నిజమైన చెల్లింపు గేట్వేలను (Razorpay, UPI లేదా Cash) ఉపయోగించండి.",
+  "paymentNotificationReceivedTitle": "చెల్లింపు స్వీకరించబడింది",
+  "paymentNotificationReceivedBody": "అతిథి నుండి {amount} స్వీకరించబడింది",
+  "selectPaymentMethodTitle": "చెల్లింపు విధానాన్ని ఎంచుకోండి",
+  "selectPaymentMethodSubtitle": "మీరు చెల్లింపును ఎలా చేయాలనుకుంటున్నారో ఎంచుకోండి",
+  "razorpayPaymentDescription": "Razorpay ద్వారా సురక్షిత ఆన్‌లైన్ చెల్లింపు",
+  "upiPaymentDescription": "PhonePe, Paytm, Google Pay తదితరాల ద్వారా చెల్లించి స్క్రీన్‌షాట్‌ను షేర్ చేయండి",
+  "cashPaymentDescription": "నగదుగా చెల్లించి యజమాని నిర్ధారణను అభ్యర్థించండి",
+  "guestProfileLoadedEvent": "guest_profile_loaded",
+  "guestProfileUpdateSuccessEvent": "guest_profile_update_success",
+  "guestProfileFieldsUpdateSuccessEvent": "guest_profile_fields_update_success",
+  "profilePhotoUploadSuccessEvent": "profile_photo_upload_success",
+  "aadhaarPhotoUploadSuccessEvent": "aadhaar_photo_upload_success",
+  "idProofUploadSuccessEvent": "id_proof_upload_success",
+  "guestStatusUpdateSuccessEvent": "guest_status_update_success",
+  "guestProfileClearedEvent": "guest_profile_cleared",
+  "guestProfileEditStartedEvent": "guest_profile_edit_started",
+  "guestProfileEditCancelledEvent": "guest_profile_edit_cancelled",
+  "guestProfileRefreshedEvent": "guest_profile_refreshed",
+  "guestProfileNotFoundEvent": "guest_profile_not_found",
+  "guestProfileViewedEvent": "guest_profile_viewed",
+  "guestProfileFetchErrorEvent": "guest_profile_fetch_error",
+  "guestProfileUpdatedEvent": "guest_profile_updated",
+  "guestProfileUpdateErrorEvent": "guest_profile_update_error",
+  "guestProfileFieldsUpdatedEvent": "guest_profile_fields_updated",
+  "guestProfileFieldsUpdateErrorEvent": "guest_profile_fields_update_error",
+  "profilePhotoUploadedEvent": "profile_photo_uploaded",
+  "profilePhotoUploadErrorEvent": "profile_photo_upload_error",
+  "aadhaarPhotoUploadedEvent": "aadhaar_photo_uploaded",
+  "aadhaarPhotoUploadErrorEvent": "aadhaar_photo_upload_error",
+  "idProofUploadedEvent": "id_proof_uploaded",
+  "idProofUploadErrorEvent": "id_proof_upload_error",
+  "guestProfileDeletedEvent": "guest_profile_deleted",
+  "guestProfileDeleteErrorEvent": "guest_profile_delete_error",
+  "guestStatusUpdatedEvent": "guest_status_updated",
+  "guestStatusUpdateErrorEvent": "guest_status_update_error",
+  "failedToLoadProfile": "Failed to load profile: {error}",
+  "@failedToLoadProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToStreamProfile": "Failed to stream profile: {error}",
+  "@failedToStreamProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateGuestProfile": "అతిథి ప్రొఫైల్‌ను నవీకరించడంలో విఫలమైంది: {error}",
+  "@failedToUpdateGuestProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateProfileFields": "Failed to update profile fields: {error}",
+  "@failedToUpdateProfileFields": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUploadIdProof": "Failed to upload ID proof: {error}",
+  "@failedToUploadIdProof": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateGuestStatus": "Failed to update guest status: {error}",
+  "@failedToUpdateGuestStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchGuestProfile": "Failed to fetch guest profile: {error}",
+  "@failedToFetchGuestProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToDeleteGuestProfile": "అతిథి ప్రొఫైల్‌ను తొలగించడంలో విఫలమైంది: {error}",
+  "@failedToDeleteGuestProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noChangesToSave": "భద్రపరచడానికి మార్పులు లేవు",
+  "pgsLoadedEvent": "pgs_loaded",
+  "pgsLoadErrorEvent": "pgs_load_error",
+  "pgSelectedEvent": "pg_selected",
+  "pgFilterChangedEvent": "pg_filter_changed",
+  "pgSearchQueryChangedEvent": "pg_search_query_changed",
+  "pgAmenitiesFilterChangedEvent": "pg_amenities_filter_changed",
+  "pgCityFilterChangedEvent": "pg_city_filter_changed",
+  "pgTypeFilterChangedEvent": "pg_type_filter_changed",
+  "pgMealTypeFilterChangedEvent": "pg_meal_type_filter_changed",
+  "pgWifiFilterChangedEvent": "pg_wifi_filter_changed",
+  "pgParkingFilterChangedEvent": "pg_parking_filter_changed",
+  "pgFiltersClearedEvent": "pg_filters_cleared",
+  "pgSavedEvent": "pg_saved",
+  "pgDeletedEvent": "pg_deleted",
+  "pgNotFoundEvent": "pg_not_found",
+  "pgViewedEvent": "pg_viewed",
+  "pgFetchErrorEvent": "pg_fetch_error",
+  "pgSaveErrorEvent": "pg_save_error",
+  "pgDeleteErrorEvent": "pg_delete_error",
+  "pgPhotoUploadedEvent": "pg_photo_uploaded",
+  "pgPhotoUploadErrorEvent": "pg_photo_upload_error",
+  "pgSearchPerformedEvent": "pg_search_performed",
+  "pgSearchErrorEvent": "pg_search_error",
+  "ownerPgsFetchedEvent": "owner_pgs_fetched",
+  "ownerPgsFetchErrorEvent": "owner_pgs_fetch_error",
+  "cityPgsFetchedEvent": "city_pgs_fetched",
+  "cityPgsFetchErrorEvent": "city_pgs_fetch_error",
+  "amenityPgsFetchedEvent": "amenity_pgs_fetched",
+  "amenityPgsFetchErrorEvent": "amenity_pgs_fetch_error",
+  "failedToLoadPgs": "PGలను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToLoadPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToLoadPgDetails": "PG వివరాలను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToLoadPgDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSavePg": "PGని సేవ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToSavePg": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToDeletePg": "PGని తొలగించడంలో విఫలమైంది: {error}",
+  "@failedToDeletePg": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToLoadPgStats": "PG గణాంకాలను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToLoadPgStats": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUploadPgPhoto": "PG ఫోటోను అప్‌లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToUploadPgPhoto": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToPerformPgSearch": "శోధనను నిర్వహించడంలో విఫలమైంది: {error}",
+  "@failedToPerformPgSearch": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchPgDetails": "PG వివరాలను లోడ్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToFetchPgDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSearchPgs": "PGలను శోధించడంలో విఫలమైంది: {error}",
+  "@failedToSearchPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchOwnerPgs": "ఓనర్ PGలను పొందడంలో విఫలమైంది: {error}",
+  "@failedToFetchOwnerPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchCityPgs": "నగర PGలను పొందడంలో విఫలమైంది: {error}",
+  "@failedToFetchCityPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToFetchAmenityPgs": "అమెనిటీ PGలను పొందడంలో విఫలమైంది: {error}",
+  "@failedToFetchAmenityPgs": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToGetPgStats": "PG గణాంకాలను పొందడంలో విఫలమైంది: {error}",
+  "@failedToGetPgStats": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "guestPgProviderInitializedEvent": "guest_pg_provider_initialized",
+  "guestPgSelectedEvent": "guest_pg_selected",
+  "guestPgClearedEvent": "guest_pg_cleared",
+  "guestPgSelectionRestoredEvent": "guest_pg_selection_restored",
+  "guestPgSelectionRestoreFailedEvent": "guest_pg_selection_restore_failed",
+  "guestPgSelectionSavedEvent": "guest_pg_selection_saved",
+  "guestPgSelectionSaveFailedEvent": "guest_pg_selection_save_failed",
+  "guestPgSelectionClearedStorageEvent": "guest_pg_selection_cleared_storage",
+  "guestPgSelectionClearFailedEvent": "guest_pg_selection_clear_failed",
+  "guestBookingRequestSentEvent": "guest_booking_request_sent",
+  "bookingRequestNotificationFailedEvent": "booking_request_notification_failed",
+  "newBookingRequestTitle": "కొత్త బుకింగ్ అభ్యర్థన",
+  "newBookingRequestBody": "{guestName} {pgName} లో చేరడానికి అభ్యర్థించారు",
+  "@newBookingRequestBody": {
+    "placeholders": {
+      "guestName": {
+        "type": "String"
+      },
+      "pgName": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToInitializeGuestPgSelection": "PG ఎంపికను ప్రారంభించడంలో విఫలమైంది: {error}",
+  "@failedToInitializeGuestPgSelection": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSelectGuestPg": "PGను ఎంచుకోవడంలో విఫలమైంది: {error}",
+  "@failedToSelectGuestPg": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToClearGuestPgSelection": "PG ఎంపికను క్లియర్ చేయడంలో విఫలమైంది: {error}",
+  "@failedToClearGuestPgSelection": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSendBookingRequest": "బుకింగ్ అభ్యర్థనను పంపడంలో విఫలమైంది: {error}",
+  "@failedToSendBookingRequest": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateBookingStatus": "బుకింగ్ స్థితిని నవీకరించడంలో విఫలమైంది: {error}",
+  "@failedToUpdateBookingStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "privacyPolicyTitle": "గోప్యతా విధానం",
+  "privacyPolicyLastUpdatedLabel": "చివరిగా నవీకరించిన తేదీ",
+  "privacyPolicyLastUpdatedDate": "నవంబర్ 2025",
+  "privacyPolicySection1Title": "1. మేము సేకరించే సమాచారం",
+  "privacyPolicySection1Content": "మేము మీరు మాకు నేరుగా అందించే సమాచారాన్ని సేకరిస్తాము, అందులో ఇవి ఉన్నాయి:\n• వ్యక్తిగత సమాచారం (పేరు, ఇమెయిల్, ఫోన్ నంబర్)\n• PG బుకింగ్ మరియు చెల్లింపు సమాచారం\n• ప్రొఫైల్ మరియు అభిరుచుల డేటా\n• ఆస్తి యజమానులతో మీ కమ్యూనికేషన్ రికార్డులు",
+  "privacyPolicySection2Title": "2. మేము మీ సమాచారాన్ని ఎలా ఉపయోగిస్తాము",
+  "privacyPolicySection2Content": "మేము సేకరించిన సమాచారాన్ని ఈ విధంగా ఉపయోగిస్తాము:\n• మా సేవలను అందించడానికి, నిర్వహించడానికి మరియు మెరుగుపరచడానికి\n• లావాదేవీలను ప్రాసెస్ చేసి సంబంధిత సమాచారాన్ని పంపడానికి\n• సాంకేతిక నోటీసులు మరియు మద్దతు సందేశాలను పంపడానికి\n• మీ వ్యాఖ్యలు మరియు ప్రశ్నలకు స్పందించడానికి",
+  "privacyPolicySection3Title": "3. సమాచారం పంచుకోవడం",
+  "privacyPolicySection3Content": "మేము మీ వ్యక్తిగత సమాచారాన్ని అమ్మము, వ్యాపారం చేయము లేదా అద్దెకు ఇవ్వము. మీ సమాచారాన్ని కేవలం ఈ సందర్భాలలో మాత్రమే పంచుకోవచ్చు:\n• బుకింగ్ కోసం ప్రాపర్టీ యజమానులతో\n• చట్టపరమైన బాధ్యతలను అనుసరించడానికి\n• మా హక్కులు మరియు భద్రతను రక్షించడానికి",
+  "privacyPolicySection4Title": "4. డేటా భద్రత",
+  "privacyPolicySection4Content": "మీ వ్యక్తిగత సమాచారాన్ని రక్షించడానికి మేము తగిన భద్రతా చర్యలను అమలు చేస్తున్నాము. అయితే, ఇంటర్నెట్ ద్వారా ప్రసారం 100% భద్రమైనది కాదని గమనించండి.",
+  "privacyPolicySection5Title": "5. మీ హక్కులు",
+  "privacyPolicySection5Content": "మీకు ఈ హక్కులు ఉన్నాయి:\n• మీ వ్యక్తిగత సమాచారాన్ని యాక్సెస్ చేయడం\n• తప్పు ఉన్న డేటాను సరిచేయడం\n• మీ డేటాను తొలగించాలని అభ్యర్థించడం\n• కొన్ని కమ్యూనికేషన్ల నుండి నిష్క్రమించడం",
+  "privacyPolicySection6Title": "6. మమ్మల్ని సంప్రదించండి",
+  "privacyPolicySection6Content": "ఈ గోప్యతా విధానం గురించి మీకు ప్రశ్నలు ఉంటే, దయచేసి మమ్మల్ని ఈ విధంగా సంప్రదించండి:\n\nఇమెయిల్: privacy@atitia.com\nఫోన్: +91 1234567890",
+  "termsOfServiceTitle": "సేవా నిబంధనలు",
+  "termsOfServiceLastUpdatedLabel": "చివరిగా నవీకరించిన తేదీ",
+  "termsOfServiceLastUpdatedDate": "నవంబర్ 2025",
+  "termsOfServiceSection1Title": "1. నిబంధనల స్వీకారం",
+  "termsOfServiceSection1Content": "Atitia యాప్‌ను యాక్సెస్ చేసి ఉపయోగించడం ద్వారా, ఈ సేవా నిబంధనలను మీరు అంగీకరిస్తున్నారు. మీరు అంగీకరించకపోతే, దయచేసి మా సేవలను ఉపయోగించవద్దు.",
+  "termsOfServiceSection2Title": "2. వినియోగదారు ఖాతాలు",
+  "termsOfServiceSection2Content": "మీరు ఈ బాధ్యతలు వహించాలి:\n• మీ ఖాతా గోప్యతను కాపాడడం\n• మీ ఖాతా ద్వారా జరిగే అన్ని కార్యకలాపాలకు బాధ్యత వహించడం\n• ఖచ్చితమైన మరియు పూర్తిగా సమాచారాన్ని అందించడం",
+  "termsOfServiceSection3Title": "3. బుకింగ్ మరియు చెల్లింపులు",
+  "termsOfServiceSection3Content": "• బుకింగ్ అభ్యర్థనలు యజమాని ఆమోదానికి లోబడి ఉంటాయి\n• చెల్లింపు నిబంధనలు ఆస్తి యజమానితో మీరు ఒప్పుకున్నట్లే ఉంటాయి\n• రీఫండ్‌లు ఆస్తి రద్దు విధానానికి లోబడి ఉంటాయి\n• మేము లావాదేవీలను సులభతరం చేస్తాము కానీ అద్దె ఒప్పందంలో భాగస్వాములు కాదము",
+  "termsOfServiceSection4Title": "4. ఆస్తి యజమాని బాధ్యతలు",
+  "termsOfServiceSection4Content": "ఆస్తి యజమానులు తప్పనిసరిగా:\n• ఖచ్చితమైన ఆస్తి సమాచారాన్ని అందించాలి\n• ధృవీకరించిన బుకింగ్‌లను గౌరవించాలి\n• ఆస్తి ప్రమాణాలను నిర్వహించాలి\n• అతిథుల ప్రశ్నలకు సమయానికి స్పందించాలి",
+  "termsOfServiceSection5Title": "5. నిషేధిత కార్యకలాపాలు",
+  "termsOfServiceSection5Content": "మీరు ఈ క్రియలను చేయకూడదని అంగీకరిస్తున్నారు:\n• చట్ట విరుద్ధ ప్రయోజనాలకు సేవను ఉపయోగించడం\n• తప్పుడు లేదా తప్పుదోవ పట్టించే సమాచారాన్ని పోస్టు చేయడం\n• యాప్ పనితీరును భంగం చేయడం\n• వ్యవస్థకు అనధికారికంగా ప్రవేశించడానికి ప్రయత్నించడం",
+  "termsOfServiceSection6Title": "6. బాధ్యత పరిమితి",
+  "termsOfServiceSection6Content": "Atitia వేదికను \"అలాగే\" అందిస్తుంది మరియు క్రింది విషయాలకు బాధ్యత వహించదు:\n• అతిథులు మరియు ఆస్తి యజమానుల మధ్య వివాదాలు\n• ఆస్తి పరిస్థితి లేదా భద్రత సమస్యలు\n• చెల్లింపు వివాదాలు లేదా రీఫండ్‌లు\n• ప్రత్యక్ష లేదా పరోక్ష నష్టాలు",
+  "termsOfServiceSection7Title": "7. నిబంధనల మార్పులు",
+  "termsOfServiceSection7Content": "ఈ నిబంధనలను ఎప్పుడైనా మార్చుకునే హక్కు మాకు ఉంది. సేవను కొనసాగిస్తూ ఉపయోగించడం ద్వారా, మార్పు చేసిన నిబంధనలను మీరు అంగీకరించినట్టే భావిస్తాము.",
+  "termsOfServiceSection8Title": "8. సంప్రదింపు సమాచారం",
+  "termsOfServiceSection8Content": "ఈ నిబంధనల గురించి ప్రశ్నలైతే, దయచేసి మమ్మల్ని ఈ విధంగా సంప్రదించండి:\n\nఇమెయిల్: legal@atitia.com\nఫోన్: +91 1234567890",
+  "notificationPreferencesTitle": "నోటిఫికేషన్ ప్రిఫరెన్సులు",
+  "notificationPreferencesSubtitle": "మీకు ఏ రకాల నోటిఫికేషన్‌లు కావాలో ఎంచుకోండి",
+  "notificationSettingsTitle": "నోటిఫికేషన్ సెట్టింగ్‌లు",
+  "notificationCategoryPaymentTitle": "చెల్లింపు నోటిఫికేషన్‌లు",
+  "notificationCategoryPaymentSubtitle": "అద్దె రైమైండర్లు, చెల్లింపు నిర్ధారణలు",
+  "notificationCategoryBookingTitle": "బుకింగ్ అప్‌డేట్లు",
+  "notificationCategoryBookingSubtitle": "బుకింగ్ నిర్ధారణలు, స్థితి మార్పులు",
+  "notificationCategoryComplaintTitle": "ఫిర్యాదు అప్‌డేట్లు",
+  "notificationCategoryComplaintSubtitle": "ఫిర్యాదు స్పందనలు, పరిష్కార అప్‌డేట్లు",
+  "notificationCategoryFoodTitle": "ఆహార నోటిఫికేషన్‌లు",
+  "notificationCategoryFoodSubtitle": "మెను అప్‌డేట్లు, ప్రత్యేక భోజనాలు",
+  "notificationCategoryMaintenanceTitle": "నిర్వహణ హెచ్చరికలు",
+  "notificationCategoryMaintenanceSubtitle": "నిర్దేశిత నిర్వహణ, మరమ్మతులు",
+  "notificationCategoryGeneralTitle": "సాధారణ ప్రకటనలు",
+  "notificationCategoryGeneralSubtitle": "ముఖ్యమైన అప్‌డేట్లు, ప్రకటనలు",
+  "analyticsDashboardTitle": "విశ్లేషణల డ్యాష్‌బోర్డు",
+  "performanceMetricsTitle": "పనితీరు ప్రమాణాలు",
+  "noPerformanceMetricsAvailable": "పనితీరు ప్రమాణాలు అందుబాటులో లేవు",
+  "userJourneyTitle": "వినియోగదారు ప్రయాణం",
+  "userJourneyDescription": "వినియోగదారు పరస్పర చర్యలు మరియు స్క్రీన్ ప్రవాహాలను ట్రాక్ చేయండి",
+  "viewJourneyDetails": "ప్రయాణ వివరాలను చూడండి",
+  "businessIntelligenceTitle": "వ్యాపార విజ్ఞానం",
+  "metricTotalSessions": "మొత్తం సెషన్లు",
+  "metricActiveUsers": "సక్రియ వినియోగదారులు",
+  "metricConversionRate": "మార్పిడి శాతం",
+  "metricAverageSessionDuration": "సెషన్ సగటు వ్యవధి",
+  "viewInsights": "అంతర్దృష్టులను చూడండి",
+  "userJourneyDetailsTitle": "వినియోగదారు ప్రయాణ వివరాలు",
+  "userJourneyDetailsDescription": "చార్ట్‌లు మరియు ప్రవాహ డయాగ్రామ్‌లతో వివరమైన వినియోగదారు ప్రయాణ విజువలైజేషన్ ఇక్కడ అమలు చేయబడుతుంది.",
+  "businessInsightsTitle": "వ్యాపార అంతర్దృష్టులు",
+  "businessInsightsDescription": "గ్రాఫ్‌లు, ధోరణులు మరియు అంచనా విశ్లేషణలతో ఆధునిక వ్యాపార విజ్ఞానం డ్యాష్‌బోర్డు ఇక్కడ అమలు చేయబడుతుంది.",
+  "analyticsWidgetTitle": "విశ్లేషణలు",
+  "analyticsSessionsLabel": "సెషన్లు",
+  "analyticsAverageTimeLabel": "సగటు సమయం",
+  "networkErrorTryAgain": "దయచేసి మీ ఇంటర్నెట్ కనెక్షన్‌ను తనిఖీ చేసి మళ్ళీ ప్రయత్నించండి.",
+  "permissionDeniedMessage": "ఈ చర్యను చేయడానికి మీకు అనుమతి లేదు.",
+  "itemNotFoundMessage": "అభ్యర్థించిన అంశం కనుగొనబడలేదు.",
+  "requestTimeoutMessage": "వినతి సమయం ముగిసింది. దయచేసి మళ్ళీ ప్రయత్నించండి.",
+  "sessionExpiredMessage": "మీ సెషన్ ముగిసింది. దయచేసి మళ్ళీ సైన్ ఇన్ చేయండి.",
+  "invalidInputMessage": "దయచేసి మీ ఇన్‌పుట్‌ను తనిఖీ చేసి మళ్ళీ ప్రయత్నించండి.",
+  "genericErrorMessage": "ఏదో తప్పు జరిగింది. దయచేసి మళ్ళీ ప్రయత్నించండి.",
+  "requiredFieldError": "ఈ ఫీల్డ్ తప్పనిసరి",
+  "invalidPhoneError": "దయచేసి సరైన ఫోన్ నంబర్ నమోదు చేయండి",
+  "fileSizeExceeded": "ఫైల్ పరిమాణం గరిష్ఠ పరిమితిని మించిపోయింది",
+  "workspaceTitle": "వర్క్‌స్పేస్",
+  "defaultCompanyName": "అటిటియా PG మేనేజ్‌మెంట్",
+  "noSharingInfoAvailable": "షేరింగ్ సమాచారం అందుబాటులో లేదు.",
+  "sharingAndVacancy": "షేరింగ్ మరియు ఖాళీలు",
+  "sharingColumn": "షేరింగ్",
+  "roomsColumn": "గదులు",
+  "vacantBedsColumn": "ఖాళీ పడకలు",
+  "rentPerBedColumn": "పడకకు అద్దె",
+  "vacantBedsAvailable": "లభ్యం",
+  "sharingPricePerBed": "{amount}/పడక",
+  "@sharingPricePerBed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "anonymousGuest": "అజ్ఞాత అతిథి",
+  "locationLabel": "ప్రాంతం",
+  "staffLabel": "సిబ్బంది",
+  "viewPhotos": "ఫోటోలు చూడండి",
+  "helpfulWithCount": "సహాయకం ({count})",
+  "@helpfulWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "writeReview": "సమీక్ష రాయండి",
+  "overallRating": "మొత్తం రేటింగ్",
+  "aspectRatings": "విభాగ రేటింగ్స్",
+  "commentsLabel": "వ్యాఖ్యలు",
+  "shareExperienceHint": "మీ అనుభవాన్ని పంచుకోండి...",
+  "optionalAddPhotos": "ఐచ్చికం: మీ సమీక్షకు ఫోటోలు జోడించండి",
+  "submitReview": "సమీక్షను సమర్పించండి",
+  "submitting": "సమర్పిస్తున్నాం",
+  "pleaseProvideOverallRating": "దయచేసి మొత్తం రేటింగ్ ఇవ్వండి",
+  "reviewSubmittedSuccessfully": "సమీక్ష విజయవంతంగా సమర్పించబడింది!",
+  "failedToSubmitReview": "సమీక్షను సమర్పించడంలో విఫలమయ్యాం: {error}",
+  "@failedToSubmitReview": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ratingPoor": "తక్కువ",
+  "ratingFair": "సరిపడ",
+  "ratingGood": "మంచి",
+  "ratingVeryGood": "చాలా మంచి",
+  "ratingExcellent": "అద్భుతం",
+  "selectRating": "ఒక రేటింగ్ ఎంచుకోండి",
+  "photosCountLabel": "ఫోటోలు ({count}/{max})",
+  "@photosCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "uploadingPhotos": "ఫోటోలు అప్లోడ్ అవుతున్నాయి...",
+  "errorPickingPhotos": "ఫోటోలు ఎంపికలో లోపం: {error}",
+  "@errorPickingPhotos": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "allPhotoUploadsFailed": "అన్ని ఫోటో అప్లోడ్లు విఫలమయ్యాయి. దయచేసి మళ్లీ ప్రయత్నించండి.",
+  "failedToUploadPhotos": "ఫోటోలు అప్లోడ్ చేయడంలో విఫలమయ్యాం: {error}",
+  "@failedToUploadPhotos": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noItemsFound": "ఏ అంశాలు కనబడలేదు",
+  "searchHint": "శోధించండి...",
+  "lightMode": "లైట్ మోడ్",
+  "darkMode": "డార్క్ మోడ్",
+  "systemDefault": "సిస్టమ్ డిఫాల్ట్",
+  "themeTooltip": "థీమ్: {current}\\n{next} కోసం ట్యాప్ చేయండి",
+  "@themeTooltip": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "next": {
+        "type": "String"
+      }
+    }
+  },
+  "themeModeTitle": "థీమ్ మోడ్",
+  "themeLightDescription": "ఎల్లప్పుడూ ప్రకాశవంతమైన థీమ్‌ను ఉపయోగించండి",
+  "themeDarkDescription": "ఎల్లప్పుడూ డార్క్ థీమ్‌ను ఉపయోగించండి",
+  "themeSystemDescription": "పరికరం సెట్టింగ్‌లను అనుసరించండి",
+  "menu": "మెను",
+  "noPgSelected": "ఏ PG ఎంపిక కాలేదు",
+  "uploadingStatus": "అప్‌లోడ్ అవుతోంది...",
+  "documentUploadedSuccessfully": "పత్రం విజయవంతంగా అప్‌లోడ్ అయింది",
+  "tapToUpload": "అప్‌లోడ్ చేయడానికి ట్యాప్ చేయండి",
+  "uploadSupportedFormats": "JPG, PNG 10MB వరకు",
+  "unsupportedFileType": "మద్దతు లేని ఫైల్ రకం: {type}",
+  "@unsupportedFileType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineActionCreate": "సృష్టించు",
+  "offlineActionUpdate": "నవీకరణ",
+  "offlineActionDelete": "తొలగించు",
+  "offlineActionSync": "సింక్",
+  "weekday_monday": "సోమవారం",
+  "weekday_tuesday": "మంగళవారం",
+  "weekday_wednesday": "బుధవారం",
+  "weekday_thursday": "గురువారం",
+  "weekday_friday": "శుక్రవారం",
+  "weekday_saturday": "శనివారం",
+  "weekday_sunday": "ఆదివారం",
+  "menuDefaultDescription": "{day} కోసం మౌలిక మెనూ - అవసరానుసారం అనుకూలించండి",
+  "@menuDefaultDescription": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "menuBreakfast_monday": "సాంబార్ కొబ్బరి పచ్చడితో ఇడ్లీ|వడ (2 ముక్కలు)|ఫిల్టర్ కాఫీ|అరటి పండు",
+  "menuBreakfast_tuesday": "సాంబార్, చట్నీతో మసాలా దోస|మేడూ వడ|టీ|ఋతువారీ ఫలం",
+  "menuBreakfast_wednesday": "కొబ్బరి పచ్చడితో ఉప్మా|వడ (2 ముక్కలు)|కాఫీ|మరిగించిన గుడ్లు (2)",
+  "menuBreakfast_thursday": "వేరుశెనగలు, కరివేపాకుతో పోహా|అరటి చిప్స్|టీ|బొప్పాయి",
+  "menuBreakfast_friday": "పూరి ఆలూ భాజీతో|హల్వా|కాఫీ|నారింజ",
+  "menuBreakfast_saturday": "అల్లం పచ్చడితో పెసరట్టు (పచ్చ పెసర దోశ)|ఉప్మా|టీ|ఋతువారీ ఫలం",
+  "menuBreakfast_sunday": "ప్రత్యేక అల్పాహారం - వడతో పొంగల్|తీపి పొంగల్|ఫిల్టర్ కాఫీ|అరటి పండు",
+  "menuLunch_monday": "ఆవిరి బియ్యం|సాంబార్|రసం|వెజిటేబుల్ కర్రీ (బీన్స్ పాల్యా)|పెరుగు|పప్పడమ్|మజ్జిగ",
+  "menuLunch_tuesday": "ఆవిరి బియ్యం|డాల్ తడ్కా|రసం|కాబేజీ పొరియల్|వంకాయ కూర|పెరుగు|ఊరగాయ",
+  "menuLunch_wednesday": "జీలకర్ర అన్నం|సాంబార్|రసం|ఆలూ వేపుడు|పాలకూర పప్పు|పెరుగు|పప్పడమ్",
+  "menuLunch_thursday": "ఆవిరి బియ్యం|పెసర పప్పు|రసం|మిశ్రమ కూరగాయ కూర|బీట్‌రూట్ పొరియల్|పెరుగు|మజ్జిగ",
+  "menuLunch_friday": "నిమ్మ అన్నం|సాంబార్|రసం|బెండకాయ వేపుడు|కారెట్ పొరియల్|పెరుగు|ఊరగాయ",
+  "menuLunch_saturday": "ఆవిరి బియ్యం|కందిపప్పు|రసం|గుమ్మడికాయ కూర|గ్రీన్ బీన్స్ పొరియల్|పెరుగు|పప్పడమ్",
+  "menuLunch_sunday": "ప్రత్యేక భోజనం - పులావు|సాంబార్|రసం|పనీర్ బటర్ మసాలా|రాయితా|తీపి (పాయసం)|పప్పడమ్",
+  "menuDinner_monday": "చపాతీ (4 ముక్కలు)|మిశ్రమ కూరగాయ కూర|డాల్ ఫ్రై|అన్నం|పెరుగు",
+  "menuDinner_tuesday": "చపాతీ (4 ముక్కలు)|పాలక్ పనీర్|డాల్ తడ్కా|అన్నం|ఊరగాయ",
+  "menuDinner_wednesday": "పరాతా (3 ముక్కలు)|ఆలూ గోబీ|పెసర పప్పు|అన్నం|పెరుగు",
+  "menuDinner_thursday": "చపాతీ (4 ముక్కలు)|చనా మసాలా|టమోటా రసం|అన్నం|రాయితా",
+  "menuDinner_friday": "పూరి (6 ముక్కలు)|ఆలూ కూర|శనగ పప్పు|అన్నం|పెరుగు",
+  "menuDinner_saturday": "చపాతీ (4 ముక్కలు)|గుడ్డు కూర (2 గుడ్లు)|డాల్ తడ్కా|అన్నం|ఊరగాయ",
+  "menuDinner_sunday": "ప్రత్యేక డిన్నర్ - నాన్ (3 ముక్కలు)|పనీర్ తిక్కా మసాలా|డాల్ మఖానీ|జీలకర్ర అన్నం|రాయితా|గులాబ్ జామున్ (2 ముక్కలు)",
+  "menuMealTypeBreakfastDescription": "ఉదయం భోజనం (ఉ. 6:00 - 10:00)",
+  "menuMealTypeLunchDescription": "మధ్యాహ్న భోజనం (మ. 12:00 - 3:00)",
+  "menuMealTypeDinnerDescription": "సాయంత్రం భోజనం (సా. 7:00 - 10:00)",
+  "menuMealTypeGeneric": "భోజనం",
+  "logButtonClicked": "బటన్ క్లిక్ చేయబడింది: {buttonName}",
+  "@logButtonClicked": {
+    "placeholders": {
+      "buttonName": {
+        "type": "String"
+      }
+    }
+  },
+  "logFormSubmitted": "ఫారమ్ సమర్పించబడింది: {formName}",
+  "@logFormSubmitted": {
+    "placeholders": {
+      "formName": {
+        "type": "String"
+      }
+    }
+  },
+  "logFilterChanged": "ఫిల్టర్ మార్చబడింది: {filterType}",
+  "@logFilterChanged": {
+    "placeholders": {
+      "filterType": {
+        "type": "String"
+      }
+    }
+  },
+  "logSearchPerformed": "శోధన నిర్వహించబడింది",
+  "logScreenViewed": "స్క్రీన్ వీక్షించబడింది: {screenName}",
+  "@logScreenViewed": {
+    "placeholders": {
+      "screenName": {
+        "type": "String"
+      }
+    }
+  },
+  "logDataLoading": "డేటా లోడ్ అవుతోంది: {dataType}",
+  "@logDataLoading": {
+    "placeholders": {
+      "dataType": {
+        "type": "String"
+      }
+    }
+  },
+  "logErrorOperation": "{operation} లో లోపం: {error}",
+  "@logErrorOperation": {
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dateInvalidFormat": "చెల్లని తేదీ ఫార్మాట్. {expected} కావాలి కానీ \"{value}\" అందింది",
+  "@dateInvalidFormat": {
+    "placeholders": {
+      "expected": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dateComponentsNotNumbers": "తేదీ భాగాలు సంఖ్యలు కావాలి: \"{value}\"",
+  "@dateComponentsNotNumbers": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dateInvalidCalendar": "చెల్లని క్యాలెండర్ తేదీ: \"{value}\"",
+  "@dateInvalidCalendar": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "dateEnterAsExpected": "{expected} విధంగా తేదీని నమోదు చేయండి",
+  "@dateEnterAsExpected": {
+    "placeholders": {
+      "expected": {
+        "type": "String"
+      }
+    }
+  },
+  "dateDigitsOnly": "తేదీ మొత్తంగా అంకెలతో ఉండాలి",
+  "dateCalendarInvalid": "చెల్లుబాటు అయ్యే క్యాలెండర్ తేదీని నమోదు చేయండి",
+  "dateGenericInvalid": "చెల్లుబాటు అయ్యే తేదీని నమోదు చేయండి ({expected})",
+  "@dateGenericInvalid": {
+    "placeholders": {
+      "expected": {
+        "type": "String"
+      }
+    }
+  },
+  "dateDayRange": "రోజు 1 మరియు 31 మధ్య ఉండాలి",
+  "dateMonthRange": "నెల 1 మరియు 12 మధ్య ఉండాలి",
+  "dateYearRange": "సంవత్సరం {min} మరియు {max} మధ్య ఉండాలి",
+  "@dateYearRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "encryptionEncryptFailed": "డేటాను ఎన్క్రిప్ట్ చేయడంలో విఫలమైంది: {error}",
+  "@encryptionEncryptFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "encryptionDecryptFailed": "డేటాను డీక్రిప్ట్ చేయడంలో విఫలమైంది: {error}",
+  "@encryptionDecryptFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "encryptionFileEncryptFailed": "ఫైల్ డేటాను ఎన్క్రిప్ట్ చేయడంలో విఫలమైంది: {error}",
+  "@encryptionFileEncryptFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "encryptionFileDecryptFailed": "ఫైల్ డేటాను డీక్రిప్ట్ చేయడంలో విఫలమైంది: {error}",
+  "@encryptionFileDecryptFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securityInvalidEmailFormat": "చెల్లని ఈమెయిల్ ఫార్మాట్",
+  "securityInvalidPhoneFormat": "చెల్లని ఫోన్ నంబర్ ఫార్మాట్",
+  "secureStorageStoreFailed": "సురక్షిత డేటాను నిల్వ చేయడంలో విఫలమైంది: {error}",
+  "@secureStorageStoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveFailed": "సురక్షిత డేటాను పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageRetrieveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreCredentialsFailed": "వినియోగదారు క్రెడెన్షియల్స్ నిల్వలో విఫలమైంది: {error}",
+  "@secureStorageStoreCredentialsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveCredentialsFailed": "వినియోగదారు క్రెడెన్షియల్స్ పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageRetrieveCredentialsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreAuthTokenFailed": "ఆథ్ టోకెన్ నిల్వలో విఫలమైంది: {error}",
+  "@secureStorageStoreAuthTokenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveAuthTokenFailed": "ఆథ్ టోకెన్ పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageRetrieveAuthTokenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreSessionFailed": "వినియోగదారు సెషన్ నిల్వలో విఫలమైంది: {error}",
+  "@secureStorageStoreSessionFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveSessionFailed": "వినియోగదారు సెషన్ పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageRetrieveSessionFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreProfileFailed": "వినియోగదారు ప్రొఫైల్ నిల్వలో విఫలమైంది: {error}",
+  "@secureStorageStoreProfileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveProfileFailed": "వినియోగదారు ప్రొఫైల్ పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageRetrieveProfileFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreApiKeyFailed": "API కీ నిల్వలో విఫలమైంది: {error}",
+  "@secureStorageStoreApiKeyFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveApiKeyFailed": "API కీ పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageRetrieveApiKeyFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStorePaymentFailed": "చెల్లింపు సమాచారాన్ని నిల్వలో విఫలమైంది: {error}",
+  "@secureStorageStorePaymentFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrievePaymentFailed": "చెల్లింపు సమాచారాన్ని పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageRetrievePaymentFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreBiometricFailed": "బయోమెట్రిక్ డేటాను నిల్వలో విఫలమైంది: {error}",
+  "@secureStorageStoreBiometricFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveBiometricFailed": "బయోమెట్రిక్ డేటాను పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageRetrieveBiometricFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageStoreDeviceSecurityFailed": "పరికర భద్రతా డేటా నిల్వలో విఫలమైంది: {error}",
+  "@secureStorageStoreDeviceSecurityFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageRetrieveDeviceSecurityFailed": "పరికర భద్రతా డేటాను పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageRetrieveDeviceSecurityFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageDeleteFailed": "సురక్షిత డేటాను తొలగించడంలో విఫలమైంది: {error}",
+  "@secureStorageDeleteFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageDeleteAllFailed": "అన్ని సురక్షిత డేటాను తొలగించడంలో విఫలమైంది: {error}",
+  "@secureStorageDeleteAllFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageGetKeysFailed": "అన్ని కీలు పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageGetKeysFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageClearUserDataFailed": "వినియోగదారు డేటాను క్లియర్ చేయడంలో విఫలమైంది: {error}",
+  "@secureStorageClearUserDataFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "secureStorageGetStatsFailed": "స్టోరేజ్ గణాంకాలను పొందడంలో విఫలమైంది: {error}",
+  "@secureStorageGetStatsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialInvalidWebClientId": "చెల్లని Google Web Client ID ఫార్మాట్",
+  "credentialStoredWebClientId": "Google Web Client ID సురక్షిత నిల్వలో భద్రపరచబడింది",
+  "credentialStoreWebClientIdFailure": "Google Web Client ID నిల్వ చేయడంలో విఫలమైంది: {error}",
+  "@credentialStoreWebClientIdFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialInvalidAndroidClientId": "చెల్లని Google Android Client ID ఫార్మాట్",
+  "credentialStoredAndroidClientId": "Google Android Client ID సురక్షిత నిల్వలో భద్రపరచబడింది",
+  "credentialStoreAndroidClientIdFailure": "Google Android Client ID నిల్వ చేయడంలో విఫలమైంది: {error}",
+  "@credentialStoreAndroidClientIdFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialInvalidIosClientId": "చెల్లని Google iOS Client ID ఫార్మాట్",
+  "credentialStoredIosClientId": "Google iOS Client ID సురక్షిత నిల్వలో భద్రపరచబడింది",
+  "credentialStoreIosClientIdFailure": "Google iOS Client ID నిల్వ చేయడంలో విఫలమైంది: {error}",
+  "@credentialStoreIosClientIdFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialInvalidClientSecret": "చెల్లని Google Client Secret ఫార్మాట్",
+  "credentialStoredClientSecret": "Google Client Secret సురక్షిత నిల్వలో భద్రపరచబడింది",
+  "credentialStoreClientSecretFailure": "Google Client Secret నిల్వ చేయడంలో విఫలమైంది: {error}",
+  "@credentialStoreClientSecretFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialClearedAll": "అన్ని Google OAuth వివరాలు సురక్షిత నిల్వ నుండి తొలగించబడాయి",
+  "credentialClearFailure": "క్రెడెన్షియల్స్ క్లియర్ చేయడంలో విఫలమైంది: {error}",
+  "@credentialClearFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialCheckFailure": "నిల్వ చేసిన క్రెడెన్షియల్స్‌ను తనిఖీ చేయడంలో విఫలమైంది: {error}",
+  "@credentialCheckFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securityAuthFailureDescription": "వినియోగదారు {userId} కోసం ధృవీకరణ విఫలమైంది: {failureReason}",
+  "@securityAuthFailureDescription": {
+    "placeholders": {
+      "userId": {
+        "type": "String"
+      },
+      "failureReason": {
+        "type": "String"
+      }
+    }
+  },
+  "securityMultipleFailuresDetected": "వినియోగదారు {userId} కోసం అనేక విఫల ధృవీకరణ ప్రయత్నాలు గుర్తించబడ్డాయి",
+  "@securityMultipleFailuresDetected": {
+    "placeholders": {
+      "userId": {
+        "type": "String"
+      }
+    }
+  },
+  "securityAuthSuccessDescription": "వినియోగదారు {userId} కోసం ధృవీకరణ విజయవంతం",
+  "@securityAuthSuccessDescription": {
+    "placeholders": {
+      "userId": {
+        "type": "String"
+      }
+    }
+  },
+  "securityMultipleFailuresAlertDescription": "వినియోగదారు {userId} కోసం అనేక విఫల ధృవీకరణ ప్రయత్నాలు",
+  "@securityMultipleFailuresAlertDescription": {
+    "placeholders": {
+      "userId": {
+        "type": "String"
+      }
+    }
+  },
+  "securityEventConsoleLog": "భద్రతా ఈవెంట్: {eventType} - {description}",
+  "@securityEventConsoleLog": {
+    "placeholders": {
+      "eventType": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "securityEventSendFailure": "భద్రతా ఈవెంట్‌ను విశ్లేషణలకు పంపడంలో విఫలమైంది: {error}",
+  "@securityEventSendFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securityAlertConsoleLog": "భద్రతా హెచ్చరిక [{severity}]: {alertType} - {description}",
+  "@securityAlertConsoleLog": {
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "alertType": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "securityAlertSendFailure": "భద్రతా హెచ్చరికను సేవలకు పంపడంలో విఫలమైంది: {error}",
+  "@securityAlertSendFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securitySuspiciousHeader": "సందేహాస్పద హెడర్ గుర్తించబడింది: {header}",
+  "@securitySuspiciousHeader": {
+    "placeholders": {
+      "header": {
+        "type": "String"
+      }
+    }
+  },
+  "securitySuspiciousBody": "వినతిలో సందేహాస్పద కంటెంట్ గుర్తించబడింది",
+  "securityIpBlocked": "IP నిరోధించబడింది: {ip}",
+  "@securityIpBlocked": {
+    "placeholders": {
+      "ip": {
+        "type": "String"
+      }
+    }
+  },
+  "securityRateLimitExceeded": "రేట్ పరిమితి దాటింది",
+  "securityInvalidHeaders": "చెల్లని వినతి శీర్షికలు",
+  "securityInvalidBody": "చెల్లని వినతి బాడీ",
+  "securityUnsupportedMethod": "మద్దతు లేని HTTP పద్ధతి: {method}",
+  "@securityUnsupportedMethod": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "securityRequestFailed": "వినతి విఫలమైంది: {error}",
+  "@securityRequestFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securitySuspiciousResponseHeader": "సందేహాస్పద ప్రతిస్పందన హెడర్: {header}",
+  "@securitySuspiciousResponseHeader": {
+    "placeholders": {
+      "header": {
+        "type": "String"
+      }
+    }
+  },
+  "securityServerErrorResponse": "సర్వర్ లోప ప్రతిస్పందన: {statusCode}",
+  "@securityServerErrorResponse": {
+    "placeholders": {
+      "statusCode": {
+        "type": "String"
+      }
+    }
+  },
+  "validationEmailRequired": "ఈమెయిల్ అవసరం",
+  "validationInvalidEmailFormat": "చెల్లని ఈమెయిల్ ఫార్మాట్",
+  "validationEmailInvalidAddress": "సరైన ఈమెయిల్ చిరునామాను ఇవ్వండి",
+  "validationEmailTooLong": "ఈమెయిల్ చిరునామా చాలా పొడవుగా ఉంది",
+  "validationPhoneRequired": "ఫోన్ నంబర్ అవసరం",
+  "validationInvalidPhoneFormat": "చెల్లని ఫోన్ నంబర్ ఫార్మాట్",
+  "validationPhoneLength": "ఫోన్ నంబర్ 10 అంకెలు ఉండాలి",
+  "validationPhoneInvalid": "సరైన భారతీయ ఫోన్ నంబర్ ఇవ్వండి",
+  "validationNameRequired": "పేరు అవసరం",
+  "validationInvalidNameFormat": "చెల్లని పేరు ఫార్మాట్",
+  "validationNameTooShort": "పేరు కనీసం 2 అక్షరాలు ఉండాలి",
+  "validationNameTooLong": "పేరు {max} అక్షరాల కన్నా తక్కువ ఉండాలి",
+  "@validationNameTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationNameInvalid": "పేరు లో అక్షరాలు మరియు స్పేస్‌లు మాత్రమే ఉండాలి",
+  "validationPasswordRequired": "పాస్‌వర్డ్ అవసరం",
+  "validationInvalidPasswordFormat": "చెల్లని పాస్‌వర్డ్ ఫార్మాట్",
+  "validationPasswordTooShort": "పాస్‌వర్డ్ కనీసం {min} అక్షరాలు ఉండాలి",
+  "@validationPasswordTooShort": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "validationPasswordTooLong": "పాస్‌వర్డ్ చాలా పొడవుగా ఉంది",
+  "validationPasswordUppercase": "పాస్‌వర్డ్‌లో కనీసం ఒక పెద్ద అక్షరం ఉండాలి",
+  "validationPasswordLowercase": "పాస్‌వర్డ్‌లో కనీసం ఒక చిన్న అక్షరం ఉండాలి",
+  "validationPasswordDigit": "పాస్‌వర్డ్‌లో కనీసం ఒక సంఖ్య ఉండాలి",
+  "validationPasswordSpecial": "పాస్‌వర్డ్‌లో కనీసం ఒక ప్రత్యేక అక్షరం ఉండాలి",
+  "validationPasswordStrength": "పాస్‌వర్డ్‌లో పెద్ద, చిన్న అక్షరాలు, సంఖ్య, ప్రత్యేక అక్షరం ఉండాలి",
+  "validationOtpRequired": "OTP అవసరం",
+  "validationInvalidOtpFormat": "చెల్లని OTP ఫార్మాట్",
+  "validationOtpLength": "OTP 6 అంకెలు ఉండాలి",
+  "validationOtpDigitsOnly": "OTPలో కేవలం అంకెలు మాత్రమే ఉండాలి",
+  "validationAddressRequired": "చిరునామా అవసరం",
+  "validationInvalidAddressFormat": "చెల్లని చిరునామా ఫార్మాట్",
+  "validationAddressTooShort": "చిరునామా కనీసం 10 అక్షరాలు ఉండాలి",
+  "validationAddressTooLong": "చిరునామా 200 అక్షరాల కన్నా తక్కువ ఉండాలి",
+  "validationAadhaarRequired": "ఆధార్ నంబర్ అవసరం",
+  "validationInvalidAadhaarFormat": "చెల్లని ఆధార్ నంబర్ ఫార్మాట్",
+  "validationAadhaarLength": "ఆధార్ నంబర్ 12 అంకెలు ఉండాలి",
+  "validationPanRequired": "PAN నంబర్ అవసరం",
+  "validationInvalidPanFormat": "చెల్లని PAN నంబర్ ఫార్మాట్",
+  "validationPanInvalid": "సరైన PAN నంబర్ ఇవ్వండి",
+  "validationFileRequired": "ఫైల్ అవసరం",
+  "validationFileMissing": "ఫైల్ లేదు",
+  "validationFileSizeExceeded": "ఫైల్ పరిమాణం {max}MB కంటే తక్కువగా ఉండాలి",
+  "@validationFileSizeExceeded": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFileTypeNotAllowed": "ఫైల్ రకం అనుమతించబడలేదు. అనుమతించిన రకాలు: {types}",
+  "@validationFileTypeNotAllowed": {
+    "placeholders": {
+      "types": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldRequired": "ఈ ఫీల్డ్ అవసరం",
+  "validationFieldNameRequired": "{field} అవసరం",
+  "@validationFieldNameRequired": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationInvalidTextFormat": "చెల్లని టెక్స్ట్ ఫార్మాట్",
+  "validationTextTooShort": "టెక్స్ట్ కనీసం {min} అక్షరాలు ఉండాలి",
+  "@validationTextTooShort": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "validationTextTooLong": "టెక్స్ట్ {max} అక్షరాల కన్నా తక్కువ ఉండాలి",
+  "@validationTextTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldMinLength": "{field} కనీసం {min} అక్షరాలు ఉండాలి",
+  "@validationFieldMinLength": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldMaxLength": "{field} {max} అక్షరాల కన్నా తక్కువ ఉండాలి",
+  "@validationFieldMaxLength": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldMustBeNumber": "{field} చెల్లుబాటు అయ్యే సంఖ్య కావాలి",
+  "@validationFieldMustBeNumber": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldMustBeGreaterThanZero": "{field} సున్నా కంటే ఎక్కువ ఉండాలి",
+  "@validationFieldMustBeGreaterThanZero": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFileSizeExceededDetailed": "{fileType}ఫైల్ పరిమాణం {max}MB కంటే తక్కువగా ఉండాలి",
+  "@validationFileSizeExceededDetailed": {
+    "placeholders": {
+      "fileType": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationInvalidInput": "చెల్లని ఇన్‌పుట్",
+  "validationDobRequired": "పుట్టిన తేదీ అవసరం",
+  "validationDobFormat": "DD/MM/YYYY ఫార్మాట్‌లో తేదీని ఇవ్వండి",
+  "validationDobInvalidDate": "చెల్లని తేదీ ఫార్మాట్",
+  "validationDobFuture": "పుట్టిన తేదీ భవిష్యత్తులో ఉండకూడదు",
+  "validationDobMinimumAge": "మీ వయసు కనీసం 18 సంవత్సరాలు ఉండాలి",
+  "validationDobInvalid": "చెల్లని తేదీ",
+  "appExceptionDefaultMessage": "లోపం సంభవించింది",
+  "appExceptionDefaultRecovery": "దయచేసి కొంతసేపు తరువాత మళ్లీ ప్రయత్నించండి",
+  "appExceptionDetailsLabel": "వివరాలు",
+  "appExceptionSuggestionLabel": "💡 సూచన",
+  "networkExceptionPrefix": "నెట్‌వర్క్ లోపం",
+  "networkExceptionMessage": "ఇంటర్నెట్ కనెక్షన్ లేదు",
+  "networkExceptionRecovery": "మీ కనెక్షన్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి",
+  "authExceptionPrefix": "ఆథ్ లోపం",
+  "authExceptionMessage": "దృవీకరణ విఫలమైంది",
+  "authExceptionRecovery": "దయచేసి మీ గుర్తింపు వివరాలను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి",
+  "dataParsingExceptionPrefix": "పార్సింగ్ లోపం",
+  "dataParsingExceptionMessage": "డేటాను విశ్లేషించడంలో విఫలమైంది",
+  "dataParsingExceptionRecovery": "దయచేసి మళ్లీ ప్రయత్నించండి లేదా సమస్య కొనసాగితే మద్దతును సంప్రదించండి",
+  "configurationExceptionPrefix": "కాన్ఫిగ్ లోపం",
+  "configurationExceptionMessage": "కాన్ఫిగరేషన్ లోపం",
+  "configurationExceptionRecovery": "దయచేసి యాప్‌ను రీస్టార్ట్ చేయండి లేదా మద్దతును సంప్రదించండి",
+  "validationExceptionPrefix": "ధృవీకరణ లోపం",
+  "validationExceptionMessage": "{field} కోసం ధృవీకరణ విఫలమైంది",
+  "@validationExceptionMessage": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "validationExceptionRecovery": "దయచేసి నమోదు చేసిన సమాచారాన్ని తనిఖీ చేయండి",
+  "imagePickerMultipleSelectionError": "బహుళ చిత్ర ఎంపిక అందుబాటులో లేదు, లోపం: {error}",
+  "@imagePickerMultipleSelectionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "validationFieldDefaultName": "ఫీల్డ్",
+  "fileTypeProfilePhoto": "ప్రొఫైల్ ఫోటో",
+  "fileTypeAadhaarDocument": "ఆధార్ డాక్యుమెంట్",
+  "performanceReportTitle": "=== పనితీరు నివేదిక ===",
+  "performanceReportGenerated": "సృష్టించినది: {timestamp}",
+  "@performanceReportGenerated": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportOperation": "ఆపరేషన్: {operation}",
+  "@performanceReportOperation": {
+    "placeholders": {
+      "operation": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportCount": "  లెక్క: {count}",
+  "@performanceReportCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportMin": "  కనిష్ఠం: {value}",
+  "@performanceReportMin": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportMax": "  గరిష్ఠం: {value}",
+  "@performanceReportMax": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportAverage": "  సగటు: {value}",
+  "@performanceReportAverage": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "performanceReportMedian": "  మధ్య విలువ: {value}",
+  "@performanceReportMedian": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "guestPgStartingLoad": "PGలను లోడ్ చేయడం ప్రారంభిస్తోంది",
+  "guestPgLoadSuccess": "PGలు విజయవంతంగా లోడ్ అయ్యాయి",
+  "guestPgLoadFailure": "PGలను లోడ్ చేయడంలో విఫలమైంది",
+  "guestPgRefreshAction": "PGలను రిఫ్రెష్ చేయండి",
+  "guestPgSelectedAction": "PG ఎంపిక చేయబడింది",
+  "guestPgClearSelectionAction": "PG ఎంపికను క్లియర్ చేయండి",
+  "guestPgSearchQueryChangedAction": "శోధన ప్రశ్న మార్చబడింది",
+  "provideDetailsAsPerDocuments": "దయచేసి మీ అధికారిక పత్రాల ప్రకారం మీ వివరాలను అందించండి",
+  "fullNameRequired": "పూర్తి పేరు అవసరం",
+  "yourEmailExample": "your.email@example.com",
+  "contactPhone": "సంప్రదింపు ఫోన్",
+  "browsePGAccommodations": "PG వసతులను బ్రౌజ్ చేయండి",
+  "complaintsRequests": "ఫిర్యాదులు & అభ్యర్థనలు",
+  "briefDescriptionOfComplaint": "మీ ఫిర్యాదు యొక్క సంక్షిప్త వివరణ",
+  "detailedDescriptionOfComplaint": "మీ ఫిర్యాదు లేదా అభ్యర్థన యొక్క వివరణాత్మక వివరణ",
+  "pleaseSelectPGFirst": "ఫిర్యాదు దాఖలు చేయడానికి దయచేసి మొదట PGని ఎంచుకోండి",
+  "invalidPGSelection": "చెల్లని PG ఎంపిక. యజమాని సమాచారం అందుబాటులో లేదు.",
+  "paymentSuccessfulOwnerNotified": "చెల్లింపు విజయవంతమైంది! యజమానికి తెలియజేయబడుతుంది.",
+  "invalidPaymentOrOwnerInfo": "చెల్లని చెల్లింపు లేదా యజమాని సమాచారం అందుబాటులో లేదు.",
+  "failedToProcessUPIPayment": "UPI చెల్లింపును ప్రాసెస్ చేయడంలో విఫలమైంది",
+  "noFilterPayments": "{filter} చెల్లింపులు లేవు",
+  "@noFilterPayments": {
+    "placeholders": {
+      "filter": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentHistoryTitle": "చెల్లింపు చరిత్ర",
+  "sharePG": "PGని షేర్ చేయండి",
+  "foodDetails": "ఆహార వివరాలు",
+  "myRoomBed": "నా గది & మంచం",
+  "getStartedWithBookingRequests": "బుకింగ్ అభ్యర్థనలతో ప్రారంభించండి",
+  "noPGsFound": "PGs కనుగొనబడలేదు",
+  "noPGsAvailable": "PGs అందుబాటులో లేవు",
+  "newBookingRequest": "కొత్త బుకింగ్ అభ్యర్థన",
+  "newComplaintFiled": "కొత్త ఫిర్యాదు దాఖలు చేయబడింది",
+  "paymentReceived": "చెల్లింపు స్వీకరించబడింది",
+  "razorpay": "Razorpay",
+  "upiPayment": "UPI చెల్లింపు",
+  "cashPayment": "నగదు చెల్లింపు",
+  "videoTutorials": "దశలవారీ గైడ్‌లను చూడండి",
+  "documentation": "వివరణాత్మక గైడ్‌లను చదవండి",
+  "emailSupport": "ఇమెయిల్ మద్దతు",
+  "supportEmail": "support@atitia.com",
+  "phoneSupport": "ఫోన్ మద్దతు",
+  "supportPhone": "+91 1234567890",
+  "liveChat": "లైవ్ చాట్",
+  "whatsappNumber": "WhatsApp: +91 7020797849",
+  "noNotifications": "నోటిఫికేషన్‌లు లేవు",
+  "receiveNotificationsOnDevice": "మీ పరికరంలో నోటిఫికేషన్‌లను స్వీకరించండి",
+  "noRevenueData": "రెవెన్యూ డేటా లేదు",
+  "averagePerMonth": "సగటు/నెల",
+  "monthlyRevenueBreakdown": "నెలవారీ రెవెన్యూ విభజన",
+  "totalBookings": "మొత్తం బుకింగ్‌లు",
+  "paidCount": "చెల్లించిన సంఖ్య",
+  "pendingCount": "పెండింగ్ సంఖ్య",
+  "myProfile": "నా ప్రొఫైల్",
+  "noBookings": "బుకింగ్‌లు లేవు",
+  "noPayments": "చెల్లింపులు లేవు",
+  "ownerRepliedToComplaint": "యజమాని మీ ఫిర్యాదుకు ప్రత్యుత్తరం ఇచ్చారు",
+  "complaintStatusDisplay": "ఫిర్యాదు {statusDisplay}",
+  "@complaintStatusDisplay": {
+    "placeholders": {
+      "statusDisplay": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingApproved": "బుకింగ్ అనుమతించబడింది",
+  "bookingRejected": "బుకింగ్ తిరస్కరించబడింది",
   "photoSUploadedSuccessfully": "{count} ఫోటో(లు) విజయవంతంగా అప్‌లోడ్ చేయబడ్డాయి",
   "@photoSUploadedSuccessfully": {
     "placeholders": {
@@ -305,56 +4946,11 @@
       }
     }
   },
-  "failedToSelectPhotos": "ఫోటోలను ఎంచుకోవడంలో విఫలమైంది",
-  "maintenance": "నిర్వహణ",
-  "housekeeping": "గృహనిర్వహణ",
-  "vehicle": "వాహనం",
-  "other": "ఇతర",
-  "start": "ప్రారంభించండి",
-  "resume": "కొనసాగించండి",
-  "details": "వివరాలు",
-  "pleaseFillInAllFields": "దయచేసి అన్ని ఫీల్డ్‌లను పూరించండి",
-  "serviceRequestSubmitted": "సేవా అభ్యర్థన సమర్పించబడింది",
-  "replySentSuccessfully": "ప్రత్యుత్తరం విజయవంతంగా పంపబడింది",
-  "serviceCompletedSuccessfully": "సేవ విజయవంతంగా పూర్తయింది",
-  "noMessagesYet": "ఇంకా సందేశాలు లేవు",
-  "replyToServiceRequest": "సేవా అభ్యర్థనకు ప్రత్యుత్తరం ఇవ్వండి",
-  "failedToUpdateStatus": "స్థితిని నవీకరించడంలో విఫలమైంది",
-  "completeService": "సేవను పూర్తి చేయండి",
-  "serviceRequest": "సేవా అభ్యర్థన",
-  "monthlyRevenue": "నెలవారీ రెవెన్యూ",
   "startBuildingYourPGProfile": "మీ PG ప్రొఫైల్‌ను నిర్మించడం ప్రారంభించండి",
   "defineYourPGStructure": "మీ PG నిర్మాణాన్ని నిర్వచించండి",
-  "bedNumberingGuide": "మంచం నంబరింగ్ గైడ్",
-  "configureRentalPricing": "అద్దె ధరను కాన్ఫిగర్ చేయండి",
   "addPGAmenities": "PG అనుకూలతలను జోడించండి",
   "uploadPGPhotos": "PG ఫోటోలను అప్‌లోడ్ చేయండి",
-  "progress": "ప్రగతి",
-  "saveDraft": "డ్రాఫ్ట్‌ను సేవ్ చేయండి",
   "pleaseEnterPGNameBeforePublishing": "ప్రచురించే ముందు దయచేసి PG పేరును నమోదు చేయండి",
-  "pgPublishedSuccessfully": "PG విజయవంతంగా ప్రచురించబడింది",
-  "draftSaved": "డ్రాఫ్ట్ సేవ్ చేయబడింది",
-  "viewDetails": "వివరాలను చూడండి",
-  "editGuest": "అతిథిని సవరించండి",
-  "sendMessage": "సందేశం పంపండి",
-  "callGuest": "అతిథిని కాల్ చేయండి",
-  "checkOut": "చెక్ అవుట్",
-  "guestUpdatedSuccessfully": "అతిథి విజయవంతంగా నవీకరించబడింది",
-  "replyToComplaint": "ఫిర్యాదుకు ప్రత్యుత్తరం ఇవ్వండి",
-  "resolveComplaint": "ఫిర్యాదును పరిష్కరించండి",
-  "complaintResolvedSuccessfully": "ఫిర్యాదు విజయవంతంగా పరిష్కరించబడింది",
-  "editBike": "బైక్‌ను సవరించండి",
-  "bikeUpdatedSuccessfully": "బైక్ విజయవంతంగా నవీకరించబడింది",
-  "moveBike": "బైక్‌ను తరలించండి",
-  "currentSpot": "ప్రస్తుత స్పాట్: {spot}",
-  "@currentSpot": {
-    "placeholders": {
-      "spot": {
-        "type": "String"
-      }
-    }
-  },
-  "removeBike": "బైక్‌ను తొలగించండి",
   "areYouSureRemoveBike": "మీరు {bikeName}ని తొలగించాలని ఖచ్చితంగా అనుకుంటున్నారా?",
   "@areYouSureRemoveBike": {
     "placeholders": {
@@ -363,8 +4959,6 @@
       }
     }
   },
-  "bikeRemovalRequestCreated": "బైక్ తొలగింపు అభ్యర్థన సృష్టించబడింది",
-  "bikeMovementRequestCreated": "బైక్ తరలింపు అభ్యర్థన సృష్టించబడింది",
   "view": "చూడండి",
   "pleaseEnterFestivalEventName": "దయచేసి పండుగ/ఈవెంట్ పేరును నమోదు చేయండి",
   "specialMenuSavedSuccessfully": "ప్రత్యేక మెనూ విజయవంతంగా సేవ్ చేయబడింది!",
@@ -375,101 +4969,29 @@
   "errorSavingMenu": "మెనూ‌ను సేవ్ చేయడంలో లోపం",
   "menuCleared": "మెనూ క్లియర్ చేయబడింది. మార్పులను సేవ్ చేయడం మర్చిపోవద్దు.",
   "clearMenu": "మెనూ క్లియర్ చేయాలా?",
-  "createPGWeeklyMenus": "PG వారపు మెనూ‌లను సృష్టించండి",
-  "defaultMenusInitializedSuccessfully": "డిఫాల్ట్ మెనూ‌లు విజయవంతంగా ప్రారంభించబడ్డాయి",
-  "failedToInitializeMenus": "మెనూ‌లను ప్రారంభించడంలో విఫలమైంది",
-  "addFestivalMenu": "పండుగ మెనూ జోడించండి",
-  "createSpecialMenuForFestivals": "పండుగల కోసం ప్రత్యేక మెనూ సృష్టించండి",
-  "addEventMenu": "ఈవెంట్ మెనూ జోడించండి",
-  "createSpecialMenuForEvents": "ఈవెంట్‌ల కోసం ప్రత్యేక మెనూ సృష్టించండి",
-  "viewAllSpecialMenus": "అన్ని ప్రత్యేక మెనూ‌లను చూడండి",
-  "manageExistingSpecialMenus": "అస్తిత్వంలో ఉన్న ప్రత్యేక మెనూ‌లను నిర్వహించండి",
+  "createPGWeeklyMenus": "PG వారపు మెనూలను సృష్టించండి",
   "weekly": "వారపు",
   "monthly": "నెలవారీ",
   "yearly": "సంవత్సరపు",
   "revenue": "రెవెన్యూ",
-  "occupancy": "ఆక్యుపెన్సీ",
-  "searchServices": "సేవలను శోధించండి",
-  "searchByTitleGuestRoomOrType": "శీర్షిక, అతిథి, గది లేదా రకం ద్వారా శోధించండి...",
-  "createNewServiceRequest": "కొత్త సేవా అభ్యర్థనను సృష్టించండి",
-  "serviceDescription": "సేవా వివరణ",
-  "describeTheServiceNeeded": "అవసరమైన సేవను వివరించండి...",
-  "submitRequest": "అభ్యర్థనను సమర్పించండి",
   "type": "రకం",
-  "priority": "ప్రాధాన్యత",
-  "requested": "అభ్యర్థించబడింది",
-  "assignedTo": "కేటాయించబడింది",
-  "complete": "పూర్తి",
-  "reply": "ప్రత్యుత్తరం",
-  "sendReply": "ప్రత్యుత్తరం పంపండి",
-  "typeYourReply": "మీ ప్రత్యుత్తరాన్ని టైప్ చేయండి...",
-  "completionNotes": "పూర్తి నోట్స్",
-  "completionNotesOptional": "పూర్తి నోట్స్ (ఐచ్ఛికం)...",
-  "markAsCompleted": "పూర్తయినదిగా గుర్తించండి",
-  "serviceTitle": "సేవా శీర్షిక",
-  "guestName": "అతిథి పేరు",
-  "room": "గది",
-  "serviceType": "సేవా రకం",
   "searchGuests": "అతిథులను శోధించండి",
   "searchByNamePhoneRoomOrEmail": "పేరు, ఫోన్, గది లేదా ఇమెయిల్ ద్వారా శోధించండి...",
   "guestNameLabel": "అతిథి పేరు",
   "phone": "ఫోన్",
-  "phoneNumberLabel": "ఫోన్ నంబర్",
   "emailAddress": "ఇమెయిల్ చిరునామా",
-  "checkIn": "చెక్-ఇన్",
-  "duration": "వ్యవధి",
-  "emergencyContact": "అత్యవసర సంప్రదింపు",
-  "emergencyPhone": "అత్యవసర ఫోన్",
-  "saveChanges": "మార్పులను సేవ్ చేయండి",
-  "message": "సందేశం",
   "enterYourMessage": "మీ సందేశాన్ని నమోదు చేయండి...",
-  "send": "పంపండి",
-  "searchComplaints": "ఫిర్యాదులను శోధించండి",
-  "searchByTitleGuestRoomOrDescription": "శీర్షిక, అతిథి, గది లేదా వివరణ ద్వారా శోధించండి...",
-  "created": "సృష్టించబడింది",
-  "resolutionNotes": "పరిష్కార నోట్స్",
-  "resolutionNotesOptional": "పరిష్కార నోట్స్ (ఐచ్ఛికం)...",
-  "markAsResolved": "పరిష్కరించబడినదిగా గుర్తించండి",
-  "complaintTitle": "ఫిర్యాదు శీర్షిక",
-  "priorityLevel": "ప్రాధాన్యత స్థాయి",
-  "searchBikes": "బైక్‌లను శోధించండి",
-  "searchByNumberNameGuestOrModel": "నంబర్, పేరు, అతిథి లేదా మోడల్ ద్వారా శోధించండి...",
-  "parkingSpot": "పార్కింగ్ స్పాట్",
-  "color": "రంగు",
-  "bikeType": "రకం",
-  "registered": "నమోదు చేయబడింది",
-  "lastParked": "చివరిగా పార్క్ చేయబడింది",
-  "newParkingSpot": "కొత్త పార్కింగ్ స్పాట్",
-  "reasonForMove": "తరలింపు కారణం",
-  "reasonForRemoval": "తొలగింపు కారణం",
-  "bikeNumber": "బైక్ నంబర్",
-  "bikeModel": "మోడల్",
-  "bikeColor": "బైక్ రంగు",
   "addMenu": "మెనూ జోడించండి",
   "saveSpecialMenu": "ప్రత్యేక మెనూ సేవ్ చేయండి",
   "note": "గమనిక",
   "addItem": "అంశాన్ని జోడించండి",
   "itemName": "అంశం పేరు",
-  "add": "జోడించండి",
-  "items": "అంశాలు",
-  "breakfast": "అల్పాహారం",
-  "lunch": "మధ్యాహ్న భోజనం",
-  "dinner": "రాత్రి భోజనం",
-  "photos": "ఫోటోలు",
   "addPhoto": "ఫోటో జోడించండి",
   "menuDescription": "మెనూ వివరణ",
   "addAnySpecialNotesAboutMenu": "ఈ మెనూ గురించి ఏదైనా ప్రత్యేక గమనికలను జోడించండి...",
-  "initialize": "ప్రారంభించండి",
-  "clearAll": "అన్నింటినీ క్లియర్ చేయండి",
   "saveSearch": "శోధనను సేవ్ చేయండి",
-  "bookNow": "ఇప్పుడే బుక్ చేయండి",
-  "requestChange": "మార్పు అభ్యర్థించండి",
   "submitRequestLabel": "అభ్యర్థనను సమర్పించండి",
-  "editMenu": "మెనూ సవరించండి",
-  "createMenu": "మెనూ సృష్టించండి",
-  "addPhotos": "ఫోటోలను జోడించండి",
   "listYourFirstPG": "మీ మొదటి PGని జాబితా చేయండి",
-  "recordPayment": "చెల్లింపును రికార్డ్ చేయండి",
   "searchByTitleGuestRoomOrTypeLabel": "శీర్షిక, అతిథి, గది లేదా రకం ద్వారా శోధించండి",
   "searchByGuestName": "అతిథి పేరు",
   "searchByRoomNumber": "గది నంబర్",
@@ -478,29 +5000,16 @@
   "searchByBikeNumber": "బైక్ నంబర్",
   "searchByBikeModel": "బైక్ మోడల్",
   "searchByBikeColor": "బైక్ రంగు",
-  "savePaymentDetails": "చెల్లింపు వివరాలను సేవ్ చేయండి",
-  "bankName": "బ్యాంక్ పేరు",
   "bankNameHint": "ఉదా., స్టేట్ బ్యాంక్ ఆఫ్ ఇండియా",
-  "accountHolderName": "ఖాతాదారు పేరు",
-  "nameAsPerBankRecords": "బ్యాంక్ రికార్డ్‌ల ప్రకారం పేరు",
-  "accountNumber": "ఖాతా నంబర్",
-  "enterAccountNumber": "ఖాతా నంబర్‌ను నమోదు చేయండి",
-  "ifscCode": "IFSC కోడ్",
   "ifscCodeHint": "ఉదా., SBIN0001234",
-  "upiID": "UPI ID",
   "upiIDHint": "yourname@paytm",
-  "paymentInstructionsOptional": "చెల్లింపు సూచనలు (ఐచ్ఛికం)",
-  "anySpecialInstructionsForGuests": "అతిథుల కోసం ఏదైనా ప్రత్యేక సూచనలు",
-  "paymentDetailsSavedSuccessfully": "చెల్లింపు వివరాలు విజయవంతంగా సేవ్ చేయబడ్డాయి",
-  "failedToSave": "సేవ్ చేయడంలో విఫలమైంది",
   "enterYourFullName": "మీ పూర్తి పేరును నమోదు చేయండి",
-  "enterYourEmail": "మీ ఇమెయిల్‌ను నమోదు చేయండి",
-  "enterYourPhoneNumber": "మీ ఫోన్ నంబర్‌ను నమోదు చేయండి",
+  "enterYourEmail": "మీ ఈమెయిల్‌ను నమోదు చేయండి",
   "enterYourPGAddress": "మీ PG చిరునామాను నమోదు చేయండి",
-  "enterPincode": "పిన్ కోడ్‌ను నమోదు చేయండి",
+  "enterPincode": "పిన్‌కోడ్‌ను నమోదు చేయండి",
   "selectState": "రాష్ట్రాన్ని ఎంచుకోండి",
-  "enterBusinessName": "వ్యాపార పేరును నమోదు చేయండి",
-  "enterBusinessType": "వ్యాపార రకాన్ని నమోదు చేయండి",
+  "enterBusinessName": "వ్యాపారం పేరును నమోదు చేయండి",
+  "enterBusinessType": "వ్యాపారం రకాన్ని నమోదు చేయండి",
   "enterPANNumber": "PAN నంబర్‌ను నమోదు చేయండి",
   "enterGSTNumber": "GST నంబర్‌ను నమోదు చేయండి",
   "fullAddressWithLandmark": "ల్యాండ్‌మార్క్‌తో పూర్తి చిరునామా",
@@ -554,21 +5063,16 @@
       }
     }
   },
-  "publish": "ప్రచురించండి",
   "totalReceived": "మొత్తం స్వీకరించబడింది",
   "totalPending": "పెండింగ్",
   "notSignedIn": "సైన్ ఇన్ చేయలేదు",
-  "userMenu": "వినియోగదారు మెనూ",
-  "system": "సిస్టమ్",
   "watchStepByStepGuides": "దశలవారీ గైడ్‌లను చూడండి",
   "readComprehensiveGuides": "వివరణాత్మక గైడ్‌లను చదవండి",
   "festivalEventNameHint": "ఉదా., దీపావళి, ఉగాది, ప్రత్యేక ఈవెంట్",
   "anySpecialInstructionsOrDetails": "ఏదైనా ప్రత్యేక సూచనలు లేదా వివరాలు...",
   "itemNameHint": "ఉదా., ప్రత్యేక బిర్యాని",
-  "pleaseEnterValidEmailAddress": "దయచేసి చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామాను నమోదు చేయండి",
   "thisFieldIsRequired": "ఈ ఫీల్డ్ అవసరం",
-  "pleaseEnterValidPhoneNumber": "దయచేసి చెల్లుబాటు అయ్యే ఫోన్ నంబర్‌ను నమోదు చేయండి",
-  "fileSizeExceedsMaximumLimit": "ఫైల్ పరిమాణం గరిష్ట పరిమితిని మించిపోయింది",
+  "fileSizeExceedsMaximumLimit": "ఫైల్ పరిమాణం గరిష్ఠ పరిమితిని మించిపోయింది",
   "noInternetConnection": "ఇంటర్నెట్ కనెక్షన్ లేదు",
   "checkYourConnectionAndTryAgain": "మీ కనెక్షన్‌ను తనిఖీ చేసి మళ్లీ ప్రయత్నించండి",
   "authenticationFailed": "ప్రామాణీకరణ విఫలమైంది",
@@ -578,24 +5082,81 @@
   "configurationError": "కాన్ఫిగరేషన్ లోపం",
   "pleaseRestartTheAppOrContactSupport": "దయచేసి అనువర్తనాన్ని పునఃప్రారంభించండి లేదా మద్దతుకు సంప్రదించండి",
   "validationFailed": "ధృవీకరణ విఫలమైంది",
-  "failedToUploadProfilePhoto": "ప్రొఫైల్ ఫోటోను అప్‌లోడ్ చేయడంలో విఫలమైంది",
-  "failedToUploadAadhaarPhoto": "ఆధార్ ఫోటోను అప్‌లోడ్ చేయడంలో విఫలమైంది",
-  "noProfileDataFound": "ప్రొఫైల్ డేటా కనుగొనబడలేదు",
-  "profileUpdatedSuccessfully": "ప్రొఫైల్ విజయవంతంగా నవీకరించబడింది",
-  "failedToUpdateProfile": "ప్రొఫైల్‌ను నవీకరించడంలో విఫలమైంది",
-  "areYouSureYouWantToLogout": "మీరు లాగ్ అవుట్ చేయాలని ఖచ్చితంగా అనుకుంటున్నారా?",
-  "loggedOutSuccessfully": "విజయవంతంగా లాగ్ అవుట్ చేయబడింది",
-  "logoutFailed": "లాగ్ అవుట్ విఫలమైంది",
-  "switchAccount": "ఖాతాను మార్చండి",
-  "switchAccountConfirmation": "మీరు {currentRole} నుండి {newRole} ఖాతాకు మారాలని ఖచ్చితంగా అనుకుంటున్నారా?\n\nమీరు కొత్త పాత్ర కోసం నమోదును పూర్తి చేయాలి.",
-  "switchedToAccount": "{role} ఖాతాకు మార్చబడింది. దయచేసి మీ నమోదును పూర్తి చేయండి.",
-  "failedToSwitchAccount": "ఖాతాను మార్చడంలో విఫలమైంది",
-  "switchButton": "మార్చండి",
-  "role": "పాత్ర",
-  "verifiedOwner": "ధృవీకరించబడిన యజమాని",
-  "pendingVerification": "పెండింగ్ ధృవీకరణ",
-  "pgManagementSystem": "PG నిర్వహణ వ్యవస్థ",
-  "madeWithLoveByAtitiaTeam": "Atitia టీమ్ చేత ❤️తో తయారు చేయబడింది",
-  "version": "వెర్షన్",
-  "poweredByCharyatani": "Charyatani ద్వారా పవర్ చేయబడింది"
+  "under18": "18 కంటే తక్కువ",
+  "provideDetailsOfPersonToContact": "అత్యవసర సమయంలో సంప్రదింపు చేయడానికి ఒక వ్యక్తి యొక్క వివరాలను అందించండి",
+  "relationshipToYou": "మీకు సంబంధం (ఉదా., తండ్రి, తల్లి, స్నేహితుడు)",
+  "contactAddress": "సంప్రదింపు చిరునామా",
+  "pgAddress": "పీజీ చిరునామా",
+  "enterYourPgAddress": "మీ పీజీ చిరునామాను నమోదు చేయండి",
+  "selectStateFirst": "ముందు రాష్ట్రాన్ని ఎంచుకోండి",
+  "businessName": "వ్యాపారం పేరు",
+  "businessType": "వ్యాపారం రకం",
+  "panNumber": "PAN నంబర్",
+  "enterPanNumber": "PAN నంబర్‌ను నమోదు చేయండి",
+  "gstNumber": "GST నంబర్",
+  "enterGstNumber": "GST నంబర్‌ను నమోదు చేయండి",
+  "ownerProfileSavePersonalInfo": "వ్యక్తిగత సమాచారాన్ని సేవ్ చేయండి",
+  "ownerProfileSaveBusinessInfo": "వ్యాపార సమాచారాన్ని సేవ్ చేయండి",
+  "uploadYourProfilePhoto": "మీ ప్రొఫైల్ ఫోటోను అప్లోడ్ చేయండి",
+  "uploadYourAadhaarPhoto": "మీ ఆధార్ కార్డ్ ఫోటోను అప్లోడ్ చేయండి",
+  "update": "నవీకరించు",
+  "upload": "అప్లోడ్ చేయండి",
+  "ownerProfileFailedToPickImage": "చిత్రాన్ని ఎంచుకోవడం విఫలమైంది: {error}",
+  "@ownerProfileFailedToPickImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateProfileWithReason": "ప్రొఫైల్‌ను నవీకరించడం విఫలమైంది: {error}",
+  "@failedToUpdateProfileWithReason": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToCreateBooking": "బుకింగ్ సృష్టించడంలో విఫలమైంది: {error}",
+  "@failedToCreateBooking": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateBooking": "బుకింగ్‌ను నవీకరించడంలో విఫలమైంది: {error}",
+  "@failedToUpdateBooking": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToGetBooking": "బుకింగ్‌ను పొందడంలో విఫలమైంది: {error}",
+  "@failedToGetBooking": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToGetActiveBooking": "సక్రియ బుకింగ్‌ను పొందడంలో విఫలమైంది: {error}",
+  "@failedToGetActiveBooking": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToCancelBooking": "బుకింగ్‌ను రద్దు చేయడంలో విఫలమైంది: {error}",
+  "@failedToCancelBooking": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ownerSettingsBuildNumberValue": "1",
+  "ownerSettingsAppVersionValue": "1.0.0"
 }

@@ -9,6 +9,8 @@ import '../../../../common/styles/colors.dart';
 import '../../../../common/styles/spacing.dart';
 import '../../../../common/widgets/text/body_text.dart';
 import '../../../../common/widgets/text/caption_text.dart';
+import '../../../../core/services/localization/internationalization_service.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Simple, reusable widget to display user location
 /// Format: State, District, Taluka/Mandal, Area, Society
@@ -24,6 +26,25 @@ class UserLocationDisplay extends StatelessWidget {
     this.textStyle,
     this.iconColor,
   });
+
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +73,9 @@ class UserLocationDisplay extends StatelessWidget {
   Widget _buildFullLocation(BuildContext context, Map<String, String> parts) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final iconColorFinal = iconColor ?? (isDark ? AppColors.textTertiary : AppColors.textSecondary);
+    final iconColorFinal =
+        iconColor ?? (isDark ? AppColors.textTertiary : AppColors.textSecondary);
+    final loc = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -81,15 +104,36 @@ class UserLocationDisplay extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (parts['state'] != null)
-                  _buildLocationRow('State', parts['state']!, context),
+                  _buildLocationRow(
+                    context,
+                    loc?.state ?? _text('stateLabel', 'State'),
+                    parts['state']!,
+                  ),
                 if (parts['district'] != null)
-                  _buildLocationRow('District', parts['district']!, context),
+                  _buildLocationRow(
+                    context,
+                    loc?.districtLabel ?? _text('districtLabel', 'District'),
+                    parts['district']!,
+                  ),
                 if (parts['taluka'] != null)
-                  _buildLocationRow('Taluka/Mandal', parts['taluka']!, context),
+                  _buildLocationRow(
+                    context,
+                    loc?.talukaMandalLabel ??
+                        _text('talukaMandalLabel', 'Taluka/Mandal'),
+                    parts['taluka']!,
+                  ),
                 if (parts['area'] != null)
-                  _buildLocationRow('Area', parts['area']!, context),
+                  _buildLocationRow(
+                    context,
+                    loc?.areaLabel ?? _text('areaLabel', 'Area'),
+                    parts['area']!,
+                  ),
                 if (parts['society'] != null)
-                  _buildLocationRow('Society', parts['society']!, context),
+                  _buildLocationRow(
+                    context,
+                    loc?.societyLabel ?? _text('societyLabel', 'Society'),
+                    parts['society']!,
+                  ),
               ],
             ),
           ),
@@ -102,7 +146,8 @@ class UserLocationDisplay extends StatelessWidget {
   Widget _buildCompactLocation(BuildContext context, Map<String, String> parts) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final iconColorFinal = iconColor ?? (isDark ? AppColors.textTertiary : AppColors.textSecondary);
+    final iconColorFinal =
+        iconColor ?? (isDark ? AppColors.textTertiary : AppColors.textSecondary);
 
     final locationText = _buildCompactLocationText(parts);
 
@@ -125,7 +170,11 @@ class UserLocationDisplay extends StatelessWidget {
   }
 
   /// Builds a single location row (Label: Value)
-  Widget _buildLocationRow(String label, String value, BuildContext context) {
+  Widget _buildLocationRow(
+    BuildContext context,
+    String label,
+    String value,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(

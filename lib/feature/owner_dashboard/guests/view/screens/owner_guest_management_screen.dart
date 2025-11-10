@@ -13,6 +13,7 @@ import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../../shared/widgets/owner_drawer.dart';
@@ -102,6 +103,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
     final guestVM = context.watch<OwnerGuestViewModel>();
     final selectedPgProvider = context.watch<SelectedPgProvider>();
     final currentPgId = selectedPgProvider.selectedPgId;
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AdaptiveAppBar(
@@ -117,33 +119,33 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _refreshData(),
-            tooltip: 'Refresh Data',
+            tooltip: loc.refreshGuestData,
           ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: TabBar(
             controller: _tabController,
-            tabs: const [
+            tabs: [
               Tab(
-                icon: Icon(Icons.people),
-                text: 'Guests',
+                icon: const Icon(Icons.people),
+                text: loc.guests,
               ),
               Tab(
-                icon: Icon(Icons.request_page),
-                text: 'Requests',
+                icon: const Icon(Icons.request_page),
+                text: loc.requests,
               ),
               Tab(
-                icon: Icon(Icons.report_problem),
-                text: 'Complaints',
+                icon: const Icon(Icons.report_problem),
+                text: loc.complaints,
               ),
               Tab(
-                icon: Icon(Icons.two_wheeler),
-                text: 'Bikes',
+                icon: const Icon(Icons.two_wheeler),
+                text: loc.bikes,
               ),
               Tab(
-                icon: Icon(Icons.build),
-                text: 'Services',
+                icon: const Icon(Icons.build),
+                text: loc.services,
               ),
             ],
             onTap: (index) {
@@ -198,16 +200,17 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
 
   /// Builds no PG selected state
   Widget _buildNoPgSelected(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.home_work_outlined, size: 64, color: Colors.grey),
           const SizedBox(height: AppSpacing.paddingM),
-          const HeadingMedium(text: 'No PG Selected'),
+          HeadingMedium(text: loc.ownerGuestNoPgSelectedTitle),
           const SizedBox(height: AppSpacing.paddingS),
-          const BodyText(
-            text: 'Please select a PG to manage guests',
+          BodyText(
+            text: loc.ownerGuestNoPgSelectedMessage,
             align: TextAlign.center,
           ),
         ],
@@ -217,13 +220,14 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
 
   /// Builds loading state
   Widget _buildLoadingState(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const AdaptiveLoader(),
           const SizedBox(height: AppSpacing.paddingM),
-          const BodyText(text: 'Loading guest data...'),
+          BodyText(text: loc.loadingGuestData),
         ],
       ),
     );
@@ -231,17 +235,18 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
 
   /// Builds error state
   Widget _buildErrorState(BuildContext context, OwnerGuestViewModel guestVM) {
+    final loc = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error_outline, size: 64, color: Colors.red),
           const SizedBox(height: AppSpacing.paddingM),
-          const BodyText(text: 'Failed to load guest data'),
+          BodyText(text: loc.ownerGuestFailedToLoadData),
           const SizedBox(height: AppSpacing.paddingM),
           ElevatedButton(
             onPressed: () => _refreshData(),
-            child: const Text('Retry'),
+            child: Text(loc.retry),
           ),
         ],
       ),
@@ -264,6 +269,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
   /// Builds the booking requests tab
   Widget _buildBookingRequestsTab(
       BuildContext context, OwnerGuestViewModel guestVM) {
+    final loc = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Header with stats
@@ -273,7 +279,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
             children: [
               Expanded(
                 child: _buildRequestStatCard(
-                  'Pending',
+                  loc.pending,
                   guestVM.pendingBookingRequests.length,
                   Colors.orange,
                 ),
@@ -281,7 +287,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
               const SizedBox(width: AppSpacing.paddingS),
               Expanded(
                 child: _buildRequestStatCard(
-                  'Approved',
+                  loc.approved,
                   guestVM.approvedBookingRequests.length,
                   Colors.green,
                 ),
@@ -289,7 +295,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
               const SizedBox(width: AppSpacing.paddingS),
               Expanded(
                 child: _buildRequestStatCard(
-                  'Rejected',
+                  loc.rejected,
                   guestVM.rejectedBookingRequests.length,
                   Colors.red,
                 ),
@@ -320,30 +326,31 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             BodyText(
-                                text: (req['guestName'] ?? 'Unknown Guest')
+                                text: (req['guestName'] ??
+                                        loc.unknownGuest)
                                     .toString()),
                             const SizedBox(height: 4),
                             CaptionText(
-                                text:
-                                    (req['pgName'] ?? 'Unknown PG').toString()),
+                                text: (req['pgName'] ?? loc.unknownPg)
+                                    .toString()),
                           ],
                         ),
                       ),
                       TextButton(
                         onPressed: () =>
                             _showRequestDetailsDialog(context, req),
-                        child: const Text('View'),
+                        child: Text(loc.viewAction),
                       ),
                       const SizedBox(width: 8),
                       if (isPending) ...[
                         TextButton(
                           onPressed: () => _showRejectDialog(context, req),
-                          child: const Text('Reject'),
+                          child: Text(loc.reject),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
                           onPressed: () => _showApproveDialog(context, req),
-                          child: const Text('Approve'),
+                          child: Text(loc.approve),
                         ),
                       ] else ...[
                         Container(
@@ -359,8 +366,8 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: CaptionText(
-                            text: status.toUpperCase(),
-                            color: (status == 'approved')
+                            text: _statusLabel(status, loc),
+                            color: status == 'approved'
                                 ? Colors.green
                                 : Colors.red,
                           ),
@@ -404,27 +411,38 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
   /// Simple details dialog
   void _showRequestDetailsDialog(
       BuildContext context, Map<String, dynamic> req) {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const HeadingMedium(text: 'Booking Request Details'),
+        title: HeadingMedium(text: loc.bookingRequestDetailsTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BodyText(text: 'Guest: ${req['guestName'] ?? '-'}'),
-            BodyText(text: 'Phone: ${req['guestPhone'] ?? '-'}'),
-            const SizedBox(height: AppSpacing.paddingS),
-            BodyText(text: 'PG: ${req['pgName'] ?? '-'}'),
             BodyText(
-                text:
-                    'Status: ${(req['status'] ?? '-').toString().toUpperCase()}'),
+              text:
+                  '${loc.bookingRequestGuestNameLabel}: ${req['guestName'] ?? '-'}',
+            ),
+            BodyText(
+              text:
+                  '${loc.bookingRequestPhoneLabel}: ${req['guestPhone'] ?? '-'}',
+            ),
+            const SizedBox(height: AppSpacing.paddingS),
+            BodyText(
+              text:
+                  '${loc.bookingRequestPgNameLabel}: ${req['pgName'] ?? '-'}',
+            ),
+            BodyText(
+              text:
+                  '${loc.bookingRequestStatusLabel}: ${_statusLabel((req['status'] ?? '-').toString().toLowerCase(), loc)}',
+            ),
           ],
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close')),
+              child: Text(loc.close)),
         ],
       ),
     );
@@ -432,22 +450,23 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
 
   void _showApproveDialog(BuildContext context, Map<String, dynamic> req) {
     final responseController = TextEditingController();
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const HeadingMedium(text: 'Approve Booking Request'),
+        title: HeadingMedium(text: loc.approveBookingRequestTitle),
         content: TextField(
           controller: responseController,
-          decoration: const InputDecoration(
-            labelText: 'Welcome message (optional)',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: loc.welcomeMessageOptional,
+            border: const OutlineInputBorder(),
           ),
           maxLines: 3,
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel')),
+              child: Text(loc.cancel)),
           ElevatedButton(
             onPressed: () async {
               final vm = context.read<OwnerGuestViewModel>();
@@ -466,7 +485,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
               // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
             },
-            child: const Text('Approve'),
+            child: Text(loc.approve),
           ),
         ],
       ),
@@ -475,22 +494,23 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
 
   void _showRejectDialog(BuildContext context, Map<String, dynamic> req) {
     final responseController = TextEditingController();
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const HeadingMedium(text: 'Reject Booking Request'),
+        title: HeadingMedium(text: loc.rejectBookingRequestTitle),
         content: TextField(
           controller: responseController,
-          decoration: const InputDecoration(
-            labelText: 'Reason (optional)',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: loc.rejectionReasonOptional,
+            border: const OutlineInputBorder(),
           ),
           maxLines: 3,
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel')),
+              child: Text(loc.cancel)),
           ElevatedButton(
             onPressed: () async {
               final vm = context.read<OwnerGuestViewModel>();
@@ -509,10 +529,23 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
               // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
             },
-            child: const Text('Reject'),
+            child: Text(loc.reject),
           ),
         ],
       ),
     );
+  }
+
+  String _statusLabel(String status, AppLocalizations loc) {
+    switch (status) {
+      case 'pending':
+        return loc.pending;
+      case 'approved':
+        return loc.approved;
+      case 'rejected':
+        return loc.rejected;
+      default:
+        return status.toUpperCase();
+    }
   }
 }

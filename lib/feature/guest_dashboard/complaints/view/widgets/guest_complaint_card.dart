@@ -8,6 +8,7 @@ import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/guest_complaint_model.dart';
 
 /// 📝 **PREMIUM COMPLAINT CARD - PRODUCTION READY**
@@ -70,22 +71,64 @@ class GuestComplaintCard extends StatelessWidget {
     return Icons.report_problem;
   }
   
-  String get _category {
+  String get _categoryKey {
     final subject = complaint.subject.toLowerCase();
-    if (subject.contains('food')) return 'Food';
-    if (subject.contains('clean')) return 'Cleanliness';
-    if (subject.contains('maintenance')) return 'Maintenance';
-    if (subject.contains('water')) return 'Water';
-    if (subject.contains('electric')) return 'Electricity';
-    if (subject.contains('wifi')) return 'WiFi';
-    if (subject.contains('noise')) return 'Noise';
-    return 'General';
+    if (subject.contains('food')) return 'food';
+    if (subject.contains('clean')) return 'cleanliness';
+    if (subject.contains('maintenance')) return 'maintenance';
+    if (subject.contains('water')) return 'water';
+    if (subject.contains('electric')) return 'electricity';
+    if (subject.contains('wifi')) return 'wifi';
+    if (subject.contains('noise')) return 'noise';
+    return 'general';
+  }
+
+  String _categoryLabel(AppLocalizations? loc) {
+    switch (_categoryKey) {
+      case 'food':
+        return loc?.complaintCategoryFood ?? 'Food';
+      case 'cleanliness':
+        return loc?.complaintCategoryCleanliness ?? 'Cleanliness';
+      case 'maintenance':
+        return loc?.complaintCategoryMaintenance ?? 'Maintenance';
+      case 'water':
+        return loc?.complaintCategoryWater ?? 'Water';
+      case 'electricity':
+        return loc?.complaintCategoryElectricity ?? 'Electricity';
+      case 'wifi':
+        return loc?.complaintCategoryWifi ?? 'Wi-Fi';
+      case 'noise':
+        return loc?.complaintCategoryNoise ?? 'Noise';
+      default:
+        return loc?.complaintCategoryGeneral ?? 'General';
+    }
+  }
+
+  String _statusLabel(AppLocalizations? loc) {
+    switch (complaint.status.toLowerCase()) {
+      case 'pending':
+        return loc?.pending ?? 'Pending';
+      case 'in progress':
+        return loc?.statusInProgress ?? 'In Progress';
+      case 'resolved':
+        return loc?.statusResolved ?? 'Resolved';
+      case 'closed':
+        return loc?.statusClosed ?? 'Closed';
+      default:
+        return complaint.status;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+    final categoryLabel = _categoryLabel(loc);
+    final statusLabel = _statusLabel(loc);
+    final displayStatus = (loc?.localeName ?? '').startsWith('en')
+        ? statusLabel.toUpperCase()
+        : statusLabel;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
@@ -165,7 +208,7 @@ class GuestComplaintCard extends StatelessWidget {
                             Icon(_statusIcon, color: _statusColor, size: 14),
                             const SizedBox(width: 4),
                             Text(
-                              complaint.status.toUpperCase(),
+                              displayStatus,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: _statusColor,
                                 fontWeight: FontWeight.w600,
@@ -219,7 +262,7 @@ class GuestComplaintCard extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 CaptionText(
-                                  text: _category,
+                                  text: categoryLabel,
                                   color: theme.primaryColor,
                                 ),
                               ],
@@ -238,7 +281,7 @@ class GuestComplaintCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               CaptionText(
-                                text: _formatDate(complaint.complaintDate),
+                                text: _formatDate(complaint.complaintDate, loc),
                                 color: isDarkMode
                                     ? AppColors.textTertiary
                                     : AppColors.textSecondary,
@@ -258,18 +301,21 @@ class GuestComplaintCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime date, AppLocalizations? loc) {
     final now = DateTime.now();
     final difference = now.difference(date);
 
     if (difference.inDays == 0) {
-      return 'Today ${DateFormat('hh:mm a').format(date)}';
+      final time =
+          DateFormat('hh:mm a', loc?.localeName).format(date);
+      return loc?.todayAt(time) ?? 'Today $time';
     } else if (difference.inDays == 1) {
-      return 'Yesterday';
+      return loc?.yesterday ?? 'Yesterday';
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
+      return loc?.daysAgo(difference.inDays) ??
+          '${difference.inDays} days ago';
     } else {
-      return DateFormat('MMM dd, yyyy').format(date);
+      return DateFormat('MMM dd, yyyy', loc?.localeName).format(date);
     }
   }
 }

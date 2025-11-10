@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../../../core/services/localization/internationalization_service.dart';
 import 'encryption_service.dart';
 
 /// Enhanced secure storage service with encryption
@@ -23,6 +24,24 @@ class SecureStorageService {
   );
 
   final EncryptionService _encryptionService = EncryptionService();
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Store sensitive data with encryption
   Future<void> storeSecureData(String key, String value) async {
@@ -31,7 +50,11 @@ class SecureStorageService {
       final encryptedValue = _encryptionService.encrypt(value);
       await _secureStorage.write(key: key, value: encryptedValue);
     } catch (e) {
-      throw SecureStorageException('Failed to store secure data: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageStoreFailed',
+        'Failed to store secure data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -44,7 +67,11 @@ class SecureStorageService {
       // Decrypt the data before returning
       return _encryptionService.decrypt(encryptedValue);
     } catch (e) {
-      throw SecureStorageException('Failed to retrieve secure data: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageRetrieveFailed',
+        'Failed to retrieve secure data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -55,7 +82,11 @@ class SecureStorageService {
       final credentialsJson = json.encode(credentials);
       await storeSecureData('user_credentials_$userId', credentialsJson);
     } catch (e) {
-      throw SecureStorageException('Failed to store user credentials: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageStoreCredentialsFailed',
+        'Failed to store user credentials: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -67,7 +98,11 @@ class SecureStorageService {
 
       return json.decode(credentialsJson) as Map<String, dynamic>;
     } catch (e) {
-      throw SecureStorageException('Failed to retrieve user credentials: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageRetrieveCredentialsFailed',
+        'Failed to retrieve user credentials: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -76,7 +111,11 @@ class SecureStorageService {
     try {
       await storeSecureData('auth_token', token);
     } catch (e) {
-      throw SecureStorageException('Failed to store auth token: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageStoreAuthTokenFailed',
+        'Failed to store auth token: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -85,7 +124,11 @@ class SecureStorageService {
     try {
       return await getSecureData('auth_token');
     } catch (e) {
-      throw SecureStorageException('Failed to retrieve auth token: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageRetrieveAuthTokenFailed',
+        'Failed to retrieve auth token: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -96,7 +139,11 @@ class SecureStorageService {
       final sessionJson = json.encode(sessionData);
       await storeSecureData('user_session_$userId', sessionJson);
     } catch (e) {
-      throw SecureStorageException('Failed to store user session: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageStoreSessionFailed',
+        'Failed to store user session: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -108,7 +155,11 @@ class SecureStorageService {
 
       return json.decode(sessionJson) as Map<String, dynamic>;
     } catch (e) {
-      throw SecureStorageException('Failed to retrieve user session: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageRetrieveSessionFailed',
+        'Failed to retrieve user session: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -122,7 +173,11 @@ class SecureStorageService {
       await _secureStorage.write(
           key: 'user_profile_$userId', value: profileJson);
     } catch (e) {
-      throw SecureStorageException('Failed to store user profile: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageStoreProfileFailed',
+        'Failed to store user profile: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -137,7 +192,11 @@ class SecureStorageService {
       return _encryptionService.decryptUserData(encryptedProfile
           .map((key, value) => MapEntry(key, value.toString())));
     } catch (e) {
-      throw SecureStorageException('Failed to retrieve user profile: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageRetrieveProfileFailed',
+        'Failed to retrieve user profile: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -146,7 +205,11 @@ class SecureStorageService {
     try {
       await storeSecureData('api_key_$keyName', apiKey);
     } catch (e) {
-      throw SecureStorageException('Failed to store API key: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageStoreApiKeyFailed',
+        'Failed to store API key: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -155,7 +218,11 @@ class SecureStorageService {
     try {
       return await getSecureData('api_key_$keyName');
     } catch (e) {
-      throw SecureStorageException('Failed to retrieve API key: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageRetrieveApiKeyFailed',
+        'Failed to retrieve API key: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -166,7 +233,11 @@ class SecureStorageService {
       final paymentJson = json.encode(paymentInfo);
       await storeSecureData('payment_info_$userId', paymentJson);
     } catch (e) {
-      throw SecureStorageException('Failed to store payment info: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageStorePaymentFailed',
+        'Failed to store payment info: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -178,7 +249,11 @@ class SecureStorageService {
 
       return json.decode(paymentJson) as Map<String, dynamic>;
     } catch (e) {
-      throw SecureStorageException('Failed to retrieve payment info: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageRetrievePaymentFailed',
+        'Failed to retrieve payment info: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -187,7 +262,11 @@ class SecureStorageService {
     try {
       await storeSecureData('biometric_$userId', biometricData);
     } catch (e) {
-      throw SecureStorageException('Failed to store biometric data: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageStoreBiometricFailed',
+        'Failed to store biometric data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -196,7 +275,11 @@ class SecureStorageService {
     try {
       return await getSecureData('biometric_$userId');
     } catch (e) {
-      throw SecureStorageException('Failed to retrieve biometric data: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageRetrieveBiometricFailed',
+        'Failed to retrieve biometric data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -207,7 +290,11 @@ class SecureStorageService {
       final securityJson = json.encode(securityData);
       await storeSecureData('device_security_$deviceId', securityJson);
     } catch (e) {
-      throw SecureStorageException('Failed to store device security data: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageStoreDeviceSecurityFailed',
+        'Failed to store device security data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -219,8 +306,11 @@ class SecureStorageService {
 
       return json.decode(securityJson) as Map<String, dynamic>;
     } catch (e) {
-      throw SecureStorageException(
-          'Failed to retrieve device security data: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageRetrieveDeviceSecurityFailed',
+        'Failed to retrieve device security data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -239,7 +329,11 @@ class SecureStorageService {
     try {
       await _secureStorage.delete(key: key);
     } catch (e) {
-      throw SecureStorageException('Failed to delete secure data: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageDeleteFailed',
+        'Failed to delete secure data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -248,7 +342,11 @@ class SecureStorageService {
     try {
       await _secureStorage.deleteAll();
     } catch (e) {
-      throw SecureStorageException('Failed to delete all secure data: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageDeleteAllFailed',
+        'Failed to delete all secure data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -257,7 +355,11 @@ class SecureStorageService {
     try {
       return await _secureStorage.readAll().then((map) => map.keys.toList());
     } catch (e) {
-      throw SecureStorageException('Failed to get all keys: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageGetKeysFailed',
+        'Failed to get all keys: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -276,7 +378,11 @@ class SecureStorageService {
         await _secureStorage.delete(key: key);
       }
     } catch (e) {
-      throw SecureStorageException('Failed to clear user data: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageClearUserDataFailed',
+        'Failed to clear user data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -314,7 +420,11 @@ class SecureStorageService {
         'otherKeys': allKeys.length - userKeys - apiKeys - deviceKeys,
       };
     } catch (e) {
-      throw SecureStorageException('Failed to get storage stats: $e');
+      throw SecureStorageException(_translate(
+        'secureStorageGetStatsFailed',
+        'Failed to get storage stats: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 }

@@ -35,6 +35,8 @@ import '../../../../../common/widgets/text/caption_text.dart';
 // import '../../../../../common/widgets/text/heading_large.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 // import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 // import '../../../../../core/navigation/navigation_service.dart';
 // import '../../../../../core/utils/constants/indian_states_cities.dart';
@@ -56,6 +58,25 @@ class OwnerProfileScreen extends StatefulWidget {
 class _OwnerProfileScreenState extends State<OwnerProfileScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   late TextEditingController _fullNameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
@@ -153,12 +174,15 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
   //   });
   // }
 
+  // ignore: unused_element
   Future<File?> _pickImage() async {
     try {
       final imageFile = await ImagePickerHelper.pickImageFromGallery();
       return imageFile;
     } catch (e) {
-      _showSnackBar('Failed to pick image: ${e.toString()}');
+      if (!mounted) return null;
+      final loc = AppLocalizations.of(context)!;
+      _showSnackBar(loc.ownerProfilePickImageFailed(e.toString()));
       return null;
     }
   }
@@ -225,11 +249,13 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
       await viewModel.updateProfile(profileData);
 
       if (mounted) {
-        _showSnackBar('Profile updated successfully');
+        final loc = AppLocalizations.of(context)!;
+        _showSnackBar(loc.ownerProfileUpdateSuccess);
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar('Failed to update profile: ${e.toString()}');
+        final loc = AppLocalizations.of(context)!;
+        _showSnackBar(loc.ownerProfileUpdateFailure(e.toString()));
       }
     }
   }
@@ -261,33 +287,36 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<OwnerProfileViewModel>();
+    final loc = AppLocalizations.of(context)!;
     // final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'My Profile',
+        title: loc.ownerProfileTitle,
         actions: [
           IconButton(
             icon: const Icon(Icons.save_rounded),
             onPressed: viewModel.loading ? null : _saveProfile,
+            tooltip: loc.ownerProfileSaveTooltip,
           ),
         ],
       ),
-      body: _buildBody(context, viewModel),
+      body: _buildBody(context, viewModel, loc),
     );
   }
 
-  Widget _buildBody(BuildContext context, OwnerProfileViewModel viewModel) {
+  Widget _buildBody(
+      BuildContext context, OwnerProfileViewModel viewModel, AppLocalizations loc) {
     return Column(
       children: [
-        _buildTabBar(),
+        _buildTabBar(loc),
         Expanded(
           child: TabBarView(
             controller: _tabController,
             children: [
-              _buildPersonalInfoTab(),
-              _buildBusinessInfoTab(),
-              _buildDocumentsTab(),
+              _buildPersonalInfoTab(loc),
+              _buildBusinessInfoTab(loc),
+              _buildDocumentsTab(loc),
             ],
           ),
         ),
@@ -295,7 +324,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildTabBar(AppLocalizations loc) {
     // final theme = Theme.of(context);
     final primaryColor = AppColors.primary;
     final surfaceColor = AppColors.darkCard;
@@ -329,16 +358,16 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        tabs: const [
-          Tab(text: 'Personal Info'),
-          Tab(text: 'Business Info'),
-          Tab(text: 'Documents'),
+        tabs: [
+          Tab(text: loc.ownerProfileTabPersonalInfo),
+          Tab(text: loc.ownerProfileTabBusinessInfo),
+          Tab(text: loc.ownerProfileTabDocuments),
         ],
       ),
     );
   }
 
-  Widget _buildPersonalInfoTab() {
+  Widget _buildPersonalInfoTab(AppLocalizations loc) {
     // final theme = Theme.of(context);
 
     return SingleChildScrollView(
@@ -350,41 +379,41 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
           children: [
             _buildTextFormField(
               controller: _fullNameController,
-              label: 'Full Name',
-              hint: 'Enter your full name',
+              label: loc.ownerProfileFullNameLabel,
+              hint: loc.ownerProfileFullNameHint,
             ),
             const SizedBox(height: AppSpacing.paddingM),
             _buildTextFormField(
               controller: _emailController,
-              label: 'Email',
-              hint: 'Enter your email',
+              label: loc.ownerProfileEmailLabel,
+              hint: loc.ownerProfileEmailHint,
             ),
             const SizedBox(height: AppSpacing.paddingM),
             _buildTextFormField(
               controller: _phoneController,
-              label: 'Phone Number',
-              hint: 'Enter your phone number',
+              label: loc.ownerProfilePhoneLabel,
+              hint: loc.ownerProfilePhoneHint,
             ),
             const SizedBox(height: AppSpacing.paddingM),
             _buildTextFormField(
               controller: _pgAddressController,
-              label: 'PG Address',
-              hint: 'Enter your PG address',
+              label: loc.ownerProfileAddressLabel,
+              hint: loc.ownerProfileAddressHint,
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            _buildStateDropdown(),
+            _buildStateDropdown(loc),
             const SizedBox(height: AppSpacing.paddingM),
-            _buildCityDropdown(),
+            _buildCityDropdown(loc),
             const SizedBox(height: AppSpacing.paddingM),
             _buildTextFormField(
               controller: _pincodeController,
-              label: 'Pincode',
-              hint: 'Enter pincode',
+              label: loc.ownerProfilePincodeLabel,
+              hint: loc.ownerProfilePincodeHint,
             ),
             const SizedBox(height: AppSpacing.paddingL),
             PrimaryButton(
               onPressed: _saveProfile,
-              label: 'Save Personal Info',
+              label: loc.ownerProfileSavePersonal,
               icon: Icons.save_rounded,
               backgroundColor: AppColors.primary,
             ),
@@ -403,25 +432,31 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
         // _availableCities = IndianStatesCities.getCitiesForState(value ?? '');
       });
     } catch (e) {
-      debugPrint('Error updating selected state: $e');
+      debugPrint(
+        _text(
+          'ownerStateUpdateFailedLog',
+          'Error updating selected state: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
-  Widget _buildStateDropdown() {
+  Widget _buildStateDropdown(AppLocalizations loc) {
     // final theme = Theme.of(context);
 
     return AdaptiveDropdown<String>(
-      label: 'State',
+      label: loc.ownerProfileStateLabel,
       value: _selectedState,
-      hint: 'Select State',
+      hint: loc.ownerProfileStateHint,
       items: [
         DropdownMenuItem<String>(
           value: 'Telangana',
-          child: BodyText(text: 'Telangana'),
+          child: BodyText(text: loc.ownerStateTelangana),
         ),
         DropdownMenuItem<String>(
           value: 'Andhra Pradesh',
-          child: BodyText(text: 'Andhra Pradesh'),
+          child: BodyText(text: loc.ownerStateAndhraPradesh),
         ),
       ],
       onChanged: _onStateChanged,
@@ -435,17 +470,25 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
         _selectedCity = value;
       });
     } catch (e) {
-      debugPrint('Error updating selected city: $e');
+      debugPrint(
+        _text(
+          'ownerCityUpdateFailedLog',
+          'Error updating selected city: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
-  Widget _buildCityDropdown() {
+  Widget _buildCityDropdown(AppLocalizations loc) {
     // final theme = Theme.of(context);
 
     return AdaptiveDropdown<String>(
-      label: 'City',
+      label: loc.ownerProfileCityLabel,
       value: _selectedCity,
-      hint: _selectedState == null ? 'Select state first' : 'Select City',
+      hint: _selectedState == null
+          ? loc.ownerProfileCityHintSelectState
+          : loc.ownerProfileCityHint,
       items: _availableCities.map((city) {
         return DropdownMenuItem<String>(
           value: city,
@@ -471,7 +514,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
     );
   }
 
-  Widget _buildBusinessInfoTab() {
+  Widget _buildBusinessInfoTab(AppLocalizations loc) {
     // final theme = Theme.of(context);
 
     return SingleChildScrollView(
@@ -481,31 +524,31 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
         children: [
           _buildTextFormField(
             controller: _businessNameController,
-            label: 'Business Name',
-            hint: 'Enter business name',
+            label: loc.ownerProfileBusinessNameLabel,
+            hint: loc.ownerProfileBusinessNameHint,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildTextFormField(
             controller: _businessTypeController,
-            label: 'Business Type',
-            hint: 'Enter business type',
+            label: loc.ownerProfileBusinessTypeLabel,
+            hint: loc.ownerProfileBusinessTypeHint,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildTextFormField(
             controller: _panNumberController,
-            label: 'PAN Number',
-            hint: 'Enter PAN number',
+            label: loc.ownerProfilePanLabel,
+            hint: loc.ownerProfilePanHint,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildTextFormField(
             controller: _gstNumberController,
-            label: 'GST Number',
-            hint: 'Enter GST number',
+            label: loc.ownerProfileGstLabel,
+            hint: loc.ownerProfileGstHint,
           ),
           const SizedBox(height: AppSpacing.paddingL),
           PrimaryButton(
             onPressed: _saveProfile,
-            label: 'Save Business Info',
+            label: loc.ownerProfileSaveBusiness,
             icon: Icons.save_rounded,
             backgroundColor: AppColors.primary,
           ),
@@ -514,27 +557,29 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
     );
   }
 
-  Widget _buildDocumentsTab() {
+  Widget _buildDocumentsTab(AppLocalizations loc) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildDocumentUploadCard(
-            title: 'Profile Photo',
-            description: 'Upload your profile photo',
+            title: loc.ownerProfileDocumentProfileTitle,
+            description: loc.ownerProfileDocumentProfileDescription,
             icon: Icons.person_rounded,
             imageUrl: _uploadedProfilePhotoUrl,
+            loc: loc,
             onTap: () {
               // TODO: Implement profile photo selection
             },
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildDocumentUploadCard(
-            title: 'Aadhaar Photo',
-            description: 'Upload your Aadhaar card photo',
+            title: loc.ownerProfileDocumentAadhaarTitle,
+            description: loc.ownerProfileDocumentAadhaarDescription,
             icon: Icons.credit_card_rounded,
             imageUrl: _uploadedAadhaarPhotoUrl,
+            loc: loc,
             onTap: () {
               // TODO: Implement Aadhaar photo selection
             },
@@ -549,6 +594,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
     required String description,
     required IconData icon,
     String? imageUrl,
+    required AppLocalizations loc,
     required VoidCallback onTap,
   }) {
     // final theme = Theme.of(context);
@@ -596,7 +642,9 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
           const SizedBox(height: 12),
           PrimaryButton(
             onPressed: onTap,
-            label: imageUrl != null ? 'Update' : 'Upload',
+            label: imageUrl != null
+                ? loc.ownerProfileDocumentUpdate
+                : loc.ownerProfileDocumentUpload,
             icon: imageUrl != null ? Icons.edit_rounded : Icons.upload_rounded,
             backgroundColor: AppColors.primary,
           ),

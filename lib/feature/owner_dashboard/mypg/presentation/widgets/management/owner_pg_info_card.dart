@@ -1,6 +1,7 @@
 // lib/feature/owner_dashboard/mypg/presentation/widgets/owner_pg_info_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/styles/spacing.dart';
@@ -9,6 +10,8 @@ import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../../l10n/app_localizations.dart';
 import '../../../../../guest_dashboard/pgs/data/models/guest_pg_model.dart';
 import '../../screens/new_pg_setup_screen.dart';
 
@@ -18,22 +21,155 @@ import '../../screens/new_pg_setup_screen.dart';
 class OwnerPgInfoCard extends StatelessWidget {
   final Map<String, dynamic>? pgDetails;
 
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
   const OwnerPgInfoCard({
     super.key,
     required this.pgDetails,
   });
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
+  String _amenityLabel(AppLocalizations? loc, String amenity) {
+    switch (amenity) {
+      case 'WiFi':
+        return loc?.pgAmenityWifi ?? _text('pgAmenityWifi', 'Wi-Fi');
+      case 'Parking':
+        return loc?.pgAmenityParking ?? _text('pgAmenityParking', 'Parking');
+      case 'Security':
+        return loc?.pgAmenitySecurity ?? _text('pgAmenitySecurity', 'Security');
+      case 'CCTV':
+        return loc?.pgAmenityCctv ?? _text('pgAmenityCctv', 'CCTV');
+      case 'Laundry':
+        return loc?.pgAmenityLaundry ?? _text('pgAmenityLaundry', 'Laundry');
+      case 'Kitchen':
+        return loc?.pgAmenityKitchen ?? _text('pgAmenityKitchen', 'Kitchen');
+      case 'AC':
+        return loc?.pgAmenityAc ?? _text('pgAmenityAc', 'AC');
+      case 'Geyser':
+        return loc?.pgAmenityGeyser ?? _text('pgAmenityGeyser', 'Geyser');
+      case 'TV':
+        return loc?.pgAmenityTv ?? _text('pgAmenityTv', 'TV');
+      case 'Refrigerator':
+        return loc?.pgAmenityRefrigerator ??
+            _text('pgAmenityRefrigerator', 'Refrigerator');
+      case 'Power Backup':
+        return loc?.pgAmenityPowerBackup ??
+            _text('pgAmenityPowerBackup', 'Power Backup');
+      case 'Gym':
+        return loc?.pgAmenityGym ?? _text('pgAmenityGym', 'Gym');
+      case 'Curtains':
+        return loc?.pgAmenityCurtains ?? _text('pgAmenityCurtains', 'Curtains');
+      case 'Bucket':
+        return loc?.pgAmenityBucket ?? _text('pgAmenityBucket', 'Bucket');
+      case 'Water Cooler':
+        return loc?.pgAmenityWaterCooler ??
+            _text('pgAmenityWaterCooler', 'Water Cooler');
+      case 'Washing Machine':
+        return loc?.pgAmenityWashingMachine ??
+            _text('pgAmenityWashingMachine', 'Washing Machine');
+      case 'Microwave':
+        return loc?.pgAmenityMicrowave ??
+            _text('pgAmenityMicrowave', 'Microwave');
+      case 'Lift':
+        return loc?.pgAmenityLift ?? _text('pgAmenityLift', 'Lift');
+      case 'Housekeeping':
+        return loc?.pgAmenityHousekeeping ??
+            _text('pgAmenityHousekeeping', 'Housekeeping');
+      case 'Attached Bathroom':
+        return loc?.pgAmenityAttachedBathroom ??
+            _text('pgAmenityAttachedBathroom', 'Attached Bathroom');
+      case 'RO Water':
+        return loc?.pgAmenityRoWater ?? _text('pgAmenityRoWater', 'RO Water');
+      case '24x7 Water Supply':
+        return loc?.pgAmenityWaterSupply ??
+            _text('pgAmenityWaterSupply', '24x7 Water Supply');
+      case 'Bed with Mattress':
+        return loc?.pgAmenityBedWithMattress ??
+            _text('pgAmenityBedWithMattress', 'Bed with Mattress');
+      case 'Wardrobe':
+        return loc?.pgAmenityWardrobe ?? _text('pgAmenityWardrobe', 'Wardrobe');
+      case 'Study Table':
+        return loc?.pgAmenityStudyTable ??
+            _text('pgAmenityStudyTable', 'Study Table');
+      case 'Chair':
+        return loc?.pgAmenityChair ?? _text('pgAmenityChair', 'Chair');
+      case 'Fan':
+        return loc?.pgAmenityFan ?? _text('pgAmenityFan', 'Fan');
+      case 'Lighting':
+        return loc?.pgAmenityLighting ??
+            _text('pgAmenityLighting', 'Lighting');
+      case 'Balcony':
+        return loc?.pgAmenityBalcony ?? _text('pgAmenityBalcony', 'Balcony');
+      case 'Common Area':
+        return loc?.pgAmenityCommonArea ??
+            _text('pgAmenityCommonArea', 'Common Area');
+      case 'Dining Area':
+        return loc?.pgAmenityDiningArea ??
+            _text('pgAmenityDiningArea', 'Dining Area');
+      case 'Induction Stove':
+        return loc?.pgAmenityInductionStove ??
+            _text('pgAmenityInductionStove', 'Induction Stove');
+      case 'Cooking Allowed':
+        return loc?.pgAmenityCookingAllowed ??
+            _text('pgAmenityCookingAllowed', 'Cooking Allowed');
+      case 'Fire Extinguisher':
+        return loc?.pgAmenityFireExtinguisher ??
+            _text('pgAmenityFireExtinguisher', 'Fire Extinguisher');
+      case 'First Aid Kit':
+        return loc?.pgAmenityFirstAidKit ??
+            _text('pgAmenityFirstAidKit', 'First Aid Kit');
+      case 'Smoke Detector':
+        return loc?.pgAmenitySmokeDetector ??
+            _text('pgAmenitySmokeDetector', 'Smoke Detector');
+      case 'Visitor Parking':
+        return loc?.pgAmenityVisitorParking ??
+            _text('pgAmenityVisitorParking', 'Visitor Parking');
+      case 'Intercom':
+        return loc?.pgAmenityIntercom ??
+            _text('pgAmenityIntercom', 'Intercom');
+      case 'Maintenance Staff':
+        return loc?.pgAmenityMaintenanceStaff ??
+            _text('pgAmenityMaintenanceStaff', 'Maintenance Staff');
+      default:
+        return amenity;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     if (pgDetails == null) {
       return AdaptiveCard(
         child: Column(
           children: [
             Icon(Icons.home_outlined, size: 64, color: Colors.grey),
             const SizedBox(height: AppSpacing.paddingM),
-            const HeadingMedium(text: 'No PG Selected'),
+            HeadingMedium(
+              text: loc?.pgInfoNoPgSelected ??
+                  _text('pgInfoNoPgSelected', 'No PG selected'),
+            ),
             const SizedBox(height: AppSpacing.paddingS),
-            const BodyText(text: 'Please select a PG from the dropdown above'),
+            BodyText(
+              text: loc?.pgInfoSelectPgPrompt ??
+                  _text('pgInfoSelectPgPrompt',
+                      'Please select a PG from the dropdown above'),
+            ),
           ],
         ),
       );
@@ -47,6 +183,19 @@ class OwnerPgInfoCard extends StatelessWidget {
         theme.textTheme.bodyLarge?.color ?? AppColors.textPrimary;
     final textSecondary =
         theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+    final numberFormatter = NumberFormat.decimalPattern(loc?.localeName);
+    final city = pgModel.city.trim();
+    final state = pgModel.state.trim();
+    final locationText = city.isNotEmpty && state.isNotEmpty
+        ? loc?.pgSummaryLocationValue(city, state) ??
+            _text('pgSummaryLocationValue', '{city}, {state}',
+                parameters: {'city': city, 'state': state})
+        : city.isNotEmpty
+            ? city
+            : state.isNotEmpty
+                ? state
+                : loc?.pgInfoLocationFallback ??
+                    _text('pgInfoLocationFallback', 'Location not available');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +274,7 @@ class OwnerPgInfoCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: BodyText(
-                                text: '${pgModel.city}, ${pgModel.state}',
+                                text: locationText,
                                 color: textSecondary,
                               ),
                             ),
@@ -142,7 +291,8 @@ class OwnerPgInfoCard extends StatelessWidget {
                       color: theme.primaryColor,
                       size: 20,
                     ),
-                    tooltip: 'Edit PG Details',
+                    tooltip: loc?.pgInfoEditTooltip ??
+                        _text('pgInfoEditTooltip', 'Edit PG details'),
                     style: IconButton.styleFrom(
                       backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
                       shape: RoundedRectangleBorder(
@@ -159,9 +309,17 @@ class OwnerPgInfoCard extends StatelessWidget {
                   context, Icons.location_city, pgModel.address, textSecondary),
               const SizedBox(height: 8),
               _buildInfoRow(context, Icons.phone,
-                  pgModel.contactNumber ?? 'Not provided', textSecondary),
+                  pgModel.contactNumber ??
+                      (loc?.pgInfoContactNotProvided ??
+                          _text('pgInfoContactNotProvided', 'Not provided')),
+                  textSecondary),
               const SizedBox(height: 8),
-              _buildInfoRow(context, Icons.business, pgModel.pgType ?? 'PG',
+              _buildInfoRow(
+                  context,
+                  Icons.business,
+                  pgModel.pgType ??
+                      (loc?.pgInfoPgTypeFallback ??
+                          _text('pgInfoPgTypeFallback', 'PG')),
                   textSecondary),
             ],
           ),
@@ -188,27 +346,49 @@ class OwnerPgInfoCard extends StatelessWidget {
                       color: AppColors.info, size: 20),
                   const SizedBox(width: 8),
                   HeadingSmall(
-                      text: 'PG Structure Overview', color: textPrimary),
+                      text: loc?.pgInfoStructureOverview ??
+                          _text('pgInfoStructureOverview', 'PG structure overview'),
+                      color: textPrimary),
                 ],
               ),
               const SizedBox(height: AppSpacing.paddingM),
               Row(
                 children: [
                   Expanded(
-                      child: _buildStatItem(context, '${pgModel.totalFloors}',
-                          'Floors', Icons.layers, AppColors.info)),
+                      child: _buildStatItem(
+                          context,
+                          numberFormatter.format(pgModel.totalFloors),
+                          loc?.pgInfoFloorsLabel ??
+                              _text('pgInfoFloorsLabel', 'Floors'),
+                          Icons.layers,
+                          AppColors.info)),
                   Expanded(
-                      child: _buildStatItem(context, '${pgModel.totalRooms}',
-                          'Rooms', Icons.meeting_room, AppColors.success)),
+                      child: _buildStatItem(
+                          context,
+                          numberFormatter.format(pgModel.totalRooms),
+                          loc?.pgInfoRoomsLabel ??
+                              _text('pgInfoRoomsLabel', 'Rooms'),
+                          Icons.meeting_room,
+                          AppColors.success)),
                   Expanded(
-                      child: _buildStatItem(context, '${pgModel.totalBeds}',
-                          'Beds', Icons.bed, AppColors.warning)),
+                      child: _buildStatItem(
+                          context,
+                          numberFormatter.format(pgModel.totalBeds),
+                          loc?.pgInfoBedsLabel ??
+                              _text('pgInfoBedsLabel', 'Beds'),
+                          Icons.bed,
+                          AppColors.warning)),
                   if (pgModel.totalRevenuePotential > 0)
                     Expanded(
                         child: _buildStatItem(
                             context,
-                            '₹${pgModel.totalRevenuePotential}',
-                            'Potential',
+                            NumberFormat.currency(
+                              locale: loc?.localeName,
+                              symbol: '₹',
+                              decimalDigits: 0,
+                            ).format(pgModel.totalRevenuePotential),
+                            loc?.pgInfoPotentialLabel ??
+                                _text('pgInfoPotentialLabel', 'Potential'),
                             Icons.currency_rupee,
                             theme.primaryColor)),
                 ],
@@ -239,12 +419,14 @@ class OwnerPgInfoCard extends StatelessWidget {
                         color: AppColors.success, size: 20),
                     const SizedBox(width: 8),
                     HeadingSmall(
-                        text: 'Floor & Room Details', color: textPrimary),
+                        text: loc?.pgInfoFloorRoomDetails ??
+                            _text('pgInfoFloorRoomDetails', 'Floor & room details'),
+                        color: textPrimary),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
                 ...pgModel.floorStructure.map((floor) => _buildFloorInfo(
-                    context, floor, isDarkMode, textPrimary, textSecondary)),
+                    context, floor, isDarkMode, textPrimary, textSecondary, loc)),
               ],
             ),
           ),
@@ -270,7 +452,10 @@ class OwnerPgInfoCard extends StatelessWidget {
                     Icon(Icons.star_rounded,
                         color: AppColors.warning, size: 20),
                     const SizedBox(width: 8),
-                    HeadingSmall(text: 'Amenities', color: textPrimary),
+                    HeadingSmall(
+                        text: loc?.pgAmenitiesTitle ??
+                            _text('pgAmenitiesTitle', 'Amenities & Facilities'),
+                        color: textPrimary),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
@@ -293,7 +478,9 @@ class OwnerPgInfoCard extends StatelessWidget {
                           Icon(Icons.check_circle,
                               size: 14, color: AppColors.info),
                           const SizedBox(width: 4),
-                          CaptionText(text: amenity, color: AppColors.info),
+                        CaptionText(
+                            text: _amenityLabel(loc, amenity),
+                            color: AppColors.info),
                         ],
                       ),
                     );
@@ -352,9 +539,20 @@ class OwnerPgInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildFloorInfo(BuildContext context, dynamic floor, bool isDarkMode,
-      Color textPrimary, Color textSecondary) {
-    final floorName = floor.floorName ?? 'Floor ${floor.floorNumber}';
+  Widget _buildFloorInfo(
+    BuildContext context,
+    dynamic floor,
+    bool isDarkMode,
+    Color textPrimary,
+    Color textSecondary,
+    AppLocalizations? loc,
+  ) {
+    final floorName = floor.floorName ??
+        (floor.floorNumber is int
+            ? loc?.pgFloorNthLabel(floor.floorNumber as int) ??
+                _text('pgFloorNthLabel', 'Floor {number}',
+                    parameters: {'number': floor.floorNumber})
+            : _text('pgFloorLabelFallback', 'Floor'));
     final rooms = floor.rooms as List<dynamic>? ?? [];
 
     return Container(
@@ -391,7 +589,11 @@ class OwnerPgInfoCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              CaptionText(text: '${rooms.length} rooms', color: textSecondary),
+              CaptionText(
+                  text: loc?.pgInfoRoomsSummary(rooms.length) ??
+                      _text('pgInfoRoomsSummary', '{count} rooms',
+                          parameters: {'count': rooms.length}),
+                  color: textSecondary),
             ],
           ),
           if (rooms.isNotEmpty) ...[
@@ -424,7 +626,17 @@ class OwnerPgInfoCard extends StatelessWidget {
                       Icon(Icons.meeting_room, size: 12, color: textSecondary),
                       const SizedBox(width: 4),
                       CaptionText(
-                          text: '$roomNumber ($sharingType, $bedsCount beds)',
+                          text: loc?.pgInfoRoomChip(
+                                  roomNumber, sharingType, bedsCount) ??
+                              _text(
+                                'pgInfoRoomChip',
+                                '{roomNumber} ({sharingType}, {bedsCount} beds)',
+                                parameters: {
+                                  'roomNumber': roomNumber,
+                                  'sharingType': sharingType,
+                                  'bedsCount': bedsCount,
+                                },
+                              ),
                           color: textSecondary),
                     ],
                   ),

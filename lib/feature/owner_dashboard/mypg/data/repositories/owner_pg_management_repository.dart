@@ -2,8 +2,10 @@
 
 import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../common/utils/constants/firestore.dart';
+import '../../../../../common/utils/exceptions/exceptions.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../models/owner_pg_management_model.dart';
 import '../../../../../common/utils/date/converter/date_service_converter.dart';
 
@@ -13,6 +15,24 @@ import '../../../../../common/utils/date/converter/date_service_converter.dart';
 class OwnerPgManagementRepository {
   final IDatabaseService _databaseService;
   final IAnalyticsService _analyticsService;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
@@ -85,7 +105,14 @@ class OwnerPgManagementRepository {
         name: 'owner_pg_create_error',
         parameters: {'error': e.toString()},
       );
-      throw Exception('Failed to create PG: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgCreateFailed',
+          'Failed to create PG: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -220,7 +247,14 @@ class OwnerPgManagementRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to get revenue report: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgRevenueReportFailed',
+          'Failed to get revenue report: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -257,7 +291,14 @@ class OwnerPgManagementRepository {
         name: 'owner_occupancy_report_error',
         parameters: {'error': e.toString()},
       );
-      throw Exception('Failed to get occupancy report: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgOccupancyReportFailed',
+          'Failed to get occupancy report: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -289,7 +330,14 @@ class OwnerPgManagementRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to approve booking: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgApproveBookingFailed',
+          'Failed to approve booking: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -321,7 +369,14 @@ class OwnerPgManagementRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to reject booking: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgRejectBookingFailed',
+          'Failed to reject booking: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -360,7 +415,14 @@ class OwnerPgManagementRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to reschedule booking: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgRescheduleBookingFailed',
+          'Failed to reschedule booking: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -392,7 +454,14 @@ class OwnerPgManagementRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to update bed status: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgUpdateBedStatusFailed',
+          'Failed to update bed status: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -419,7 +488,14 @@ class OwnerPgManagementRepository {
         name: 'owner_pg_save_error',
         parameters: {'error': e.toString()},
       );
-      throw Exception('Failed to save PG: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgSaveFailed',
+          'Failed to save PG: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -440,7 +516,14 @@ class OwnerPgManagementRepository {
         name: 'owner_pg_delete_error',
         parameters: {'error': e.toString()},
       );
-      throw Exception('Failed to delete PG: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgDeleteFailed',
+          'Failed to delete PG: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -477,7 +560,14 @@ class OwnerPgManagementRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to update PG: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgUpdateFailed',
+          'Failed to update PG: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -510,7 +600,14 @@ class OwnerPgManagementRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch PGs: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgFetchListFailed',
+          'Failed to fetch PGs: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -550,7 +647,14 @@ class OwnerPgManagementRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch PG details: $e');
+      throw AppException(
+        message: _text(
+          'ownerPgFetchDetailsFailed',
+          'Failed to fetch PG details: {error}',
+          parameters: {'error': e.toString()},
+        ),
+        details: e.toString(),
+      );
     }
   }
 

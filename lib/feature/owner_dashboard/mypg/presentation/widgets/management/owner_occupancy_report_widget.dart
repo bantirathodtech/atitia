@@ -1,6 +1,7 @@
 // lib/features/owner_dashboard/mypg/presentation/widgets/owner_occupancy_report_widget.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/styles/spacing.dart';
@@ -9,20 +10,53 @@ import '../../../../../../common/widgets/grids/responsive_grid.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../../l10n/app_localizations.dart';
 import '../../../data/models/owner_pg_management_model.dart';
 
 /// Widget displaying occupancy report with statistics
 class OwnerOccupancyReportWidget extends StatelessWidget {
   final OwnerOccupancyReport report;
 
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
   const OwnerOccupancyReportWidget({
     required this.report,
     super.key,
   });
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
+    final numberFormatter = NumberFormat.decimalPattern(loc?.localeName);
+    final percentageFormatter =
+        NumberFormat.decimalPattern(loc?.localeName);
+    final totalBedsText = numberFormatter.format(report.totalBeds);
+    final occupiedBedsText = numberFormatter.format(report.occupiedBeds);
+    final vacantBedsText = numberFormatter.format(report.vacantBeds);
+    final pendingBedsText = numberFormatter.format(report.pendingBeds);
+    final maintenanceBedsText =
+        numberFormatter.format(report.maintenanceBeds);
+    final occupancyRateText =
+        '${percentageFormatter.format(report.occupancyPercentage)}%';
 
     return AdaptiveCard(
       child: Padding(
@@ -35,7 +69,8 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
                 Icon(Icons.analytics_rounded, color: AppColors.info, size: 20),
                 const SizedBox(width: 8),
                 HeadingMedium(
-                  text: 'Occupancy Report',
+                  text: loc?.ownerOccupancyReportTitle ??
+                      _text('ownerOccupancyReportTitle', 'Occupancy Report'),
                   color: AppColors.info,
                 ),
               ],
@@ -48,40 +83,47 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
               childAspectRatio: 1.8,
               children: [
                 _buildStatItem(
-                  'Total Beds',
-                  '${report.totalBeds}',
+                  loc?.ownerOccupancyReportTotalBedsLabel ??
+                      _text('ownerOccupancyReportTotalBedsLabel', 'Total Beds'),
+                  totalBedsText,
                   Icons.bed,
                   AppColors.info,
                 ),
                 _buildStatItem(
-                  'Occupied',
-                  '${report.occupiedBeds}',
+                  loc?.ownerOccupancyReportOccupiedLabel ??
+                      _text('ownerOccupancyReportOccupiedLabel', 'Occupied'),
+                  occupiedBedsText,
                   Icons.person,
                   AppColors.success,
                 ),
                 _buildStatItem(
-                  'Vacant',
-                  '${report.vacantBeds}',
+                  loc?.ownerOccupancyReportVacantLabel ??
+                      _text('ownerOccupancyReportVacantLabel', 'Vacant'),
+                  vacantBedsText,
                   Icons.bed_outlined,
                   AppColors.warning,
                 ),
                 _buildStatItem(
-                  'Occupancy Rate',
-                  '${report.occupancyPercentage.toStringAsFixed(1)}%',
+                  loc?.ownerOccupancyReportRateLabel ??
+                      _text('ownerOccupancyReportRateLabel', 'Occupancy Rate'),
+                  occupancyRateText,
                   Icons.pie_chart,
                   theme.primaryColor,
                 ),
                 if (report.pendingBeds > 0)
                   _buildStatItem(
-                    'Pending',
-                    '${report.pendingBeds}',
+                    loc?.ownerOccupancyReportPendingLabel ??
+                        _text('ownerOccupancyReportPendingLabel', 'Pending'),
+                    pendingBedsText,
                     Icons.schedule,
                     AppColors.warning,
                   ),
                 if (report.maintenanceBeds > 0)
                   _buildStatItem(
-                    'Maintenance',
-                    '${report.maintenanceBeds}',
+                    loc?.ownerOccupancyReportMaintenanceLabel ??
+                        _text('ownerOccupancyReportMaintenanceLabel',
+                            'Maintenance'),
+                    maintenanceBedsText,
                     Icons.build,
                     AppColors.error,
                   ),

@@ -16,6 +16,7 @@ import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/utils/validators/general_validators.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/guest_pg_selection_provider.dart';
 import '../../data/models/guest_complaint_model.dart';
@@ -57,9 +58,12 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error picking image: $e')),
-        );
+        final loc = AppLocalizations.of(context);
+        if (loc != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(loc.errorPickingImage(e.toString()))),
+          );
+        }
       }
     }
   }
@@ -84,11 +88,14 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
   /// Validates form, uploads images, and submits complaint to Firestore
   /// Handles complete complaint submission workflow with error handling
   Future<void> _submitComplaint() async {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return;
+    
     // Validate form inputs
     // Local validation for shared inputs
     setState(() {
-      _subjectError = GeneralValidators.validateRequired('Subject', _subjectController.text);
-      _descriptionError = GeneralValidators.validateRequired('Description', _descriptionController.text);
+      _subjectError = GeneralValidators.validateRequired(loc.subject, _subjectController.text);
+      _descriptionError = GeneralValidators.validateRequired(loc.description, _descriptionController.text);
     });
     if (_subjectError != null || _descriptionError != null) return;
 
@@ -97,9 +104,12 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
     
     // Check user authentication
     if (guestId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not authenticated')),
-      );
+      final loc = AppLocalizations.of(context);
+      if (loc != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.userNotAuthenticated)),
+        );
+      }
       return;
     }
 
@@ -111,9 +121,9 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
     // Validate that guest has selected a PG
     if (pgId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a PG first to file a complaint'),
-          duration: Duration(seconds: 3),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)?.pleaseSelectPgFirstToFileComplaint ?? 'Please select a PG first to file a complaint'),
+          duration: const Duration(seconds: 3),
         ),
       );
       return;
@@ -155,9 +165,12 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
 
       // Check if widget is still mounted before using context
       if (!mounted) return;
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text('Complaint submitted successfully')),
-      );
+      final loc = AppLocalizations.of(context);
+      if (loc != null) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text(loc.complaintSubmittedSuccessfully)),
+        );
+      }
 
       // Navigate back to complaints list using centralized NavigationService
       final navigationService = getIt<NavigationService>();
@@ -169,9 +182,12 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
       // Changed to: catch (dynamic e) with explicit dynamic type annotation
       // Note: Using dynamic instead of Object to avoid naming conflict with type name
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Submission failed: $e')),
-        );
+        final loc = AppLocalizations.of(context);
+        if (loc != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${loc.submissionFailed}: ${e.toString()}')),
+          );
+        }
       }
     } finally {
       if (mounted) {
@@ -189,12 +205,14 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    
     return Scaffold(
       // =======================================================================
       // App Bar with Theme Toggle - Submit Complaint
       // =======================================================================
       appBar: AdaptiveAppBar(
-        title: 'Submit New Complaint',
+        title: loc?.submitNewComplaint ?? 'Submit New Complaint',
         showThemeToggle: true,  // Theme toggle for comfortable form filling
       ),
       body: SingleChildScrollView(
@@ -204,40 +222,52 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Complaint Subject Input (shared TextInput)
-              TextInput(
-                controller: _subjectController,
-                label: 'Subject',
-                hint: 'Brief description of your complaint',
-                error: _subjectError,
-                onChanged: (v) => setState(() {
-                  _subjectError = GeneralValidators.validateRequired('Subject', v);
-                }),
-              ),
-              const SizedBox(height: 16),
+              Builder(
+                builder: (context) {
+                  final loc = AppLocalizations.of(context);
+                  if (loc == null) return const SizedBox.shrink();
+                  
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Complaint Subject Input (shared TextInput)
+                      TextInput(
+                        controller: _subjectController,
+                        label: loc.subject,
+                        hint: loc.briefDescriptionOfYourComplaint,
+                        error: _subjectError,
+                        onChanged: (v) => setState(() {
+                          _subjectError = GeneralValidators.validateRequired(loc.subject, v);
+                        }),
+                      ),
+                      const SizedBox(height: 16),
 
-              // Complaint Description Input (shared TextInput)
-              TextInput(
-                controller: _descriptionController,
-                label: 'Description',
-                hint: 'Detailed description of your complaint or request',
-                maxLines: 5,
-                error: _descriptionError,
-                onChanged: (v) => setState(() {
-                  _descriptionError = GeneralValidators.validateRequired('Description', v);
-                }),
-              ),
-              const SizedBox(height: 16),
+                      // Complaint Description Input (shared TextInput)
+                      TextInput(
+                        controller: _descriptionController,
+                        label: loc.description,
+                        hint: loc.detailedDescriptionOfYourComplaint,
+                        maxLines: 5,
+                        error: _descriptionError,
+                        onChanged: (v) => setState(() {
+                          _descriptionError = GeneralValidators.validateRequired(loc.description, v);
+                        }),
+                      ),
+                      const SizedBox(height: 16),
 
-              // Image Attachment Section
-              _buildImageAttachmentSection(),
-              const SizedBox(height: 24),
+                      // Image Attachment Section
+                      _buildImageAttachmentSection(),
+                      const SizedBox(height: 24),
 
-              // Submit Button
-              PrimaryButton(
-                onPressed: _isSubmitting ? null : _submitComplaint,
-                label: 'Submit Complaint',
-                isLoading: _isSubmitting,
+                      // Submit Button
+                      PrimaryButton(
+                        onPressed: _isSubmitting ? null : _submitComplaint,
+                        label: loc.submitComplaint,
+                        isLoading: _isSubmitting,
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -248,11 +278,14 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
 
   /// Builds the image attachment section with preview and add button
   Widget _buildImageAttachmentSection() {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return const SizedBox.shrink();
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Attach Photos (Optional)',
+          loc.attachPhotosOptional,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
@@ -307,14 +340,14 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
                   border: Border.all(color: Colors.grey.shade300),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.add_a_photo, size: 30, color: Colors.grey),
-                    SizedBox(height: 4),
+                    const Icon(Icons.add_a_photo, size: 30, color: Colors.grey),
+                    const SizedBox(height: 4),
                     Text(
-                      'Add',
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      loc.add,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -325,7 +358,7 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
         if (_imageFiles.isNotEmpty) ...[
           const SizedBox(height: 8),
           Text(
-            '${_imageFiles.length} image(s) selected',
+            loc.imagesSelected(_imageFiles.length),
             style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ],

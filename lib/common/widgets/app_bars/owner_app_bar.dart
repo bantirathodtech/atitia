@@ -9,6 +9,8 @@
 // ============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../../l10n/app_localizations.dart';
 import 'adaptive_app_bar.dart';
 import '../../../feature/owner_dashboard/shared/widgets/pg_selector_dropdown.dart';
 
@@ -56,6 +58,10 @@ class OwnerAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final menuLabel = loc?.menu ?? 'Menu';
+    final refreshLabel = loc?.refresh ?? 'Refresh';
+
     return AdaptiveAppBar(
       // Title: Use titleWidget if provided, otherwise PG selector or tab title
       title: showPgSelector ? null : tabTitle,
@@ -70,12 +76,12 @@ class OwnerAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: onDrawerTap ?? () {
             Scaffold.of(context).openDrawer();
           },
-          tooltip: 'Menu',
+          tooltip: menuLabel,
         ),
       ],
 
       // Actions: Refresh + additional actions + theme toggle
-      actions: _buildActions(context),
+      actions: _buildActions(context, refreshLabel),
 
       // Layout
       centerTitle: true,
@@ -88,7 +94,7 @@ class OwnerAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   /// Build actions (refresh + additional + theme toggle)
-  List<Widget> _buildActions(BuildContext context) {
+  List<Widget> _buildActions(BuildContext context, String refreshLabel) {
     final actions = <Widget>[];
 
     // Add refresh button if enabled
@@ -100,7 +106,7 @@ class OwnerAppBar extends StatelessWidget implements PreferredSizeWidget {
               () {
                 // Default refresh behavior
               },
-          tooltip: 'Refresh',
+          tooltip: refreshLabel,
         ),
       );
     }

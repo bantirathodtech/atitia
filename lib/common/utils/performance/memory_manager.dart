@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'dart:async';
+import '../../../../core/services/localization/internationalization_service.dart';
 
 /// Memory management utility for proper disposal patterns
 /// Helps prevent memory leaks and optimize app performance
@@ -11,6 +12,24 @@ class MemoryManager {
   static final List<ScrollController> _scrollControllers = [];
   static final List<AnimationController> _animationControllers = [];
   static final List<FocusNode> _focusNodes = [];
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Register a stream subscription for automatic disposal
   static void registerSubscription(StreamSubscription subscription) {
@@ -99,7 +118,11 @@ class MemoryManager {
       PaintingBinding.instance.imageCache.clear();
       PaintingBinding.instance.imageCache.clearLiveImages();
     } catch (e) {
-      debugPrint('⚠️ Memory Manager: Failed to clear image cache: $e');
+      debugPrint(_translate(
+        'failedToClearImageCache',
+        '⚠️ Memory Manager: Failed to clear image cache: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 }

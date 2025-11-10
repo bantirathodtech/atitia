@@ -1,9 +1,3 @@
-// ============================================================================
-// Guest Settings Screen
-// ============================================================================
-// Settings screen for guest users to manage app preferences
-// ============================================================================
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -13,27 +7,27 @@ import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/dropdowns/language_selector.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../core/app/theme/theme_provider.dart';
 import '../../../../../l10n/app_localizations.dart';
-import '../../../shared/widgets/guest_drawer.dart';
+import '../../../shared/widgets/owner_drawer.dart';
 
-/// Settings screen for guests
-class GuestSettingsScreen extends StatelessWidget {
-  const GuestSettingsScreen({super.key});
+/// Settings screen for owners
+class OwnerSettingsScreen extends StatelessWidget {
+  const OwnerSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-
     return Scaffold(
       appBar: AdaptiveAppBar(
         title: loc.settings,
       ),
-      drawer: const GuestDrawer(),
+      drawer: OwnerDrawer(
+        currentTabIndex: 0,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         child: Column(
@@ -43,9 +37,9 @@ class GuestSettingsScreen extends StatelessWidget {
               context,
               title: loc.appearance,
               children: [
-                _buildThemeSelector(context),
+                _buildThemeSelector(context, loc),
                 const SizedBox(height: AppSpacing.paddingM),
-                _buildLanguageSelector(context),
+                _buildLanguageSelector(context, loc),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingL),
@@ -146,8 +140,7 @@ class GuestSettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeSelector(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+  Widget _buildThemeSelector(BuildContext context, AppLocalizations loc) {
     final themeProvider = context.watch<ThemeProvider>();
 
     return AdaptiveCard(
@@ -156,7 +149,6 @@ class GuestSettingsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,16 +198,13 @@ class GuestSettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageSelector(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-
+  Widget _buildLanguageSelector(BuildContext context, AppLocalizations loc) {
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,8 +225,6 @@ class GuestSettingsScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingM),
-          const LanguageSelector(),
         ],
       ),
     );
@@ -248,34 +235,14 @@ class GuestSettingsScreen extends StatelessWidget {
     required String title,
     required String subtitle,
     required bool value,
-    required ValueChanged<bool> onChanged,
+    required Function(bool) onChanged,
   }) {
-    return AdaptiveCard(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingM,
-        vertical: AppSpacing.paddingS,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                BodyText(
-                  text: title,
-                  medium: true,
-                ),
-                const SizedBox(height: 4),
-                CaptionText(text: subtitle),
-              ],
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-          ),
-        ],
+    return ListTile(
+      title: BodyText(text: title),
+      subtitle: CaptionText(text: subtitle),
+      trailing: Switch(
+        value: value,
+        onChanged: onChanged,
       ),
     );
   }
@@ -286,17 +253,13 @@ class GuestSettingsScreen extends StatelessWidget {
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return AdaptiveCard(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingM,
-        vertical: AppSpacing.paddingS,
+    return ListTile(
+      title: BodyText(text: title),
+      leading: Icon(
+        icon,
+        color: AppColors.primary,
       ),
-      child: ListTile(
-        leading: Icon(icon, color: AppColors.primary),
-        title: BodyText(text: title, medium: true),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
-      ),
+      onTap: onTap,
     );
   }
 

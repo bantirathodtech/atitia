@@ -343,12 +343,19 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                           ? NetworkImage(user!.profilePhotoUrl!)
                           : null,
                       child: user?.profilePhotoUrl == null
-                          ? Text(
-                              user?.initials ?? 'U',
-                              style: AppTypography.headlineMedium.copyWith(
-                                color: AppColors.textOnPrimary,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          ? Builder(
+                              builder: (context) {
+                                final loc = AppLocalizations.of(context);
+                                final fallbackInitial =
+                                    loc?.drawerDefaultInitial ?? 'U';
+                                return Text(
+                                  user?.initials ?? fallbackInitial,
+                                  style: AppTypography.headlineMedium.copyWith(
+                                    color: AppColors.textOnPrimary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              },
                             )
                           : null,
                     ),
@@ -357,35 +364,48 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
                   // User Info
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user?.displayName ?? 'User',
-                          style: AppTypography.headlineSmall.copyWith(
-                            color: AppColors.textOnPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          user?.roleDisplay ?? 'Guest',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color:
-                                AppColors.textOnPrimary.withValues(alpha: 0.8),
-                          ),
-                        ),
-                        if (user?.email != null) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            user!.email!,
-                            style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textOnPrimary
-                                  .withValues(alpha: 0.7),
+                    child: Builder(
+                      builder: (context) {
+                        final loc = AppLocalizations.of(context);
+                        final displayName = user?.displayName ??
+                            loc?.drawerDefaultUserName ??
+                            'User';
+                        final roleLabel = user?.roleDisplay ??
+                            (user?.isOwner == true
+                                ? loc?.owner ?? 'Owner'
+                                : loc?.guest ?? 'Guest');
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              displayName,
+                              style: AppTypography.headlineMedium.copyWith(
+                                color: AppColors.textOnPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
-                      ],
+                            const SizedBox(height: 4),
+                            Text(
+                              roleLabel,
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.textOnPrimary
+                                    .withValues(alpha: 0.8),
+                              ),
+                            ),
+                            if (user?.email != null) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                user!.email!,
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.textOnPrimary
+                                      .withValues(alpha: 0.7),
+                                ),
+                              ),
+                            ],
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -496,7 +516,8 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
         final role = user?.role ?? 'guest';
 
         // Use custom menu items if provided, otherwise use role-based menu
-        final menuItems = customMenuItems ?? _getRoleBasedMenuItems(role, context);
+        final menuItems =
+            customMenuItems ?? _getRoleBasedMenuItems(role, context);
 
         return SingleChildScrollView(
           child: Column(
@@ -508,8 +529,9 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                   return _buildMenuSection(
                     context,
                     title: loc?.userMenu ?? 'User Menu',
-                    items:
-                        menuItems.where((item) => item.section == 'user').toList(),
+                    items: menuItems
+                        .where((item) => item.section == 'user')
+                        .toList(),
                   );
                 },
               ),
@@ -536,6 +558,8 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
   /// Build Company/Workspace Switcher Section
   Widget _buildCompanySwitcher(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppSpacing.paddingL),
@@ -551,7 +575,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Workspace',
+            loc?.workspaceTitle ?? 'Workspace',
             style: AppTypography.labelLarge.copyWith(
               color: Theme.of(context).textTheme.bodySmall?.color,
               fontWeight: FontWeight.w600,
@@ -582,7 +606,8 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                 const SizedBox(width: AppSpacing.paddingS),
                 Expanded(
                   child: Text(
-                    currentCompany ?? 'Atitia PG Management',
+                    currentCompany ??
+                        (loc?.defaultCompanyName ?? 'Atitia PG Management'),
                     style: AppTypography.bodyMedium,
                   ),
                 ),
@@ -701,56 +726,70 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
           const SizedBox(height: AppSpacing.paddingM),
 
           // Version & Legal Links
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Builder(
-                builder: (context) {
-                  final loc = AppLocalizations.of(context);
-                  return Text(
-                    '${loc?.version ?? 'Version'} 1.0.0',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: Theme.of(context).textTheme.bodySmall?.color,
-                    ),
-                  );
-                },
-              ),
-              Row(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final loc = AppLocalizations.of(context);
+
+              final versionText = Text(
+                '${loc?.version ?? 'Version'} 1.0.0',
+                style: AppTypography.bodySmall.copyWith(
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+              );
+
+              final links = Wrap(
+                alignment: WrapAlignment.end,
+                spacing: AppSpacing.paddingM,
+                runSpacing: AppSpacing.paddingXS,
                 children: [
-                  Builder(
-                    builder: (context) {
-                      final loc = AppLocalizations.of(context);
-                      return GestureDetector(
-                        onTap: () => _showPrivacyPolicy(context),
-                        child: Text(
-                          loc?.privacyPolicy ?? 'Privacy',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.primary,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      );
-                    },
+                  GestureDetector(
+                    onTap: () => _showPrivacyPolicy(context),
+                    child: Text(
+                      loc?.privacyPolicy ?? 'Privacy',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.primary,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: AppSpacing.paddingM),
-                  Builder(
-                    builder: (context) {
-                      final loc = AppLocalizations.of(context);
-                      return GestureDetector(
-                        onTap: () => _showTermsOfService(context),
-                        child: Text(
-                          loc?.termsOfService ?? 'Terms',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.primary,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      );
-                    },
+                  GestureDetector(
+                    onTap: () => _showTermsOfService(context),
+                    child: Text(
+                      loc?.termsOfService ?? 'Terms',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.primary,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
                   ),
                 ],
-              ),
-            ],
+              );
+
+              if (constraints.maxWidth <= 320) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    versionText,
+                    const SizedBox(height: AppSpacing.paddingXS),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: links,
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: versionText),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  Flexible(child: links),
+                ],
+              );
+            },
           ),
 
           const SizedBox(height: AppSpacing.paddingS),
@@ -860,14 +899,14 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
   Widget _buildLanguageSelector(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
     final localizations = AppLocalizations.of(context);
-    
+
     if (localizations == null) {
       return const SizedBox.shrink();
     }
 
     // Get current language display name
-    final currentLang = localeProvider.locale.languageCode == 'te' 
-        ? localizations.telugu 
+    final currentLang = localeProvider.locale.languageCode == 'te'
+        ? localizations.telugu
         : localizations.english;
 
     return GestureDetector(
@@ -1150,9 +1189,10 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
   // ==========================================================================
 
   /// Get role-based menu items
-  List<DrawerMenuItem> _getRoleBasedMenuItems(String role, BuildContext context) {
+  List<DrawerMenuItem> _getRoleBasedMenuItems(
+      String role, BuildContext context) {
     final loc = AppLocalizations.of(context);
-    
+
     // Base items for all roles
     final commonItems = [
       DrawerMenuItem(
@@ -1250,7 +1290,8 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(loc?.privacyPolicy ?? 'Privacy Policy'),
-        content: Text(loc?.privacyPolicy ?? 'Privacy Policy content goes here...'),
+        content:
+            Text(loc?.privacyPolicy ?? 'Privacy Policy content goes here...'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -1268,7 +1309,8 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(loc?.termsOfService ?? 'Terms of Service'),
-        content: Text(loc?.termsOfService ?? 'Terms of Service content goes here...'),
+        content: Text(
+            loc?.termsOfService ?? 'Terms of Service content goes here...'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

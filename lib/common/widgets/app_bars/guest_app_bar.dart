@@ -10,6 +10,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../l10n/app_localizations.dart';
 import 'adaptive_app_bar.dart';
 import '../../../feature/owner_dashboard/shared/viewmodel/selected_pg_provider.dart';
 
@@ -57,6 +59,10 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final menuLabel = loc?.menu ?? 'Menu';
+    final refreshLabel = loc?.refresh ?? 'Refresh';
+
     return AdaptiveAppBar(
       // Title: Use titleWidget if provided, otherwise current PG or tab title
       title: showCurrentPg ? null : tabTitle,
@@ -70,12 +76,12 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: onDrawerTap ?? () {
             Scaffold.of(context).openDrawer();
           },
-          tooltip: 'Menu',
+          tooltip: menuLabel,
         ),
       ],
 
       // Actions: Refresh + additional actions + theme toggle
-      actions: _buildActions(context),
+      actions: _buildActions(context, refreshLabel),
 
       // Layout
       centerTitle: true,
@@ -92,6 +98,9 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Consumer<SelectedPgProvider>(
       builder: (context, selectedPgProvider, child) {
         final selectedPg = selectedPgProvider.selectedPg;
+        final loc = AppLocalizations.of(context);
+        final pgLabel = loc?.pgLabel ?? 'PG';
+        final noPgSelected = loc?.noPgSelected ?? 'No PG Selected';
 
         if (selectedPg != null) {
           return Container(
@@ -114,7 +123,9 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  selectedPg['pgName'] as String? ?? selectedPg['name'] as String? ?? 'PG',
+                  selectedPg['pgName'] as String? ??
+                      selectedPg['name'] as String? ??
+                      pgLabel,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     fontSize: 14,
@@ -145,7 +156,7 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'No PG Selected',
+                  noPgSelected,
                   style: TextStyle(
                     color: Colors.orange,
                     fontSize: 14,
@@ -161,7 +172,7 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   /// Build actions (refresh + additional + theme toggle)
-  List<Widget> _buildActions(BuildContext context) {
+  List<Widget> _buildActions(BuildContext context, String refreshLabel) {
     final actions = <Widget>[];
 
     // Add refresh button if enabled
@@ -173,7 +184,7 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
               () {
                 // Default refresh behavior
               },
-          tooltip: 'Refresh',
+          tooltip: refreshLabel,
         ),
       );
     }

@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../../../../common/lifecycle/stateless/adaptive_stateless_widget.dart';
 import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/utils/data/indian_states_cities.dart';
-import '../../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../../common/widgets/dropdowns/adaptive_dropdown.dart';
-import '../../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../../common/widgets/grids/responsive_grid.dart';
+import '../../../../../../common/widgets/inputs/text_input.dart';
+import '../../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../../l10n/app_localizations.dart';
 
 /// Basic PG Information Form Widget
 class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
@@ -63,18 +64,19 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
     final availableCities = selectedState != null
         ? IndianStatesCities.getCitiesForState(selectedState!)
         : <String>[];
+    final loc = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HeadingMedium(text: 'Basic Information'),
+        HeadingMedium(text: loc.pgBasicInfoTitle),
         const SizedBox(height: AppSpacing.paddingL),
 
         // Full-width Address first for clarity
         TextInput(
           controller: addressController,
-          label: 'Complete Address',
-          hint: 'Full address with landmark',
+          label: loc.pgBasicInfoAddressLabel,
+          hint: loc.pgBasicInfoAddressHint,
           maxLines: 3,
           error: addressError,
         ),
@@ -89,19 +91,19 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
           children: [
             TextInput(
               controller: pgNameController,
-              label: 'PG Name',
-              hint: 'e.g., Green Meadows PG',
+              label: loc.pgBasicInfoPgNameLabel,
+              hint: loc.pgBasicInfoPgNameHint,
               error: pgNameError,
             ),
             TextInput(
               controller: contactController,
-              label: 'Contact Number',
-              hint: 'e.g., +91 9876543210',
+              label: loc.pgBasicInfoContactLabel,
+              hint: loc.pgBasicInfoContactHint,
               keyboardType: TextInputType.phone,
               error: contactError,
             ),
             AdaptiveDropdown<String>(
-              label: 'State',
+              label: loc.pgBasicInfoStateLabel,
               value: selectedState,
               items: IndianStatesCities.states.map((state) {
                 return DropdownMenuItem(
@@ -110,11 +112,11 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
                 );
               }).toList(),
               onChanged: onStateChanged,
-              hint: 'Select State',
+              hint: loc.pgBasicInfoStateHint,
               error: stateError,
             ),
             AdaptiveDropdown<String>(
-              label: 'City',
+              label: loc.pgBasicInfoCityLabel,
               value: selectedCity,
               items: availableCities.map((city) {
                 return DropdownMenuItem(
@@ -123,37 +125,55 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
                 );
               }).toList(),
               onChanged: onCityChanged,
-              hint: 'Select City',
+              hint: loc.pgBasicInfoCityHint,
               enabled: selectedState != null,
               error: cityError,
             ),
             TextInput(
               controller: areaController,
-              label: 'Area',
-              hint: 'e.g., Sector 5, HSR Layout',
+              label: loc.pgBasicInfoAreaLabel,
+              hint: loc.pgBasicInfoAreaHint,
               error: null,
             ),
             AdaptiveDropdown<String>(
-              label: 'PG Type',
+              label: loc.pgBasicInfoPgTypeLabel,
               value: selectedPgType,
-              items: const [
-                DropdownMenuItem(value: 'Boys', child: Text('Boys')),
-                DropdownMenuItem(value: 'Girls', child: Text('Girls')),
-                DropdownMenuItem(value: 'Co-ed', child: Text('Co-ed')),
+              items: [
+                DropdownMenuItem(
+                  value: 'Boys',
+                  child: Text(loc.pgBasicInfoPgTypeBoys),
+                ),
+                DropdownMenuItem(
+                  value: 'Girls',
+                  child: Text(loc.pgBasicInfoPgTypeGirls),
+                ),
+                DropdownMenuItem(
+                  value: 'Co-ed',
+                  child: Text(loc.pgBasicInfoPgTypeCoed),
+                ),
               ],
               onChanged: onPgTypeChanged,
-              hint: 'Select PG Type',
+              hint: loc.pgBasicInfoPgTypeHint,
             ),
             AdaptiveDropdown<String>(
-              label: 'Meal Type',
+              label: loc.pgBasicInfoMealTypeLabel,
               value: selectedMealType,
-              items: const [
-                DropdownMenuItem(value: 'Veg', child: Text('Veg')),
-                DropdownMenuItem(value: 'Non-Veg', child: Text('Non-Veg')),
-                DropdownMenuItem(value: 'Both', child: Text('Both')),
+              items: [
+                DropdownMenuItem(
+                  value: 'Veg',
+                  child: Text(loc.pgBasicInfoMealTypeVeg),
+                ),
+                DropdownMenuItem(
+                  value: 'Non-Veg',
+                  child: Text(loc.pgBasicInfoMealTypeNonVeg),
+                ),
+                DropdownMenuItem(
+                  value: 'Both',
+                  child: Text(loc.pgBasicInfoMealTypeBoth),
+                ),
               ],
               onChanged: onMealTypeChanged,
-              hint: 'Select Meal Type',
+              hint: loc.pgBasicInfoMealTypeHint,
             ),
           ],
         ),
@@ -161,13 +181,13 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
         // Food & Meal Details Section
         if (mealTimingsController != null || foodQualityController != null) ...[
           const SizedBox(height: AppSpacing.paddingL),
-          HeadingMedium(text: 'Food & Meal Details'),
+          HeadingMedium(text: loc.pgBasicInfoFoodSectionTitle),
           const SizedBox(height: AppSpacing.paddingM),
           if (mealTimingsController != null)
             TextInput(
               controller: mealTimingsController!,
-              label: 'Meal Timings',
-              hint: 'e.g., Breakfast: 8:00 AM - 10:00 AM, Lunch: 1:00 PM - 2:00 PM, Dinner: 8:00 PM - 9:30 PM',
+              label: loc.pgBasicInfoMealTimingsLabel,
+              hint: loc.pgBasicInfoMealTimingsHint,
               maxLines: 3,
               keyboardType: TextInputType.multiline,
             ),
@@ -176,8 +196,8 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
           if (foodQualityController != null)
             TextInput(
               controller: foodQualityController!,
-              label: 'Food Quality Description',
-              hint: 'Describe the food quality, cuisine type, specialities, etc.',
+              label: loc.pgBasicInfoFoodQualityLabel,
+              hint: loc.pgBasicInfoFoodQualityHint,
               maxLines: 4,
               keyboardType: TextInputType.multiline,
             ),
@@ -188,8 +208,8 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
         // Full-width Description at the end
         TextInput(
           controller: descriptionController,
-          label: 'Description',
-          hint: 'Brief description of your PG',
+          label: loc.pgBasicInfoDescriptionLabel,
+          hint: loc.pgBasicInfoDescriptionHint,
           keyboardType: TextInputType.multiline,
           textInputAction: TextInputAction.newline,
           maxLines: 6,

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../data/models/owner_pg_management_model.dart';
 import '../../data/repositories/owner_pg_management_repository.dart';
 
@@ -15,6 +16,24 @@ import '../../data/repositories/owner_pg_management_repository.dart';
 class OwnerPgManagementViewModel extends BaseProviderState {
   final OwnerPgManagementRepository _repository;
   final _analyticsService = getIt.analytics;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If repository is not provided, creates it with default services
@@ -50,7 +69,8 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   String get selectedFilter => _selectedFilter;
 
   /// Helper getters for PG details
-  String get pgName => _pgDetails?['pgName'] ?? 'Unknown PG';
+  String get pgName =>
+      _pgDetails?['pgName'] ?? _text('ownerPgUnknownName', 'Unknown PG');
   String get pgAddress => _pgDetails?['address'] ?? '';
   String get pgCity => _pgDetails?['city'] ?? '';
   String get pgState => _pgDetails?['state'] ?? '';
@@ -89,7 +109,14 @@ class OwnerPgManagementViewModel extends BaseProviderState {
         },
       );
     } catch (e) {
-      setError(true, 'Failed to initialize PG management: $e');
+      setError(
+        true,
+        _text(
+          'ownerPgInitializeFailed',
+          'Failed to initialize PG management: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -282,7 +309,14 @@ class OwnerPgManagementViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to approve booking: $e');
+      setError(
+        true,
+        _text(
+          'ownerPgApproveBookingFailed',
+          'Failed to approve booking: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -303,7 +337,14 @@ class OwnerPgManagementViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to reject booking: $e');
+      setError(
+        true,
+        _text(
+          'ownerPgRejectBookingFailed',
+          'Failed to reject booking: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -325,7 +366,14 @@ class OwnerPgManagementViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to reschedule booking: $e');
+      setError(
+        true,
+        _text(
+          'ownerPgRescheduleBookingFailed',
+          'Failed to reschedule booking: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -335,7 +383,10 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   /// Update bed status
   Future<bool> updateBedStatus(String bedId, String status) async {
     if (_pgId == null) {
-      setError(true, 'PG ID not initialized');
+      setError(
+        true,
+        _text('ownerPgIdNotInitialized', 'PG ID not initialized'),
+      );
       return false;
     }
 
@@ -354,7 +405,14 @@ class OwnerPgManagementViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to update bed status: $e');
+      setError(
+        true,
+        _text(
+          'ownerPgUpdateBedStatusFailed',
+          'Failed to update bed status: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -439,7 +497,14 @@ class OwnerPgManagementViewModel extends BaseProviderState {
         parameters: {'pg_id': _pgId ?? 'unknown'},
       );
     } catch (e) {
-      setError(true, 'Failed to refresh data: $e');
+      setError(
+        true,
+        _text(
+          'ownerPgRefreshFailed',
+          'Failed to refresh data: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -481,7 +546,14 @@ class OwnerPgManagementViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to save PG: $e');
+      setError(
+        true,
+        _text(
+          'ownerPgSaveFailed',
+          'Failed to save PG: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -492,7 +564,10 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   Future<bool> updatePGDetails(
       String pgId, Map<String, dynamic> updates) async {
     if (pgId.isEmpty) {
-      setError(true, 'PG ID not provided');
+      setError(
+        true,
+        _text('ownerPgIdNotProvided', 'PG ID not provided'),
+      );
       return false;
     }
 
@@ -512,7 +587,14 @@ class OwnerPgManagementViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to update PG: $e');
+      setError(
+        true,
+        _text(
+          'ownerPgUpdateFailed',
+          'Failed to update PG: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);
@@ -534,7 +616,14 @@ class OwnerPgManagementViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to delete PG: $e');
+      setError(
+        true,
+        _text(
+          'ownerPgDeleteFailed',
+          'Failed to delete PG: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
       return false;
     } finally {
       setLoading(false);

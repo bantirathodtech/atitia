@@ -16,6 +16,7 @@ import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../core/viewmodels/notification_viewmodel.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 
 /// Notifications screen for guests
@@ -28,7 +29,18 @@ class GuestNotificationsScreen extends StatefulWidget {
 }
 
 class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
-  String _selectedFilter = 'All';
+  static const List<String> _filterKeys = [
+    'all',
+    'unread',
+    'bookings',
+    'payments',
+    'complaints',
+    'bed_changes',
+    'pg_updates',
+    'services',
+  ];
+
+  String _selectedFilter = 'all';
 
   @override
   void initState() {
@@ -42,21 +54,17 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'Notifications',
+        title: loc.guestNotificationsTitle,
         actions: [
-          Consumer<NotificationViewModel>(
-            builder: (context, viewModel, _) {
-              return IconButton(
-                icon: const Icon(Icons.mark_email_read),
-                onPressed: viewModel.loading
-                    ? null
-                    : () async {
-                        await viewModel.markAllAsRead();
-                      },
-                tooltip: 'Mark all as read',
-              );
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: loc.refresh,
+            onPressed: () {
+              final viewModel = context.read<NotificationViewModel>();
+              viewModel.loadNotifications();
             },
           ),
         ],
@@ -76,13 +84,14 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
                   const Icon(Icons.error_outline, size: 48, color: Colors.red),
                   const SizedBox(height: AppSpacing.paddingM),
                   BodyText(
-                    text: viewModel.errorMessage ?? 'Failed to load notifications',
+                    text: viewModel.errorMessage ??
+                        loc.guestNotificationsLoadFailed,
                     color: AppColors.textSecondary,
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
                   ElevatedButton(
                     onPressed: () => viewModel.loadNotifications(),
-                    child: const Text('Retry'),
+                    child: Text(loc.retry),
                   ),
                 ],
               ),
@@ -94,13 +103,13 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
 
           return Column(
             children: [
-              _buildFilterChips(),
+              _buildFilterChips(loc),
               Expanded(
                 child: filteredNotifications.isEmpty
                     ? EmptyState(
                         icon: Icons.notifications_none,
-                        title: 'No Notifications',
-                        message: 'You don\'t have any notifications yet.',
+                        title: loc.guestNotificationsEmptyTitle,
+                        message: loc.guestNotificationsEmptyMessage,
                       )
                     : ListView.builder(
                         padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -111,6 +120,7 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
                             context,
                             notification,
                             viewModel,
+                            loc,
                           );
                         },
                       ),
@@ -122,7 +132,7 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
     );
   }
 
-  Widget _buildFilterChips() {
+  Widget _buildFilterChips(AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingM,
@@ -131,54 +141,73 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: [
-            _buildFilterChip('All'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Unread'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Bookings'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Payments'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Complaints'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Bed Changes'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('PG Updates'),
-            const SizedBox(width: AppSpacing.paddingS),
-            _buildFilterChip('Services'),
-          ],
+          children: _filterKeys
+              .map(
+                (key) => Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
+                  child: _buildFilterChip(key, loc),
+                ),
+              )
+              .toList(),
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label) {
-    final isSelected = _selectedFilter == label;
+  Widget _buildFilterChip(String key, AppLocalizations loc) {
+    final isSelected = _selectedFilter == key;
     return FilterChip(
-      label: Text(label),
+      label: Text(_filterLabel(key, loc)),
       selected: isSelected,
       onSelected: (selected) {
         setState(() {
-          _selectedFilter = label;
+          _selectedFilter = key;
         });
       },
     );
+  }
+
+  String _filterLabel(String key, AppLocalizations loc) {
+    switch (key) {
+      case 'unread':
+        return loc.guestNotificationsFilterUnread;
+      case 'bookings':
+        return loc.guestNotificationsFilterBookings;
+      case 'payments':
+        return loc.guestNotificationsFilterPayments;
+      case 'complaints':
+        return loc.guestNotificationsFilterComplaints;
+      case 'bed_changes':
+        return loc.guestNotificationsFilterBedChanges;
+      case 'pg_updates':
+        return loc.guestNotificationsFilterPgUpdates;
+      case 'services':
+        return loc.guestNotificationsFilterServices;
+      case 'all':
+      default:
+        return loc.guestNotificationsFilterAll;
+    }
   }
 
   Widget _buildNotificationCard(
     BuildContext context,
     Map<String, dynamic> notification,
     NotificationViewModel viewModel,
+    AppLocalizations loc,
   ) {
     final isUnread = !(notification['read'] as bool? ?? false);
     final timestamp = notification['timestamp'] as DateTime? ??
         DateTime.now().subtract(const Duration(days: 1));
     final type = notification['type'] as String? ?? '';
+    final title = notification['title'] as String? ??
+        loc.guestNotificationsDefaultTitle;
+    final body = notification['body'] as String? ??
+        loc.guestNotificationsDefaultBody;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-        child: AdaptiveCard(
+      child: AdaptiveCard(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         onTap: () {
           final notificationId = notification['id'] as String?;
@@ -211,7 +240,7 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
                     children: [
                       Expanded(
                         child: BodyText(
-                          text: notification['title'] as String,
+                          text: title,
                           medium: true,
                         ),
                       ),
@@ -228,7 +257,7 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
                   ),
                   const SizedBox(height: 4),
                   CaptionText(
-                    text: notification['body'] as String? ?? 'No message',
+                    text: body,
                   ),
                   const SizedBox(height: 4),
                   CaptionText(

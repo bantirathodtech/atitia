@@ -3,13 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../styles/spacing.dart';
+import '../../../core/models/review_model.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../styles/colors.dart';
+import '../../styles/spacing.dart';
 import '../../styles/typography.dart';
+import '../images/adaptive_image.dart';
 import '../text/body_text.dart';
 import '../text/caption_text.dart';
-import '../images/adaptive_image.dart';
-import '../../../core/models/review_model.dart';
 
 /// ⭐ **REVIEW CARD - PRODUCTION READY**
 ///
@@ -38,10 +39,13 @@ class ReviewCard extends StatefulWidget {
 }
 
 class _ReviewCardState extends State<ReviewCard> {
+  static const _reviewDatePattern = 'MMM dd, yyyy';
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
@@ -56,21 +60,21 @@ class _ReviewCardState extends State<ReviewCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildReviewHeader(context, isDarkMode),
+              _buildReviewHeader(context, isDarkMode, loc),
               const SizedBox(height: AppSpacing.paddingM),
               _buildRatingDisplay(context),
               const SizedBox(height: AppSpacing.paddingM),
-              _buildReviewText(context),
+              _buildReviewText(context, loc),
               if (widget.review.photos.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.paddingM),
-                _buildReviewPhotos(context, isDarkMode),
+                _buildReviewPhotos(context, isDarkMode, loc),
               ],
               if (widget.review.ownerResponse != null) ...[
                 const SizedBox(height: AppSpacing.paddingM),
-                _buildOwnerResponse(context, isDarkMode),
+                _buildOwnerResponse(context, isDarkMode, loc),
               ],
               const SizedBox(height: AppSpacing.paddingM),
-              _buildReviewFooter(context, isDarkMode),
+              _buildReviewFooter(context, loc),
             ],
           ),
         ),
@@ -78,9 +82,25 @@ class _ReviewCardState extends State<ReviewCard> {
     );
   }
 
-  Widget _buildReviewHeader(BuildContext context, bool isDarkMode) {
+  Widget _buildReviewHeader(
+    BuildContext context,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     final theme = Theme.of(context);
-    
+    final reviewDate = _formatDate(loc, widget.review.reviewDate);
+    final fallbackInitials = loc?.guestInitialsFallback ?? 'G';
+    final initialsSource = widget.review.guestName.trim().isNotEmpty
+        ? widget.review.guestName.trim()
+        : fallbackInitials;
+    final trimmedInitials = initialsSource.trim();
+    final displayInitial = trimmedInitials.isNotEmpty
+        ? trimmedInitials[0].toUpperCase()
+        : 'G';
+    final displayName = widget.review.guestName.trim().isNotEmpty
+        ? widget.review.guestName
+        : (loc?.anonymousGuest ?? 'Anonymous Guest');
+
     return Row(
       children: [
         CircleAvatar(
@@ -91,9 +111,7 @@ class _ReviewCardState extends State<ReviewCard> {
               : null,
           child: widget.review.guestPhotoUrl == null
               ? Text(
-                  widget.review.guestName.isNotEmpty 
-                      ? widget.review.guestName[0].toUpperCase()
-                      : 'G',
+                  displayInitial,
                   style: AppTypography.bodyLarge.copyWith(
                     color: theme.primaryColor,
                     fontWeight: FontWeight.bold,
@@ -107,9 +125,7 @@ class _ReviewCardState extends State<ReviewCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.review.guestName.isNotEmpty 
-                    ? widget.review.guestName 
-                    : 'Anonymous Guest',
+                displayName,
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -120,7 +136,7 @@ class _ReviewCardState extends State<ReviewCard> {
                   color: AppColors.textSecondary,
                 ),
               CaptionText(
-                text: DateFormat('MMM dd, yyyy').format(widget.review.reviewDate),
+                text: reviewDate,
                 color: AppColors.textSecondary,
               ),
             ],
@@ -140,7 +156,7 @@ class _ReviewCardState extends State<ReviewCard> {
               ),
             ),
             child: Text(
-              'Pending',
+              loc?.pending ?? 'Pending',
               style: AppTypography.caption.copyWith(
                 color: AppColors.warning,
                 fontWeight: FontWeight.bold,
@@ -175,7 +191,7 @@ class _ReviewCardState extends State<ReviewCard> {
     );
   }
 
-  Widget _buildReviewText(BuildContext context) {
+  Widget _buildReviewText(BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -184,7 +200,7 @@ class _ReviewCardState extends State<ReviewCard> {
           const SizedBox(height: AppSpacing.paddingS),
         ],
         if (_hasAspectRatings()) ...[
-          _buildAspectRatings(context),
+          _buildAspectRatings(context, loc),
         ],
       ],
     );
@@ -198,19 +214,31 @@ class _ReviewCardState extends State<ReviewCard> {
            widget.review.staffRating > 0;
   }
 
-  Map<String, double> _getAspectRatings() {
+  Map<String, double> _getAspectRatings(AppLocalizations? loc) {
     final ratings = <String, double>{};
-    if (widget.review.cleanlinessRating > 0) ratings['Cleanliness'] = widget.review.cleanlinessRating;
-    if (widget.review.amenitiesRating > 0) ratings['Amenities'] = widget.review.amenitiesRating;
-    if (widget.review.locationRating > 0) ratings['Location'] = widget.review.locationRating;
-    if (widget.review.foodRating > 0) ratings['Food Quality'] = widget.review.foodRating;
-    if (widget.review.staffRating > 0) ratings['Staff'] = widget.review.staffRating;
+    if (widget.review.cleanlinessRating > 0) {
+      ratings[loc?.cleanliness ?? 'Cleanliness'] =
+          widget.review.cleanlinessRating;
+    }
+    if (widget.review.amenitiesRating > 0) {
+      ratings[loc?.amenities ?? 'Amenities'] = widget.review.amenitiesRating;
+    }
+    if (widget.review.locationRating > 0) {
+      ratings[loc?.locationLabel ?? 'Location'] =
+          widget.review.locationRating;
+    }
+    if (widget.review.foodRating > 0) {
+      ratings[loc?.foodQuality ?? 'Food Quality'] = widget.review.foodRating;
+    }
+    if (widget.review.staffRating > 0) {
+      ratings[loc?.staffLabel ?? 'Staff'] = widget.review.staffRating;
+    }
     return ratings;
   }
 
-  Widget _buildAspectRatings(BuildContext context) {
+  Widget _buildAspectRatings(BuildContext context, AppLocalizations? loc) {
     final theme = Theme.of(context);
-    final aspectRatings = _getAspectRatings();
+    final aspectRatings = _getAspectRatings(loc);
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,12 +280,16 @@ class _ReviewCardState extends State<ReviewCard> {
     );
   }
 
-  Widget _buildReviewPhotos(BuildContext context, bool isDarkMode) {
+  Widget _buildReviewPhotos(
+    BuildContext context,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Photos',
+          loc?.photos ?? 'Photos',
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -305,9 +337,16 @@ class _ReviewCardState extends State<ReviewCard> {
     );
   }
 
-  Widget _buildOwnerResponse(BuildContext context, bool isDarkMode) {
+  Widget _buildOwnerResponse(
+    BuildContext context,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     final theme = Theme.of(context);
-    
+    final responseDate = widget.review.ownerResponseDate != null
+        ? _formatDate(loc, widget.review.ownerResponseDate!)
+        : null;
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
@@ -333,7 +372,7 @@ class _ReviewCardState extends State<ReviewCard> {
               ),
               const SizedBox(width: AppSpacing.paddingXS),
               Text(
-                'Owner Response',
+                loc?.ownerResponse ?? 'Owner Response',
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
                   color: theme.primaryColor,
@@ -342,7 +381,7 @@ class _ReviewCardState extends State<ReviewCard> {
               const Spacer(),
               if (widget.review.ownerResponseDate != null)
                 CaptionText(
-                  text: DateFormat('MMM dd, yyyy').format(widget.review.ownerResponseDate!),
+                  text: responseDate!,
                   color: AppColors.textSecondary,
                 ),
             ],
@@ -354,9 +393,9 @@ class _ReviewCardState extends State<ReviewCard> {
     );
   }
 
-  Widget _buildReviewFooter(BuildContext context, bool isDarkMode) {
+  Widget _buildReviewFooter(BuildContext context, AppLocalizations? loc) {
     final theme = Theme.of(context);
-    
+
     return Row(
       children: [
         if (widget.onVoteHelpful != null) ...[
@@ -368,7 +407,8 @@ class _ReviewCardState extends State<ReviewCard> {
               color: AppColors.textSecondary,
             ),
             label: Text(
-              'Helpful (${widget.review.helpfulVotes})',
+              loc?.helpfulWithCount(widget.review.helpfulVotes) ??
+                  'Helpful (${widget.review.helpfulVotes})',
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
@@ -381,7 +421,7 @@ class _ReviewCardState extends State<ReviewCard> {
           TextButton(
             onPressed: widget.onViewPhotos,
             child: Text(
-              'View Photos',
+              loc?.viewPhotos ?? 'View Photos',
               style: AppTypography.bodySmall.copyWith(
                 color: theme.primaryColor,
                 fontWeight: FontWeight.w600,
@@ -390,5 +430,11 @@ class _ReviewCardState extends State<ReviewCard> {
           ),
       ],
     );
+  }
+
+  String _formatDate(AppLocalizations? loc, DateTime date) {
+    final localeName = loc?.localeName ?? 'en';
+    final formatter = DateFormat(_reviewDatePattern, localeName);
+    return formatter.format(date);
   }
 }

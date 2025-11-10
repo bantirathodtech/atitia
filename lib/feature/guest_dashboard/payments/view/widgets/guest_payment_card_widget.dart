@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
@@ -21,6 +23,8 @@ class GuestPaymentCardWidget extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onPay;
   final bool showPayButton;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   const GuestPaymentCardWidget({
     super.key,
@@ -29,6 +33,22 @@ class GuestPaymentCardWidget extends StatelessWidget {
     this.onPay,
     this.showPayButton = false,
   });
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   Color _getStatusColor() {
     switch (payment.status.toLowerCase()) {
@@ -60,46 +80,51 @@ class GuestPaymentCardWidget extends StatelessWidget {
     }
   }
 
-  String _getStatusMessage() {
+  String _getStatusMessage(AppLocalizations? loc) {
     switch (payment.status.toLowerCase()) {
       case 'paid':
-        return 'Payment completed successfully';
+        return loc?.paymentCompletedSuccessfully ??
+            _text('paymentCompletedSuccessfully', 'Payment completed successfully');
       case 'pending':
         return payment.isOverdue
-            ? 'Payment overdue - please pay immediately'
-            : 'Payment pending';
+            ? (loc?.paymentOverdue ??
+                _text('paymentOverdue', 'Payment overdue — please pay immediately'))
+            : (loc?.paymentPending ?? _text('paymentPending', 'Payment pending'));
       case 'failed':
-        return 'Payment failed - please try again';
+        return loc?.paymentFailedMessage ??
+            _text('paymentFailedMessage', 'Payment failed — please try again');
       case 'refunded':
-        return 'Payment has been refunded';
+        return loc?.paymentRefunded ??
+            _text('paymentRefunded', 'Payment has been refunded');
       default:
-        return 'Unknown status';
+        return loc?.unknownStatus ?? _text('unknownStatus', 'Unknown status');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return AdaptiveCard(
       onTap: onTap,
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context),
+          _buildHeader(context, loc),
           const SizedBox(height: AppSpacing.paddingS),
-          _buildPaymentInfo(context),
+          _buildPaymentInfo(context, loc),
           const SizedBox(height: AppSpacing.paddingS),
-          _buildStatusRow(context),
-          if (showPayButton && payment.status == 'Pending') ...[
+          _buildStatusRow(context, loc),
+          if (showPayButton && payment.status.toLowerCase() == 'pending') ...[
             const SizedBox(height: AppSpacing.paddingM),
-            _buildActionButtons(context),
+            _buildActionButtons(context, loc),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations? loc) {
     return Row(
       children: [
         Container(
@@ -119,11 +144,20 @@ class GuestPaymentCardWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               HeadingSmall(
-                text: payment.paymentType,
+                text: _paymentTypeLabel(payment.paymentType, loc),
                 color: Theme.of(context).textTheme.titleMedium?.color,
               ),
               CaptionText(
-                text: 'Payment #${payment.paymentId.substring(0, 8)}',
+                text: loc?.paymentNumber(
+                      payment.paymentId.substring(0, 8).toUpperCase(),
+                    ) ??
+                    _text(
+                      'paymentNumber',
+                      'Payment #{id}',
+                      parameters: {
+                        'id': payment.paymentId.substring(0, 8).toUpperCase(),
+                      },
+                    ),
                 color: Theme.of(context).textTheme.bodySmall?.color,
               ),
             ],
@@ -139,7 +173,7 @@ class GuestPaymentCardWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
           ),
           child: Text(
-            payment.status,
+            _statusLabel(payment.status, loc),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 12,
@@ -151,18 +185,18 @@ class GuestPaymentCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentInfo(BuildContext context) {
+  Widget _buildPaymentInfo(BuildContext context, AppLocalizations? loc) {
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             BodyText(
-              text: 'Amount',
+              text: loc?.amount ?? _text('amount', 'Amount'),
               color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
             BodyText(
-              text: payment.formattedAmount,
+              text: _formatAmount(payment.amount, loc),
               color: Theme.of(context).textTheme.titleMedium?.color,
             ),
           ],
@@ -172,11 +206,11 @@ class GuestPaymentCardWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             BodyText(
-              text: 'Due Date',
+              text: loc?.dueDate ?? _text('dueDate', 'Due Date'),
               color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
             BodyText(
-              text: _formatDate(payment.dueDate),
+              text: _formatDate(payment.dueDate, loc),
               color: payment.isOverdue ? Colors.red : null,
             ),
           ],
@@ -187,7 +221,7 @@ class GuestPaymentCardWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               BodyText(
-                text: 'Description',
+                text: loc?.description ?? _text('description', 'Description'),
                 color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
               Expanded(
@@ -204,7 +238,7 @@ class GuestPaymentCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusRow(BuildContext context) {
+  Widget _buildStatusRow(BuildContext context, AppLocalizations? loc) {
     return Row(
       children: [
         Icon(
@@ -215,20 +249,20 @@ class GuestPaymentCardWidget extends StatelessWidget {
         const SizedBox(width: AppSpacing.paddingXS),
         Expanded(
           child: CaptionText(
-            text: _getStatusMessage(),
+            text: _getStatusMessage(loc),
             color: _getStatusColor(),
           ),
         ),
         if (payment.paymentMethod.isNotEmpty)
           CaptionText(
-            text: payment.paymentMethod,
+            text: _paymentMethodLabel(payment.paymentMethod, loc),
             color: Theme.of(context).textTheme.bodySmall?.color,
           ),
       ],
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, AppLocalizations? loc) {
     return Row(
       children: [
         Expanded(
@@ -242,7 +276,7 @@ class GuestPaymentCardWidget extends StatelessWidget {
                 navigationService.goToGuestPaymentDetails(payment.paymentId);
               }
             },
-            label: 'View Details',
+            label: loc?.viewDetails ?? _text('viewDetails', 'View Details'),
             icon: Icons.visibility,
           ),
         ),
@@ -250,7 +284,7 @@ class GuestPaymentCardWidget extends StatelessWidget {
         Expanded(
           child: PrimaryButton(
             onPressed: onPay,
-            label: 'Pay Now',
+            label: loc?.payNow ?? _text('payNow', 'Pay Now'),
             icon: Icons.payment,
             backgroundColor: _getStatusColor(),
           ),
@@ -259,7 +293,70 @@ class GuestPaymentCardWidget extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    return DateFormat('MMM dd, yyyy').format(date);
+  String _formatDate(DateTime date, AppLocalizations? loc) {
+    final locale = loc?.localeName;
+    return DateFormat.yMMMd(locale).format(date);
+  }
+
+  String _formatAmount(double amount, AppLocalizations? loc) {
+    final locale = loc?.localeName ?? 'en_IN';
+    final symbol = NumberFormat.simpleCurrency(locale: locale).currencySymbol;
+    return NumberFormat.currency(locale: locale, symbol: symbol).format(amount);
+  }
+
+  String _statusLabel(String status, AppLocalizations? loc) {
+    switch (status.toLowerCase()) {
+      case 'paid':
+        return loc?.paid ?? _text('paid', 'Paid');
+      case 'pending':
+        return loc?.pending ?? _text('pending', 'Pending');
+      case 'failed':
+        return loc?.failed ?? _text('failed', 'Failed');
+      case 'refunded':
+        return loc?.refunded ?? _text('refunded', 'Refunded');
+      case 'confirmed':
+        return loc?.confirmed ?? _text('confirmed', 'Confirmed');
+      default:
+        return status;
+    }
+  }
+
+  String _paymentMethodLabel(String method, AppLocalizations? loc) {
+    switch (method.toLowerCase()) {
+      case 'razorpay':
+        return loc?.paymentMethodRazorpay ??
+            _text('paymentMethodRazorpay', 'Razorpay');
+      case 'upi':
+        return loc?.paymentMethodUpi ?? _text('paymentMethodUpi', 'UPI');
+      case 'cash':
+        return loc?.paymentMethodCash ?? _text('paymentMethodCash', 'Cash');
+      case 'bank_transfer':
+        return loc?.paymentMethodBankTransfer ??
+            _text('paymentMethodBankTransfer', 'Bank Transfer');
+      default:
+        return loc?.paymentMethodOther ??
+            _text('paymentMethodOther', 'Other');
+    }
+  }
+
+  String _paymentTypeLabel(String type, AppLocalizations? loc) {
+    switch (type.toLowerCase()) {
+      case 'rent':
+        return loc?.paymentTypeRent ??
+            _text('paymentTypeRent', 'Rent Payment');
+      case 'security deposit':
+        return loc?.paymentTypeSecurityDeposit ??
+            _text('paymentTypeSecurityDeposit', 'Security Deposit');
+      case 'maintenance':
+        return loc?.paymentTypeMaintenance ??
+            _text('paymentTypeMaintenance', 'Maintenance Fee');
+      case 'late fee':
+        return loc?.paymentTypeLateFee ??
+            _text('paymentTypeLateFee', 'Late Fee');
+      default:
+        return loc?.paymentTypeOther(type) ??
+            _text('paymentTypeOther', '{type} Payment',
+                parameters: {'type': type});
+    }
   }
 }

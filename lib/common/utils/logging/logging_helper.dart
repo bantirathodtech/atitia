@@ -1,10 +1,29 @@
 // lib/common/utils/logging/logging_helper.dart
 
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../../../../core/services/logging/app_logger.dart';
 
 /// Helper class for common logging patterns and utilities
 class LoggingHelper {
   static AppLogger get _logger => AppLogger.instance;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Log button clicks
   static void logButtonClick(
@@ -13,8 +32,14 @@ class LoggingHelper {
     String? feature,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logButtonClicked',
+      'Button clicked: {buttonName}',
+      parameters: {'buttonName': buttonName},
+    );
+
     _logger.userAction(
-      'Button clicked: $buttonName',
+      message,
       feature: feature ?? 'ui',
       metadata: {
         'buttonName': buttonName,
@@ -32,8 +57,14 @@ class LoggingHelper {
     Map<String, dynamic>? formData,
     bool success = true,
   }) {
+    final message = _translate(
+      'logFormSubmitted',
+      'Form submitted: {formName}',
+      parameters: {'formName': formName},
+    );
+
     _logger.userAction(
-      'Form submitted: $formName',
+      message,
       feature: feature ?? 'ui',
       metadata: {
         'formName': formName,
@@ -52,8 +83,14 @@ class LoggingHelper {
     String? screen,
     String? feature,
   }) {
+    final message = _translate(
+      'logFilterChanged',
+      'Filter changed: {filterType}',
+      parameters: {'filterType': filterType},
+    );
+
     _logger.userAction(
-      'Filter changed: $filterType',
+      message,
       feature: feature ?? 'ui',
       metadata: {
         'filterType': filterType,
@@ -71,8 +108,13 @@ class LoggingHelper {
     String? feature,
     int? resultCount,
   }) {
-    _logger.userAction(
+    final message = _translate(
+      'logSearchPerformed',
       'Search performed',
+    );
+
+    _logger.userAction(
+      message,
       feature: feature ?? 'search',
       metadata: {
         'query': query,
@@ -97,8 +139,14 @@ class LoggingHelper {
     String? feature,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logScreenViewed',
+      'Screen viewed: {screenName}',
+      parameters: {'screenName': screenName},
+    );
+
     _logger.userAction(
-      'Screen viewed: $screenName',
+      message,
       feature: feature ?? 'navigation',
       metadata: {
         'screenName': screenName,
@@ -116,8 +164,14 @@ class LoggingHelper {
     int? itemCount,
     Duration? duration,
   }) {
+    final message = _translate(
+      'logDataLoading',
+      'Data loading: {dataType}',
+      parameters: {'dataType': dataType},
+    );
+
     _logger.info(
-      'Data loading: $dataType',
+      message,
       action: 'data_loading',
       metadata: {
         'dataType': dataType,
@@ -137,8 +191,17 @@ class LoggingHelper {
     Map<String, dynamic>? context,
     StackTrace? stackTrace,
   }) {
+    final message = _translate(
+      'logErrorOperation',
+      'Error in {operation}: {error}',
+      parameters: {
+        'operation': operation,
+        'error': error.toString(),
+      },
+    );
+
     _logger.error(
-      'Error in $operation: ${error.toString()}',
+      message,
       action: 'error_occurred',
       metadata: {
         'operation': operation,
@@ -159,9 +222,14 @@ class LoggingHelper {
     Map<String, dynamic>? responseData,
     String? error,
   }) {
+    final label = _translate(
+      'logApiResponseLabel',
+      'RESPONSE',
+    );
+
     _logger.apiCall(
       endpoint,
-      'RESPONSE',
+      label,
       statusCode: statusCode,
       duration: duration,
       metadata: {
@@ -179,8 +247,14 @@ class LoggingHelper {
     bool success = true,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logAuthEventMessage',
+      'Auth: {event}',
+      parameters: {'event': event},
+    );
+
     _logger.userAction(
-      'Auth: $event',
+      message,
       feature: 'authentication',
       metadata: {
         'event': event,
@@ -199,8 +273,17 @@ class LoggingHelper {
     String? feature,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logRoleActionMessage',
+      '{role} action: {action}',
+      parameters: {
+        'role': role,
+        'action': action,
+      },
+    );
+
     _logger.userAction(
-      '$role action: $action',
+      message,
       feature: feature ?? 'role_action',
       metadata: {
         'role': role,
@@ -217,8 +300,14 @@ class LoggingHelper {
     String? feature,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logPgActionMessage',
+      'PG {action}',
+      parameters: {'action': action},
+    );
+
     _logger.userAction(
-      'PG $action',
+      message,
       feature: feature ?? 'pg_management',
       metadata: {
         'action': action,
@@ -236,8 +325,14 @@ class LoggingHelper {
     String? status,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logPaymentEventMessage',
+      'Payment: {event}',
+      parameters: {'event': event},
+    );
+
     _logger.userAction(
-      'Payment: $event',
+      message,
       feature: 'payments',
       metadata: {
         'event': event,
@@ -256,8 +351,14 @@ class LoggingHelper {
     String? mealType,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logFoodActionMessage',
+      'Food {action}',
+      parameters: {'action': action},
+    );
+
     _logger.userAction(
-      'Food $action',
+      message,
       feature: 'food_management',
       metadata: {
         'action': action,
@@ -275,8 +376,14 @@ class LoggingHelper {
     String? status,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logComplaintEventMessage',
+      'Complaint: {event}',
+      parameters: {'event': event},
+    );
+
     _logger.userAction(
-      'Complaint: $event',
+      message,
       feature: 'complaints',
       metadata: {
         'event': event,
@@ -294,8 +401,14 @@ class LoggingHelper {
     String? pgId,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logGuestActionMessage',
+      'Guest {action}',
+      parameters: {'action': action},
+    );
+
     _logger.userAction(
-      'Guest $action',
+      message,
       feature: 'guest_management',
       metadata: {
         'action': action,
@@ -312,8 +425,14 @@ class LoggingHelper {
     String? pgId,
     Map<String, dynamic>? metadata,
   }) {
+    final message = _translate(
+      'logOwnerActionMessage',
+      'Owner {action}',
+      parameters: {'action': action},
+    );
+
     _logger.userAction(
-      'Owner $action',
+      message,
       feature: 'owner_management',
       metadata: {
         'action': action,

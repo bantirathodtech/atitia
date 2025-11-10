@@ -12,12 +12,33 @@ import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../viewmodel/guest_pg_selection_provider.dart';
 
 /// Compact widget that displays selected PG information in AppBar
 /// Shows PG name and location in a small, centered format
 class GuestPgAppBarDisplay extends StatelessWidget {
   const GuestPgAppBarDisplay({super.key});
+
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +57,7 @@ class GuestPgAppBarDisplay extends StatelessWidget {
 
   /// Builds the display when no PG is selected
   Widget _buildNoPgSelected(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingS,
@@ -59,7 +81,7 @@ class GuestPgAppBarDisplay extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           CaptionText(
-            text: 'No PG Selected',
+            text: loc?.noPgSelected ?? _text('noPgSelected', 'No PG Selected'),
             color: AppColors.primary,
           ),
         ],
@@ -71,10 +93,21 @@ class GuestPgAppBarDisplay extends StatelessWidget {
   Widget _buildPgSelected(BuildContext context, dynamic selectedPg) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
-    final pgName = selectedPg.pgName ?? 'Unknown PG';
-    final pgLocation = selectedPg.fullAddress ??
-        '${selectedPg.city ?? 'Unknown City'}, ${selectedPg.area ?? 'Unknown Area'}';
+    final pgName = (selectedPg.pgName as String?)
+                ?.trim()
+                .isNotEmpty ==
+            true
+        ? selectedPg.pgName
+        : loc?.unknownPg ?? _text('unknownPg', 'Unknown PG');
+
+    final pgLocation = _resolveLocation(
+      context,
+      selectedPg.fullAddress as String?,
+      selectedPg.city as String?,
+      selectedPg.area as String?,
+    );
     final pgStatus = selectedPg.isActive ? 'active' : 'inactive';
 
     return Container(
@@ -116,6 +149,33 @@ class GuestPgAppBarDisplay extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _resolveLocation(
+    BuildContext context,
+    String? fullAddress,
+    String? city,
+    String? area,
+  ) {
+    final loc = AppLocalizations.of(context);
+    if (fullAddress != null && fullAddress.trim().isNotEmpty) {
+      return fullAddress.trim();
+    }
+
+    final hasCity = city?.trim().isNotEmpty ?? false;
+    final hasArea = area?.trim().isNotEmpty ?? false;
+
+    if (!hasCity && !hasArea) {
+      return loc?.pgLocationFallback ??
+          _text('pgLocationFallback', 'Location unavailable');
+    }
+
+    final cityValue =
+        hasCity ? city!.trim() : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
+    final areaValue =
+        hasArea ? area!.trim() : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
+
+    return '$cityValue, $areaValue';
   }
 
   /// Gets color for PG status

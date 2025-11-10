@@ -1,6 +1,7 @@
 // lib/features/owner_dashboard/myguest/view/widgets/record_payment_dialog.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
@@ -11,6 +12,7 @@ import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_guest_model.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 
@@ -70,6 +72,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -87,11 +90,11 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
               children: [
                 _buildHeader(context, isDark),
                 const SizedBox(height: AppSpacing.paddingL),
-                _buildGuestBookingSelection(context, isDark),
+                _buildGuestBookingSelection(context, isDark, loc),
                 const SizedBox(height: AppSpacing.paddingL),
-                _buildPaymentDetailsForm(context, isDark),
+                _buildPaymentDetailsForm(context, isDark, loc),
                 const SizedBox(height: AppSpacing.paddingL),
-                _buildActions(context),
+                _buildActions(context, loc),
               ],
             ),
           ),
@@ -102,6 +105,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
 
   /// Builds the dialog header
   Widget _buildHeader(BuildContext context, bool isDark) {
+    final loc = AppLocalizations.of(context);
     return Row(
       children: [
         Container(
@@ -121,9 +125,10 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const HeadingMedium(text: 'Record Payment'),
+              HeadingMedium(text: loc?.recordPayment ?? 'Record Payment'),
               CaptionText(
-                text: 'Manually record a payment received from a guest',
+                text: loc?.recordPaymentDescription ??
+                    'Manually record a payment received from a guest',
                 color: isDark ? Colors.white70 : Colors.grey[600],
               ),
             ],
@@ -134,19 +139,20 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
   }
 
   /// Builds guest and booking selection
-  Widget _buildGuestBookingSelection(BuildContext context, bool isDark) {
+  Widget _buildGuestBookingSelection(
+      BuildContext context, bool isDark, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const HeadingSmall(text: 'Guest & Booking'),
+        HeadingSmall(text: loc?.guestAndBooking ?? 'Guest & Booking'),
         const SizedBox(height: AppSpacing.paddingM),
         // Guest dropdown
         DropdownButtonFormField<OwnerGuestModel>(
           initialValue: _selectedGuest,
-          decoration: const InputDecoration(
-            labelText: 'Select Guest',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.person),
+          decoration: InputDecoration(
+            labelText: loc?.selectGuest ?? 'Select Guest',
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.person),
           ),
           items: widget.guests.map((guest) {
             return DropdownMenuItem(
@@ -162,7 +168,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
           },
           validator: (value) {
             if (value == null) {
-              return 'Please select a guest';
+              return loc?.pleaseSelectGuest ?? 'Please select a guest';
             }
             return null;
           },
@@ -171,10 +177,10 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
         // Booking dropdown
         DropdownButtonFormField<OwnerBookingModel>(
           initialValue: _selectedBooking,
-          decoration: const InputDecoration(
-            labelText: 'Select Booking (Optional)',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.book_online),
+          decoration: InputDecoration(
+            labelText: loc?.selectBookingOptional ?? 'Select Booking (Optional)',
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.book_online),
           ),
           items: widget.bookings
               .where((booking) => booking.guestUid == _selectedGuest?.uid)
@@ -198,29 +204,30 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
   }
 
   /// Builds payment details form
-  Widget _buildPaymentDetailsForm(BuildContext context, bool isDark) {
+  Widget _buildPaymentDetailsForm(
+      BuildContext context, bool isDark, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const HeadingSmall(text: 'Payment Details'),
+        HeadingSmall(text: loc?.paymentDetails ?? 'Payment Details'),
         const SizedBox(height: AppSpacing.paddingM),
         // Amount
         TextFormField(
           controller: _amountController,
-          decoration: const InputDecoration(
-            labelText: 'Payment Amount *',
-            hintText: 'Enter amount in rupees',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.currency_rupee),
+          decoration: InputDecoration(
+            labelText: loc?.paymentAmountLabel ?? 'Payment Amount *',
+            hintText: loc?.enterAmountHint ?? 'Enter amount in rupees',
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.currency_rupee),
           ),
           keyboardType: TextInputType.numberWithOptions(decimal: true),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Please enter payment amount';
+              return loc?.pleaseEnterAmount ?? 'Please enter amount';
             }
             final amount = double.tryParse(value);
             if (amount == null || amount <= 0) {
-              return 'Please enter a valid amount';
+              return loc?.pleaseEnterValidAmount ?? 'Please enter a valid amount';
             }
             return null;
           },
@@ -229,17 +236,22 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
         // Payment method
         DropdownButtonFormField<String>(
           initialValue: _selectedPaymentMethod,
-          decoration: const InputDecoration(
-            labelText: 'Payment Method *',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.payment),
+          decoration: InputDecoration(
+            labelText: loc?.paymentMethod ?? 'Payment Method *',
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.payment),
           ),
-          items: const [
-            DropdownMenuItem(value: 'cash', child: Text('Cash')),
-            DropdownMenuItem(value: 'upi', child: Text('UPI')),
-            DropdownMenuItem(value: 'card', child: Text('Card')),
+          items: [
             DropdownMenuItem(
-                value: 'bank_transfer', child: Text('Bank Transfer')),
+                value: 'cash', child: Text(loc?.paymentMethodCash ?? 'Cash')),
+            DropdownMenuItem(
+                value: 'upi', child: Text(loc?.paymentMethodUpi ?? 'UPI')),
+            DropdownMenuItem(
+                value: 'card', child: Text(loc?.paymentMethodCard ?? 'Card')),
+            DropdownMenuItem(
+                value: 'bank_transfer',
+                child:
+                    Text(loc?.paymentMethodBankTransfer ?? 'Bank Transfer')),
           ],
           onChanged: (value) {
             setState(() {
@@ -276,7 +288,8 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
                 Expanded(
                   child: BodyText(
                     text:
-                        '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                        DateFormat.yMMMd(loc?.localeName)
+                            .format(_selectedDate),
                   ),
                 ),
               ],
@@ -287,22 +300,23 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
         // Transaction ID
         TextFormField(
           controller: _transactionIdController,
-          decoration: const InputDecoration(
-            labelText: 'Transaction ID (Optional)',
-            hintText: 'Enter transaction ID or reference number',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.receipt),
+          decoration: InputDecoration(
+            labelText: loc?.transactionIdOptional ?? 'Transaction ID (Optional)',
+            hintText: loc?.enterTransactionIdHint ??
+                'Enter transaction ID or reference number',
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.receipt),
           ),
         ),
         const SizedBox(height: AppSpacing.paddingM),
         // Notes
         TextFormField(
           controller: _notesController,
-          decoration: const InputDecoration(
-            labelText: 'Notes (Optional)',
-            hintText: 'Any additional notes about this payment',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.note),
+          decoration: InputDecoration(
+            labelText: loc?.notesOptional ?? 'Notes (Optional)',
+            hintText: loc?.notesHint ?? 'Any additional notes about this payment',
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.note),
           ),
           maxLines: 3,
         ),
@@ -311,19 +325,21 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
   }
 
   /// Builds the action buttons
-  Widget _buildActions(BuildContext context) {
+  Widget _buildActions(BuildContext context, AppLocalizations? loc) {
     return Row(
       children: [
         Expanded(
           child: SecondaryButton(
-            label: 'Cancel',
+            label: loc?.cancel ?? 'Cancel',
             onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
           ),
         ),
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: PrimaryButton(
-            label: _isSubmitting ? 'Recording...' : 'Record Payment',
+            label: _isSubmitting
+                ? (loc?.recording ?? 'Recording...')
+                : (loc?.recordPayment ?? 'Record Payment'),
             onPressed: _isSubmitting ? null : _submitPayment,
             isLoading: _isSubmitting,
           ),
@@ -340,8 +356,10 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
 
     if (_selectedGuest == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a guest'),
+        SnackBar(
+          content: Text(
+              AppLocalizations.of(context)?.pleaseSelectGuest ??
+                  'Please select a guest'),
           backgroundColor: Colors.red,
         ),
       );
@@ -356,7 +374,8 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final viewModel =
           Provider.of<OwnerGuestViewModel>(context, listen: false);
-      final ownerName = authProvider.user?.fullName ?? 'Owner';
+      final ownerName =
+          authProvider.user?.fullName ?? (AppLocalizations.of(context)?.owner ?? 'Owner');
 
       final amount = double.parse(_amountController.text.trim());
       final paymentId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -400,9 +419,10 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: BodyText(
-              text: 'Error recording payment: $e',
-              color: Colors.white,
+            content: Text(
+              AppLocalizations.of(context)
+                      ?.errorRecordingPayment(e.toString()) ??
+                  'Error recording payment: $e',
             ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,

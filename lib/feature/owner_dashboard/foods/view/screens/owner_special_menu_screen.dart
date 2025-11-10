@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
@@ -24,6 +25,7 @@ import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../data/models/owner_food_menu.dart';
 import '../../viewmodel/owner_food_viewmodel.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 /// Screen for owners to create special menu overrides for festivals/events
 class OwnerSpecialMenuScreen extends StatefulWidget {
@@ -85,14 +87,16 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final appBarTitle = widget.existingOverride != null
+        ? loc.ownerSpecialMenuEditTitle
+        : loc.ownerSpecialMenuAddTitle;
     return Scaffold(
       // =======================================================================
       // App Bar with Theme Toggle - Special Menu
       // =======================================================================
       appBar: AdaptiveAppBar(
-        title: widget.existingOverride != null
-            ? 'Edit Special Menu'
-            : 'Add Special Menu',
+        title: appBarTitle,
         elevation: 2,
         showThemeToggle: true, // Theme toggle for comfortable form filling
       ),
@@ -103,7 +107,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                 children: [
                   AdaptiveLoader(),
                   const SizedBox(height: AppSpacing.paddingM),
-                  const BodyText(text: 'Saving special menu...'),
+                  BodyText(text: loc.ownerSpecialMenuSaving),
                 ],
               ),
             )
@@ -115,24 +119,25 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Date Selection
-                    _buildDateSection(),
+                    _buildDateSection(loc),
                     const SizedBox(height: AppSpacing.paddingM),
 
                     // Festival Name
-                    _buildFestivalSection(),
+                    _buildFestivalSection(loc),
                     const SizedBox(height: AppSpacing.paddingM),
 
                     // Special Note
-                    _buildNoteSection(),
+                    _buildNoteSection(loc),
                     const SizedBox(height: AppSpacing.paddingM),
 
                     // Info about fallback
-                    _buildFallbackInfo(),
+                    _buildFallbackInfo(loc),
                     const SizedBox(height: AppSpacing.paddingM),
 
                     // Meal Sections (Optional)
                     _buildOptionalMealSection(
-                      'Breakfast',
+                      loc,
+                      loc.breakfast,
                       _breakfastItems,
                       Icons.free_breakfast,
                       (items) => setState(() => _breakfastItems = items),
@@ -140,7 +145,8 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                     const SizedBox(height: AppSpacing.paddingM),
 
                     _buildOptionalMealSection(
-                      'Lunch',
+                      loc,
+                      loc.lunch,
                       _lunchItems,
                       Icons.lunch_dining,
                       (items) => setState(() => _lunchItems = items),
@@ -148,7 +154,8 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                     const SizedBox(height: AppSpacing.paddingM),
 
                     _buildOptionalMealSection(
-                      'Dinner',
+                      loc,
+                      loc.dinner,
                       _dinnerItems,
                       Icons.dinner_dining,
                       (items) => setState(() => _dinnerItems = items),
@@ -160,7 +167,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                       width: double.infinity,
                       child: PrimaryButton(
                         onPressed: _saveSpecialMenu,
-                        label: 'Save Special Menu',
+                        label: loc.ownerSpecialMenuSaveButton,
                         icon: Icons.save,
                       ),
                     ),
@@ -171,9 +178,11 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
     );
   }
 
-  Widget _buildDateSection() {
+  Widget _buildDateSection(AppLocalizations loc) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final formattedDate =
+        DateFormat.yMMMMd(loc.localeName).format(_selectedDate);
 
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -184,7 +193,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
             children: [
               Icon(Icons.calendar_today, color: theme.primaryColor, size: 20),
               const SizedBox(width: AppSpacing.paddingS),
-              const HeadingSmall(text: 'Date'),
+              HeadingSmall(text: loc.date),
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -205,8 +214,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   BodyText(
-                    text:
-                        '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                    text: formattedDate,
                     medium: true,
                   ),
                   Icon(Icons.edit_calendar, color: theme.primaryColor),
@@ -219,7 +227,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
     );
   }
 
-  Widget _buildFestivalSection() {
+  Widget _buildFestivalSection(AppLocalizations loc) {
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -230,21 +238,21 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
               Icon(Icons.celebration,
                   color: Theme.of(context).primaryColor, size: 20),
               const SizedBox(width: AppSpacing.paddingS),
-              const HeadingSmall(text: 'Festival/Event Name'),
+              HeadingSmall(text: loc.ownerSpecialMenuFestivalHeading),
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
           TextInput(
             controller: _festivalNameController,
-            label: 'Name',
-            hint: 'e.g., Diwali, Ugadi, Special Event',
+            label: loc.name,
+            hint: loc.ownerSpecialMenuFestivalHint,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildNoteSection() {
+  Widget _buildNoteSection(AppLocalizations loc) {
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -254,14 +262,14 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
             children: [
               Icon(Icons.note, color: Theme.of(context).primaryColor, size: 20),
               const SizedBox(width: AppSpacing.paddingS),
-              const HeadingSmall(text: 'Special Note'),
+              HeadingSmall(text: loc.ownerSpecialMenuSpecialNoteHeading),
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
           TextInput(
             controller: _specialNoteController,
-            label: 'Note',
-            hint: 'Any special instructions or details...',
+            label: loc.ownerSpecialMenuSpecialNoteLabel,
+            hint: loc.ownerSpecialMenuSpecialNoteHint,
             maxLines: 2,
           ),
         ],
@@ -269,7 +277,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
     );
   }
 
-  Widget _buildFallbackInfo() {
+  Widget _buildFallbackInfo(AppLocalizations loc) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
@@ -282,14 +290,14 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
         children: [
           Icon(
             Icons.info_outline,
-            color:
-                isDarkMode ? AppColors.info : AppColors.info.withValues(alpha: 0.8),
+            color: isDarkMode
+                ? AppColors.info
+                : AppColors.info.withValues(alpha: 0.8),
           ),
           const SizedBox(width: AppSpacing.paddingS),
           Expanded(
             child: BodyText(
-              text:
-                  'Leave meal sections empty to use the default weekly menu for this day',
+              text: loc.ownerSpecialMenuFallbackInfo,
               color: isDarkMode
                   ? theme.textTheme.bodyMedium?.color
                   : AppColors.info.withValues(alpha: 0.9),
@@ -301,6 +309,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
   }
 
   Widget _buildOptionalMealSection(
+    AppLocalizations loc,
     String title,
     List<String>? items,
     IconData icon,
@@ -325,7 +334,8 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                 children: [
                   Icon(icon, color: theme.primaryColor, size: 20),
                   const SizedBox(width: AppSpacing.paddingS),
-                  HeadingSmall(text: '$title (Optional)'),
+                  HeadingSmall(
+                      text: loc.ownerSpecialMenuOptionalSection(title)),
                 ],
               ),
               Switch(
@@ -348,15 +358,16 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                 child: Column(
                   children: [
                     BodyText(
-                      text: 'No items added',
+                      text: loc.ownerSpecialMenuNoItems,
                       color: isDarkMode
                           ? AppColors.textTertiary
                           : AppColors.textSecondary,
                     ),
                     const SizedBox(height: AppSpacing.paddingS),
                     SecondaryButton(
-                      onPressed: () => _addMealItem(title, mealItems, onUpdate),
-                      label: 'Add Item',
+                      onPressed: () =>
+                          _addMealItem(loc, title, mealItems, onUpdate),
+                      label: loc.ownerSpecialMenuAddItem,
                       icon: Icons.add,
                     ),
                   ],
@@ -422,8 +433,9 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: SecondaryButton(
-                  onPressed: () => _addMealItem(title, mealItems, onUpdate),
-                  label: 'Add Item',
+                  onPressed: () =>
+                      _addMealItem(loc, title, mealItems, onUpdate),
+                  label: loc.ownerSpecialMenuAddItem,
                   icon: Icons.add,
                 ),
               ),
@@ -450,6 +462,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
   }
 
   Future<void> _addMealItem(
+    AppLocalizations loc,
     String mealType,
     List<String> items,
     Function(List<String>?) onUpdate,
@@ -462,17 +475,18 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
-        title: HeadingMedium(text: 'Add $mealType Item'),
+        title:
+            HeadingMedium(text: loc.ownerSpecialMenuAddMealItemTitle(mealType)),
         content: TextInput(
           controller: controller,
-          label: 'Item Name',
-          hint: 'e.g., Special Biryani',
+          label: loc.ownerSpecialMenuItemNameLabel,
+          hint: loc.ownerSpecialMenuItemNameHint,
           autoFocus: true,
         ),
         actions: [
           SecondaryButton(
             onPressed: () => Navigator.of(context).pop(),
-            label: 'Cancel',
+            label: loc.cancel,
           ),
           PrimaryButton(
             onPressed: () {
@@ -480,7 +494,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                 Navigator.of(context).pop(controller.text.trim());
               }
             },
-            label: 'Add',
+            label: loc.add,
             icon: Icons.add,
           ),
         ],
@@ -494,11 +508,16 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
   }
 
   Future<void> _saveSpecialMenu() async {
+    final loc = AppLocalizations.of(context)!;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
     // Validate festival name
     if (_festivalNameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: const Text('Please enter festival/event name'),
+          content: Text(
+            loc.ownerSpecialMenuFestivalRequired,
+          ),
           backgroundColor: AppColors.warning,
         ),
       );
@@ -552,23 +571,22 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
           // Changed from: Using context after async gap with unrelated mounted check
           // Changed to: Check mounted immediately before using context, store Navigator and ScaffoldMessenger
           if (!mounted) return;
-          final navigator = Navigator.of(context);
-          final scaffoldMessenger = ScaffoldMessenger.of(context);
-          
           navigator.pop();
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: const Text('Special menu saved successfully!'),
+              content: Text(loc.ownerSpecialMenuSaveSuccess),
               backgroundColor: AppColors.success,
             ),
           );
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          final errorMessage = foodVM.errorMessage?.isNotEmpty == true
+              ? foodVM.errorMessage!
+              : loc.unknownErrorOccurred;
+          scaffoldMessenger.showSnackBar(
             SnackBar(
-              content:
-                  Text('Failed to save special menu: ${foodVM.errorMessage}'),
+              content: Text(loc.ownerSpecialMenuSaveError(errorMessage)),
               backgroundColor: AppColors.error,
             ),
           );
@@ -576,9 +594,11 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('Error saving special menu: $e'),
+            content: Text(
+              loc.ownerSpecialMenuSaveError(e.toString()),
+            ),
             backgroundColor: AppColors.error,
           ),
         );

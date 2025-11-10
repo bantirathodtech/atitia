@@ -12,6 +12,7 @@ import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/loaders/shimmer_loader.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../feature/owner_dashboard/foods/data/models/owner_food_menu.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
@@ -39,24 +40,32 @@ class GuestFoodListScreen extends StatefulWidget {
 class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<String> _days = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday'
-  ];
+  
+  List<String> _getDays(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) {
+      return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    }
+    return [
+      loc.monday,
+      loc.tuesday,
+      loc.wednesday,
+      loc.thursday,
+      loc.friday,
+      loc.saturday,
+      loc.sunday,
+    ];
+  }
 
   @override
   void initState() {
     super.initState();
     // Initialize tab controller with today's day
     final today = DateFormat('EEEE').format(DateTime.now());
-    final todayIndex = _days.indexOf(today);
+    final englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final todayIndex = englishDays.indexOf(today);
     _tabController = TabController(
-      length: _days.length,
+      length: 7, // Always 7 days
       vsync: this,
       initialIndex: todayIndex >= 0 ? todayIndex : 0,
     );
@@ -131,6 +140,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final today = DateFormat('EEEE').format(DateTime.now());
+    final loc = AppLocalizations.of(context);
+    final days = _getDays(context);
+    final englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     return SingleChildScrollView(
       child: Column(
@@ -155,8 +167,11 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               labelColor: theme.primaryColor,
               unselectedLabelColor:
                   isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
-              tabs: _days.map((day) {
-                final isToday = day == today;
+              tabs: days.asMap().entries.map((entry) {
+                final index = entry.key;
+                final day = entry.value;
+                final englishDay = englishDays[index];
+                final isToday = englishDay == today;
                 return Tab(
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -196,7 +211,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             height: MediaQuery.of(context).size.height - 350,
             child: TabBarView(
               controller: _tabController,
-              children: _days.map((day) {
+              children: englishDays.map((day) {
                 final menu = foodViewModel.getMenuForDay(day);
                 return _buildDayMenu(context, day, menu, isDarkMode);
               }).toList(),
@@ -215,7 +230,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     like: true,
                   ),
                   icon: const Icon(Icons.thumb_up_alt_outlined),
-                  label: const Text("Like Today's Menu"),
+                  label: Text(loc?.likeTodaysMenu ?? "Like Today's Menu"),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
                 OutlinedButton.icon(
@@ -224,7 +239,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     like: false,
                   ),
                   icon: const Icon(Icons.thumb_down_alt_outlined),
-                  label: const Text('Dislike'),
+                  label: Text(loc?.dislike ?? 'Dislike'),
                 ),
               ],
             ),
@@ -256,7 +271,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           if (menu.breakfast.isNotEmpty)
             _buildMealSection(
               context,
-              'Breakfast',
+              AppLocalizations.of(context)?.breakfast ?? 'Breakfast',
               Icons.free_breakfast,
               menu.breakfast,
               AppColors.breakfast,
@@ -269,7 +284,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           if (menu.lunch.isNotEmpty)
             _buildMealSection(
               context,
-              'Lunch',
+              AppLocalizations.of(context)?.lunch ?? 'Lunch',
               Icons.lunch_dining,
               menu.lunch,
               AppColors.lunch,
@@ -282,7 +297,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           if (menu.dinner.isNotEmpty)
             _buildMealSection(
               context,
-              'Dinner',
+              AppLocalizations.of(context)?.dinner ?? 'Dinner',
               Icons.dinner_dining,
               menu.dinner,
               AppColors.dinner,
@@ -303,6 +318,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   Widget _buildMenuInfoCard(
       BuildContext context, OwnerFoodMenu menu, bool isDarkMode) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -329,7 +345,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Menu Note',
+                  loc?.menuNote ?? 'Menu Note',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.textTheme.bodyLarge?.color,
@@ -362,6 +378,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     bool isDarkMode,
   ) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -426,7 +443,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: Text(
-                    '${items.length} items',
+                    '${items.length} ${loc?.items ?? 'items'}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: color,
                       fontWeight: FontWeight.w600,
@@ -507,7 +524,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     color: Theme.of(context).primaryColor),
                 const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
-                  text: 'Food Gallery',
+                  text: AppLocalizations.of(context)?.foodGallery ?? 'Food Gallery',
                   color: Theme.of(context).textTheme.headlineSmall?.color,
                 ),
               ],
@@ -557,11 +574,24 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
 
   /// ❌ No menu for day
   Widget _buildNoDayMenu(BuildContext context, String day, bool isDarkMode) {
+    final loc = AppLocalizations.of(context);
+    // Map English day to localized day
+    final dayMap = {
+      'Monday': loc?.monday ?? 'Monday',
+      'Tuesday': loc?.tuesday ?? 'Tuesday',
+      'Wednesday': loc?.wednesday ?? 'Wednesday',
+      'Thursday': loc?.thursday ?? 'Thursday',
+      'Friday': loc?.friday ?? 'Friday',
+      'Saturday': loc?.saturday ?? 'Saturday',
+      'Sunday': loc?.sunday ?? 'Sunday',
+    };
+    final localizedDay = dayMap[day] ?? day;
+    
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: EmptyState(
-        title: 'No Menu for $day',
-        message: 'The owner hasn\'t set a menu for this day yet.',
+        title: loc?.noMenuForDay(localizedDay) ?? 'No Menu for $localizedDay',
+        message: loc?.ownerHasntSetMenuForDay ?? 'The owner hasn\'t set a menu for this day yet.',
         icon: Icons.restaurant_menu,
       ),
     );
@@ -590,14 +620,15 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   /// ❌ Error state
   Widget _buildErrorState(
       BuildContext context, GuestFoodViewmodel foodViewModel) {
+    final loc = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: EmptyState(
-        title: 'Error Loading Menu',
+        title: loc?.errorLoadingMenu ?? 'Error Loading Menu',
         message: foodViewModel.errorMessage ??
-            'Unable to load menu. Please try again.',
+            (loc?.unableToLoadMenuPleaseTryAgain ?? 'Unable to load menu. Please try again.'),
         icon: Icons.error_outline,
-        actionLabel: 'Retry',
+        actionLabel: loc?.retry ?? 'Retry',
         onAction: () => foodViewModel.loadGuestMenu(),
       ),
     );
@@ -642,7 +673,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Food Menu Statistics',
+            text: AppLocalizations.of(context)?.foodMenuStatistics ?? 'Food Menu Statistics',
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -653,7 +684,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               Expanded(
                 child: _buildStatCard(
                   context,
-                  'Weekly Menus',
+                  AppLocalizations.of(context)?.weeklyMenus ?? 'Weekly Menus',
                   '0',
                   Icons.calendar_view_week,
                   Colors.blue,
@@ -1041,7 +1072,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             child: ElevatedButton.icon(
               onPressed: () => foodViewModel.loadGuestMenu(),
               icon: const Icon(Icons.refresh),
-              label: const Text('Refresh Menu'),
+              label: Text(AppLocalizations.of(context)?.refreshMenu ?? 'Refresh Menu'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
                 foregroundColor: Colors.white,
