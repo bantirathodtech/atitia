@@ -1,6 +1,7 @@
 // lib/common/widgets/notifications/notification_preferences_widget.dart
 
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../styles/spacing.dart';
 import '../../styles/colors.dart';
 import '../../styles/typography.dart';
@@ -51,6 +52,7 @@ class _NotificationPreferencesWidgetState extends State<NotificationPreferencesW
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
@@ -65,57 +67,58 @@ class _NotificationPreferencesWidgetState extends State<NotificationPreferencesW
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
-            text: 'Notification Preferences',
+            text: loc.notificationPreferencesTitle,
             color: theme.primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           BodyText(
-            text: 'Choose which types of notifications you want to receive',
+            text: loc.notificationPreferencesSubtitle,
             color: AppColors.textSecondary,
           ),
           const SizedBox(height: AppSpacing.paddingL),
-          ..._buildNotificationToggles(context, isDarkMode),
+          ..._buildNotificationToggles(context, isDarkMode, loc),
         ],
       ),
     );
   }
 
-  List<Widget> _buildNotificationToggles(BuildContext context, bool isDarkMode) {
+  List<Widget> _buildNotificationToggles(
+      BuildContext context, bool isDarkMode, AppLocalizations loc) {
     final notifications = [
       {
         'key': 'payment',
-        'title': 'Payment Notifications',
-        'subtitle': 'Rent reminders, payment confirmations',
+        'title': loc.notificationCategoryPaymentTitle,
+        'subtitle': loc.notificationCategoryPaymentSubtitle,
         'icon': Icons.payment,
       },
       {
         'key': 'booking',
-        'title': 'Booking Updates',
-        'subtitle': 'Booking confirmations, status changes',
+        'title': loc.notificationCategoryBookingTitle,
+        'subtitle': loc.notificationCategoryBookingSubtitle,
         'icon': Icons.event_available,
       },
       {
         'key': 'complaint',
-        'title': 'Complaint Updates',
-        'subtitle': 'Complaint responses, resolution updates',
+        'title': loc.notificationCategoryComplaintTitle,
+        'subtitle': loc.notificationCategoryComplaintSubtitle,
         'icon': Icons.support_agent,
       },
       {
         'key': 'food',
-        'title': 'Food Notifications',
-        'subtitle': 'Menu updates, special meals',
+        'title': loc.notificationCategoryFoodTitle,
+        'subtitle': loc.notificationCategoryFoodSubtitle,
         'icon': Icons.restaurant,
       },
       {
         'key': 'maintenance',
-        'title': 'Maintenance Alerts',
-        'subtitle': 'Scheduled maintenance, repairs',
+        'title': loc.notificationCategoryMaintenanceTitle,
+        'subtitle': loc.notificationCategoryMaintenanceSubtitle,
         'icon': Icons.build,
       },
       {
         'key': 'general',
-        'title': 'General Announcements',
-        'subtitle': 'Important updates, announcements',
+        'title': loc.notificationCategoryGeneralTitle,
+        'subtitle': loc.notificationCategoryGeneralSubtitle,
         'icon': Icons.campaign,
       },
     ];
@@ -212,6 +215,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
@@ -236,13 +240,14 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                 ),
                 const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
-                  text: 'Notification Settings',
+                  text: loc.notificationSettingsTitle,
                   color: theme.primaryColor,
                 ),
                 const Spacer(),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close),
+                  tooltip: loc.close,
                 ),
               ],
             ),
@@ -253,7 +258,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
-                    children: _buildNotificationToggles(context, isDarkMode),
+                    children: _buildNotificationToggles(context, isDarkMode, loc),
                   ),
                 ),
               ),
@@ -263,7 +268,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Done'),
+                  child: Text(loc.done),
                 ),
               ],
             ),
@@ -273,42 +278,43 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
     );
   }
 
-  List<Widget> _buildNotificationToggles(BuildContext context, bool isDarkMode) {
+  List<Widget> _buildNotificationToggles(
+      BuildContext context, bool isDarkMode, AppLocalizations loc) {
     final notifications = [
       {
         'key': 'payment',
-        'title': 'Payment Notifications',
-        'subtitle': 'Rent reminders, payment confirmations',
+        'title': loc.notificationCategoryPaymentTitle,
+        'subtitle': loc.notificationCategoryPaymentSubtitle,
         'icon': Icons.payment,
       },
       {
         'key': 'booking',
-        'title': 'Booking Updates',
-        'subtitle': 'Booking confirmations, status changes',
+        'title': loc.notificationCategoryBookingTitle,
+        'subtitle': loc.notificationCategoryBookingSubtitle,
         'icon': Icons.event_available,
       },
       {
         'key': 'complaint',
-        'title': 'Complaint Updates',
-        'subtitle': 'Complaint responses, resolution updates',
+        'title': loc.notificationCategoryComplaintTitle,
+        'subtitle': loc.notificationCategoryComplaintSubtitle,
         'icon': Icons.support_agent,
       },
       {
         'key': 'food',
-        'title': 'Food Notifications',
-        'subtitle': 'Menu updates, special meals',
+        'title': loc.notificationCategoryFoodTitle,
+        'subtitle': loc.notificationCategoryFoodSubtitle,
         'icon': Icons.restaurant,
       },
       {
         'key': 'maintenance',
-        'title': 'Maintenance Alerts',
-        'subtitle': 'Scheduled maintenance, repairs',
+        'title': loc.notificationCategoryMaintenanceTitle,
+        'subtitle': loc.notificationCategoryMaintenanceSubtitle,
         'icon': Icons.build,
       },
       {
         'key': 'general',
-        'title': 'General Announcements',
-        'subtitle': 'Important updates, announcements',
+        'title': loc.notificationCategoryGeneralTitle,
+        'subtitle': loc.notificationCategoryGeneralSubtitle,
         'icon': Icons.campaign,
       },
     ];

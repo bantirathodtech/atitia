@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../common/utils/logging/logging_mixin.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../data/models/guest_pg_model.dart';
 import '../data/repository/guest_pg_repository.dart';
 
@@ -14,6 +16,24 @@ import '../data/repository/guest_pg_repository.dart';
 class GuestPgViewModel extends BaseProviderState with LoggingMixin {
   final GuestPgRepository _repository;
   final _analyticsService = getIt.analytics;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If repository is not provided, creates it with default services
@@ -87,7 +107,10 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     setLoading(true);
     clearError();
 
-    logInfo('Starting to load PGs', feature: 'guest_pgs');
+    logInfo(
+      _text('guestPgStartingLoad', 'Starting to load PGs'),
+      feature: 'guest_pgs',
+    );
 
     // Listen to real-time PG updates
     _repository.getAllPGsStream().listen(
@@ -98,30 +121,34 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
         setLoading(false);
 
         logInfo(
-          'PGs loaded successfully',
+          _text('guestPgLoadSuccess', 'PGs loaded successfully'),
           feature: 'guest_pgs',
           metadata: {'count': pgs.length},
         );
 
         _analyticsService.logEvent(
-          name: 'pgs_loaded',
+          name: _i18n.translate('pgsLoadedEvent'),
           parameters: {
             'count': pgs.length,
           },
         );
       },
       onError: (error) {
-        setError(true, 'Failed to load PGs: $error');
+        setError(
+            true,
+            _i18n.translate('failedToLoadPgs', parameters: {
+              'error': error.toString(),
+            }));
         setLoading(false);
 
         logError(
-          'Failed to load PGs',
+          _text('guestPgLoadFailure', 'Failed to load PGs'),
           feature: 'guest_pgs',
           error: error,
         );
 
         _analyticsService.logEvent(
-          name: 'pgs_load_error',
+          name: _i18n.translate('pgsLoadErrorEvent'),
           parameters: {
             'error': error.toString(),
           },
@@ -135,7 +162,10 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
   /// Refreshes PG data manually
   /// Useful for pull-to-refresh functionality
   void refreshPGs(BuildContext context) {
-    logUserAction('Refresh PGs', feature: 'guest_pgs');
+    logUserAction(
+      _text('guestPgRefreshAction', 'Refresh PGs'),
+      feature: 'guest_pgs',
+    );
     loadPGs(context);
   }
 
@@ -146,7 +176,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     notifyListeners();
 
     logUserAction(
-      'PG Selected',
+      _text('guestPgSelectedAction', 'PG Selected'),
       feature: 'guest_pgs',
       metadata: {
         'pgId': pg.pgId,
@@ -157,7 +187,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     );
 
     _analyticsService.logEvent(
-      name: 'pg_selected',
+      name: _i18n.translate('pgSelectedEvent'),
       parameters: {
         'pg_id': pg.pgId,
         'pg_name': pg.pgName,
@@ -173,7 +203,10 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _selectedPG = null;
     notifyListeners();
 
-    logUserAction('Clear Selected PG', feature: 'guest_pgs');
+    logUserAction(
+      _text('guestPgClearSelectionAction', 'Clear Selected PG'),
+      feature: 'guest_pgs',
+    );
   }
 
   /// Sets filter for PG listings
@@ -191,7 +224,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     );
 
     _analyticsService.logEvent(
-      name: 'pg_filter_changed',
+      name: _i18n.translate('pgFilterChangedEvent'),
       parameters: {'filter': filter},
     );
   }
@@ -204,7 +237,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     notifyListeners();
 
     logUserAction(
-      'Search Query Changed',
+      _text('guestPgSearchQueryChangedAction', 'Search Query Changed'),
       feature: 'guest_pgs',
       metadata: {
         'oldQuery': oldQuery,
@@ -214,7 +247,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     );
 
     _analyticsService.logEvent(
-      name: 'pg_search_query_changed',
+      name: _i18n.translate('pgSearchQueryChangedEvent'),
       parameters: {'query': query},
     );
   }
@@ -225,7 +258,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _updateFilteredPGs();
     notifyListeners();
     _analyticsService.logEvent(
-      name: 'pg_amenities_filter_changed',
+      name: _i18n.translate('pgAmenitiesFilterChangedEvent'),
       parameters: {'amenities': amenities},
     );
   }
@@ -236,7 +269,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _updateFilteredPGs();
     notifyListeners();
     _analyticsService.logEvent(
-      name: 'pg_city_filter_changed',
+      name: _i18n.translate('pgCityFilterChangedEvent'),
       parameters: {'city': city ?? 'all'},
     );
   }
@@ -247,7 +280,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _updateFilteredPGs();
     notifyListeners();
     _analyticsService.logEvent(
-      name: 'pg_type_filter_changed',
+      name: _i18n.translate('pgTypeFilterChangedEvent'),
       parameters: {'pg_type': pgType ?? 'all'},
     );
   }
@@ -258,7 +291,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _updateFilteredPGs();
     notifyListeners();
     _analyticsService.logEvent(
-      name: 'pg_meal_type_filter_changed',
+      name: _i18n.translate('pgMealTypeFilterChangedEvent'),
       parameters: {'meal_type': mealType ?? 'all'},
     );
   }
@@ -269,7 +302,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _updateFilteredPGs();
     notifyListeners();
     _analyticsService.logEvent(
-      name: 'pg_wifi_filter_changed',
+      name: _i18n.translate('pgWifiFilterChangedEvent'),
       parameters: {'wifi_available': wifiAvailable?.toString() ?? 'all'},
     );
   }
@@ -280,7 +313,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _updateFilteredPGs();
     notifyListeners();
     _analyticsService.logEvent(
-      name: 'pg_parking_filter_changed',
+      name: _i18n.translate('pgParkingFilterChangedEvent'),
       parameters: {'parking_available': parkingAvailable?.toString() ?? 'all'},
     );
   }
@@ -298,7 +331,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _updateFilteredPGs();
     notifyListeners();
     _analyticsService.logEvent(
-      name: 'pg_filters_cleared',
+      name: _i18n.translate('pgFiltersClearedEvent'),
       parameters: {},
     );
   }
@@ -319,7 +352,11 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
 
       return pg;
     } catch (e) {
-      setError(true, 'Failed to load PG details: $e');
+      setError(
+          true,
+          _i18n.translate('failedToLoadPgDetails', parameters: {
+            'error': e.toString(),
+          }));
       setLoading(false);
       return null;
     }
@@ -440,13 +477,17 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
       clearError();
       await _repository.addOrUpdatePG(pg);
       _analyticsService.logEvent(
-        name: 'pg_saved',
+        name: _i18n.translate('pgSavedEvent'),
         parameters: {
           'pg_id': pg.pgId,
         },
       );
     } catch (e) {
-      setError(true, 'Failed to save PG: $e');
+      setError(
+          true,
+          _i18n.translate('failedToSavePg', parameters: {
+            'error': e.toString(),
+          }));
       rethrow;
     } finally {
       setLoading(false);
@@ -461,13 +502,17 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
       clearError();
       await _repository.deletePG(pgId);
       _analyticsService.logEvent(
-        name: 'pg_deleted',
+        name: _i18n.translate('pgDeletedEvent'),
         parameters: {
           'pg_id': pgId,
         },
       );
     } catch (e) {
-      setError(true, 'Failed to delete PG: $e');
+      setError(
+          true,
+          _i18n.translate('failedToDeletePg', parameters: {
+            'error': e.toString(),
+          }));
       rethrow;
     } finally {
       setLoading(false);
@@ -557,25 +602,37 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
       _pgStats = stats;
       notifyListeners();
     } catch (e) {
-      setError(true, 'Failed to load PG stats: $e');
+      setError(
+          true,
+          _i18n.translate('failedToLoadPgStats', parameters: {
+            'error': e.toString(),
+          }));
     } finally {
       setLoading(false);
     }
   }
 
   /// Uploads PG photo and returns download URL
-  Future<String> uploadPGPhoto(
+  Future<String?> uploadPGPhoto(
       String pgId, String fileName, dynamic file) async {
     try {
       setLoading(true);
       clearError();
-      final downloadUrl = await _repository.uploadPGPhoto(pgId, fileName, file);
+      final downloadUrl = await _repository.uploadPGPhoto(
+        pgId,
+        fileName,
+        file,
+      );
+      setLoading(false);
       return downloadUrl;
     } catch (e) {
-      setError(true, 'Failed to upload photo: $e');
-      rethrow;
-    } finally {
+      setError(
+          true,
+          _i18n.translate('failedToUploadPgPhoto', parameters: {
+            'error': e.toString(),
+          }));
       setLoading(false);
+      return null;
     }
   }
 
@@ -598,19 +655,23 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
         city: city,
         area: area,
         amenities: amenities,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
         pgType: pgType,
         mealType: mealType,
         wifiAvailable: wifiAvailable,
         parkingAvailable: parkingAvailable,
-        minPrice: minPrice,
-        maxPrice: maxPrice,
       );
+      setLoading(false);
       return results;
     } catch (e) {
-      setError(true, 'Failed to perform search: $e');
-      return [];
-    } finally {
+      setError(
+          true,
+          _i18n.translate('failedToPerformPgSearch', parameters: {
+            'error': e.toString(),
+          }));
       setLoading(false);
+      return [];
     }
   }
 }

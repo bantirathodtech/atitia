@@ -1,3 +1,24 @@
+import '../../../../core/services/localization/internationalization_service.dart';
+
+final InternationalizationService _i18n =
+    InternationalizationService.instance;
+
+String _translate(
+  String key,
+  String fallback, {
+  Map<String, dynamic>? parameters,
+}) {
+  final translated = _i18n.translate(key, parameters: parameters);
+  if (translated.isEmpty || translated == key) {
+    var result = fallback;
+    parameters?.forEach((paramKey, value) {
+      result = result.replaceAll('{$paramKey}', value.toString());
+    });
+    return result;
+  }
+  return translated;
+}
+
 /// Enhanced error severity levels for better error categorization
 enum ErrorSeverity {
   low, // Non-critical errors (e.g., optional field validation)
@@ -17,27 +38,38 @@ class AppException implements Exception {
   final DateTime timestamp;
 
   AppException({
-    this.message = 'An error occurred',
+    String? message,
     this.prefix,
     this.details,
     this.severity = ErrorSeverity.medium,
-    this.recoverySuggestion,
+    String? recoverySuggestion,
     this.originalError,
-  }) : timestamp = DateTime.now();
+  })  : message = message ??
+            _translate('appExceptionDefaultMessage', 'An error occurred'),
+        recoverySuggestion = recoverySuggestion ??
+            _translate(
+              'appExceptionDefaultRecovery',
+              'Please try again later',
+            ),
+        timestamp = DateTime.now();
 
   @override
   String toString() {
     final baseString = prefix == null ? message : '$prefix: $message';
     final parts = <String>[baseString];
-    
-    if (details != null) {
-      parts.add('Details: $details');
+
+    if (details != null && details!.isNotEmpty) {
+      final detailsLabel =
+          _translate('appExceptionDetailsLabel', 'Details');
+      parts.add('$detailsLabel: $details');
     }
-    
-    if (recoverySuggestion != null) {
-      parts.add('💡 Suggestion: $recoverySuggestion');
+
+    if (recoverySuggestion != null && recoverySuggestion!.isNotEmpty) {
+      final suggestionLabel =
+          _translate('appExceptionSuggestionLabel', '💡 Suggestion');
+      parts.add('$suggestionLabel: $recoverySuggestion');
     }
-    
+
     return parts.join('\n');
   }
 
@@ -58,11 +90,19 @@ class AppException implements Exception {
 /// Enhanced network exception with retry guidance
 class NetworkException extends AppException {
   NetworkException({
-    super.message = 'No internet connection',
-    super.recoverySuggestion = 'Check your connection and try again',
+    String? message,
+    String? recoverySuggestion,
     super.originalError,
   }) : super(
-          prefix: 'Network Error',
+          message: message ??
+              _translate('networkExceptionMessage', 'No internet connection'),
+          recoverySuggestion: recoverySuggestion ??
+              _translate(
+                'networkExceptionRecovery',
+                'Check your connection and try again',
+              ),
+          prefix:
+              _translate('networkExceptionPrefix', 'Network Error'),
           severity: ErrorSeverity.medium,
         );
 }
@@ -70,11 +110,18 @@ class NetworkException extends AppException {
 /// Enhanced authentication exception with user-friendly messages
 class AuthException extends AppException {
   AuthException({
-    super.message = 'Authentication failed',
-    super.recoverySuggestion = 'Please check your credentials and try again',
+    String? message,
+    String? recoverySuggestion,
     super.originalError,
   }) : super(
-          prefix: 'Auth Error',
+          message: message ??
+              _translate('authExceptionMessage', 'Authentication failed'),
+          recoverySuggestion: recoverySuggestion ??
+              _translate(
+                'authExceptionRecovery',
+                'Please check your credentials and try again',
+              ),
+          prefix: _translate('authExceptionPrefix', 'Auth Error'),
           severity: ErrorSeverity.high,
         );
 }
@@ -82,12 +129,19 @@ class AuthException extends AppException {
 /// Enhanced data parsing exception
 class DataParsingException extends AppException {
   DataParsingException({
-    super.message = 'Failed to parse data',
-    super.recoverySuggestion =
-        'Please try again or contact support if the problem persists',
+    String? message,
+    String? recoverySuggestion,
     super.originalError,
   }) : super(
-          prefix: 'Parsing Error',
+          message: message ??
+              _translate('dataParsingExceptionMessage', 'Failed to parse data'),
+          recoverySuggestion: recoverySuggestion ??
+              _translate(
+                'dataParsingExceptionRecovery',
+                'Please try again or contact support if the problem persists',
+              ),
+          prefix:
+              _translate('dataParsingExceptionPrefix', 'Parsing Error'),
           severity: ErrorSeverity.medium,
         );
 }
@@ -95,11 +149,19 @@ class DataParsingException extends AppException {
 /// New exception for configuration errors
 class ConfigurationException extends AppException {
   ConfigurationException({
-    super.message = 'Configuration error',
-    super.recoverySuggestion = 'Please restart the app or contact support',
+    String? message,
+    String? recoverySuggestion,
     super.originalError,
   }) : super(
-          prefix: 'Config Error',
+          message: message ??
+              _translate('configurationExceptionMessage', 'Configuration error'),
+          recoverySuggestion: recoverySuggestion ??
+              _translate(
+                'configurationExceptionRecovery',
+                'Please restart the app or contact support',
+              ),
+          prefix:
+              _translate('configurationExceptionPrefix', 'Config Error'),
           severity: ErrorSeverity.critical,
         );
 }
@@ -110,14 +172,22 @@ class ValidationException extends AppException {
 
   ValidationException({
     required this.fieldName,
-    String message = 'Validation failed',
+    String? message,
     String? recoverySuggestion,
     super.originalError,
   }) : super(
-          message: '$message for $fieldName',
-          prefix: 'Validation Error',
+          message: message ??
+              _translate(
+                'validationExceptionMessage',
+                'Validation failed for {field}',
+                parameters: {'field': fieldName},
+              ),
+          prefix: _translate('validationExceptionPrefix', 'Validation Error'),
           severity: ErrorSeverity.low,
-          recoverySuggestion:
-              recoverySuggestion ?? 'Please check the entered information',
+          recoverySuggestion: recoverySuggestion ??
+              _translate(
+                'validationExceptionRecovery',
+                'Please check the entered information',
+              ),
         );
 }

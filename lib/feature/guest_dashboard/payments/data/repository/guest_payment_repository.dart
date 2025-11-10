@@ -1,9 +1,12 @@
 // lib/features/guest_dashboard/payments/repository/guest_payment_repository.dart
+import 'package:intl/intl.dart';
+
 import '../../../../../common/utils/constants/firestore.dart';
 import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/repositories/notification_repository.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../models/guest_payment_model.dart';
 
 /// Repository layer for guest payments data operations
@@ -13,6 +16,7 @@ class GuestPaymentRepository {
   final IDatabaseService _databaseService;
   final IAnalyticsService _analyticsService;
   final NotificationRepository _notificationRepository;
+  final InternationalizationService _i18n = InternationalizationService.instance;
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
@@ -110,32 +114,35 @@ class GuestPaymentRepository {
 
       // Notify owner about payment received
       if (payment.ownerId.isNotEmpty && payment.status == 'Paid') {
-        try {
-          await _notificationRepository.sendUserNotification(
-            userId: payment.ownerId,
-            type: 'payment_received',
-            title: 'Payment Received',
-            body: 'Payment of ₹${payment.amount.toStringAsFixed(0)} received from guest',
-            data: {
-              'paymentId': payment.paymentId,
-              'bookingId': payment.bookingId,
-              'guestId': payment.guestId,
-              'pgId': payment.pgId,
-              'amount': payment.amount,
-              'paymentType': payment.paymentType,
-              'paymentMethod': payment.paymentMethod,
-            },
-          );
-        } catch (e) {
-          // Log but don't fail the payment if notification fails
-          await _analyticsService.logEvent(
-            name: 'payment_notification_failed',
-            parameters: {
-              'payment_id': payment.paymentId,
-              'error': e.toString(),
-            },
-          );
-        }
+        final locale = _i18n.currentLocale;
+        final symbol = NumberFormat.simpleCurrency(locale: locale.toString()).currencySymbol;
+        final formattedAmount = NumberFormat.currency(
+          locale: locale.toString(),
+          symbol: symbol,
+          decimalDigits: 0,
+        ).format(payment.amount);
+
+        final title = _i18n.translate('paymentNotificationReceivedTitle');
+        final body = _i18n.translate(
+          'paymentNotificationReceivedBody',
+          parameters: {'amount': formattedAmount},
+        );
+
+        await _notificationRepository.sendUserNotification(
+          userId: payment.ownerId,
+          type: 'payment_received',
+          title: title,
+          body: body,
+          data: {
+            'paymentId': payment.paymentId,
+            'bookingId': payment.bookingId,
+            'guestId': payment.guestId,
+            'pgId': payment.pgId,
+            'amount': payment.amount,
+            'paymentType': payment.paymentType,
+            'paymentMethod': payment.paymentMethod,
+          },
+        );
       }
     } catch (e) {
       // Track error analytics

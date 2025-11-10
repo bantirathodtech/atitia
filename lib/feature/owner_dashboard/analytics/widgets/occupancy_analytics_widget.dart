@@ -1,6 +1,7 @@
 // lib/feature/owner_dashboard/analytics/widgets/occupancy_analytics_widget.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
@@ -8,6 +9,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 /// Occupancy analytics widget for Owner dashboard
 /// Shows occupancy rates, trends, and capacity utilization
@@ -36,22 +38,24 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeader(context, isDark),
+        _buildHeader(context, isDark, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildOccupancyMetrics(context, isDark),
+        _buildOccupancyMetrics(context, isDark, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildOccupancyChart(context, isDark),
+        _buildOccupancyChart(context, isDark, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildCapacityAnalysis(context, isDark),
+        _buildCapacityAnalysis(context, isDark, loc),
       ],
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark) {
+  Widget _buildHeader(
+      BuildContext context, bool isDark, AppLocalizations loc) {
     return Row(
       children: [
         Container(
@@ -71,11 +75,11 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const HeadingMedium(text: 'Occupancy Analytics'),
+              HeadingMedium(text: loc.occupancyAnalyticsTitle),
               CaptionText(
                 text: widget.selectedPgId != null
-                    ? 'Occupancy insights for selected PG'
-                    : 'Overall occupancy performance',
+                    ? loc.occupancyAnalyticsSelectedPg
+                    : loc.occupancyAnalyticsOverall,
                 color: isDark ? Colors.white70 : Colors.grey[600],
               ),
             ],
@@ -85,21 +89,23 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
           IconButton(
             onPressed: widget.onRefresh,
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh Data',
+            tooltip: loc.analyticsRefreshData,
           ),
       ],
     );
   }
 
-  Widget _buildOccupancyMetrics(BuildContext context, bool isDark) {
+  Widget _buildOccupancyMetrics(
+      BuildContext context, bool isDark, AppLocalizations loc) {
     final metrics = _calculateOccupancyMetrics();
+    final percentFormatter = NumberFormat.decimalPattern(loc.localeName);
 
     return Row(
       children: [
         Expanded(
           child: _buildMetricCard(
-            'Current Occupancy',
-            '${metrics['currentOccupancy']}%',
+            loc.occupancyMetricCurrent,
+            '${percentFormatter.format(metrics['currentOccupancy'])}%',
             Icons.bed,
             _getOccupancyColor(metrics['currentOccupancy']),
             isDark,
@@ -108,8 +114,8 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: _buildMetricCard(
-            'Avg. Occupancy',
-            '${metrics['avgOccupancy']}%',
+            loc.occupancyMetricAverage,
+            '${percentFormatter.format(metrics['avgOccupancy'])}%',
             Icons.trending_up,
             Colors.blue,
             isDark,
@@ -118,8 +124,8 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: _buildMetricCard(
-            'Peak Occupancy',
-            '${metrics['peakOccupancy']}%',
+            loc.occupancyMetricPeak,
+            '${percentFormatter.format(metrics['peakOccupancy'])}%',
             Icons.flag,
             Colors.orange,
             isDark,
@@ -165,7 +171,8 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildOccupancyChart(BuildContext context, bool isDark) {
+  Widget _buildOccupancyChart(
+      BuildContext context, bool isDark, AppLocalizations loc) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -174,17 +181,17 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
           children: [
             Row(
               children: [
-                const HeadingSmall(text: 'Occupancy Trends'),
+                HeadingSmall(text: loc.occupancyTrendsLabel),
                 const Spacer(),
-                _buildPeriodSelector(isDark),
+                _buildPeriodSelector(isDark, loc),
                 const SizedBox(width: AppSpacing.paddingM),
-                _buildViewSelector(isDark),
+                _buildViewSelector(isDark, loc),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingL),
             SizedBox(
               height: 300,
-              child: _buildSimpleOccupancyChart(isDark),
+              child: _buildSimpleOccupancyChart(isDark, loc),
             ),
           ],
         ),
@@ -192,7 +199,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildPeriodSelector(bool isDark) {
+  Widget _buildPeriodSelector(bool isDark, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -207,10 +214,19 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
           color: isDark ? Colors.white : Colors.black,
           fontSize: 14,
         ),
-        items: const [
-          DropdownMenuItem(value: 'weekly', child: Text('Weekly')),
-          DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
-          DropdownMenuItem(value: 'yearly', child: Text('Yearly')),
+        items: [
+          DropdownMenuItem(
+            value: 'weekly',
+            child: Text(loc.analyticsPeriodWeekly),
+          ),
+          DropdownMenuItem(
+            value: 'monthly',
+            child: Text(loc.analyticsPeriodMonthly),
+          ),
+          DropdownMenuItem(
+            value: 'yearly',
+            child: Text(loc.analyticsPeriodYearly),
+          ),
         ],
         onChanged: (value) {
           setState(() {
@@ -221,7 +237,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildViewSelector(bool isDark) {
+  Widget _buildViewSelector(bool isDark, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -236,10 +252,19 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
           color: isDark ? Colors.white : Colors.black,
           fontSize: 14,
         ),
-        items: const [
-          DropdownMenuItem(value: 'overview', child: Text('Overview')),
-          DropdownMenuItem(value: 'by_room', child: Text('By Room')),
-          DropdownMenuItem(value: 'by_floor', child: Text('By Floor')),
+        items: [
+          DropdownMenuItem(
+            value: 'overview',
+            child: Text(loc.occupancyViewOverview),
+          ),
+          DropdownMenuItem(
+            value: 'by_room',
+            child: Text(loc.occupancyViewByRoom),
+          ),
+          DropdownMenuItem(
+            value: 'by_floor',
+            child: Text(loc.occupancyViewByFloor),
+          ),
         ],
         onChanged: (value) {
           setState(() {
@@ -250,10 +275,12 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildSimpleOccupancyChart(bool isDark) {
+  Widget _buildSimpleOccupancyChart(bool isDark, AppLocalizations loc) {
     final chartData = _getOccupancyChartData();
-    final labels = chartData['labels'] as List<String>;
+    final months = chartData['months'] as List<int>;
     final values = chartData['data'] as List<int>;
+    final percentFormatter = NumberFormat.decimalPattern(loc.localeName);
+    final monthFormatter = DateFormat.MMM(loc.localeName);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -286,7 +313,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      labels[index],
+                      monthFormatter.format(DateTime(2000, months[index])),
                       style: TextStyle(
                         color: isDark ? Colors.white70 : Colors.grey[600],
                         fontSize: 12,
@@ -294,7 +321,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '$value%',
+                      '${percentFormatter.format(value)}%',
                       style: TextStyle(
                         color: isDark ? Colors.white : Colors.black,
                         fontSize: 10,
@@ -307,16 +334,16 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
             ),
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          const BodyText(
-            text: 'Occupancy Trend (Last 6 Months)',
-          ),
+          BodyText(text: loc.occupancyTrendLastMonths(6)),
         ],
       ),
     );
   }
 
-  Widget _buildCapacityAnalysis(BuildContext context, bool isDark) {
-    final analysis = _calculateCapacityAnalysis();
+  Widget _buildCapacityAnalysis(
+      BuildContext context, bool isDark, AppLocalizations loc) {
+    final analysis = _calculateCapacityAnalysis(loc);
+    final numberFormatter = NumberFormat.decimalPattern(loc.localeName);
 
     return AdaptiveCard(
       child: Padding(
@@ -324,14 +351,14 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const HeadingSmall(text: 'Capacity Analysis'),
+            HeadingSmall(text: loc.occupancyCapacityTitle),
             const SizedBox(height: AppSpacing.paddingM),
             Row(
               children: [
                 Expanded(
                   child: _buildCapacityCard(
-                    'Available Beds',
-                    '${analysis['availableBeds']}',
+                    loc.occupancyCapacityAvailableBeds,
+                    numberFormatter.format(analysis['availableBeds']),
                     Icons.bed_outlined,
                     Colors.green,
                     isDark,
@@ -340,8 +367,8 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildCapacityCard(
-                    'Occupied Beds',
-                    '${analysis['occupiedBeds']}',
+                    loc.occupancyCapacityOccupiedBeds,
+                    numberFormatter.format(analysis['occupiedBeds']),
                     Icons.bed,
                     Colors.blue,
                     isDark,
@@ -350,8 +377,8 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildCapacityCard(
-                    'Total Capacity',
-                    '${analysis['totalCapacity']}',
+                    loc.occupancyCapacityTotal,
+                    numberFormatter.format(analysis['totalCapacity']),
                     Icons.home,
                     Colors.grey,
                     isDark,
@@ -360,7 +387,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
               ],
             ),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildOccupancyInsights(analysis, isDark),
+            _buildOccupancyInsights(analysis, isDark, loc),
           ],
         ),
       ),
@@ -406,7 +433,8 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildOccupancyInsights(Map<String, dynamic> analysis, bool isDark) {
+  Widget _buildOccupancyInsights(
+      Map<String, dynamic> analysis, bool isDark, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
@@ -416,9 +444,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const BodyText(
-            text: 'Occupancy Insights',
-          ),
+          BodyText(text: loc.occupancyInsightsTitle),
           const SizedBox(height: AppSpacing.paddingS),
           BodyText(
             text: analysis['insights'],
@@ -426,9 +452,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
           ),
           if (analysis['recommendations'].isNotEmpty) ...[
             const SizedBox(height: AppSpacing.paddingM),
-            const BodyText(
-              text: 'Recommendations:',
-            ),
+            BodyText(text: loc.occupancyRecommendationsTitle),
             const SizedBox(height: AppSpacing.paddingS),
             ...analysis['recommendations']
                 .map<Widget>((rec) => Padding(
@@ -494,57 +518,54 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
   Map<String, dynamic> _getOccupancyChartData() {
     // Sample data - replace with actual data from your repository
     final sampleData = [
-      {'month': 'Jan', 'occupancy': 85},
-      {'month': 'Feb', 'occupancy': 78},
-      {'month': 'Mar', 'occupancy': 92},
-      {'month': 'Apr', 'occupancy': 88},
-      {'month': 'May', 'occupancy': 95},
-      {'month': 'Jun', 'occupancy': 90},
+      {'month': 1, 'occupancy': 85},
+      {'month': 2, 'occupancy': 78},
+      {'month': 3, 'occupancy': 92},
+      {'month': 4, 'occupancy': 88},
+      {'month': 5, 'occupancy': 95},
+      {'month': 6, 'occupancy': 90},
     ];
 
-    final labels = sampleData.map((d) => d['month'] as String).toList();
+    final months = sampleData.map((d) => d['month'] as int).toList();
     final values = sampleData.map((d) => d['occupancy'] as int).toList();
 
     return {
-      'labels': labels,
+      'months': months,
       'data': values,
     };
   }
 
-  Map<String, dynamic> _calculateCapacityAnalysis() {
+  Map<String, dynamic> _calculateCapacityAnalysis(AppLocalizations loc) {
     // Sample data - replace with actual data from your repository
     final totalCapacity = 50;
     final occupiedBeds = 45;
     final availableBeds = totalCapacity - occupiedBeds;
     final occupancyRate = (occupiedBeds / totalCapacity) * 100;
 
-    String insights =
-        'Current occupancy is at ${occupancyRate.toStringAsFixed(1)}%. ';
+    final rateString =
+        '${NumberFormat.decimalPattern(loc.localeName).format(occupancyRate)}%';
+    String insights = loc.occupancyInsightsCurrentRate(rateString);
     List<String> recommendations = [];
 
     if (occupancyRate >= 90) {
-      insights +=
-          'Your PG is nearly at full capacity. Consider expanding or opening new rooms.';
-      recommendations.add('Consider adding more beds or rooms');
-      recommendations.add('Review pricing strategy for high demand');
+      insights += ' ${loc.occupancyInsightsNearFull}';
+      recommendations.add(loc.occupancyRecommendationAddCapacity);
+      recommendations.add(loc.occupancyRecommendationReviewPricing);
     } else if (occupancyRate >= 70) {
-      insights +=
-          'Good occupancy rate. Monitor trends and consider marketing strategies.';
-      recommendations.add('Focus on maintaining current occupancy');
-      recommendations.add('Consider seasonal pricing adjustments');
+      insights += ' ${loc.occupancyInsightsGood}';
+      recommendations.add(loc.occupancyRecommendationMaintainOccupancy);
+      recommendations.add(loc.occupancyRecommendationSeasonalPricing);
     } else if (occupancyRate >= 50) {
-      insights +=
-          'Moderate occupancy. There\'s room for improvement through better marketing.';
-      recommendations.add('Increase marketing efforts');
-      recommendations.add('Review and improve amenities');
-      recommendations.add('Consider competitive pricing');
+      insights += ' ${loc.occupancyInsightsModerate}';
+      recommendations.add(loc.occupancyRecommendationIncreaseMarketing);
+      recommendations.add(loc.occupancyRecommendationImproveAmenities);
+      recommendations.add(loc.occupancyRecommendationCompetitivePricing);
     } else {
-      insights +=
-          'Low occupancy rate. Immediate action needed to improve bookings.';
-      recommendations.add('Urgent marketing campaign needed');
-      recommendations.add('Review and reduce pricing');
-      recommendations.add('Improve facilities and amenities');
-      recommendations.add('Consider partnerships with local businesses');
+      insights += ' ${loc.occupancyInsightsLow}';
+      recommendations.add(loc.occupancyRecommendationUrgentCampaign);
+      recommendations.add(loc.occupancyRecommendationReducePricing);
+      recommendations.add(loc.occupancyRecommendationImproveFacilities);
+      recommendations.add(loc.occupancyRecommendationPartnerships);
     }
 
     return {

@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
@@ -19,6 +20,8 @@ import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../feature/owner_dashboard/myguest/data/models/owner_booking_request_model.dart';
 import '../../../../../feature/owner_dashboard/myguest/data/repository/owner_booking_request_repository.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/user_location_display.dart';
 
@@ -40,6 +43,8 @@ class _GuestBookingRequestsScreenState
   StreamSubscription<List<OwnerBookingRequestModel>>? _requestsSubscription;
   bool _loading = true;
   String? _error;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   @override
   void initState() {
@@ -63,6 +68,7 @@ class _GuestBookingRequestsScreenState
 
   /// Loads booking requests for the current guest using real repository
   void _loadBookingRequests() {
+    final loc = AppLocalizations.of(context);
     try {
       setState(() {
         _loading = true;
@@ -75,16 +81,20 @@ class _GuestBookingRequestsScreenState
       final finalGuestId = firebaseAuthUser?.uid;
 
       if (finalGuestId == null || finalGuestId.isEmpty) {
-        debugPrint(
-            '⚠️ No Firebase Auth user found - user might not be authenticated');
+        debugPrint(_text('bookingRequestAuthDebug',
+            '⚠️ No Firebase Auth user found - user might not be authenticated'));
         setState(() {
-          _error = 'User not authenticated. Please sign in again.';
+          _error = loc?.bookingRequestUserNotAuthenticated ??
+              _text('bookingRequestUserNotAuthenticated',
+                  'User not authenticated. Please sign in again.');
           _loading = false;
         });
         return;
       }
 
-      debugPrint('🔑 Loading booking requests for guestId: $finalGuestId');
+      debugPrint(_text('bookingRequestLoadingDebug',
+          '🔑 Loading booking requests for guestId: {guestId}',
+          parameters: {'guestId': finalGuestId}));
 
       // Cancel any existing subscription to prevent memory leaks
       _requestsSubscription?.cancel();
@@ -103,22 +113,31 @@ class _GuestBookingRequestsScreenState
           }
         },
         onError: (error) {
-          debugPrint('Booking requests stream error: $error');
+          debugPrint(_text('bookingRequestStreamErrorDebug',
+              'Booking requests stream error: {error}',
+              parameters: {'error': error.toString()}));
           if (mounted) {
-            String errorMessage = 'Failed to load booking requests';
+            String errorMessage = loc?.bookingRequestLoadFailed ??
+                _text('bookingRequestLoadFailed',
+                    'Failed to load booking requests');
 
             // Provide user-friendly error messages
             if (error.toString().contains('permission') ||
                 error.toString().contains('Missing or insufficient')) {
-              errorMessage =
-                  'Permission denied. Please ensure you are logged in correctly.';
+              errorMessage = loc?.bookingRequestPermissionDenied ??
+                  _text('bookingRequestPermissionDenied',
+                      'Permission denied. Please ensure you are logged in correctly.');
             } else if (error.toString().contains('network') ||
                 error.toString().contains('unavailable')) {
-              errorMessage =
-                  'Network error. Please check your connection and try again.';
+              errorMessage = loc?.bookingRequestNetworkError ??
+                  _text('bookingRequestNetworkError',
+                      'Network error. Please check your connection and try again.');
             } else {
               errorMessage =
-                  'Failed to load booking requests: ${error.toString()}';
+                  loc?.bookingRequestGeneralError(error.toString()) ??
+                      _text('bookingRequestGeneralError',
+                          'Failed to load booking requests: {error}',
+                          parameters: {'error': error.toString()});
             }
 
             setState(() {
@@ -130,26 +149,49 @@ class _GuestBookingRequestsScreenState
         cancelOnError: false, // Keep stream alive even on error
       );
     } catch (e) {
-      debugPrint('Exception loading booking requests: $e');
+      debugPrint(_text('bookingRequestExceptionDebug',
+          'Exception loading booking requests: {error}',
+          parameters: {'error': e.toString()}));
       if (mounted) {
         setState(() {
-          _error = 'Failed to load booking requests: ${e.toString()}';
+          _error = loc?.bookingRequestGeneralError(e.toString()) ??
+              _text('bookingRequestGeneralError',
+                  'Failed to load booking requests: {error}',
+                  parameters: {'error': e.toString()});
           _loading = false;
         });
       }
     }
   }
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'My Booking Requests',
+        title: loc?.myBookingRequests ??
+            _text('myBookingRequests', 'My Booking Requests'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadBookingRequests,
-            tooltip: 'Refresh',
+            tooltip: loc?.refresh ?? _text('refresh', 'Refresh'),
           ),
         ],
         showBackButton: true,
@@ -162,14 +204,19 @@ class _GuestBookingRequestsScreenState
 
   /// Builds the main body content
   Widget _buildBody() {
+    final loc = AppLocalizations.of(context);
     if (_loading) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AdaptiveLoader(),
-            SizedBox(height: AppSpacing.paddingM),
-            BodyText(text: 'Loading booking requests...'),
+            const AdaptiveLoader(),
+            const SizedBox(height: AppSpacing.paddingM),
+            BodyText(
+              text: loc?.loadingBookingRequests ??
+                  _text(
+                      'loadingBookingRequests', 'Loading booking requests...'),
+            ),
           ],
         ),
       );
@@ -182,8 +229,9 @@ class _GuestBookingRequestsScreenState
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: AppSpacing.paddingL),
-            const HeadingMedium(
-              text: 'Error Loading Requests',
+            HeadingMedium(
+              text: loc?.bookingRequestsErrorTitle ??
+                  _text('bookingRequestsErrorTitle', 'Error Loading Requests'),
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingS),
@@ -194,7 +242,7 @@ class _GuestBookingRequestsScreenState
             const SizedBox(height: AppSpacing.paddingL),
             ElevatedButton(
               onPressed: _loadBookingRequests,
-              child: const Text('Try Again'),
+              child: Text(loc?.tryAgain ?? _text('tryAgain', 'Try Again')),
             ),
           ],
         ),
@@ -243,6 +291,7 @@ class _GuestBookingRequestsScreenState
         _bookingRequests.where((r) => r.status == 'approved').length;
     final rejectedCount =
         _bookingRequests.where((r) => r.status == 'rejected').length;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
@@ -262,8 +311,9 @@ class _GuestBookingRequestsScreenState
       ),
       child: Column(
         children: [
-          const HeadingMedium(
-            text: 'Booking Request Summary',
+          HeadingMedium(
+            text: loc?.bookingRequestSummary ??
+                _text('bookingRequestSummary', 'Booking Request Summary'),
             color: AppColors.textOnPrimary,
             align: TextAlign.center,
           ),
@@ -271,9 +321,24 @@ class _GuestBookingRequestsScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem('Pending', pendingCount, Colors.orange),
-              _buildStatItem('Approved', approvedCount, Colors.green),
-              _buildStatItem('Rejected', rejectedCount, Colors.red),
+              _buildStatItem(
+                loc?.bookingRequestPending ??
+                    _text('bookingRequestPending', 'Pending'),
+                pendingCount,
+                Colors.orange,
+              ),
+              _buildStatItem(
+                loc?.bookingRequestApproved ??
+                    _text('bookingRequestApproved', 'Approved'),
+                approvedCount,
+                Colors.green,
+              ),
+              _buildStatItem(
+                loc?.bookingRequestRejected ??
+                    _text('bookingRequestRejected', 'Rejected'),
+                rejectedCount,
+                Colors.red,
+              ),
             ],
           ),
         ],
@@ -312,6 +377,7 @@ class _GuestBookingRequestsScreenState
   /// Builds structured zero-state content with hints and placeholder rows
   Widget _buildZeroStateContent() {
     final padding = context.responsivePadding;
+    final loc = AppLocalizations.of(context);
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(padding.horizontal),
@@ -320,9 +386,14 @@ class _GuestBookingRequestsScreenState
         children: [
           // Info hint card
           InfoCard(
-            title: 'Get Started with Booking Requests',
-            description:
-                'Browse PGs and send booking requests. Owners will review and respond to your requests here.',
+            title: loc?.bookingRequestsIntroTitle ??
+                _text('bookingRequestsIntroTitle',
+                    'Get Started with Booking Requests'),
+            description: loc?.bookingRequestsIntroDescription ??
+                _text(
+                  'bookingRequestsIntroDescription',
+                  'Browse PGs and send booking requests. Owners will review and respond to your requests here.',
+                ),
             icon: Icons.info_outline,
             iconColor: AppColors.primary,
           ),
@@ -420,6 +491,8 @@ class _GuestBookingRequestsScreenState
     final statusColor = _getStatusColor(status);
     final requestDate = request.createdAt;
     final respondedAt = request.respondedAt;
+    final loc = AppLocalizations.of(context);
+    final statusLabel = _statusLabel(status, loc);
 
     return AdaptiveCard(
       onTap: () => _showRequestDetails(request),
@@ -446,7 +519,7 @@ class _GuestBookingRequestsScreenState
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: CaptionText(
-                    text: status.toUpperCase(),
+                    text: statusLabel,
                     color: statusColor,
                   ),
                 ),
@@ -474,7 +547,11 @@ class _GuestBookingRequestsScreenState
                     size: 14, color: Colors.grey.shade600),
                 const SizedBox(width: 4),
                 BodyText(
-                  text: 'Requested: ${_formatDate(requestDate)}',
+                  text: loc?.bookingRequestRequestedOn(
+                        _formatDate(requestDate),
+                      ) ??
+                      _text('bookingRequestRequestedOn', 'Requested: {date}',
+                          parameters: {'date': _formatDate(requestDate)}),
                   color: Colors.grey.shade600,
                 ),
               ],
@@ -488,7 +565,11 @@ class _GuestBookingRequestsScreenState
                       size: 14, color: Colors.grey.shade600),
                   const SizedBox(width: 4),
                   BodyText(
-                    text: 'Responded: ${_formatDate(respondedAt)}',
+                    text: loc?.bookingRequestRespondedOn(
+                          _formatDate(respondedAt),
+                        ) ??
+                        _text('bookingRequestRespondedOn', 'Responded: {date}',
+                            parameters: {'date': _formatDate(respondedAt)}),
                     color: Colors.grey.shade600,
                   ),
                 ],
@@ -500,7 +581,9 @@ class _GuestBookingRequestsScreenState
             if (request.guestName.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.paddingS),
               BodyText(
-                text: 'Request from: ${request.guestName}',
+                text: loc?.bookingRequestFrom(request.guestName) ??
+                    _text('bookingRequestFrom', 'Request from: {name}',
+                        parameters: {'name': request.guestName}),
                 color: Colors.grey.shade700,
               ),
             ],
@@ -538,31 +621,50 @@ class _GuestBookingRequestsScreenState
 
   /// Shows detailed request information
   void _showRequestDetails(OwnerBookingRequestModel request) {
+    final loc = AppLocalizations.of(context);
+    final statusLabel = _statusLabel(request.status, loc);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: HeadingSmall(text: 'Booking Request Details'),
+        title: HeadingSmall(
+          text: loc?.bookingRequestDetailsTitle ??
+              _text('bookingRequestDetailsTitle', 'Booking Request Details'),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('PG Name', request.pgName),
-              _buildDetailRow('Status', request.status.toUpperCase()),
-              _buildDetailRow('Request Date', _formatDate(request.createdAt)),
+              _buildDetailRow(
+                  loc?.bookingRequestPgName ??
+                      _text('bookingRequestPgName', 'PG Name'),
+                  request.pgName),
+              _buildDetailRow(
+                  loc?.bookingRequestStatus ??
+                      _text('bookingRequestStatus', 'Status'),
+                  statusLabel),
+              _buildDetailRow(
+                  loc?.bookingRequestDate ??
+                      _text('bookingRequestDate', 'Request Date'),
+                  _formatDate(request.createdAt)),
               if (request.respondedAt != null)
                 _buildDetailRow(
-                    'Response Date', _formatDate(request.respondedAt!)),
+                    loc?.bookingRequestResponseDate ??
+                        _text('bookingRequestResponseDate', 'Response Date'),
+                    _formatDate(request.respondedAt!)),
               if (request.responseMessage != null &&
                   request.responseMessage!.isNotEmpty)
-                _buildDetailRow('Owner Response', request.responseMessage!),
+                _buildDetailRow(
+                    loc?.bookingRequestOwnerResponse ??
+                        _text('bookingRequestOwnerResponse', 'Owner Response'),
+                    request.responseMessage!),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(loc?.close ?? _text('close', 'Close')),
           ),
         ],
       ),
@@ -605,8 +707,25 @@ class _GuestBookingRequestsScreenState
     }
   }
 
+  String _statusLabel(String status, AppLocalizations? loc) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return loc?.bookingRequestPending ??
+            _text('bookingRequestPending', 'Pending');
+      case 'approved':
+        return loc?.bookingRequestApproved ??
+            _text('bookingRequestApproved', 'Approved');
+      case 'rejected':
+        return loc?.bookingRequestRejected ??
+            _text('bookingRequestRejected', 'Rejected');
+      default:
+        return status;
+    }
+  }
+
   /// Formats date for display
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+    final locale = AppLocalizations.of(context)?.localeName;
+    return DateFormat.yMMMd(locale).format(date);
   }
 }

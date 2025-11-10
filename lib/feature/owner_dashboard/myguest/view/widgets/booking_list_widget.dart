@@ -8,6 +8,8 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_guest_model.dart';
 
 /// Widget displaying booking list with status and payment information
@@ -15,17 +17,41 @@ import '../../data/models/owner_guest_model.dart';
 class BookingListWidget extends StatelessWidget {
   final List<OwnerBookingModel> bookings;
 
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
   const BookingListWidget({
     required this.bookings,
     super.key,
   });
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     if (bookings.isEmpty) {
-      return const EmptyState(
-        title: 'No Bookings',
-        message: 'Booking list will appear here once bookings are created',
+      return EmptyState(
+        title: loc?.ownerNoBookingsTitle ??
+            _text('ownerNoBookingsTitle', 'No Bookings'),
+        message: loc?.ownerNoBookingsMessage ??
+            _text('ownerNoBookingsMessage',
+                'Booking list will appear here once bookings are created'),
         icon: Icons.book_online_outlined,
       );
     }
@@ -37,16 +63,20 @@ class BookingListWidget extends StatelessWidget {
         final booking = bookings[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-          child: _buildBookingCard(context, booking),
+          child: _buildBookingCard(context, booking, loc),
         );
       },
     );
   }
 
   /// Builds individual booking card
-  Widget _buildBookingCard(BuildContext context, OwnerBookingModel booking) {
+  Widget _buildBookingCard(
+    BuildContext context,
+    OwnerBookingModel booking,
+    AppLocalizations? loc,
+  ) {
     return AdaptiveCard(
-      onTap: () => _showBookingDetails(context, booking),
+      onTap: () => _showBookingDetails(context, booking, loc),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         child: Column(
@@ -94,7 +124,9 @@ class BookingListWidget extends StatelessWidget {
                 Icon(Icons.access_time, size: 14, color: Colors.grey.shade600),
                 const SizedBox(width: 4),
                 CaptionText(
-                  text: '${booking.durationInDays} days',
+                  text: loc?.durationDays(booking.durationInDays) ??
+                      _text('durationDays', '{count} days',
+                          parameters: {'count': booking.durationInDays}),
                   color: Colors.grey.shade600,
                 ),
               ],
@@ -108,7 +140,8 @@ class BookingListWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CaptionText(
-                      text: 'Rent',
+                      text: loc?.rentLabel ??
+                          _text('rentLabel', 'Rent'),
                       color: Colors.grey.shade600,
                     ),
                     BodyText(
@@ -121,7 +154,8 @@ class BookingListWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CaptionText(
-                      text: 'Deposit',
+                      text: loc?.depositLabel ??
+                          _text('depositLabel', 'Deposit'),
                       color: Colors.grey.shade600,
                     ),
                     BodyText(
@@ -134,7 +168,7 @@ class BookingListWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     CaptionText(
-                      text: 'Paid',
+                      text: loc?.paidLabel ?? _text('paidLabel', 'Paid'),
                       color: Colors.grey.shade600,
                     ),
                     BodyText(
@@ -169,35 +203,72 @@ class BookingListWidget extends StatelessWidget {
   }
 
   /// Shows booking details dialog
-  void _showBookingDetails(BuildContext context, OwnerBookingModel booking) {
+  void _showBookingDetails(
+    BuildContext context,
+    OwnerBookingModel booking,
+    AppLocalizations? loc,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: HeadingSmall(text: 'Booking Details'),
+        title:
+            HeadingSmall(
+                text: loc?.bookingDetailsTitle ??
+                    _text('bookingDetailsTitle', 'Booking Details')),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('Room/Bed', booking.roomBedDisplay),
-              _buildDetailRow('Start Date', booking.formattedStartDate),
-              _buildDetailRow('End Date', booking.formattedEndDate),
-              _buildDetailRow('Duration', '${booking.durationInDays} days'),
-              _buildDetailRow('Rent', booking.formattedRent),
-              _buildDetailRow('Deposit', booking.formattedDeposit),
-              _buildDetailRow('Paid', booking.formattedPaid),
-              _buildDetailRow('Remaining', booking.formattedRemaining),
-              _buildDetailRow('Status', booking.statusDisplay),
-              _buildDetailRow('Payment Status', booking.paymentStatusDisplay),
+              _buildDetailRow(
+                loc?.roomBedLabel ??
+                    _text('roomBedLabel', 'Room/Bed'),
+                booking.roomBedDisplay,
+              ),
+              _buildDetailRow(
+                  loc?.startDate ?? _text('startDate', 'Start Date'),
+                  booking.formattedStartDate),
+              _buildDetailRow(
+                  loc?.endDate ?? _text('endDate', 'End Date'),
+                  booking.formattedEndDate),
+              _buildDetailRow(
+                loc?.durationLabel ?? _text('durationLabel', 'Duration'),
+                loc?.durationDays(booking.durationInDays) ??
+                    _text('durationDays', '{count} days',
+                        parameters: {'count': booking.durationInDays}),
+              ),
+              _buildDetailRow(
+                  loc?.rentLabel ?? _text('rentLabel', 'Rent'),
+                  booking.formattedRent),
+              _buildDetailRow(
+                  loc?.depositLabel ?? _text('depositLabel', 'Deposit'),
+                  booking.formattedDeposit),
+              _buildDetailRow(
+                  loc?.paidLabel ?? _text('paidLabel', 'Paid'),
+                  booking.formattedPaid),
+              _buildDetailRow(
+                  loc?.remainingLabel ??
+                      _text('remainingLabel', 'Remaining'),
+                  booking.formattedRemaining),
+              _buildDetailRow(
+                  loc?.statusLabel ?? _text('statusLabel', 'Status'),
+                  booking.statusDisplay),
+              _buildDetailRow(
+                loc?.paymentStatusLabel ??
+                    _text('paymentStatusLabel', 'Payment Status'),
+                booking.paymentStatusDisplay,
+              ),
               if (booking.notes != null && booking.notes!.isNotEmpty)
-                _buildDetailRow('Notes', booking.notes!),
+                _buildDetailRow(
+                    loc?.notesLabel ?? _text('notesLabel', 'Notes'),
+                    booking.notes!),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(loc?.close ?? _text('close', 'Close')),
           ),
         ],
       ),

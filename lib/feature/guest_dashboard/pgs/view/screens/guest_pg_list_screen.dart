@@ -17,6 +17,8 @@ import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
 import '../../../shared/widgets/user_location_display.dart';
@@ -45,6 +47,24 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _showFilterPanel = false;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -74,6 +94,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
   @override
   Widget build(BuildContext context) {
     final pgVM = Provider.of<GuestPgViewModel>(context);
+    final loc = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AdaptiveAppBar(
@@ -84,12 +105,13 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () => _toggleFilterPanel(),
-            tooltip: 'Search & Filters',
+          tooltip: loc?.searchAndFilters ??
+              _text('searchAndFilters', 'Search & Filters'),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => pgVM.refreshPGs(context),
-            tooltip: 'Refresh',
+          tooltip: loc?.refresh ?? _text('refresh', 'Refresh'),
           ),
         ],
         showBackButton: false,
@@ -123,9 +145,15 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           AppColors.darkCard, // Fixed: using dark mode for consistency
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
-        title: HeadingMedium(
-          text: 'Find Your PG',
-          color: AppColors.textOnPrimary,
+        title: Builder(
+          builder: (context) {
+            final loc = AppLocalizations.of(context);
+            return HeadingMedium(
+              text: loc?.findYourPg ??
+                  _text('findYourPg', 'Find Your PG'),
+              color: AppColors.textOnPrimary,
+            );
+          },
         ),
         background: Container(
           decoration: BoxDecoration(
@@ -162,13 +190,25 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
               _showFilterPanel = !_showFilterPanel;
             });
           },
-          tooltip: _showFilterPanel ? 'Hide Filters' : 'Show Filters',
+          tooltip: () {
+            final loc = AppLocalizations.of(context);
+            return _showFilterPanel
+                ? (loc?.hideFilters ??
+                    _text('hideFilters', 'Hide Filters'))
+                : (loc?.showFilters ??
+                    _text('showFilters', 'Show Filters'));
+          }(),
         ),
         // Refresh
-        IconButton(
-          icon: const Icon(Icons.refresh, color: AppColors.textOnPrimary),
-          onPressed: () => pgVM.refreshPGs(context),
-          tooltip: 'Refresh',
+        Builder(
+          builder: (context) {
+            final loc = AppLocalizations.of(context);
+            return IconButton(
+              icon: const Icon(Icons.refresh, color: AppColors.textOnPrimary),
+              onPressed: () => pgVM.refreshPGs(context),
+              tooltip: loc?.refresh ?? _text('refresh', 'Refresh'),
+            );
+          },
         ),
       ],
     );
@@ -178,6 +218,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
   Widget _buildStatsRow(
       BuildContext context, GuestPgViewModel pgVM, bool isDarkMode) {
     final stats = pgVM.pgStats;
+    final loc = AppLocalizations.of(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -185,7 +226,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
         _buildStatBadge(
           context,
           '${stats['totalPGs'] ?? 0}',
-          'PGs Available',
+          loc?.pgsAvailable ?? _text('pgsAvailable', 'PGs Available'),
           Icons.apartment,
           AppColors.success,
           true,
@@ -193,7 +234,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
         _buildStatBadge(
           context,
           '${stats['totalCities'] ?? 0}',
-          'Cities',
+          loc?.cities ?? _text('cities', 'Cities'),
           Icons.location_city,
           AppColors.info,
           true,
@@ -201,7 +242,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
         _buildStatBadge(
           context,
           '${stats['totalAmenities'] ?? 0}',
-          'Amenities',
+          loc?.amenities ?? _text('amenities', 'Amenities'),
           Icons.room_service,
           AppColors.warning,
           true,
@@ -302,6 +343,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
   Widget _buildSearchBar(BuildContext context, GuestPgViewModel pgVM) {
     // final theme = Theme.of(context);
     // final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
@@ -309,7 +351,11 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
         controller: _searchController,
         onChanged: (value) => pgVM.setSearchQuery(value),
         decoration: InputDecoration(
-          hintText: 'Search by name, city, area...',
+          hintText: loc?.searchByNameCityArea ??
+              _text(
+                'searchByNameCityArea',
+                'Search by name, city, area...',
+              ),
           prefixIcon: const Icon(Icons.search),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
@@ -346,6 +392,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
 
   /// 🎛️ Advanced filters panel
   Widget _buildAdvancedFilters(BuildContext context, GuestPgViewModel pgVM) {
+    final loc = AppLocalizations.of(context);
     // final theme = Theme.of(context);
     // final isDarkMode = theme.brightness == Brightness.dark;
 
@@ -374,12 +421,14 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               HeadingSmall(
-                text: 'Filters',
+                text: loc?.filters ?? _text('filters', 'Filters'),
                 color: AppColors.primary,
               ),
               TextButton(
                 onPressed: () => pgVM.clearAllFilters(),
-                child: const Text('Clear All'),
+            child: Text(
+              loc?.clearAll ?? _text('clearAll', 'Clear All'),
+            ),
               ),
             ],
           ),
@@ -387,7 +436,9 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
 
           // City filter
           if (pgVM.getAvailableCities().isNotEmpty) ...[
-            BodyText(text: 'City', color: AppColors.textSecondary),
+            BodyText(
+                text: loc?.city ?? _text('city', 'City'),
+                color: AppColors.textSecondary),
             const SizedBox(height: AppSpacing.paddingS),
             Wrap(
               spacing: AppSpacing.paddingS,
@@ -411,7 +462,9 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
 
           // Amenities filter
           if (pgVM.getAvailableAmenities().isNotEmpty) ...[
-            BodyText(text: 'Amenities', color: AppColors.textSecondary),
+            BodyText(
+                text: loc?.amenities ?? _text('amenities', 'Amenities'),
+                color: AppColors.textSecondary),
             const SizedBox(height: AppSpacing.paddingS),
             Wrap(
               spacing: AppSpacing.paddingS,
@@ -445,6 +498,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
 
   /// 🏷️ Active filters chips
   Widget _buildActiveFiltersChips(BuildContext context, GuestPgViewModel pgVM) {
+    final loc = AppLocalizations.of(context);
     // final theme = Theme.of(context);
     // final isDarkMode = theme.brightness == Brightness.dark;
 
@@ -457,7 +511,8 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           Row(
             children: [
               CaptionText(
-                text: 'Active Filters:',
+                text:
+                    '${loc?.activeFilters ?? _text('activeFilters', 'Active Filters')}:',
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: AppSpacing.paddingS),
@@ -469,7 +524,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
                       if (pgVM.searchQuery.isNotEmpty)
                         _buildActiveFilterChip(
                           context,
-                          'Search: ${pgVM.searchQuery}',
+                          '${loc?.search ?? _text('search', 'Search')}: ${pgVM.searchQuery}',
                           () {
                             _searchController.clear();
                             pgVM.setSearchQuery('');
@@ -479,7 +534,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
                       if (pgVM.selectedCity != null)
                         _buildActiveFilterChip(
                           context,
-                          'City: ${pgVM.selectedCity}',
+                          '${loc?.city ?? _text('city', 'City')}: ${pgVM.selectedCity}',
                           () => pgVM.setSelectedCity(null),
                           true,
                         ),
@@ -503,7 +558,18 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           ),
           const SizedBox(height: AppSpacing.paddingS),
           BodyText(
-            text: '${pgVM.filteredPGCount} of ${pgVM.totalPGCount} PGs',
+            text: loc?.pgCountSummary(
+                  pgVM.filteredPGCount,
+                  pgVM.totalPGCount,
+                ) ??
+                _text(
+                  'pgCountSummary',
+                  '{filtered} of {total} PGs',
+                  parameters: {
+                    'filtered': pgVM.filteredPGCount.toString(),
+                    'total': pgVM.totalPGCount.toString(),
+                  },
+                ),
             color: AppColors.textSecondary,
           ),
         ],
@@ -529,15 +595,20 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
   /// 📋 PGs list with premium cards
   Widget _buildPGsList(BuildContext context, GuestPgViewModel pgVM) {
     final pgs = pgVM.filteredPGs;
+    final loc = AppLocalizations.of(context);
 
     if (pgs.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.paddingL),
         child: EmptyState(
-          title: 'No PGs Found',
-          message: 'Try adjusting your search or filters',
+          title: loc?.noPgsFound ?? _text('noPgsFound', 'No PGs Found'),
+          message: loc?.noPgsFoundDescription ??
+              _text(
+                'noPgsFoundDescription',
+                'Try adjusting your search or filters to find more options.',
+              ),
           icon: Icons.search_off,
-          actionLabel: 'Clear Filters',
+          actionLabel: loc?.clearAll ?? _text('clearAll', 'Clear All'),
           onAction: () {
             _searchController.clear();
             pgVM.clearAllFilters();
@@ -591,6 +662,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
   Widget _buildErrorState(BuildContext context, GuestPgViewModel pgVM) {
     // final theme = Theme.of(context);
     // final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -604,13 +676,16 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           ),
           const SizedBox(height: AppSpacing.paddingL),
           HeadingMedium(
-            text: 'Error loading PGs',
+            text: loc?.errorLoadingPgs ??
+                _text('errorLoadingPgs', 'Error loading PGs'),
             align: TextAlign.center,
             color: AppColors.textPrimary,
           ),
           const SizedBox(height: AppSpacing.paddingS),
           BodyText(
-            text: pgVM.errorMessage ?? 'Unknown error occurred',
+            text: pgVM.errorMessage ??
+                (loc?.unknownErrorOccurred ??
+                    _text('unknownErrorOccurred', 'Unknown error occurred')),
             align: TextAlign.center,
             color: AppColors.textSecondary,
           ),
@@ -620,7 +695,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
               // pgVM.clearError();
               pgVM.loadPGs(context);
             },
-            label: 'Try Again',
+            label: loc?.tryAgain ?? _text('tryAgain', 'Try Again'),
             icon: Icons.refresh,
           ),
         ],
@@ -630,14 +705,17 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
 
   /// 📭 Empty state
   Widget _buildEmptyState(BuildContext context, GuestPgViewModel pgVM) {
+    final loc = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: EmptyState(
-        title: 'No PGs Available',
-        message:
-            'PG listings will appear here once they are added to the platform.',
+        title:
+            loc?.noPgsAvailable ?? _text('noPgsAvailable', 'No PGs Available'),
+        message: loc?.pgListingsWillAppear ??
+            _text('pgListingsWillAppear',
+                'PG listings will appear here once they are added to the platform.'),
         icon: Icons.apartment,
-        actionLabel: 'Refresh',
+        actionLabel: loc?.refresh ?? _text('refresh', 'Refresh'),
         onAction: () => pgVM.refreshPGs(context),
       ),
     );

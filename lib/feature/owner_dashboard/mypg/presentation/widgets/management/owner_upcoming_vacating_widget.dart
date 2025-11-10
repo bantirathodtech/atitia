@@ -7,19 +7,41 @@ import '../../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../../l10n/app_localizations.dart';
 import '../../../data/models/owner_pg_management_model.dart';
 
 /// Widget displaying upcoming vacating bookings
 class OwnerUpcomingVacatingWidget extends StatelessWidget {
   final List<OwnerBooking> bookings;
 
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
   const OwnerUpcomingVacatingWidget({
     required this.bookings,
     super.key,
   });
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     if (bookings.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -31,7 +53,10 @@ class OwnerUpcomingVacatingWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HeadingMedium(
-              text: 'Upcoming Vacating (${bookings.length})',
+              text: loc?.ownerUpcomingVacatingTitle(bookings.length) ??
+                  _text('ownerUpcomingVacatingTitle',
+                      'Upcoming Vacating ({count})',
+                      parameters: {'count': bookings.length}),
               color: Theme.of(context).primaryColor,
             ),
             const SizedBox(height: AppSpacing.paddingM),

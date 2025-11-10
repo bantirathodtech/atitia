@@ -1,6 +1,7 @@
 // lib/features/owner_dashboard/myguest/view/widgets/payment_list_widget.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
@@ -10,7 +11,9 @@ import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
+import '../../../../../l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/owner_guest_model.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
@@ -23,6 +26,9 @@ class PaymentListWidget extends StatelessWidget {
   final List<OwnerGuestModel> guests;
   final List<OwnerBookingModel> bookings;
 
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
   const PaymentListWidget({
     required this.payments,
     required this.viewModel,
@@ -31,12 +37,33 @@ class PaymentListWidget extends StatelessWidget {
     super.key,
   });
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     if (payments.isEmpty) {
-      return const EmptyState(
-        title: 'No Payments',
-        message: 'Payment records will appear here once payments are collected',
+      return EmptyState(
+        title: loc?.ownerNoPaymentsTitle ??
+            _text('ownerNoPaymentsTitle', 'No Payments'),
+        message: loc?.ownerNoPaymentsMessage ??
+            _text('ownerNoPaymentsMessage',
+                'Payment records will appear here once payments are collected'),
         icon: Icons.payment_outlined,
       );
     }
@@ -48,19 +75,23 @@ class PaymentListWidget extends StatelessWidget {
         final payment = payments[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-          child: _buildPaymentCard(context, payment),
+          child: _buildPaymentCard(context, payment, loc),
         );
       },
     );
   }
 
   /// Builds individual payment card
-  Widget _buildPaymentCard(BuildContext context, OwnerPaymentModel payment) {
+  Widget _buildPaymentCard(
+    BuildContext context,
+    OwnerPaymentModel payment,
+    AppLocalizations? loc,
+  ) {
     final guest = guests.firstWhere(
       (g) => g.uid == payment.guestUid,
       orElse: () => OwnerGuestModel(
         uid: payment.guestUid,
-        fullName: 'Unknown Guest',
+        fullName: loc?.unknownGuest ?? _text('unknownGuest', 'Unknown Guest'),
         phoneNumber: '',
       ),
     );
@@ -71,8 +102,10 @@ class PaymentListWidget extends StatelessWidget {
         id: payment.bookingId,
         guestUid: payment.guestUid,
         pgId: payment.pgId,
-        roomNumber: 'N/A',
-        bedNumber: 'N/A',
+        roomNumber:
+            loc?.notAvailable ?? _text('notAvailable', 'Not available'),
+        bedNumber:
+            loc?.notAvailable ?? _text('notAvailable', 'Not available'),
         startDate: DateTime.now(),
         endDate: DateTime.now(),
       ),
@@ -116,7 +149,7 @@ class PaymentListWidget extends StatelessWidget {
                 Icon(Icons.currency_rupee, size: 16, color: Colors.green),
                 const SizedBox(width: 4),
                 BodyText(
-                  text: payment.formattedAmount,
+                  text: _formatCurrency(payment.amountPaid, loc),
                   medium: true,
                   color: Colors.green,
                 ),
@@ -130,7 +163,7 @@ class PaymentListWidget extends StatelessWidget {
                     size: 14, color: Colors.grey.shade600),
                 const SizedBox(width: 4),
                 BodyText(
-                  text: payment.formattedDate,
+                  text: _formatDate(payment.date, loc),
                   color: Colors.grey.shade600,
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
@@ -163,15 +196,17 @@ class PaymentListWidget extends StatelessWidget {
                 children: [
                   Expanded(
                     child: SecondaryButton(
-                      label: 'Reject',
-                      onPressed: () => _rejectPayment(context, payment),
+                      label: loc?.reject ?? _text('reject', 'Reject'),
+                      onPressed: () => _rejectPayment(context, payment, loc),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.paddingS),
                   Expanded(
                     child: PrimaryButton(
-                      label: 'Mark Collected',
-                      onPressed: () => _collectPayment(context, payment),
+                      label: loc?.markPaymentCollected ??
+                          _text(
+                              'markPaymentCollected', 'Mark Payment as Collected'),
+                      onPressed: () => _collectPayment(context, payment, loc),
                     ),
                   ),
                 ],
@@ -190,51 +225,84 @@ class PaymentListWidget extends StatelessWidget {
     OwnerGuestModel guest,
     OwnerBookingModel booking,
   ) {
+    final loc = AppLocalizations.of(context);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: HeadingSmall(text: 'Payment Details'),
+        title: HeadingSmall(
+            text: loc?.paymentDetails ??
+                _text('paymentDetails', 'Payment Details')),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow('Guest Name', guest.fullName),
-              _buildDetailRow('Phone', guest.phoneNumber),
-              _buildDetailRow('Amount', payment.formattedAmount),
-              _buildDetailRow('Payment Method', payment.paymentMethodDisplay),
-              _buildDetailRow('Payment Date', payment.formattedDate),
-              _buildDetailRow('Status', payment.statusDisplay),
-              _buildDetailRow('Room/Bed', booking.roomBedDisplay),
+              _buildDetailRow(
+                  loc?.guestName ?? _text('guestName', 'Guest Name'),
+                  guest.fullName,
+                  loc),
+              _buildDetailRow(
+                  loc?.phoneNumber ?? _text('phoneNumber', 'Phone'),
+                  guest.phoneNumber,
+                  loc),
+              _buildDetailRow(
+                  loc?.amount ?? _text('amount', 'Amount'),
+                  _formatCurrency(payment.amountPaid, loc),
+                  loc),
+              _buildDetailRow(
+                  loc?.paymentMethod ??
+                      _text('paymentMethod', 'Payment Method'),
+                  payment.paymentMethodDisplay, loc),
+              _buildDetailRow(
+                  loc?.paymentDate ?? _text('paymentDate', 'Payment Date'),
+                  _formatDate(payment.date, loc),
+                  loc),
+              _buildDetailRow(
+                  loc?.status ?? _text('status', 'Status'),
+                  payment.statusDisplay,
+                  loc),
+              _buildDetailRow(
+                  loc?.roomBed ?? _text('roomBed', 'Room/Bed'),
+                  booking.roomBedDisplay,
+                  loc),
               if (payment.transactionId != null &&
                   payment.transactionId!.isNotEmpty)
-                _buildDetailRow('Transaction ID', payment.transactionId!),
+                _buildDetailRow(
+                    loc?.transactionId ??
+                        _text('transactionId', 'Transaction ID'),
+                    payment.transactionId!, loc),
               if (payment.notes != null && payment.notes!.isNotEmpty)
-                _buildDetailRow('Notes', payment.notes!),
+                _buildDetailRow(
+                    loc?.notes ?? _text('notes', 'Notes'), payment.notes!, loc),
               if (payment.collectedBy != null)
-                _buildDetailRow('Collected By', payment.collectedBy!),
+                _buildDetailRow(
+                    loc?.collectedBy ?? _text('collectedBy', 'Collected By'),
+                    payment.collectedBy!,
+                    loc),
             ],
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+            child: Text(loc?.close ?? _text('close', 'Close')),
           ),
           if (payment.isPending) ...[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _rejectPayment(context, payment);
+                _rejectPayment(context, payment, loc);
               },
-              child: const Text('Reject'),
+              child: Text(loc?.reject ?? _text('reject', 'Reject')),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _collectPayment(context, payment);
+                _collectPayment(context, payment, loc);
               },
-              child: const Text('Mark Collected'),
+              child: Text(loc?.markPaymentCollected ??
+                  _text('markPaymentCollected', 'Mark Payment as Collected')),
             ),
           ],
         ],
@@ -243,7 +311,7 @@ class PaymentListWidget extends StatelessWidget {
   }
 
   /// Builds a detail row for the dialog
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(String label, String value, AppLocalizations? loc) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
       child: Row(
@@ -265,28 +333,41 @@ class PaymentListWidget extends StatelessWidget {
   }
 
   /// Collects a payment
-  void _collectPayment(BuildContext context, OwnerPaymentModel payment) {
+  void _collectPayment(
+      BuildContext context, OwnerPaymentModel payment, AppLocalizations? loc) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingSmall(text: 'Mark Payment as Collected'),
+        title: HeadingSmall(
+            text: loc?.markPaymentCollected ??
+                _text('markPaymentCollected', 'Mark Payment as Collected')),
         content: BodyText(
-          text:
-              'Are you sure you want to mark this payment of ${payment.formattedAmount} as collected?',
+          text: loc?.confirmMarkPaymentCollected(
+                _formatCurrency(payment.amountPaid, loc),
+              ) ??
+              _text(
+                'confirmMarkPaymentCollected',
+                'Are you sure you want to mark this payment of {amount} as collected?',
+                parameters: {
+                  'amount': _formatCurrency(payment.amountPaid, loc),
+                },
+              ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc?.cancel ?? _text('cancel', 'Cancel')),
           ),
           PrimaryButton(
-            label: 'Confirm',
+            label: loc?.confirm ?? _text('confirm', 'Confirm'),
             onPressed: () async {
               Navigator.of(context).pop();
 
               final authProvider =
                   Provider.of<AuthProvider>(context, listen: false);
-              final ownerName = authProvider.user?.fullName ?? 'Owner';
+              final ownerName =
+                  authProvider.user?.fullName ??
+                      (loc?.owner ?? _text('owner', 'Owner'));
 
               final updatedPayment = payment.copyWith(
                 status: 'collected',
@@ -297,14 +378,16 @@ class PaymentListWidget extends StatelessWidget {
               final success = await viewModel.updatePayment(updatedPayment);
 
               if (context.mounted) {
+                final message = success
+                    ? (loc?.paymentMarkedCollected ??
+                        _text('paymentMarkedCollected',
+                            'Payment marked as collected'))
+                    : (loc?.ownerPaymentUpdateFailed ??
+                        _text('ownerPaymentUpdateFailed',
+                            'Failed to update payment'));
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: BodyText(
-                      text: success
-                          ? 'Payment marked as collected'
-                          : 'Failed to update payment',
-                      color: Colors.white,
-                    ),
+                    content: Text(message),
                     backgroundColor: success ? Colors.green : Colors.red,
                   ),
                 );
@@ -317,26 +400,31 @@ class PaymentListWidget extends StatelessWidget {
   }
 
   /// Rejects a payment
-  void _rejectPayment(BuildContext context, OwnerPaymentModel payment) {
+  void _rejectPayment(
+      BuildContext context, OwnerPaymentModel payment, AppLocalizations? loc) {
     final reasonController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingSmall(text: 'Reject Payment'),
+        title: HeadingSmall(text: loc?.rejectPayment ?? 'Reject Payment'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             BodyText(
-              text: 'Please provide a reason for rejecting this payment:',
+              text: loc?.provideRejectionReason ??
+                  _text('provideRejectionReason',
+                      'Please provide a reason for rejecting this payment:'),
             ),
             const SizedBox(height: AppSpacing.paddingM),
             TextField(
               controller: reasonController,
-              decoration: const InputDecoration(
-                labelText: 'Rejection Reason',
-                hintText: 'Enter reason for rejection...',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: loc?.rejectionReason ??
+                    _text('rejectionReason', 'Rejection Reason'),
+                hintText: loc?.enterRejectionReason ??
+                    _text('enterRejectionReason', 'Enter reason for rejection...'),
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -345,18 +433,24 @@ class PaymentListWidget extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc?.cancel ?? _text('cancel', 'Cancel')),
           ),
           PrimaryButton(
-            label: 'Reject',
+            label: loc?.reject ?? _text('reject', 'Reject'),
             onPressed: () async {
               Navigator.of(context).pop();
 
               final updatedPayment = payment.copyWith(
                 status: 'failed',
                 notes: reasonController.text.trim().isNotEmpty
-                    ? 'Rejected: ${reasonController.text.trim()}'
-                    : 'Payment rejected by owner',
+                    ? loc?.rejectedWithReason(reasonController.text.trim()) ??
+                        _text('rejectedWithReason', 'Rejected: {reason}',
+                            parameters: {
+                              'reason': reasonController.text.trim()
+                            })
+                    : loc?.paymentRejectedByOwner ??
+                        _text('paymentRejectedByOwner',
+                            'Payment rejected by owner'),
                 updatedAt: DateTime.now(),
               );
 
@@ -365,11 +459,13 @@ class PaymentListWidget extends StatelessWidget {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: BodyText(
-                      text: success
-                          ? 'Payment rejected'
-                          : 'Failed to reject payment',
-                      color: Colors.white,
+                    content: Text(
+                      success
+                          ? (loc?.paymentRejected ??
+                              _text('paymentRejected', 'Payment rejected'))
+                          : (loc?.failedToRejectPayment ??
+                              _text('failedToRejectPayment',
+                                  'Failed to reject payment')),
                     ),
                     backgroundColor: success ? Colors.orange : Colors.red,
                   ),
@@ -380,5 +476,20 @@ class PaymentListWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatCurrency(double amount, AppLocalizations? loc) {
+    final format = NumberFormat.simpleCurrency(
+      locale: loc?.localeName,
+      name: 'INR',
+    );
+    return format.format(amount);
+  }
+
+  String _formatDate(DateTime date, AppLocalizations? loc) {
+    final locale = loc?.localeName;
+    final datePart = DateFormat.yMMMd(locale).format(date);
+    final timePart = DateFormat.jm(locale).format(date);
+    return '$datePart • $timePart';
   }
 }

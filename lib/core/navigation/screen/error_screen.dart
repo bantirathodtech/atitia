@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../navigation_service.dart';
 
 /// Universal error screen for handling navigation errors and unknown routes.
@@ -77,7 +78,7 @@ class ErrorScreen extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text('Go to Home'),
+          child: Text(AppLocalizations.of(context)?.goToHome ?? 'Go to Home'),
         ),
         const SizedBox(height: 12),
 
@@ -87,14 +88,14 @@ class ErrorScreen extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text('Go Back'),
+          child: Text(AppLocalizations.of(context)?.goBack ?? 'Go Back'),
         ),
         const SizedBox(height: 12),
 
         // Sign In Button (Tertiary Action - if not authenticated)
         TextButton(
           onPressed: _goToPhoneAuth,
-          child: const Text('Sign In'),
+          child: Text(AppLocalizations.of(context)?.signIn ?? 'Sign In'),
         ),
       ],
     );

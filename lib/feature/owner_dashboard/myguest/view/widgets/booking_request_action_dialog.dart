@@ -1,6 +1,7 @@
 // lib/features/owner_dashboard/myguest/view/widgets/booking_request_action_dialog.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
@@ -11,6 +12,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_booking_request_model.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 
@@ -62,6 +64,7 @@ class _BookingRequestActionDialogState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -74,13 +77,13 @@ class _BookingRequestActionDialogState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(context, isDark),
+            _buildHeader(context, isDark, loc),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildRequestInfo(context, isDark),
+            _buildRequestInfo(context, isDark, loc),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildForm(context, isDark),
+            _buildForm(context, isDark, loc),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildActions(context),
+            _buildActions(context, loc),
           ],
         ),
       ),
@@ -88,7 +91,8 @@ class _BookingRequestActionDialogState
   }
 
   /// Builds the dialog header
-  Widget _buildHeader(BuildContext context, bool isDark) {
+  Widget _buildHeader(
+      BuildContext context, bool isDark, AppLocalizations? loc) {
     return Row(
       children: [
         Container(
@@ -112,14 +116,18 @@ class _BookingRequestActionDialogState
             children: [
               HeadingMedium(
                 text: widget.isApproval
-                    ? 'Approve Booking Request'
-                    : 'Reject Booking Request',
+                    ? (loc?.approveBookingRequestTitle ??
+                        'Approve Booking Request')
+                    : (loc?.rejectBookingRequestTitle ??
+                        'Reject Booking Request'),
                 color: isDark ? Colors.white : Colors.black,
               ),
               CaptionText(
                 text: widget.isApproval
-                    ? 'Approve this guest\'s request to join your PG'
-                    : 'Reject this guest\'s request to join your PG',
+                    ? (loc?.approveBookingRequestSubtitle ??
+                        'Approve this guest\'s request to join your PG')
+                    : (loc?.rejectBookingRequestSubtitle ??
+                        'Reject this guest\'s request to join your PG'),
                 color: isDark ? Colors.white70 : Colors.grey[600],
               ),
             ],
@@ -130,7 +138,8 @@ class _BookingRequestActionDialogState
   }
 
   /// Builds request information section
-  Widget _buildRequestInfo(BuildContext context, bool isDark) {
+  Widget _buildRequestInfo(
+      BuildContext context, bool isDark, AppLocalizations? loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
@@ -169,7 +178,8 @@ class _BookingRequestActionDialogState
               ),
               const SizedBox(width: AppSpacing.paddingS),
               BodyText(
-                text: widget.request.guestPhone,
+                text:
+                    '${loc?.contactNumberLabel ?? 'Contact Number'}: ${widget.request.guestPhone}',
                 color: isDark ? Colors.white70 : Colors.grey[600],
               ),
             ],
@@ -184,7 +194,7 @@ class _BookingRequestActionDialogState
               ),
               const SizedBox(width: AppSpacing.paddingS),
               BodyText(
-                text: widget.request.guestEmail,
+                text: '${loc?.emailLabel ?? 'Email'}: ${widget.request.guestEmail}',
                 color: isDark ? Colors.white70 : Colors.grey[600],
               ),
             ],
@@ -200,7 +210,8 @@ class _BookingRequestActionDialogState
               const SizedBox(width: AppSpacing.paddingS),
               Expanded(
                 child: BodyText(
-                  text: widget.request.pgName,
+                  text:
+                      '${loc?.pgLabel ?? 'PG'}: ${widget.request.pgName}',
                   color: isDark ? Colors.white70 : Colors.grey[700],
                 ),
               ),
@@ -212,14 +223,19 @@ class _BookingRequestActionDialogState
   }
 
   /// Builds the form for response and additional details
-  Widget _buildForm(BuildContext context, bool isDark) {
+  Widget _buildForm(
+      BuildContext context, bool isDark, AppLocalizations? loc) {
+    final dateFormat = DateFormat.yMMMd(loc?.localeName);
+
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
-            text: widget.isApproval ? 'Approval Details' : 'Rejection Details',
+            text: widget.isApproval
+                ? (loc?.approvalDetails ?? 'Approval Details')
+                : (loc?.rejectionDetails ?? 'Rejection Details'),
             color: isDark ? Colors.white : Colors.black,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -229,11 +245,14 @@ class _BookingRequestActionDialogState
             controller: _responseController,
             decoration: InputDecoration(
               labelText: widget.isApproval
-                  ? 'Welcome Message (Optional)'
-                  : 'Reason for Rejection (Optional)',
+                  ? (loc?.welcomeMessageOptional ?? 'Welcome Message (Optional)')
+                  : (loc?.rejectionReasonOptional ??
+                      'Reason for Rejection (Optional)'),
               hintText: widget.isApproval
-                  ? 'Add a welcome message for the guest...'
-                  : 'Explain why the request is being rejected...',
+                  ? (loc?.welcomeMessageHint ??
+                      'Add a welcome message for the guest...')
+                  : (loc?.rejectionReasonHintDetailed ??
+                      'Explain why the request is being rejected...'),
               border: const OutlineInputBorder(),
             ),
             maxLines: 3,
@@ -244,21 +263,21 @@ class _BookingRequestActionDialogState
             const SizedBox(height: AppSpacing.paddingM),
             TextFormField(
               controller: _roomNumberController,
-              decoration: const InputDecoration(
-                labelText: 'Room Number *',
-                hintText: 'Enter room number...',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.door_front_door),
+              decoration: InputDecoration(
+                labelText: loc?.roomNumberLabel ?? 'Room Number *',
+                hintText: loc?.enterRoomNumberHint ?? 'Enter room number...',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.door_front_door),
               ),
             ),
             const SizedBox(height: AppSpacing.paddingM),
             TextFormField(
               controller: _bedNumberController,
-              decoration: const InputDecoration(
-                labelText: 'Bed Number *',
-                hintText: 'Enter bed number...',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.bed),
+              decoration: InputDecoration(
+                labelText: loc?.bedNumberLabel ?? 'Bed Number *',
+                hintText: loc?.enterBedNumberHint ?? 'Enter bed number...',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.bed),
               ),
             ),
             const SizedBox(height: AppSpacing.paddingM),
@@ -270,7 +289,9 @@ class _BookingRequestActionDialogState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const CaptionText(text: 'Start Date'),
+                      CaptionText(
+                        text: loc?.startDateLabel ?? 'Start Date',
+                      ),
                       const SizedBox(height: AppSpacing.paddingXS),
                       InkWell(
                         onTap: _selectStartDate,
@@ -288,8 +309,9 @@ class _BookingRequestActionDialogState
                               Expanded(
                                 child: BodyText(
                                   text: _startDate != null
-                                      ? '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'
-                                      : 'Select start date',
+                                      ? dateFormat.format(_startDate!)
+                                      : (loc?.selectStartDate ??
+                                          'Select start date'),
                                 ),
                               ),
                             ],
@@ -304,7 +326,9 @@ class _BookingRequestActionDialogState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const CaptionText(text: 'End Date'),
+                      CaptionText(
+                        text: loc?.endDateLabel ?? 'End Date',
+                      ),
                       const SizedBox(height: AppSpacing.paddingXS),
                       InkWell(
                         onTap: _selectEndDate,
@@ -322,8 +346,8 @@ class _BookingRequestActionDialogState
                               Expanded(
                                 child: BodyText(
                                   text: _endDate != null
-                                      ? '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'
-                                      : 'Select end date',
+                                      ? dateFormat.format(_endDate!)
+                                      : (loc?.selectEndDate ?? 'Select end date'),
                                 ),
                               ),
                             ],
@@ -342,12 +366,12 @@ class _BookingRequestActionDialogState
   }
 
   /// Builds the action buttons
-  Widget _buildActions(BuildContext context) {
+  Widget _buildActions(BuildContext context, AppLocalizations? loc) {
     return Row(
       children: [
         Expanded(
           child: SecondaryButton(
-            label: 'Cancel',
+            label: loc?.cancel ?? 'Cancel',
             onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
           ),
         ),
@@ -355,8 +379,12 @@ class _BookingRequestActionDialogState
         Expanded(
           child: PrimaryButton(
             label: _isSubmitting
-                ? (widget.isApproval ? 'Approving...' : 'Rejecting...')
-                : (widget.isApproval ? 'Approve Request' : 'Reject Request'),
+                ? (widget.isApproval
+                    ? (loc?.approving ?? 'Approving...')
+                    : (loc?.rejecting ?? 'Rejecting...'))
+                : (widget.isApproval
+                    ? (loc?.approveRequest ?? 'Approve Request')
+                    : (loc?.rejectRequest ?? 'Reject Request')),
             onPressed: _isSubmitting ? null : _submitAction,
             isLoading: _isSubmitting,
           ),
@@ -404,6 +432,7 @@ class _BookingRequestActionDialogState
 
   /// Submits the approval or rejection
   Future<void> _submitAction() async {
+    final loc = AppLocalizations.of(context);
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -421,8 +450,9 @@ class _BookingRequestActionDialogState
         if (_roomNumberController.text.trim().isEmpty ||
             _bedNumberController.text.trim().isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Room and Bed numbers are required for approval'),
+            SnackBar(
+              content: Text(loc?.roomBedNumbersRequired ??
+                  'Room and bed numbers are required for approval'),
               backgroundColor: Colors.orange,
             ),
           );
@@ -455,8 +485,10 @@ class _BookingRequestActionDialogState
           SnackBar(
             content: BodyText(
               text: widget.isApproval
-                  ? 'Booking request approved successfully!'
-                  : 'Booking request rejected successfully!',
+                  ? (loc?.bookingRequestApprovedSuccess ??
+                      'Booking request approved successfully!')
+                  : (loc?.bookingRequestRejectedSuccess ??
+                      'Booking request rejected successfully!'),
               color: Colors.white,
             ),
             backgroundColor: widget.isApproval ? Colors.green : Colors.red,
@@ -466,10 +498,13 @@ class _BookingRequestActionDialogState
       }
     } catch (e) {
       if (mounted) {
+        final actionLabel = widget.isApproval
+            ? (loc?.approveAction ?? 'approve')
+            : (loc?.rejectAction ?? 'reject');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(
-              text:
+              text: loc?.bookingRequestActionFailed(actionLabel, e.toString()) ??
                   'Failed to ${widget.isApproval ? 'approve' : 'reject'} request: $e',
               color: Colors.white,
             ),

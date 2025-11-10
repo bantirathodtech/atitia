@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
@@ -86,6 +87,10 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   Widget build(BuildContext context) {
     // Check if we're editing an existing menu or creating a new one
     final isEditing = widget.existingMenu != null;
+    final loc = AppLocalizations.of(context)!;
+    final appBarTitle = isEditing
+        ? loc.ownerMenuEditTitleEdit(widget.dayLabel)
+        : loc.ownerMenuEditTitleCreate(widget.dayLabel);
 
     return Scaffold(
       // =======================================================================
@@ -97,9 +102,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       // Auto action: Theme toggle (Light/Dark/System)
       // =======================================================================
       appBar: AdaptiveAppBar(
-        title: isEditing
-            ? 'Edit ${widget.dayLabel} Menu' // ✏️ Editing existing menu
-            : 'Create ${widget.dayLabel} Menu', // ➕ Creating new menu
+        title: appBarTitle,
         elevation: 2,
         showThemeToggle: true, // Theme toggle for comfortable editing
         actions: [
@@ -108,7 +111,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             IconButton(
               icon: Icon(Icons.delete_outline, color: AppColors.error),
               onPressed: _confirmDeleteMenu,
-              tooltip: 'Delete Menu',
+              tooltip: loc.ownerMenuEditDeleteTooltip,
             ),
           // Theme toggle automatically added after custom actions
         ],
@@ -120,7 +123,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 children: [
                   AdaptiveLoader(),
                   const SizedBox(height: AppSpacing.paddingM),
-                  const BodyText(text: 'Saving menu...'),
+                  BodyText(text: loc.ownerMenuEditSaving),
                 ],
               ),
             )
@@ -132,19 +135,21 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Header Info
-                    _buildHeaderCard(),
+                    _buildHeaderCard(loc),
                     const SizedBox(height: AppSpacing.paddingM),
 
                     // Photos Section
-                    _buildPhotosSection(),
+                    _buildPhotosSection(loc),
                     const SizedBox(height: AppSpacing.paddingM),
 
                     // Breakfast Section
                     _buildMealSection(
-                      title: 'Breakfast',
+                      loc: loc,
+                      title: loc.breakfast,
                       items: _breakfastItems,
                       icon: Icons.free_breakfast,
-                      onAdd: () => _addMealItem('Breakfast', _breakfastItems),
+                      onAdd: () =>
+                          _addMealItem(loc, loc.breakfast, _breakfastItems),
                       onRemove: (index) =>
                           _removeMealItem(_breakfastItems, index),
                     ),
@@ -152,26 +157,30 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
 
                     // Lunch Section
                     _buildMealSection(
-                      title: 'Lunch',
+                      loc: loc,
+                      title: loc.lunch,
                       items: _lunchItems,
                       icon: Icons.lunch_dining,
-                      onAdd: () => _addMealItem('Lunch', _lunchItems),
+                      onAdd: () =>
+                          _addMealItem(loc, loc.lunch, _lunchItems),
                       onRemove: (index) => _removeMealItem(_lunchItems, index),
                     ),
                     const SizedBox(height: AppSpacing.paddingM),
 
                     // Dinner Section
                     _buildMealSection(
-                      title: 'Dinner',
+                      loc: loc,
+                      title: loc.dinner,
                       items: _dinnerItems,
                       icon: Icons.dinner_dining,
-                      onAdd: () => _addMealItem('Dinner', _dinnerItems),
+                      onAdd: () =>
+                          _addMealItem(loc, loc.dinner, _dinnerItems),
                       onRemove: (index) => _removeMealItem(_dinnerItems, index),
                     ),
                     const SizedBox(height: AppSpacing.paddingM),
 
                     // Description Section
-                    _buildDescriptionSection(),
+                    _buildDescriptionSection(loc),
                     const SizedBox(height: AppSpacing.paddingXL),
 
                     // Save Button - Text changes based on edit vs create mode
@@ -180,8 +189,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                       child: PrimaryButton(
                         onPressed: _saveMenu,
                         label: isEditing
-                            ? 'Update Menu'
-                            : 'Create Menu', // Dynamic label
+                            ? loc.ownerMenuEditUpdateButton
+                            : loc.ownerMenuEditCreateButton,
                         icon: isEditing
                             ? Icons.update
                             : Icons.save, // Dynamic icon
@@ -207,7 +216,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   /// - Theme-aware colors for perfect visibility
   /// - Modern stat chips with icons
   /// ============================================================================
-  Widget _buildHeaderCard() {
+  Widget _buildHeaderCard(AppLocalizations loc) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     // final textPrimary =
@@ -285,7 +294,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${widget.dayLabel} Menu',
+                      loc.ownerMenuEditOverviewTitle(widget.dayLabel),
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -295,7 +304,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Create & manage daily menu',
+                      loc.ownerMenuEditOverviewSubtitle,
                       style: TextStyle(
                         fontSize: 13,
                         color: textSecondary,
@@ -319,45 +328,50 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             children: [
               // Total Items Stat
               _buildStatChip(
-                icon: Icons.restaurant_rounded,
-                label: 'Items',
+                context: context,
+                label: loc.ownerMenuEditStatItems,
                 value: '$totalItems',
+                icon: Icons.list_alt,
                 color: AppColors.info,
                 isDarkMode: isDarkMode,
               ),
 
               // Breakfast Count
               _buildStatChip(
-                icon: Icons.breakfast_dining_rounded,
-                label: 'Breakfast',
+                context: context,
+                label: loc.breakfast,
                 value: '${_breakfastItems.length}',
+                icon: Icons.breakfast_dining_rounded,
                 color: AppColors.breakfast,
                 isDarkMode: isDarkMode,
               ),
 
               // Lunch Count
               _buildStatChip(
-                icon: Icons.lunch_dining_rounded,
-                label: 'Lunch',
+                context: context,
+                label: loc.lunch,
                 value: '${_lunchItems.length}',
+                icon: Icons.lunch_dining_rounded,
                 color: AppColors.lunch,
                 isDarkMode: isDarkMode,
               ),
 
               // Dinner Count
               _buildStatChip(
-                icon: Icons.dinner_dining_rounded,
-                label: 'Dinner',
+                context: context,
+                label: loc.dinner,
                 value: '${_dinnerItems.length}',
+                icon: Icons.dinner_dining_rounded,
                 color: AppColors.dinner,
                 isDarkMode: isDarkMode,
               ),
 
               // Photos Count
               _buildStatChip(
-                icon: Icons.photo_library_rounded,
-                label: 'Photos',
+                context: context,
+                label: loc.ownerMenuEditStatPhotos,
                 value: '$totalPhotos',
+                icon: Icons.photo_library_rounded,
                 color: AppColors.warning,
                 isDarkMode: isDarkMode,
               ),
@@ -395,7 +409,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'Last Updated: ${widget.existingMenu!.formattedUpdatedAt}',
+                    loc.ownerMenuEditLastUpdated(
+                        widget.existingMenu!.formattedUpdatedAt),
                     style: TextStyle(
                       fontSize: 12,
                       color: textSecondary,
@@ -413,9 +428,10 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
 
   /// Builds modern stat chip with icon and count
   Widget _buildStatChip({
-    required IconData icon,
+    required BuildContext context,
     required String label,
     required String value,
+    required IconData icon,
     required Color color,
     required bool isDarkMode,
   }) {
@@ -459,7 +475,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
     );
   }
 
-  Widget _buildPhotosSection() {
+  Widget _buildPhotosSection(AppLocalizations loc) {
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -476,12 +492,12 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                     size: 20,
                   ),
                   const SizedBox(width: AppSpacing.paddingS),
-                  const HeadingSmall(text: 'Menu Photos'),
+                  HeadingSmall(text: loc.ownerMenuEditPhotosHeading),
                 ],
               ),
               SecondaryButton(
-                onPressed: _isUploadingPhoto ? null : _pickImage,
-                label: 'Add Photo',
+                onPressed: _isUploadingPhoto ? null : () => _pickImage(loc),
+                label: loc.ownerMenuEditAddPhoto,
                 icon: Icons.add_photo_alternate,
               ),
             ],
@@ -532,7 +548,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             const SizedBox(height: AppSpacing.paddingS),
             const LinearProgressIndicator(),
             const SizedBox(height: AppSpacing.paddingXS),
-            const BodyText(text: 'Uploading photo...', color: Colors.grey),
+            BodyText(text: loc.ownerMenuEditUploadingPhoto, color: Colors.grey),
           ],
         ],
       ),
@@ -544,6 +560,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
     required VoidCallback onDelete,
     bool isNew = false,
   }) {
+    final loc = AppLocalizations.of(context)!;
     return Container(
       width: 120,
       height: 120,
@@ -572,7 +589,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  'NEW',
+                  loc.ownerMenuEditBadgeNew,
                   style: TextStyle(
                     color: AppColors.textOnPrimary, // White text on green
                     fontSize: 10,
@@ -611,6 +628,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
     final textSecondary =
         theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+    final loc = AppLocalizations.of(context)!;
 
     return Container(
       height: 120,
@@ -639,7 +657,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: 'No photos added yet',
+              text: loc.ownerMenuEditNoPhotos,
               color: textSecondary, // Theme-aware text
             ),
           ],
@@ -650,6 +668,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
 
   /// Builds meal section (Breakfast/Lunch/Dinner) with theme-aware colors
   Widget _buildMealSection({
+    required AppLocalizations loc,
     required String title,
     required List<String> items,
     required IconData icon,
@@ -676,7 +695,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 children: [
                   Icon(icon, color: primaryColor, size: 20),
                   const SizedBox(width: AppSpacing.paddingS),
-                  HeadingSmall(text: title),
+                  HeadingSmall(text: loc.ownerMenuEditOptionalSection(title)),
                   const SizedBox(width: AppSpacing.paddingS),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -689,7 +708,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                           BorderRadius.circular(AppSpacing.borderRadiusS),
                     ),
                     child: BodyText(
-                      text: '${items.length} items',
+                      text: loc.ownerMenuEditItemsCount(items.length),
                       color: primaryColor,
                     ),
                   ),
@@ -698,7 +717,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
               IconButton(
                 onPressed: onAdd,
                 icon: Icon(Icons.add_circle, color: primaryColor),
-                tooltip: 'Add $title Item',
+                tooltip: loc.ownerMenuEditAddItemTooltip(title),
               ),
             ],
           ),
@@ -710,7 +729,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.paddingM),
                 child: BodyText(
-                  text: 'No $title items added yet',
+                  text: loc.ownerMenuEditNoItemsForMeal(title),
                   color: textSecondary, // Theme-aware
                 ),
               ),
@@ -773,7 +792,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                         color: AppColors.error, // Theme-aware error color
                         size: 20,
                       ),
-                      tooltip: 'Remove Item',
+                      tooltip: loc.ownerMenuEditRemoveItemTooltip,
                     ),
                   ],
                 ),
@@ -784,7 +803,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
     );
   }
 
-  Widget _buildDescriptionSection() {
+  Widget _buildDescriptionSection(AppLocalizations loc) {
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -798,14 +817,14 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.paddingS),
-              const HeadingSmall(text: 'Description (Optional)'),
+              HeadingSmall(text: loc.ownerMenuEditDescriptionHeading),
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
           TextInput(
             controller: _descriptionController,
-            label: 'Menu Description',
-            hint: 'Add any special notes about this menu...',
+            label: loc.ownerMenuEditDescriptionLabel,
+            hint: loc.ownerMenuEditDescriptionHint,
             maxLines: 3,
           ),
         ],
@@ -814,7 +833,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   }
 
   /// Shows dialog to add meal item (theme-aware)
-  Future<void> _addMealItem(String mealType, List<String> items) async {
+  Future<void> _addMealItem(AppLocalizations loc, String mealType, List<String> items) async {
     final controller = TextEditingController();
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
@@ -828,7 +847,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        title: HeadingMedium(text: 'Add $mealType Item'),
+        title: HeadingMedium(text: loc.ownerMenuEditAddMealItemTitle(mealType)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -842,8 +861,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
-                labelText: 'Item Name',
-                hintText: 'e.g., Idli with Sambar, Dosa, Poha',
+                labelText: loc.ownerMenuEditItemNameLabel,
+                hintText: loc.ownerMenuEditItemNameHint,
                 prefixIcon: Icon(
                   Icons.restaurant_rounded,
                   color: theme.colorScheme.primary,
@@ -872,7 +891,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         actions: [
           SecondaryButton(
             onPressed: () => Navigator.of(context).pop(),
-            label: 'Cancel',
+            label: loc.cancel,
           ),
           const SizedBox(width: 8),
           PrimaryButton(
@@ -881,7 +900,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 Navigator.of(context).pop(controller.text.trim());
               }
             },
-            label: 'Add',
+            label: loc.add,
             icon: Icons.add,
           ),
         ],
@@ -903,7 +922,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
 
   /// Picks image from gallery (cross-platform: web & mobile)
   /// Returns File on mobile, XFile on web
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(AppLocalizations loc) async {
     try {
       final pickedFile = await ImagePickerHelper.pickImageFromGallery(
         imageQuality: 85, // Only parameter supported
@@ -918,7 +937,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error picking image: $e'),
+            content: Text(loc.ownerMenuEditImagePickError(e.toString())),
             backgroundColor: AppColors.error,
           ),
         );
@@ -981,13 +1000,17 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       return;
     }
 
+    final loc = AppLocalizations.of(context)!;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
     // Validation: At least one meal item required
     if (_breakfastItems.isEmpty &&
         _lunchItems.isEmpty &&
         _dinnerItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: const Text('Please add at least one meal item'),
+          content: Text(loc.ownerMenuEditMealRequired),
           backgroundColor: AppColors.warning, // Theme-aware warning color
         ),
       );
@@ -1009,10 +1032,9 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       // ========================================================================
       if (ownerId.isEmpty) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: const Text(
-                  'Error: User not authenticated. Please login again.'),
+              content: Text(loc.ownerMenuEditAuthError),
               backgroundColor: AppColors.error,
             ),
           );
@@ -1068,8 +1090,9 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         updatedAt: DateTime.now(),
       );
 
-      debugPrint(
-          '   - Total Items: ${_breakfastItems.length + _lunchItems.length + _dinnerItems.length}');
+      final totalItemsCount =
+          _breakfastItems.length + _lunchItems.length + _dinnerItems.length;
+      debugPrint(loc.ownerMenuEditLogTotalItems(totalItemsCount));
 
       // Save to repository
       final success = await foodVM.saveWeeklyMenu(updatedMenu);
@@ -1077,8 +1100,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       if (success) {
         final isEditing = widget.existingMenu != null;
         debugPrint(isEditing
-            ? '✅ Menu updated successfully!'
-            : '✅ Menu created successfully!'); // Debug log
+            ? loc.ownerMenuEditLogUpdateSuccess
+            : loc.ownerMenuEditLogCreateSuccess); // Debug log
 
         if (mounted) {
           // Refresh menus for current PG
@@ -1089,25 +1112,24 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
           // Changed from: Using context after async gap with unrelated mounted check
           // Changed to: Check mounted immediately before using context, store Navigator and ScaffoldMessenger
           if (!mounted) return;
-          final navigator = Navigator.of(context);
-          final scaffoldMessenger = ScaffoldMessenger.of(context);
-          
+
           navigator.pop();
           scaffoldMessenger.showSnackBar(
             SnackBar(
               content: Text(isEditing
-                      ? '${widget.dayLabel} menu updated successfully!' // ✏️ Updated
-                      : '${widget.dayLabel} menu created successfully!' // ➕ Created
-                  ),
+                  ? loc.ownerMenuEditUpdateSuccess(widget.dayLabel)
+                  : loc.ownerMenuEditCreateSuccess(widget.dayLabel)),
               backgroundColor: AppColors.success, // Theme-aware success color
             ),
           );
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          final errorMessage =
+              foodVM.errorMessage?.isNotEmpty == true ? foodVM.errorMessage! : loc.unknownErrorOccurred;
+          scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: Text('Failed to save menu: ${foodVM.errorMessage}'),
+              content: Text(loc.ownerMenuEditSaveFailed(errorMessage)),
               backgroundColor: AppColors.error, // Theme-aware error color
             ),
           );
@@ -1115,9 +1137,9 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('Error saving menu: $e'),
+            content: Text(loc.ownerMenuEditSaveError(e.toString())),
             backgroundColor: AppColors.error, // Theme-aware error color
           ),
         );
@@ -1132,14 +1154,14 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   }
 
   Future<void> _confirmDeleteMenu() async {
+    final loc = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => ConfirmationDialog(
-        title: 'Clear Menu?',
-        message:
-            'Are you sure you want to clear this menu? This will remove all items and photos.',
-        confirmText: 'Clear',
-        cancelText: 'Cancel',
+        title: loc.ownerMenuEditClearTitle,
+        message: loc.ownerMenuEditClearMessage,
+        confirmText: loc.ownerMenuEditClearConfirm,
+        cancelText: loc.cancel,
         isDestructive: true,
       ),
     );
@@ -1160,8 +1182,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       // Changed to: Check mounted before using context
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Menu cleared. Don\'t forget to save changes.'),
+        SnackBar(
+          content: Text(loc.ownerMenuEditClearSnackbar),
           backgroundColor: Colors.orange,
         ),
       );

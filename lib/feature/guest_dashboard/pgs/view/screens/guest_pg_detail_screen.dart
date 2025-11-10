@@ -26,6 +26,8 @@ import '../widgets/guest_amenities_list.dart';
 import '../widgets/booking_request_dialog.dart';
 import '../../../../../common/widgets/sharing_summary.dart';
 import '../../../../../common/widgets/containers/section_container.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 /// Comprehensive PG Details Screen with all information sections
 /// Displays complete PG information in organized sections
@@ -43,6 +45,24 @@ class GuestPgDetailScreen extends StatefulWidget {
 
 class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
   bool _isFavorite = false;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -59,10 +79,12 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
   Widget build(BuildContext context) {
     final pgVM = Provider.of<GuestPgViewModel>(context);
     final pg = pgVM.selectedPG;
+    final loc = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: pg?.pgName ?? 'PG Details',
+        title: pg?.pgName ??
+            (loc?.pgDetails ?? _text('pgDetails', 'PG Details')),
         actions: [
           IconButton(
             icon: Icon(
@@ -89,6 +111,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
 
   /// Builds appropriate body content based on current state
   Widget _buildBody(BuildContext context, GuestPgViewModel pgVM, dynamic pg) {
+    final loc = AppLocalizations.of(context);
     if (pgVM.loading && pg == null) {
       return const Center(child: AdaptiveLoader());
     }
@@ -101,18 +124,21 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: AppSpacing.paddingL),
             HeadingMedium(
-              text: 'Error loading PG details',
+              text: loc?.errorLoadingPgDetails ??
+                  _text('errorLoadingPgDetails', 'Error loading PG details'),
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: pgVM.errorMessage ?? 'Unknown error occurred',
+              text: pgVM.errorMessage ??
+                  (loc?.unknownErrorOccurred ??
+                      _text('unknownErrorOccurred', 'Unknown error occurred')),
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingL),
             PrimaryButton(
               onPressed: () => pgVM.getPGById(widget.pgId),
-              label: 'Try Again',
+              label: loc?.tryAgain ?? _text('tryAgain', 'Try Again'),
               icon: Icons.refresh,
             ),
           ],
@@ -122,11 +148,17 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
 
     if (pg == null) {
       return EmptyState(
-        title: 'PG Not Found',
-        message:
-            'The requested PG could not be found or may have been removed.',
+        title: AppLocalizations.of(context)?.pgNotFound ??
+            _text('pgNotFound', 'PG Not Found'),
+        message: AppLocalizations.of(context)
+                ?.theRequestedPgCouldNotBeFoundOrMayHaveBeenRemoved ??
+            _text(
+              'theRequestedPgCouldNotBeFoundOrMayHaveBeenRemoved',
+              'The requested PG could not be found or may have been removed.',
+            ),
         icon: Icons.apartment,
-        actionLabel: 'Go Back',
+        actionLabel: AppLocalizations.of(context)?.goBack ??
+            _text('goBack', 'Go Back'),
         onAction: () => getIt<NavigationService>().goBack(),
       );
     }
@@ -167,6 +199,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
   Widget _buildHeroSection(BuildContext context, dynamic pg) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,13 +236,16 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               color: isDark ? AppColors.darkInputFill : Colors.grey.shade200,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
             ),
-            child: const Center(
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.apartment, size: 64, color: Colors.grey),
-                  SizedBox(height: AppSpacing.paddingS),
-                  CaptionText(text: 'No photos available'),
+                  const Icon(Icons.apartment, size: 64, color: Colors.grey),
+                  const SizedBox(height: AppSpacing.paddingS),
+                  CaptionText(
+                    text: loc?.noPhotosAvailable ??
+                        _text('noPhotosAvailable', 'No photos available'),
+                  ),
                 ],
               ),
             ),
@@ -248,6 +284,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     final colorScheme = theme.colorScheme;
     final summary = getSharingSummary(pg);
     final pricing = pg.pricing ?? {};
+    final loc = AppLocalizations.of(context);
 
     // Get rent config from pg model (primary source)
     final rentConfig = pg.rentConfig ?? {};
@@ -291,7 +328,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     }
 
     return SectionContainer(
-      title: 'Pricing & Availability',
+      title: loc?.pricingAvailability ??
+          _text('pricingAvailability', 'Pricing & Availability'),
       icon: Icons.attach_money,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,7 +341,10 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const HeadingSmall(text: 'Sharing Options & Pricing'),
+                  HeadingSmall(
+                    text: loc?.sharingOptionsPricing ??
+                        _text('sharingOptionsPricing', 'Sharing Options & Pricing'),
+                  ),
                   const SizedBox(height: AppSpacing.paddingM),
                   ...sharingOptions.map((entry) {
                     return Padding(
@@ -318,11 +359,29 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                                   size: 18, color: colorScheme.primary),
                               const SizedBox(width: AppSpacing.paddingXS),
                               BodyText(
-                                  text: '${entry.key} Sharing', medium: true),
+                                text: loc?.sharingLabel(
+                                      int.tryParse(entry.key) ?? 0,
+                                    ) ??
+                                    _text(
+                                      'sharingLabelDefault',
+                                      '{count} Sharing',
+                                      parameters: {'count': entry.key},
+                                    ),
+                                medium: true,
+                              ),
                             ],
                           ),
                           Text(
-                            '₹${_formatCurrency(entry.value)}/month',
+                            loc?.monthlyRentDisplay(
+                                  _formatCurrency(entry.value),
+                                ) ??
+                                _text(
+                                  'monthlyRentDisplay',
+                                  '₹{amount}/month',
+                                  parameters: {
+                                    'amount': _formatCurrency(entry.value),
+                                  },
+                                ),
                             style: theme.textTheme.bodyLarge?.copyWith(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.bold,
@@ -343,7 +402,10 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const HeadingSmall(text: 'Sharing Options & Pricing'),
+                  HeadingSmall(
+                    text: loc?.sharingOptionsPricing ??
+                        _text('sharingOptionsPricing', 'Sharing Options & Pricing'),
+                  ),
                   const SizedBox(height: AppSpacing.paddingM),
                   ...summary.entries.map((entry) {
                     final sharingType = entry.key.replaceAll('-share', '');
@@ -359,11 +421,31 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                                   size: 18, color: colorScheme.primary),
                               const SizedBox(width: AppSpacing.paddingXS),
                               BodyText(
-                                  text: '$sharingType Sharing', medium: true),
+                                text: loc?.sharingLabel(
+                                      int.tryParse(sharingType) ?? 0,
+                                    ) ??
+                                    _text(
+                                      'sharingLabelDefault',
+                                      '{count} Sharing',
+                                      parameters: {'count': sharingType},
+                                    ),
+                                medium: true,
+                              ),
                             ],
                           ),
                           Text(
-                            '₹${_formatCurrency(entry.value.pricePerBed.toDouble())}/month',
+                            loc?.monthlyRentDisplay(
+                                  _formatCurrency(
+                                      entry.value.pricePerBed.toDouble()),
+                                ) ??
+                                _text(
+                                  'monthlyRentDisplay',
+                                  '₹{amount}/month',
+                                  parameters: {
+                                    'amount': _formatCurrency(
+                                        entry.value.pricePerBed.toDouble()),
+                                  },
+                                ),
                             style: theme.textTheme.bodyLarge?.copyWith(
                               color: colorScheme.primary,
                               fontWeight: FontWeight.bold,
@@ -387,15 +469,41 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               if (deposit > 0)
                 _buildPricingCard(
                   context,
-                  'Security Deposit',
-                  '₹${_formatCurrency(deposit)}',
+              loc?.securityDeposit ??
+                  _text('securityDeposit', 'Security Deposit'),
+              _text(
+                'currencyAmount',
+                '₹{amount}',
+                parameters: {'amount': _formatCurrency(deposit)},
+              ),
                   Icons.security,
                 ),
               if (hasMaintenance)
                 _buildPricingCard(
                   context,
-                  'Maintenance',
-                  '₹${_formatCurrency(maintenanceAmount)}/${maintenanceType == 'monthly' ? 'month' : 'one-time'}',
+                  loc?.maintenance ?? _text('maintenance', 'Maintenance'),
+              (() {
+                final perMonthLabel =
+                    loc?.perMonth ?? _text('perMonth', 'Per Month');
+                final oneTimeLabel =
+                    loc?.oneTime ?? _text('oneTime', 'one-time');
+                return loc?.maintenanceAmountWithFrequency(
+                      _formatCurrency(maintenanceAmount),
+                      maintenanceType == 'monthly'
+                          ? perMonthLabel
+                          : oneTimeLabel,
+                    ) ??
+                  _text(
+                    'maintenanceAmountWithFrequency',
+                    '₹{amount}/{frequency}',
+                    parameters: {
+                      'amount': _formatCurrency(maintenanceAmount),
+                      'frequency': maintenanceType == 'monthly'
+                          ? perMonthLabel
+                          : oneTimeLabel,
+                    },
+                  );
+              })(),
                   Icons.build,
                 ),
             ],
@@ -488,6 +596,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     // Get minimum rent from sharing options or summary
     double firstMonthRent = 0.0;
@@ -514,28 +623,43 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               Icon(Icons.calculate, color: colorScheme.primary, size: 20),
               const SizedBox(width: AppSpacing.paddingXS),
               HeadingSmall(
-                  text: 'Total Initial Payment', color: colorScheme.primary),
+                text: loc?.totalInitialPayment ??
+                    _text('totalInitialPayment', 'Total Initial Payment'),
+                color: colorScheme.primary,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
           if (firstMonthRent > 0)
             _buildPricingRow(
-                'First Month Rent', '₹${_formatCurrency(firstMonthRent)}'),
+              loc?.firstMonthRent ??
+                  _text('firstMonthRent', 'First Month Rent'),
+              _text('currencyAmount', '₹{amount}',
+                  parameters: {'amount': _formatCurrency(firstMonthRent)}),
+            ),
           if (firstMonthRent > 0 && deposit > 0)
             const SizedBox(height: AppSpacing.paddingXS),
           if (deposit > 0)
             _buildPricingRowWithNote(
-              'Security Deposit',
-              '₹${_formatCurrency(deposit)}',
-              '(Refundable when you leave)',
+              loc?.securityDeposit ??
+                  _text('securityDeposit', 'Security Deposit'),
+              _text('currencyAmount', '₹{amount}',
+                  parameters: {'amount': _formatCurrency(deposit)}),
+              loc?.refundableWhenYouLeave ??
+                  _text('refundableWhenYouLeave', '(Refundable when you leave)'),
             ),
           if (deposit > 0 && maintenance > 0)
             const SizedBox(height: AppSpacing.paddingXS),
           if (maintenance > 0)
             _buildPricingRowWithNote(
-              'Maintenance',
-              '₹${_formatCurrency(maintenance)}',
-              isMaintenanceMonthly ? '(Monthly)' : '(One-time)',
+              loc?.maintenance ?? _text('maintenance', 'Maintenance'),
+              _text('currencyAmount', '₹{amount}',
+                  parameters: {'amount': _formatCurrency(maintenance)}),
+              isMaintenanceMonthly
+                  ? (loc?.monthlyLabel ??
+                      _text('monthlyLabel', '(Monthly)'))
+                  : (loc?.oneTimeLabel ??
+                      _text('oneTimeLabel', '(One-time)')),
             ),
           if (total > 0) ...[
             Divider(
@@ -550,9 +674,13 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  HeadingSmall(text: 'Total', color: colorScheme.primary),
                   HeadingSmall(
-                    text: '₹${_formatCurrency(total)}',
+                    text: loc?.totalLabel ?? _text('totalLabel', 'Total'),
+                    color: colorScheme.primary,
+                  ),
+                  HeadingSmall(
+                    text: _text('currencyAmount', '₹{amount}',
+                        parameters: {'amount': _formatCurrency(total)}),
                     color: colorScheme.primary,
                   ),
                 ],
@@ -582,8 +710,31 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                 Expanded(
                   child: BodyText(
                     text: isMaintenanceMonthly && maintenance > 0
-                        ? 'From 2nd month onwards: Rent + Maintenance (₹${_formatCurrency(firstMonthRent)} + ₹${_formatCurrency(maintenance)} = ₹${_formatCurrency(firstMonthRent + maintenance)})'
-                        : 'From 2nd month onwards: Only Rent (₹${_formatCurrency(firstMonthRent)})',
+                        ? loc?.secondMonthRentMaintenance(
+                              _formatCurrency(firstMonthRent),
+                              _formatCurrency(maintenance),
+                              _formatCurrency(firstMonthRent + maintenance),
+                            ) ??
+                            _text(
+                              'secondMonthRentMaintenance',
+                              'From 2nd month onwards: Rent + Maintenance (₹{rent} + ₹{maintenance} = ₹{total})',
+                              parameters: {
+                                'rent': _formatCurrency(firstMonthRent),
+                                'maintenance': _formatCurrency(maintenance),
+                                'total': _formatCurrency(
+                                    firstMonthRent + maintenance),
+                              },
+                            )
+                        : loc?.secondMonthRentOnly(
+                              _formatCurrency(firstMonthRent),
+                            ) ??
+                            _text(
+                              'secondMonthRentOnly',
+                              'From 2nd month onwards: Only Rent (₹{rent})',
+                              parameters: {
+                                'rent': _formatCurrency(firstMonthRent),
+                              },
+                            ),
                     small: true,
                     color: colorScheme.onSecondaryContainer,
                   ),
@@ -641,15 +792,35 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final availableTypes = <String>[];
+    final loc = AppLocalizations.of(context);
 
     // Get from sharingOptions first (rentConfig)
     if (sharingOptions.isNotEmpty) {
-      availableTypes
-          .addAll(sharingOptions.map((e) => '${e.key} sharing').toList());
+      availableTypes.addAll(sharingOptions
+          .map(
+            (e) => loc?.sharingLabel(int.tryParse(e.key) ?? 0) ??
+                _text(
+                  'sharingLabelDefault',
+                  '{count} Sharing',
+                  parameters: {'count': e.key},
+                ),
+          )
+          .toList());
     } else if (summary.isNotEmpty) {
       // Fallback to summary
       availableTypes.addAll(summary.keys
-          .map((k) => '${k.replaceAll('-share', '')} sharing')
+          .map(
+            (k) => loc?.sharingLabel(
+                  int.tryParse(k.replaceAll('-share', '')) ?? 0,
+                ) ??
+                _text(
+                  'sharingLabelDefault',
+                  '{count} Sharing',
+                  parameters: {
+                    'count': k.replaceAll('-share', ''),
+                  },
+                ),
+          )
           .toList());
     }
 
@@ -673,7 +844,14 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           const SizedBox(width: AppSpacing.paddingS),
           Expanded(
             child: BodyText(
-              text: 'Available: ${availableTypes.join(", ")}',
+              text: loc?.availableTypes(availableTypes.join(', ')) ??
+                  _text(
+                    'availableTypes',
+                    'Available: {types}',
+                    parameters: {
+                      'types': availableTypes.join(', '),
+                    },
+                  ),
               medium: true,
               color: successColor,
             ),
@@ -685,8 +863,10 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
 
   /// Section 3: Location & Vicinity
   Widget _buildLocationSection(BuildContext context, dynamic pg) {
+    final loc = AppLocalizations.of(context);
     return SectionContainer(
-      title: 'Location & Vicinity',
+      title: loc?.locationVicinity ??
+          _text('locationVicinity', 'Location & Vicinity'),
       icon: Icons.location_on,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -696,17 +876,31 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfoRow('Complete Address', pg.address),
+                _buildInfoRow(
+                      loc?.completeAddress ??
+                          _text('completeAddress', 'Complete Address'),
+                      pg.address),
                 const SizedBox(height: AppSpacing.paddingS),
                 Row(
                   children: [
-                    Expanded(child: _buildInfoRow('Area', pg.area)),
+                    Expanded(
+                      child: _buildInfoRow(
+                        loc?.areaLabel ?? _text('areaLabel', 'Area'),
+                        pg.area,
+                      ),
+                    ),
                     const SizedBox(width: AppSpacing.paddingM),
-                    Expanded(child: _buildInfoRow('City', pg.city)),
+                    Expanded(
+                      child: _buildInfoRow(
+                        loc?.cityLabel ?? _text('cityLabel', 'City'),
+                        pg.city,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
-                _buildInfoRow('State', pg.state),
+                _buildInfoRow(
+                    loc?.stateLabel ?? _text('stateLabel', 'State'), pg.state),
               ],
             ),
           ),
@@ -714,7 +908,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           // Interactive Map Button
           if (pg.hasLocation || pg.googleMapLink != null)
             PrimaryButton(
-              label: 'View on Map',
+              label: loc?.viewOnMap ?? _text('viewOnMap', 'View on Map'),
               icon: Icons.map,
               onPressed: () => _openMap(context, pg),
             ),
@@ -730,7 +924,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     }
 
     return SectionContainer(
-      title: 'Facilities & Amenities',
+      title: AppLocalizations.of(context)?.facilitiesAmenities ??
+          _text('facilitiesAmenities', 'Facilities & Amenities'),
       icon: Icons.room_service,
       child: AdaptiveCard(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -747,26 +942,42 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
       return const SizedBox.shrink();
     }
 
+    final loc = AppLocalizations.of(context);
+
     return SectionContainer(
-      title: 'Food & Meal Information',
+      title: AppLocalizations.of(context)?.foodMealInformation ??
+          _text('foodMealInformation', 'Food & Meal Information'),
       icon: Icons.restaurant,
       child: AdaptiveCard(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (pg.mealType != null) _buildInfoRow('Meal Type', pg.mealType!),
+            if (pg.mealType != null)
+              _buildInfoRow(
+                loc?.mealTypeFieldLabel ??
+                    _text('mealTypeFieldLabel', 'Meal Type'),
+                pg.mealType!,
+              ),
             if (pg.mealType != null &&
                 (pg.mealTimings != null || pg.foodQuality != null))
               const SizedBox(height: AppSpacing.paddingS),
             if (pg.mealTimings != null && pg.mealTimings!.isNotEmpty)
-              _buildInfoRow('Meal Timings', pg.mealTimings!),
+              _buildInfoRow(
+                loc?.mealTimingsFieldLabel ??
+                    _text('mealTimingsFieldLabel', 'Meal Timings'),
+                pg.mealTimings!,
+              ),
             if (pg.mealTimings != null &&
                 pg.foodQuality != null &&
                 pg.foodQuality!.isNotEmpty)
               const SizedBox(height: AppSpacing.paddingS),
             if (pg.foodQuality != null && pg.foodQuality!.isNotEmpty)
-              _buildInfoRow('Food Quality', pg.foodQuality!),
+              _buildInfoRow(
+                loc?.foodQualityFieldLabel ??
+                    _text('foodQualityFieldLabel', 'Food Quality'),
+                pg.foodQuality!,
+              ),
           ],
         ),
       ),
@@ -779,8 +990,11 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
       return const SizedBox.shrink();
     }
 
+    final loc = AppLocalizations.of(context);
+
     return SectionContainer(
-      title: 'Rules & Policies',
+      title: AppLocalizations.of(context)?.rulesPolicies ??
+          _text('rulesPolicies', 'Rules & Policies'),
       icon: Icons.rule,
       child: AdaptiveCard(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -789,37 +1003,48 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           children: [
             if (pg.rules!['entryTimings'] != null) ...[
               _buildInfoRow(
-                  'Entry Timings', pg.rules!['entryTimings'].toString()),
+                  loc?.entryTimings ??
+                      _text('entryTimings', 'Entry Timings'),
+                  pg.rules!['entryTimings'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['exitTimings'] != null) ...[
               _buildInfoRow(
-                  'Exit Timings', pg.rules!['exitTimings'].toString()),
+                  loc?.exitTimings ?? _text('exitTimings', 'Exit Timings'),
+                  pg.rules!['exitTimings'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['guestPolicy'] != null) ...[
               _buildInfoRow(
-                  'Guest Policy', pg.rules!['guestPolicy'].toString()),
+                  loc?.guestPolicy ?? _text('guestPolicy', 'Guest Policy'),
+                  pg.rules!['guestPolicy'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['smokingPolicy'] != null) ...[
               _buildInfoRow(
-                  'Smoking Policy', pg.rules!['smokingPolicy'].toString()),
+                  loc?.smokingPolicy ??
+                      _text('smokingPolicy', 'Smoking Policy'),
+                  pg.rules!['smokingPolicy'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['alcoholPolicy'] != null) ...[
               _buildInfoRow(
-                  'Alcohol Policy', pg.rules!['alcoholPolicy'].toString()),
+                  loc?.alcoholPolicy ??
+                      _text('alcoholPolicy', 'Alcohol Policy'),
+                  pg.rules!['alcoholPolicy'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['refundPolicy'] != null) ...[
               _buildInfoRow(
-                  'Refund Policy', pg.rules!['refundPolicy'].toString()),
+                  loc?.refundPolicy ?? _text('refundPolicy', 'Refund Policy'),
+                  pg.rules!['refundPolicy'].toString()),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.rules!['noticePeriod'] != null)
               _buildInfoRow(
-                  'Notice Period', pg.rules!['noticePeriod'].toString()),
+                loc?.noticePeriod ?? _text('noticePeriod', 'Notice Period'),
+                pg.rules!['noticePeriod'].toString(),
+              ),
           ],
         ),
       ),
@@ -832,8 +1057,11 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
       return const SizedBox.shrink();
     }
 
+    final loc = AppLocalizations.of(context);
+
     return SectionContainer(
-      title: 'Contact & Owner Information',
+      title: AppLocalizations.of(context)?.contactOwnerInformation ??
+          _text('contactOwnerInformation', 'Contact & Owner Information'),
       icon: Icons.person,
       child: AdaptiveCard(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -841,21 +1069,31 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (pg.ownerName != null) ...[
-              _buildInfoRow('Owner Name', pg.ownerName!),
+              _buildInfoRow(
+                  loc?.ownerNameLabel ?? _text('ownerNameLabel', 'Owner Name'),
+                  pg.ownerName!),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.contactNumber != null) ...[
               GestureDetector(
                 onTap: () => _callOwner(pg.contactNumber!),
-                child: _buildInfoRow('Contact Number', pg.contactNumber!,
-                    isClickable: true),
+                child: _buildInfoRow(
+                  loc?.contactNumberLabel ??
+                      _text('contactNumberLabel', 'Contact Number'),
+                  pg.contactNumber!,
+                  isClickable: true,
+                ),
               ),
               const SizedBox(height: AppSpacing.paddingS),
             ],
             if (pg.email != null)
               GestureDetector(
                 onTap: () => _emailOwner(pg.email!),
-                child: _buildInfoRow('Email', pg.email!, isClickable: true),
+                child: _buildInfoRow(
+                  loc?.emailLabel ?? _text('emailLabel', 'Email'),
+                  pg.email!,
+                  isClickable: true,
+                ),
               ),
           ],
         ),
@@ -869,9 +1107,11 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     if (bankDetails.isEmpty) {
       return const SizedBox.shrink();
     }
+    final loc = AppLocalizations.of(context);
 
     return SectionContainer(
-      title: 'Payment Information',
+      title: AppLocalizations.of(context)?.paymentInformation ??
+          _text('paymentInformation', 'Payment Information'),
       icon: Icons.account_balance,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -882,21 +1122,29 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (bankDetails['accountHolderName'] != null) ...[
-                  _buildInfoRow('Account Holder',
+                  _buildInfoRow(
+                      loc?.accountHolder ??
+                          _text('accountHolder', 'Account Holder'),
                       bankDetails['accountHolderName'].toString()),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
                 if (bankDetails['accountNumber'] != null) ...[
-                  _buildInfoRow('Account Number',
+                  _buildInfoRow(
+                      loc?.accountNumber ??
+                          _text('accountNumber', 'Account Number'),
                       bankDetails['accountNumber'].toString()),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
                 if (bankDetails['IFSC'] != null) ...[
-                  _buildInfoRow('IFSC Code', bankDetails['IFSC'].toString()),
+                  _buildInfoRow(
+                      loc?.ifscCode ?? _text('ifscCode', 'IFSC Code'),
+                      bankDetails['IFSC'].toString()),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
                 if (bankDetails['UPI'] != null)
-                  _buildInfoRow('UPI ID', bankDetails['UPI'].toString()),
+                  _buildInfoRow(
+                      loc?.upiId ?? _text('upiId', 'UPI ID'),
+                      bankDetails['UPI'].toString()),
               ],
             ),
           ),
@@ -907,7 +1155,10 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               padding: const EdgeInsets.all(AppSpacing.paddingM),
               child: Column(
                 children: [
-                  const HeadingSmall(text: 'QR Code for Payment'),
+                  HeadingSmall(
+                    text: loc?.qrCodeForPayment ??
+                        _text('qrCodeForPayment', 'QR Code for Payment'),
+                  ),
                   const SizedBox(height: AppSpacing.paddingM),
                   AdaptiveImage(
                     imageUrl: bankDetails['QRCodeUrl']!,
@@ -938,8 +1189,11 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
       return const SizedBox.shrink();
     }
 
+    final loc = AppLocalizations.of(context);
+
     return SectionContainer(
-      title: 'Additional Information',
+      title: AppLocalizations.of(context)?.additionalInformation ??
+          _text('additionalInformation', 'Additional Information'),
       icon: Icons.info_outline,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -950,21 +1204,33 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (pg.description != null && pg.description!.isNotEmpty) ...[
-                  _buildInfoRow('Description', pg.description!),
+                  _buildInfoRow(
+                      loc?.descriptionLabel ??
+                          _text('descriptionLabel', 'Description'),
+                      pg.description!),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
                 if (pg.pgType != null) ...[
-                  _buildInfoRow('PG Type', pg.pgType!),
+                  _buildInfoRow(
+                      loc?.pgTypeFieldLabel ??
+                          _text('pgTypeFieldLabel', 'PG Type'),
+                      pg.pgType!),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
                 if (pg.parkingDetails != null &&
                     pg.parkingDetails!.isNotEmpty) ...[
-                  _buildInfoRow('Parking Details', pg.parkingDetails!),
+                  _buildInfoRow(
+                      loc?.parkingDetails ??
+                          _text('parkingDetails', 'Parking Details'),
+                      pg.parkingDetails!),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
                 if (pg.securityMeasures != null &&
                     pg.securityMeasures!.isNotEmpty)
-                  _buildInfoRow('Security Measures', pg.securityMeasures!),
+                  _buildInfoRow(
+                      loc?.securityMeasures ??
+                          _text('securityMeasures', 'Security Measures'),
+                      pg.securityMeasures!),
               ],
             ),
           ),
@@ -982,7 +1248,11 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                           size: 18,
                           color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: AppSpacing.paddingXS),
-                      const HeadingSmall(text: 'Payment Instructions'),
+                      HeadingSmall(
+                        text: loc?.paymentInstructionsLabel ??
+                            _text('paymentInstructionsLabel',
+                                'Payment Instructions'),
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
@@ -1004,7 +1274,9 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                           size: 18,
                           color: Theme.of(context).colorScheme.primary),
                       const SizedBox(width: AppSpacing.paddingXS),
-                      const HeadingSmall(text: 'Nearby Places'),
+                      HeadingSmall(
+                          text: loc?.nearbyPlacesLabel ??
+                              _text('nearbyPlacesLabel', 'Nearby Places')),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
@@ -1050,7 +1322,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           children: [
             Expanded(
               child: SecondaryButton(
-                label: 'Call Owner',
+                label: AppLocalizations.of(context)?.callOwner ??
+                    _text('callOwner', 'Call Owner'),
                 icon: Icons.phone,
                 onPressed: pg.contactNumber != null
                     ? () => _callOwner(pg.contactNumber!)
@@ -1060,7 +1333,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             const SizedBox(width: AppSpacing.paddingS),
             Expanded(
               child: SecondaryButton(
-                label: 'Share PG',
+                label: AppLocalizations.of(context)?.sharePg ??
+                    _text('sharePg', 'Share PG'),
                 icon: Icons.share,
                 onPressed: () => _sharePG(context, pg),
               ),
@@ -1069,7 +1343,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
             Expanded(
               flex: 2,
               child: PrimaryButton(
-                label: 'Request Booking',
+                label: AppLocalizations.of(context)?.requestBooking ??
+                    _text('requestBooking', 'Request Booking'),
                 icon: Icons.home_work,
                 onPressed: () {
                   showDialog(
@@ -1158,9 +1433,14 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open maps')),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)?.couldNotOpenMaps ??
+                  _text('couldNotOpenMaps', 'Could not open maps'),
+            ),
+          ),
+        );
     }
   }
 
@@ -1184,19 +1464,35 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
   Future<void> _sharePG(BuildContext context, dynamic pg) async {
     if (pg == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('PG information not available')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)?.pgInformationNotAvailable ??
+                _text('pgInformationNotAvailable', 'PG information not available'),
+          ),
+        ),
       );
       return;
     }
 
     try {
+      final loc = AppLocalizations.of(context);
       // Build shareable text with PG details
       final StringBuffer shareText = StringBuffer();
-      shareText.writeln('🏠 ${pg.pgName ?? 'PG Property'}');
+      final pgName =
+          pg.pgName ?? (loc?.pgProperty ?? _text('pgProperty', 'PG Property'));
+      shareText.writeln(
+        loc?.sharePgHeading(pgName) ??
+            _text('sharePgHeading', '🏠 {name}',
+                parameters: {'name': pgName}),
+      );
       shareText.writeln();
       
       if (pg.pgAddress != null && pg.pgAddress.isNotEmpty) {
-        shareText.writeln('📍 Address: ${pg.pgAddress}');
+        shareText.writeln(
+          loc?.sharePgAddressLine(pg.pgAddress) ??
+              _text('sharePgAddressLine', '📍 Address: {address}',
+                  parameters: {'address': pg.pgAddress}),
+        );
       }
       
       // Add pricing information if available
@@ -1205,33 +1501,91 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
       
       if (rentConfig.isNotEmpty || pricing.isNotEmpty) {
         shareText.writeln();
-        shareText.writeln('💰 Pricing:');
+        shareText
+            .writeln(loc?.sharePgPricingHeader ?? _text('sharePgPricingHeader', '💰 Pricing:'));
         
         // Show sharing options from rentConfig
         if (rentConfig['oneShare'] != null && (rentConfig['oneShare'] as num) > 0) {
-          shareText.writeln('1 Share: ₹${rentConfig['oneShare']}');
+          shareText.writeln(
+            loc?.sharePgPricingEntry(
+                  '1',
+                  _formatCurrency(
+                      (rentConfig['oneShare'] as num).toDouble()),
+                ) ??
+                _text(
+                  'sharePgPricingEntry',
+                  '{count} Share: ₹{price}',
+                  parameters: {
+                    'count': '1',
+                    'price': _formatCurrency(
+                        (rentConfig['oneShare'] as num).toDouble()),
+                  },
+                ),
+          );
         }
         if (rentConfig['twoShare'] != null && (rentConfig['twoShare'] as num) > 0) {
-          shareText.writeln('2 Share: ₹${rentConfig['twoShare']}');
+          shareText.writeln(
+            loc?.sharePgPricingEntry(
+                  '2',
+                  _formatCurrency(
+                      (rentConfig['twoShare'] as num).toDouble()),
+                ) ??
+                _text(
+                  'sharePgPricingEntry',
+                  '{count} Share: ₹{price}',
+                  parameters: {
+                    'count': '2',
+                    'price': _formatCurrency(
+                        (rentConfig['twoShare'] as num).toDouble()),
+                  },
+                ),
+          );
         }
         if (rentConfig['threeShare'] != null && (rentConfig['threeShare'] as num) > 0) {
-          shareText.writeln('3 Share: ₹${rentConfig['threeShare']}');
+          shareText.writeln(
+            loc?.sharePgPricingEntry(
+                  '3',
+                  _formatCurrency(
+                      (rentConfig['threeShare'] as num).toDouble()),
+                ) ??
+                _text(
+                  'sharePgPricingEntry',
+                  '{count} Share: ₹{price}',
+                  parameters: {
+                    'count': '3',
+                    'price': _formatCurrency(
+                        (rentConfig['threeShare'] as num).toDouble()),
+                  },
+                ),
+          );
         }
       }
       
       // Add amenities if available
       if (pg.amenities != null && (pg.amenities as List).isNotEmpty) {
         shareText.writeln();
-        shareText.writeln('✨ Amenities: ${(pg.amenities as List).join(", ")}');
+        shareText.writeln(
+          loc?.sharePgAmenitiesLine(
+                (pg.amenities as List).join(', '),
+              ) ??
+              _text(
+                'sharePgAmenitiesLine',
+                '✨ Amenities: {amenities}',
+                parameters: {
+                  'amenities': (pg.amenities as List).join(", "),
+                },
+              ),
+        );
       }
       
       shareText.writeln();
-      shareText.writeln('Check out this PG on Atitia!');
+      shareText.writeln(loc?.sharePgFooter ??
+          _text('sharePgFooter', 'Check out this PG on Atitia!'));
       
       // Share using share_plus
       await Share.share(
         shareText.toString(),
-        subject: '${pg.pgName ?? "PG Property"} - Atitia',
+        subject: '$pgName - Atitia',
       );
       
       // Log analytics
@@ -1246,7 +1600,11 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to share: ${e.toString()}'),
+              content: Text(
+                AppLocalizations.of(context)?.failedToShare(e.toString()) ??
+                    _text('failedToShare', 'Failed to share: {error}',
+                        parameters: {'error': e.toString()}),
+              ),
             backgroundColor: AppColors.error,
           ),
         );

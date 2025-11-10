@@ -5,12 +5,17 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
+import '../../../../core/services/localization/internationalization_service.dart';
+
 /// Advanced encryption service for sensitive data protection
 /// Provides AES encryption, hashing, and secure key management
 class EncryptionService {
   static final EncryptionService _instance = EncryptionService._internal();
   factory EncryptionService() => _instance;
   EncryptionService._internal();
+
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   Encrypter? _encrypter;
   IV? _iv;
@@ -54,7 +59,11 @@ class EncryptionService {
       final encrypted = _encrypter!.encrypt(plaintext, iv: _iv!);
       return encrypted.base64;
     } catch (e) {
-      throw EncryptionException('Failed to encrypt data: $e');
+      throw EncryptionException(_translate(
+        'encryptionEncryptFailed',
+        'Failed to encrypt data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -66,7 +75,11 @@ class EncryptionService {
       final encrypted = Encrypted.fromBase64(ciphertext);
       return _encrypter!.decrypt(encrypted, iv: _iv!);
     } catch (e) {
-      throw EncryptionException('Failed to decrypt data: $e');
+      throw EncryptionException(_translate(
+        'encryptionDecryptFailed',
+        'Failed to decrypt data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -158,7 +171,11 @@ class EncryptionService {
       final encrypted = _encrypter!.encryptBytes(fileData, iv: _iv!);
       return encrypted.bytes;
     } catch (e) {
-      throw EncryptionException('Failed to encrypt file data: $e');
+      throw EncryptionException(_translate(
+        'encryptionFileEncryptFailed',
+        'Failed to encrypt file data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -170,7 +187,11 @@ class EncryptionService {
       final encrypted = Encrypted(encryptedData);
       return Uint8List.fromList(_encrypter!.decryptBytes(encrypted, iv: _iv!));
     } catch (e) {
-      throw EncryptionException('Failed to decrypt file data: $e');
+      throw EncryptionException(_translate(
+        'encryptionFileDecryptFailed',
+        'Failed to decrypt file data: {error}',
+        parameters: {'error': e.toString()},
+      ));
     }
   }
 
@@ -183,6 +204,22 @@ class EncryptionService {
     } catch (e) {
       return false;
     }
+  }
+
+  String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
   }
 }
 
@@ -197,6 +234,9 @@ class EncryptionException implements Exception {
 
 /// Security utility for data protection
 class SecurityUtils {
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
   /// Sanitize input data to prevent injection attacks
   static String sanitizeInput(String input) {
     if (input.isEmpty) return input;
@@ -216,7 +256,10 @@ class SecurityUtils {
     final sanitized = sanitizeInput(email);
     if (sanitized.isNotEmpty &&
         !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(sanitized)) {
-      throw SecurityException('Invalid email format');
+      throw SecurityException(_translate(
+        'securityInvalidEmailFormat',
+        'Invalid email format',
+      ));
     }
     return sanitized;
   }
@@ -226,7 +269,10 @@ class SecurityUtils {
     final sanitized = sanitizeInput(phone);
     final digitsOnly = sanitized.replaceAll(RegExp(r'[^0-9]'), '');
     if (digitsOnly.length != 10) {
-      throw SecurityException('Invalid phone number format');
+      throw SecurityException(_translate(
+        'securityInvalidPhoneFormat',
+        'Invalid phone number format',
+      ));
     }
     return digitsOnly;
   }
@@ -275,6 +321,22 @@ class SecurityUtils {
     final maskedPart = '*' * (data.length - visibleChars);
 
     return visiblePart + maskedPart;
+  }
+
+  static String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
   }
 }
 

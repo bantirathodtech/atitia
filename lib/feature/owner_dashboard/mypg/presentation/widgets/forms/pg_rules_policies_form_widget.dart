@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../../../common/lifecycle/stateless/adaptive_stateless_widget.dart';
 import '../../../../../../common/styles/spacing.dart';
-import '../../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../../common/widgets/dropdowns/adaptive_dropdown.dart';
-import '../../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../../common/widgets/grids/responsive_grid.dart';
+import '../../../../../../common/widgets/inputs/text_input.dart';
+import '../../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../../l10n/app_localizations.dart';
 
 /// Rules & Policies Form Widget
 class PgRulesPoliciesFormWidget extends AdaptiveStatelessWidget {
@@ -34,10 +35,11 @@ class PgRulesPoliciesFormWidget extends AdaptiveStatelessWidget {
 
   @override
   Widget buildAdaptive(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HeadingMedium(text: 'Rules & Policies'),
+        HeadingMedium(text: loc.pgRulesTitle),
         const SizedBox(height: AppSpacing.paddingL),
         
         ResponsiveGrid(
@@ -48,40 +50,50 @@ class PgRulesPoliciesFormWidget extends AdaptiveStatelessWidget {
           children: [
             TextInput(
               controller: entryTimingsController,
-              label: 'Entry Timings',
-              hint: 'e.g., 6:00 AM - 11:00 PM',
+              label: loc.pgRulesEntryTimingsLabel,
+              hint: loc.pgRulesTimingsHint,
             ),
             TextInput(
               controller: exitTimingsController,
-              label: 'Exit Timings',
-              hint: 'e.g., 6:00 AM - 11:00 PM',
+              label: loc.pgRulesExitTimingsLabel,
+              hint: loc.pgRulesTimingsHint,
             ),
             AdaptiveDropdown<String>(
-              label: 'Smoking Policy',
+              label: loc.pgRulesSmokingPolicyLabel,
               value: selectedSmokingPolicy,
-              items: const [
-                DropdownMenuItem(value: 'Not Allowed', child: Text('Not Allowed')),
-                DropdownMenuItem(value: 'Allowed', child: Text('Allowed')),
-                DropdownMenuItem(value: 'Designated Areas Only', child: Text('Designated Areas Only')),
+              items: [
+                DropdownMenuItem(
+                    value: 'Not Allowed',
+                    child: Text(loc.pgRulesPolicyNotAllowed)),
+                DropdownMenuItem(
+                    value: 'Allowed', child: Text(loc.pgRulesPolicyAllowed)),
+                DropdownMenuItem(
+                    value: 'Designated Areas Only',
+                    child: Text(loc.pgRulesPolicyDesignatedAreas)),
               ],
               onChanged: onSmokingPolicyChanged,
-              hint: 'Select Policy',
+              hint: loc.pgRulesPolicyHint,
             ),
             AdaptiveDropdown<String>(
-              label: 'Alcohol Policy',
+              label: loc.pgRulesAlcoholPolicyLabel,
               value: selectedAlcoholPolicy,
-              items: const [
-                DropdownMenuItem(value: 'Not Allowed', child: Text('Not Allowed')),
-                DropdownMenuItem(value: 'Allowed', child: Text('Allowed')),
-                DropdownMenuItem(value: 'Designated Areas Only', child: Text('Designated Areas Only')),
+              items: [
+                DropdownMenuItem(
+                    value: 'Not Allowed',
+                    child: Text(loc.pgRulesPolicyNotAllowed)),
+                DropdownMenuItem(
+                    value: 'Allowed', child: Text(loc.pgRulesPolicyAllowed)),
+                DropdownMenuItem(
+                    value: 'Designated Areas Only',
+                    child: Text(loc.pgRulesPolicyDesignatedAreas)),
               ],
               onChanged: onAlcoholPolicyChanged,
-              hint: 'Select Policy',
+              hint: loc.pgRulesPolicyHint,
             ),
             TextInput(
               controller: noticePeriodController,
-              label: 'Notice Period (Days)',
-              hint: 'e.g., 30',
+              label: loc.pgRulesNoticePeriodLabel,
+              hint: loc.pgRulesNoticePeriodHint,
               keyboardType: TextInputType.number,
             ),
           ],
@@ -91,8 +103,8 @@ class PgRulesPoliciesFormWidget extends AdaptiveStatelessWidget {
         
         TextInput(
           controller: guestPolicyController,
-          label: 'Guest Policy',
-          hint: 'Rules regarding guests, visitors, overnight stays, etc.',
+          label: loc.pgRulesGuestPolicyLabel,
+          hint: loc.pgRulesGuestPolicyHint,
           maxLines: 4,
           keyboardType: TextInputType.multiline,
         ),
@@ -101,8 +113,8 @@ class PgRulesPoliciesFormWidget extends AdaptiveStatelessWidget {
         
         TextInput(
           controller: refundPolicyController,
-          label: 'Refund Policy',
-          hint: 'Terms and conditions for refunds, deposits, cancellations, etc.',
+          label: loc.pgRulesRefundPolicyLabel,
+          hint: loc.pgRulesRefundPolicyHint,
           maxLines: 4,
           keyboardType: TextInputType.multiline,
         ),

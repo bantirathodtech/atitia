@@ -11,6 +11,7 @@ import '../text/heading_small.dart';
 import '../text/body_text.dart';
 import '../cards/adaptive_card.dart';
 import '../../../core/services/analytics/enhanced_analytics_service.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// 📊 **ANALYTICS DASHBOARD - PRODUCTION READY**
 ///
@@ -48,13 +49,14 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const HeadingMedium(text: 'Analytics Dashboard'),
+        title: HeadingMedium(text: loc.analyticsDashboardTitle),
         backgroundColor: theme.primaryColor,
         foregroundColor: AppColors.textOnPrimary,
         actions: [
@@ -71,18 +73,19 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildPerformanceMetricsCard(context, isDarkMode),
+                  _buildPerformanceMetricsCard(context, isDarkMode, loc),
                   const SizedBox(height: AppSpacing.paddingM),
-                  _buildUserJourneyCard(context, isDarkMode),
+                  _buildUserJourneyCard(context, isDarkMode, loc),
                   const SizedBox(height: AppSpacing.paddingM),
-                  _buildBusinessMetricsCard(context, isDarkMode),
+                  _buildBusinessMetricsCard(context, isDarkMode, loc),
                 ],
               ),
             ),
     );
   }
 
-  Widget _buildPerformanceMetricsCard(BuildContext context, bool isDarkMode) {
+  Widget _buildPerformanceMetricsCard(
+      BuildContext context, bool isDarkMode, AppLocalizations loc) {
     final theme = Theme.of(context);
     
     return AdaptiveCard(
@@ -92,13 +95,13 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
-            text: 'Performance Metrics',
+            text: loc.performanceMetricsTitle,
             color: theme.primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           if (_performanceMetrics.isEmpty)
-            const BodyText(
-              text: 'No performance metrics available',
+            BodyText(
+              text: loc.noPerformanceMetricsAvailable,
               color: AppColors.textSecondary,
             )
           else
@@ -153,7 +156,8 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
     );
   }
 
-  Widget _buildUserJourneyCard(BuildContext context, bool isDarkMode) {
+  Widget _buildUserJourneyCard(
+      BuildContext context, bool isDarkMode, AppLocalizations loc) {
     final theme = Theme.of(context);
     
     return AdaptiveCard(
@@ -163,25 +167,26 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
-            text: 'User Journey',
+            text: loc.userJourneyTitle,
             color: theme.primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          const BodyText(
-            text: 'Track user interactions and screen flows',
+          BodyText(
+            text: loc.userJourneyDescription,
             color: AppColors.textSecondary,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           ElevatedButton(
-            onPressed: () => _showUserJourneyDetails(),
-            child: const BodyText(text: 'View Journey Details'),
+            onPressed: () => _showUserJourneyDetails(loc),
+            child: BodyText(text: loc.viewJourneyDetails),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBusinessMetricsCard(BuildContext context, bool isDarkMode) {
+  Widget _buildBusinessMetricsCard(
+      BuildContext context, bool isDarkMode, AppLocalizations loc) {
     final theme = Theme.of(context);
     
     return AdaptiveCard(
@@ -191,18 +196,18 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
-            text: 'Business Intelligence',
+            text: loc.businessIntelligenceTitle,
             color: theme.primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          _buildMetricRow('Total Sessions', '24'),
-          _buildMetricRow('Active Users', '156'),
-          _buildMetricRow('Conversion Rate', '12.5%'),
-          _buildMetricRow('Avg Session Duration', '8m 32s'),
+          _buildMetricRow(loc.metricTotalSessions, '24'),
+          _buildMetricRow(loc.metricActiveUsers, '156'),
+          _buildMetricRow(loc.metricConversionRate, '12.5%'),
+          _buildMetricRow(loc.metricAverageSessionDuration, '8m 32s'),
           const SizedBox(height: AppSpacing.paddingM),
           ElevatedButton(
-            onPressed: () => _showBusinessInsights(),
-            child: const BodyText(text: 'View Insights'),
+            onPressed: () => _showBusinessInsights(loc),
+            child: BodyText(text: loc.viewInsights),
           ),
         ],
       ),
@@ -228,36 +233,36 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
     );
   }
 
-  void _showUserJourneyDetails() {
+  void _showUserJourneyDetails(AppLocalizations loc) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingSmall(text: 'User Journey Details'),
-        content: const BodyText(
-          text: 'Detailed user journey visualization would be implemented here with charts and flow diagrams.',
+        title: HeadingSmall(text: loc.userJourneyDetailsTitle),
+        content: BodyText(
+          text: loc.userJourneyDetailsDescription,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(loc.close),
           ),
         ],
       ),
     );
   }
 
-  void _showBusinessInsights() {
+  void _showBusinessInsights(AppLocalizations loc) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingSmall(text: 'Business Insights'),
-        content: const BodyText(
-          text: 'Advanced business intelligence dashboard with charts, trends, and predictive analytics would be implemented here.',
+        title: HeadingSmall(text: loc.businessInsightsTitle),
+        content: BodyText(
+          text: loc.businessInsightsDescription,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(loc.close),
           ),
         ],
       ),
@@ -301,6 +306,7 @@ class _AnalyticsWidgetState extends State<AnalyticsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
@@ -319,7 +325,7 @@ class _AnalyticsWidgetState extends State<AnalyticsWidget> {
               ),
               const SizedBox(width: AppSpacing.paddingS),
               HeadingSmall(
-                text: 'Analytics',
+                text: loc.analyticsWidgetTitle,
                 color: theme.primaryColor,
               ),
             ],
@@ -328,8 +334,10 @@ class _AnalyticsWidgetState extends State<AnalyticsWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem('Sessions', _sessionCount.toString()),
-              _buildStatItem('Avg Time', '${_avgResponseTime.toStringAsFixed(1)}ms'),
+              _buildStatItem(loc.analyticsSessionsLabel, _sessionCount.toString()),
+              _buildStatItem(
+                  loc.analyticsAverageTimeLabel,
+                  '${_avgResponseTime.toStringAsFixed(1)}ms'),
             ],
           ),
         ],

@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
@@ -20,7 +21,9 @@ import '../../../../../core/models/bed_change_request_model.dart';
 import '../../../../../core/models/booking_model.dart';
 import '../../../../../core/repositories/bed_change_request_repository.dart';
 import '../../../../../core/repositories/booking_repository.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 
 /// Screen for guests to view their assigned room/bed and request changes
@@ -42,6 +45,24 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
       _bedChangeRequestSubscription;
   bool _loading = true;
   String? _error;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -56,6 +77,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
   }
 
   Future<void> _loadRoomBedInfo() async {
+    final loc = AppLocalizations.of(context);
     setState(() {
       _loading = true;
       _error = null;
@@ -67,7 +89,8 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
 
       if (guestId.isEmpty) {
         setState(() {
-          _error = 'User not authenticated';
+          _error = loc?.userNotAuthenticatedRoomBed ??
+              _text('userNotAuthenticatedRoomBed', 'User not authenticated');
           _loading = false;
         });
         return;
@@ -89,7 +112,12 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Failed to load room/bed information: $e';
+          _error = loc?.failedToLoadRoomBedInformation(e.toString()) ??
+              _text(
+                'failedToLoadRoomBedInformation',
+                'Failed to load room/bed information: {error}',
+                parameters: {'error': e.toString()},
+              );
           _loading = false;
         });
       }
@@ -108,31 +136,38 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
         }
       },
       onError: (error) {
-        logError('Failed to load bed change requests: $error');
+        logError(
+          _text(
+            'failedToLoadBedChangeRequests',
+            'Failed to load bed change requests: {error}',
+            parameters: {'error': error.toString()},
+          ),
+        );
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'My Room & Bed',
+        title: loc?.myRoomAndBed ?? _text('myRoomAndBed', 'My Room & Bed'),
         showBackButton: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadRoomBedInfo,
-            tooltip: 'Refresh',
+            tooltip: loc?.refresh ?? _text('refresh', 'Refresh'),
           ),
         ],
       ),
       drawer: const GuestDrawer(),
-      body: _buildBody(context),
+      body: _buildBody(context, loc),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context, AppLocalizations? loc) {
     if (_loading) {
       return const Center(child: AdaptiveLoader());
     }
@@ -144,12 +179,14 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
           children: [
             Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: AppSpacing.paddingM),
-            HeadingMedium(text: 'Error'),
+            HeadingMedium(
+              text: loc?.errorTitle ?? _text('errorTitle', 'Error'),
+            ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(text: _error!, align: TextAlign.center),
             const SizedBox(height: AppSpacing.paddingL),
             PrimaryButton(
-              label: 'Retry',
+              label: loc?.retry ?? _text('retry', 'Retry'),
               onPressed: _loadRoomBedInfo,
             ),
           ],
@@ -158,11 +195,14 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     }
 
     if (_booking == null) {
-      return const Center(
+      return Center(
         child: EmptyState(
-          title: 'No Active Booking',
-          message:
-              'You don\'t have an active booking yet. Book a PG to get assigned a room and bed.',
+          title: loc?.noActiveBooking ?? _text('noActiveBooking', 'No Active Booking'),
+          message: loc?.noActiveBookingDescription ??
+              _text(
+                'noActiveBookingDescription',
+                'You don\'t have an active booking yet. Book a PG to get assigned a room and bed.',
+              ),
           icon: Icons.bed_outlined,
         ),
       );
@@ -173,21 +213,22 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildRoomBedCard(context),
+          _buildRoomBedCard(context, loc),
           const SizedBox(height: AppSpacing.paddingL),
-          _buildBookingInfoCard(context),
+          _buildBookingInfoCard(context, loc),
           if (_bedChangeRequests.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.paddingL),
-            _buildBedChangeRequestsCard(context),
+            _buildBedChangeRequestsCard(context, loc),
           ],
           const SizedBox(height: AppSpacing.paddingL),
-          _buildRequestChangeSection(context),
+          _buildRequestChangeSection(context, loc),
         ],
       ),
     );
   }
 
-  Widget _buildRoomBedCard(BuildContext context) {
+  Widget _buildRoomBedCard(
+      BuildContext context, AppLocalizations? loc) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -220,19 +261,33 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
             const SizedBox(height: AppSpacing.paddingM),
             if (_booking!.roomNumber.isNotEmpty)
               HeadingMedium(
-                text: 'Room ${_booking!.roomNumber}',
+                text: loc?.roomLabelWithNumber(_booking!.roomNumber) ??
+                    _text(
+                      'roomLabelWithNumber',
+                      'Room {roomNumber}',
+                      parameters: {
+                        'roomNumber': _booking!.roomNumber,
+                      },
+                    ),
                 color: AppColors.textOnPrimary,
               ),
             if (_booking!.bedNumber.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.paddingS),
               HeadingMedium(
-                text: 'Bed ${_booking!.bedNumber}',
+                text: loc?.bedLabelWithNumber(_booking!.bedNumber) ??
+                    _text(
+                      'bedLabelWithNumber',
+                      'Bed {bedNumber}',
+                      parameters: {
+                        'bedNumber': _booking!.bedNumber,
+                      },
+                    ),
                 color: AppColors.textOnPrimary,
               ),
             ],
             if (_booking!.roomNumber.isEmpty && _booking!.bedNumber.isEmpty)
               HeadingMedium(
-                text: 'Not Assigned',
+                text: loc?.notAssigned ?? _text('notAssigned', 'Not assigned'),
                 color: AppColors.textOnPrimary,
               ),
           ],
@@ -241,24 +296,40 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     );
   }
 
-  Widget _buildBookingInfoCard(BuildContext context) {
+  Widget _buildBookingInfoCard(
+      BuildContext context, AppLocalizations? loc) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const HeadingSmall(text: 'Booking Information'),
+            HeadingSmall(
+                text: loc?.bookingInformation ??
+                    _text('bookingInformation', 'Booking Information')),
             const SizedBox(height: AppSpacing.paddingM),
-            _buildInfoRow('PG Name', _booking!.pgName),
-            _buildInfoRow('Start Date', _formatDate(_booking!.startDate)),
+            _buildInfoRow(
+                loc?.bookingRequestPgName ??
+                    _text('bookingRequestPgName', 'PG Name'),
+                _booking!.pgName),
+            _buildInfoRow(
+                loc?.startDate ?? _text('startDate', 'Start Date'),
+                _formatDate(_booking!.startDate)),
             if (_booking!.endDate != null)
-              _buildInfoRow('End Date', _formatDate(_booking!.endDate!)),
-            _buildInfoRow('Status', _booking!.status.toUpperCase()),
+              _buildInfoRow(
+                  loc?.endDate ?? _text('endDate', 'End Date'),
+                  _formatDate(_booking!.endDate!)),
+            _buildInfoRow(
+                loc?.status ?? _text('status', 'Status'),
+                _statusLabel(_booking!.status, loc)),
             if (_booking!.roomNumber.isNotEmpty)
-              _buildInfoRow('Room', _booking!.roomNumber),
+              _buildInfoRow(
+                  loc?.room ?? _text('room', 'Room'),
+                  _booking!.roomNumber),
             if (_booking!.bedNumber.isNotEmpty)
-              _buildInfoRow('Bed', _booking!.bedNumber),
+              _buildInfoRow(
+                  loc?.bed ?? _text('bed', 'Bed'),
+                  _booking!.bedNumber),
           ],
         ),
       ),
@@ -278,23 +349,30 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     );
   }
 
-  Widget _buildRequestChangeSection(BuildContext context) {
+  Widget _buildRequestChangeSection(
+      BuildContext context, AppLocalizations? loc) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const HeadingSmall(text: 'Request Bed/Room Change'),
+            HeadingSmall(
+                text: loc?.requestBedRoomChange ??
+                    _text('requestBedRoomChange', 'Request Bed/Room Change')),
             const SizedBox(height: AppSpacing.paddingS),
-            const BodyText(
-              text:
-                  'Need to change your room or bed? Submit a request and the owner will review it.',
+            BodyText(
+              text: loc?.requestBedRoomChangeDescription ??
+                  _text(
+                    'requestBedRoomChangeDescription',
+                    'Need to change your room or bed? Submit a request and the owner will review it.',
+                  ),
               color: AppColors.textSecondary,
             ),
             const SizedBox(height: AppSpacing.paddingM),
             PrimaryButton(
-              label: 'Request Change',
+              label: loc?.requestChange ??
+                  _text('requestChange', 'Request Change'),
               icon: Icons.swap_horiz,
               onPressed: () => _showChangeRequestDialog(context),
             ),
@@ -308,55 +386,68 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     final reasonController = TextEditingController();
     final newRoomController = TextEditingController();
     final newBedController = TextEditingController();
+    final loc = AppLocalizations.of(context);
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const HeadingSmall(text: 'Request Room/Bed Change'),
+        title: HeadingSmall(
+            text: loc?.requestRoomBedChangeTitle ??
+                _text('requestRoomBedChangeTitle', 'Request Room/Bed Change')),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const BodyText(
-                text: 'Current Assignment:',
+              BodyText(
+                text: loc?.currentAssignment ??
+                    _text('currentAssignment', 'Current Assignment:'),
                 medium: true,
               ),
               const SizedBox(height: AppSpacing.paddingS),
               BodyText(
                 text: _booking!.roomNumber.isNotEmpty &&
                         _booking!.bedNumber.isNotEmpty
-                    ? 'Room ${_booking!.roomNumber}, Bed ${_booking!.bedNumber}'
-                    : 'Not assigned',
+                    ? '${loc?.roomLabelWithNumber(_booking!.roomNumber) ?? _text('roomLabelWithNumber', 'Room {roomNumber}', parameters: {'roomNumber': _booking!.roomNumber})}, ${loc?.bedLabelWithNumber(_booking!.bedNumber) ?? _text('bedLabelWithNumber', 'Bed {bedNumber}', parameters: {'bedNumber': _booking!.bedNumber})}'
+                    : loc?.notAssigned ?? _text('notAssigned', 'Not assigned'),
               ),
               const SizedBox(height: AppSpacing.paddingL),
               TextField(
                 controller: newRoomController,
-                decoration: const InputDecoration(
-                  labelText: 'Preferred Room Number (Optional)',
-                  hintText: 'Enter preferred room...',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.door_front_door),
+                decoration: InputDecoration(
+                  labelText: loc?.preferredRoomNumberOptional ??
+                      _text('preferredRoomNumberOptional',
+                          'Preferred Room Number (Optional)'),
+                  hintText: loc?.preferredRoomNumberHint ??
+                      _text('preferredRoomNumberHint', 'Enter preferred room...'),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.door_front_door),
                 ),
               ),
               const SizedBox(height: AppSpacing.paddingM),
               TextField(
                 controller: newBedController,
-                decoration: const InputDecoration(
-                  labelText: 'Preferred Bed Number (Optional)',
-                  hintText: 'Enter preferred bed...',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.bed),
+                decoration: InputDecoration(
+                  labelText: loc?.preferredBedNumberOptional ??
+                      _text('preferredBedNumberOptional',
+                          'Preferred Bed Number (Optional)'),
+                  hintText: loc?.preferredBedNumberHint ??
+                      _text('preferredBedNumberHint', 'Enter preferred bed...'),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.bed),
                 ),
               ),
               const SizedBox(height: AppSpacing.paddingM),
               TextField(
                 controller: reasonController,
-                decoration: const InputDecoration(
-                  labelText: 'Reason *',
-                  hintText: 'Why do you need to change room/bed?',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.note),
+                decoration: InputDecoration(
+                  labelText: loc?.reasonRequiredLabel ??
+                      _text('reasonRequiredLabel', 'Reason *'),
+                  hintText: loc?.reasonRequiredHint ??
+                      _text('reasonRequiredHint',
+                          'Why do you need to change room/bed?'),
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.note),
                 ),
                 maxLines: 3,
               ),
@@ -366,15 +457,18 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc?.cancel ?? _text('cancel', 'Cancel')),
           ),
           PrimaryButton(
-            label: 'Submit Request',
+            label:
+                loc?.submitRequest ?? _text('submitRequest', 'Submit Request'),
             onPressed: () async {
               if (reasonController.text.trim().isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please provide a reason for the change'),
+                  SnackBar(
+                    content: Text(loc?.provideReasonError ??
+                        _text('provideReasonError',
+                            'Please provide a reason for the change')),
                     backgroundColor: Colors.orange,
                   ),
                 );
@@ -407,8 +501,10 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
               if (context.mounted) {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Change request submitted successfully'),
+                  SnackBar(
+                    content: Text(loc?.changeRequestSuccess ??
+                        _text('changeRequestSuccess',
+                            'Change request submitted successfully')),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -420,7 +516,8 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     );
   }
 
-  Widget _buildBedChangeRequestsCard(BuildContext context) {
+  Widget _buildBedChangeRequestsCard(
+      BuildContext context, AppLocalizations? loc) {
     // Get the most recent request
     final recentRequest = _bedChangeRequests.first;
     final status = recentRequest.status.toLowerCase();
@@ -431,17 +528,17 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     switch (status) {
       case 'approved':
         statusColor = Colors.green;
-        statusText = 'Approved';
+        statusText = _statusLabel(status, loc);
         statusIcon = Icons.check_circle;
         break;
       case 'rejected':
         statusColor = Colors.red;
-        statusText = 'Rejected';
+        statusText = _statusLabel(status, loc);
         statusIcon = Icons.cancel;
         break;
       default:
         statusColor = Colors.orange;
-        statusText = 'Pending';
+        statusText = _statusLabel(status, loc);
         statusIcon = Icons.pending;
     }
 
@@ -455,7 +552,10 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
               children: [
                 Icon(statusIcon, color: statusColor, size: 24),
                 const SizedBox(width: AppSpacing.paddingS),
-                HeadingSmall(text: 'Bed Change Request Status'),
+                HeadingSmall(
+                    text: loc?.bedChangeRequestStatus ??
+                        _text('bedChangeRequestStatus',
+                            'Bed Change Request Status')),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -468,7 +568,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: BodyText(
-                    text: statusText.toUpperCase(),
+                    text: statusText,
                     color: statusColor,
                     medium: true,
                   ),
@@ -479,7 +579,8 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
             if (recentRequest.preferredRoomNumber != null ||
                 recentRequest.preferredBedNumber != null) ...[
               BodyText(
-                text: 'Preferred:',
+                text: loc?.preferredLabel ??
+                    _text('preferredLabel', 'Preferred:'),
                 medium: true,
                 color: Colors.grey[700],
               ),
@@ -487,15 +588,33 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
               BodyText(
                 text: recentRequest.preferredRoomNumber != null &&
                         recentRequest.preferredBedNumber != null
-                    ? 'Room ${recentRequest.preferredRoomNumber}, Bed ${recentRequest.preferredBedNumber}'
+                    ? '${loc?.roomLabelWithNumber(recentRequest.preferredRoomNumber!) ?? _text('roomLabelWithNumber', 'Room {roomNumber}', parameters: {'roomNumber': recentRequest.preferredRoomNumber.toString()})}, ${loc?.bedLabelWithNumber(recentRequest.preferredBedNumber!) ?? _text('bedLabelWithNumber', 'Bed {bedNumber}', parameters: {'bedNumber': recentRequest.preferredBedNumber.toString()})}'
                     : recentRequest.preferredRoomNumber != null
-                        ? 'Room ${recentRequest.preferredRoomNumber}'
-                        : 'Bed ${recentRequest.preferredBedNumber}',
+                        ? loc?.roomLabelWithNumber(
+                              recentRequest.preferredRoomNumber!) ??
+                            _text(
+                                'roomLabelWithNumber',
+                                'Room {roomNumber}',
+                                parameters: {
+                                  'roomNumber':
+                                      recentRequest.preferredRoomNumber
+                                          .toString(),
+                                })
+                        : loc?.bedLabelWithNumber(
+                              recentRequest.preferredBedNumber!) ??
+                            _text(
+                                'bedLabelWithNumber',
+                                'Bed {bedNumber}',
+                                parameters: {
+                                  'bedNumber':
+                                      recentRequest.preferredBedNumber
+                                          .toString(),
+                                }),
               ),
               const SizedBox(height: AppSpacing.paddingM),
             ],
             BodyText(
-              text: 'Reason:',
+              text: loc?.reasonLabel ?? _text('reasonLabel', 'Reason:'),
               medium: true,
               color: Colors.grey[700],
             ),
@@ -514,7 +633,8 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     BodyText(
-                      text: 'Owner Response:',
+                      text: loc?.ownerResponseLabel ??
+                          _text('ownerResponseLabel', 'Owner Response:'),
                       medium: true,
                       color: statusColor,
                     ),
@@ -529,7 +649,14 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
             ],
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: 'Requested: ${_formatDate(recentRequest.createdAt)}',
+              text: loc?.requestedOnLabel(_formatDate(recentRequest.createdAt)) ??
+                  _text(
+                    'requestedLabel',
+                    'Requested: {date}',
+                    parameters: {
+                      'date': _formatDate(recentRequest.createdAt),
+                    },
+                  ),
               color: Colors.grey[600],
             ),
           ],
@@ -538,7 +665,24 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     );
   }
 
+  String _statusLabel(String status, AppLocalizations? loc) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return loc?.bookingRequestPending ??
+            _text('bookingRequestPending', 'Pending');
+      case 'approved':
+        return loc?.bookingRequestApproved ??
+            _text('bookingRequestApproved', 'Approved');
+      case 'rejected':
+        return loc?.bookingRequestRejected ??
+            _text('bookingRequestRejected', 'Rejected');
+      default:
+        return status;
+    }
+  }
+
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+    final locale = AppLocalizations.of(context)?.localeName;
+    return DateFormat.yMMMd(locale).format(date);
   }
 }

@@ -10,6 +10,8 @@ import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../data/models/owner_food_menu.dart';
 import '../../viewmodel/owner_food_viewmodel.dart';
 import '../screens/owner_menu_edit_screen.dart';
@@ -20,10 +22,30 @@ class OwnerMenuDayTab extends StatelessWidget {
   final String dayLabel;
   const OwnerMenuDayTab({required this.dayLabel, super.key});
 
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
     final vm = Provider.of<OwnerFoodViewModel>(context);
     final OwnerFoodMenu? menu = vm.getMenuByDay(dayLabel);
+    final loc = AppLocalizations.of(context);
 
     // Check for special menu override for today's date
     final today = DateTime.now();
@@ -43,21 +65,21 @@ class OwnerMenuDayTab extends StatelessWidget {
         // Special Menu Override Banner (if exists)
         if (specialOverride != null)
           SliverToBoxAdapter(
-            child: _buildSpecialMenuBanner(context, specialOverride),
+            child: _buildSpecialMenuBanner(context, specialOverride, loc),
           ),
 
         // Feedback aggregates banner for today (likes/dislikes per meal)
         if (dayLabel == DateFormat('EEEE').format(DateTime.now()))
           SliverToBoxAdapter(
-            child: _buildFeedbackBanner(context, vm),
+            child: _buildFeedbackBanner(context, vm, loc),
           ),
 
         // Breakfast Section
         SliverToBoxAdapter(
           child: _buildMealSection(
             context,
-            'BREAKFAST',
-            '7:00 AM - 10:00 AM',
+            (loc?.breakfast ?? _text('breakfast', 'Breakfast')).toUpperCase(),
+            loc?.breakfastTime ?? _text('breakfastTime', '7:00 AM - 10:00 AM'),
             specialOverride?.breakfast ?? menu.breakfast,
             Icons.wb_sunny_outlined,
             const Color(0xFFFF6B6B),
@@ -69,8 +91,8 @@ class OwnerMenuDayTab extends StatelessWidget {
         SliverToBoxAdapter(
           child: _buildMealSection(
             context,
-            'LUNCH',
-            '12:00 PM - 3:00 PM',
+            (loc?.lunch ?? _text('lunch', 'Lunch')).toUpperCase(),
+            loc?.lunchTime ?? _text('lunchTime', '12:00 PM - 3:00 PM'),
             specialOverride?.lunch ?? menu.lunch,
             Icons.restaurant_outlined,
             const Color(0xFF4CAF50),
@@ -82,8 +104,8 @@ class OwnerMenuDayTab extends StatelessWidget {
         SliverToBoxAdapter(
           child: _buildMealSection(
             context,
-            'DINNER',
-            '7:00 PM - 10:00 PM',
+            (loc?.dinner ?? _text('dinner', 'Dinner')).toUpperCase(),
+            loc?.dinnerTime ?? _text('dinnerTime', '7:00 PM - 10:00 PM'),
             specialOverride?.dinner ?? menu.dinner,
             Icons.nightlight_outlined,
             const Color(0xFF9C27B0),
@@ -96,7 +118,7 @@ class OwnerMenuDayTab extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             child: PrimaryButton(
-              label: 'Edit Menu',
+              label: loc?.editMenu ?? _text('editMenu', 'Edit Menu'),
               icon: Icons.edit,
               onPressed: () => _navigateToEditScreen(context),
             ),
@@ -106,7 +128,8 @@ class OwnerMenuDayTab extends StatelessWidget {
     );
   }
 
-  Widget _buildFeedbackBanner(BuildContext context, OwnerFoodViewModel vm) {
+  Widget _buildFeedbackBanner(
+      BuildContext context, OwnerFoodViewModel vm, AppLocalizations? loc) {
     final agg = vm.feedbackAggregates;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -116,13 +139,18 @@ class OwnerMenuDayTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const HeadingMedium(text: 'Guest Feedback (Today)'),
+              HeadingMedium(
+                text: loc?.guestFeedbackToday ??
+                    _text('guestFeedbackToday', 'Guest Feedback (Today)'),
+              ),
               const SizedBox(height: AppSpacing.paddingS),
-              _buildRow('Breakfast', agg['breakfast']!),
+              _buildRow(loc?.breakfast ?? _text('breakfast', 'Breakfast'),
+                  agg['breakfast']!),
               const SizedBox(height: AppSpacing.paddingXS),
-              _buildRow('Lunch', agg['lunch']!),
+              _buildRow(loc?.lunch ?? _text('lunch', 'Lunch'), agg['lunch']!),
               const SizedBox(height: AppSpacing.paddingXS),
-              _buildRow('Dinner', agg['dinner']!),
+              _buildRow(
+                  loc?.dinner ?? _text('dinner', 'Dinner'), agg['dinner']!),
             ],
           ),
         ),
@@ -149,21 +177,28 @@ class OwnerMenuDayTab extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.restaurant_menu, size: 64, color: Colors.grey),
           const SizedBox(height: AppSpacing.paddingM),
-          HeadingMedium(text: 'No Menu for $dayLabel'),
+          HeadingMedium(
+            text: loc?.noMenuForDay(dayLabel) ??
+                _text('noMenuForDay', 'No Menu for {day}',
+                    parameters: {'day': dayLabel}),
+          ),
           const SizedBox(height: AppSpacing.paddingS),
-          const BodyText(
-            text: 'Create a menu for this day to get started',
+          BodyText(
+            text: loc?.createMenuForThisDay ??
+                _text('createMenuForThisDay',
+                    'Create a menu for this day to get started'),
             align: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.paddingL),
           PrimaryButton(
-            label: 'Create Menu',
+            label: loc?.createMenu ?? _text('createMenu', 'Create Menu'),
             icon: Icons.add,
             onPressed: () => _navigateToEditScreen(context),
           ),
@@ -228,8 +263,10 @@ class OwnerMenuDayTab extends StatelessWidget {
                     color: AppColors.warning,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const BodyText(
-                    text: 'SPECIAL',
+                  child: BodyText(
+                    text: (AppLocalizations.of(context)?.special ??
+                            _text('special', 'Special'))
+                        .toUpperCase(),
                     color: Colors.white,
                     small: true,
                   ),
@@ -245,8 +282,9 @@ class OwnerMenuDayTab extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.paddingM),
           if (items.isEmpty)
-            const BodyText(
-              text: 'No items added yet',
+            BodyText(
+              text: AppLocalizations.of(context)?.ownerFoodNoItemsAddedYet ??
+                  _text('ownerFoodNoItemsAddedYet', 'No items added yet'),
               color: Colors.grey,
             )
           else
@@ -265,8 +303,8 @@ class OwnerMenuDayTab extends StatelessWidget {
     );
   }
 
-  Widget _buildSpecialMenuBanner(
-      BuildContext context, OwnerMenuOverride specialOverride) {
+  Widget _buildSpecialMenuBanner(BuildContext context,
+      OwnerMenuOverride specialOverride, AppLocalizations? loc) {
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -297,7 +335,9 @@ class OwnerMenuDayTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 HeadingMedium(
-                  text: specialOverride.festivalName ?? 'Special Menu',
+                  text: specialOverride.festivalName ??
+                      loc?.specialMenuLabel ??
+                      _text('specialMenuLabel', 'Special Menu'),
                   color: Colors.white,
                 ),
                 if (specialOverride.specialNote != null &&

@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../l10n/app_localizations.dart';
+
 /// Emergency fallback application for when main initialization fails.
 ///
 /// Responsibility:
@@ -34,7 +36,7 @@ class EmergencyFallbackApp extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // Title
-                  Text('App Initialization Issue',
+                  Text(AppLocalizations.of(context)?.appInitializationIssue ?? 'App Initialization Issue',
                       style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -44,8 +46,7 @@ class EmergencyFallbackApp extends StatelessWidget {
 
                   // Description
                   Text(
-                    'We\'re having trouble connecting to our services. '
-                    'This might be due to network issues or maintenance.',
+                    AppLocalizations.of(context)?.troubleConnectingServices ?? 'We\'re having trouble connecting to our services. This might be due to network issues or maintenance.',
                     style: TextStyle(
                         fontSize: 16, color: Colors.grey[600], height: 1.4),
                     textAlign: TextAlign.center,
@@ -60,7 +61,7 @@ class EmergencyFallbackApp extends StatelessWidget {
                       ElevatedButton.icon(
                         onPressed: _retryAppInitialization,
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Try Again'),
+                        label: Text(AppLocalizations.of(context)?.tryAgain ?? 'Try Again'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,
@@ -72,7 +73,7 @@ class EmergencyFallbackApp extends StatelessWidget {
                       TextButton.icon(
                         onPressed: _exitApp,
                         icon: const Icon(Icons.exit_to_app),
-                        label: const Text('Exit'),
+                        label: Text(AppLocalizations.of(context)?.exit ?? 'Exit'),
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.grey[600],
                         ),

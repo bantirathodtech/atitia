@@ -1,6 +1,7 @@
 // lib/feature/owner_dashboard/shared/widgets/owner_payment_notifications_badge.dart
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/styles/colors.dart';
@@ -10,6 +11,7 @@ import '../../../../common/widgets/text/caption_text.dart';
 import '../../../../common/widgets/text/heading_small.dart';
 import '../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../auth/logic/auth_provider.dart';
 import '../../../../core/viewmodels/payment_notification_viewmodel.dart';
 import '../../../../core/models/payment_notification_model.dart';
@@ -55,8 +57,7 @@ class _OwnerPaymentNotificationsBadgeState
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<PaymentNotificationViewModel>();
-    final theme = Theme.of(context);
-    // final true = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     if (!viewModel.hasPendingNotifications) {
       return const SizedBox.shrink();
@@ -106,13 +107,16 @@ class _OwnerPaymentNotificationsBadgeState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const BodyText(
-                    text: 'Pending Payments',
+                  BodyText(
+                    text: loc?.pendingPayments ?? 'Pending Payments',
                     color: Colors.white,
                     medium: true,
                   ),
                   CaptionText(
-                    text: '${viewModel.pendingNotifications.length} waiting',
+                    text: loc?.pendingPaymentsWaiting(
+                          viewModel.pendingNotifications.length,
+                        ) ??
+                        '${viewModel.pendingNotifications.length} waiting',
                     color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ],
@@ -157,13 +161,13 @@ class _PaymentNotificationsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    // final true = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: BoxDecoration(
-        color: AppColors.darkCard,
+        color: isDark ? AppColors.darkCard : Colors.white,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.borderRadiusL),
         ),
@@ -205,10 +209,13 @@ class _PaymentNotificationsSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const HeadingSmall(text: 'Pending Payments'),
+                      HeadingSmall(text: loc?.pendingPayments ?? 'Pending Payments'),
                       CaptionText(
-                        text: '${notifications.length} notifications',
-                        color: AppColors.textSecondary,
+                        text: loc?.notificationsCount(notifications.length) ??
+                            '${notifications.length} notifications',
+                        color: isDark
+                            ? Colors.white70
+                            : AppColors.textSecondary,
                       ),
                     ],
                   ),
@@ -248,18 +255,18 @@ class _PaymentNotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    // final true = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final authProvider = context.read<AuthProvider>();
     final viewModel = context.read<PaymentNotificationViewModel>();
+    final loc = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: true ? AppColors.darkInputFill : AppColors.surfaceVariant,
+        color: isDark ? AppColors.darkInputFill : AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: AppColors.darkDivider,
+          color: isDark ? AppColors.darkDivider : AppColors.outline,
         ),
       ),
       child: Column(
@@ -279,7 +286,7 @@ class _PaymentNotificationCard extends StatelessWidget {
                   border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
                 ),
                 child: BodyText(
-                  text: notification.formattedAmount,
+                  text: _formatCurrency(notification.amount, loc),
                   color: AppColors.success,
                   medium: true,
                 ),
@@ -296,7 +303,7 @@ class _PaymentNotificationCard extends StatelessWidget {
                   border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
                 ),
                 child: CaptionText(
-                  text: notification.paymentMethodDisplay,
+                  text: _paymentMethodLabel(notification.paymentMethod, loc),
                   color: AppColors.info,
                 ),
               ),
@@ -311,7 +318,8 @@ class _PaymentNotificationCard extends StatelessWidget {
                     size: 14, color: AppColors.textSecondary),
                 const SizedBox(width: 4),
                 CaptionText(
-                  text: 'TXN: ${notification.transactionId}',
+                  text: loc?.transactionIdLabel(notification.transactionId!) ??
+                      'TXN: ${notification.transactionId}',
                   color: AppColors.textSecondary,
                 ),
               ],
@@ -338,8 +346,8 @@ class _PaymentNotificationCard extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     height: 150,
-                    color: true ? AppColors.darkCard : AppColors.outline,
-                    child: const Center(
+                    color: isDark ? AppColors.darkCard : AppColors.outline,
+                    child: Center(
                       child: Icon(Icons.error, color: AppColors.error),
                     ),
                   );
@@ -353,19 +361,19 @@ class _PaymentNotificationCard extends StatelessWidget {
             children: [
               Expanded(
                 child: SecondaryButton(
-                  label: 'Reject',
+                  label: loc?.reject ?? 'Reject',
                   icon: Icons.close,
                   onPressed: () =>
-                      _rejectPayment(context, viewModel, authProvider),
+                      _rejectPayment(context, viewModel, authProvider, loc),
                 ),
               ),
               const SizedBox(width: AppSpacing.paddingS),
               Expanded(
                 child: PrimaryButton(
-                  label: 'Confirm',
+                  label: loc?.confirm ?? 'Confirm',
                   icon: Icons.check,
                   onPressed: () =>
-                      _confirmPayment(context, viewModel, authProvider),
+                      _confirmPayment(context, viewModel, authProvider, loc),
                 ),
               ),
             ],
@@ -379,6 +387,7 @@ class _PaymentNotificationCard extends StatelessWidget {
     BuildContext context,
     PaymentNotificationViewModel viewModel,
     AuthProvider authProvider,
+    AppLocalizations? loc,
   ) async {
     final ownerId = authProvider.user?.userId ?? '';
     final success =
@@ -386,8 +395,9 @@ class _PaymentNotificationCard extends StatelessWidget {
 
     if (success && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Payment confirmed successfully'),
+        SnackBar(
+          content: Text(loc?.paymentConfirmedSuccessfully ??
+              'Payment confirmed successfully'),
           backgroundColor: AppColors.success,
         ),
       );
@@ -398,8 +408,9 @@ class _PaymentNotificationCard extends StatelessWidget {
     BuildContext context,
     PaymentNotificationViewModel viewModel,
     AuthProvider authProvider,
+    AppLocalizations? loc,
   ) async {
-    final reason = await _showRejectDialog(context);
+    final reason = await _showRejectDialog(context, loc);
     if (reason == null || reason.isEmpty) return;
 
     final ownerId = authProvider.user?.userId ?? '';
@@ -408,41 +419,68 @@ class _PaymentNotificationCard extends StatelessWidget {
 
     if (success && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Payment rejected'),
+        SnackBar(
+          content: Text(loc?.paymentRejected ?? 'Payment rejected'),
           backgroundColor: AppColors.error,
         ),
       );
     }
   }
 
-  Future<String?> _showRejectDialog(BuildContext context) async {
+  Future<String?> _showRejectDialog(
+      BuildContext context, AppLocalizations? loc) async {
     final controller = TextEditingController();
     return showDialog<String>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Reject Payment'),
+          title: Text(loc?.rejectPayment ?? 'Reject Payment'),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'Reason for rejection',
-              hintText: 'e.g., Incorrect amount, wrong transaction',
+            decoration: InputDecoration(
+              labelText: loc?.rejectionReason ?? 'Reason for rejection',
+              hintText: loc?.rejectionReasonHint ??
+                  'e.g., Incorrect amount, wrong transaction',
             ),
             maxLines: 2,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(loc?.cancel ?? 'Cancel'),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, controller.text),
-              child: const Text('Reject'),
+              child: Text(loc?.reject ?? 'Reject'),
             ),
           ],
         );
       },
     );
+  }
+
+  String _formatCurrency(double amount, AppLocalizations? loc) {
+    final formatter = NumberFormat.simpleCurrency(
+      locale: loc?.localeName,
+      name: 'INR',
+    );
+    return formatter.format(amount);
+  }
+
+  String _paymentMethodLabel(String method, AppLocalizations? loc) {
+    switch (method.toLowerCase()) {
+      case 'cash':
+        return loc?.paymentMethodCash ?? 'Cash';
+      case 'upi':
+        return loc?.paymentMethodUpi ?? 'UPI';
+      case 'razorpay':
+        return loc?.paymentMethodRazorpay ?? 'Razorpay';
+      case 'card':
+        return loc?.paymentMethodCard ?? 'Card';
+      case 'bank_transfer':
+        return loc?.paymentMethodBankTransfer ?? 'Bank Transfer';
+      default:
+        return loc?.paymentMethodOther ?? method.toUpperCase();
+    }
   }
 }

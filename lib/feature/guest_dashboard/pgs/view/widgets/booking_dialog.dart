@@ -12,6 +12,8 @@ import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../core/models/booking_model.dart';
 import '../../../../../core/repositories/booking_repository.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
+import '../../../../../l10n/app_localizations.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../data/models/guest_pg_model.dart';
 import '../../../../../feature/owner_dashboard/mypg/data/models/pg_floor_model.dart';
 import '../../../../../feature/owner_dashboard/mypg/data/models/pg_room_model.dart';
@@ -40,11 +42,30 @@ class _BookingDialogState extends State<BookingDialog> {
   PgBedModel? _selectedBed;
   DateTime? _startDate;
   bool _booking = false;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Dialog(
       backgroundColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
@@ -59,7 +80,7 @@ class _BookingDialogState extends State<BookingDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             HeadingSmall(
-              text: 'Book a Bed',
+              text: loc?.bookBed ?? _text('bookBed', 'Book a Bed'),
               color: theme.primaryColor,
             ),
             const SizedBox(height: AppSpacing.paddingM),
@@ -69,23 +90,23 @@ class _BookingDialogState extends State<BookingDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (widget.pg.hasFlexibleStructure) ...[
-                      _buildFloorSelector(context, isDarkMode),
+                      _buildFloorSelector(context, isDarkMode, loc),
                       if (_selectedFloor != null) ...[
                         const SizedBox(height: AppSpacing.paddingM),
-                        _buildRoomSelector(context, isDarkMode),
+                        _buildRoomSelector(context, isDarkMode, loc),
                       ],
                       if (_selectedRoom != null) ...[
                         const SizedBox(height: AppSpacing.paddingM),
-                        _buildBedSelector(context, isDarkMode),
+                        _buildBedSelector(context, isDarkMode, loc),
                       ],
                       if (_selectedBed != null) ...[
                         const SizedBox(height: AppSpacing.paddingM),
-                        _buildStartDatePicker(context, isDarkMode),
+                        _buildStartDatePicker(context, isDarkMode, loc),
                         const SizedBox(height: AppSpacing.paddingM),
-                        _buildBookingSummary(context, isDarkMode),
+                        _buildBookingSummary(context, isDarkMode, loc),
                       ],
                     ] else
-                      _buildLegacyBookingMessage(context, isDarkMode),
+                      _buildLegacyBookingMessage(context, isDarkMode, loc),
                   ],
                 ),
               ),
@@ -96,7 +117,7 @@ class _BookingDialogState extends State<BookingDialog> {
               children: [
                 TextButton(
                   onPressed: _booking ? null : () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: Text(loc?.cancel ?? _text('cancel', 'Cancel')),
                 ),
                 const SizedBox(width: AppSpacing.paddingS),
                 ElevatedButton(
@@ -110,7 +131,8 @@ class _BookingDialogState extends State<BookingDialog> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Confirm Booking'),
+                      : Text(loc?.confirmBooking ??
+                          _text('confirmBooking', 'Confirm Booking')),
                 ),
               ],
             ),
@@ -120,11 +142,15 @@ class _BookingDialogState extends State<BookingDialog> {
     );
   }
 
-  Widget _buildFloorSelector(BuildContext context, bool isDarkMode) {
+  Widget _buildFloorSelector(
+      BuildContext context, bool isDarkMode, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        BodyText(text: 'Select Floor', color: AppColors.textSecondary),
+        BodyText(
+          text: loc?.selectFloor ?? _text('selectFloor', 'Select Floor'),
+          color: AppColors.textSecondary,
+        ),
         const SizedBox(height: AppSpacing.paddingS),
         Wrap(
           spacing: AppSpacing.paddingS,
@@ -147,11 +173,15 @@ class _BookingDialogState extends State<BookingDialog> {
     );
   }
 
-  Widget _buildRoomSelector(BuildContext context, bool isDarkMode) {
+  Widget _buildRoomSelector(
+      BuildContext context, bool isDarkMode, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        BodyText(text: 'Select Room', color: AppColors.textSecondary),
+        BodyText(
+          text: loc?.selectRoom ?? _text('selectRoom', 'Select Room'),
+          color: AppColors.textSecondary,
+        ),
         const SizedBox(height: AppSpacing.paddingS),
         Wrap(
           spacing: AppSpacing.paddingS,
@@ -162,7 +192,20 @@ class _BookingDialogState extends State<BookingDialog> {
 
             return FilterChip(
               label: Text(
-                  '${room.roomNumber} (${room.sharingType}-sharing) - $availableBeds available'),
+                  loc?.roomOptionLabel(
+                        room.roomNumber,
+                        room.sharingType,
+                        availableBeds,
+                      ) ??
+                      _text(
+                        'roomOptionLabel',
+                        '{roomNumber} ({sharingType}-sharing) - {availableBeds} available',
+                        parameters: {
+                          'roomNumber': room.roomNumber,
+                          'sharingType': room.sharingType,
+                          'availableBeds': availableBeds.toString(),
+                        },
+                      )),
               selected: isSelected,
               onSelected: availableBeds > 0
                   ? (selected) {
@@ -179,21 +222,28 @@ class _BookingDialogState extends State<BookingDialog> {
     );
   }
 
-  Widget _buildBedSelector(BuildContext context, bool isDarkMode) {
+  Widget _buildBedSelector(
+      BuildContext context, bool isDarkMode, AppLocalizations? loc) {
     final vacantBeds =
         _selectedRoom!.beds.where((b) => b.status == 'vacant').toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        BodyText(text: 'Select Bed', color: AppColors.textSecondary),
+        BodyText(
+          text: loc?.selectBed ?? _text('selectBed', 'Select Bed'),
+          color: AppColors.textSecondary,
+        ),
         const SizedBox(height: AppSpacing.paddingS),
         Wrap(
           spacing: AppSpacing.paddingS,
           children: vacantBeds.map((bed) {
             final isSelected = _selectedBed?.bedId == bed.bedId;
+            final label = loc?.bedLabel(bed.bedNumber) ??
+                _text('bedLabel', 'Bed {bedNumber}',
+                    parameters: {'bedNumber': bed.bedNumber.toString()});
             return ChoiceChip(
-              label: Text('Bed ${bed.bedNumber}'),
+              label: Text(label),
               selected: isSelected,
               onSelected: (selected) {
                 setState(() {
@@ -207,11 +257,15 @@ class _BookingDialogState extends State<BookingDialog> {
     );
   }
 
-  Widget _buildStartDatePicker(BuildContext context, bool isDarkMode) {
+  Widget _buildStartDatePicker(
+      BuildContext context, bool isDarkMode, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        BodyText(text: 'Start Date', color: AppColors.textSecondary),
+        BodyText(
+          text: loc?.startDate ?? _text('startDate', 'Start Date'),
+          color: AppColors.textSecondary,
+        ),
         const SizedBox(height: AppSpacing.paddingS),
         InkWell(
           onTap: () async {
@@ -243,8 +297,10 @@ class _BookingDialogState extends State<BookingDialog> {
                 const SizedBox(width: AppSpacing.paddingS),
                 Text(
                   _startDate != null
-                      ? DateFormat('MMM dd, yyyy').format(_startDate!)
-                      : 'Select start date',
+                      ? DateFormat('MMM dd, yyyy', loc?.localeName)
+                          .format(_startDate!)
+                      : loc?.selectStartDate ??
+                          _text('selectStartDate', 'Select start date'),
                 ),
               ],
             ),
@@ -254,7 +310,8 @@ class _BookingDialogState extends State<BookingDialog> {
     );
   }
 
-  Widget _buildBookingSummary(BuildContext context, bool isDarkMode) {
+  Widget _buildBookingSummary(
+      BuildContext context, bool isDarkMode, AppLocalizations? loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
@@ -265,17 +322,38 @@ class _BookingDialogState extends State<BookingDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingSmall(text: 'Booking Summary', color: AppColors.success),
+          HeadingSmall(
+            text: loc?.bookingSummary ??
+                _text('bookingSummary', 'Booking Summary'),
+            color: AppColors.success,
+          ),
           const SizedBox(height: AppSpacing.paddingS),
-          _buildSummaryRow('Room', _selectedRoom!.roomNumber),
-          _buildSummaryRow('Bed', 'Bed ${_selectedBed!.bedNumber}'),
-          _buildSummaryRow('Sharing', '${_selectedRoom!.sharingType}-sharing'),
-          _buildSummaryRow('Rent', '₹${_selectedRoom!.pricePerBed}/month'),
           _buildSummaryRow(
-            'Start Date',
+            loc?.room ?? _text('room', 'Room'),
+            _selectedRoom!.roomNumber,
+          ),
+          _buildSummaryRow(
+            loc?.bed ?? _text('bed', 'Bed'),
+            loc?.bedLabel(_selectedBed!.bedNumber) ??
+                _text('bedLabel', 'Bed {bedNumber}', parameters: {
+                  'bedNumber': _selectedBed!.bedNumber.toString(),
+                }),
+          ),
+          _buildSummaryRow(
+            loc?.sharing ?? _text('sharing', 'Sharing'),
+            '${_selectedRoom!.sharingType}-sharing',
+          ),
+          _buildSummaryRow(
+            loc?.rent ?? _text('rent', 'Rent'),
+            _text('monthlyRentDisplay', '₹{amount}/month',
+                parameters: {'amount': _selectedRoom!.pricePerBed.toString()}),
+          ),
+          _buildSummaryRow(
+            loc?.startDate ?? _text('startDate', 'Start Date'),
             _startDate != null
-                ? DateFormat('MMM dd, yyyy').format(_startDate!)
-                : 'Not selected',
+                ? DateFormat('MMM dd, yyyy', loc?.localeName)
+                    .format(_startDate!)
+                : loc?.notSelected ?? _text('notSelected', 'Not selected'),
           ),
         ],
       ),
@@ -295,11 +373,14 @@ class _BookingDialogState extends State<BookingDialog> {
     );
   }
 
-  Widget _buildLegacyBookingMessage(BuildContext context, bool isDarkMode) {
+  Widget _buildLegacyBookingMessage(
+      BuildContext context, bool isDarkMode, AppLocalizations? loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
-      child: const BodyText(
-        text: 'Please contact the owner directly to book this PG.',
+      child: BodyText(
+        text: loc?.legacyBookingMessage ??
+            _text('legacyBookingMessage',
+                'Please contact the owner directly to book this PG.'),
         align: TextAlign.center,
       ),
     );
@@ -311,6 +392,7 @@ class _BookingDialogState extends State<BookingDialog> {
     try {
       final authProvider = context.read<AuthProvider>();
       final guestId = authProvider.user!.userId;
+      final loc = AppLocalizations.of(context);
 
       final booking = BookingModel(
         bookingId:
@@ -337,17 +419,26 @@ class _BookingDialogState extends State<BookingDialog> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Booking request sent! Owner will confirm shortly.'),
+          SnackBar(
+            content: Text(
+              loc?.bookingRequestSuccess ??
+                  _text('bookingRequestSuccess',
+                      'Booking request sent! Owner will confirm shortly.'),
+            ),
             backgroundColor: AppColors.success,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
+        final loc = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to book: $e'),
+            content: Text(
+              loc?.bookingRequestFailed(e.toString()) ??
+                  _text('bookingRequestFailed', 'Failed to book: {error}',
+                      parameters: {'error': e.toString()}),
+            ),
             backgroundColor: AppColors.error,
           ),
         );

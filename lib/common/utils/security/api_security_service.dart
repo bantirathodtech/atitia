@@ -4,11 +4,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../../../../core/services/localization/internationalization_service.dart';
+
 /// API Security service for rate limiting, authentication, and request validation
 class ApiSecurityService {
   static final ApiSecurityService _instance = ApiSecurityService._internal();
   factory ApiSecurityService() => _instance;
   ApiSecurityService._internal();
+
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   // Rate limiting storage
   final Map<String, List<DateTime>> _requestHistory = {};
@@ -63,6 +68,22 @@ class ApiSecurityService {
     return limit - currentCount;
   }
 
+  String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   /// Reset rate limit for a client
   void resetRateLimit(String clientId) {
     _requestHistory.remove(clientId);
@@ -91,7 +112,13 @@ class ApiSecurityService {
     for (final header in suspiciousHeaders) {
       if (headers.containsKey(header)) {
         // Log suspicious activity
-        _logSuspiciousActivity('Suspicious header detected: $header');
+        _logSuspiciousActivity(
+          _translate(
+            'securitySuspiciousHeader',
+            'Suspicious header detected: {header}',
+            parameters: {'header': header},
+          ),
+        );
       }
     }
 
@@ -108,7 +135,10 @@ class ApiSecurityService {
 
       // Check for suspicious content
       if (_containsSuspiciousContent(jsonData)) {
-        _logSuspiciousActivity('Suspicious content detected in request body');
+        _logSuspiciousActivity(_translate(
+          'securitySuspiciousBody',
+          'Suspicious content detected in request body',
+        ));
         return false;
       }
 
@@ -263,7 +293,13 @@ class ApiSecurityService {
   /// Block an IP address
   void blockIP(String ip) {
     // In production, this should add to a database of blocked IPs
-    _logSuspiciousActivity('IP blocked: $ip');
+    _logSuspiciousActivity(
+      _translate(
+        'securityIpBlocked',
+        'IP blocked: {ip}',
+        parameters: {'ip': ip},
+      ),
+    );
   }
 
   /// Secure HTTP request with security headers
@@ -276,7 +312,9 @@ class ApiSecurityService {
   }) async {
     // Check rate limit
     if (clientId != null && !checkRateLimit(clientId)) {
-      throw SecurityException('Rate limit exceeded');
+      throw SecurityException(
+        _translate('securityRateLimitExceeded', 'Rate limit exceeded'),
+      );
     }
 
     // Prepare secure headers
@@ -289,14 +327,18 @@ class ApiSecurityService {
 
     // Validate headers
     if (!validateRequestHeaders(secureHeaders)) {
-      throw SecurityException('Invalid request headers');
+      throw SecurityException(
+        _translate('securityInvalidHeaders', 'Invalid request headers'),
+      );
     }
 
     // Validate body
     if (body != null) {
       final bodyString = body is String ? body : json.encode(body);
       if (!validateRequestBody(bodyString)) {
-        throw SecurityException('Invalid request body');
+        throw SecurityException(
+          _translate('securityInvalidBody', 'Invalid request body'),
+        );
       }
     }
 
@@ -317,7 +359,13 @@ class ApiSecurityService {
           response = await http.delete(url, headers: secureHeaders);
           break;
         default:
-          throw SecurityException('Unsupported HTTP method: $method');
+          throw SecurityException(
+            _translate(
+              'securityUnsupportedMethod',
+              'Unsupported HTTP method: {method}',
+              parameters: {'method': method},
+            ),
+          );
       }
 
       // Check response for security issues
@@ -325,7 +373,13 @@ class ApiSecurityService {
 
       return response;
     } catch (e) {
-      throw SecurityException('Request failed: $e');
+      throw SecurityException(
+        _translate(
+          'securityRequestFailed',
+          'Request failed: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -335,13 +389,25 @@ class ApiSecurityService {
     final suspiciousHeaders = ['x-powered-by', 'server'];
     for (final header in suspiciousHeaders) {
       if (response.headers.containsKey(header)) {
-        _logSuspiciousActivity('Suspicious response header: $header');
+        _logSuspiciousActivity(
+          _translate(
+            'securitySuspiciousResponseHeader',
+            'Suspicious response header: {header}',
+            parameters: {'header': header},
+          ),
+        );
       }
     }
 
     // Check response status
     if (response.statusCode >= 500) {
-      _logSuspiciousActivity('Server error response: ${response.statusCode}');
+      _logSuspiciousActivity(
+        _translate(
+          'securityServerErrorResponse',
+          'Server error response: {statusCode}',
+          parameters: {'statusCode': response.statusCode.toString()},
+        ),
+      );
     }
   }
 

@@ -293,25 +293,30 @@ class GuestProfileModel extends UserModel {
   }
 
   /// Returns formatted joining date
-  String get formattedJoiningDate =>
-      joiningDate != null ? DateFormat('MMM dd, yyyy').format(joiningDate!) : 'N/A';
+  String get formattedJoiningDate => joiningDate != null
+      ? DateFormat('MMM dd, yyyy').format(joiningDate!)
+      : 'N/A';
 
   /// Returns formatted date of birth
   @override
-  String get formattedDateOfBirth =>
-      dateOfBirth != null ? DateFormat('MMM dd, yyyy').format(dateOfBirth!) : 'N/A';
+  String get formattedDateOfBirth => dateOfBirth != null
+      ? DateFormat('MMM dd, yyyy').format(dateOfBirth!)
+      : 'N/A';
 
   /// Returns formatted last updated date
-  String get formattedLastUpdated =>
-      lastUpdated != null ? DateFormat('MMM dd, yyyy hh:mm a').format(lastUpdated!) : 'N/A';
+  String get formattedLastUpdated => lastUpdated != null
+      ? DateFormat('MMM dd, yyyy hh:mm a').format(lastUpdated!)
+      : 'N/A';
 
   /// Returns formatted deposit amount
-  String get formattedDeposit =>
-      deposit != null ? '₹${NumberFormat('#,##0').format(deposit)}' : 'N/A';
+  String get formattedDeposit => deposit != null
+      ? '₹${NumberFormat('#,##0').format(deposit)}'
+      : 'N/A';
 
   /// Returns formatted rent amount
-  String get formattedRent =>
-      rent != null ? '₹${NumberFormat('#,##0').format(rent)}' : 'N/A';
+  String get formattedRent => rent != null
+      ? '₹${NumberFormat('#,##0').format(rent)}'
+      : 'N/A';
 
   /// Returns formatted monthly payment (rent + deposit)
   String get formattedMonthlyPayment {

@@ -6,6 +6,7 @@ import '../../../../../common/utils/constants/firestore.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/interfaces/storage/storage_service_interface.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../models/guest_pg_model.dart';
 
 /// Repository handling PG data operations and file uploads
@@ -15,6 +16,25 @@ class GuestPgRepository {
   final IDatabaseService _databaseService;
   final IStorageService _storageService;
   final IAnalyticsService _analyticsService;
+  final InternationalizationService _i18n = InternationalizationService.instance;
+  final InternationalizationService _uiI18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _uiI18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
@@ -41,7 +61,7 @@ class GuestPgRepository {
 
       if (!doc.exists) {
         await _analyticsService.logEvent(
-          name: 'pg_not_found',
+          name: _i18n.translate('pgNotFoundEvent'),
           parameters: {'pg_id': pgId},
         );
         return null;
@@ -52,7 +72,7 @@ class GuestPgRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'pg_viewed',
+        name: _i18n.translate('pgViewedEvent'),
         parameters: {
           'pg_id': pgId,
           'pg_name': pg.pgName,
@@ -64,13 +84,19 @@ class GuestPgRepository {
       return pg;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'pg_fetch_error',
+        name: _i18n.translate('pgFetchErrorEvent'),
         parameters: {
           'pg_id': pgId,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch PG details: $e');
+      throw Exception(
+        _text(
+          'failedToFetchPgDetails',
+          'Failed to load PG details: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -94,7 +120,7 @@ class GuestPgRepository {
 
       // Log analytics for PG list loaded
       _analyticsService.logEvent(
-        name: 'pgs_loaded',
+        name: _i18n.translate('pgsLoadedEvent'),
         parameters: {
           'total_pgs': pgs.length,
           'cities_count': pgs.map((pg) => pg.city).toSet().length,
@@ -118,7 +144,7 @@ class GuestPgRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'pg_saved',
+        name: _i18n.translate('pgSavedEvent'),
         parameters: {
           'pg_id': pg.pgId,
           'pg_name': pg.pgName,
@@ -131,13 +157,19 @@ class GuestPgRepository {
       );
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'pg_save_error',
+        name: _i18n.translate('pgSaveErrorEvent'),
         parameters: {
           'pg_id': pg.pgId,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to save PG: $e');
+      throw Exception(
+        _text(
+          'failedToSavePg',
+          'Failed to save PG: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -152,18 +184,24 @@ class GuestPgRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'pg_deleted',
+        name: _i18n.translate('pgDeletedEvent'),
         parameters: {'pg_id': pgId},
       );
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'pg_delete_error',
+        name: _i18n.translate('pgDeleteErrorEvent'),
         parameters: {
           'pg_id': pgId,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to delete PG: $e');
+      throw Exception(
+        _text(
+          'failedToDeletePg',
+          'Failed to delete PG: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -184,7 +222,7 @@ class GuestPgRepository {
       );
 
       await _analyticsService.logEvent(
-        name: 'pg_photo_uploaded',
+        name: _i18n.translate('pgPhotoUploadedEvent'),
         parameters: {
           'pg_id': pgId,
           'file_name': fileName,
@@ -194,14 +232,20 @@ class GuestPgRepository {
       return downloadUrl;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'pg_photo_upload_error',
+        name: _i18n.translate('pgPhotoUploadErrorEvent'),
         parameters: {
           'pg_id': pgId,
           'file_name': fileName,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to upload PG photo: $e');
+      throw Exception(
+        _text(
+          'failedToUploadPgPhoto',
+          'Failed to upload PG photo: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -259,7 +303,7 @@ class GuestPgRepository {
       }).toList();
 
       await _analyticsService.logEvent(
-        name: 'pg_search_performed',
+        name: _i18n.translate('pgSearchPerformedEvent'),
         parameters: {
           'search_criteria': {
             'city': city,
@@ -277,10 +321,16 @@ class GuestPgRepository {
       return filteredPGs;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'pg_search_error',
+        name: _i18n.translate('pgSearchErrorEvent'),
         parameters: {'error': e.toString()},
       );
-      throw Exception('Failed to search PGs: $e');
+      throw Exception(
+        _text(
+          'failedToSearchPgs',
+          'Failed to search PGs: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -292,7 +342,7 @@ class GuestPgRepository {
       final ownerPGs = allPGs.where((pg) => pg.ownerUid == ownerUid).toList();
 
       await _analyticsService.logEvent(
-        name: 'owner_pgs_fetched',
+        name: _i18n.translate('ownerPgsFetchedEvent'),
         parameters: {
           'owner_uid': ownerUid,
           'pgs_count': ownerPGs.length,
@@ -302,13 +352,19 @@ class GuestPgRepository {
       return ownerPGs;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'owner_pgs_fetch_error',
+        name: _i18n.translate('ownerPgsFetchErrorEvent'),
         parameters: {
           'owner_uid': ownerUid,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch owner PGs: $e');
+      throw Exception(
+        _text(
+          'failedToFetchOwnerPgs',
+          'Failed to fetch owner PGs: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -322,7 +378,7 @@ class GuestPgRepository {
           .toList();
 
       await _analyticsService.logEvent(
-        name: 'city_pgs_fetched',
+        name: _i18n.translate('cityPgsFetchedEvent'),
         parameters: {
           'city': city,
           'pgs_count': cityPGs.length,
@@ -332,13 +388,19 @@ class GuestPgRepository {
       return cityPGs;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'city_pgs_fetch_error',
+        name: _i18n.translate('cityPgsFetchErrorEvent'),
         parameters: {
           'city': city,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch city PGs: $e');
+      throw Exception(
+        _text(
+          'failedToFetchCityPgs',
+          'Failed to fetch city PGs: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -354,7 +416,7 @@ class GuestPgRepository {
       }).toList();
 
       await _analyticsService.logEvent(
-        name: 'amenity_pgs_fetched',
+        name: _i18n.translate('amenityPgsFetchedEvent'),
         parameters: {
           'amenities': amenities,
           'pgs_count': amenityPGs.length,
@@ -364,13 +426,19 @@ class GuestPgRepository {
       return amenityPGs;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'amenity_pgs_fetch_error',
+        name: _i18n.translate('amenityPgsFetchErrorEvent'),
         parameters: {
           'amenities': amenities,
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch amenity PGs: $e');
+      throw Exception(
+        _text(
+          'failedToFetchAmenityPgs',
+          'Failed to fetch amenity PGs: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 
@@ -406,17 +474,23 @@ class GuestPgRepository {
       };
 
       await _analyticsService.logEvent(
-        name: 'pg_stats_generated',
+        name: _i18n.translate('pgStatsGeneratedEvent'),
         parameters: stats,
       );
 
       return stats;
     } catch (e) {
       await _analyticsService.logEvent(
-        name: 'pg_stats_error',
+        name: _i18n.translate('pgStatsErrorEvent'),
         parameters: {'error': e.toString()},
       );
-      throw Exception('Failed to fetch PG stats: $e');
+      throw Exception(
+        _text(
+          'failedToGetPgStats',
+          'Failed to get PG stats: {error}',
+          parameters: {'error': e.toString()},
+        ),
+      );
     }
   }
 }

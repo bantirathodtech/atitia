@@ -2,6 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import '../../../core/db/flutter_secure_storage.dart';
+import '../../../../core/services/localization/internationalization_service.dart';
 
 /// Helper utility for storing Google OAuth credentials in secure storage
 /// 
@@ -18,6 +19,24 @@ import '../../../core/db/flutter_secure_storage.dart';
 /// ```
 class CredentialStorageHelper {
   final LocalStorageService _storage = LocalStorageService();
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _translate(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Store Google Sign-In Web Client ID
   /// 
@@ -33,15 +52,15 @@ class CredentialStorageHelper {
   Future<bool> storeGoogleWebClientId(String clientId, {bool validate = true}) async {
     try {
       if (validate && !_isValidClientId(clientId)) {
-        debugPrint('❌ Invalid Google Web Client ID format');
+        debugPrint('❌ ${_translate('credentialInvalidWebClientId', 'Invalid Google Web Client ID format')}');
         return false;
       }
       
       await _storage.write('google_web_client_id', clientId);
-      debugPrint('✅ Google Web Client ID stored in secure storage');
+      debugPrint('✅ ${_translate('credentialStoredWebClientId', 'Google Web Client ID stored in secure storage')}');
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to store Google Web Client ID: $e');
+      debugPrint('❌ ${_translate('credentialStoreWebClientIdFailure', 'Failed to store Google Web Client ID: {error}', parameters: {'error': e.toString()})}');
       return false;
     }
   }
@@ -50,15 +69,15 @@ class CredentialStorageHelper {
   Future<bool> storeGoogleAndroidClientId(String clientId, {bool validate = true}) async {
     try {
       if (validate && !_isValidClientId(clientId)) {
-        debugPrint('❌ Invalid Google Android Client ID format');
+        debugPrint('❌ ${_translate('credentialInvalidAndroidClientId', 'Invalid Google Android Client ID format')}');
         return false;
       }
       
       await _storage.write('google_android_client_id', clientId);
-      debugPrint('✅ Google Android Client ID stored in secure storage');
+      debugPrint('✅ ${_translate('credentialStoredAndroidClientId', 'Google Android Client ID stored in secure storage')}');
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to store Google Android Client ID: $e');
+      debugPrint('❌ ${_translate('credentialStoreAndroidClientIdFailure', 'Failed to store Google Android Client ID: {error}', parameters: {'error': e.toString()})}');
       return false;
     }
   }
@@ -67,15 +86,15 @@ class CredentialStorageHelper {
   Future<bool> storeGoogleIosClientId(String clientId, {bool validate = true}) async {
     try {
       if (validate && !_isValidClientId(clientId)) {
-        debugPrint('❌ Invalid Google iOS Client ID format');
+        debugPrint('❌ ${_translate('credentialInvalidIosClientId', 'Invalid Google iOS Client ID format')}');
         return false;
       }
       
       await _storage.write('google_ios_client_id', clientId);
-      debugPrint('✅ Google iOS Client ID stored in secure storage');
+      debugPrint('✅ ${_translate('credentialStoredIosClientId', 'Google iOS Client ID stored in secure storage')}');
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to store Google iOS Client ID: $e');
+      debugPrint('❌ ${_translate('credentialStoreIosClientIdFailure', 'Failed to store Google iOS Client ID: {error}', parameters: {'error': e.toString()})}');
       return false;
     }
   }
@@ -84,15 +103,15 @@ class CredentialStorageHelper {
   Future<bool> storeGoogleClientSecret(String clientSecret, {bool validate = true}) async {
     try {
       if (validate && !_isValidClientSecret(clientSecret)) {
-        debugPrint('❌ Invalid Google Client Secret format');
+        debugPrint('❌ ${_translate('credentialInvalidClientSecret', 'Invalid Google Client Secret format')}');
         return false;
       }
       
       await _storage.write('google_client_secret', clientSecret);
-      debugPrint('✅ Google Client Secret stored in secure storage');
+      debugPrint('✅ ${_translate('credentialStoredClientSecret', 'Google Client Secret stored in secure storage')}');
       return true;
     } catch (e) {
-      debugPrint('❌ Failed to store Google Client Secret: $e');
+      debugPrint('❌ ${_translate('credentialStoreClientSecretFailure', 'Failed to store Google Client Secret: {error}', parameters: {'error': e.toString()})}');
       return false;
     }
   }
@@ -157,9 +176,9 @@ class CredentialStorageHelper {
       await _storage.delete('google_android_client_id');
       await _storage.delete('google_ios_client_id');
       await _storage.delete('google_client_secret');
-      debugPrint('✅ All Google OAuth credentials cleared from secure storage');
+      debugPrint('✅ ${_translate('credentialClearedAll', 'All Google OAuth credentials cleared from secure storage')}');
     } catch (e) {
-      debugPrint('⚠️ Failed to clear credentials: $e');
+      debugPrint('⚠️ ${_translate('credentialClearFailure', 'Failed to clear credentials: {error}', parameters: {'error': e.toString()})}');
     }
   }
 
@@ -182,7 +201,7 @@ class CredentialStorageHelper {
       final secret = await _storage.read('google_client_secret');
       results['client_secret'] = secret != null && secret.isNotEmpty;
     } catch (e) {
-      debugPrint('⚠️ Failed to check stored credentials: $e');
+      debugPrint('⚠️ ${_translate('credentialCheckFailure', 'Failed to check stored credentials: {error}', parameters: {'error': e.toString()})}');
     }
     
     return results;

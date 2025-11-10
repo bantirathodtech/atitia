@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'platform_helper.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/constants/validation.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
@@ -27,11 +26,6 @@ class PhoneAuthScreen extends StatefulWidget {
   @override
   State<PhoneAuthScreen> createState() => _PhoneAuthScreenState();
 }
-
-/// Helper function to check if running on macOS (web-safe)
-/// Returns false on web, true only on actual macOS desktop
-/// Uses platform_helper.dart for safe Platform detection
-bool get _isMacOS => isMacOSSafe;
 
 class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   final _phoneController = TextEditingController();
@@ -68,34 +62,43 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   }
 
   /// Validates phone number
-  String? _validatePhone(String value) {
+  String? _validatePhone(String value, BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return null;
+    
     if (value.trim().isEmpty) {
-      return 'Phone number is required';
+      return loc.phoneNumberIsRequired;
     }
     if (!RegExp(ValidationConstants.phoneRegex).hasMatch(value.trim())) {
-      return 'Please enter a valid 10-digit phone number';
+      return loc.pleaseEnterValid10DigitPhoneNumber;
     }
     return null;
   }
 
   /// Validates OTP
-  String? _validateOTP(String value) {
+  String? _validateOTP(String value, BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return null;
+    
     if (value.trim().isEmpty) {
-      return 'OTP is required';
+      return loc.otpIsRequired;
     }
     if (value.trim().length != 6) {
-      return 'OTP must be 6 digits';
+      return loc.otpMustBe6Digits;
     }
     if (!RegExp(r'^\d{6}$').hasMatch(value.trim())) {
-      return 'OTP must contain only digits';
+      return loc.otpMustContainOnlyDigits;
     }
     return null;
   }
 
   /// Sends OTP to provided phone number
   Future<void> _sendOTP() async {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return;
+    
     // Validate phone number
-    final phoneErr = _validatePhone(_phoneController.text.trim());
+    final phoneErr = _validatePhone(_phoneController.text.trim(), context);
     if (phoneErr != null) {
       setState(() => _phoneError = phoneErr);
       return;
@@ -116,15 +119,18 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           (verificationId, resendToken) {
             // OTP sent successfully
             if (mounted) {
+              final loc = AppLocalizations.of(context);
+              if (loc == null) return;
+              
               setState(() {
                 _otpSent = true;
                 _loading = false;
               });
 
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: BodyText(
-                      text: 'OTP sent successfully! Please check your phone.'),
+                      text: loc.otpSentSuccessfullyPleaseCheckYourPhone),
                   backgroundColor: Colors.green,
                   duration: Duration(seconds: 3),
                 ),
@@ -137,18 +143,18 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               setState(() => _loading = false);
 
               // Show user-friendly error message
-              String errorMessage = 'Failed to send OTP. Please try again.';
+              final loc = AppLocalizations.of(context);
+              if (loc == null) return;
+              
+              String errorMessage = loc.failedToSendOtpPleaseTryAgain;
               if (error.code == 'too-many-requests') {
-                errorMessage =
-                    'Too many requests. Please wait a few minutes before trying again.';
+                errorMessage = loc.tooManyRequestsPleaseWaitFewMinutes;
               } else if (error.code == 'invalid-phone-number') {
-                errorMessage = 'Please enter a valid 10-digit phone number.';
+                errorMessage = loc.pleaseEnterValid10DigitPhoneNumber;
               } else if (error.code == 'quota-exceeded') {
-                errorMessage =
-                    'SMS service temporarily unavailable. Please try again later.';
+                errorMessage = loc.smsServiceTemporarilyUnavailable;
               } else if (error.code == 'captcha-check-failed') {
-                errorMessage =
-                    'Security verification failed. Please try again.';
+                errorMessage = loc.securityVerificationFailedPleaseTryAgain;
               }
 
               ScaffoldMessenger.of(context).showSnackBar(
@@ -165,8 +171,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           if (mounted && _loading) {
             setState(() => _loading = false);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: BodyText(text: 'Request timed out. Please try again.'),
+              SnackBar(
+                content: BodyText(text: loc.requestTimedOutPleaseTryAgain),
                 backgroundColor: Colors.orange,
                 duration: Duration(seconds: 3),
               ),
@@ -179,68 +185,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: BodyText(text: 'Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
-    }
-  }
-
-  /// Google Sign-In for macOS and other platforms
-  Future<void> _signInWithGoogle() async {
-    setState(() => _loading = true);
-
-    final authProvider = context.read<AuthProvider>();
-
-    try {
-      // Web platform requires special handling
-      if (kIsWeb) {
-        // For web, we need to show a message that Google Sign-In requires the button widget
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: BodyText(
-                text:
-                    'Google Sign-In on web requires the sign-in button. Please use the Google Sign-In button above.',
-              ),
-              backgroundColor: Colors.blue,
-              duration: Duration(seconds: 5),
-            ),
-          );
-        }
-        setState(() => _loading = false);
-        return;
-      }
-
-      // Add timeout protection
-      await Future.any([
-        authProvider.signInWithGoogle(),
-        Future.delayed(Duration(seconds: 30), () {
-          if (mounted && _loading) {
-            setState(() => _loading = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: BodyText(
-                    text: 'Google Sign-In timed out. Please try again.'),
-                backgroundColor: Colors.orange,
-                duration: Duration(seconds: 3),
-              ),
-            );
-          }
-        }),
-      ]);
-      // Navigation is handled in AuthProvider
-      if (mounted) {
-        setState(() => _loading = false);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _loading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: BodyText(text: 'Google Sign-In failed: ${e.toString()}'),
+            content: BodyText(text: loc.error(e.toString())),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 3),
           ),
@@ -251,8 +196,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
   /// Verifies OTP and navigates to appropriate screen
   Future<void> _verifyOTP() async {
+    final loc = AppLocalizations.of(context)!;
+    
     // Validate OTP
-    final otpErr = _validateOTP(_otpController.text.trim());
+    final otpErr = _validateOTP(_otpController.text.trim(), context);
     if (otpErr != null) {
       setState(() => _otpError = otpErr);
       return;
@@ -276,7 +223,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       if (authProvider.error) {
         setState(() => _loading = false);
         final msg = authProvider.errorMessage ??
-            'Authentication failed. Please select the correct role.';
+            loc.authenticationFailedPleaseSelectCorrectRole;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(text: msg),
@@ -293,8 +240,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       if (user == null) {
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: BodyText(text: 'User data not found'),
+          SnackBar(
+            content: BodyText(text: loc.userDataNotFound),
             backgroundColor: Colors.red,
           ),
         );
@@ -331,9 +278,8 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             '⚠️ Phone Auth: Invalid role "$userRole" - redirecting to role selection');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content:
-                  BodyText(text: 'Invalid user role. Please select a role.'),
+            SnackBar(
+              content: BodyText(text: loc.invalidUserRolePleaseSelectRole),
               backgroundColor: Colors.red,
             ),
           );
@@ -345,7 +291,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: BodyText(text: 'Verification failed: ${e.toString()}'),
+            content: BodyText(text: loc.verificationFailed(e.toString())),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 3),
           ),
@@ -356,6 +302,9 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
   /// Handles Google sign-in
   Future<void> _handleGoogleSignIn() async {
+    final loc = AppLocalizations.of(context);
+    if (loc == null) return;
+    
     setState(() => _loading = true);
     
     try {
@@ -368,7 +317,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: BodyText(text: 'Google sign-in failed: ${e.toString()}'),
+            content: BodyText(text: loc.googleSignInFailedError(e.toString())),
             backgroundColor: Colors.red,
           ),
         );
@@ -388,7 +337,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
 
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: role != null ? 'Login as ${role.toUpperCase()}' : 'Login',
+        title: role != null ? loc.loginAs(role) : loc.login,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => getIt<NavigationService>().goToRoleSelection(),
@@ -413,14 +362,14 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               
               // Title
               HeadingLarge(
-                text: role != null ? 'Login as ${role.toUpperCase()}' : 'Login',
+                text: role != null ? loc.loginAs(role) : loc.login,
                 align: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
               
               // Subtitle
-              const CaptionText(
-                text: 'Enter your phone number to receive OTP',
+              CaptionText(
+                text: loc.enterPhoneNumberToReceiveOTP,
                 align: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -430,7 +379,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 TextInput(
                   controller: _phoneController,
                   label: loc.phoneNumber,
-                  hint: '10-digit mobile number',
+                  hint: loc.tenDigitMobileNumber,
                   prefixIcon: const Icon(Icons.phone),
                   keyboardType: TextInputType.phone,
                   enabled: !_otpSent && !_loading,
@@ -438,7 +387,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   maxLength: 10,
                   onChanged: (v) {
                     setState(() {
-                      _phoneError = _validatePhone(v);
+                      _phoneError = _validatePhone(v, context);
                     });
                   },
                 ),
@@ -459,7 +408,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Phone Authentication',
+                              loc.phoneAuthentication,
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 color: Colors.grey.shade700,
@@ -467,7 +416,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Not available on macOS. Please use Google Sign-In below.',
+                              loc.notAvailableOnMacOS,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade600,
@@ -487,20 +436,20 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 TextInput(
                   controller: _otpController,
                   label: loc.enterOTP,
-                  hint: '6-digit code',
+                  hint: loc.sixDigitCode,
                   keyboardType: TextInputType.number,
                   maxLength: 6,
                   error: _otpError,
                   prefixIcon: const Icon(Icons.security),
                   onChanged: (v) {
                     setState(() {
-                      _otpError = _validateOTP(v);
+                      _otpError = _validateOTP(v, context);
                     });
                   },
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                const CaptionText(
-                  text: 'Please enter the 6-digit code sent to your phone',
+                CaptionText(
+                  text: loc.pleaseEnterSixDigitCode,
                   align: TextAlign.center,
                 ),
               ],
@@ -533,7 +482,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                             _otpError = null;
                           });
                         },
-                  label: 'Change Number',
+                  label: loc.changeNumber,
                   icon: Icons.edit,
                 ),
               ],
@@ -548,7 +497,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                       child: CaptionText(
-                        text: 'OR',
+                        text: loc.or,
                         color: Colors.grey.shade600,
                       ),
                     ),
@@ -560,15 +509,15 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               // Google sign-in - Available for all platforms
               if (_isMacOS) ...[
                 const SizedBox(height: AppSpacing.md),
-                const CaptionText(
-                  text: 'Phone OTP is not available on macOS. Please use Google Sign-In:',
+                CaptionText(
+                  text: loc.notAvailableOnMacOS,
                   align: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.sm),
               ],
               PrimaryButton(
-                onPressed: _loading ? null : _signInWithGoogle,
-                label: _isMacOS ? 'Sign in with Google (Recommended)' : 'Continue with Google',
+                onPressed: _loading ? null : _handleGoogleSignIn,
+                label: loc.googleSignIn,
                 icon: Icons.g_mobiledata,
               ),
             ],

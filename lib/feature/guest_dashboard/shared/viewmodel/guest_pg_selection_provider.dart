@@ -8,10 +8,12 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../core/repositories/notification_repository.dart';
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../../pgs/data/models/guest_pg_model.dart';
 
 /// Provider for managing guest PG selection state
@@ -20,6 +22,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
   final _analyticsService = getIt.analytics;
   final _notificationRepository = NotificationRepository();
   final _localStorage = getIt.localStorage;
+  final InternationalizationService _i18n = InternationalizationService.instance;
   
   // Storage keys for PG selection persistence
   static const String _storageKeyPgId = 'guest_selected_pg_id';
@@ -52,15 +55,20 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       await _loadSavedPgSelection();
       _setLoading(false);
 
+      final savedPgId = await _localStorage.read(_storageKeyPgId);
+      final hasSelectedPg = savedPgId != null && savedPgId.isNotEmpty;
+
       _analyticsService.logEvent(
-        name: 'guest_pg_provider_initialized',
+        name: _i18n.translate('guestPgProviderInitializedEvent'),
         parameters: {
           'has_selected_pg': hasSelectedPg,
           'selected_pg_id': _selectedPgId ?? 'none',
         },
       );
     } catch (e) {
-      _setError('Failed to initialize PG selection: $e');
+      _setError(_i18n.translate('failedToInitializeGuestPgSelection', parameters: {
+        'error': e.toString(),
+      }));
       _setLoading(false);
     }
   }
@@ -81,7 +89,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       notifyListeners();
 
       _analyticsService.logEvent(
-        name: 'guest_pg_selected',
+        name: _i18n.translate('guestPgSelectedEvent'),
         parameters: {
           'pg_id': pg.pgId,
           'pg_name': pg.pgName,
@@ -91,7 +99,9 @@ class GuestPgSelectionProvider extends ChangeNotifier {
 
       _setLoading(false);
     } catch (e) {
-      _setError('Failed to select PG: $e');
+      _setError(_i18n.translate('failedToSelectGuestPg', parameters: {
+        'error': e.toString(),
+      }));
       _setLoading(false);
     }
   }
@@ -108,11 +118,13 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       notifyListeners();
 
       _analyticsService.logEvent(
-        name: 'guest_pg_cleared',
+        name: _i18n.translate('guestPgClearedEvent'),
         parameters: {},
       );
     } catch (e) {
-      _setError('Failed to clear PG selection: $e');
+      _setError(_i18n.translate('failedToClearGuestPgSelection', parameters: {
+        'error': e.toString(),
+      }));
     }
   }
 
@@ -135,8 +147,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       // CRITICAL: Use Firebase Auth UID to match request.auth.uid in Firestore rules
       final currentUser = firebase_auth.FirebaseAuth.instance.currentUser;
       if (currentUser == null || currentUser.uid.isEmpty) {
-        throw Exception(
-            'User not authenticated. Please sign in to send booking requests.');
+        throw Exception(_i18n.translate('bookingRequestUserNotAuthenticated'));
       }
       final guestId = currentUser.uid; // Use Firebase Auth UID
 
@@ -181,8 +192,11 @@ class GuestPgSelectionProvider extends ChangeNotifier {
         await _notificationRepository.sendUserNotification(
           userId: pg.ownerUid,
           type: 'booking_request',
-          title: 'New Booking Request',
-          body: '$guestName requested to join ${pg.pgName}',
+          title: _i18n.translate('newBookingRequestTitle'),
+          body: _i18n.translate('newBookingRequestBody', parameters: {
+            'guestName': guestName,
+            'pgName': pg.pgName,
+          }),
           data: {
             'requestId': requestId,
             'pgId': pg.pgId,
@@ -196,7 +210,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       } catch (e) {
         // Log but don't fail the booking request if notification fails
         _analyticsService.logEvent(
-          name: 'booking_request_notification_failed',
+          name: _i18n.translate('bookingRequestNotificationFailedEvent'),
           parameters: {
             'request_id': requestId,
             'error': e.toString(),
@@ -205,7 +219,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       }
 
       _analyticsService.logEvent(
-        name: 'guest_booking_request_sent',
+        name: _i18n.translate('guestBookingRequestSentEvent'),
         parameters: {
           'pg_id': pg.pgId,
           'pg_name': pg.pgName,
@@ -219,7 +233,9 @@ class GuestPgSelectionProvider extends ChangeNotifier {
 
       _setLoading(false);
     } catch (e) {
-      _setError('Failed to send booking request: $e');
+      _setError(_i18n.translate('failedToSendBookingRequest', parameters: {
+        'error': e.toString(),
+      }));
       _setLoading(false);
     }
   }
@@ -247,7 +263,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       _selectedPgId = savedPg.pgId;
 
       _analyticsService.logEvent(
-        name: 'guest_pg_selection_restored',
+        name: _i18n.translate('guestPgSelectionRestoredEvent'),
         parameters: {
           'pg_id': savedPg.pgId,
           'pg_name': savedPg.pgName,
@@ -258,7 +274,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       await _clearSavedPgSelection();
       
       _analyticsService.logEvent(
-        name: 'guest_pg_selection_restore_failed',
+        name: _i18n.translate('guestPgSelectionRestoreFailedEvent'),
         parameters: {
           'error': e.toString(),
         },
@@ -285,7 +301,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       await _localStorage.write(_storageKeyPgData, pgJson);
 
       _analyticsService.logEvent(
-        name: 'guest_pg_selection_saved',
+        name: _i18n.translate('guestPgSelectionSavedEvent'),
         parameters: {
           'pg_id': _selectedPgId!,
           'pg_name': _selectedPg!.pgName,
@@ -294,7 +310,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
     } catch (e) {
       // Log error but don't throw - persistence failure shouldn't break selection
       _analyticsService.logEvent(
-        name: 'guest_pg_selection_save_failed',
+        name: _i18n.translate('guestPgSelectionSaveFailedEvent'),
         parameters: {
           'error': e.toString(),
           'pg_id': _selectedPgId ?? 'none',
@@ -311,13 +327,13 @@ class GuestPgSelectionProvider extends ChangeNotifier {
       await _localStorage.delete(_storageKeyPgData);
 
       _analyticsService.logEvent(
-        name: 'guest_pg_selection_cleared_storage',
+        name: _i18n.translate('guestPgSelectionClearedStorageEvent'),
         parameters: {},
       );
     } catch (e) {
       // Log error but don't throw - clearing failure is not critical
       _analyticsService.logEvent(
-        name: 'guest_pg_selection_clear_failed',
+        name: _i18n.translate('guestPgSelectionClearFailedEvent'),
         parameters: {
           'error': e.toString(),
         },

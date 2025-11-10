@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../core/services/localization/internationalization_service.dart';
 import '../../feature/guest_dashboard/pgs/data/models/guest_pg_model.dart';
 import '../../feature/owner_dashboard/mypg/data/models/pg_room_model.dart';
+import '../../l10n/app_localizations.dart';
 import 'text/body_text.dart';
 import 'text/heading_small.dart';
 
@@ -42,12 +44,17 @@ class SharingSummaryRow extends StatelessWidget {
     if (summary.isEmpty) {
       return const SizedBox.shrink();
     }
+    final loc = AppLocalizations.of(context);
+    final i18n = InternationalizationService.instance;
     return Padding(
       padding: const EdgeInsets.only(top: 12, left: 8, right: 8, bottom: 4),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: summary.entries.map((e) {
+            final amount = i18n.formatCurrency(e.value.pricePerBed);
+            final priceLabel =
+                loc?.sharingPricePerBed(amount) ?? '$amount/bed';
             return Container(
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -63,9 +70,10 @@ class SharingSummaryRow extends StatelessWidget {
                   BodyText(text: e.key, small: true),
                   const SizedBox(width: 8),
                   BodyText(
-                      text: '₹${e.value.pricePerBed}/bed',
-                      color: Colors.indigo,
-                      small: true),
+                    text: priceLabel,
+                    color: Colors.indigo,
+                    small: true,
+                  ),
                 ],
               ),
             );
@@ -84,12 +92,20 @@ class SharingSummaryTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final summary = getSharingSummary(pg);
     if (summary.isEmpty) {
-      return const BodyText(text: 'No sharing info available.');
+      final loc = AppLocalizations.of(context);
+      return BodyText(
+        text: loc?.noSharingInfoAvailable ?? 'No sharing info available.',
+      );
     }
+    final loc = AppLocalizations.of(context);
+    final i18n = InternationalizationService.instance;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HeadingSmall(text: 'Sharing & Vacancy', color: Colors.deepPurple),
+        HeadingSmall(
+          text: loc?.sharingAndVacancy ?? 'Sharing & Vacancy',
+          color: Colors.deepPurple,
+        ),
         const SizedBox(height: 8),
         Table(
           border: TableBorder.all(color: Colors.grey.shade200),
@@ -101,16 +117,16 @@ class SharingSummaryTable extends StatelessWidget {
           },
           children: [
             TableRow(children: [
-              _th('Sharing'),
-              _th('Rooms'),
-              _th('Vacant Beds'),
-              _th('Rent/bed'),
+              _th(loc?.sharingColumn ?? 'Sharing'),
+              _th(loc?.roomsColumn ?? 'Rooms'),
+              _th(loc?.vacantBedsColumn ?? 'Vacant beds'),
+              _th(loc?.rentPerBedColumn ?? 'Rent / bed'),
             ]),
             ...summary.entries.map((e) => TableRow(children: [
                   _td(e.key),
                   _td('${e.value.roomCount}'),
-                  _td('Available'), // Hide vacant bed count
-                  _td('₹${e.value.pricePerBed}'),
+                  _td(loc?.vacantBedsAvailable ?? 'Available'),
+                  _td(i18n.formatCurrency(e.value.pricePerBed)),
                 ])),
           ],
         ),

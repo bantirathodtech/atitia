@@ -2,11 +2,12 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/text/heading_small.dart';
-import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../common/widgets/indicators/empty_state.dart';
+import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_guest_model.dart';
 
 /// Interactive bed map widget showing room and bed occupancy
@@ -21,10 +22,12 @@ class InteractiveBedMapWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     if (bookings.isEmpty) {
-      return const EmptyState(
-        title: 'No Bookings',
-        message: 'Bed occupancy map will appear here once bookings are created',
+      return EmptyState(
+        title: loc.ownerBedMapNoBookingsTitle,
+        message: loc.ownerBedMapNoBookingsMessage,
         icon: Icons.bed_outlined,
       );
     }
@@ -40,7 +43,7 @@ class InteractiveBedMapWidget extends StatelessWidget {
         final roomBookingsList = roomBookings[roomNumber]!;
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
-          child: _buildRoomCard(context, roomNumber, roomBookingsList),
+          child: _buildRoomCard(context, roomNumber, roomBookingsList, loc),
         );
       },
     );
@@ -60,8 +63,12 @@ class InteractiveBedMapWidget extends StatelessWidget {
   }
 
   /// Builds room card with bed occupancy
-  Widget _buildRoomCard(BuildContext context, String roomNumber,
-      List<OwnerBookingModel> roomBookings) {
+  Widget _buildRoomCard(
+    BuildContext context,
+    String roomNumber,
+    List<OwnerBookingModel> roomBookings,
+    AppLocalizations loc,
+  ) {
     final activeBookings = roomBookings.where((b) => b.isActive).length;
     final totalBeds = roomBookings.length;
 
@@ -84,7 +91,7 @@ class InteractiveBedMapWidget extends StatelessWidget {
                     ),
                     const SizedBox(width: AppSpacing.paddingS),
                     HeadingSmall(
-                      text: 'Room $roomNumber',
+                      text: loc.ownerBedMapRoom(roomNumber),
                       color: Theme.of(context).primaryColor,
                     ),
                   ],
@@ -100,7 +107,10 @@ class InteractiveBedMapWidget extends StatelessWidget {
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: CaptionText(
-                    text: '$activeBookings/$totalBeds occupied',
+                    text: loc.ownerBedMapOccupiedCount(
+                      activeBookings,
+                      totalBeds,
+                    ),
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
@@ -111,9 +121,9 @@ class InteractiveBedMapWidget extends StatelessWidget {
             Wrap(
               spacing: AppSpacing.paddingS,
               runSpacing: AppSpacing.paddingS,
-              children: roomBookings.map((booking) {
-                return _buildBedItem(context, booking);
-              }).toList(),
+              children: roomBookings
+                  .map((booking) => _buildBedItem(context, booking, loc))
+                  .toList(),
             ),
           ],
         ),
@@ -122,7 +132,11 @@ class InteractiveBedMapWidget extends StatelessWidget {
   }
 
   /// Builds individual bed item
-  Widget _buildBedItem(BuildContext context, OwnerBookingModel booking) {
+  Widget _buildBedItem(
+    BuildContext context,
+    OwnerBookingModel booking,
+    AppLocalizations loc,
+  ) {
     final isOccupied = booking.isActive;
     final color = isOccupied ? Colors.green : Colors.grey;
 
@@ -143,14 +157,14 @@ class InteractiveBedMapWidget extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           CaptionText(
-            text: 'Bed ${booking.bedNumber}',
+            text: loc.bedLabelWithNumber(booking.bedNumber),
             color: color,
             align: TextAlign.center,
           ),
           if (isOccupied) ...[
             const SizedBox(height: 2),
             CaptionText(
-              text: 'Occupied',
+              text: loc.occupiedLabel,
               color: color,
               align: TextAlign.center,
             ),

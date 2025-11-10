@@ -16,7 +16,9 @@ import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/guest_pg_model.dart';
 import '../../../shared/viewmodel/guest_pg_selection_provider.dart';
 
@@ -39,8 +41,26 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _messageController = TextEditingController();
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   bool _isSubmitting = false;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -73,6 +93,7 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -87,11 +108,11 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
           children: [
             _buildHeader(context, isDark),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildPgInfo(context, isDark),
+            _buildPgInfo(context, isDark, loc),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildForm(context, isDark),
+            _buildForm(context, isDark, loc),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildActions(context),
+            _buildActions(context, loc),
           ],
         ),
       ),
@@ -100,6 +121,7 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
 
   /// Builds the dialog header
   Widget _buildHeader(BuildContext context, bool isDark) {
+    final loc = AppLocalizations.of(context);
     return Row(
       children: [
         Container(
@@ -119,9 +141,14 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const HeadingMedium(text: 'Request to Join PG'),
+              HeadingMedium(
+                text: loc?.requestToJoinPg ??
+                    _text('requestToJoinPg', 'Request to Join PG'),
+              ),
               CaptionText(
-                text: 'Send a booking request to the owner',
+                text: loc?.sendBookingRequestToOwner ??
+                    _text('sendBookingRequestToOwner',
+                        'Send a booking request to the owner'),
                 color: isDark ? Colors.white70 : Colors.grey[600],
               ),
             ],
@@ -132,7 +159,11 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
   }
 
   /// Builds PG information section
-  Widget _buildPgInfo(BuildContext context, bool isDark) {
+  Widget _buildPgInfo(
+    BuildContext context,
+    bool isDark,
+    AppLocalizations? loc,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
@@ -172,8 +203,7 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
               const SizedBox(width: AppSpacing.paddingS),
               Expanded(
                 child: BodyText(
-                  text: widget.pg.fullAddress ??
-                      '${widget.pg.city}, ${widget.pg.area}',
+                  text: widget.pg.fullAddress,
                   color: isDark ? Colors.white70 : Colors.grey[600],
                 ),
               ),
@@ -189,7 +219,7 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
               ),
               const SizedBox(width: AppSpacing.paddingS),
               BodyText(
-                text: '₹${widget.pg.pricing?['monthly'] ?? 'N/A'}/month',
+                text: _buildMonthlyRentText(loc),
                 color: Colors.green,
               ),
             ],
@@ -199,25 +229,45 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
     );
   }
 
+  String _buildMonthlyRentText(AppLocalizations? loc) {
+    final monthly = widget.pg.pricing?['monthly'];
+    if (monthly == null) {
+      return loc?.notAvailable ?? _text('notAvailable', 'N/A');
+    }
+    final amountString = monthly.toString();
+    return loc?.monthlyRentDisplay(amountString) ??
+        _text('monthlyRentDisplay', '₹{amount}/month',
+            parameters: {'amount': amountString});
+  }
+
   /// Builds the booking request form
-  Widget _buildForm(BuildContext context, bool isDark) {
+  Widget _buildForm(
+    BuildContext context,
+    bool isDark,
+    AppLocalizations? loc,
+  ) {
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const HeadingSmall(text: 'Contact Information'),
+          HeadingSmall(
+            text: loc?.contactInformation ??
+                _text('contactInformation', 'Contact Information'),
+          ),
           const SizedBox(height: AppSpacing.paddingM),
           TextFormField(
             controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Full Name',
-              hintText: 'Enter your full name',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: loc?.fullName ?? _text('fullName', 'Full Name'),
+              hintText: loc?.enterYourCompleteName ??
+                  _text('enterYourCompleteName', 'Enter your full name'),
+              border: const OutlineInputBorder(),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter your name';
+                return loc?.pleaseEnterYourName ??
+                    _text('pleaseEnterYourName', 'Please enter your name');
               }
               return null;
             },
@@ -225,18 +275,24 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
           const SizedBox(height: AppSpacing.paddingM),
           TextFormField(
             controller: _phoneController,
-            decoration: const InputDecoration(
-              labelText: 'Phone Number',
-              hintText: 'Enter your phone number',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText:
+                  loc?.phoneNumber ?? _text('phoneNumber', 'Phone Number'),
+              hintText: loc?.enterYourPhoneNumber ??
+                  _text('enterYourPhoneNumber', 'Enter your phone number'),
+              border: const OutlineInputBorder(),
             ),
             keyboardType: TextInputType.phone,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter your phone number';
+                return loc?.pleaseEnterYourPhoneNumber ??
+                    _text('pleaseEnterYourPhoneNumber',
+                        'Please enter your phone number');
               }
               if (value.length < 10) {
-                return 'Please enter a valid phone number';
+                return loc?.pleaseEnterValidPhoneNumber ??
+                    _text('pleaseEnterValidPhoneNumber',
+                        'Please enter a valid phone number');
               }
               return null;
             },
@@ -244,18 +300,23 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
           const SizedBox(height: AppSpacing.paddingM),
           TextFormField(
             controller: _emailController,
-            decoration: const InputDecoration(
-              labelText: 'Email Address',
-              hintText: 'Enter your email address',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: loc?.email ?? _text('email', 'Email'),
+              hintText: loc?.enterYourEmailAddress ??
+                  _text('enterYourEmailAddress', 'Enter your email address'),
+              border: const OutlineInputBorder(),
             ),
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter your email address';
+                return loc?.pleaseEnterYourEmailAddress ??
+                    _text('pleaseEnterYourEmailAddress',
+                        'Please enter your email address');
               }
               if (!value.contains('@')) {
-                return 'Please enter a valid email address';
+                return loc?.pleaseEnterValidEmailAddress ??
+                    _text('pleaseEnterValidEmailAddress',
+                        'Please enter a valid email address');
               }
               return null;
             },
@@ -263,10 +324,13 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
           const SizedBox(height: AppSpacing.paddingM),
           TextFormField(
             controller: _messageController,
-            decoration: const InputDecoration(
-              labelText: 'Message (Optional)',
-              hintText: 'Any additional information for the owner...',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText:
+                  loc?.messageOptional ?? _text('messageOptional', 'Message (Optional)'),
+              hintText: loc?.messageOptionalHint ??
+                  _text('messageOptionalHint',
+                      'Any additional information for the owner...'),
+              border: const OutlineInputBorder(),
             ),
             maxLines: 3,
           ),
@@ -276,19 +340,21 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
   }
 
   /// Builds the dialog action buttons
-  Widget _buildActions(BuildContext context) {
+  Widget _buildActions(BuildContext context, AppLocalizations? loc) {
     return Row(
       children: [
         Expanded(
           child: SecondaryButton(
-            label: 'Cancel',
+            label: loc?.cancel ?? _text('cancel', 'Cancel'),
             onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
           ),
         ),
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: PrimaryButton(
-            label: _isSubmitting ? 'Sending...' : 'Send Request',
+            label: _isSubmitting
+                ? loc?.sending ?? _text('sending', 'Sending...')
+                : loc?.sendRequest ?? _text('sendRequest', 'Send Request'),
             onPressed: _isSubmitting ? null : _submitBookingRequest,
             isLoading: _isSubmitting,
           ),
@@ -308,6 +374,7 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
     });
 
     try {
+      final loc = AppLocalizations.of(context);
       final guestPgProvider =
           Provider.of<GuestPgSelectionProvider>(context, listen: false);
 
@@ -321,33 +388,40 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
             : _messageController.text.trim(),
       );
 
-      if (mounted) {
-        Navigator.of(context).pop();
+      if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: BodyText(
-              text: 'Booking request sent successfully!',
-              color: Colors.white,
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            loc?.bookingRequestSuccess ??
+                _text(
+                  'bookingRequestSuccess',
+                  'Booking request sent! Owner will confirm shortly.',
+                ),
           ),
-        );
-      }
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: BodyText(
-              text: 'Failed to send booking request: $e',
-              color: Colors.white,
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
+      if (!mounted) return;
+      final loc = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            loc?.bookingRequestFailed(e.toString()) ??
+                _text(
+                  'bookingRequestFailed',
+                  'Failed to book: {error}',
+                  parameters: {'error': e.toString()},
+                ),
           ),
-        );
-      }
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {

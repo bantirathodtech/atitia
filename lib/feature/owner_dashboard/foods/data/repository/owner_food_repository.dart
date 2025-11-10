@@ -2,9 +2,11 @@
 
 import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../common/utils/constants/storage.dart';
+import '../../../../../common/utils/exceptions/exceptions.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/interfaces/storage/storage_service_interface.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../models/owner_food_menu.dart';
 
 /// Repository for managing Owner's food menu data using interface-based services.
@@ -14,6 +16,24 @@ class OwnerFoodRepository {
   final IDatabaseService _databaseService;
   final IStorageService _storageService;
   final IAnalyticsService _analyticsService;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
@@ -100,7 +120,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch weekly menus: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodFetchMenusFailed',
+          'Failed to fetch weekly menus',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -155,7 +181,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch weekly menu: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodFetchMenuFailed',
+          'Failed to fetch weekly menu',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -222,7 +254,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch menu overrides: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodFetchOverridesFailed',
+          'Failed to fetch menu overrides',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -284,7 +322,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to save weekly menu: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodRepositorySaveMenuFailed',
+          'Failed to save weekly menu',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -309,7 +353,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to save weekly menus: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodRepositorySaveMenusFailed',
+          'Failed to save weekly menus',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -333,7 +383,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to delete weekly menu: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodRepositoryDeleteMenuFailed',
+          'Failed to delete weekly menu',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -364,7 +420,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to save menu override: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodRepositorySaveOverrideFailed',
+          'Failed to save menu override',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -388,7 +450,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to delete menu override: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodRepositoryDeleteOverrideFailed',
+          'Failed to delete menu override',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -428,7 +496,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to upload photo: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodRepositoryUploadPhotoFailed',
+          'Failed to upload photo',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -449,7 +523,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to delete photo: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodRepositoryDeletePhotoFailed',
+          'Failed to delete photo',
+        ),
+        details: e.toString(),
+      );
     }
   }
 
@@ -497,7 +577,13 @@ class OwnerFoodRepository {
           'error': e.toString(),
         },
       );
-      throw Exception('Failed to fetch menu stats: $e');
+      throw AppException(
+        message: _text(
+          'ownerFoodFetchStatsFailed',
+          'Failed to fetch menu stats',
+        ),
+        details: e.toString(),
+      );
     }
   }
 }

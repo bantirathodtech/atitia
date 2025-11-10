@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/utils/constants/routes.dart';
@@ -19,18 +20,36 @@ import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../core/app/theme/theme_provider.dart';
 import '../../../../../common/widgets/dropdowns/language_selector.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 
 /// Settings screen for owners
 class OwnerSettingsScreen extends StatelessWidget {
   const OwnerSettingsScreen({super.key});
 
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _text(String key, String fallback,
+      {Map<String, dynamic>? parameters}) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: 'Settings',
+        title: loc.settings,
       ),
-      drawer: OwnerDrawer(
+      drawer: const OwnerDrawer(
         currentTabIndex: 0,
       ),
       body: SingleChildScrollView(
@@ -40,38 +59,38 @@ class OwnerSettingsScreen extends StatelessWidget {
           children: [
             _buildSection(
               context,
-              title: 'Appearance',
+              title: loc.appearance,
               children: [
-                _buildThemeSelector(context),
+                _buildThemeSelector(context, loc),
                 const SizedBox(height: AppSpacing.paddingM),
-                _buildLanguageSelector(context),
+                _buildLanguageSelector(context, loc),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingL),
             _buildSection(
               context,
-              title: 'Notifications',
+              title: loc.notifications,
               children: [
                 _buildSwitchTile(
                   context,
-                  title: 'Push Notifications',
-                  subtitle: 'Receive notifications on your device',
+                  title: loc.pushNotifications,
+                  subtitle: loc.receiveNotificationsOnYourDevice,
                   value: true,
                   onChanged: (value) {},
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
                 _buildSwitchTile(
                   context,
-                  title: 'Email Notifications',
-                  subtitle: 'Receive notifications via email',
+                  title: loc.emailNotifications,
+                  subtitle: loc.receiveNotificationsViaEmail,
                   value: false,
                   onChanged: (value) {},
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
                 _buildSwitchTile(
                   context,
-                  title: 'Payment Reminders',
-                  subtitle: 'Get reminders for pending payments',
+                  title: loc.paymentReminders,
+                  subtitle: loc.getRemindersForPendingPayments,
                   value: true,
                   onChanged: (value) {},
                 ),
@@ -80,11 +99,11 @@ class OwnerSettingsScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.paddingL),
             _buildSection(
               context,
-              title: 'Data & Privacy',
+              title: loc.dataPrivacy,
               children: [
                 _buildListTile(
                   context,
-                  title: 'Privacy Policy',
+                  title: loc.privacyPolicy,
                   icon: Icons.privacy_tip_outlined,
                   onTap: () {
                     context.push(AppRoutes.privacyPolicy);
@@ -93,7 +112,7 @@ class OwnerSettingsScreen extends StatelessWidget {
                 const SizedBox(height: AppSpacing.paddingS),
                 _buildListTile(
                   context,
-                  title: 'Terms of Service',
+                  title: loc.termsOfService,
                   icon: Icons.description_outlined,
                   onTap: () {
                     context.push(AppRoutes.termsOfService);
@@ -104,18 +123,18 @@ class OwnerSettingsScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.paddingL),
             _buildSection(
               context,
-              title: 'About',
+              title: loc.about,
               children: [
                 _buildInfoTile(
                   context,
-                  title: 'App Version',
-                  value: '1.0.0',
+                  title: loc.appVersion,
+                  value: _text('ownerSettingsAppVersionValue', '1.0.0'),
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
                 _buildInfoTile(
                   context,
-                  title: 'Build Number',
-                  value: '1',
+                  title: loc.buildNumber,
+                  value: _text('ownerSettingsBuildNumberValue', '1'),
                 ),
               ],
             ),
@@ -145,7 +164,7 @@ class OwnerSettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeSelector(BuildContext context) {
+  Widget _buildThemeSelector(BuildContext context, AppLocalizations loc) {
     final themeProvider = context.watch<ThemeProvider>();
 
     return AdaptiveCard(
@@ -160,12 +179,12 @@ class OwnerSettingsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   BodyText(
-                    text: 'Theme',
+                    text: loc.theme,
                     medium: true,
                   ),
                   const SizedBox(height: 4),
                   CaptionText(
-                    text: 'Choose your preferred theme',
+                    text: loc.chooseYourPreferredTheme,
                   ),
                 ],
               ),
@@ -177,21 +196,21 @@ class OwnerSettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.paddingM),
           SegmentedButton<ThemeMode>(
-            segments: const [
+            segments: [
               ButtonSegment<ThemeMode>(
                 value: ThemeMode.light,
-                label: Text('Light'),
-                icon: Icon(Icons.light_mode),
+                label: Text(loc.themeLight),
+                icon: const Icon(Icons.light_mode),
               ),
               ButtonSegment<ThemeMode>(
                 value: ThemeMode.dark,
-                label: Text('Dark'),
-                icon: Icon(Icons.dark_mode),
+                label: Text(loc.themeDark),
+                icon: const Icon(Icons.dark_mode),
               ),
               ButtonSegment<ThemeMode>(
                 value: ThemeMode.system,
-                label: Text('System'),
-                icon: Icon(Icons.brightness_auto),
+                label: Text(loc.themeSystem),
+                icon: const Icon(Icons.brightness_auto),
               ),
             ],
             selected: {themeProvider.themeMode},
@@ -204,7 +223,7 @@ class OwnerSettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageSelector(BuildContext context) {
+  Widget _buildLanguageSelector(BuildContext context, AppLocalizations loc) {
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -217,12 +236,12 @@ class OwnerSettingsScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   BodyText(
-                    text: 'Language',
+                    text: loc.language,
                     medium: true,
                   ),
                   const SizedBox(height: 4),
                   CaptionText(
-                    text: 'Select your preferred language',
+                    text: loc.selectPreferredLanguage,
                   ),
                 ],
               ),
@@ -270,6 +289,12 @@ class OwnerSettingsScreen extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
+            thumbColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return AppColors.primary;
+              }
+              return null;
+            }),
           ),
         ],
       ),
@@ -292,6 +317,9 @@ class OwnerSettingsScreen extends StatelessWidget {
         title: BodyText(text: title, medium: true),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+        ),
       ),
     );
   }
@@ -316,4 +344,3 @@ class OwnerSettingsScreen extends StatelessWidget {
     );
   }
 }
-

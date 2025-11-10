@@ -2,6 +2,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../core/services/localization/internationalization_service.dart';
 import '../utils/exceptions/exceptions.dart';
 
 /// Service for handling and standardizing error handling across the app
@@ -10,6 +11,7 @@ import '../utils/exceptions/exceptions.dart';
 class ErrorHandlerService {
   final _analyticsService = getIt.analytics;
   final _crashlyticsService = getIt.crashlytics;
+  final InternationalizationService _i18n = InternationalizationService.instance;
 
   ErrorHandlerService._privateConstructor();
   static final ErrorHandlerService _instance =
@@ -32,33 +34,33 @@ class ErrorHandlerService {
     if (errorString.contains('network') ||
         errorString.contains('internet') ||
         errorString.contains('connection')) {
-      return 'Please check your internet connection and try again.';
+      return _i18n.translate('networkErrorTryAgain');
     }
 
     if (errorString.contains('permission') || errorString.contains('denied')) {
-      return 'You don\'t have permission to perform this action.';
+      return _i18n.translate('permissionDeniedMessage');
     }
 
     if (errorString.contains('not found') || errorString.contains('404')) {
-      return 'The requested item could not be found.';
+      return _i18n.translate('itemNotFoundMessage');
     }
 
     if (errorString.contains('timeout')) {
-      return 'The request took too long. Please try again.';
+      return _i18n.translate('requestTimeoutMessage');
     }
 
     if (errorString.contains('unauthorized') ||
         errorString.contains('401') ||
         errorString.contains('403')) {
-      return 'Your session has expired. Please sign in again.';
+      return _i18n.translate('sessionExpiredMessage');
     }
 
     if (errorString.contains('validation') || errorString.contains('invalid')) {
-      return 'Please check your input and try again.';
+      return _i18n.translate('invalidInputMessage');
     }
 
     // Generic fallback
-    return fallbackMessage ?? 'Something went wrong. Please try again.';
+    return fallbackMessage ?? _i18n.translate('genericErrorMessage');
   }
 
   /// Handle error with full logging and user-friendly message

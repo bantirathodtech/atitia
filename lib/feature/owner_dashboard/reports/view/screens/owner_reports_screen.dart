@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
@@ -43,6 +44,15 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime _endDate = DateTime.now();
 
+  String _formatCurrency(double value, AppLocalizations loc) {
+    final localeCurrency = NumberFormat.simpleCurrency(locale: loc.localeName);
+    return NumberFormat.currency(
+      locale: loc.localeName,
+      symbol: localeCurrency.currencySymbol,
+      decimalDigits: 0,
+    ).format(value);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -77,12 +87,13 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
   }
 
   Future<void> _selectDateRange() async {
+    final loc = AppLocalizations.of(context)!;
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
       initialDateRange: DateTimeRange(start: _startDate, end: _endDate),
-      helpText: 'Select Report Period',
+      helpText: loc.ownerReportsSelectPeriod,
     );
 
     if (picked != null) {
@@ -96,6 +107,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final selectedPgProvider = context.watch<SelectedPgProvider>();
     final currentPgId = selectedPgProvider.selectedPgId;
 
@@ -116,12 +128,12 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           IconButton(
             icon: const Icon(Icons.calendar_today),
             onPressed: _selectDateRange,
-            tooltip: 'Select Date Range',
+            tooltip: loc.ownerReportsSelectDateRange,
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _refreshReports,
-            tooltip: 'Refresh Reports',
+            tooltip: loc.ownerReportsRefresh,
           ),
         ],
         bottom: PreferredSize(
@@ -129,12 +141,22 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           child: TabBar(
             controller: _tabController,
             isScrollable: true,
-            tabs: const [
-              Tab(icon: Icon(Icons.attach_money), text: 'Revenue'),
-              Tab(icon: Icon(Icons.book), text: 'Bookings'),
-              Tab(icon: Icon(Icons.people), text: 'Guests'),
-              Tab(icon: Icon(Icons.payment), text: 'Payments'),
-              Tab(icon: Icon(Icons.report_problem), text: 'Complaints'),
+            tabs: [
+              Tab(
+                  icon: const Icon(Icons.attach_money),
+                  text: loc.ownerReportsTabRevenue),
+              Tab(
+                  icon: const Icon(Icons.book),
+                  text: loc.ownerReportsTabBookings),
+              Tab(
+                  icon: const Icon(Icons.people),
+                  text: loc.ownerReportsTabGuests),
+              Tab(
+                  icon: const Icon(Icons.payment),
+                  text: loc.ownerReportsTabPayments),
+              Tab(
+                  icon: const Icon(Icons.report_problem),
+                  text: loc.ownerReportsTabComplaints),
             ],
           ),
         ),
@@ -144,22 +166,22 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
       drawer: const OwnerDrawer(
         currentTabIndex: 0,
       ),
-      body: _buildBody(context),
+      body: _buildBody(context, loc),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context, AppLocalizations loc) {
     final overviewVM = context.watch<OwnerOverviewViewModel>();
     final guestVM = context.watch<OwnerGuestViewModel>();
 
     if (overviewVM.loading && overviewVM.overviewData == null) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AdaptiveLoader(),
-            SizedBox(height: AppSpacing.paddingM),
-            BodyText(text: 'Loading reports...'),
+            const AdaptiveLoader(),
+            const SizedBox(height: AppSpacing.paddingM),
+            BodyText(text: loc.ownerReportsLoading),
           ],
         ),
       );
@@ -172,19 +194,19 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: AppSpacing.paddingL),
-            const HeadingMedium(
-              text: 'Error Loading Reports',
+            HeadingMedium(
+              text: loc.ownerReportsErrorTitle,
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: overviewVM.errorMessage ?? 'Unknown error occurred',
+              text: overviewVM.errorMessage ?? loc.unknownErrorOccurred,
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingL),
             PrimaryButton(
               onPressed: _refreshReports,
-              label: 'Try Again',
+              label: loc.tryAgain,
               icon: Icons.refresh,
             ),
           ],
@@ -195,36 +217,36 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
     return TabBarView(
       controller: _tabController,
       children: [
-        _buildRevenueReport(context, overviewVM),
-        _buildBookingsReport(context, guestVM),
-        _buildGuestsReport(context, guestVM),
-        _buildPaymentsReport(context, guestVM),
-        _buildComplaintsReport(context, guestVM),
+        _buildRevenueReport(context, overviewVM, loc),
+        _buildBookingsReport(context, guestVM, loc),
+        _buildGuestsReport(context, guestVM, loc),
+        _buildPaymentsReport(context, guestVM, loc),
+        _buildComplaintsReport(context, guestVM, loc),
       ],
     );
   }
 
-  Widget _buildRevenueReport(
-      BuildContext context, OwnerOverviewViewModel viewModel) {
+  Widget _buildRevenueReport(BuildContext context,
+      OwnerOverviewViewModel viewModel, AppLocalizations loc) {
     final overview = viewModel.overviewData;
     final monthlyBreakdown = viewModel.monthlyBreakdown;
     final propertyBreakdown = viewModel.propertyBreakdown;
 
     if (overview == null) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.assessment,
-        title: 'No Revenue Data',
-        message: 'Revenue data will appear here once you have bookings',
+        title: loc.ownerReportsNoRevenueData,
+        message: loc.ownerReportsRevenuePlaceholder,
       );
     }
 
     final totalRevenue = monthlyBreakdown != null && monthlyBreakdown.isNotEmpty
         ? monthlyBreakdown.values.fold(0.0, (a, b) => a + b)
         : overview.totalRevenue;
-    final averageRevenue = monthlyBreakdown != null &&
-            monthlyBreakdown.values.isNotEmpty
-        ? totalRevenue / monthlyBreakdown.values.where((v) => v > 0).length
-        : 0.0;
+    final averageRevenue =
+        monthlyBreakdown != null && monthlyBreakdown.values.isNotEmpty
+            ? totalRevenue / monthlyBreakdown.values.where((v) => v > 0).length
+            : 0.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -232,7 +254,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Date Range Display
-          _buildDateRangeCard(context),
+          _buildDateRangeCard(context, loc),
           const SizedBox(height: AppSpacing.paddingL),
 
           // Summary Cards
@@ -240,8 +262,8 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
             children: [
               Expanded(
                 child: InfoCard(
-                  title: 'Total Revenue',
-                  description: '₹${NumberFormat('#,##0').format(totalRevenue)}',
+                  title: loc.totalRevenue,
+                  description: _formatCurrency(totalRevenue, loc),
                   icon: Icons.attach_money,
                   iconColor: Colors.green,
                 ),
@@ -249,8 +271,8 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               const SizedBox(width: AppSpacing.paddingM),
               Expanded(
                 child: InfoCard(
-                  title: 'Average/Month',
-                  description: '₹${NumberFormat('#,##0').format(averageRevenue)}',
+                  title: loc.ownerReportsAveragePerMonth,
+                  description: _formatCurrency(averageRevenue, loc),
                   icon: Icons.trending_up,
                   iconColor: Colors.blue,
                 ),
@@ -262,7 +284,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           // Monthly Revenue Chart
           if (monthlyBreakdown != null && monthlyBreakdown.isNotEmpty)
             OwnerChartWidget(
-              title: 'Monthly Revenue Breakdown',
+              title: loc.ownerReportsMonthlyRevenueBreakdown,
               data: monthlyBreakdown,
             ),
           if (monthlyBreakdown != null && monthlyBreakdown.isNotEmpty)
@@ -270,21 +292,20 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
 
           // Property Breakdown
           if (propertyBreakdown != null && propertyBreakdown.isNotEmpty)
-            _buildPropertyRevenueCard(context, propertyBreakdown),
+            _buildPropertyRevenueCard(context, propertyBreakdown, loc),
         ],
       ),
     );
   }
 
-  Widget _buildBookingsReport(
-      BuildContext context, OwnerGuestViewModel viewModel) {
+  Widget _buildBookingsReport(BuildContext context,
+      OwnerGuestViewModel viewModel, AppLocalizations loc) {
     final bookings = viewModel.bookings;
     final bookingRequests = viewModel.bookingRequests;
     final bedChangeRequests = viewModel.bedChangeRequests;
 
     final totalBookings = bookings.length;
-    final activeBookings =
-        bookings.where((b) => b.isActive).length;
+    final activeBookings = bookings.where((b) => b.isActive).length;
     final pendingRequests = bookingRequests.where((r) => r.isPending).length;
     final approvedRequests =
         bookingRequests.where((r) => r.status == 'approved').length;
@@ -296,7 +317,8 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
     // Filter by date range
     final filteredBookings = bookings.where((b) {
       final bookingDate = b.startDate;
-      return bookingDate.isAfter(_startDate.subtract(const Duration(days: 1))) &&
+      return bookingDate
+              .isAfter(_startDate.subtract(const Duration(days: 1))) &&
           bookingDate.isBefore(_endDate.add(const Duration(days: 1)));
     }).toList();
 
@@ -305,7 +327,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildDateRangeCard(context),
+          _buildDateRangeCard(context, loc),
           const SizedBox(height: AppSpacing.paddingL),
 
           // Summary Cards
@@ -314,37 +336,37 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
             runSpacing: AppSpacing.paddingM,
             children: [
               InfoCard(
-                title: 'Total Bookings',
+                title: loc.ownerReportsTotalBookings,
                 description: totalBookings.toString(),
                 icon: Icons.book,
                 iconColor: Colors.blue,
               ),
               InfoCard(
-                title: 'Active',
+                title: loc.active,
                 description: activeBookings.toString(),
                 icon: Icons.check_circle,
                 iconColor: Colors.green,
               ),
               InfoCard(
-                title: 'Pending Requests',
+                title: loc.ownerReportsPendingRequests,
                 description: pendingRequests.toString(),
                 icon: Icons.pending,
                 iconColor: Colors.orange,
               ),
               InfoCard(
-                title: 'Approved',
+                title: loc.approved,
                 description: approvedRequests.toString(),
                 icon: Icons.thumb_up,
                 iconColor: Colors.green,
               ),
               InfoCard(
-                title: 'Rejected',
+                title: loc.rejected,
                 description: rejectedRequests.toString(),
                 icon: Icons.thumb_down,
                 iconColor: Colors.red,
               ),
               InfoCard(
-                title: 'Bed Changes',
+                title: loc.bedChanges,
                 description: pendingBedChanges.toString(),
                 icon: Icons.bed,
                 iconColor: Colors.purple,
@@ -354,14 +376,14 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           const SizedBox(height: AppSpacing.paddingL),
 
           // Booking Trends
-          _buildBookingTrendsCard(context, filteredBookings),
+          _buildBookingTrendsCard(context, filteredBookings, loc),
         ],
       ),
     );
   }
 
-  Widget _buildGuestsReport(
-      BuildContext context, OwnerGuestViewModel viewModel) {
+  Widget _buildGuestsReport(BuildContext context, OwnerGuestViewModel viewModel,
+      AppLocalizations loc) {
     final guests = viewModel.guests;
     final guestStats = viewModel.guestStats;
 
@@ -374,7 +396,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildDateRangeCard(context),
+          _buildDateRangeCard(context, loc),
           const SizedBox(height: AppSpacing.paddingL),
 
           // Summary Cards
@@ -382,7 +404,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
             children: [
               Expanded(
                 child: InfoCard(
-                  title: 'Total Guests',
+                  title: loc.totalGuests,
                   description: totalGuests.toString(),
                   icon: Icons.people,
                   iconColor: Colors.blue,
@@ -391,7 +413,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               const SizedBox(width: AppSpacing.paddingM),
               Expanded(
                 child: InfoCard(
-                  title: 'Active',
+                  title: loc.active,
                   description: activeGuests.toString(),
                   icon: Icons.check_circle,
                   iconColor: Colors.green,
@@ -400,7 +422,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               const SizedBox(width: AppSpacing.paddingM),
               Expanded(
                 child: InfoCard(
-                  title: 'Inactive',
+                  title: loc.inactive,
                   description: inactiveGuests.toString(),
                   icon: Icons.cancel,
                   iconColor: Colors.red,
@@ -412,20 +434,21 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
 
           // Guest Statistics
           if (guestStats.isNotEmpty)
-            _buildGuestStatsCard(context, guestStats),
+            _buildGuestStatsCard(context, guestStats, loc),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentsReport(
-      BuildContext context, OwnerGuestViewModel viewModel) {
+  Widget _buildPaymentsReport(BuildContext context,
+      OwnerGuestViewModel viewModel, AppLocalizations loc) {
     final payments = viewModel.payments;
 
     // Filter by date range
     final filteredPayments = payments.where((p) {
       final paymentDate = p.date;
-      return paymentDate.isAfter(_startDate.subtract(const Duration(days: 1))) &&
+      return paymentDate
+              .isAfter(_startDate.subtract(const Duration(days: 1))) &&
           paymentDate.isBefore(_endDate.add(const Duration(days: 1)));
     }).toList();
 
@@ -435,7 +458,8 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
     final pendingAmount = filteredPayments
         .where((p) => p.status == 'pending')
         .fold(0.0, (sum, p) => sum + p.amountPaid);
-    final paidCount = filteredPayments.where((p) => p.status == 'collected').length;
+    final paidCount =
+        filteredPayments.where((p) => p.status == 'collected').length;
     final pendingCount =
         filteredPayments.where((p) => p.status == 'pending').length;
 
@@ -444,7 +468,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildDateRangeCard(context),
+          _buildDateRangeCard(context, loc),
           const SizedBox(height: AppSpacing.paddingL),
 
           // Summary Cards
@@ -453,25 +477,25 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
             runSpacing: AppSpacing.paddingM,
             children: [
               InfoCard(
-                title: 'Total Received',
-                description: '₹${NumberFormat('#,##0').format(totalAmount)}',
+                title: loc.ownerReportsTotalReceived,
+                description: _formatCurrency(totalAmount, loc),
                 icon: Icons.attach_money,
                 iconColor: Colors.green,
               ),
               InfoCard(
-                title: 'Pending',
-                description: '₹${NumberFormat('#,##0').format(pendingAmount)}',
+                title: loc.pendingPayments,
+                description: _formatCurrency(pendingAmount, loc),
                 icon: Icons.pending,
                 iconColor: Colors.orange,
               ),
               InfoCard(
-                title: 'Paid Count',
+                title: loc.ownerReportsPaidCount,
                 description: paidCount.toString(),
                 icon: Icons.check_circle,
                 iconColor: Colors.blue,
               ),
               InfoCard(
-                title: 'Pending Count',
+                title: loc.ownerReportsPendingCount,
                 description: pendingCount.toString(),
                 icon: Icons.schedule,
                 iconColor: Colors.red,
@@ -481,20 +505,21 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           const SizedBox(height: AppSpacing.paddingL),
 
           // Payment Trends
-          _buildPaymentTrendsCard(context, filteredPayments),
+          _buildPaymentTrendsCard(context, filteredPayments, loc),
         ],
       ),
     );
   }
 
-  Widget _buildComplaintsReport(
-      BuildContext context, OwnerGuestViewModel viewModel) {
+  Widget _buildComplaintsReport(BuildContext context,
+      OwnerGuestViewModel viewModel, AppLocalizations loc) {
     final complaints = viewModel.complaints;
 
     // Filter by date range
     final filteredComplaints = complaints.where((c) {
       final complaintDate = c.createdAt;
-      return complaintDate.isAfter(_startDate.subtract(const Duration(days: 1))) &&
+      return complaintDate
+              .isAfter(_startDate.subtract(const Duration(days: 1))) &&
           complaintDate.isBefore(_endDate.add(const Duration(days: 1)));
     }).toList();
 
@@ -511,7 +536,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildDateRangeCard(context),
+          _buildDateRangeCard(context, loc),
           const SizedBox(height: AppSpacing.paddingL),
 
           // Summary Cards
@@ -520,25 +545,25 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
             runSpacing: AppSpacing.paddingM,
             children: [
               InfoCard(
-                title: 'Total Complaints',
+                title: loc.totalComplaints,
                 description: totalComplaints.toString(),
                 icon: Icons.report_problem,
                 iconColor: Colors.red,
               ),
               InfoCard(
-                title: 'Pending',
+                title: loc.pending,
                 description: pendingComplaints.toString(),
                 icon: Icons.pending,
                 iconColor: Colors.orange,
               ),
               InfoCard(
-                title: 'In Progress',
+                title: loc.inProgress,
                 description: inProgressComplaints.toString(),
                 icon: Icons.schedule,
                 iconColor: Colors.blue,
               ),
               InfoCard(
-                title: 'Resolved',
+                title: loc.resolved,
                 description: resolvedComplaints.toString(),
                 icon: Icons.check_circle,
                 iconColor: Colors.green,
@@ -548,13 +573,13 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           const SizedBox(height: AppSpacing.paddingL),
 
           // Complaint Trends
-          _buildComplaintTrendsCard(context, filteredComplaints),
+          _buildComplaintTrendsCard(context, filteredComplaints, loc),
         ],
       ),
     );
   }
 
-  Widget _buildDateRangeCard(BuildContext context) {
+  Widget _buildDateRangeCard(BuildContext context, AppLocalizations loc) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -571,16 +596,17 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           ),
           TextButton(
             onPressed: _selectDateRange,
-            child: const Text('Change'),
+            child: Text(loc.ownerReportsChangeDateRange),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPropertyRevenueCard(
-      BuildContext context, Map<String, double> propertyBreakdown) {
-    final totalRevenue = propertyBreakdown.values.fold(0.0, (sum, v) => sum + v);
+  Widget _buildPropertyRevenueCard(BuildContext context,
+      Map<String, double> propertyBreakdown, AppLocalizations loc) {
+    final totalRevenue =
+        propertyBreakdown.values.fold(0.0, (sum, v) => sum + v);
 
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -588,7 +614,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Property-wise Revenue',
+            text: loc.ownerReportsPropertyWiseRevenue,
             color: Theme.of(context).primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -596,7 +622,8 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
             final percentage =
                 totalRevenue > 0 ? (entry.value / totalRevenue * 100) : 0.0;
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingS),
+              padding:
+                  const EdgeInsets.symmetric(vertical: AppSpacing.paddingS),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -607,7 +634,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
                         child: BodyText(text: entry.key),
                       ),
                       BodyText(
-                        text: '₹${NumberFormat('#,##0').format(entry.value)}',
+                        text: _formatCurrency(entry.value, loc),
                         medium: true,
                         color: Theme.of(context).primaryColor,
                       ),
@@ -625,7 +652,9 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
                     ),
                   ),
                   CaptionText(
-                    text: '${percentage.toStringAsFixed(1)}% of total',
+                    text: loc.ownerReportsPercentageOfTotal(
+                      percentage.toStringAsFixed(1),
+                    ),
                     color: AppColors.textTertiary,
                   ),
                 ],
@@ -636,9 +665,9 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              BodyText(text: 'Total Revenue', medium: true),
+              BodyText(text: loc.totalRevenue, medium: true),
               BodyText(
-                text: '₹${NumberFormat('#,##0').format(totalRevenue)}',
+                text: _formatCurrency(totalRevenue, loc),
                 medium: true,
                 color: Theme.of(context).primaryColor,
               ),
@@ -650,7 +679,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
   }
 
   Widget _buildBookingTrendsCard(
-      BuildContext context, List<dynamic> bookings) {
+      BuildContext context, List<dynamic> bookings, AppLocalizations loc) {
     // Group bookings by month
     final Map<String, int> monthlyBookings = {};
     for (final booking in bookings) {
@@ -665,25 +694,26 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Booking Trends',
+            text: loc.ownerReportsBookingTrends,
             color: Theme.of(context).primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           if (monthlyBookings.isEmpty)
-            const BodyText(
-              text: 'No booking data available for selected period',
+            BodyText(
+              text: loc.ownerReportsNoBookingData,
               color: AppColors.textSecondary,
             )
           else
             ...monthlyBookings.entries.map((entry) {
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
+                padding:
+                    const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     BodyText(text: entry.key),
                     BodyText(
-                      text: '${entry.value} bookings',
+                      text: loc.ownerReportsBookingsCount(entry.value),
                       medium: true,
                       color: Theme.of(context).primaryColor,
                     ),
@@ -696,21 +726,22 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
     );
   }
 
-  Widget _buildGuestStatsCard(
-      BuildContext context, Map<String, dynamic> guestStats) {
+  Widget _buildGuestStatsCard(BuildContext context,
+      Map<String, dynamic> guestStats, AppLocalizations loc) {
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Guest Statistics',
+            text: loc.ownerReportsGuestStatistics,
             color: Theme.of(context).primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           ...guestStats.entries.map((entry) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
+              padding:
+                  const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -730,7 +761,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
   }
 
   Widget _buildPaymentTrendsCard(
-      BuildContext context, List<dynamic> payments) {
+      BuildContext context, List<dynamic> payments, AppLocalizations loc) {
     // Group payments by month
     final Map<String, double> monthlyPayments = {};
     for (final payment in payments.where((p) => p.status == 'collected')) {
@@ -746,25 +777,26 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Payment Trends',
+            text: loc.ownerReportsPaymentTrends,
             color: Theme.of(context).primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           if (monthlyPayments.isEmpty)
-            const BodyText(
-              text: 'No payment data available for selected period',
+            BodyText(
+              text: loc.ownerReportsNoPaymentData,
               color: AppColors.textSecondary,
             )
           else
             ...monthlyPayments.entries.map((entry) {
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
+                padding:
+                    const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     BodyText(text: entry.key),
                     BodyText(
-                      text: '₹${NumberFormat('#,##0').format(entry.value)}',
+                      text: _formatCurrency(entry.value, loc),
                       medium: true,
                       color: Theme.of(context).primaryColor,
                     ),
@@ -778,7 +810,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
   }
 
   Widget _buildComplaintTrendsCard(
-      BuildContext context, List<dynamic> complaints) {
+      BuildContext context, List<dynamic> complaints, AppLocalizations loc) {
     // Group complaints by month
     final Map<String, int> monthlyComplaints = {};
     for (final complaint in complaints) {
@@ -793,25 +825,26 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: 'Complaint Trends',
+            text: loc.ownerReportsComplaintTrends,
             color: Theme.of(context).primaryColor,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           if (monthlyComplaints.isEmpty)
-            const BodyText(
-              text: 'No complaint data available for selected period',
+            BodyText(
+              text: loc.ownerReportsNoComplaintData,
               color: AppColors.textSecondary,
             )
           else
             ...monthlyComplaints.entries.map((entry) {
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
+                padding:
+                    const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     BodyText(text: entry.key),
                     BodyText(
-                      text: '${entry.value} complaints',
+                      text: loc.ownerReportsComplaintsCount(entry.value),
                       medium: true,
                       color: Theme.of(context).primaryColor,
                     ),

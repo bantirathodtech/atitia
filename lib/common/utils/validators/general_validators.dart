@@ -1,5 +1,6 @@
 import 'package:atitia/common/utils/extensions/string_extensions.dart';
 
+import '../../../core/services/localization/internationalization_service.dart';
 import '../constants/app.dart';
 
 /// General-purpose validators for various form inputs.
@@ -15,6 +16,32 @@ import '../constants/app.dart';
 /// GeneralValidators.validateRequired(fieldName, value)
 /// ```
 class GeneralValidators {
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  static String _msg(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
+  static String _fieldLabel(String? fieldName) {
+    if (fieldName != null && fieldName.trim().isNotEmpty) {
+      return fieldName;
+    }
+    return _msg('validationFieldDefaultName', 'Field');
+  }
+
   // MARK: - Common Field Validators
   // ==========================================
 
@@ -35,7 +62,10 @@ class GeneralValidators {
     final cleanEmail = email.trim();
 
     if (!cleanEmail.isValidEmail()) {
-      return 'Please enter a valid email address';
+      return _msg(
+        'validationEmailInvalidAddress',
+        'Please enter a valid email address',
+      );
     }
 
     return null;
@@ -52,7 +82,11 @@ class GeneralValidators {
   /// - Error message string if invalid
   static String? validateRequired(String fieldName, String? value) {
     if (value == null || value.trim().isEmpty) {
-      return '$fieldName is required';
+      return _msg(
+        'validationFieldNameRequired',
+        '{field} is required',
+        parameters: {'field': fieldName},
+      );
     }
     return null;
   }
@@ -65,13 +99,24 @@ class GeneralValidators {
       {String? fieldName}) {
     if (value == null || value.isEmpty) {
       return fieldName != null
-          ? '$fieldName is required'
-          : 'This field is required';
+          ? _msg(
+              'validationFieldNameRequired',
+              '{field} is required',
+              parameters: {'field': fieldName},
+            )
+          : _msg('validationFieldRequired', 'This field is required');
     }
 
     if (value.length < minLength) {
-      final name = fieldName ?? 'Field';
-      return '$name must be at least $minLength characters';
+      final name = _fieldLabel(fieldName);
+      return _msg(
+        'validationFieldMinLength',
+        '{field} must be at least {min} characters',
+        parameters: {
+          'field': name,
+          'min': minLength.toString(),
+        },
+      );
     }
 
     return null;
@@ -83,8 +128,15 @@ class GeneralValidators {
     if (value == null || value.isEmpty) return null;
 
     if (value.length > maxLength) {
-      final name = fieldName ?? 'Field';
-      return '$name must be less than $maxLength characters';
+      final name = _fieldLabel(fieldName);
+      return _msg(
+        'validationFieldMaxLength',
+        '{field} must be less than {max} characters',
+        parameters: {
+          'field': name,
+          'max': maxLength.toString(),
+        },
+      );
     }
 
     return null;
@@ -99,8 +151,12 @@ class GeneralValidators {
 
     final number = double.tryParse(value);
     if (number == null) {
-      final name = fieldName ?? 'Field';
-      return '$name must be a valid number';
+      final name = _fieldLabel(fieldName);
+      return _msg(
+        'validationFieldMustBeNumber',
+        '{field} must be a valid number',
+        parameters: {'field': name},
+      );
     }
 
     return null;
@@ -113,8 +169,12 @@ class GeneralValidators {
 
     final number = double.parse(value!);
     if (number <= 0) {
-      final name = fieldName ?? 'Field';
-      return '$name must be greater than zero';
+      final name = _fieldLabel(fieldName);
+      return _msg(
+        'validationFieldMustBeGreaterThanZero',
+        '{field} must be greater than zero',
+        parameters: {'field': name},
+      );
     }
 
     return null;
@@ -128,8 +188,17 @@ class GeneralValidators {
       {String? fileType}) {
     if (fileSizeInBytes > maxSizeInBytes) {
       final maxSizeMB = (maxSizeInBytes / (1024 * 1024)).toStringAsFixed(1);
-      final fileTypeText = fileType != null ? '$fileType ' : '';
-      return '${fileTypeText}File size must be less than ${maxSizeMB}MB';
+      final fileTypeText = fileType != null && fileType.isNotEmpty
+          ? '$fileType '
+          : '';
+      return _msg(
+        'validationFileSizeExceededDetailed',
+        '{fileType}File size must be less than {max}MB',
+        parameters: {
+          'fileType': fileTypeText,
+          'max': maxSizeMB,
+        },
+      );
     }
     return null;
   }
@@ -139,7 +208,7 @@ class GeneralValidators {
     return validateFileSize(
       fileSizeInBytes,
       AppConstants.maxProfilePhotoSize,
-      fileType: 'Profile photo',
+      fileType: _msg('fileTypeProfilePhoto', 'Profile photo'),
     );
   }
 
@@ -148,7 +217,7 @@ class GeneralValidators {
     return validateFileSize(
       fileSizeInBytes,
       AppConstants.maxAadhaarFileSize,
-      fileType: 'Aadhaar document',
+      fileType: _msg('fileTypeAadhaarDocument', 'Aadhaar document'),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'dart:async';
 import '../../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../../common/utils/exceptions/exceptions.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../data/models/owner_profile_model.dart';
 import '../data/repository/owner_profile_repository.dart';
 
@@ -16,6 +17,8 @@ class OwnerProfileViewModel extends BaseProviderState {
   final OwnerProfileRepository _repository;
   final _authService = getIt.auth;
   final _analyticsService = getIt.analytics;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   /// Constructor with dependency injection
   /// If repository is not provided, creates it with default services
@@ -36,6 +39,22 @@ class OwnerProfileViewModel extends BaseProviderState {
   /// Gets current owner ID from auth service
   String? get currentOwnerId => _authService.currentUserId;
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   void dispose() {
     _profileSubscription?.cancel();
@@ -50,7 +69,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final id = ownerId ?? currentOwnerId;
       if (id == null || id.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -64,7 +83,7 @@ class OwnerProfileViewModel extends BaseProviderState {
 
       if (_profile == null) {
         throw AppException(
-          message: 'Profile not found',
+          message: _text('ownerProfileNotFound', 'Profile not found'),
           severity: ErrorSeverity.high,
         );
       }
@@ -72,7 +91,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       notifyListeners();
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to load profile',
+        message:
+            _text('ownerProfileLoadFailed', 'Failed to load profile'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -87,7 +107,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final id = ownerId ?? currentOwnerId;
       if (id == null || id.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -105,7 +125,8 @@ class OwnerProfileViewModel extends BaseProviderState {
         },
         onError: (error) {
           final exception = AppException(
-            message: 'Failed to stream profile',
+            message: _text(
+                'ownerProfileStreamFailed', 'Failed to stream profile'),
             details: error.toString(),
           );
           setError(true, exception.toString());
@@ -113,7 +134,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       );
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to start profile stream',
+        message: _text('ownerProfileStreamStartFailed',
+            'Failed to start profile stream'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -141,7 +163,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       notifyListeners();
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to create profile',
+        message:
+            _text('ownerProfileCreateFailed', 'Failed to create profile'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -159,7 +182,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -181,7 +204,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       );
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to update profile',
+        message:
+            _text('ownerProfileUpdateFailed', 'Failed to update profile'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -199,7 +223,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -218,7 +242,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       );
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to update bank details',
+        message: _text('ownerBankDetailsUpdateFailed',
+            'Failed to update bank details'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -236,7 +261,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -255,7 +280,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       );
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to update business information',
+        message: _text('ownerBusinessInfoUpdateFailed',
+            'Failed to update business information'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -274,7 +300,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -301,7 +327,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       return photoUrl;
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to upload profile photo',
+        message: _text('ownerProfilePhotoUploadFailed',
+            'Failed to upload profile photo'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -321,7 +348,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -348,7 +375,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       return documentUrl;
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to upload Aadhaar document',
+        message: _text('ownerAadhaarUploadFailed',
+            'Failed to upload Aadhaar document'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -368,7 +396,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -395,7 +423,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       return qrCodeUrl;
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to upload UPI QR code',
+        message: _text(
+            'ownerUpiQrUploadFailed', 'Failed to upload UPI QR code'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -414,7 +443,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -423,7 +452,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       await loadProfile();
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to add PG',
+        message: _text('ownerAddPgFailed', 'Failed to add PG'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -441,7 +470,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -450,7 +479,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       await loadProfile();
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to remove PG',
+        message: _text('ownerRemovePgFailed', 'Failed to remove PG'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -468,7 +497,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -477,7 +506,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       await loadProfile();
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to verify profile',
+        message: _text('ownerProfileVerifyFailed', 'Failed to verify profile'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -495,7 +524,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -504,7 +533,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       await loadProfile();
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to deactivate profile',
+        message: _text('ownerProfileDeactivateFailed',
+            'Failed to deactivate profile'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -522,7 +552,7 @@ class OwnerProfileViewModel extends BaseProviderState {
       final ownerId = currentOwnerId;
       if (ownerId == null || ownerId.isEmpty) {
         throw AppException(
-          message: 'Owner ID not available',
+          message: _text('ownerIdNotAvailable', 'Owner ID not available'),
           severity: ErrorSeverity.high,
         );
       }
@@ -531,7 +561,8 @@ class OwnerProfileViewModel extends BaseProviderState {
       await loadProfile();
     } catch (e) {
       final exception = AppException(
-        message: 'Failed to activate profile',
+        message: _text('ownerProfileActivateFailed',
+            'Failed to activate profile'),
         details: e.toString(),
       );
       setError(true, exception.toString());

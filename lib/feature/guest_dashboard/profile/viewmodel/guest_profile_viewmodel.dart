@@ -4,6 +4,7 @@ import 'dart:io';
 
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
+import '../../../../core/services/localization/internationalization_service.dart';
 import '../data/models/guest_profile_model.dart';
 import '../data/repository/guest_profile_repository.dart';
 
@@ -13,6 +14,7 @@ import '../data/repository/guest_profile_repository.dart';
 class GuestProfileViewModel extends BaseProviderState {
   final GuestProfileRepository _repository;
   final _analyticsService = getIt.analytics;
+  final InternationalizationService _i18n = InternationalizationService.instance;
 
   /// Constructor with dependency injection
   /// If repository is not provided, creates it with default services
@@ -43,14 +45,16 @@ class GuestProfileViewModel extends BaseProviderState {
       _guest = await _repository.getGuestProfile(userId);
 
       _analyticsService.logEvent(
-        name: 'guest_profile_loaded',
+        name: _i18n.translate('guestProfileLoadedEvent'),
         parameters: {
           'user_id': userId,
           'profile_completion': _guest?.profileCompletionPercentage ?? 0,
         },
       );
     } catch (e) {
-      setError(true, 'Failed to load profile: $e');
+      setError(true, _i18n.translate('failedToLoadProfile', parameters: {
+        'error': e.toString(),
+      }));
       _guest = null;
     } finally {
       setLoading(false);
@@ -70,7 +74,9 @@ class GuestProfileViewModel extends BaseProviderState {
         notifyListeners();
       },
       onError: (error) {
-        setError(true, 'Failed to stream profile: $error');
+        setError(true, _i18n.translate('failedToStreamProfile', parameters: {
+          'error': error.toString(),
+        }));
         setLoading(false);
       },
     );
@@ -87,7 +93,7 @@ class GuestProfileViewModel extends BaseProviderState {
       _guest = updatedGuest;
 
       _analyticsService.logEvent(
-        name: 'guest_profile_update_success',
+        name: _i18n.translate('guestProfileUpdateSuccessEvent'),
         parameters: {
           'user_id': updatedGuest.userId,
           'profile_completion': updatedGuest.profileCompletionPercentage,
@@ -96,7 +102,9 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to update profile: $e');
+      setError(true, _i18n.translate('failedToUpdateGuestProfile', parameters: {
+        'error': e.toString(),
+      }));
       return false;
     } finally {
       setLoading(false);
@@ -118,7 +126,7 @@ class GuestProfileViewModel extends BaseProviderState {
       await loadGuestProfile(userId);
 
       _analyticsService.logEvent(
-        name: 'guest_profile_fields_update_success',
+        name: _i18n.translate('guestProfileFieldsUpdateSuccessEvent'),
         parameters: {
           'user_id': userId,
           'fields_count': fields.length,
@@ -127,7 +135,9 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to update profile fields: $e');
+      setError(true, _i18n.translate('failedToUpdateProfileFields', parameters: {
+        'error': e.toString(),
+      }));
       return false;
     } finally {
       setLoading(false);
@@ -152,13 +162,15 @@ class GuestProfileViewModel extends BaseProviderState {
       await updateProfileFields(userId, {'profilePhotoUrl': downloadUrl});
 
       _analyticsService.logEvent(
-        name: 'profile_photo_upload_success',
+        name: _i18n.translate('profilePhotoUploadSuccessEvent'),
         parameters: {'user_id': userId},
       );
 
       return downloadUrl;
     } catch (e) {
-      setError(true, 'Failed to upload profile photo: $e');
+      setError(true, _i18n.translate('failedToUploadProfilePhoto', parameters: {
+        'error': e.toString(),
+      }));
       return null;
     } finally {
       setLoading(false);
@@ -183,13 +195,15 @@ class GuestProfileViewModel extends BaseProviderState {
       await updateProfileFields(userId, {'aadhaarPhotoUrl': downloadUrl});
 
       _analyticsService.logEvent(
-        name: 'aadhaar_photo_upload_success',
+        name: _i18n.translate('aadhaarPhotoUploadSuccessEvent'),
         parameters: {'user_id': userId},
       );
 
       return downloadUrl;
     } catch (e) {
-      setError(true, 'Failed to upload Aadhaar photo: $e');
+      setError(true, _i18n.translate('failedToUploadAadhaarPhoto', parameters: {
+        'error': e.toString(),
+      }));
       return null;
     } finally {
       setLoading(false);
@@ -221,7 +235,7 @@ class GuestProfileViewModel extends BaseProviderState {
       });
 
       _analyticsService.logEvent(
-        name: 'id_proof_upload_success',
+        name: _i18n.translate('idProofUploadSuccessEvent'),
         parameters: {
           'user_id': userId,
           'id_proof_type': idProofType,
@@ -230,7 +244,9 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return downloadUrl;
     } catch (e) {
-      setError(true, 'Failed to upload ID proof: $e');
+      setError(true, _i18n.translate('failedToUploadIdProof', parameters: {
+        'error': e.toString(),
+      }));
       return null;
     } finally {
       setLoading(false);
@@ -248,7 +264,7 @@ class GuestProfileViewModel extends BaseProviderState {
       await loadGuestProfile(userId);
 
       _analyticsService.logEvent(
-        name: 'guest_status_update_success',
+        name: _i18n.translate('guestStatusUpdateSuccessEvent'),
         parameters: {
           'user_id': userId,
           'is_active': isActive,
@@ -257,7 +273,9 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, 'Failed to update guest status: $e');
+      setError(true, _i18n.translate('failedToUpdateGuestStatus', parameters: {
+        'error': e.toString(),
+      }));
       return false;
     } finally {
       setLoading(false);
@@ -274,7 +292,7 @@ class GuestProfileViewModel extends BaseProviderState {
     notifyListeners();
 
     _analyticsService.logEvent(
-      name: 'guest_profile_cleared',
+      name: _i18n.translate('guestProfileClearedEvent'),
       parameters: {},
     );
   }
@@ -286,7 +304,7 @@ class GuestProfileViewModel extends BaseProviderState {
     notifyListeners();
 
     _analyticsService.logEvent(
-      name: 'guest_profile_edit_started',
+      name: _i18n.translate('guestProfileEditStartedEvent'),
       parameters: {},
     );
   }
@@ -298,7 +316,7 @@ class GuestProfileViewModel extends BaseProviderState {
     notifyListeners();
 
     _analyticsService.logEvent(
-      name: 'guest_profile_edit_cancelled',
+      name: _i18n.translate('guestProfileEditCancelledEvent'),
       parameters: {},
     );
   }
@@ -312,7 +330,7 @@ class GuestProfileViewModel extends BaseProviderState {
   /// Saves edited fields to Firestore
   Future<bool> saveEditedFields(String userId) async {
     if (_editedFields.isEmpty) {
-      setError(true, 'No changes to save');
+      setError(true, _i18n.translate('noChangesToSave'));
       return false;
     }
 
@@ -330,7 +348,7 @@ class GuestProfileViewModel extends BaseProviderState {
     await loadGuestProfile(userId);
 
     _analyticsService.logEvent(
-      name: 'guest_profile_refreshed',
+      name: _i18n.translate('guestProfileRefreshedEvent'),
       parameters: {'user_id': userId},
     );
   }
@@ -339,10 +357,12 @@ class GuestProfileViewModel extends BaseProviderState {
   bool get hasCompleteProfile => _guest?.hasCompleteProfile ?? false;
 
   /// Gets formatted display name for UI
-  String get displayName => _guest?.displayName ?? 'Guest User';
+  String get displayName =>
+      _guest?.displayName ?? _i18n.translate('guestUser');
 
   /// Gets profile initials for avatar
-  String get initials => _guest?.initials ?? 'GU';
+  String get initials =>
+      _guest?.initials ?? _i18n.translate('guestInitialsFallback');
 
   /// Gets profile completion percentage
   int get profileCompletionPercentage =>
@@ -365,9 +385,6 @@ class GuestProfileViewModel extends BaseProviderState {
 
   /// Checks if profile has ID proof
   bool get hasIdProof => _guest?.hasIdProof ?? false;
-
-  /// Gets profile status display
-  String get statusDisplay => _guest?.statusDisplay ?? 'Unknown';
 
   /// Checks if profile is active
   bool get isActive => _guest?.isActive ?? false;

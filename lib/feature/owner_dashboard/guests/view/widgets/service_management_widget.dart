@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/utils/extensions/context_extensions.dart';
@@ -14,6 +15,7 @@ import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 import '../../data/models/owner_service_model.dart';
 
@@ -31,6 +33,25 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   final TextEditingController _serviceTypeController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
   bool _isFormExpanded = false;
+
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
 
   @override
   void initState() {
@@ -70,6 +91,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   /// Builds search bar and filter controls
   Widget _buildSearchAndFilters(
       BuildContext context, OwnerGuestViewModel guestVM) {
+    final loc = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
@@ -80,8 +103,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
               Expanded(
                 child: TextInput(
                   controller: _searchController,
-                  label: 'Search Services',
-                  hint: 'Search by title, guest, room, or type...',
+                  label: loc.searchServices,
+                  hint: loc.searchByTitleGuestRoomOrType,
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -99,7 +122,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
               IconButton(
                 icon: const Icon(Icons.tune),
                 onPressed: () => _showAdvancedSearch(context, guestVM),
-                tooltip: 'Advanced Search',
+                tooltip: loc.advancedSearch,
               ),
             ],
           ),
@@ -113,22 +136,22 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
               spacing: AppSpacing.paddingS,
               runSpacing: AppSpacing.paddingXS,
               children: [
-                _buildFilterChip('All', 'all', guestVM.statusFilter,
+                _buildFilterChip(loc.all, 'all', guestVM.statusFilter,
                     guestVM.setStatusFilter),
-                _buildFilterChip('New', 'new', guestVM.statusFilter,
+                _buildFilterChip(loc.statusNew, 'new', guestVM.statusFilter,
                     guestVM.setStatusFilter),
-                _buildFilterChip('In Progress', 'in_progress',
+                _buildFilterChip(loc.inProgress, 'in_progress',
                     guestVM.statusFilter, guestVM.setStatusFilter),
-                _buildFilterChip('Completed', 'completed', guestVM.statusFilter,
+                _buildFilterChip(loc.completed, 'completed', guestVM.statusFilter,
                     guestVM.setStatusFilter),
-                _buildFilterChip('Urgent', 'urgent', guestVM.statusFilter,
+                _buildFilterChip(loc.urgent, 'urgent', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingM),
-                _buildTypeFilterChip('Maintenance', 'maintenance',
+                _buildTypeFilterChip(loc.maintenance, 'maintenance',
                     guestVM.typeFilter, guestVM.setTypeFilter),
-                _buildTypeFilterChip('Housekeeping', 'housekeeping',
+                _buildTypeFilterChip(loc.housekeeping, 'housekeeping',
                     guestVM.typeFilter, guestVM.setTypeFilter),
-                _buildTypeFilterChip('Vehicle', 'vehicle', guestVM.typeFilter,
+                _buildTypeFilterChip(loc.vehicle, 'vehicle', guestVM.typeFilter,
                     guestVM.setTypeFilter),
               ],
             ),
@@ -217,6 +240,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   Widget _buildServiceRequestForm(
       BuildContext context, OwnerGuestViewModel guestVM) {
     final isMobile = context.isMobile;
+    final loc = AppLocalizations.of(context)!;
 
     // Collapsed state - show compact button
     if (!_isFormExpanded) {
@@ -226,7 +250,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
           vertical: AppSpacing.paddingS,
         ),
         child: PrimaryButton(
-          label: 'Create New Service Request',
+          label: loc.createNewServiceRequest,
           icon: Icons.add_circle_outline,
           onPressed: _toggleFormExpansion,
         ),
@@ -273,13 +297,13 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 ),
               ),
               const SizedBox(width: AppSpacing.paddingS),
-              const Expanded(
-                child: HeadingSmall(text: 'Create Service Request'),
+              Expanded(
+                child: HeadingSmall(text: loc.createServiceRequest),
               ),
               IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: _toggleFormExpansion,
-                tooltip: 'Collapse',
+                tooltip: loc.collapse,
                 iconSize: 20,
               ),
             ],
@@ -294,7 +318,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                   ? null
                   : _serviceTypeController.text,
               decoration: InputDecoration(
-                labelText: 'Service Type',
+                labelText: loc.serviceType,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
@@ -304,22 +328,22 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                   vertical: AppSpacing.paddingM,
                 ),
               ),
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: 'maintenance',
-                  child: Text('Maintenance'),
+                  child: Text(loc.maintenance),
                 ),
                 DropdownMenuItem(
                   value: 'housekeeping',
-                  child: Text('Housekeeping'),
+                  child: Text(loc.housekeeping),
                 ),
                 DropdownMenuItem(
                   value: 'vehicle',
-                  child: Text('Vehicle'),
+                  child: Text(loc.vehicle),
                 ),
                 DropdownMenuItem(
                   value: 'other',
-                  child: Text('Other'),
+                  child: Text(loc.other),
                 ),
               ],
               onChanged: (value) {
@@ -331,8 +355,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
             const SizedBox(height: AppSpacing.paddingM),
             TextInput(
               controller: _messageController,
-              label: 'Service Description',
-              hint: 'Describe the service needed...',
+              label: loc.serviceDescription,
+              hint: loc.describeTheServiceNeeded,
               maxLines: 3,
               prefixIcon: const Icon(Icons.description_outlined),
             ),
@@ -340,7 +364,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
             SizedBox(
               width: double.infinity,
               child: PrimaryButton(
-                label: 'Submit Request',
+                label: loc.submitRequest,
                 icon: Icons.send,
                 onPressed: _serviceTypeController.text.isNotEmpty &&
                         _messageController.text.isNotEmpty
@@ -359,7 +383,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                         ? null
                         : _serviceTypeController.text,
                     decoration: InputDecoration(
-                      labelText: 'Service Type',
+                      labelText: loc.serviceType,
                       border: OutlineInputBorder(
                         borderRadius:
                             BorderRadius.circular(AppSpacing.borderRadiusS),
@@ -370,22 +394,22 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                         vertical: AppSpacing.paddingM,
                       ),
                     ),
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: 'maintenance',
-                        child: Text('Maintenance'),
+                        child: Text(loc.maintenance),
                       ),
                       DropdownMenuItem(
                         value: 'housekeeping',
-                        child: Text('Housekeeping'),
+                        child: Text(loc.housekeeping),
                       ),
                       DropdownMenuItem(
                         value: 'vehicle',
-                        child: Text('Vehicle'),
+                        child: Text(loc.vehicle),
                       ),
                       DropdownMenuItem(
                         value: 'other',
-                        child: Text('Other'),
+                        child: Text(loc.other),
                       ),
                     ],
                     onChanged: (value) {
@@ -400,15 +424,15 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                   flex: 3,
                   child: TextInput(
                     controller: _messageController,
-                    label: 'Service Description',
-                    hint: 'Describe the service needed...',
+                    label: loc.serviceDescription,
+                    hint: loc.describeTheServiceNeeded,
                     maxLines: 1,
                     prefixIcon: const Icon(Icons.description_outlined),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
                 PrimaryButton(
-                  label: 'Submit',
+                  label: loc.submit,
                   icon: Icons.send,
                   onPressed: _serviceTypeController.text.isNotEmpty &&
                           _messageController.text.isNotEmpty
@@ -429,6 +453,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
     OwnerGuestViewModel guestVM,
     List<OwnerServiceModel> services,
   ) {
+    final loc = AppLocalizations.of(context)!;
     final inProgressServices = services.where((s) => s.isInProgress).toList();
     final otherServices = services.where((s) => !s.isInProgress).toList();
 
@@ -439,7 +464,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
         if (inProgressServices.isNotEmpty) ...[
           _buildSectionHeader(
             context,
-            'In Progress (${inProgressServices.length})',
+            '${loc.inProgress} (${inProgressServices.length})',
             Icons.hourglass_empty,
             Colors.orange,
           ),
@@ -455,7 +480,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
           if (inProgressServices.isNotEmpty)
             _buildSectionHeader(
               context,
-              'Other Services (${otherServices.length})',
+              '${loc.otherServices} (${otherServices.length})',
               Icons.list,
               Colors.grey,
             ),
@@ -495,6 +520,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   /// Builds service list
   Widget _buildServiceList(BuildContext context, OwnerGuestViewModel guestVM,
       List<OwnerServiceModel> services) {
+    final loc = AppLocalizations.of(context)!;
+
     if (guestVM.loading && services.isEmpty) {
       return const Center(child: AdaptiveLoader());
     }
@@ -504,12 +531,12 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
     return Column(
       children: [
         // Stats header
-        _buildStatsHeader(context, guestVM),
+        _buildStatsHeader(context, guestVM, loc),
         SizedBox(height: isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
         // Service list or structured empty state
         Expanded(
           child: services.isEmpty
-              ? _buildStructuredEmptyState(context, guestVM)
+              ? _buildStructuredEmptyState(context, guestVM, loc)
               : _buildServiceListWithGrouping(context, guestVM, services),
         ),
       ],
@@ -517,7 +544,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   }
 
   /// Builds stats header
-  Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM) {
+  Widget _buildStatsHeader(
+      BuildContext context, OwnerGuestViewModel guestVM, AppLocalizations loc) {
     final isMobile = context.isMobile;
     final pendingCount = guestVM.services.where((s) => !s.isCompleted).length;
     final completedCount = guestVM.services.where((s) => s.isCompleted).length;
@@ -554,7 +582,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 Flexible(
                   child: _buildStatCard(
                     context,
-                    'Total',
+                    loc.total,
                     guestVM.totalServices.toString(),
                     Icons.build,
                     AppColors.primary,
@@ -569,7 +597,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 Flexible(
                   child: _buildStatCard(
                     context,
-                    'Pending',
+                    loc.pending,
                     pendingCount.toString(),
                     Icons.pending,
                     Colors.orange,
@@ -584,7 +612,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 Flexible(
                   child: _buildStatCard(
                     context,
-                    'Completed',
+                    loc.completed,
                     completedCount.toString(),
                     Icons.check_circle,
                     Colors.green,
@@ -598,7 +626,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 Expanded(
                   child: _buildStatCard(
                     context,
-                    'Total',
+                    loc.total,
                     guestVM.totalServices.toString(),
                     Icons.build,
                     AppColors.primary,
@@ -612,7 +640,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 Expanded(
                   child: _buildStatCard(
                     context,
-                    'Pending',
+                    loc.pending,
                     pendingCount.toString(),
                     Icons.pending,
                     Colors.orange,
@@ -626,7 +654,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 Expanded(
                   child: _buildStatCard(
                     context,
-                    'Completed',
+                    loc.completed,
                     completedCount.toString(),
                     Icons.check_circle,
                     Colors.green,
@@ -702,7 +730,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
 
   /// Builds structured empty state with placeholder rows
   Widget _buildStructuredEmptyState(
-      BuildContext context, OwnerGuestViewModel guestVM) {
+      BuildContext context, OwnerGuestViewModel guestVM, AppLocalizations loc) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -719,7 +747,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
               children: [
                 const Icon(Icons.build_outlined, size: 20, color: Colors.grey),
                 const SizedBox(width: AppSpacing.paddingS),
-                const BodyText(text: 'Service Requests'),
+                BodyText(text: loc.serviceRequests),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -729,7 +757,12 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
-                  child: const BodyText(text: '0 requests'),
+                child: BodyText(
+                  text: _text(
+                    'ownerServiceZeroRequests',
+                    '0 requests',
+                  ),
+                ),
                 ),
               ],
             ),
@@ -758,11 +791,10 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
               children: [
                 const Icon(Icons.build_outlined, size: 48, color: Colors.grey),
                 const SizedBox(height: AppSpacing.paddingM),
-                const HeadingMedium(text: 'No Service Requests Yet'),
+                HeadingMedium(text: loc.noServiceRequestsYet),
                 const SizedBox(height: AppSpacing.paddingS),
-                const BodyText(
-                  text:
-                      'Guest service requests will appear here when submitted',
+                BodyText(
+                  text: loc.serviceRequestsAppearHere,
                   align: TextAlign.center,
                 ),
               ],
@@ -865,6 +897,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   /// Builds individual service card
   Widget _buildServiceCard(BuildContext context, OwnerGuestViewModel guestVM,
       OwnerServiceModel service) {
+    final loc = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
       child: AdaptiveCard(
@@ -898,7 +932,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${service.guestName} - Room ${service.roomNumber}',
+                            '${service.guestName} - ${loc.room} ${service.roomNumber}',
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 14,
@@ -929,14 +963,14 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.category,
-                        label: 'Type',
+                        label: loc.serviceType,
                         value: service.serviceTypeDisplay,
                       ),
                     ),
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.priority_high,
-                        label: 'Priority',
+                        label: loc.priority,
                         value: service.priorityDisplay,
                       ),
                     ),
@@ -950,7 +984,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                     Expanded(
                       child: _buildDetailItem(
                         icon: Icons.schedule,
-                        label: 'Requested',
+                        label: loc.requested,
                         value: _formatDate(service.requestedAt),
                       ),
                     ),
@@ -958,7 +992,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                       Expanded(
                         child: _buildDetailItem(
                           icon: Icons.person,
-                          label: 'Assigned To',
+                          label: loc.assignedTo,
                           value: service.assignedToName!,
                         ),
                       ),
@@ -975,7 +1009,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${service.unreadOwnerMessages} unread messages',
+                      loc.unreadMessagesCount(service.unreadOwnerMessages),
                       style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 12,
@@ -1002,7 +1036,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                               'in_progress',
                             ),
                             icon: const Icon(Icons.play_arrow, size: 18),
-                            label: const Text('Start'),
+                            label: Text(loc.start),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.orange,
                               side: const BorderSide(color: Colors.orange),
@@ -1012,7 +1046,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                       else if (service.isInProgress)
                         Expanded(
                           child: PrimaryButton(
-                            label: 'Complete',
+                            label: loc.complete,
                             icon: Icons.check_circle,
                             onPressed: () => _completeService(
                               context,
@@ -1031,7 +1065,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                               'in_progress',
                             ),
                             icon: const Icon(Icons.refresh, size: 18),
-                            label: const Text('Resume'),
+                            label: Text(loc.resume),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.orange,
                               side: const BorderSide(color: Colors.orange),
@@ -1046,7 +1080,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                           service,
                         ),
                         icon: const Icon(Icons.info_outline, size: 18),
-                        label: const Text('Details'),
+                        label: Text(loc.details),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primary,
                           side: BorderSide(color: AppColors.primary),
@@ -1179,10 +1213,11 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   /// Submits service request
   void _submitServiceRequest(
       BuildContext context, OwnerGuestViewModel guestVM) {
+    final loc = AppLocalizations.of(context)!;
     if (_serviceTypeController.text.isEmpty ||
         _messageController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        SnackBar(content: Text(loc.pleaseFillInAllFields)),
       );
       return;
     }
@@ -1197,7 +1232,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
       ownerId: 'current_owner', // This should come from auth
       roomNumber: '101', // This should come from guest info
       serviceType: _serviceTypeController.text,
-      title: 'Service Request',
+      title: loc.serviceRequest,
       description: _messageController.text,
       status: 'new',
       priority: 'medium',
@@ -1220,7 +1255,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Service request submitted')),
+      SnackBar(content: Text(loc.serviceRequestSubmitted)),
     );
   }
 
@@ -1232,56 +1267,73 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
       builder: (context) => AlertDialog(
         title: Text(service.title),
         content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('Guest', service.guestName),
-              _buildDetailRow('Room', service.roomNumber),
-              _buildDetailRow('Type', service.serviceTypeDisplay),
-              _buildDetailRow('Priority', service.priorityDisplay),
-              _buildDetailRow('Status', service.statusDisplay),
-              _buildDetailRow('Requested', _formatDate(service.requestedAt)),
-              if (service.assignedToName != null)
-                _buildDetailRow('Assigned To', service.assignedToName!),
-              if (service.completedAt != null)
-                _buildDetailRow('Completed', _formatDate(service.completedAt!)),
-              const SizedBox(height: AppSpacing.paddingM),
-              const Text('Description:',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              Text(service.description),
-              const SizedBox(height: AppSpacing.paddingM),
-              const Text('Messages:',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
-              _buildMessagesList(service.messages),
-            ],
-          ),
+          child: _buildServiceDetailsContent(context, service),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-          if (!service.isCompleted) ...[
-            PrimaryButton(
-              label: 'Reply',
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showReplyDialog(context, guestVM, service);
-              },
-            ),
-            PrimaryButton(
-              label: 'Complete',
-              onPressed: () => _completeService(context, guestVM, service),
-            ),
-          ],
-        ],
+        actions: _buildServiceDetailsActions(context, guestVM, service),
       ),
     );
   }
 
+  Widget _buildServiceDetailsContent(
+      BuildContext context, OwnerServiceModel service) {
+    final loc = AppLocalizations.of(context)!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildDetailRow(loc.guest, service.guestName),
+        _buildDetailRow(loc.room, service.roomNumber),
+        _buildDetailRow(loc.serviceType, service.serviceTypeDisplay),
+        _buildDetailRow(loc.priority, service.priorityDisplay),
+        _buildDetailRow(loc.status, service.statusDisplay),
+        _buildDetailRow(loc.requested, _formatDate(service.requestedAt)),
+        if (service.assignedToName != null)
+          _buildDetailRow(loc.assignedTo, service.assignedToName!),
+        if (service.completedAt != null)
+          _buildDetailRow(
+              loc.completed,
+              _formatDate(
+                service.completedAt!,
+              )),
+        const SizedBox(height: AppSpacing.paddingM),
+        Text(loc.description,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text(service.description),
+        const SizedBox(height: AppSpacing.paddingM),
+        Text(loc.messages,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        _buildMessagesList(service.messages),
+      ],
+    );
+  }
+
+  List<Widget> _buildServiceDetailsActions(BuildContext context,
+      OwnerGuestViewModel guestVM, OwnerServiceModel service) {
+    final loc = AppLocalizations.of(context)!;
+
+    return [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(),
+        child: Text(loc.close),
+      ),
+      if (!service.isCompleted) ...[
+        PrimaryButton(
+          label: loc.reply,
+          onPressed: () {
+            Navigator.of(context).pop();
+            _showReplyDialog(context, guestVM, service);
+          },
+        ),
+        PrimaryButton(
+          label: loc.complete,
+          onPressed: () => _completeService(context, guestVM, service),
+        ),
+      ],
+    ];
+  }
   /// Builds detail row for dialog
   Widget _buildDetailRow(String label, String value) {
     return Padding(
@@ -1307,7 +1359,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   /// Builds messages list
   Widget _buildMessagesList(List<ServiceMessage> messages) {
     if (messages.isEmpty) {
-      return const Text('No messages yet');
+      return Text(AppLocalizations.of(context)!.noMessagesYet);
     }
 
     return Column(
@@ -1360,26 +1412,29 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reply to Service Request'),
+        title: Text(AppLocalizations.of(context)!.replyToServiceRequest),
         content: TextInput(
           controller: replyController,
-          label: 'Reply',
-          hint: 'Type your reply...',
+          label: AppLocalizations.of(context)!.replyLabel,
+          hint: AppLocalizations.of(context)!.typeYourReply,
           maxLines: 4,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           PrimaryButton(
-            label: 'Send Reply',
+              label: AppLocalizations.of(context)!.sendReply,
             onPressed: () async {
               if (replyController.text.isNotEmpty) {
+                final navigator = Navigator.of(context);
+                final scaffoldMessenger = ScaffoldMessenger.of(this.context);
+                final loc = AppLocalizations.of(context)!;
                 final success = await guestVM.addServiceReply(
                   service.serviceId,
                   replyController.text,
-                  'Owner',
+                  loc.owner,
                 );
 
                 // FIXED: BuildContext async gap warning
@@ -1388,12 +1443,10 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 // Changed to: Check mounted immediately before each context usage
                 // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
                 if (!success || !mounted) return;
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pop();
+                navigator.pop();
                 if (!mounted) return;
-                // ignore: use_build_context_synchronously
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Reply sent successfully')),
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(content: Text(loc.replySentSuccessfully)),
                 );
               }
             },
@@ -1410,6 +1463,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
     OwnerServiceModel service,
     String newStatus,
   ) async {
+    final loc = AppLocalizations.of(context)!;
+
     try {
       final success = await guestVM.updateServiceStatus(
         service.serviceId,
@@ -1427,8 +1482,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
         SnackBar(
           content: Text(
             newStatus == 'in_progress'
-                ? 'Service started'
-                : 'Service status updated',
+                ? loc.serviceStarted
+                : loc.serviceStatusUpdated,
           ),
         ),
       );
@@ -1442,7 +1497,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to update status: $e'),
+          content: Text(loc.failedToUpdateStatus(e.toString())),
           backgroundColor: Colors.red,
         ),
       );
@@ -1460,21 +1515,24 @@ void _completeService(BuildContext context, OwnerGuestViewModel guestVM,
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('Complete Service'),
+      title: Text(AppLocalizations.of(context)!.completeService),
       content: TextInput(
         controller: notesController,
-        label: 'Completion Notes',
-        hint: 'Completion notes (optional)...',
+        label: AppLocalizations.of(context)!.completionNotes,
+        hint: AppLocalizations.of(context)!.completionNotesOptional,
         maxLines: 3,
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         PrimaryButton(
-          label: 'Mark as Completed',
+          label: AppLocalizations.of(context)!.markAsCompleted,
           onPressed: () async {
+            final navigator = Navigator.of(context);
+            final scaffoldMessenger = ScaffoldMessenger.of(context);
+            final loc = AppLocalizations.of(context)!;
             final success = await guestVM.updateServiceStatus(
               service.serviceId,
               'completed',
@@ -1489,14 +1547,12 @@ void _completeService(BuildContext context, OwnerGuestViewModel guestVM,
             // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
             // Note: Dialog context is safe to use here - dialog manages its own lifecycle
             if (!success) {
-              Navigator.of(context).pop();
+              navigator.pop();
               return;
             }
-            // ignore: use_build_context_synchronously
-            Navigator.of(context).pop();
-            // ignore: use_build_context_synchronously
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Service completed successfully')),
+            navigator.pop();
+            scaffoldMessenger.showSnackBar(
+              SnackBar(content: Text(loc.serviceCompletedSuccessfully)),
             );
           },
         ),
@@ -1515,38 +1571,38 @@ void _showAdvancedSearch(BuildContext context, OwnerGuestViewModel guestVM) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: const HeadingMedium(text: 'Advanced Search'),
+      title: HeadingMedium(text: AppLocalizations.of(context)!.advancedSearch),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextInput(
-            label: 'Service Title',
-            hint: 'Service title',
+            label: AppLocalizations.of(context)!.serviceTitle,
+            hint: AppLocalizations.of(context)!.serviceTitle,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           TextInput(
-            label: 'Guest Name',
-            hint: 'Guest name',
+            label: AppLocalizations.of(context)!.guestName,
+            hint: AppLocalizations.of(context)!.guestName,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           TextInput(
-            label: 'Room',
-            hint: 'Room number',
+            label: AppLocalizations.of(context)!.room,
+            hint: AppLocalizations.of(context)!.roomNumber,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           TextInput(
-            label: 'Service Type',
-            hint: 'Service type',
+            label: AppLocalizations.of(context)!.serviceType,
+            hint: AppLocalizations.of(context)!.serviceType,
           ),
         ],
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const BodyText(text: 'Cancel'),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         PrimaryButton(
-          label: 'Search',
+          label: AppLocalizations.of(context)!.search,
           onPressed: () {
             Navigator.pop(context);
             // TODO: Implement advanced search

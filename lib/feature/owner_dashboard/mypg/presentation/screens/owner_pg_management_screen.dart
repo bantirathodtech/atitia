@@ -15,6 +15,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/owner_drawer.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
@@ -101,7 +102,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: viewModel.refreshData,
-            tooltip: 'Refresh PG Data',
+            tooltip: AppLocalizations.of(context)?.refreshPgData ?? 'Refresh PG Data',
           ),
         ],
 
@@ -113,10 +114,10 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             indicatorColor: Colors.white,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
-            tabs: const [
-              Tab(text: 'Dashboard', icon: Icon(Icons.dashboard, size: 16)),
-              Tab(text: 'Bed Map', icon: Icon(Icons.bed, size: 16)),
-              Tab(text: 'Bookings', icon: Icon(Icons.book_online, size: 16)),
+            tabs: [
+              Tab(text: AppLocalizations.of(context)?.dashboard ?? 'Dashboard', icon: const Icon(Icons.dashboard, size: 16)),
+              Tab(text: AppLocalizations.of(context)?.bedMap ?? 'Bed Map', icon: const Icon(Icons.bed, size: 16)),
+              Tab(text: AppLocalizations.of(context)?.booking ?? 'Bookings', icon: const Icon(Icons.book_online, size: 16)),
             ],
           ),
         ),
@@ -141,13 +142,13 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           children: [
             const Icon(Icons.home_outlined, size: 80, color: Colors.grey),
             const SizedBox(height: AppSpacing.paddingM),
-            const HeadingMedium(text: 'No PGs Listed Yet'),
+            HeadingMedium(text: AppLocalizations.of(context)?.noPgsListedYet ?? 'No PGs Listed Yet'),
             const SizedBox(height: AppSpacing.paddingS),
-            const BodyText(text: 'Tap the button below to list your first PG'),
+            BodyText(text: AppLocalizations.of(context)?.tapButtonBelowToListFirstPg ?? 'Tap the button below to list your first PG'),
             const SizedBox(height: AppSpacing.paddingL),
             PrimaryButton(
               onPressed: () => _navigateToCreatePG(context),
-              label: 'List Your First PG',
+              label: AppLocalizations.of(context)?.listYourFirstPg ?? 'List Your First PG',
               icon: Icons.add_business,
             ),
           ],
@@ -162,7 +163,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           children: [
             AdaptiveLoader(),
             const SizedBox(height: AppSpacing.paddingM),
-            const BodyText(text: 'Loading PG data...'),
+            BodyText(text: AppLocalizations.of(context)?.loadingPgData ?? 'Loading PG data...'),
           ],
         ),
       );
@@ -175,19 +176,19 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: AppSpacing.paddingL),
-            const HeadingMedium(
-              text: 'Error Loading Data',
+            HeadingMedium(
+              text: AppLocalizations.of(context)?.errorLoadingData ?? 'Error Loading Data',
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: viewModel.errorMessage ?? 'Unknown error occurred',
+              text: viewModel.errorMessage ?? (AppLocalizations.of(context)?.somethingWentWrong ?? 'Unknown error occurred'),
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingL),
             PrimaryButton(
               onPressed: viewModel.refreshData,
-              label: 'Try Again',
+              label: AppLocalizations.of(context)?.tryAgain ?? 'Try Again',
               icon: Icons.refresh,
             ),
           ],
@@ -269,7 +270,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                         color: Theme.of(context).primaryColor, size: 20),
                     const SizedBox(width: 8),
                     HeadingMedium(
-                      text: 'Bookings Overview',
+                      text: AppLocalizations.of(context)?.bookingsOverview ?? 'Bookings Overview',
                       color: Theme.of(context).primaryColor,
                     ),
                   ],
@@ -281,7 +282,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                       child: _buildStatItem(
                         context,
                         '$total',
-                        'Total',
+                        AppLocalizations.of(context)?.total ?? 'Total',
                         Icons.receipt_long,
                         Theme.of(context).primaryColor,
                       ),
@@ -290,7 +291,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                       child: _buildStatItem(
                         context,
                         '$approved',
-                        'Approved',
+                        AppLocalizations.of(context)?.approved ?? 'Approved',
                         Icons.check_circle,
                         Colors.green,
                       ),
@@ -299,7 +300,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                       child: _buildStatItem(
                         context,
                         '$pending',
-                        'Pending',
+                        AppLocalizations.of(context)?.pending ?? 'Pending',
                         Icons.schedule,
                         Colors.orange,
                       ),
@@ -308,7 +309,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                       child: _buildStatItem(
                         context,
                         '$rejected',
-                        'Rejected',
+                        AppLocalizations.of(context)?.rejected ?? 'Rejected',
                         Icons.cancel,
                         Colors.red,
                       ),
@@ -339,25 +340,34 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
 
   Widget _buildFilterChips(
       BuildContext context, OwnerPgManagementViewModel viewModel) {
-    final filters = ['All', 'Occupied', 'Vacant', 'Pending', 'Maintenance'];
+    final loc = AppLocalizations.of(context);
+    final filters = [
+      loc?.all ?? 'All',
+      loc?.occupied ?? 'Occupied',
+      loc?.vacant ?? 'Vacant',
+      loc?.pending ?? 'Pending',
+      loc?.maintenance ?? 'Maintenance',
+    ];
+    final filterKeys = ['All', 'Occupied', 'Vacant', 'Pending', 'Maintenance'];
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: filters.length,
+        itemCount: filterKeys.length,
         itemBuilder: (context, index) {
-          final filter = filters[index];
-          final isSelected = viewModel.selectedFilter == filter;
+          final filterKey = filterKeys[index];
+          final filterLabel = filters[index];
+          final isSelected = viewModel.selectedFilter == filterKey;
 
           return Padding(
             padding: const EdgeInsets.only(right: AppSpacing.paddingS),
             child: CustomFilterChip(
-              label: filter,
+              label: filterLabel,
               selected: isSelected,
               onSelected: (selected) {
-                viewModel.setFilter(filter);
+                viewModel.setFilter(filterKey);
               },
             ),
           );
@@ -409,7 +419,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                   Expanded(
                     child: PrimaryButton(
                       onPressed: () => viewModel.approveBooking(booking.id),
-                      label: 'Approve',
+                      label: AppLocalizations.of(context)?.approve ?? 'Approve',
                       icon: Icons.check,
                     ),
                   ),
@@ -417,7 +427,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                   Expanded(
                     child: PrimaryButton(
                       onPressed: () => viewModel.rejectBooking(booking.id),
-                      label: 'Reject',
+                      label: AppLocalizations.of(context)?.reject ?? 'Reject',
                       icon: Icons.close,
                       backgroundColor: Colors.red,
                     ),

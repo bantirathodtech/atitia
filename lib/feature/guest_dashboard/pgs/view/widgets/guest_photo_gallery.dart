@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../l10n/app_localizations.dart';
 
 /// Widget displaying PG photos in a horizontal gallery
 /// Uses common UI components for consistent styling
@@ -9,6 +11,8 @@ class GuestPhotoGallery extends StatelessWidget {
   final List<String> photos;
   final double height;
   final double width;
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   const GuestPhotoGallery({
     required this.photos,
@@ -17,8 +21,26 @@ class GuestPhotoGallery extends StatelessWidget {
     super.key,
   });
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     if (photos.isEmpty) {
       return Container(
         height: height,
@@ -38,7 +60,8 @@ class GuestPhotoGallery extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.paddingS),
               BodyText(
-                text: 'No photos available',
+                text: loc?.noPhotosAvailable ??
+                    _text('noPhotosAvailable', 'No photos available'),
                 color: Colors.grey.shade600,
                 align: TextAlign.center,
               ),
@@ -82,7 +105,8 @@ class GuestPhotoGallery extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.paddingS / 2),
                       BodyText(
-                        text: 'Failed to load',
+                        text: loc?.failedToLoadImage ??
+                            _text('failedToLoadImage', 'Failed to load image'),
                         color: Colors.grey.shade600,
                       ),
                     ],

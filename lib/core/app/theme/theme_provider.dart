@@ -27,7 +27,11 @@
 import 'package:atitia/core/app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
+import '../../services/localization/internationalization_service.dart';
+
 class ThemeProvider extends ChangeNotifier {
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
   // ==========================================================================
   // Private State - Current theme mode
   // ==========================================================================
@@ -64,11 +68,11 @@ class ThemeProvider extends ChangeNotifier {
   String get themeModeName {
     switch (_themeMode) {
       case ThemeMode.light:
-        return 'Light Mode';
+        return _i18n.translate('lightMode');
       case ThemeMode.dark:
-        return 'Dark Mode';
+        return _i18n.translate('darkMode');
       case ThemeMode.system:
-        return 'System Default';
+        return _i18n.translate('systemDefault');
     }
   }
 

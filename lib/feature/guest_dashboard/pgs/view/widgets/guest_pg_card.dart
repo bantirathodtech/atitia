@@ -12,6 +12,8 @@ import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../common/widgets/sharing_summary.dart';
+import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/guest_pg_model.dart';
 import 'booking_request_dialog.dart';
 
@@ -32,6 +34,8 @@ class GuestPgCard extends StatelessWidget {
   final VoidCallback? onTap;
   final double? userLatitude; // User's current location latitude
   final double? userLongitude; // User's current location longitude
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   const GuestPgCard({
     required this.pg,
@@ -41,10 +45,27 @@ class GuestPgCard extends StatelessWidget {
     super.key,
   });
 
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
@@ -71,9 +92,9 @@ class GuestPgCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildImageSection(context, isDarkMode),
-                _buildDetailsSection(context, isDarkMode),
-                _buildActionSection(context, isDarkMode),
+                _buildImageSection(context, isDarkMode, loc),
+                _buildDetailsSection(context, isDarkMode, loc),
+                _buildActionSection(context, isDarkMode, loc),
               ],
             ),
           ),
@@ -83,7 +104,11 @@ class GuestPgCard extends StatelessWidget {
   }
 
   /// 📸 Image section with status indicator, badges, and PG info overlay
-  Widget _buildImageSection(BuildContext context, bool isDarkMode) {
+  Widget _buildImageSection(
+    BuildContext context,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     return Stack(
       children: [
         // Main Image
@@ -135,11 +160,18 @@ class GuestPgCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Status Indicator Badge
-              _buildStatusBadge(),
+              _buildStatusBadge(loc),
               // Photo count badge
               if (pg.hasPhotos)
                 _buildBadge(
-                  '${pg.photos.length} Photos',
+                  loc?.photosBadge(pg.photos.length) ??
+                      _text(
+                        'photosBadge',
+                        '{count} Photo(s)',
+                        parameters: {
+                          'count': pg.photos.length.toString(),
+                        },
+                      ),
                   Colors.black.withValues(alpha: 0.7),
                   Icons.photo_library,
                 ),
@@ -162,7 +194,7 @@ class GuestPgCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 6),
-              _buildLocationRow(context),
+              _buildLocationRow(context, loc),
             ],
           ),
         ),
@@ -171,24 +203,32 @@ class GuestPgCard extends StatelessWidget {
   }
 
   /// 📋 Details section with quick decision factors
-  Widget _buildDetailsSection(BuildContext context, bool isDarkMode) {
+  Widget _buildDetailsSection(
+    BuildContext context,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Quick Decision Factors Row
-          _buildQuickDecisionFactors(context, isDarkMode),
+          _buildQuickDecisionFactors(context, isDarkMode, loc),
           const SizedBox(height: AppSpacing.paddingM),
           // Sharing Summary Preview
-          _buildSharingPreview(context, isDarkMode),
+          _buildSharingPreview(context, isDarkMode, loc),
         ],
       ),
     );
   }
 
   /// 🏷️ Quick decision factors: PG Type, Meal Type
-  Widget _buildQuickDecisionFactors(BuildContext context, bool isDarkMode) {
+  Widget _buildQuickDecisionFactors(
+    BuildContext context,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     return Wrap(
       spacing: AppSpacing.paddingS,
       runSpacing: AppSpacing.paddingS,
@@ -197,7 +237,7 @@ class GuestPgCard extends StatelessWidget {
         if (pg.pgType != null)
           _buildDecisionFactorBadge(
             _getPgTypeIcon(pg.pgType!),
-            pg.pgType!,
+            loc?.pgTypeLabel(pg.pgType!) ?? pg.pgType!,
             AppColors.info,
             isDarkMode,
           ),
@@ -205,7 +245,7 @@ class GuestPgCard extends StatelessWidget {
         if (pg.mealType != null)
           _buildDecisionFactorBadge(
             _getMealTypeIcon(pg.mealType!),
-            pg.mealType!,
+            loc?.mealTypeLabel(pg.mealType!) ?? pg.mealType!,
             AppColors.secondary,
             isDarkMode,
           ),
@@ -214,7 +254,11 @@ class GuestPgCard extends StatelessWidget {
   }
 
   /// 👥 Sharing summary preview
-  Widget _buildSharingPreview(BuildContext context, bool isDarkMode) {
+  Widget _buildSharingPreview(
+    BuildContext context,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     final summary = getSharingSummary(pg);
     
     if (summary.isEmpty) {
@@ -235,6 +279,7 @@ class GuestPgCard extends StatelessWidget {
         final info = summary[sharingType]!;
         return _buildSharingBadge(
           sharingType,
+          loc,
           info.vacantBedsCount > 0,
           isDarkMode,
         );
@@ -243,7 +288,11 @@ class GuestPgCard extends StatelessWidget {
   }
 
   /// 🎯 Action section with buttons
-  Widget _buildActionSection(BuildContext context, bool isDarkMode) {
+  Widget _buildActionSection(
+    BuildContext context,
+    bool isDarkMode,
+    AppLocalizations? loc,
+  ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.paddingM,
@@ -256,7 +305,7 @@ class GuestPgCard extends StatelessWidget {
           // View Details Button (Primary)
           Expanded(
             child: SecondaryButton(
-              label: 'View Details',
+              label: loc?.viewDetails ?? _text('viewDetails', 'View Details'),
               icon: Icons.arrow_forward,
               onPressed: onTap,
             ),
@@ -264,7 +313,7 @@ class GuestPgCard extends StatelessWidget {
           const SizedBox(width: AppSpacing.paddingS),
           // Book Now Button (Optional)
           PrimaryButton(
-            label: 'Book Now',
+            label: loc?.bookNow ?? _text('bookNow', 'Book Now'),
             icon: Icons.home_work,
             onPressed: () => _showBookingRequestDialog(context),
           ),
@@ -274,7 +323,7 @@ class GuestPgCard extends StatelessWidget {
   }
 
   /// 🏷️ Status badge (Available/Unavailable)
-  Widget _buildStatusBadge() {
+  Widget _buildStatusBadge(AppLocalizations? loc) {
     final isAvailable = pg.isActive;
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -297,7 +346,9 @@ class GuestPgCard extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            isAvailable ? 'Available' : 'Unavailable',
+            isAvailable
+                ? (loc?.available ?? _text('available', 'Available'))
+                : (loc?.unavailable ?? _text('unavailable', 'Unavailable')),
             style: const TextStyle(
               color: AppColors.textOnPrimary,
               fontSize: 11,
@@ -339,8 +390,8 @@ class GuestPgCard extends StatelessWidget {
   }
 
   /// 📍 Location row with clickable map link and distance
-  Widget _buildLocationRow(BuildContext context) {
-    final distanceText = _getDistanceText();
+  Widget _buildLocationRow(BuildContext context, AppLocalizations? loc) {
+    final distanceText = _getDistanceText(loc);
 
     return Row(
       children: [
@@ -421,11 +472,18 @@ class GuestPgCard extends StatelessWidget {
   /// 👥 Sharing badge
   Widget _buildSharingBadge(
     String sharingType,
+    AppLocalizations? loc,
     bool hasVacancy,
     bool isDarkMode,
   ) {
     final sharingNumber = sharingType.replaceAll(RegExp(r'[^0-9]'), '');
-    final displayText = '$sharingNumber Sharing';
+    final number = int.tryParse(sharingNumber) ?? 0;
+    final displayText = loc?.sharingLabel(number) ??
+        _text(
+          'sharingLabel',
+          '{count} Sharing',
+          parameters: {'count': number.toString()},
+        );
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -490,7 +548,8 @@ class GuestPgCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           CaptionText(
-            text: 'No Image Available',
+            text: AppLocalizations.of(context)?.noImageAvailable ??
+                _text('noImageAvailable', 'No Image Available'),
             color: AppColors.textTertiary,
           ),
         ],
@@ -499,7 +558,7 @@ class GuestPgCard extends StatelessWidget {
   }
 
   /// 📍 Get distance text from user location
-  String? _getDistanceText() {
+  String? _getDistanceText(AppLocalizations? loc) {
     if (userLatitude == null ||
         userLongitude == null ||
         !pg.hasLocation) {
@@ -510,9 +569,21 @@ class GuestPgCard extends StatelessWidget {
     if (distance == null) return null;
 
     if (distance < 1) {
-      return '${(distance * 1000).toStringAsFixed(0)}m away';
+      final meters = (distance * 1000).round();
+      return loc?.distanceMeters(meters) ??
+          _text(
+            'distanceMeters',
+            '{meters}m away',
+            parameters: {'meters': meters.toString()},
+          );
     } else {
-      return '${distance.toStringAsFixed(1)}km away';
+      final kilometers = double.parse(distance.toStringAsFixed(1));
+      return loc?.distanceKilometers(kilometers) ??
+          _text(
+            'distanceKilometers',
+            '{kilometers}km away',
+            parameters: {'kilometers': kilometers.toString()},
+          );
     }
   }
 
@@ -539,7 +610,12 @@ class GuestPgCard extends StatelessWidget {
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open maps')),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)?.couldNotOpenMaps ??
+                  _text('couldNotOpenMaps', 'Could not open maps'),
+            ),
+          ),
         );
       }
     }

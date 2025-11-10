@@ -19,7 +19,9 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/cards/info_card.dart';
 import '../../../../../common/widgets/containers/section_container.dart';
+import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/logic/auth_provider.dart';
+import '../../../../../../core/services/localization/internationalization_service.dart';
 import '../../data/models/owner_pg_management_model.dart';
 import '../../domain/entities/owner_pg_entity.dart';
 import '../viewmodels/owner_pg_management_viewmodel.dart';
@@ -48,6 +50,25 @@ class NewPgSetupScreen extends StatefulWidget {
 
 class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     with SingleTickerProviderStateMixin, ResponsiveSystemMixin {
+  static final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
+  String _text(
+    String key,
+    String fallback, {
+    Map<String, dynamic>? parameters,
+  }) {
+    final translated = _i18n.translate(key, parameters: parameters);
+    if (translated.isEmpty || translated == key) {
+      var result = fallback;
+      parameters?.forEach((paramKey, value) {
+        result = result.replaceAll('{$paramKey}', value.toString());
+      });
+      return result;
+    }
+    return translated;
+  }
+
   late TabController _tabController;
   final _formKey = GlobalKey<FormState>();
   // Separate scroll controllers for each tab to avoid conflicts
@@ -416,7 +437,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: isEditMode ? 'Edit PG' : 'New PG Setup',
+        title: isEditMode ? (AppLocalizations.of(context)?.editPg ?? 'Edit PG') : (AppLocalizations.of(context)?.newPgSetup ?? 'New PG Setup'),
         showThemeToggle: true,
         actions: [
           // Progress indicator
@@ -433,7 +454,11 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
               isEditMode ? Icons.save : Icons.add_business,
             ),
             onPressed: _submitForm,
-            tooltip: isEditMode ? 'Update PG' : 'Create PG',
+            tooltip: isEditMode
+                ? (AppLocalizations.of(context)?.updatePg ??
+                    _text('updatePg', 'Update PG'))
+                : (AppLocalizations.of(context)?.createPg ??
+                    _text('createPg', 'Create PG')),
           ),
         ],
       ),
@@ -497,7 +522,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             const AdaptiveLoader(),
             const SizedBox(height: AppSpacing.paddingL),
             BodyText(
-              text: 'Loading PG details...',
+            text: AppLocalizations.of(context)?.ownerPgLoadingDetails ??
+                _text('ownerPgLoadingDetails', 'Loading PG details...'),
               color: Theme.of(context).disabledColor,
             ),
           ],
@@ -541,35 +567,35 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       BuildContext context, ResponsiveConfig responsive, bool isDark) {
     final tabs = [
       Tab(
-        text: responsive.isMobile ? 'Basic' : 'Basic Info',
+        text: responsive.isMobile ? (AppLocalizations.of(context)?.basic ?? 'Basic') : (AppLocalizations.of(context)?.basicInfo ?? 'Basic Info'),
         icon: const Icon(Icons.info_outline, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? 'Rent' : 'Rent Config',
+        text: responsive.isMobile ? (AppLocalizations.of(context)?.rent ?? 'Rent') : (AppLocalizations.of(context)?.rentConfig ?? 'Rent Config'),
         icon: const Icon(Icons.attach_money, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? 'Structure' : 'Floor Structure',
+        text: responsive.isMobile ? (AppLocalizations.of(context)?.structure ?? 'Structure') : (AppLocalizations.of(context)?.floorStructure ?? 'Floor Structure'),
         icon: const Icon(Icons.home_work_outlined, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? 'Amenities' : 'Amenities',
+        text: AppLocalizations.of(context)?.amenities ?? 'Amenities',
         icon: const Icon(Icons.room_service, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? 'Photos' : 'Photos',
+        text: AppLocalizations.of(context)?.photos ?? 'Photos',
         icon: const Icon(Icons.photo_library, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? 'Rules' : 'Rules & Policies',
+        text: responsive.isMobile ? (AppLocalizations.of(context)?.rules ?? 'Rules') : (AppLocalizations.of(context)?.rulesPolicies ?? 'Rules & Policies'),
         icon: const Icon(Icons.rule, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? 'More' : 'Additional Info',
+        text: responsive.isMobile ? (AppLocalizations.of(context)?.more ?? 'More') : (AppLocalizations.of(context)?.additionalInfo ?? 'Additional Info'),
         icon: const Icon(Icons.info, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? 'Summary' : 'Summary',
+        text: AppLocalizations.of(context)?.summary ?? 'Summary',
         icon: const Icon(Icons.preview, size: 18),
       ),
     ];
@@ -646,6 +672,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   }
 
   Widget _buildBasicInfoTab(ResponsiveConfig responsive) {
+    final loc = AppLocalizations.of(context);
     final hasData = _pgNameController.text.isNotEmpty ||
         _addressController.text.isNotEmpty ||
         _selectedState != null;
@@ -659,13 +686,25 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           if (!hasData)
             _buildZeroStateHint(
               icon: Icons.info_outline,
-              title: 'Start Building Your PG Profile',
-              message:
-                  'Fill in the basic information about your PG to get started.',
+              title: loc?.startBuildingYourPgProfile ??
+                  _text('startBuildingYourPgProfile', 'Start Building Your PG Profile'),
+              message: loc?.ownerPgBasicInfoZeroStateMessage ??
+                  _text(
+                    'ownerPgBasicInfoZeroStateMessage',
+                    'Fill in the basic information about your PG to get started.',
+                  ),
               stats: [
-                _buildQuickStat('Progress',
-                    '$_completedSections/$_totalSections', Colors.blue),
-                _buildQuickStat('Required', '5', Colors.orange),
+                _buildQuickStat(
+                  loc?.progress ?? _text('progress', 'Progress'),
+                  '$_completedSections/$_totalSections',
+                  Colors.blue,
+                ),
+                _buildQuickStat(
+                  loc?.ownerPgQuickStatRequired ??
+                      _text('ownerPgQuickStatRequired', 'Required'),
+                  '5',
+                  Colors.orange,
+                ),
               ],
             )
           else
@@ -698,6 +737,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   }
 
   Widget _buildFloorStructureTab(ResponsiveConfig responsive) {
+    final loc = AppLocalizations.of(context);
     final hasData = _floors.isNotEmpty;
 
     return SingleChildScrollView(
@@ -708,13 +748,29 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           if (!hasData)
             _buildZeroStateHint(
               icon: Icons.home_work_outlined,
-              title: 'Define Your PG Structure',
-              message:
-                  'Set up the floor structure, rooms, and beds for your PG.',
+              title: loc?.defineYourPgStructure ??
+                  _text('defineYourPgStructure', 'Define Your PG Structure'),
+              message: loc?.ownerPgFloorStructureZeroStateMessage ??
+                  _text(
+                    'ownerPgFloorStructureZeroStateMessage',
+                    'Set up the floor structure, rooms, and beds for your PG.',
+                  ),
               stats: [
-                _buildQuickStat('Floors', '${_floors.length}', Colors.purple),
-                _buildQuickStat('Rooms', '${_rooms.length}', Colors.teal),
-                _buildQuickStat('Beds', '${_beds.length}', Colors.indigo),
+                _buildQuickStat(
+                    loc?.ownerPgQuickStatFloors ??
+                        _text('ownerPgQuickStatFloors', 'Floors'),
+                    '${_floors.length}',
+                    Colors.purple),
+                _buildQuickStat(
+                    loc?.ownerPgQuickStatRooms ??
+                        _text('ownerPgQuickStatRooms', 'Rooms'),
+                    '${_rooms.length}',
+                    Colors.teal),
+                _buildQuickStat(
+                    loc?.ownerPgQuickStatBeds ??
+                        _text('ownerPgQuickStatBeds', 'Beds'),
+                    '${_beds.length}',
+                    Colors.indigo),
               ],
             )
           else
@@ -722,28 +778,94 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           const SizedBox(height: AppSpacing.paddingM),
           // Bed numbering guide
           SectionContainer(
-            title: 'Bed Numbering Guide',
-            description:
-                'Number beds consistently based on door position so everyone agrees.',
+            title: loc?.bedNumberingGuide ??
+                _text('bedNumberingGuide', 'Bed Numbering Guide'),
+            description: loc?.ownerPgBedNumberingDescription ??
+                _text(
+                  'ownerPgBedNumberingDescription',
+                  'Number beds consistently based on door position so everyone agrees.',
+                ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 BodyText(
-                  text:
-                      'Rule: Stand at the entrance facing inside → left-to-right, front-to-back (door wall to opposite wall).',
+                  text: loc?.ownerPgBedNumberingRule ??
+                      _text(
+                        'ownerPgBedNumberingRule',
+                        'Rule: Stand at the entrance facing inside → left-to-right, front-to-back (door wall to opposite wall).',
+                      ),
                 ),
-                SizedBox(height: AppSpacing.paddingS),
-                HeadingSmall(text: '2x2 layout'),
-                BodyText(text: 'Bed-1: nearest row, left side'),
-                BodyText(text: 'Bed-2: nearest row, right side'),
-                BodyText(text: 'Bed-3: far row, left side'),
-                BodyText(text: 'Bed-4: far row, right side'),
-                SizedBox(height: AppSpacing.paddingS),
-                HeadingSmall(text: '1x4 along a wall (door → last wall)'),
-                BodyText(text: 'Bed-1: closest to door'),
-                BodyText(text: 'Bed-2: next'),
-                BodyText(text: 'Bed-3: next'),
-                BodyText(text: 'Bed-4: farthest from door'),
+                const SizedBox(height: AppSpacing.paddingS),
+                HeadingSmall(
+                  text: loc?.ownerPgBedLayoutTwoByTwo ??
+                      _text('ownerPgBedLayoutTwoByTwo', '2x2 layout'),
+                ),
+                BodyText(
+                  text: loc?.ownerPgBed1NearestLeft ??
+                      _text(
+                        'ownerPgBed1NearestLeft',
+                        'Bed-1: nearest row, left side',
+                      ),
+                ),
+                BodyText(
+                  text: loc?.ownerPgBed2NearestRight ??
+                      _text(
+                        'ownerPgBed2NearestRight',
+                        'Bed-2: nearest row, right side',
+                      ),
+                ),
+                BodyText(
+                  text: loc?.ownerPgBed3FarLeft ??
+                      _text(
+                        'ownerPgBed3FarLeft',
+                        'Bed-3: far row, left side',
+                      ),
+                ),
+                BodyText(
+                  text: loc?.ownerPgBed4FarRight ??
+                      _text(
+                        'ownerPgBed4FarRight',
+                        'Bed-4: far row, right side',
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.paddingS),
+                HeadingSmall(
+                  text: loc?.ownerPgBedLayoutOneByFour ??
+                      _text(
+                        'ownerPgBedLayoutOneByFour',
+                        '1x4 along a wall (door → last wall)',
+                      ),
+                ),
+                BodyText(
+                  text: loc?.ownerPgBed1ClosestDoor ??
+                      _text(
+                        'ownerPgBed1ClosestDoor',
+                        'Bed-1: closest to door',
+                      ),
+                ),
+                BodyText(
+                  text: loc?.ownerPgBedNext(2) ??
+                      _text(
+                        'ownerPgBedNext',
+                        'Bed-{number}: next',
+                        parameters: {'number': 2},
+                      ),
+                ),
+                BodyText(
+                  text: loc?.ownerPgBedNext(3) ??
+                      _text(
+                        'ownerPgBedNext',
+                        'Bed-{number}: next',
+                        parameters: {'number': 3},
+                      ),
+                ),
+                BodyText(
+                  text: loc?.ownerPgBed4Farthest ??
+                      _text(
+                        'ownerPgBed4Farthest',
+                        'Bed-4: farthest from door',
+                      ),
+                ),
               ],
             ),
           ),
@@ -762,6 +884,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   }
 
   Widget _buildRentConfigTab(ResponsiveConfig responsive) {
+    final loc = AppLocalizations.of(context);
     final rentCount =
         _rentControllers.values.where((c) => c.text.isNotEmpty).length;
     final hasData = rentCount > 0 || _depositController.text.isNotEmpty;
@@ -774,14 +897,27 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           if (!hasData)
             _buildZeroStateHint(
               icon: Icons.attach_money,
-              title: 'Configure Rental Pricing',
-              message:
-                  'Set up rent amounts for different sharing types and maintenance charges.',
+              title: loc?.configureRentalPricing ??
+                  _text('configureRentalPricing', 'Configure Rental Pricing'),
+              message: loc?.ownerPgRentConfigZeroStateMessage ??
+                  _text(
+                    'ownerPgRentConfigZeroStateMessage',
+                    'Set up rent amounts for different sharing types and maintenance charges.',
+                  ),
               stats: [
-                _buildQuickStat('Rent Types', '$rentCount/5', Colors.green),
                 _buildQuickStat(
-                    'Deposit',
-                    _depositController.text.isEmpty ? 'Not Set' : 'Set',
+                    loc?.ownerPgQuickStatRentTypes ??
+                        _text('ownerPgQuickStatRentTypes', 'Rent Types'),
+                    '$rentCount/5',
+                    Colors.green),
+                _buildQuickStat(
+                    loc?.ownerPgQuickStatDeposit ??
+                        _text('ownerPgQuickStatDeposit', 'Deposit'),
+                    _depositController.text.isEmpty
+                        ? (loc?.ownerPgStatusNotSet ??
+                            _text('ownerPgStatusNotSet', 'Not Set'))
+                        : (loc?.ownerPgStatusSet ??
+                            _text('ownerPgStatusSet', 'Set')),
                     Colors.amber),
               ],
             )
@@ -802,6 +938,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   }
 
   Widget _buildAmenitiesTab(ResponsiveConfig responsive) {
+    final loc = AppLocalizations.of(context);
     final hasData = _selectedAmenities.isNotEmpty;
 
     return SingleChildScrollView(
@@ -812,12 +949,19 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           if (!hasData)
             _buildZeroStateHint(
               icon: Icons.room_service,
-              title: 'Add PG Amenities',
-              message:
-                  'Select the amenities your PG offers to help guests find you.',
+              title: loc?.addPgAmenities ??
+                  _text('addPgAmenities', 'Add PG Amenities'),
+              message: loc?.ownerPgAmenitiesZeroStateMessage ??
+                  _text(
+                    'ownerPgAmenitiesZeroStateMessage',
+                    'Select the amenities your PG offers to help guests find you.',
+                  ),
               stats: [
                 _buildQuickStat(
-                    'Selected', '${_selectedAmenities.length}', Colors.cyan),
+                    loc?.ownerPgQuickStatSelected ??
+                        _text('ownerPgQuickStatSelected', 'Selected'),
+                    '${_selectedAmenities.length}',
+                    Colors.cyan),
               ],
             )
           else
@@ -834,6 +978,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   }
 
   Widget _buildPhotosTab(ResponsiveConfig responsive) {
+    final loc = AppLocalizations.of(context);
     final hasData = _uploadedPhotos.isNotEmpty;
 
     return SingleChildScrollView(
@@ -844,12 +989,18 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           if (!hasData)
             _buildZeroStateHint(
               icon: Icons.photo_library_outlined,
-              title: 'Upload PG Photos',
-              message:
-                  'Add photos of your PG to showcase it to potential guests.',
+              title: loc?.uploadPgPhotos ??
+                  _text('uploadPgPhotos', 'Upload PG Photos'),
+              message: loc?.ownerPgPhotosZeroStateMessage ??
+                  _text(
+                    'ownerPgPhotosZeroStateMessage',
+                    'Add photos of your PG to showcase it to potential guests.',
+                  ),
               stats: [
                 _buildQuickStat(
-                    'Photos', '${_uploadedPhotos.length}', Colors.pink),
+                    loc?.photos ?? _text('photos', 'Photos'),
+                    '${_uploadedPhotos.length}',
+                    Colors.pink),
               ],
             )
           else
@@ -988,9 +1139,21 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
   /// Build progress header using reusable components
   Widget _buildProgressHeader(ResponsiveConfig responsive) {
+    final loc = AppLocalizations.of(context);
     return SectionContainer(
-      title: 'Progress',
-      description: '$_completedSections of $_totalSections sections completed',
+      title: loc?.progress ?? _text('progress', 'Progress'),
+      description: loc?.ownerPgProgressDescription(
+            _completedSections,
+            _totalSections,
+          ) ??
+          _text(
+            'ownerPgProgressDescription',
+            '{completed} of {total} sections completed',
+            parameters: {
+              'completed': _completedSections,
+              'total': _totalSections,
+            },
+          ),
       child: _buildProgressIndicator(context),
     );
   }
@@ -1026,13 +1189,13 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           // Save Draft
           TextButton(
             onPressed: vm.loading ? null : _saveDraft,
-            child: const Text('Save Draft'),
+            child: Text(AppLocalizations.of(context)?.saveDraft ?? 'Save Draft'),
           ),
           const SizedBox(width: AppSpacing.paddingM),
           // Publish button visible when minimally valid
           PrimaryButton(
             onPressed: vm.loading ? null : _publishPG,
-            label: 'Publish',
+            label: AppLocalizations.of(context)?.publish ?? 'Publish',
             icon: Icons.publish,
           ),
           const SizedBox(width: AppSpacing.paddingM),
@@ -1041,15 +1204,15 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             child: PrimaryButton(
               onPressed: vm.loading ? null : _submitForm,
               label: vm.loading
-                  ? (isEditMode ? 'Updating...' : 'Creating...')
-                  : (isEditMode ? 'Update PG' : 'Create PG'),
+                  ? (isEditMode ? (AppLocalizations.of(context)?.updating ?? 'Updating...') : (AppLocalizations.of(context)?.creating ?? 'Creating...'))
+                  : (isEditMode ? (AppLocalizations.of(context)?.updatePg ?? 'Update PG') : (AppLocalizations.of(context)?.createPg ?? 'Create PG')),
               icon: isEditMode ? Icons.save : Icons.add_business,
             ),
           ),
           const SizedBox(width: AppSpacing.paddingM),
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
           ),
         ],
       ),
@@ -1061,7 +1224,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     final ownerId = authProvider.user?.userId ?? '';
     if (ownerId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not authenticated')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.userNotAuthenticated ?? 'User not authenticated')),
       );
       return;
     }
@@ -1069,7 +1232,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     // Require minimal publish fields
     if (_pgNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter PG name before publishing')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.pleaseEnterPgNameBeforePublishing ?? 'Please enter PG name before publishing')),
       );
       _tabController.animateTo(0);
       return;
@@ -1096,12 +1259,24 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     if (!mounted) return;
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('PG published successfully'), backgroundColor: Colors.green),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)?.pgPublishedSuccessfully ??
+                _text('ownerPgPublishedSuccessfully', 'PG published successfully'),
+          ),
+          backgroundColor: Colors.green,
+        ),
       );
       Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(vm.errorMessage ?? 'Failed to publish PG'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(
+            vm.errorMessage ??
+                _text('ownerPgPublishFailed', 'Failed to publish PG'),
+          ),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -1118,7 +1293,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     if (ownerId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not authenticated')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.userNotAuthenticated ?? 'User not authenticated')),
       );
       return;
     }
@@ -1291,7 +1466,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     if (ownerId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User not authenticated')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.userNotAuthenticated ?? 'User not authenticated')),
       );
       debugPrint('[SAVE_DRAFT][ERROR] User not authenticated');
       return;
@@ -1418,8 +1593,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Draft saved'),
+          SnackBar(
+          content: Text(AppLocalizations.of(context)?.draftSaved ?? 'Draft saved'),
           backgroundColor: Colors.green,
         ),
       );
