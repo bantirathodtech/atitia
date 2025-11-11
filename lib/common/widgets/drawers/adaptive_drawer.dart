@@ -38,15 +38,17 @@
 //   )
 // ============================================================================
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 
 import '../../lifecycle/stateless/adaptive_stateless_widget.dart';
 import '../../styles/colors.dart';
 import '../../styles/spacing.dart';
 import '../../styles/typography.dart';
+import '../../utils/constants/app.dart';
 import '../../../feature/auth/logic/auth_provider.dart';
 import '../../../core/app/theme/theme_provider.dart';
 import '../../../core/app/localization/locale_provider.dart';
@@ -746,7 +748,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                 runSpacing: AppSpacing.paddingXS,
                 children: [
                   GestureDetector(
-                    onTap: () => _showPrivacyPolicy(context),
+                    onTap: () async => await _showPrivacyPolicy(context),
                     child: Text(
                       loc?.privacyPolicy ?? 'Privacy',
                       style: AppTypography.bodySmall.copyWith(
@@ -1284,22 +1286,19 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
   }
 
   /// Show Privacy Policy
-  void _showPrivacyPolicy(BuildContext context) {
+  Future<void> _showPrivacyPolicy(BuildContext context) async {
     final loc = AppLocalizations.of(context);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(loc?.privacyPolicy ?? 'Privacy Policy'),
-        content:
-            Text(loc?.privacyPolicy ?? 'Privacy Policy content goes here...'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc?.close ?? 'Close'),
-          ),
-        ],
-      ),
+    final uri = Uri.parse(AppConstants.privacyPolicyUrl);
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
     );
+
+    if (!launched && loc != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.privacyPolicyOpenLinkError)),
+      );
+    }
   }
 
   /// Show Terms of Service

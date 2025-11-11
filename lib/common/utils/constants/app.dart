@@ -21,7 +21,11 @@ class AppConstants {
   static const String appVersion = '1.0.0';
 
   /// Support email for user assistance
-  static const String supportEmail = 'support@atitia.com';
+  static const String supportEmail = 'bantirathodtech@gmail.com';
+
+  /// Public privacy policy URL hosted for regulatory compliance
+  static const String privacyPolicyUrl =
+      'https://sites.google.com/view/atitiaprivacy/home';
 
   // MARK: - Business Rules
   // ==========================================

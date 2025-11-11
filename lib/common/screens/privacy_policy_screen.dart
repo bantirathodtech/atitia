@@ -6,11 +6,15 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../l10n/app_localizations.dart';
+import '../utils/constants/app.dart';
 import '../styles/colors.dart';
 import '../styles/spacing.dart';
 import '../widgets/app_bars/adaptive_app_bar.dart';
 import '../widgets/cards/adaptive_card.dart';
+import '../widgets/buttons/secondary_button.dart';
 import '../widgets/text/body_text.dart';
 import '../widgets/text/heading_large.dart';
 
@@ -33,6 +37,17 @@ class PrivacyPolicyScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HeadingLarge(text: loc.privacyPolicyTitle),
+            const SizedBox(height: AppSpacing.paddingM),
+            SecondaryButton(
+              label: loc.privacyPolicyViewOnlineButton,
+              icon: Icons.open_in_new,
+              onPressed: () => _openPrivacyPolicyUrl(context),
+            ),
+            const SizedBox(height: AppSpacing.paddingS),
+            BodyText(
+              text:
+                  loc.privacyPolicyHostedNotice(AppConstants.privacyPolicyUrl),
+            ),
             const SizedBox(height: AppSpacing.paddingM),
             AdaptiveCard(
               padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -80,6 +95,21 @@ class PrivacyPolicyScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _openPrivacyPolicyUrl(BuildContext context) async {
+    final uri = Uri.parse(AppConstants.privacyPolicyUrl);
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched) {
+      final loc = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(loc.privacyPolicyOpenLinkError)),
+      );
+    }
   }
 
   Widget _buildSection(String title, String content) {

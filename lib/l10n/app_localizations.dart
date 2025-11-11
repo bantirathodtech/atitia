@@ -11821,8 +11821,26 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicyLastUpdatedDate.
   ///
   /// In en, this message translates to:
-  /// **'November 2025'**
+  /// **'November 11, 2025'**
   String get privacyPolicyLastUpdatedDate;
+
+  /// No description provided for @privacyPolicyHostedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'You can review the most recent version online at {url}.'**
+  String privacyPolicyHostedNotice(String url);
+
+  /// No description provided for @privacyPolicyViewOnlineButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open privacy policy website'**
+  String get privacyPolicyViewOnlineButton;
+
+  /// No description provided for @privacyPolicyOpenLinkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open privacy policy. Please try again later.'**
+  String get privacyPolicyOpenLinkError;
 
   /// No description provided for @privacyPolicySection1Title.
   ///
@@ -11833,7 +11851,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicySection1Content.
   ///
   /// In en, this message translates to:
-  /// **'We collect information that you provide directly to us, including:\n• Personal information (name, email, phone number)\n• PG booking and payment information\n• Profile and preference data\n• Communication records with property owners'**
+  /// **'We collect information that you provide directly to us, including:\n• Account details (name, email address, profile photo, or other identifiers)\n• Communications such as support messages, feedback, and survey responses\n• Content you share, including uploads, media, and in-app inputs\n• Sensitive data only when you give explicit consent for a feature'**
   String get privacyPolicySection1Content;
 
   /// No description provided for @privacyPolicySection2Title.
@@ -11845,7 +11863,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicySection2Content.
   ///
   /// In en, this message translates to:
-  /// **'We use the information we collect to:\n• Provide, maintain, and improve our services\n• Process transactions and send related information\n• Send technical notices and support messages\n• Respond to your comments and questions'**
+  /// **'We use the information we collect to:\n• Provide, operate, maintain, and improve the Services\n• Personalize your experience and deliver relevant content\n• Handle account creation, authentication, and customer support\n• Analyze usage trends, diagnose issues, and ensure service reliability\n• Send service announcements, security alerts, and updates\n• Enforce our terms, prevent abuse, and comply with legal obligations'**
   String get privacyPolicySection2Content;
 
   /// No description provided for @privacyPolicySection3Title.
@@ -11857,7 +11875,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicySection3Content.
   ///
   /// In en, this message translates to:
-  /// **'We do not sell, trade, or rent your personal information. We may share your information only:\n• With property owners for booking purposes\n• To comply with legal obligations\n• To protect our rights and safety'**
+  /// **'We share personal data only when necessary:\n• With service providers that support hosting, analytics, payments, or security and are bound by confidentiality\n• To comply with applicable laws, regulations, or lawful requests\n• During a business transfer such as a merger, acquisition, or asset sale\n• With your consent or at your direction'**
   String get privacyPolicySection3Content;
 
   /// No description provided for @privacyPolicySection4Title.
@@ -11869,7 +11887,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicySection4Content.
   ///
   /// In en, this message translates to:
-  /// **'We implement appropriate security measures to protect your personal information. However, no method of transmission over the internet is 100% secure.'**
+  /// **'We deploy technical and organizational safeguards—encryption in transit, secure storage, access controls, and regular reviews—to protect your data. However, no transmission or storage system is completely secure, so we encourage you to use strong passwords and notify us of any suspected unauthorized activity.'**
   String get privacyPolicySection4Content;
 
   /// No description provided for @privacyPolicySection5Title.
@@ -11881,7 +11899,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicySection5Content.
   ///
   /// In en, this message translates to:
-  /// **'You have the right to:\n• Access your personal information\n• Correct inaccurate data\n• Request deletion of your data\n• Opt-out of certain communications'**
+  /// **'You can:\n• Request access to or a copy of the information we hold about you\n• Update or correct inaccurate data\n• Request deletion of your data, subject to legal retention requirements\n• Withdraw consent for optional data processing\n• Opt out of marketing and non-essential communications'**
   String get privacyPolicySection5Content;
 
   /// No description provided for @privacyPolicySection6Title.
@@ -11893,7 +11911,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicySection6Content.
   ///
   /// In en, this message translates to:
-  /// **'If you have questions about this Privacy Policy, please contact us at:\n\nEmail: privacy@atitia.com\nPhone: +91 1234567890'**
+  /// **'If you have questions about this Privacy Policy, please contact us at:\n\nEmail: bantirathodtech@gmail.com\nAddress: Hitech City, Hyderabad, Telangana, India 500083'**
   String get privacyPolicySection6Content;
 
   /// No description provided for @termsOfServiceTitle.

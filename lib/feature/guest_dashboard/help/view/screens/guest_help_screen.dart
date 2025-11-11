@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/utils/constants/app.dart';
 import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
@@ -187,11 +188,11 @@ class GuestHelpScreen extends StatelessWidget {
             context,
             icon: Icons.email,
             title: loc.guestHelpEmailTitle,
-            subtitle: 'support@atitia.com',
+            subtitle: AppConstants.supportEmail,
             onTap: () async {
               final Uri emailUri = Uri(
                 scheme: 'mailto',
-                path: 'support@atitia.com',
+                path: AppConstants.supportEmail,
                 query: 'subject=Support Request',
               );
               if (await canLaunchUrl(emailUri)) {
@@ -222,22 +223,24 @@ class GuestHelpScreen extends StatelessWidget {
               // Try WhatsApp first
               final Uri whatsappUrl = Uri.parse('https://wa.me/917020797849');
               bool whatsappLaunched = false;
-              
+
               if (await canLaunchUrl(whatsappUrl)) {
                 try {
-                  await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+                  await launchUrl(whatsappUrl,
+                      mode: LaunchMode.externalApplication);
                   whatsappLaunched = true;
                 } catch (e) {
                   // WhatsApp failed, try fallback
                   whatsappLaunched = false;
                 }
               }
-              
+
               // Fallback to web chat if WhatsApp is not available
               if (!whatsappLaunched) {
                 final Uri webChatUrl = Uri.parse('https://chat.atitia.com');
                 if (await canLaunchUrl(webChatUrl)) {
-                  await launchUrl(webChatUrl, mode: LaunchMode.externalApplication);
+                  await launchUrl(webChatUrl,
+                      mode: LaunchMode.externalApplication);
                 } else {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(

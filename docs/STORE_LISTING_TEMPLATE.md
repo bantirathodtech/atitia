@@ -328,7 +328,7 @@ Create a terms of service page covering:
 Suggested URL: `https://atitia.com/terms-of-service`
 
 ### Support Contact
-- Email: support@atitia.com
+- Email: bantirathodtech@gmail.com
 - Website: https://support.atitia.com
 - Phone: +91-XXXXXXXXXX (optional)
 
