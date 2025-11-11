@@ -13,7 +13,7 @@
     <application
         android:label="atitia"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
 
         <!-- Add this line for Play Integrity App Check -->
         <meta-data

@@ -100,6 +100,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.2
 
   build_runner: ^2.9.0
   flutter_gen_runner: ^5.12.0
@@ -111,6 +112,7 @@ flutter:
   assets:
     - assets/images/
     - assets/localization/        # ← Add ARB files here
+    - assets/app_icon.jpeg
 
   fonts:
     - family: Roboto
@@ -151,3 +153,16 @@ flutter:
 
   # Enable generate for localization from arb files
   generate: true
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  macos:
+    generate: true
+  web:
+    generate: true
+    image_path: "assets/app_icon.jpeg"
+    background_color: "#FFFFFF"
+    theme_color: "#1DB3A0"
+  image_path: "assets/app_icon.jpeg"
+  min_sdk_android: 21

@@ -1,54 +1,34 @@
 {
     "//": "============================================================================",
-    "//": "WEB APP MANIFEST - PWA (Progressive Web App) Configuration",
-    "//": "============================================================================",
-    "//": "This file defines how your app appears when installed on mobile devices",
-    "//": "and how it behaves as a Progressive Web App (PWA).",
-    "//": "",
-    "//": "IMPORTANT FIELDS:",
-    "//": "- name: Full app name (shown during install and in settings)",
-    "//": "- short_name: Abbreviated name (shown on home screen if space is limited)",
-    "//": "- start_url: URL to load when app is launched from home screen",
-    "//": "- display: How the app window should appear (standalone, fullscreen, etc)",
-    "//": "- background_color: Splash screen background color while app loads",
-    "//": "- theme_color: Color of the browser UI elements (address bar, etc)",
-    "//": "============================================================================",
-
     "name": "Atitia - PG Management Platform",
     "short_name": "Atitia",
-    
     "//description": "Description of what the app does",
     "description": "Premium PG Management and Guest Experience Platform. Manage hostels, bookings, food menus, payments, and provide excellent guest services.",
-    
     "//start_url": "Starting URL when app launches from home screen",
     "start_url": ".",
-    
     "//scope": "Navigation scope - URLs within this scope use the app shell",
     "scope": "/",
-    
     "//display": "How the app should be displayed",
     "//display_options": "standalone (no browser UI), fullscreen, minimal-ui, browser",
     "display": "standalone",
-    
     "//orientation": "Screen orientation preference",
     "//orientation_options": "any, natural, landscape, portrait, portrait-primary, portrait-secondary, landscape-primary, landscape-secondary",
     "orientation": "any",
-    
     "//background_color": "Splash screen background color (matches your primary brand color)",
     "//background_color_note": "This should match your app's primary color - currently set to purple (#7B61FF)",
-    "background_color": "#7B61FF",
-    
+    "background_color": "#FFFFFF",
     "//theme_color": "Browser UI color (address bar, status bar)",
     "//theme_color_note": "This should match your app's primary color for consistent branding",
-    "theme_color": "#7B61FF",
-    
+    "theme_color": "#1DB3A0",
     "//categories": "App Store categories (helps with discoverability)",
-    "categories": ["business", "productivity", "lifestyle"],
-    
+    "categories": [
+        "business",
+        "productivity",
+        "lifestyle"
+    ],
     "//prefer_related_applications": "Whether to prefer native app over web app",
     "//prefer_related_applications_note": "Set to true if you have native Android/iOS apps in stores",
     "prefer_related_applications": false,
-    
     "//related_applications": "Links to native apps (if they exist)",
     "//related_applications_example": [
         {
@@ -58,7 +38,6 @@
             "//id": "com.avishio.atitia"
         }
     ],
-    
     "//icons": "App icons for various devices and contexts",
     "//icons_note": "Provide multiple sizes for optimal display across all devices",
     "//icons_guidelines": [
@@ -67,38 +46,6 @@
         "- maskable: Adaptive icons that work with different device shapes",
         "- Use PNG format with transparency for best results"
     ],
-    "icons": [
-        {
-            "//": "Standard icon for most devices (minimum PWA requirement)",
-            "src": "icons/Icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "//": "Large icon for splash screens and high-res displays",
-            "src": "icons/Icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "//": "Maskable icon for adaptive display (Android)",
-            "//": "Ensures your icon looks good on all device shapes (rounded, squircle, etc)",
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "//": "Large maskable icon for high-res adaptive displays",
-            "src": "icons/Icon-maskable-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-        }
-    ],
-
     "//screenshots": "Screenshots for app install prompts (optional but recommended)",
     "//screenshots_note": "Add screenshots to showcase your app during installation",
     "//screenshots_example": [
@@ -109,7 +56,6 @@
             "//label": "Home Screen"
         }
     ],
-
     "//shortcuts": "Quick actions from home screen icon (optional)",
     "//shortcuts_note": "Allow users to quickly access key features",
     "//shortcuts_example": [
@@ -118,13 +64,16 @@
             "//short_name": "Menu",
             "//description": "Check today's food menu",
             "//url": "/food-menu",
-            "//icons": [{ "src": "icons/menu-icon.png", "sizes": "96x96" }]
+            "//icons": [
+                {
+                    "src": "icons/menu-icon.png",
+                    "sizes": "96x96"
+                }
+            ]
         }
     ],
-
     "//share_target": "Enable web share API (optional)",
     "//share_target_note": "Allows your app to receive shared content from other apps",
-    
     "//note_for_developers": [
         "MANIFEST FILE MAINTENANCE CHECKLIST:",
         "================================",
@@ -150,5 +99,29 @@
         "□ Ensure app opens without browser UI (standalone mode)",
         "□ Test offline functionality (if service worker enabled)",
         "□ Verify theme color matches brand in browser UI"
+    ],
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
     ]
 }
