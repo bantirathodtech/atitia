@@ -49,12 +49,13 @@ class StepIndicator extends AdaptiveStatelessWidget {
   Widget buildAdaptive(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     // Theme-aware default colors
     final active = activeColor ?? theme.primaryColor;
-    final inactive = inactiveColor ?? (isDarkMode 
-        ? AppColors.darkDivider  // Dark mode: lighter grey for visibility
-        : AppColors.outline);     // Light mode: standard outline color
+    final inactive = inactiveColor ??
+        (isDarkMode
+            ? AppColors.darkDivider // Dark mode: lighter grey for visibility
+            : AppColors.outline); // Light mode: standard outline color
     final completed = completedColor ?? AppColors.success;
 
     return Container(
@@ -119,7 +120,7 @@ class StepIndicator extends AdaptiveStatelessWidget {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
-                        
+
                         // Step label with theme-aware text color
                         AnimatedDefaultTextStyle(
                           duration: const Duration(milliseconds: 300),
@@ -130,9 +131,11 @@ class StepIndicator extends AdaptiveStatelessWidget {
                             // Theme-aware text color
                             color: isCompleted || isActive
                                 ? theme.textTheme.bodyLarge?.color
-                                : (isDarkMode 
-                                    ? AppColors.textTertiary  // Dark mode: lighter grey
-                                    : AppColors.textSecondary),  // Light mode: medium grey
+                                : (isDarkMode
+                                    ? AppColors
+                                        .textTertiary // Dark mode: lighter grey
+                                    : AppColors
+                                        .textSecondary), // Light mode: medium grey
                           ),
                           child: Text(
                             stepLabels[index],
@@ -144,7 +147,7 @@ class StepIndicator extends AdaptiveStatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   // Connector line (except for last step)
                   if (index < totalSteps - 1)
                     Expanded(
@@ -163,4 +166,3 @@ class StepIndicator extends AdaptiveStatelessWidget {
     );
   }
 }
-

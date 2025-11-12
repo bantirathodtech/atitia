@@ -102,7 +102,8 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: viewModel.refreshData,
-            tooltip: AppLocalizations.of(context)?.refreshPgData ?? 'Refresh PG Data',
+            tooltip: AppLocalizations.of(context)?.refreshPgData ??
+                'Refresh PG Data',
           ),
         ],
 
@@ -115,9 +116,15 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(text: AppLocalizations.of(context)?.dashboard ?? 'Dashboard', icon: const Icon(Icons.dashboard, size: 16)),
-              Tab(text: AppLocalizations.of(context)?.bedMap ?? 'Bed Map', icon: const Icon(Icons.bed, size: 16)),
-              Tab(text: AppLocalizations.of(context)?.booking ?? 'Bookings', icon: const Icon(Icons.book_online, size: 16)),
+              Tab(
+                  text: AppLocalizations.of(context)?.dashboard ?? 'Dashboard',
+                  icon: const Icon(Icons.dashboard, size: 16)),
+              Tab(
+                  text: AppLocalizations.of(context)?.bedMap ?? 'Bed Map',
+                  icon: const Icon(Icons.bed, size: 16)),
+              Tab(
+                  text: AppLocalizations.of(context)?.booking ?? 'Bookings',
+                  icon: const Icon(Icons.book_online, size: 16)),
             ],
           ),
         ),
@@ -142,13 +149,19 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           children: [
             const Icon(Icons.home_outlined, size: 80, color: Colors.grey),
             const SizedBox(height: AppSpacing.paddingM),
-            HeadingMedium(text: AppLocalizations.of(context)?.noPgsListedYet ?? 'No PGs Listed Yet'),
+            HeadingMedium(
+                text: AppLocalizations.of(context)?.noPgsListedYet ??
+                    'No PGs Listed Yet'),
             const SizedBox(height: AppSpacing.paddingS),
-            BodyText(text: AppLocalizations.of(context)?.tapButtonBelowToListFirstPg ?? 'Tap the button below to list your first PG'),
+            BodyText(
+                text:
+                    AppLocalizations.of(context)?.tapButtonBelowToListFirstPg ??
+                        'Tap the button below to list your first PG'),
             const SizedBox(height: AppSpacing.paddingL),
             PrimaryButton(
               onPressed: () => _navigateToCreatePG(context),
-              label: AppLocalizations.of(context)?.listYourFirstPg ?? 'List Your First PG',
+              label: AppLocalizations.of(context)?.listYourFirstPg ??
+                  'List Your First PG',
               icon: Icons.add_business,
             ),
           ],
@@ -163,7 +176,9 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           children: [
             AdaptiveLoader(),
             const SizedBox(height: AppSpacing.paddingM),
-            BodyText(text: AppLocalizations.of(context)?.loadingPgData ?? 'Loading PG data...'),
+            BodyText(
+                text: AppLocalizations.of(context)?.loadingPgData ??
+                    'Loading PG data...'),
           ],
         ),
       );
@@ -177,12 +192,15 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: AppSpacing.paddingL),
             HeadingMedium(
-              text: AppLocalizations.of(context)?.errorLoadingData ?? 'Error Loading Data',
+              text: AppLocalizations.of(context)?.errorLoadingData ??
+                  'Error Loading Data',
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: viewModel.errorMessage ?? (AppLocalizations.of(context)?.somethingWentWrong ?? 'Unknown error occurred'),
+              text: viewModel.errorMessage ??
+                  (AppLocalizations.of(context)?.somethingWentWrong ??
+                      'Unknown error occurred'),
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingL),
@@ -268,9 +286,10 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                   children: [
                     Icon(Icons.book_online_rounded,
                         color: Theme.of(context).primaryColor, size: 20),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.paddingS),
                     HeadingMedium(
-                      text: AppLocalizations.of(context)?.bookingsOverview ?? 'Bookings Overview',
+                      text: AppLocalizations.of(context)?.bookingsOverview ??
+                          'Bookings Overview',
                       color: Theme.of(context).primaryColor,
                     ),
                   ],
@@ -460,7 +479,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
-      margin: const EdgeInsets.all(4),
+      margin: const EdgeInsets.all(AppSpacing.paddingXS),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
         color: color.withValues(alpha: isDarkMode ? 0.15 : 0.1),

@@ -142,8 +142,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                     guestVM.setStatusFilter),
                 _buildFilterChip(loc.inProgress, 'in_progress',
                     guestVM.statusFilter, guestVM.setStatusFilter),
-                _buildFilterChip(loc.completed, 'completed', guestVM.statusFilter,
-                    guestVM.setStatusFilter),
+                _buildFilterChip(loc.completed, 'completed',
+                    guestVM.statusFilter, guestVM.setStatusFilter),
                 _buildFilterChip(loc.urgent, 'urgent', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingM),
@@ -285,7 +285,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -504,7 +504,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(6),
+          padding: const EdgeInsets.all(AppSpacing.paddingS),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(6),
@@ -701,7 +701,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppSpacing.paddingS),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -757,12 +757,12 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
-                child: BodyText(
-                  text: _text(
-                    'ownerServiceZeroRequests',
-                    '0 requests',
+                  child: BodyText(
+                    text: _text(
+                      'ownerServiceZeroRequests',
+                      '0 requests',
+                    ),
                   ),
-                ),
                 ),
               ],
             ),
@@ -930,7 +930,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppSpacing.paddingXS),
                           Text(
                             '${service.guestName} - ${loc.room} ${service.roomNumber}',
                             style: TextStyle(
@@ -1106,7 +1106,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
     return Row(
       children: [
         Icon(icon, size: 16, color: Colors.grey[600]),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1299,12 +1299,11 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
         const SizedBox(height: AppSpacing.paddingM),
         Text(loc.description,
             style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.paddingXS),
         Text(service.description),
         const SizedBox(height: AppSpacing.paddingM),
-        Text(loc.messages,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
+        Text(loc.messages, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: AppSpacing.paddingXS),
         _buildMessagesList(service.messages),
       ],
     );
@@ -1334,6 +1333,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
       ],
     ];
   }
+
   /// Builds detail row for dialog
   Widget _buildDetailRow(String label, String value) {
     return Padding(
@@ -1371,7 +1371,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   Widget _buildMessageItem(ServiceMessage message) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.paddingS),
       decoration: BoxDecoration(
         color: message.isFromGuest
             ? Colors.grey[100]
@@ -1397,7 +1397,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.paddingXS),
           Text(message.message),
         ],
       ),
@@ -1425,7 +1425,7 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
             child: Text(AppLocalizations.of(context)!.cancel),
           ),
           PrimaryButton(
-              label: AppLocalizations.of(context)!.sendReply,
+            label: AppLocalizations.of(context)!.sendReply,
             onPressed: () async {
               if (replyController.text.isNotEmpty) {
                 final navigator = Navigator.of(context);

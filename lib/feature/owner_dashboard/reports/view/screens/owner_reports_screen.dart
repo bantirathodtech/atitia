@@ -640,7 +640,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.paddingXS),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(

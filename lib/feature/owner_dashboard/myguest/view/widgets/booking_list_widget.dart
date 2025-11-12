@@ -93,7 +93,8 @@ class BookingListWidget extends StatelessWidget {
                     vertical: AppSpacing.paddingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(booking.status).withValues(alpha: 0.2),
+                    color:
+                        _getStatusColor(booking.status).withValues(alpha: 0.2),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -108,8 +109,9 @@ class BookingListWidget extends StatelessWidget {
             // Booking dates
             Row(
               children: [
-                Icon(Icons.calendar_today, size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                Icon(Icons.calendar_today,
+                    size: 14, color: Colors.grey.shade600),
+                const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text:
                       '${booking.formattedStartDate} - ${booking.formattedEndDate}',
@@ -122,7 +124,7 @@ class BookingListWidget extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.access_time, size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 CaptionText(
                   text: loc?.durationDays(booking.durationInDays) ??
                       _text('durationDays', '{count} days',
@@ -140,8 +142,7 @@ class BookingListWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CaptionText(
-                      text: loc?.rentLabel ??
-                          _text('rentLabel', 'Rent'),
+                      text: loc?.rentLabel ?? _text('rentLabel', 'Rent'),
                       color: Colors.grey.shade600,
                     ),
                     BodyText(
@@ -154,8 +155,8 @@ class BookingListWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CaptionText(
-                      text: loc?.depositLabel ??
-                          _text('depositLabel', 'Deposit'),
+                      text:
+                          loc?.depositLabel ?? _text('depositLabel', 'Deposit'),
                       color: Colors.grey.shade600,
                     ),
                     BodyText(
@@ -211,25 +212,22 @@ class BookingListWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title:
-            HeadingSmall(
-                text: loc?.bookingDetailsTitle ??
-                    _text('bookingDetailsTitle', 'Booking Details')),
+        title: HeadingSmall(
+            text: loc?.bookingDetailsTitle ??
+                _text('bookingDetailsTitle', 'Booking Details')),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildDetailRow(
-                loc?.roomBedLabel ??
-                    _text('roomBedLabel', 'Room/Bed'),
+                loc?.roomBedLabel ?? _text('roomBedLabel', 'Room/Bed'),
                 booking.roomBedDisplay,
               ),
               _buildDetailRow(
                   loc?.startDate ?? _text('startDate', 'Start Date'),
                   booking.formattedStartDate),
-              _buildDetailRow(
-                  loc?.endDate ?? _text('endDate', 'End Date'),
+              _buildDetailRow(loc?.endDate ?? _text('endDate', 'End Date'),
                   booking.formattedEndDate),
               _buildDetailRow(
                 loc?.durationLabel ?? _text('durationLabel', 'Duration'),
@@ -237,18 +235,15 @@ class BookingListWidget extends StatelessWidget {
                     _text('durationDays', '{count} days',
                         parameters: {'count': booking.durationInDays}),
               ),
-              _buildDetailRow(
-                  loc?.rentLabel ?? _text('rentLabel', 'Rent'),
+              _buildDetailRow(loc?.rentLabel ?? _text('rentLabel', 'Rent'),
                   booking.formattedRent),
               _buildDetailRow(
                   loc?.depositLabel ?? _text('depositLabel', 'Deposit'),
                   booking.formattedDeposit),
-              _buildDetailRow(
-                  loc?.paidLabel ?? _text('paidLabel', 'Paid'),
+              _buildDetailRow(loc?.paidLabel ?? _text('paidLabel', 'Paid'),
                   booking.formattedPaid),
               _buildDetailRow(
-                  loc?.remainingLabel ??
-                      _text('remainingLabel', 'Remaining'),
+                  loc?.remainingLabel ?? _text('remainingLabel', 'Remaining'),
                   booking.formattedRemaining),
               _buildDetailRow(
                   loc?.statusLabel ?? _text('statusLabel', 'Status'),
@@ -259,8 +254,7 @@ class BookingListWidget extends StatelessWidget {
                 booking.paymentStatusDisplay,
               ),
               if (booking.notes != null && booking.notes!.isNotEmpty)
-                _buildDetailRow(
-                    loc?.notesLabel ?? _text('notesLabel', 'Notes'),
+                _buildDetailRow(loc?.notesLabel ?? _text('notesLabel', 'Notes'),
                     booking.notes!),
             ],
           ),

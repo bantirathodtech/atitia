@@ -127,32 +127,20 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                 _buildFilterChip(loc.all, 'all', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(loc.statusNew, 'new',
+                _buildFilterChip(loc.statusNew, 'new', guestVM.statusFilter,
+                    guestVM.setStatusFilter),
+                const SizedBox(width: AppSpacing.paddingS),
+                _buildFilterChip(loc.statusInProgress, 'in_progress',
                     guestVM.statusFilter, guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc.statusInProgress,
-                    'in_progress',
-                    guestVM.statusFilter,
+                _buildFilterChip(loc.statusResolved, 'resolved',
+                    guestVM.statusFilter, guestVM.setStatusFilter),
+                const SizedBox(width: AppSpacing.paddingS),
+                _buildFilterChip(loc.urgent, 'urgent', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc.statusResolved,
-                    'resolved',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc.urgent,
-                    'urgent',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc.highPriority,
-                    'high_priority',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
+                _buildFilterChip(loc.highPriority, 'high_priority',
+                    guestVM.statusFilter, guestVM.setStatusFilter),
               ],
             ),
           ),
@@ -211,8 +199,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   }
 
   /// Builds stats header
-  Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM,
-      AppLocalizations loc) {
+  Widget _buildStatsHeader(
+      BuildContext context, OwnerGuestViewModel guestVM, AppLocalizations loc) {
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -279,8 +267,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
 
   /// Builds structured empty state with placeholder rows
   Widget _buildStructuredEmptyState(
-      BuildContext context, OwnerGuestViewModel guestVM,
-      AppLocalizations loc) {
+      BuildContext context, OwnerGuestViewModel guestVM, AppLocalizations loc) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -308,8 +295,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
-                  child:
-                      BodyText(text: loc.complaintCount(0)),
+                  child: BodyText(text: loc.complaintCount(0)),
                 ),
               ],
             ),
@@ -478,7 +464,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppSpacing.paddingXS),
                           Text(
                             '${complaint.guestName} - ${loc.room} ${complaint.roomNumber}',
                             style: TextStyle(
@@ -561,7 +547,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
     return Row(
       children: [
         Icon(icon, size: 16, color: Colors.grey[600]),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -692,25 +678,22 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
               children: [
                 _buildDetailRow(loc.guest, complaint.guestName),
                 _buildDetailRow(loc.room, complaint.roomNumber),
-                _buildDetailRow(loc.complaintTitle,
-                    complaint.title),
-                _buildDetailRow(loc.priority,
-                    complaint.priorityDisplay),
+                _buildDetailRow(loc.complaintTitle, complaint.title),
+                _buildDetailRow(loc.priority, complaint.priorityDisplay),
                 _buildDetailRow(loc.status, complaint.statusDisplay),
-                _buildDetailRow(loc.created,
-                    _formatDate(complaint.createdAt)),
+                _buildDetailRow(loc.created, _formatDate(complaint.createdAt)),
                 if (complaint.resolvedAt != null)
-                  _buildDetailRow(loc.statusResolved,
-                      _formatDate(complaint.resolvedAt!)),
+                  _buildDetailRow(
+                      loc.statusResolved, _formatDate(complaint.resolvedAt!)),
                 const SizedBox(height: AppSpacing.paddingM),
                 Text(loc.description,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.paddingXS),
                 Text(complaint.description),
                 const SizedBox(height: AppSpacing.paddingM),
                 Text(loc.messages,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.paddingXS),
                 _buildMessagesList(complaint.messages),
               ],
             ),
@@ -730,8 +713,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
               ),
               PrimaryButton(
                 label: loc.resolve,
-                onPressed: () =>
-                    _resolveComplaint(context, guestVM, complaint),
+                onPressed: () => _resolveComplaint(context, guestVM, complaint),
               ),
             ],
           ],
@@ -777,7 +759,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   Widget _buildMessageItem(ComplaintMessage message) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.paddingS),
       decoration: BoxDecoration(
         color: message.isFromGuest
             ? Colors.grey[100]
@@ -803,7 +785,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.paddingXS),
           Text(message.message),
         ],
       ),
@@ -902,7 +884,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                 navigator.pop();
                 if (!mounted) return;
                 scaffoldMessenger.showSnackBar(
-                  SnackBar(content: Text(locOuter.complaintResolvedSuccessfully)),
+                  SnackBar(
+                      content: Text(locOuter.complaintResolvedSuccessfully)),
                 );
               },
             ),
@@ -919,8 +902,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
 
   /// Builds quick stats and bulk actions bar
   Widget _buildQuickStatsAndActions(
-      BuildContext context, OwnerGuestViewModel guestVM,
-      AppLocalizations loc) {
+      BuildContext context, OwnerGuestViewModel guestVM, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingM,
@@ -938,18 +920,12 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
             child: Row(
               children: [
                 _buildStatChip(
-                    context,
-                    loc.total,
-                    '${guestVM.complaints.length}'),
+                    context, loc.total, '${guestVM.complaints.length}'),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildStatChip(
-                    context,
-                    loc.statusNew,
+                _buildStatChip(context, loc.statusNew,
                     '${guestVM.complaints.where((c) => c.status == 'new').length}'),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildStatChip(
-                    context,
-                    loc.urgent,
+                _buildStatChip(context, loc.urgent,
                     '${guestVM.complaints.where((c) => c.priority == 'urgent').length}'),
               ],
             ),

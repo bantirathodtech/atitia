@@ -7,12 +7,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
@@ -236,19 +238,32 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
   /// Builds error state
   Widget _buildErrorState(BuildContext context, OwnerGuestViewModel guestVM) {
     final loc = AppLocalizations.of(context)!;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-          const SizedBox(height: AppSpacing.paddingM),
-          BodyText(text: loc.ownerGuestFailedToLoadData),
-          const SizedBox(height: AppSpacing.paddingM),
-          ElevatedButton(
-            onPressed: () => _refreshData(),
-            child: Text(loc.retry),
-          ),
-        ],
+    return Semantics(
+      label: 'Error loading guest data',
+      hint:
+          'An error occurred while loading guest management data. Use the retry button to try again.',
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Semantics(
+              label: 'Error icon',
+              excludeSemantics: true,
+              child:
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            ),
+            const SizedBox(height: AppSpacing.paddingM),
+            Semantics(
+              header: true,
+              child: BodyText(text: loc.ownerGuestFailedToLoadData),
+            ),
+            const SizedBox(height: AppSpacing.paddingM),
+            PrimaryButton(
+              onPressed: () => _refreshData(),
+              label: loc.retry,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -326,10 +341,9 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             BodyText(
-                                text: (req['guestName'] ??
-                                        loc.unknownGuest)
+                                text: (req['guestName'] ?? loc.unknownGuest)
                                     .toString()),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppSpacing.paddingXS),
                             CaptionText(
                                 text: (req['pgName'] ?? loc.unknownPg)
                                     .toString()),
@@ -341,16 +355,16 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
                             _showRequestDetailsDialog(context, req),
                         child: Text(loc.viewAction),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.paddingS),
                       if (isPending) ...[
                         TextButton(
                           onPressed: () => _showRejectDialog(context, req),
                           child: Text(loc.reject),
                         ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
+                        const SizedBox(width: AppSpacing.paddingS),
+                        PrimaryButton(
                           onPressed: () => _showApproveDialog(context, req),
-                          child: Text(loc.approve),
+                          label: loc.approve,
                         ),
                       ] else ...[
                         Container(
@@ -430,8 +444,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text:
-                  '${loc.bookingRequestPgNameLabel}: ${req['pgName'] ?? '-'}',
+              text: '${loc.bookingRequestPgNameLabel}: ${req['pgName'] ?? '-'}',
             ),
             BodyText(
               text:
@@ -467,7 +480,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(loc.cancel)),
-          ElevatedButton(
+          PrimaryButton(
             onPressed: () async {
               final vm = context.read<OwnerGuestViewModel>();
               final requestId =
@@ -485,7 +498,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
               // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
             },
-            child: Text(loc.approve),
+            label: loc.approve,
           ),
         ],
       ),
@@ -511,7 +524,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(loc.cancel)),
-          ElevatedButton(
+          PrimaryButton(
             onPressed: () async {
               final vm = context.read<OwnerGuestViewModel>();
               final requestId =
@@ -529,7 +542,8 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
               // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
             },
-            child: Text(loc.reject),
+            label: loc.reject,
+            backgroundColor: AppColors.error,
           ),
         ],
       ),

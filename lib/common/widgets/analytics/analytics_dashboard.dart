@@ -87,7 +87,7 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
   Widget _buildPerformanceMetricsCard(
       BuildContext context, bool isDarkMode, AppLocalizations loc) {
     final theme = Theme.of(context);
-    
+
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       backgroundColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
@@ -105,7 +105,9 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
               color: AppColors.textSecondary,
             )
           else
-            ..._performanceMetrics.take(10).map((metric) => _buildMetricItem(metric)),
+            ..._performanceMetrics
+                .take(10)
+                .map((metric) => _buildMetricItem(metric)),
         ],
       ),
     );
@@ -115,8 +117,9 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
     final name = metric['metric_name'] as String;
     final value = metric['value'] as double;
     final unit = metric['unit'] as String? ?? 'ms';
-    final timestamp = DateTime.fromMillisecondsSinceEpoch(metric['timestamp'] as int);
-    
+    final timestamp =
+        DateTime.fromMillisecondsSinceEpoch(metric['timestamp'] as int);
+
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -159,7 +162,7 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
   Widget _buildUserJourneyCard(
       BuildContext context, bool isDarkMode, AppLocalizations loc) {
     final theme = Theme.of(context);
-    
+
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       backgroundColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
@@ -188,7 +191,7 @@ class _AnalyticsDashboardState extends State<AnalyticsDashboard> {
   Widget _buildBusinessMetricsCard(
       BuildContext context, bool isDarkMode, AppLocalizations loc) {
     final theme = Theme.of(context);
-    
+
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       backgroundColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
@@ -291,14 +294,14 @@ class _AnalyticsWidgetState extends State<AnalyticsWidget> {
 
   Future<void> _loadQuickStats() async {
     final metrics = await _analyticsService.getPerformanceMetrics();
-    
+
     if (mounted) {
       setState(() {
         _sessionCount = metrics.length;
         if (metrics.isNotEmpty) {
-          _avgResponseTime = metrics
-              .map((m) => m['value'] as double)
-              .reduce((a, b) => a + b) / metrics.length;
+          _avgResponseTime =
+              metrics.map((m) => m['value'] as double).reduce((a, b) => a + b) /
+                  metrics.length;
         }
       });
     }
@@ -334,9 +337,9 @@ class _AnalyticsWidgetState extends State<AnalyticsWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem(loc.analyticsSessionsLabel, _sessionCount.toString()),
               _buildStatItem(
-                  loc.analyticsAverageTimeLabel,
+                  loc.analyticsSessionsLabel, _sessionCount.toString()),
+              _buildStatItem(loc.analyticsAverageTimeLabel,
                   '${_avgResponseTime.toStringAsFixed(1)}ms'),
             ],
           ),

@@ -15,7 +15,8 @@ class GuestPaymentModel {
   final double amount;
   final DateTime paymentDate;
   final DateTime dueDate;
-  final String status; // Pending, Paid, Failed, Refunded, Confirmed (for cash/UPI)
+  final String
+      status; // Pending, Paid, Failed, Refunded, Confirmed (for cash/UPI)
   final String paymentMethod; // 'razorpay', 'upi', 'cash', 'bank_transfer'
   final String? transactionId;
   final String? upiReferenceId;

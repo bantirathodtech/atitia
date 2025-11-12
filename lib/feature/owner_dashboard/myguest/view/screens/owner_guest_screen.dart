@@ -69,7 +69,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.request_page_outlined, size: 64, color: Colors.grey),
+            const Icon(Icons.request_page_outlined,
+                size: 64, color: Colors.grey),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(
               text: loc.noRequests,
@@ -143,7 +144,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.report_problem_outlined, size: 64, color: Colors.grey),
+            const Icon(Icons.report_problem_outlined,
+                size: 64, color: Colors.grey),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(text: loc.noComplaintsFound),
             const SizedBox(height: AppSpacing.paddingS),
@@ -200,13 +202,13 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                   Row(
                     children: [
                       Icon(Icons.person, size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.paddingXS),
                       CaptionText(
                         text: c.guestName.isEmpty ? loc.guest : c.guestName,
                       ),
                       const SizedBox(width: AppSpacing.paddingM),
                       Icon(Icons.schedule, size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.paddingXS),
                       CaptionText(text: _formatShortDate(c.createdAt)),
                     ],
                   ),
@@ -405,12 +407,18 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             unselectedLabelColor: Colors.white70,
             tabs: [
               Tab(text: loc.guests, icon: const Icon(Icons.people, size: 16)),
-              Tab(text: loc.booking, icon: const Icon(Icons.book_online, size: 16)),
-              Tab(text: loc.payments, icon: const Icon(Icons.payment, size: 16)),
+              Tab(
+                  text: loc.booking,
+                  icon: const Icon(Icons.book_online, size: 16)),
+              Tab(
+                  text: loc.payments,
+                  icon: const Icon(Icons.payment, size: 16)),
               Tab(
                   text: loc.complaints,
                   icon: const Icon(Icons.report_problem, size: 16)),
-              Tab(text: loc.requests, icon: const Icon(Icons.request_page, size: 16)),
+              Tab(
+                  text: loc.requests,
+                  icon: const Icon(Icons.request_page, size: 16)),
               Tab(text: loc.bedMap, icon: const Icon(Icons.bed, size: 16)),
             ],
           ),
@@ -734,7 +742,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           color: Theme.of(context).primaryColor,
           size: 24,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.paddingXS),
         Text(
           value,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -861,7 +869,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                       children: [
                         Icon(Icons.check_circle,
                             size: 16, color: AppColors.info),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.paddingXS),
                         BodyText(
                           text:
                               '${viewModel.filteredGuests.length} ${loc.found}',
@@ -985,8 +993,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   }
 
   /// Builds individual payment stat item
-  Widget _buildPaymentStatItem(
-      BuildContext context, String label, int count, double amount, Color color) {
+  Widget _buildPaymentStatItem(BuildContext context, String label, int count,
+      double amount, Color color) {
     final localeName = AppLocalizations.of(context)!.localeName;
     final currencyFormatter =
         NumberFormat.simpleCurrency(locale: localeName, name: 'INR');
@@ -1010,7 +1018,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                   color: AppColors.textOnPrimary,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.paddingXS),
               Text(
                 formattedAmount,
                 style: const TextStyle(
@@ -1083,7 +1091,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             Row(
               children: [
                 Icon(Icons.apartment, size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: BodyText(
                     text: request.pgName,
@@ -1097,7 +1105,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             Row(
               children: [
                 Icon(Icons.phone, size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: request.guestPhone,
                   color: Colors.grey.shade600,
@@ -1110,7 +1118,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
               children: [
                 Icon(Icons.calendar_today,
                     size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: request.formattedCreatedAt,
                   color: Colors.grey.shade600,
@@ -1169,11 +1177,9 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildDetailRow(
-                loc.bookingRequestGuestNameLabel, request.guestDisplayName),
-              _buildDetailRow(
-                  loc.bookingRequestPhoneLabel, request.guestPhone),
-              _buildDetailRow(
-                  loc.bookingRequestEmailLabel, request.guestEmail),
+                  loc.bookingRequestGuestNameLabel, request.guestDisplayName),
+              _buildDetailRow(loc.bookingRequestPhoneLabel, request.guestPhone),
+              _buildDetailRow(loc.bookingRequestEmailLabel, request.guestEmail),
               _buildDetailRow(loc.bookingRequestPgNameLabel, request.pgName),
               _buildDetailRow(
                   loc.bookingRequestDateLabel, request.formattedCreatedAt),

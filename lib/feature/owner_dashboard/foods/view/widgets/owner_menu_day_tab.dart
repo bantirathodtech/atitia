@@ -166,11 +166,11 @@ class OwnerMenuDayTab extends StatelessWidget {
         Expanded(child: BodyText(text: label)),
         const SizedBox(width: AppSpacing.paddingS),
         Icon(Icons.thumb_up_alt_outlined, size: 16, color: Colors.green),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.paddingXS),
         CaptionText(text: likes.toString()),
         const SizedBox(width: AppSpacing.paddingM),
         Icon(Icons.thumb_down_alt_outlined, size: 16, color: Colors.red),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.paddingXS),
         CaptionText(text: dislikes.toString()),
       ],
     );

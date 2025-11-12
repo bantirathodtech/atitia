@@ -126,41 +126,23 @@ class _GuestListWidgetState extends State<GuestListWidget> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip(
-                    loc?.all ?? _text('all', 'All'),
-                    'all',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
+                _buildFilterChip(loc?.all ?? _text('all', 'All'), 'all',
+                    guestVM.statusFilter, guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc?.active ?? _text('active', 'Active'),
-                    'active',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
+                _buildFilterChip(loc?.active ?? _text('active', 'Active'),
+                    'active', guestVM.statusFilter, guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc?.inactive ?? _text('inactive', 'Inactive'),
-                    'inactive',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
+                _buildFilterChip(loc?.inactive ?? _text('inactive', 'Inactive'),
+                    'inactive', guestVM.statusFilter, guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc?.pending ?? _text('pending', 'Pending'),
-                    'pending',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
+                _buildFilterChip(loc?.pending ?? _text('pending', 'Pending'),
+                    'pending', guestVM.statusFilter, guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc?.statusNew ?? _text('statusNew', 'New'),
-                    'new',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
+                _buildFilterChip(loc?.statusNew ?? _text('statusNew', 'New'),
+                    'new', guestVM.statusFilter, guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc?.statusVip ?? _text('statusVip', 'VIP'),
-                    'vip',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
+                _buildFilterChip(loc?.statusVip ?? _text('statusVip', 'VIP'),
+                    'vip', guestVM.statusFilter, guestVM.setStatusFilter),
               ],
             ),
           ),
@@ -205,9 +187,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
           Expanded(
             child: Row(
               children: [
-                _buildStatChip(
-                    context,
-                    loc?.total ?? _text('total', 'Total'),
+                _buildStatChip(context, loc?.total ?? _text('total', 'Total'),
                     '${guestVM.guests.length}'),
                 const SizedBox(width: AppSpacing.paddingS),
                 _buildStatChip(
@@ -226,8 +206,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: () => _exportGuests(context, guestVM, loc),
-            tooltip:
-                loc?.exportData ?? _text('exportData', 'Export Data'),
+            tooltip: loc?.exportData ?? _text('exportData', 'Export Data'),
           ),
         ],
       ),
@@ -262,8 +241,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
       context: context,
       builder: (context) => AlertDialog(
         title: HeadingMedium(
-            text:
-                loc?.advancedSearch ?? _text('advancedSearch', 'Advanced Search')),
+            text: loc?.advancedSearch ??
+                _text('advancedSearch', 'Advanced Search')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -291,8 +270,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-              child:
-                BodyText(text: loc?.cancel ?? _text('cancel', 'Cancel')),
+            child: BodyText(text: loc?.cancel ?? _text('cancel', 'Cancel')),
           ),
           PrimaryButton(
             label: loc?.search ?? _text('search', 'Search'),
@@ -666,7 +644,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppSpacing.paddingXS),
                           Text(
                             guest.roomAssignment,
                             style: TextStyle(
@@ -702,7 +680,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                     Column(
                       children: [
                         _buildStatusChip(context, guest.status, loc),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.paddingXS),
                         PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, size: 16),
                           onSelected: (value) => _handleGuestAction(
@@ -834,7 +812,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
     return Row(
       children: [
         Icon(icon, size: 16, color: Colors.grey[600]),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

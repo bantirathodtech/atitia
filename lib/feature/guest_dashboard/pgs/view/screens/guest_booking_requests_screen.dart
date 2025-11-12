@@ -18,6 +18,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../feature/owner_dashboard/myguest/data/models/owner_booking_request_model.dart';
 import '../../../../../feature/owner_dashboard/myguest/data/repository/owner_booking_request_repository.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
@@ -240,9 +241,9 @@ class _GuestBookingRequestsScreenState
               align: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.paddingL),
-            ElevatedButton(
+            PrimaryButton(
               onPressed: _loadBookingRequests,
-              child: Text(loc?.tryAgain ?? _text('tryAgain', 'Try Again')),
+              label: loc?.tryAgain ?? _text('tryAgain', 'Try Again'),
             ),
           ],
         ),
@@ -457,7 +458,7 @@ class _GuestBookingRequestsScreenState
             Row(
               children: [
                 Icon(Icons.location_on, size: 14, color: Colors.grey.shade400),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 ShimmerLoader(
                   width: 150,
                   height: 12,
@@ -471,7 +472,7 @@ class _GuestBookingRequestsScreenState
               children: [
                 Icon(Icons.calendar_today,
                     size: 14, color: Colors.grey.shade400),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 ShimmerLoader(
                   width: 120,
                   height: 12,
@@ -530,7 +531,7 @@ class _GuestBookingRequestsScreenState
             Row(
               children: [
                 Icon(Icons.location_on, size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: BodyText(
                     text: request.pgName,
@@ -545,7 +546,7 @@ class _GuestBookingRequestsScreenState
               children: [
                 Icon(Icons.calendar_today,
                     size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: loc?.bookingRequestRequestedOn(
                         _formatDate(requestDate),
@@ -563,7 +564,7 @@ class _GuestBookingRequestsScreenState
                 children: [
                   Icon(Icons.check_circle,
                       size: 14, color: Colors.grey.shade600),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.paddingXS),
                   BodyText(
                     text: loc?.bookingRequestRespondedOn(
                           _formatDate(respondedAt),

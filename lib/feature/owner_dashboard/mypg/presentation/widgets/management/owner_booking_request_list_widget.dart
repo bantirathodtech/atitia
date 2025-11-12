@@ -49,7 +49,8 @@ class OwnerBookingRequestListWidget extends StatelessWidget {
           children: [
             HeadingMedium(
               text: loc?.ownerBookingRequestsTitle(bookings.length) ??
-                  _text('ownerBookingRequestsTitle', 'Pending Requests ({count})',
+                  _text(
+                      'ownerBookingRequestsTitle', 'Pending Requests ({count})',
                       parameters: {'count': bookings.length}),
               color: Theme.of(context).primaryColor,
             ),

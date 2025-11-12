@@ -157,7 +157,7 @@ class OwnerSettingsScreen extends StatelessWidget {
                     text: loc.theme,
                     medium: true,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.paddingXS),
                   CaptionText(
                     text: loc.chooseYourPreferredTheme,
                   ),
@@ -213,7 +213,7 @@ class OwnerSettingsScreen extends StatelessWidget {
                     text: loc.language,
                     medium: true,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.paddingXS),
                   CaptionText(
                     text: loc.selectPreferredLanguage,
                   ),

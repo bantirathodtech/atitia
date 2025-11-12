@@ -115,7 +115,7 @@ class OwnerSummaryWidget extends StatelessWidget {
             children: [
               Icon(icon, color: color, size: 24),
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
                   shape: BoxShape.circle,

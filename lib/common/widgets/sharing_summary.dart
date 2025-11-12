@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../common/styles/spacing.dart';
 import '../../core/services/localization/internationalization_service.dart';
 import '../../feature/guest_dashboard/pgs/data/models/guest_pg_model.dart';
 import '../../feature/owner_dashboard/mypg/data/models/pg_room_model.dart';
@@ -53,8 +54,7 @@ class SharingSummaryRow extends StatelessWidget {
         child: Row(
           children: summary.entries.map((e) {
             final amount = i18n.formatCurrency(e.value.pricePerBed);
-            final priceLabel =
-                loc?.sharingPricePerBed(amount) ?? '$amount/bed';
+            final priceLabel = loc?.sharingPricePerBed(amount) ?? '$amount/bed';
             return Container(
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -66,9 +66,9 @@ class SharingSummaryRow extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(Icons.bed, size: 14, color: Colors.blueGrey),
-                  const SizedBox(width: 3),
+                  const SizedBox(width: AppSpacing.paddingXS),
                   BodyText(text: e.key, small: true),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.paddingS),
                   BodyText(
                     text: priceLabel,
                     color: Colors.indigo,
@@ -106,7 +106,7 @@ class SharingSummaryTable extends StatelessWidget {
           text: loc?.sharingAndVacancy ?? 'Sharing & Vacancy',
           color: Colors.deepPurple,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.paddingS),
         Table(
           border: TableBorder.all(color: Colors.grey.shade200),
           columnWidths: const {
@@ -135,9 +135,9 @@ class SharingSummaryTable extends StatelessWidget {
   }
 
   Widget _th(String text) => Padding(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.all(AppSpacing.paddingS),
       child: BodyText(text: text, small: true, color: Colors.grey));
   Widget _td(String text) => Padding(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.all(AppSpacing.paddingS),
       child: BodyText(text: text, small: true));
 }

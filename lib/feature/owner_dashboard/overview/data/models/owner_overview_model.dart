@@ -152,8 +152,7 @@ class OwnerOverviewModel {
   String get formattedOccupancyRate => '${occupancyRate.toStringAsFixed(1)}%';
 
   /// Returns formatted collection rate
-  String get formattedCollectionRate =>
-      '${collectionRate.toStringAsFixed(1)}%';
+  String get formattedCollectionRate => '${collectionRate.toStringAsFixed(1)}%';
 
   /// Returns formatted average revenue per property
   String get formattedAvgRevenuePerProperty =>
@@ -203,4 +202,3 @@ class OwnerOverviewModel {
     return 'OwnerOverviewModel(ownerId: $ownerId, properties: $totalProperties, revenue: $formattedTotalRevenue)';
   }
 }
-

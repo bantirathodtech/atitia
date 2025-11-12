@@ -8,7 +8,7 @@ import '../text/body_text.dart';
 import '../text/heading_medium.dart';
 
 /// Reusable confirmation dialog for destructive or important actions
-/// 
+///
 /// Features:
 /// - Customizable title and message
 /// - Primary and secondary action buttons
@@ -81,4 +81,3 @@ class ConfirmationDialog extends StatelessWidget {
     );
   }
 }
-

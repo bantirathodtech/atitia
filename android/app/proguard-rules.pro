@@ -54,3 +54,38 @@
     public static *** i(...);
 }
 
+# Keep Google Sign-In classes
+-keep class com.google.android.gms.auth.** { *; }
+-keep class com.google.android.gms.common.** { *; }
+
+# Keep Supabase classes (if using)
+-keep class io.supabase.** { *; }
+-dontwarn io.supabase.**
+
+# Keep Razorpay classes
+-keep class com.razorpay.** { *; }
+-dontwarn com.razorpay.**
+
+# Keep image picker classes
+-keep class io.flutter.plugins.imagepicker.** { *; }
+
+# Keep all model classes (for JSON serialization)
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Preserve line numbers for crash reporting
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
+
+
+
+    # Ignore missing Play Core classes (deferred components - not used)
+-dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**
+-dontwarn io.flutter.embedding.engine.deferredcomponents.**
+
+# Keep Flutter deferred components (even if not used)
+-keep class io.flutter.embedding.engine.deferredcomponents.** { *; }
+

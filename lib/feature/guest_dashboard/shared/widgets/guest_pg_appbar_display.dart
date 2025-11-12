@@ -79,7 +79,7 @@ class GuestPgAppBarDisplay extends StatelessWidget {
             color: AppColors.primary,
             size: 16,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.paddingXS),
           CaptionText(
             text: loc?.noPgSelected ?? _text('noPgSelected', 'No PG Selected'),
             color: AppColors.primary,
@@ -95,10 +95,7 @@ class GuestPgAppBarDisplay extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
-    final pgName = (selectedPg.pgName as String?)
-                ?.trim()
-                .isNotEmpty ==
-            true
+    final pgName = (selectedPg.pgName as String?)?.trim().isNotEmpty == true
         ? selectedPg.pgName
         : loc?.unknownPg ?? _text('unknownPg', 'Unknown PG');
 
@@ -131,7 +128,7 @@ class GuestPgAppBarDisplay extends StatelessWidget {
             color: _getStatusColor(pgStatus),
             size: 16,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.paddingXS),
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,10 +167,12 @@ class GuestPgAppBarDisplay extends StatelessWidget {
           _text('pgLocationFallback', 'Location unavailable');
     }
 
-    final cityValue =
-        hasCity ? city!.trim() : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
-    final areaValue =
-        hasArea ? area!.trim() : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
+    final cityValue = hasCity
+        ? city!.trim()
+        : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
+    final areaValue = hasArea
+        ? area!.trim()
+        : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
 
     return '$cityValue, $areaValue';
   }

@@ -317,7 +317,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.paddingS),
                     Text(
                       monthFormatter.format(DateTime(2000, months[index])),
                       style: TextStyle(
@@ -325,7 +325,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                         fontSize: 12,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     Text(
                       compactCurrency.format(value),
                       style: TextStyle(
@@ -424,7 +424,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                 color: growth >= 0 ? Colors.green : Colors.red,
                 size: 16,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.paddingXS),
               CaptionText(
                 text: '${growth >= 0 ? '+' : ''}${growth.toStringAsFixed(1)}%',
                 color: growth >= 0 ? Colors.green : Colors.red,

@@ -53,8 +53,7 @@ class OwnerRevenueReportWidget extends StatelessWidget {
     final collectedText = currencyFormatter.format(report.collectedAmount);
     final pendingText = currencyFormatter.format(report.pendingAmount);
     final totalPaymentsText = numberFormatter.format(report.totalPayments);
-    final collectedCountText =
-        numberFormatter.format(report.collectedPayments);
+    final collectedCountText = numberFormatter.format(report.collectedPayments);
 
     return AdaptiveCard(
       child: Padding(
@@ -66,7 +65,7 @@ class OwnerRevenueReportWidget extends StatelessWidget {
               children: [
                 Icon(Icons.account_balance_wallet_rounded,
                     color: AppColors.success, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.paddingS),
                 HeadingMedium(
                   text: loc?.ownerRevenueReportTitle ??
                       _text('ownerRevenueReportTitle', 'Revenue Report'),
@@ -131,7 +130,7 @@ class OwnerRevenueReportWidget extends StatelessWidget {
   Widget _buildStatItem(
       String label, String value, IconData icon, Color color) {
     return Container(
-      margin: const EdgeInsets.all(4),
+      margin: const EdgeInsets.all(AppSpacing.paddingXS),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),

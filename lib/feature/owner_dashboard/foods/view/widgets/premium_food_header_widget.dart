@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
+import '../../../../../common/styles/spacing.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../viewmodel/owner_food_viewmodel.dart';
@@ -72,7 +73,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
         // Premium Header section with gradient background
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -106,7 +107,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                 children: [
                   // Premium gradient icon container
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppSpacing.paddingS),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -130,7 +131,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                       size: 28,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacing.paddingM),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +155,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                             ),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.paddingXS),
                         Text(
                           loc?.manageBreakfastLunchDinnerForAllDays ??
                               _text(
@@ -172,7 +173,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.paddingS),
               _buildStatsRow(context, foodVM, dayColors[currentTabIndex], loc),
             ],
           ),
@@ -215,7 +216,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
             dayColor,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: _buildStatChip(
             '$totalItems',
@@ -224,7 +225,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
             dayColor,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: _buildStatChip(
             '${stats['totalPhotos'] ?? 0}',
@@ -234,7 +235,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
           ),
         ),
         if ((stats['upcomingFestivals'] ?? 0) > 0) ...[
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.paddingS),
           Flexible(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -295,7 +296,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
             color: color,
             size: 14,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.paddingXS),
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -440,7 +441,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                         size: 16,
                         color: isSelected ? AppColors.textOnPrimary : tabColor,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: AppSpacing.paddingS),
                       Flexible(
                         child: Text(
                           dayNames[index],

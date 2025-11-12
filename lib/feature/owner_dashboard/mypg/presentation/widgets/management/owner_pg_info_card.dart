@@ -112,8 +112,7 @@ class OwnerPgInfoCard extends StatelessWidget {
       case 'Fan':
         return loc?.pgAmenityFan ?? _text('pgAmenityFan', 'Fan');
       case 'Lighting':
-        return loc?.pgAmenityLighting ??
-            _text('pgAmenityLighting', 'Lighting');
+        return loc?.pgAmenityLighting ?? _text('pgAmenityLighting', 'Lighting');
       case 'Balcony':
         return loc?.pgAmenityBalcony ?? _text('pgAmenityBalcony', 'Balcony');
       case 'Common Area':
@@ -141,8 +140,7 @@ class OwnerPgInfoCard extends StatelessWidget {
         return loc?.pgAmenityVisitorParking ??
             _text('pgAmenityVisitorParking', 'Visitor Parking');
       case 'Intercom':
-        return loc?.pgAmenityIntercom ??
-            _text('pgAmenityIntercom', 'Intercom');
+        return loc?.pgAmenityIntercom ?? _text('pgAmenityIntercom', 'Intercom');
       case 'Maintenance Staff':
         return loc?.pgAmenityMaintenanceStaff ??
             _text('pgAmenityMaintenanceStaff', 'Maintenance Staff');
@@ -234,7 +232,7 @@ class OwnerPgInfoCard extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppSpacing.paddingS),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -266,12 +264,12 @@ class OwnerPgInfoCard extends StatelessWidget {
                           text: pgModel.pgName,
                           color: textPrimary,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.paddingXS),
                         Row(
                           children: [
                             Icon(Icons.location_on,
                                 size: 14, color: AppColors.info),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppSpacing.paddingXS),
                             Expanded(
                               child: BodyText(
                                 text: locationText,
@@ -294,7 +292,8 @@ class OwnerPgInfoCard extends StatelessWidget {
                     tooltip: loc?.pgInfoEditTooltip ??
                         _text('pgInfoEditTooltip', 'Edit PG details'),
                     style: IconButton.styleFrom(
-                      backgroundColor: theme.primaryColor.withValues(alpha: 0.1),
+                      backgroundColor:
+                          theme.primaryColor.withValues(alpha: 0.1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -307,13 +306,15 @@ class OwnerPgInfoCard extends StatelessWidget {
               // Address and Contact
               _buildInfoRow(
                   context, Icons.location_city, pgModel.address, textSecondary),
-              const SizedBox(height: 8),
-              _buildInfoRow(context, Icons.phone,
+              const SizedBox(height: AppSpacing.paddingS),
+              _buildInfoRow(
+                  context,
+                  Icons.phone,
                   pgModel.contactNumber ??
                       (loc?.pgInfoContactNotProvided ??
                           _text('pgInfoContactNotProvided', 'Not provided')),
                   textSecondary),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.paddingS),
               _buildInfoRow(
                   context,
                   Icons.business,
@@ -344,10 +345,11 @@ class OwnerPgInfoCard extends StatelessWidget {
                 children: [
                   Icon(Icons.analytics_rounded,
                       color: AppColors.info, size: 20),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.paddingS),
                   HeadingSmall(
                       text: loc?.pgInfoStructureOverview ??
-                          _text('pgInfoStructureOverview', 'PG structure overview'),
+                          _text('pgInfoStructureOverview',
+                              'PG structure overview'),
                       color: textPrimary),
                 ],
               ),
@@ -417,16 +419,22 @@ class OwnerPgInfoCard extends StatelessWidget {
                   children: [
                     Icon(Icons.apartment_rounded,
                         color: AppColors.success, size: 20),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.paddingS),
                     HeadingSmall(
                         text: loc?.pgInfoFloorRoomDetails ??
-                            _text('pgInfoFloorRoomDetails', 'Floor & room details'),
+                            _text('pgInfoFloorRoomDetails',
+                                'Floor & room details'),
                         color: textPrimary),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
                 ...pgModel.floorStructure.map((floor) => _buildFloorInfo(
-                    context, floor, isDarkMode, textPrimary, textSecondary, loc)),
+                    context,
+                    floor,
+                    isDarkMode,
+                    textPrimary,
+                    textSecondary,
+                    loc)),
               ],
             ),
           ),
@@ -451,7 +459,7 @@ class OwnerPgInfoCard extends StatelessWidget {
                   children: [
                     Icon(Icons.star_rounded,
                         color: AppColors.warning, size: 20),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.paddingS),
                     HeadingSmall(
                         text: loc?.pgAmenitiesTitle ??
                             _text('pgAmenitiesTitle', 'Amenities & Facilities'),
@@ -469,18 +477,18 @@ class OwnerPgInfoCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: AppColors.info.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
-                        border:
-                            Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+                        border: Border.all(
+                            color: AppColors.info.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.check_circle,
                               size: 14, color: AppColors.info),
-                          const SizedBox(width: 4),
-                        CaptionText(
-                            text: _amenityLabel(loc, amenity),
-                            color: AppColors.info),
+                          const SizedBox(width: AppSpacing.paddingXS),
+                          CaptionText(
+                              text: _amenityLabel(loc, amenity),
+                              color: AppColors.info),
                         ],
                       ),
                     );
@@ -499,7 +507,7 @@ class OwnerPgInfoCard extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, size: 16, color: textColor),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: BodyText(text: text, color: textColor),
         ),
@@ -513,8 +521,8 @@ class OwnerPgInfoCard extends StatelessWidget {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(right: AppSpacing.paddingS),
+      padding: const EdgeInsets.all(AppSpacing.paddingS),
       decoration: BoxDecoration(
         color: color.withValues(alpha: isDarkMode ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(12),
@@ -523,7 +531,7 @@ class OwnerPgInfoCard extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, size: 24, color: color),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.paddingS),
           Text(
             value,
             style: TextStyle(
@@ -532,7 +540,7 @@ class OwnerPgInfoCard extends StatelessWidget {
               color: color,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.paddingXS),
           CaptionText(text: label, color: color.withValues(alpha: 0.8)),
         ],
       ),
@@ -556,8 +564,8 @@ class OwnerPgInfoCard extends StatelessWidget {
     final rooms = floor.rooms as List<dynamic>? ?? [];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+      padding: const EdgeInsets.all(AppSpacing.paddingS),
       decoration: BoxDecoration(
         color: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(12),
@@ -580,7 +588,7 @@ class OwnerPgInfoCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.layers, size: 14, color: AppColors.success),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.paddingXS),
                     BodyText(
                         text: floorName,
                         color: AppColors.success,
@@ -597,7 +605,7 @@ class OwnerPgInfoCard extends StatelessWidget {
             ],
           ),
           if (rooms.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.paddingS),
             Wrap(
               spacing: 6,
               runSpacing: 6,
@@ -624,7 +632,7 @@ class OwnerPgInfoCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.meeting_room, size: 12, color: textSecondary),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.paddingXS),
                       CaptionText(
                           text: loc?.pgInfoRoomChip(
                                   roomNumber, sharingType, bedsCount) ??

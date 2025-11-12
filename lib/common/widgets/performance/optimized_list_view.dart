@@ -3,6 +3,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../../../common/styles/spacing.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// Performance-optimized ListView with lazy loading and memory management
@@ -142,7 +143,7 @@ class _OptimizedListViewState<T> extends State<OptimizedListView<T>> {
 
   Widget _buildLoadingIndicator() {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
       alignment: Alignment.center,
       child: widget.loadingWidget ??
           const SizedBox(
@@ -160,7 +161,7 @@ class _OptimizedListViewState<T> extends State<OptimizedListView<T>> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.paddingM),
           Text(
             loc?.noItemsFound ?? 'No items found',
             style: const TextStyle(
@@ -318,7 +319,7 @@ class _OptimizedGridViewState<T> extends State<OptimizedGridView<T>> {
 
   Widget _buildLoadingIndicator() {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
       alignment: Alignment.center,
       child: widget.loadingWidget ??
           const SizedBox(
@@ -336,7 +337,7 @@ class _OptimizedGridViewState<T> extends State<OptimizedGridView<T>> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.grid_view_outlined, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.paddingM),
           Text(
             loc?.noItemsFound ?? 'No items found',
             style: const TextStyle(

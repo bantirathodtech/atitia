@@ -16,7 +16,8 @@ class GuestPaymentRepository {
   final IDatabaseService _databaseService;
   final IAnalyticsService _analyticsService;
   final NotificationRepository _notificationRepository;
-  final InternationalizationService _i18n = InternationalizationService.instance;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
@@ -115,7 +116,8 @@ class GuestPaymentRepository {
       // Notify owner about payment received
       if (payment.ownerId.isNotEmpty && payment.status == 'Paid') {
         final locale = _i18n.currentLocale;
-        final symbol = NumberFormat.simpleCurrency(locale: locale.toString()).currencySymbol;
+        final symbol = NumberFormat.simpleCurrency(locale: locale.toString())
+            .currencySymbol;
         final formattedAmount = NumberFormat.currency(
           locale: locale.toString(),
           symbol: symbol,

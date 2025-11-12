@@ -36,7 +36,9 @@ class GuestListWidget extends StatelessWidget {
     if (guests.isEmpty) {
       return EmptyState(
         title: AppLocalizations.of(context)?.noGuests ?? 'No Guests',
-        message: AppLocalizations.of(context)?.guestListWillAppearHereOnceGuestsAreAdded ?? 'Guest list will appear here once guests are added',
+        message: AppLocalizations.of(context)
+                ?.guestListWillAppearHereOnceGuestsAreAdded ??
+            'Guest list will appear here once guests are added',
         icon: Icons.people_outline,
       );
     }
@@ -117,7 +119,7 @@ class GuestListWidget extends StatelessWidget {
                     Row(
                       children: [
                         Icon(Icons.phone, size: 14, color: textSecondary),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.paddingXS),
                         Expanded(
                           child: BodyText(
                             text: guest.phoneNumber,
@@ -130,7 +132,7 @@ class GuestListWidget extends StatelessWidget {
                     Row(
                       children: [
                         Icon(Icons.bed, size: 14, color: textSecondary),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.paddingXS),
                         Expanded(
                           child: CaptionText(
                             text: guest.roomBedDisplay,
@@ -194,12 +196,11 @@ class GuestListWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow(context, loc.ownerGuestDetailVehicleNumber,
-                  guest.vehicleNo!),
-              if (guest.vehicleName != null &&
-                  guest.vehicleName!.isNotEmpty)
-                _buildDetailRow(context, loc.ownerGuestDetailVehicle,
-                    guest.vehicleName!),
+              _buildDetailRow(
+                  context, loc.ownerGuestDetailVehicleNumber, guest.vehicleNo!),
+              if (guest.vehicleName != null && guest.vehicleName!.isNotEmpty)
+                _buildDetailRow(
+                    context, loc.ownerGuestDetailVehicle, guest.vehicleName!),
               if (guest.roomNumber != null)
                 _buildDetailRow(
                   context,
@@ -215,8 +216,8 @@ class GuestListWidget extends StatelessWidget {
               if (guest.joiningDate != null)
                 _buildDetailRow(context, loc.ownerGuestDetailJoined,
                     guest.formattedJoiningDate),
-              _buildDetailRow(context, loc.ownerGuestDetailStatus,
-                  guest.statusDisplay),
+              _buildDetailRow(
+                  context, loc.ownerGuestDetailStatus, guest.statusDisplay),
             ],
           ),
         ),

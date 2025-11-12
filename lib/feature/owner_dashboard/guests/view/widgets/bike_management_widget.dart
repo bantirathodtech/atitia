@@ -126,32 +126,19 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                 _buildFilterChip(loc.all, 'all', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc.active, 'active', guestVM.statusFilter,
+                _buildFilterChip(loc.active, 'active', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc.registered,
-                    'registered',
-                    guestVM.statusFilter,
+                _buildFilterChip(loc.registered, 'registered',
+                    guestVM.statusFilter, guestVM.setStatusFilter),
+                const SizedBox(width: AppSpacing.paddingS),
+                _buildFilterChip(loc.violation, 'violation',
+                    guestVM.statusFilter, guestVM.setStatusFilter),
+                const SizedBox(width: AppSpacing.paddingS),
+                _buildFilterChip(loc.expired, 'expired', guestVM.statusFilter,
                     guestVM.setStatusFilter),
                 const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc.violation,
-                    'violation',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc.expired,
-                    'expired',
-                    guestVM.statusFilter,
-                    guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
-                _buildFilterChip(
-                    loc.premium,
-                    'premium',
-                    guestVM.statusFilter,
+                _buildFilterChip(loc.premium, 'premium', guestVM.statusFilter,
                     guestVM.setStatusFilter),
               ],
             ),
@@ -207,8 +194,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
   }
 
   /// Builds stats header
-  Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM,
-      AppLocalizations loc) {
+  Widget _buildStatsHeader(
+      BuildContext context, OwnerGuestViewModel guestVM, AppLocalizations loc) {
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -464,7 +451,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppSpacing.paddingXS),
                           Text(
                             bike.guestInfo,
                             style: TextStyle(
@@ -525,7 +512,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                 if (bike.hasViolation && bike.violationReason != null) ...[
                   const SizedBox(height: AppSpacing.paddingS),
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppSpacing.paddingS),
                     decoration: BoxDecoration(
                       color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -533,7 +520,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                     child: Row(
                       children: [
                         const Icon(Icons.warning, color: Colors.red, size: 16),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.paddingS),
                         Expanded(
                           child: Text(
                             loc.violationWithReason(bike.violationReason!),
@@ -574,7 +561,7 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
     return Row(
       children: [
         Icon(icon, size: 16, color: Colors.grey[600]),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -692,12 +679,10 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   _buildDetailRow(
                       loc.lastParked, _formatDate(bike.lastParkedDate!)),
                 if (bike.removalDate != null)
-                  _buildDetailRow(
-                      loc.removed, _formatDate(bike.removalDate!)),
+                  _buildDetailRow(loc.removed, _formatDate(bike.removalDate!)),
                 if (bike.violationReason != null)
                   _buildDetailRow(loc.violationLabel, bike.violationReason!),
-                if (bike.notes != null)
-                  _buildDetailRow(loc.notes, bike.notes!),
+                if (bike.notes != null) _buildDetailRow(loc.notes, bike.notes!),
               ],
             ),
           ),

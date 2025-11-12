@@ -302,7 +302,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   BodyText(text: loc.ownerOverviewOccupancyRate),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.paddingXS),
                   HeadingMedium(
                     text: occupancy,
                     color: Theme.of(context).primaryColor,
@@ -459,7 +459,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 18, color: Theme.of(context).primaryColor),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.paddingS),
             BodyText(
               text: label,
               color: Theme.of(context).primaryColor,

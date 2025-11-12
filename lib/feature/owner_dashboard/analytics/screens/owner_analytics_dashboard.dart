@@ -10,6 +10,7 @@ import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../shared/viewmodel/selected_pg_provider.dart';
@@ -260,27 +261,39 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget _buildErrorState(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: Colors.red[400],
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-          HeadingMedium(text: loc.analyticsErrorTitle),
-          const SizedBox(height: AppSpacing.paddingM),
-          BodyText(
-            text: _error ?? loc.analyticsUnknownError,
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-          ElevatedButton(
-            onPressed: _refreshData,
-            child: Text(loc.retry),
-          ),
-        ],
+    return Semantics(
+      label: 'Error loading analytics data',
+      hint:
+          'An error occurred while loading analytics. Use the retry button to try again.',
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Semantics(
+              label: 'Error icon',
+              excludeSemantics: true,
+              child: Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Colors.red[400],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.paddingL),
+            Semantics(
+              header: true,
+              child: HeadingMedium(text: loc.analyticsErrorTitle),
+            ),
+            const SizedBox(height: AppSpacing.paddingM),
+            BodyText(
+              text: _error ?? loc.analyticsUnknownError,
+            ),
+            const SizedBox(height: AppSpacing.paddingL),
+            PrimaryButton(
+              onPressed: _refreshData,
+              label: loc.retry,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -514,16 +527,13 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                             '• ',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color:
-                                  isDark ? Colors.white70 : Colors.grey[700],
+                              color: isDark ? Colors.white70 : Colors.grey[700],
                             ),
                           ),
                           Expanded(
                             child: BodyText(
                               text: rec,
-                              color: isDark
-                                  ? Colors.white70
-                                  : Colors.grey[600],
+                              color: isDark ? Colors.white70 : Colors.grey[600],
                             ),
                           ),
                         ],

@@ -194,7 +194,8 @@ class _BookingRequestActionDialogState
               ),
               const SizedBox(width: AppSpacing.paddingS),
               BodyText(
-                text: '${loc?.emailLabel ?? 'Email'}: ${widget.request.guestEmail}',
+                text:
+                    '${loc?.emailLabel ?? 'Email'}: ${widget.request.guestEmail}',
                 color: isDark ? Colors.white70 : Colors.grey[600],
               ),
             ],
@@ -210,8 +211,7 @@ class _BookingRequestActionDialogState
               const SizedBox(width: AppSpacing.paddingS),
               Expanded(
                 child: BodyText(
-                  text:
-                      '${loc?.pgLabel ?? 'PG'}: ${widget.request.pgName}',
+                  text: '${loc?.pgLabel ?? 'PG'}: ${widget.request.pgName}',
                   color: isDark ? Colors.white70 : Colors.grey[700],
                 ),
               ),
@@ -223,8 +223,7 @@ class _BookingRequestActionDialogState
   }
 
   /// Builds the form for response and additional details
-  Widget _buildForm(
-      BuildContext context, bool isDark, AppLocalizations? loc) {
+  Widget _buildForm(BuildContext context, bool isDark, AppLocalizations? loc) {
     final dateFormat = DateFormat.yMMMd(loc?.localeName);
 
     return Form(
@@ -245,7 +244,8 @@ class _BookingRequestActionDialogState
             controller: _responseController,
             decoration: InputDecoration(
               labelText: widget.isApproval
-                  ? (loc?.welcomeMessageOptional ?? 'Welcome Message (Optional)')
+                  ? (loc?.welcomeMessageOptional ??
+                      'Welcome Message (Optional)')
                   : (loc?.rejectionReasonOptional ??
                       'Reason for Rejection (Optional)'),
               hintText: widget.isApproval
@@ -347,7 +347,8 @@ class _BookingRequestActionDialogState
                                 child: BodyText(
                                   text: _endDate != null
                                       ? dateFormat.format(_endDate!)
-                                      : (loc?.selectEndDate ?? 'Select end date'),
+                                      : (loc?.selectEndDate ??
+                                          'Select end date'),
                                 ),
                               ),
                             ],
@@ -504,7 +505,8 @@ class _BookingRequestActionDialogState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(
-              text: loc?.bookingRequestActionFailed(actionLabel, e.toString()) ??
+              text: loc?.bookingRequestActionFailed(
+                      actionLabel, e.toString()) ??
                   'Failed to ${widget.isApproval ? 'approve' : 'reject'} request: $e',
               color: Colors.white,
             ),

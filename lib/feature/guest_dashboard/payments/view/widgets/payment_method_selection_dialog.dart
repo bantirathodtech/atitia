@@ -72,8 +72,7 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
             const SizedBox(height: AppSpacing.paddingM),
             BodyText(
               text: loc?.selectPaymentMethodSubtitle ??
-                  _text(
-                      'selectPaymentMethodSubtitle',
+                  _text('selectPaymentMethodSubtitle',
                       'Choose how you want to make the payment'),
               color: AppColors.textSecondary,
             ),
@@ -103,8 +102,7 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
               icon: Icons.qr_code_scanner,
               title: loc?.paymentMethodUpi ?? _text('paymentMethodUpi', 'UPI'),
               description: loc?.upiPaymentDescription ??
-                  _text(
-                      'upiPaymentDescription',
+                  _text('upiPaymentDescription',
                       'Pay via PhonePe, Paytm, Google Pay, etc. and share screenshot'),
               color: Colors.green,
               isDark: isDark,
@@ -118,8 +116,8 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
             _buildPaymentMethodOption(
               context: context,
               icon: Icons.money,
-              title: loc?.paymentMethodCash ??
-                  _text('paymentMethodCash', 'Cash'),
+              title:
+                  loc?.paymentMethodCash ?? _text('paymentMethodCash', 'Cash'),
               description: loc?.cashPaymentDescription ??
                   _text('cashPaymentDescription',
                       'Pay in cash and request owner confirmation'),
@@ -189,15 +187,15 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
                   Text(
                     title,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.paddingXS),
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                          color: AppColors.textSecondary,
+                        ),
                   ),
                 ],
               ),
@@ -232,4 +230,3 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
     );
   }
 }
-

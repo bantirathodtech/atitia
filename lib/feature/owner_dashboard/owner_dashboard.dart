@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 import '../../common/styles/colors.dart';
 import '../../common/utils/logging/logging_helper.dart';
+import '../../common/utils/responsive/responsive_system.dart';
 import '../../l10n/app_localizations.dart';
 import '../auth/logic/auth_provider.dart';
 import 'shared/viewmodel/selected_pg_provider.dart';
@@ -107,57 +108,158 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // IndexedStack preserves state of all tabs
-      body: Stack(
-        children: [
-          // Main content
-          IndexedStack(index: _currentIndex, children: _tabs),
-          // Floating payment notifications badge
-          const OwnerPaymentNotificationsBadge(),
+  /// Builds the responsive bottom navigation bar with premium theme-aware styling
+  Widget _buildResponsiveBottomNavigationBar() {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+
+    return Semantics(
+      label: 'Main navigation',
+      hint: 'Use tabs to navigate between different sections',
+      child: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
+        type: BottomNavigationBarType.fixed,
+        showUnselectedLabels: true,
+        selectedItemColor: theme.primaryColor,
+        unselectedItemColor:
+            isDarkMode ? AppColors.textTertiary : Colors.grey.shade600,
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w400,
+          fontSize: 11,
+        ),
+        elevation: 8,
+        backgroundColor:
+            isDarkMode ? AppColors.darkCard : theme.scaffoldBackgroundColor,
+        items: [
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.dashboard_outlined),
+            activeIcon: const Icon(Icons.dashboard),
+            label: loc?.overview ?? "Overview",
+            tooltip: loc?.overview ?? "View dashboard overview",
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.restaurant_menu),
+            activeIcon: const Icon(Icons.restaurant),
+            label: loc?.food ?? "Food",
+            tooltip: loc?.food ?? "Manage food menu",
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home),
+            label: loc?.pgs ?? "PGs",
+            tooltip: loc?.pgs ?? "Manage paying guest properties",
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.people_outline),
+            activeIcon: const Icon(Icons.people),
+            label: loc?.guests ?? "Guests",
+            tooltip: loc?.guests ?? "Manage guests",
+          ),
         ],
       ),
+    );
+  }
 
-      // Bottom navigation bar with theme support
-      bottomNavigationBar: Builder(
-        builder: (context) {
-          final loc = AppLocalizations.of(context);
-          return BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: _onTabTapped,
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Theme.of(context).primaryColor,
-            selectedItemColor: AppColors.textOnPrimary, // White when selected
-            unselectedItemColor: AppColors.textOnPrimary.withValues(
-              alpha: 0.7,
-            ), // Semi-transparent white
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-            items: [
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.dashboard),
-                label: loc?.overview ?? "Overview",
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.restaurant_menu),
-                label: loc?.food ?? "Food",
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.home),
-                label: loc?.pgs ?? "PGs",
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.people),
-                label: loc?.guests ?? "Guests",
-              ),
-              // BottomNavigationBarItem(
-              //   icon: Icon(Icons.person),
-              //   label: "Profile",
-              // ), // REMOVED - Profile tab removed from bottom nav
-            ],
-          );
-        },
+  @override
+  Widget build(BuildContext context) {
+    final responsiveConfig = ResponsiveSystem.getConfig(context);
+    final isTabletLandscape = responsiveConfig.isTablet &&
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    return Scaffold(
+      // Responsive body: Navigation rail + content for tablet landscape, content only for mobile/portrait
+      body: isTabletLandscape
+          ? Row(
+              children: [
+                _buildNavigationRail()!,
+                Expanded(
+                  child: Stack(
+                    children: [
+                      // Main content
+                      IndexedStack(index: _currentIndex, children: _tabs),
+                      // Floating payment notifications badge
+                      const OwnerPaymentNotificationsBadge(),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : Stack(
+              children: [
+                // Main content
+                IndexedStack(index: _currentIndex, children: _tabs),
+                // Floating payment notifications badge
+                const OwnerPaymentNotificationsBadge(),
+              ],
+            ),
+
+      // Bottom navigation only for mobile/portrait
+      bottomNavigationBar:
+          isTabletLandscape ? null : _buildResponsiveBottomNavigationBar(),
+    );
+  }
+
+  /// Builds navigation rail for tablet landscape mode
+  Widget? _buildNavigationRail() {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+
+    return Semantics(
+      label: 'Main navigation',
+      hint: 'Use navigation rail to navigate between different sections',
+      child: NavigationRail(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: _onTabTapped,
+        backgroundColor:
+            isDarkMode ? AppColors.darkCard : theme.scaffoldBackgroundColor,
+        selectedIconTheme: IconThemeData(
+          color: theme.primaryColor,
+          size: 28,
+        ),
+        unselectedIconTheme: IconThemeData(
+          color: isDarkMode ? AppColors.textTertiary : Colors.grey.shade600,
+          size: 24,
+        ),
+        selectedLabelTextStyle: TextStyle(
+          color: theme.primaryColor,
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+        ),
+        unselectedLabelTextStyle: TextStyle(
+          color: isDarkMode ? AppColors.textTertiary : Colors.grey.shade600,
+          fontWeight: FontWeight.w400,
+          fontSize: 12,
+        ),
+        labelType: NavigationRailLabelType.all,
+        destinations: [
+          NavigationRailDestination(
+            icon: const Icon(Icons.dashboard_outlined),
+            selectedIcon: const Icon(Icons.dashboard),
+            label: Text(loc?.overview ?? 'Overview'),
+          ),
+          NavigationRailDestination(
+            icon: const Icon(Icons.restaurant_menu),
+            selectedIcon: const Icon(Icons.restaurant),
+            label: Text(loc?.food ?? 'Food'),
+          ),
+          NavigationRailDestination(
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: Text(loc?.pgs ?? 'PGs'),
+          ),
+          NavigationRailDestination(
+            icon: const Icon(Icons.people_outline),
+            selectedIcon: const Icon(Icons.people),
+            label: Text(loc?.guests ?? 'Guests'),
+          ),
+        ],
       ),
     );
   }

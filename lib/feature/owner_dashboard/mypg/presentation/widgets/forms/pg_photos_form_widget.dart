@@ -67,7 +67,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
       // Changed from: Using context after async gap (image picker)
       // Changed to: Direct context usage - StatelessWidget context is safe after async operations
       // Note: StatelessWidget doesn't have mounted property, but context usage is safe here
-      
+
       // Show loading indicator with progress
       // Note: showDialog is safe to use after async when mounted check is performed, analyzer flags as false positive
       showDialog(
@@ -106,15 +106,16 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
       // Changed from: Using context after async gap (showDialog)
       // Changed to: Direct context usage - StatelessWidget context is safe after async operations
       // Note: StatelessWidget doesn't have mounted property, but context usage is safe here
-      
+
       // Get owner ID for path generation
       // ignore: use_build_context_synchronously
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final ownerId = authProvider.user?.userId ?? 'unknown';
-      
+
       // Use PG ID if available (edit mode), otherwise use ownerId + timestamp for create mode
-      final photoId = pgId ?? 'temp_${ownerId}_${DateTime.now().millisecondsSinceEpoch}';
-      
+      final photoId =
+          pgId ?? 'temp_${ownerId}_${DateTime.now().millisecondsSinceEpoch}';
+
       final List<String> uploadedUrls = [];
       int successCount = 0;
       int failCount = 0;
@@ -123,10 +124,11 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
       for (int i = 0; i < imageFiles.length; i++) {
         try {
           final imageFile = imageFiles[i];
-          
+
           // Generate unique file name
-          final fileName = 'pg_${photoId}_photo_${uploadedPhotos.length + i + 1}_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
-          
+          final fileName =
+              'pg_${photoId}_photo_${uploadedPhotos.length + i + 1}_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
+
           // Upload to storage using pg_photos path
           // The adapter expects path to be the full path including folder
           final imageUrl = await storageService.uploadFile(
@@ -147,9 +149,10 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
               parameters: {'index': i, 'error': errorMsg},
             ),
           );
-          
+
           // Provide more helpful error messages
-          if (errorMsg.contains('Failed to fetch') || errorMsg.contains('CORS')) {
+          if (errorMsg.contains('Failed to fetch') ||
+              errorMsg.contains('CORS')) {
             debugPrint(
               _text(
                 'pgSupabaseStorageTroubleshoot',
@@ -167,7 +170,8 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
 
       // Add all uploaded photo URLs to list
       if (uploadedUrls.isNotEmpty) {
-        final updatedPhotos = List<String>.from(uploadedPhotos)..addAll(uploadedUrls);
+        final updatedPhotos = List<String>.from(uploadedPhotos)
+          ..addAll(uploadedUrls);
         onPhotosChanged(updatedPhotos);
       }
 
@@ -227,7 +231,8 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              AppLocalizations.of(context)?.failedToSelectPhotos(e.toString()) ??
+              AppLocalizations.of(context)
+                      ?.failedToSelectPhotos(e.toString()) ??
                   _text(
                     'pgPhotosSelectFailed',
                     'Failed to select photos: {error}',
@@ -333,7 +338,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                     child: GestureDetector(
                       onTap: () => _removePhoto(index),
                       child: Container(
-                        padding: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(AppSpacing.paddingXS),
                         decoration: const BoxDecoration(
                           color: Colors.red,
                           shape: BoxShape.circle,

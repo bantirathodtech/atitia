@@ -325,8 +325,8 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
           TextFormField(
             controller: _messageController,
             decoration: InputDecoration(
-              labelText:
-                  loc?.messageOptional ?? _text('messageOptional', 'Message (Optional)'),
+              labelText: loc?.messageOptional ??
+                  _text('messageOptional', 'Message (Optional)'),
               hintText: loc?.messageOptionalHint ??
                   _text('messageOptionalHint',
                       'Any additional information for the owner...'),

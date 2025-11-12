@@ -27,20 +27,20 @@ class CustomChoiceChip extends AdaptiveStatelessWidget {
   Widget buildAdaptive(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     // Use provided colors or fall back to theme-aware defaults
     final effectiveSelectedColor = selectedColor ?? theme.primaryColor;
-    final effectiveBackgroundColor = backgroundColor ?? 
-        (isDark ? AppColors.darkCard : AppColors.lightCard);
-    
+    final effectiveBackgroundColor =
+        backgroundColor ?? (isDark ? AppColors.darkCard : AppColors.lightCard);
+
     // Ensure text color has proper contrast when selected
-    final labelColor = selected 
-        ? AppColors.textOnPrimary 
+    final labelColor = selected
+        ? AppColors.textOnPrimary
         : (isDark ? AppColors.darkText : AppColors.textPrimary);
-    
+
     // Icon color should match label color
-    final iconColor = selected 
-        ? AppColors.textOnPrimary 
+    final iconColor = selected
+        ? AppColors.textOnPrimary
         : (isDark ? AppColors.darkText : AppColors.textPrimary);
 
     return ChoiceChip(
@@ -49,14 +49,14 @@ class CustomChoiceChip extends AdaptiveStatelessWidget {
         children: [
           if (icon != null) ...[
             Icon(
-              icon, 
+              icon,
               size: 16,
               color: iconColor,
             ),
             const SizedBox(width: AppSpacing.paddingXS),
           ],
           Text(
-            label, 
+            label,
             style: AppTypography.bodySmall.copyWith(
               color: labelColor,
             ),

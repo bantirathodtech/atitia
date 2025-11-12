@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../common/styles/spacing.dart';
+import '../../../common/widgets/buttons/primary_button.dart';
+import '../../../common/widgets/buttons/secondary_button.dart';
+import '../../../common/widgets/text/body_text.dart';
+import '../../../common/widgets/text/heading_medium.dart';
 import '../../../l10n/app_localizations.dart';
 import '../navigation_service.dart';
 
@@ -23,79 +28,82 @@ class ErrorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Error Icon
-            Icon(
-              Icons.error_outline_rounded,
-              size: 80,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(height: 24),
+      body: Semantics(
+        label: 'Page not found error',
+        hint:
+            'The page you are looking for does not exist. Use the buttons below to navigate.',
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Error Icon
+              Semantics(
+                label: 'Error icon',
+                excludeSemantics: true,
+                child: Icon(
+                  Icons.error_outline_rounded,
+                  size: 80,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
 
-            // Error Title
-            Text(
-              'Page Not Found',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
+              // Error Title
+              Semantics(
+                header: true,
+                child: HeadingMedium(
+                  text: 'Page Not Found',
+                  align: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
 
-            // Error Description
-            Text(
-              'The page you are looking for doesn\'t exist or has been moved.',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
+              // Error Description - More actionable message
+              BodyText(
+                text:
+                    'The page you are looking for doesn\'t exist or has been moved. You can go back to the previous page or return to the home screen.',
+                align: TextAlign.center,
+                small: true,
+              ),
+              const SizedBox(height: AppSpacing.paddingXL),
 
-            // Action Buttons
-            _buildActionButtons(context),
-          ],
+              // Action Buttons
+              _buildActionButtons(context),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildActionButtons(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Column(
       children: [
         // Go Home Button (Primary Action)
-        ElevatedButton(
+        PrimaryButton(
           onPressed: _goToHome,
-          style: ElevatedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 50),
-          ),
-          child: Text(AppLocalizations.of(context)?.goToHome ?? 'Go to Home'),
+          label: loc?.goToHome ?? 'Go to Home',
+          icon: Icons.home,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.paddingS),
 
         // Go Back Button (Secondary Action)
-        OutlinedButton(
+        SecondaryButton(
           onPressed: _goBack,
-          style: OutlinedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 50),
-          ),
-          child: Text(AppLocalizations.of(context)?.goBack ?? 'Go Back'),
+          label: loc?.goBack ?? 'Go Back',
+          icon: Icons.arrow_back,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.paddingS),
 
         // Sign In Button (Tertiary Action - if not authenticated)
-        TextButton(
+        TextButton.icon(
           onPressed: _goToPhoneAuth,
-          child: Text(AppLocalizations.of(context)?.signIn ?? 'Sign In'),
+          icon: const Icon(Icons.login),
+          label: Text(loc?.signIn ?? 'Sign In'),
         ),
       ],
     );

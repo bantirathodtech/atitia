@@ -40,11 +40,19 @@ class GuestFoodListScreen extends StatefulWidget {
 class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
+
   List<String> _getDays(BuildContext context) {
     final loc = AppLocalizations.of(context);
     if (loc == null) {
-      return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      return [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ];
     }
     return [
       loc.monday,
@@ -62,7 +70,15 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     super.initState();
     // Initialize tab controller with today's day
     final today = DateFormat('EEEE').format(DateTime.now());
-    final englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final englishDays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
     final todayIndex = englishDays.indexOf(today);
     _tabController = TabController(
       length: 7, // Always 7 days
@@ -142,7 +158,15 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     final today = DateFormat('EEEE').format(DateTime.now());
     final loc = AppLocalizations.of(context);
     final days = _getDays(context);
-    final englishDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final englishDays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
 
     return SingleChildScrollView(
       child: Column(
@@ -351,7 +375,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.paddingXS),
                 Text(
                   menu.description!,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -484,7 +508,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                         size: 16,
                         color: color,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: AppSpacing.paddingS),
                       Text(
                         item,
                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -524,7 +548,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     color: Theme.of(context).primaryColor),
                 const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
-                  text: AppLocalizations.of(context)?.foodGallery ?? 'Food Gallery',
+                  text: AppLocalizations.of(context)?.foodGallery ??
+                      'Food Gallery',
                   color: Theme.of(context).textTheme.headlineSmall?.color,
                 ),
               ],
@@ -586,12 +611,13 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
       'Sunday': loc?.sunday ?? 'Sunday',
     };
     final localizedDay = dayMap[day] ?? day;
-    
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: EmptyState(
         title: loc?.noMenuForDay(localizedDay) ?? 'No Menu for $localizedDay',
-        message: loc?.ownerHasntSetMenuForDay ?? 'The owner hasn\'t set a menu for this day yet.',
+        message: loc?.ownerHasntSetMenuForDay ??
+            'The owner hasn\'t set a menu for this day yet.',
         icon: Icons.restaurant_menu,
       ),
     );
@@ -626,7 +652,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
       child: EmptyState(
         title: loc?.errorLoadingMenu ?? 'Error Loading Menu',
         message: foodViewModel.errorMessage ??
-            (loc?.unableToLoadMenuPleaseTryAgain ?? 'Unable to load menu. Please try again.'),
+            (loc?.unableToLoadMenuPleaseTryAgain ??
+                'Unable to load menu. Please try again.'),
         icon: Icons.error_outline,
         actionLabel: loc?.retry ?? 'Retry',
         onAction: () => foodViewModel.loadGuestMenu(),
@@ -673,7 +700,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
-            text: AppLocalizations.of(context)?.foodMenuStatistics ?? 'Food Menu Statistics',
+            text: AppLocalizations.of(context)?.foodMenuStatistics ??
+                'Food Menu Statistics',
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -796,7 +824,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               color: color,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.paddingXS),
           Text(
             label,
             style: TextStyle(
@@ -993,7 +1021,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.paddingXS),
                 Container(
                   height: 8,
                   width: 120,
@@ -1072,7 +1100,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             child: ElevatedButton.icon(
               onPressed: () => foodViewModel.loadGuestMenu(),
               icon: const Icon(Icons.refresh),
-              label: Text(AppLocalizations.of(context)?.refreshMenu ?? 'Refresh Menu'),
+              label: Text(
+                  AppLocalizations.of(context)?.refreshMenu ?? 'Refresh Menu'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
                 foregroundColor: Colors.white,

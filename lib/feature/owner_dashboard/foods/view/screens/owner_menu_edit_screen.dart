@@ -161,8 +161,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                       title: loc.lunch,
                       items: _lunchItems,
                       icon: Icons.lunch_dining,
-                      onAdd: () =>
-                          _addMealItem(loc, loc.lunch, _lunchItems),
+                      onAdd: () => _addMealItem(loc, loc.lunch, _lunchItems),
                       onRemove: (index) => _removeMealItem(_lunchItems, index),
                     ),
                     const SizedBox(height: AppSpacing.paddingM),
@@ -173,8 +172,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                       title: loc.dinner,
                       items: _dinnerItems,
                       icon: Icons.dinner_dining,
-                      onAdd: () =>
-                          _addMealItem(loc, loc.dinner, _dinnerItems),
+                      onAdd: () => _addMealItem(loc, loc.dinner, _dinnerItems),
                       onRemove: (index) => _removeMealItem(_dinnerItems, index),
                     ),
                     const SizedBox(height: AppSpacing.paddingM),
@@ -302,7 +300,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                         letterSpacing: 0.5,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     Text(
                       loc.ownerMenuEditOverviewSubtitle,
                       style: TextStyle(
@@ -407,7 +405,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                     size: 16,
                     color: textSecondary,
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: AppSpacing.paddingS),
                   Text(
                     loc.ownerMenuEditLastUpdated(
                         widget.existingMenu!.formattedUpdatedAt),
@@ -452,7 +450,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 16, color: color),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppSpacing.paddingS),
           Text(
             value,
             style: TextStyle(
@@ -461,7 +459,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
               color: color,
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.paddingXS),
           Text(
             label,
             style: TextStyle(
@@ -604,7 +602,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             child: InkWell(
               onTap: onDelete,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(AppSpacing.paddingXS),
                 decoration: BoxDecoration(
                   color: AppColors.error, // Theme-aware error color
                   shape: BoxShape.circle,
@@ -833,7 +831,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   }
 
   /// Shows dialog to add meal item (theme-aware)
-  Future<void> _addMealItem(AppLocalizations loc, String mealType, List<String> items) async {
+  Future<void> _addMealItem(
+      AppLocalizations loc, String mealType, List<String> items) async {
     final controller = TextEditingController();
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
@@ -893,7 +892,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             onPressed: () => Navigator.of(context).pop(),
             label: loc.cancel,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.paddingS),
           PrimaryButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
@@ -1125,8 +1124,9 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         }
       } else {
         if (mounted) {
-          final errorMessage =
-              foodVM.errorMessage?.isNotEmpty == true ? foodVM.errorMessage! : loc.unknownErrorOccurred;
+          final errorMessage = foodVM.errorMessage?.isNotEmpty == true
+              ? foodVM.errorMessage!
+              : loc.unknownErrorOccurred;
           scaffoldMessenger.showSnackBar(
             SnackBar(
               content: Text(loc.ownerMenuEditSaveFailed(errorMessage)),

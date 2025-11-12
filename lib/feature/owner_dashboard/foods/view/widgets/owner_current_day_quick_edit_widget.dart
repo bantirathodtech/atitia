@@ -23,12 +23,14 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
     final foodVM = context.watch<OwnerFoodViewModel>();
     final currentDayMenu = foodVM.currentDayMenu;
     final currentDay = MenuInitializationHelper.weekdayString(DateTime.now());
-    
+
     // Theme-aware colors
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final textSecondary = theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
-    final textTertiary = isDarkMode ? AppColors.textTertiary : AppColors.textSecondary;
+    final textSecondary =
+        theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+    final textTertiary =
+        isDarkMode ? AppColors.textTertiary : AppColors.textSecondary;
 
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -45,7 +47,8 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.paddingS),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      color:
+                          Theme.of(context).primaryColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -73,7 +76,8 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
               ),
               if (currentDayMenu != null)
                 IconButton(
-                  onPressed: () => _editCurrentDayMenu(context, currentDayMenu, currentDay),
+                  onPressed: () =>
+                      _editCurrentDayMenu(context, currentDayMenu, currentDay),
                   icon: Icon(
                     Icons.edit,
                     color: Theme.of(context).primaryColor,
@@ -83,7 +87,6 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          
           if (currentDayMenu == null)
             Center(
               child: Column(
@@ -94,7 +97,8 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
                   PrimaryButton(
-                    onPressed: () => _editCurrentDayMenu(context, null, currentDay),
+                    onPressed: () =>
+                        _editCurrentDayMenu(context, null, currentDay),
                     label: 'Add Menu',
                     icon: Icons.add,
                   ),
@@ -156,7 +160,7 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Row(
       children: [
         Icon(
@@ -174,13 +178,17 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: itemCount > 0
-                ? AppColors.success.withValues(alpha: isDarkMode ? 0.15 : 0.1) // Theme-aware
-                : AppColors.warning.withValues(alpha: isDarkMode ? 0.15 : 0.1), // Theme-aware
+                ? AppColors.success
+                    .withValues(alpha: isDarkMode ? 0.15 : 0.1) // Theme-aware
+                : AppColors.warning
+                    .withValues(alpha: isDarkMode ? 0.15 : 0.1), // Theme-aware
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
           ),
           child: BodyText(
             text: '$itemCount items',
-            color: itemCount > 0 ? AppColors.success : AppColors.warning, // Theme-aware
+            color: itemCount > 0
+                ? AppColors.success
+                : AppColors.warning, // Theme-aware
           ),
         ),
       ],
@@ -202,4 +210,3 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
     );
   }
 }
-

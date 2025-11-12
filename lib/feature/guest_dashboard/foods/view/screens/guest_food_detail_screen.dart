@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../../common/widgets/text/index.dart';
@@ -64,7 +65,7 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
       // =======================================================================
       appBar: AdaptiveAppBar(
         title: 'Food Details',
-        showThemeToggle: true,  // Theme toggle for comfortable reading
+        showThemeToggle: true, // Theme toggle for comfortable reading
       ),
       body: _buildBody(),
     );
@@ -80,9 +81,9 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             BodyText(text: 'Failed to load food details', medium: true),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.paddingS),
             BodyText(text: _error ?? 'Unknown error', color: Colors.grey),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.paddingM),
             PrimaryButton(onPressed: _load, label: 'Retry'),
           ],
         ),
@@ -91,13 +92,13 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
 
     final food = _food!;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Name
           BodyText(text: food.name, medium: true),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.paddingS),
           // Image
           if (food.firstImageUrl != null)
             ClipRRect(
@@ -109,13 +110,13 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.paddingS),
           // Description
           BodyText(text: food.description),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.paddingS),
           // Price
           BodyText(text: 'Price: ${food.formattedPrice}', medium: true),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.paddingS),
           // Availability
           BodyText(
             text: food.isCurrentlyAvailable ? 'Available' : 'Out of Stock',

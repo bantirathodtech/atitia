@@ -77,7 +77,17 @@ secrets.json
 .secrets/
 .secrets/**
 !.secrets/README.md
+!.secrets/**/README.md
 !.secrets/.gitkeep
+
+# Additional secret file patterns
+*.p12
+*.mobileprovision
+*.provisionprofile
+*.p8
+service_account.json
+exportOptions.plist
+keystore.properties
 
 # Sensitive Configuration Files
 config/secrets.dart

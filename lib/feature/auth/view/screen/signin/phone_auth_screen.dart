@@ -65,7 +65,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   String? _validatePhone(String value, BuildContext context) {
     final loc = AppLocalizations.of(context);
     if (loc == null) return null;
-    
+
     if (value.trim().isEmpty) {
       return loc.phoneNumberIsRequired;
     }
@@ -79,7 +79,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   String? _validateOTP(String value, BuildContext context) {
     final loc = AppLocalizations.of(context);
     if (loc == null) return null;
-    
+
     if (value.trim().isEmpty) {
       return loc.otpIsRequired;
     }
@@ -96,7 +96,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   Future<void> _sendOTP() async {
     final loc = AppLocalizations.of(context);
     if (loc == null) return;
-    
+
     // Validate phone number
     final phoneErr = _validatePhone(_phoneController.text.trim(), context);
     if (phoneErr != null) {
@@ -121,7 +121,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             if (mounted) {
               final loc = AppLocalizations.of(context);
               if (loc == null) return;
-              
+
               setState(() {
                 _otpSent = true;
                 _loading = false;
@@ -145,7 +145,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               // Show user-friendly error message
               final loc = AppLocalizations.of(context);
               if (loc == null) return;
-              
+
               String errorMessage = loc.failedToSendOtpPleaseTryAgain;
               if (error.code == 'too-many-requests') {
                 errorMessage = loc.tooManyRequestsPleaseWaitFewMinutes;
@@ -197,7 +197,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   /// Verifies OTP and navigates to appropriate screen
   Future<void> _verifyOTP() async {
     final loc = AppLocalizations.of(context)!;
-    
+
     // Validate OTP
     final otpErr = _validateOTP(_otpController.text.trim(), context);
     if (otpErr != null) {
@@ -304,14 +304,14 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   Future<void> _handleGoogleSignIn() async {
     final loc = AppLocalizations.of(context);
     if (loc == null) return;
-    
+
     setState(() => _loading = true);
-    
+
     try {
       await context.read<AuthProvider>().signInWithGoogle();
-      
+
       if (!mounted) return;
-      
+
       // Navigation is handled in AuthProvider.signInWithGoogle()
     } catch (e) {
       if (mounted) {
@@ -351,7 +351,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppSpacing.xl),
-              
+
               // Header icon
               Icon(
                 Icons.phone_android,
@@ -359,14 +359,14 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 color: Theme.of(context).primaryColor,
               ),
               const SizedBox(height: AppSpacing.lg),
-              
+
               // Title
               HeadingLarge(
                 text: role != null ? loc.loginAs(role) : loc.login,
                 align: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
-              
+
               // Subtitle
               CaptionText(
                 text: loc.enterPhoneNumberToReceiveOTP,
@@ -414,7 +414,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                                 color: Colors.grey.shade700,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppSpacing.paddingXS),
                             Text(
                               loc.notAvailableOnMacOS,
                               style: TextStyle(
@@ -429,7 +429,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   ),
                 ),
               ],
-              
+
               // OTP input field (shown after OTP is sent) - Not available on macOS
               if (_otpSent && _isPhoneAuthAvailable) ...[
                 const SizedBox(height: AppSpacing.lg),
@@ -453,9 +453,9 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   align: TextAlign.center,
                 ),
               ],
-              
+
               const SizedBox(height: AppSpacing.xl),
-              
+
               // Action button (Send OTP / Verify) - Not available on macOS
               if (_isPhoneAuthAvailable) ...[
                 PrimaryButton(
@@ -468,7 +468,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   isLoading: _loading,
                 ),
               ],
-              
+
               // Change number option - Not available on macOS
               if (_otpSent && _isPhoneAuthAvailable) ...[
                 const SizedBox(height: AppSpacing.md),
@@ -486,16 +486,17 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                   icon: Icons.edit,
                 ),
               ],
-              
+
               const SizedBox(height: AppSpacing.lg),
-              
+
               // Divider - Only show when both methods are available
               if (_isPhoneAuthAvailable) ...[
                 Row(
                   children: [
                     const Expanded(child: Divider()),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                       child: CaptionText(
                         text: loc.or,
                         color: Colors.grey.shade600,

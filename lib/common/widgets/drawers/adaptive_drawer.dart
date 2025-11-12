@@ -335,31 +335,41 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
               Row(
                 children: [
                   // Profile Photo
-                  GestureDetector(
-                    onTap: onProfileTap,
-                    child: CircleAvatar(
-                      radius: 30,
-                      backgroundColor:
-                          AppColors.textOnPrimary.withValues(alpha: 0.2),
-                      backgroundImage: user?.profilePhotoUrl != null
-                          ? NetworkImage(user!.profilePhotoUrl!)
-                          : null,
-                      child: user?.profilePhotoUrl == null
-                          ? Builder(
-                              builder: (context) {
-                                final loc = AppLocalizations.of(context);
-                                final fallbackInitial =
-                                    loc?.drawerDefaultInitial ?? 'U';
-                                return Text(
-                                  user?.initials ?? fallbackInitial,
-                                  style: AppTypography.headlineMedium.copyWith(
-                                    color: AppColors.textOnPrimary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                );
-                              },
-                            )
-                          : null,
+                  Semantics(
+                    button: true,
+                    label: 'User profile',
+                    hint: 'Tap to view or edit profile',
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: onProfileTap,
+                        borderRadius: BorderRadius.circular(30),
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundColor:
+                              AppColors.textOnPrimary.withValues(alpha: 0.2),
+                          backgroundImage: user?.profilePhotoUrl != null
+                              ? NetworkImage(user!.profilePhotoUrl!)
+                              : null,
+                          child: user?.profilePhotoUrl == null
+                              ? Builder(
+                                  builder: (context) {
+                                    final loc = AppLocalizations.of(context);
+                                    final fallbackInitial =
+                                        loc?.drawerDefaultInitial ?? 'U';
+                                    return Text(
+                                      user?.initials ?? fallbackInitial,
+                                      style:
+                                          AppTypography.headlineMedium.copyWith(
+                                        color: AppColors.textOnPrimary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : null,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.paddingM),
@@ -387,7 +397,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppSpacing.paddingXS),
                             Text(
                               roleLabel,
                               style: AppTypography.bodyMedium.copyWith(
@@ -747,23 +757,49 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                 spacing: AppSpacing.paddingM,
                 runSpacing: AppSpacing.paddingXS,
                 children: [
-                  GestureDetector(
-                    onTap: () async => await _showPrivacyPolicy(context),
-                    child: Text(
-                      loc?.privacyPolicy ?? 'Privacy',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.primary,
-                        decoration: TextDecoration.underline,
+                  Semantics(
+                    button: true,
+                    label: loc?.privacyPolicy ?? 'Privacy Policy',
+                    hint: 'Opens privacy policy in browser',
+                    child: InkWell(
+                      onTap: () async => await _showPrivacyPolicy(context),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.borderRadiusS),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.paddingXS,
+                          vertical: AppSpacing.paddingXS / 2,
+                        ),
+                        child: Text(
+                          loc?.privacyPolicy ?? 'Privacy',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primary,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () => _showTermsOfService(context),
-                    child: Text(
-                      loc?.termsOfService ?? 'Terms',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.primary,
-                        decoration: TextDecoration.underline,
+                  Semantics(
+                    button: true,
+                    label: loc?.termsOfService ?? 'Terms of Service',
+                    hint: 'Opens terms of service dialog',
+                    child: InkWell(
+                      onTap: () => _showTermsOfService(context),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.borderRadiusS),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.paddingXS,
+                          vertical: AppSpacing.paddingXS / 2,
+                        ),
+                        child: Text(
+                          loc?.termsOfService ?? 'Terms',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primary,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -825,33 +861,42 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
     required String label,
     VoidCallback? onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          vertical: AppSpacing.paddingS,
-          horizontal: AppSpacing.paddingS,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.textOnPrimary.withValues(alpha: 0.1),
+    return Semantics(
+      button: true,
+      label: label,
+      hint: 'Tap to open $label',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: AppColors.textOnPrimary,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: AppSpacing.paddingS,
+              horizontal: AppSpacing.paddingS,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textOnPrimary,
-                fontSize: 10,
-              ),
+            decoration: BoxDecoration(
+              color: AppColors.textOnPrimary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
-          ],
+            child: Column(
+              children: [
+                Icon(
+                  icon,
+                  size: 20,
+                  color: AppColors.textOnPrimary,
+                ),
+                const SizedBox(height: AppSpacing.paddingXS),
+                Text(
+                  label,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textOnPrimary,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -864,34 +909,43 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
     required String label,
     VoidCallback? onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          vertical: AppSpacing.paddingS,
-          horizontal: AppSpacing.paddingS,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.textOnPrimary.withValues(alpha: 0.1),
+    return Semantics(
+      button: true,
+      label: label,
+      hint: 'Tap to toggle $label',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: AppColors.textOnPrimary,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: AppSpacing.paddingS,
+              horizontal: AppSpacing.paddingS,
             ),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textOnPrimary,
-                fontSize: 10,
-              ),
+            decoration: BoxDecoration(
+              color: AppColors.textOnPrimary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 16,
+                  color: AppColors.textOnPrimary,
+                ),
+                const SizedBox(width: AppSpacing.paddingXS),
+                Text(
+                  label,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textOnPrimary,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -911,78 +965,97 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
         ? localizations.telugu
         : localizations.english;
 
-    return GestureDetector(
-      onTap: () {
-        // Show language selection dialog
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(localizations.language),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.language),
-                  title: Text(localizations.english),
-                  trailing: localeProvider.locale.languageCode == 'en'
-                      ? const Icon(Icons.check, color: AppColors.primary)
-                      : null,
-                  onTap: () {
-                    localeProvider.setLocale(const Locale('en'));
-                    Navigator.pop(context);
-                  },
+    return Semantics(
+      button: true,
+      label: 'Language selector',
+      hint: 'Current language: $currentLang. Tap to change language',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            // Show language selection dialog
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(localizations.language),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Semantics(
+                      button: true,
+                      label: 'English',
+                      selected: localeProvider.locale.languageCode == 'en',
+                      child: ListTile(
+                        leading: const Icon(Icons.language),
+                        title: Text(localizations.english),
+                        trailing: localeProvider.locale.languageCode == 'en'
+                            ? const Icon(Icons.check, color: AppColors.primary)
+                            : null,
+                        onTap: () {
+                          localeProvider.setLocale(const Locale('en'));
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                    Semantics(
+                      button: true,
+                      label: 'Telugu',
+                      selected: localeProvider.locale.languageCode == 'te',
+                      child: ListTile(
+                        leading: const Icon(Icons.language),
+                        title: Text(localizations.telugu),
+                        trailing: localeProvider.locale.languageCode == 'te'
+                            ? const Icon(Icons.check, color: AppColors.primary)
+                            : null,
+                        onTap: () {
+                          localeProvider.setLocale(const Locale('te'));
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                ListTile(
-                  leading: const Icon(Icons.language),
-                  title: Text(localizations.telugu),
-                  trailing: localeProvider.locale.languageCode == 'te'
-                      ? const Icon(Icons.check, color: AppColors.primary)
-                      : null,
-                  onTap: () {
-                    localeProvider.setLocale(const Locale('te'));
-                    Navigator.pop(context);
-                  },
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(localizations.close),
+                  ),
+                ],
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: AppSpacing.paddingS,
+              horizontal: AppSpacing.paddingS,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.textOnPrimary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.language,
+                  size: 16,
+                  color: AppColors.textOnPrimary,
+                ),
+                const SizedBox(width: AppSpacing.paddingXS),
+                Flexible(
+                  child: Text(
+                    currentLang,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textOnPrimary,
+                      fontSize: 10,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(localizations.close),
-              ),
-            ],
           ),
-        );
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          vertical: AppSpacing.paddingS,
-          horizontal: AppSpacing.paddingS,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.textOnPrimary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.language,
-              size: 16,
-              color: AppColors.textOnPrimary,
-            ),
-            const SizedBox(width: 4),
-            Flexible(
-              child: Text(
-                currentLang,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textOnPrimary,
-                  fontSize: 10,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -1011,7 +1084,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                 size: 16,
                 color: AppColors.textOnPrimary,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.paddingS),
               Builder(
                 builder: (context) {
                   final loc = AppLocalizations.of(context);
@@ -1025,34 +1098,45 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                 },
               ),
               const Spacer(),
-              GestureDetector(
-                onTap: () {
-                  final newRole = currentRole == 'guest' ? 'owner' : 'guest';
-                  onRoleSwitch?.call(newRole);
-                },
-                child: Builder(
-                  builder: (context) {
-                    final loc = AppLocalizations.of(context);
-                    return Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: AppSpacing.paddingXS,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.textOnPrimary,
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.borderRadiusXS),
-                      ),
-                      child: Text(
-                        (loc?.switchButton ?? 'SWITCH').toUpperCase(),
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.primary,
-                          fontSize: 8,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    );
-                  },
+              Semantics(
+                button: true,
+                label: 'Switch role',
+                hint: 'Switch between guest and owner role',
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      final newRole =
+                          currentRole == 'guest' ? 'owner' : 'guest';
+                      onRoleSwitch?.call(newRole);
+                    },
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusXS),
+                    child: Builder(
+                      builder: (context) {
+                        final loc = AppLocalizations.of(context);
+                        return Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppSpacing.paddingXS,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.textOnPrimary,
+                            borderRadius: BorderRadius.circular(
+                                AppSpacing.borderRadiusXS),
+                          ),
+                          child: Text(
+                            (loc?.switchButton ?? 'SWITCH').toUpperCase(),
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.primary,
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -1101,84 +1185,92 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => onItemSelected?.call(item.id),
-          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppSpacing.paddingM,
-              vertical: AppSpacing.paddingM,
-            ),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? AppColors.primary.withValues(alpha: 0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: isSelected
-                  ? Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.3), width: 1)
-                  : null,
-            ),
-            child: Row(
-              children: [
-                // Icon
-                Icon(
-                  item.icon,
-                  size: 24,
-                  color: isSelected ? AppColors.primary : theme.iconTheme.color,
-                ),
-                const SizedBox(width: AppSpacing.paddingM),
-
-                // Label
-                Expanded(
-                  child: Text(
-                    item.label,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: isSelected
-                          ? AppColors.primary
-                          : theme.textTheme.bodyLarge?.color,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
+      child: Semantics(
+        button: true,
+        label: item.label,
+        selected: isSelected,
+        hint: item.badge != null ? 'Has ${item.badge} notifications' : null,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => onItemSelected?.call(item.id),
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.paddingM,
+                vertical: AppSpacing.paddingM,
+              ),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                border: isSelected
+                    ? Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        width: 1)
+                    : null,
+              ),
+              child: Row(
+                children: [
+                  // Icon
+                  Icon(
+                    item.icon,
+                    size: 24,
+                    color:
+                        isSelected ? AppColors.primary : theme.iconTheme.color,
                   ),
-                ),
+                  const SizedBox(width: AppSpacing.paddingM),
 
-                // Badge (if any)
-                if (item.badge != null) ...[
-                  const SizedBox(width: AppSpacing.paddingS),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppSpacing.paddingXS,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary,
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.borderRadiusS),
-                    ),
+                  // Label
+                  Expanded(
                     child: Text(
-                      item.badge!,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textOnPrimary,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                      item.label,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: isSelected
+                            ? AppColors.primary
+                            : theme.textTheme.bodyLarge?.color,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
                   ),
-                ],
 
-                // Trailing icon
-                if (item.trailingIcon != null) ...[
-                  const SizedBox(width: AppSpacing.paddingS),
-                  Icon(
-                    item.trailingIcon,
-                    size: 20,
-                    color: theme.iconTheme.color?.withValues(alpha: 0.6),
-                  ),
+                  // Badge (if any)
+                  if (item.badge != null) ...[
+                    const SizedBox(width: AppSpacing.paddingS),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.paddingXS,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary,
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.borderRadiusS),
+                      ),
+                      child: Text(
+                        item.badge!,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textOnPrimary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  // Trailing icon
+                  if (item.trailingIcon != null) ...[
+                    const SizedBox(width: AppSpacing.paddingS),
+                    Icon(
+                      item.trailingIcon,
+                      size: 20,
+                      color: theme.iconTheme.color?.withValues(alpha: 0.6),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),

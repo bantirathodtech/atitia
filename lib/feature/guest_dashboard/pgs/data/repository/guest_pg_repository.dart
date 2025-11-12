@@ -16,7 +16,8 @@ class GuestPgRepository {
   final IDatabaseService _databaseService;
   final IStorageService _storageService;
   final IAnalyticsService _analyticsService;
-  final InternationalizationService _i18n = InternationalizationService.instance;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
   final InternationalizationService _uiI18n =
       InternationalizationService.instance;
 

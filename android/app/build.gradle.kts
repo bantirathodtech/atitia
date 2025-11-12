@@ -67,9 +67,11 @@ android {
                 signingConfigs.getByName("debug")
             }
             
-            // Optimizations for release builds
-            isMinifyEnabled = false  // Set to true if you add ProGuard rules
-            isShrinkResources = false  // Set to true if isMinifyEnabled is true
+            // ✅ PRODUCTION: Enable code shrinking and obfuscation for release builds
+            // This reduces APK size and makes reverse engineering more difficult
+            // ProGuard rules are configured in proguard-rules.pro
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

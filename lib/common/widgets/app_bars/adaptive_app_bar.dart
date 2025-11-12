@@ -451,14 +451,18 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                 // Constrain the title widget to available space to prevent overflow
                                 return ConstrainedBox(
                                   constraints: BoxConstraints(
-                                    maxWidth: constraints.maxWidth * 0.6, // Use max 60% of available width
+                                    maxWidth: constraints.maxWidth *
+                                        0.6, // Use max 60% of available width
                                     minWidth: 120.0,
                                   ),
                                   child: titleWidget ??
                                       Text(
                                         title!,
-                                        style: AppTypography.appBarTitle.copyWith(
-                                          color: isDark ? Colors.white : Colors.black,
+                                        style:
+                                            AppTypography.appBarTitle.copyWith(
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
@@ -662,7 +666,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
               color: isDark ? Colors.white : Colors.black,
               size: 20,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.paddingXS),
             Text(
               backLabel,
               style: TextStyle(

@@ -93,9 +93,10 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// Loads owner payment details from guest's selected PG
   Future<void> _loadOwnerPaymentDetailsFromSelectedPg() async {
-    final pgProvider = Provider.of<GuestPgSelectionProvider>(context, listen: false);
+    final pgProvider =
+        Provider.of<GuestPgSelectionProvider>(context, listen: false);
     final selectedPg = pgProvider.selectedPg;
-    
+
     if (selectedPg == null || selectedPg.ownerUid.isEmpty) {
       // No PG selected, clear payment details
       if (mounted) {
@@ -109,7 +110,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
     setState(() => _loadingOwnerDetails = true);
     try {
-      final details = await _ownerPaymentRepo.getPaymentDetails(selectedPg.ownerUid);
+      final details =
+          await _ownerPaymentRepo.getPaymentDetails(selectedPg.ownerUid);
       if (mounted) {
         setState(() {
           _ownerPaymentDetails = details;
@@ -184,8 +186,6 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     );
   }
 
-  
-
   /// 📊 Tab Bar
   Widget _buildTabBar(BuildContext context, bool isDarkMode) {
     final theme = Theme.of(context);
@@ -237,34 +237,27 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           child: UserLocationDisplay(),
         ),
         ...paymentVM.notifications.map((notification) =>
-          _buildPaymentCard(context, notification, isDarkMode, loc)
-        ),
+            _buildPaymentCard(context, notification, isDarkMode, loc)),
       ],
     );
   }
 
   /// 💳 Payment Card
-  Widget _buildPaymentCard(
-      BuildContext context,
-      dynamic notification,
-      bool isDarkMode,
-      AppLocalizations? loc) {
+  Widget _buildPaymentCard(BuildContext context, dynamic notification,
+      bool isDarkMode, AppLocalizations? loc) {
     final theme = Theme.of(context);
     final statusColor = _getStatusColor(notification.status);
     final statusIcon = _getStatusIcon(notification.status);
     final statusLabel = _notificationStatusLabel(notification.status, loc);
-    final paymentMethodLabel =
-        notification.paymentMethod != null
-            ? _notificationPaymentMethodLabel(notification.paymentMethod!, loc)
-            : null;
-    final formattedDate =
-        _formatDate(notification.timestamp, loc);
+    final paymentMethodLabel = notification.paymentMethod != null
+        ? _notificationPaymentMethodLabel(notification.paymentMethod!, loc)
+        : null;
+    final formattedDate = _formatDate(notification.timestamp, loc);
     final currencyFormatter = NumberFormat.simpleCurrency(
       locale: loc?.localeName,
       name: 'INR',
     );
-    final formattedAmount =
-        currencyFormatter.format(notification.amount);
+    final formattedAmount = currencyFormatter.format(notification.amount);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
@@ -428,7 +421,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                           children: [
                             Icon(Icons.message,
                                 size: 16, color: theme.primaryColor),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.paddingS),
                             Text(
                               loc?.ownerResponse ??
                                   _text('ownerResponse', 'Owner Response'),
@@ -438,7 +431,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.paddingS),
                         Text(
                           notification.ownerResponse!,
                           style: theme.textTheme.bodyMedium,
@@ -528,7 +521,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   BodyText(
                       text: loc?.upiId ?? _text('upiId', 'UPI ID'),
                       color: AppColors.textSecondary),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.paddingXS),
                   Text(
                     _ownerPaymentDetails!.upiId!,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -546,8 +539,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   BodyText(
-                      text: loc?.upiQrCode ??
-                          _text('upiQrCode', 'UPI QR Code'),
+                      text: loc?.upiQrCode ?? _text('upiQrCode', 'UPI QR Code'),
                       color: AppColors.textSecondary),
                   const SizedBox(height: AppSpacing.paddingS),
                   ClipRRect(
@@ -622,7 +614,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           size: 16,
           color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -679,8 +671,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     }
   }
 
-  String _notificationPaymentMethodLabel(
-      String method, AppLocalizations? loc) {
+  String _notificationPaymentMethodLabel(String method, AppLocalizations? loc) {
     switch (method.toLowerCase()) {
       case 'razorpay':
         return loc?.paymentMethodRazorpay ??
@@ -693,8 +684,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         return loc?.paymentMethodBankTransfer ??
             _text('paymentMethodBankTransfer', 'Bank Transfer');
       default:
-        return loc?.paymentMethodOther ??
-            _text('paymentMethodOther', 'Other');
+        return loc?.paymentMethodOther ?? _text('paymentMethodOther', 'Other');
     }
   }
 
@@ -828,8 +818,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               Expanded(
                 child: _buildPaymentStatCard(
                   context,
-                  loc?.totalAmount ??
-                      _text('totalAmount', 'Total Amount'),
+                  loc?.totalAmount ?? _text('totalAmount', 'Total Amount'),
                   '₹0',
                   Icons.currency_rupee,
                   Colors.purple,
@@ -889,7 +878,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               color: color,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.paddingXS),
           Text(
             label,
             style: TextStyle(
@@ -976,7 +965,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     Container(
                       height: 8,
                       width: 100,
@@ -1022,7 +1011,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         color: isDarkMode ? Colors.white70 : Colors.grey[600],
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     Container(
                       height: 16,
                       width: 80,
@@ -1045,7 +1034,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         color: isDarkMode ? Colors.white70 : Colors.grey[600],
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     Container(
                       height: 16,
                       width: 60,
@@ -1068,7 +1057,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         color: isDarkMode ? Colors.white70 : Colors.grey[600],
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     Container(
                       height: 16,
                       width: 70,
@@ -1139,7 +1128,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 _tabController.animateTo(1);
               },
               icon: const Icon(Icons.send),
-              label: Text(loc?.sendPayment ?? _text('sendPayment', 'Send Payment')),
+              label: Text(
+                  loc?.sendPayment ?? _text('sendPayment', 'Send Payment')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
                 foregroundColor: Colors.white,
@@ -1242,19 +1232,24 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       _buildPlaceholderPaymentMethod(
                           context,
                           loc?.upiId ?? _text('upiId', 'UPI ID'),
-                          loc?.notAvailable ?? _text('notAvailable', 'Not Available'),
+                          loc?.notAvailable ??
+                              _text('notAvailable', 'Not Available'),
                           isDarkMode),
                       const SizedBox(height: AppSpacing.paddingS),
                       _buildPlaceholderPaymentMethod(
                           context,
-                          loc?.bankAccount ?? _text('bankAccount', 'Bank Account'),
-                          loc?.notAvailable ?? _text('notAvailable', 'Not Available'),
+                          loc?.bankAccount ??
+                              _text('bankAccount', 'Bank Account'),
+                          loc?.notAvailable ??
+                              _text('notAvailable', 'Not Available'),
                           isDarkMode),
                       const SizedBox(height: AppSpacing.paddingS),
                       _buildPlaceholderPaymentMethod(
                           context,
-                          loc?.phoneNumber ?? _text('phoneNumber', 'Phone Number'),
-                          loc?.notAvailable ?? _text('notAvailable', 'Not Available'),
+                          loc?.phoneNumber ??
+                              _text('phoneNumber', 'Phone Number'),
+                          loc?.notAvailable ??
+                              _text('notAvailable', 'Not Available'),
                           isDarkMode),
                     ],
                   ),
@@ -1306,18 +1301,19 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     // Get owner payment details to check if Razorpay is enabled
     final pgProvider = context.read<GuestPgSelectionProvider>();
     final selectedPg = pgProvider.selectedPg;
-    
+
     bool razorpayEnabled = false;
     if (selectedPg != null && selectedPg.ownerUid.isNotEmpty) {
       try {
-        final paymentDetails = await _ownerPaymentRepo.getPaymentDetails(selectedPg.ownerUid);
+        final paymentDetails =
+            await _ownerPaymentRepo.getPaymentDetails(selectedPg.ownerUid);
         razorpayEnabled = paymentDetails?.razorpayEnabled ?? false;
       } catch (e) {
         // If error fetching, default to false
         razorpayEnabled = false;
       }
     }
-    
+
     // Show payment method selection first
     // FIXED: BuildContext async gap warning
     // Flutter recommends: Store context before async operations
@@ -1331,9 +1327,9 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
       currentContext,
       razorpayEnabled: razorpayEnabled,
     );
-    
+
     if (selectedMethod == null || !mounted) return;
-    
+
     // Show payment form based on selected method
     // FIXED: BuildContext async gap warning
     // Flutter recommends: Check mounted immediately before using context after async gap
@@ -1393,7 +1389,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
     }
     return translated;
   }
-  
+
   @override
   void initState() {
     super.initState();
@@ -1443,44 +1439,45 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                   }
                   if (double.tryParse(value) == null) {
                     return loc?.pleaseEnterValidAmount ??
-                        _text('pleaseEnterValidAmount', 'Please enter valid amount');
+                        _text('pleaseEnterValidAmount',
+                            'Please enter valid amount');
                   }
                   return null;
                 },
               ),
               const SizedBox(height: AppSpacing.paddingM),
-              
+
               // Method-specific fields
               if (widget.paymentMethod == PaymentMethodType.upi) ...[
                 // UPI: Screenshot (required) - Transaction ID is visible in screenshot
                 _buildScreenshotUpload(context, theme, loc),
-              const SizedBox(height: AppSpacing.paddingM),
+                const SizedBox(height: AppSpacing.paddingM),
                 // Transaction ID field is optional - screenshot already contains it
-              Builder(
-                builder: (context) {
-                  return TextFormField(
-                    controller: _transactionIdController,
-                    decoration: InputDecoration(
-                      labelText: loc?.transactionIdOptional ??
-                          _text('transactionIdOptional', 'Transaction ID (Optional)'),
-                      hintText: loc?.notRequiredAlreadyVisibleInScreenshot ??
-                          _text('notRequiredAlreadyVisibleInScreenshot',
-                              'Not required - already visible in screenshot'),
-                      helperText:
-                          loc?.youCanSkipThisTransactionIdIsInScreenshot ??
-                              _text(
-                                'youCanSkipThisTransactionIdIsInScreenshot',
-                                'You can skip this - transaction ID is in the screenshot',
-                              ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
+                Builder(
+                  builder: (context) {
+                    return TextFormField(
+                      controller: _transactionIdController,
+                      decoration: InputDecoration(
+                        labelText: loc?.transactionIdOptional ??
+                            _text('transactionIdOptional',
+                                'Transaction ID (Optional)'),
+                        hintText: loc?.notRequiredAlreadyVisibleInScreenshot ??
+                            _text('notRequiredAlreadyVisibleInScreenshot',
+                                'Not required - already visible in screenshot'),
+                        helperText:
+                            loc?.youCanSkipThisTransactionIdIsInScreenshot ??
+                                _text(
+                                  'youCanSkipThisTransactionIdIsInScreenshot',
+                                  'You can skip this - transaction ID is in the screenshot',
+                                ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
                 BodyText(
                   text: loc?.upiPaymentTip ??
-                      _text(
-                          'upiPaymentTip',
+                      _text('upiPaymentTip',
                           '💡 Tip: After making payment via PhonePe, Paytm, Google Pay, etc., upload the payment screenshot. The transaction ID is already visible in the screenshot.'),
                   color: AppColors.textSecondary,
                   small: true,
@@ -1489,14 +1486,14 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                 // Cash: Message only
                 BodyText(
                   text: loc?.cashPaymentNotificationInfo ??
-                      _text(
-                          'cashPaymentNotificationInfo',
+                      _text('cashPaymentNotificationInfo',
                           'You will send a cash payment notification to the owner. Owner will confirm once they receive the cash.'),
                   color: AppColors.textSecondary,
                   small: true,
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
-              ] else if (widget.paymentMethod == PaymentMethodType.razorpay) ...[
+              ] else if (widget.paymentMethod ==
+                  PaymentMethodType.razorpay) ...[
                 // Razorpay: No additional fields needed
                 BodyText(
                   text: loc?.payViaRazorpayDescription ??
@@ -1507,7 +1504,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
               ],
-              
+
               // Message field (optional for all methods)
               TextFormField(
                 controller: _messageController,
@@ -1524,23 +1521,21 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: (_sending || _processingRazorpay) ? null : () => Navigator.pop(context),
+          onPressed: (_sending || _processingRazorpay)
+              ? null
+              : () => Navigator.pop(context),
           child: Text(loc?.cancel ?? _text('cancel', 'Cancel')),
         ),
-        ElevatedButton(
+        PrimaryButton(
           onPressed: (_sending || _processingRazorpay) ? null : _handlePayment,
-          child: (_sending || _processingRazorpay)
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(_getButtonText(loc)),
+          label: _getButtonText(loc),
+          isLoading: _sending || _processingRazorpay,
+          enabled: !(_sending || _processingRazorpay),
         ),
       ],
     );
   }
-  
+
   String _getDialogTitle(AppLocalizations? loc) {
     switch (widget.paymentMethod) {
       case PaymentMethodType.razorpay:
@@ -1554,7 +1549,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
             _text('cashPaymentNotification', 'Cash Payment Notification');
     }
   }
-  
+
   String _getButtonText(AppLocalizations? loc) {
     switch (widget.paymentMethod) {
       case PaymentMethodType.razorpay:
@@ -1566,31 +1561,33 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
             _text('sendNotification', 'Send Notification');
     }
   }
-  
+
   Widget _buildScreenshotUpload(
       BuildContext context, ThemeData theme, AppLocalizations? loc) {
     if (_screenshotFile != null) {
       return FutureBuilder<Uint8List>(
-                  future: _screenshotFile.readAsBytes(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
+        future: _screenshotFile.readAsBytes(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                        height: 150,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-                          border: Border.all(color: theme.primaryColor),
-                        ),
+                  height: 150,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
+                    border: Border.all(color: theme.primaryColor),
+                  ),
                   child: Stack(
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-                          child: Image.memory(
-                            snapshot.data!,
-                            fit: BoxFit.cover,
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.borderRadiusM),
+                        child: Image.memory(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
                           width: double.infinity,
                           height: 150,
                         ),
@@ -1608,7 +1605,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.paddingS),
                 BodyText(
                   text: loc?.screenshotUploaded ??
                       _text('screenshotUploaded', 'Screenshot uploaded'),
@@ -1616,18 +1613,18 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                   small: true,
                 ),
               ],
-                      );
-                    }
-                    return Container(
-                      height: 150,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
+            );
+          }
+          return Container(
+            height: 150,
+            width: double.infinity,
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-                        border: Border.all(color: theme.primaryColor),
-                      ),
-                      child: const Center(child: CircularProgressIndicator()),
-                    );
-                  },
+              border: Border.all(color: theme.primaryColor),
+            ),
+            child: const Center(child: CircularProgressIndicator()),
+          );
+        },
       );
     }
     return OutlinedButton.icon(
@@ -1646,15 +1643,17 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
   }
 
   /// Gets the first approved booking request ID for the selected PG
-  Future<String> _getApprovedBookingRequestId(String guestId, String pgId) async {
+  Future<String> _getApprovedBookingRequestId(
+      String guestId, String pgId) async {
     try {
       // Use stream to get booking requests, then take first value
-      final requestsStream = _bookingRequestRepo.streamGuestBookingRequests(guestId);
+      final requestsStream =
+          _bookingRequestRepo.streamGuestBookingRequests(guestId);
       final requests = await requestsStream.first.timeout(
         const Duration(seconds: 5),
         onTimeout: () => <OwnerBookingRequestModel>[],
       );
-      
+
       // Find the first approved booking request for the selected PG
       final approvedRequest = requests.firstWhere(
         (request) => request.pgId == pgId && request.status == 'approved',
@@ -1681,7 +1680,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
         break;
     }
   }
-  
+
   /// Process Razorpay payment
   Future<void> _processRazorpayPayment() async {
     if (!_formKey.currentState!.validate()) return;
@@ -1708,10 +1707,10 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                AppLocalizations.of(context)?.invalidPgSelectionOwnerInfoNotAvailable ??
-                    _text('invalidPgSelectionOwnerInfoNotAvailable',
-                        'Invalid PG selection. Owner information not available.')),
+            content: Text(AppLocalizations.of(context)
+                    ?.invalidPgSelectionOwnerInfoNotAvailable ??
+                _text('invalidPgSelectionOwnerInfoNotAvailable',
+                    'Invalid PG selection. Owner information not available.')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1725,7 +1724,8 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       final authProvider = context.read<AuthProvider>();
       final guestId = authProvider.user!.userId;
       final amount = double.parse(_amountController.text);
-      final orderId = 'order_${guestId}_${DateTime.now().millisecondsSinceEpoch}';
+      final orderId =
+          'order_${guestId}_${DateTime.now().millisecondsSinceEpoch}';
 
       // Open Razorpay payment
       await _razorpayService.openPayment(
@@ -1748,15 +1748,15 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
             razorpayOrderId: orderId,
             razorpayPaymentId: response.paymentId,
           );
-          
+
           if (mounted) {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                    AppLocalizations.of(context)?.paymentSuccessfulOwnerWillBeNotified ??
-                        _text('paymentSuccessfulOwnerWillBeNotified',
-                            'Payment successful! Owner will be notified.')),
+                content: Text(AppLocalizations.of(context)
+                        ?.paymentSuccessfulOwnerWillBeNotified ??
+                    _text('paymentSuccessfulOwnerWillBeNotified',
+                        'Payment successful! Owner will be notified.')),
                 backgroundColor: AppColors.success,
               ),
             );
@@ -1766,10 +1766,10 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                    AppLocalizations.of(context)?.paymentFailed(response.message ?? '') ??
-                        _text('paymentFailed', 'Payment failed: {message}',
-                            parameters: {'message': response.message ?? ''})),
+                content: Text(AppLocalizations.of(context)
+                        ?.paymentFailed(response.message ?? '') ??
+                    _text('paymentFailed', 'Payment failed: {message}',
+                        parameters: {'message': response.message ?? ''})),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -1780,10 +1780,11 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                AppLocalizations.of(context)?.failedToProcessPayment(e.toString()) ??
-                    _text('failedToProcessPayment', 'Failed to process payment: {error}',
-                        parameters: {'error': e.toString()})),
+            content: Text(AppLocalizations.of(context)
+                    ?.failedToProcessPayment(e.toString()) ??
+                _text('failedToProcessPayment',
+                    'Failed to process payment: {error}',
+                    parameters: {'error': e.toString()})),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1794,22 +1795,21 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       }
     }
   }
-  
+
   /// Send UPI payment notification with screenshot
   Future<void> _sendUpiPayment() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     // For UPI, screenshot is required as it contains the transaction ID
     // Transaction ID field is optional - owner can extract it from screenshot if needed
     if (_screenshotFile == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                AppLocalizations.of(context)?.pleaseUploadPaymentScreenshot ??
-                    _text(
-                        'pleaseUploadPaymentScreenshot',
-                        'Please upload payment screenshot. Transaction ID is visible in the screenshot.')),
+            content: Text(AppLocalizations.of(context)
+                    ?.pleaseUploadPaymentScreenshot ??
+                _text('pleaseUploadPaymentScreenshot',
+                    'Please upload payment screenshot. Transaction ID is visible in the screenshot.')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -1825,7 +1825,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       paymentScreenshot: _screenshotFile,
     );
   }
-  
+
   /// Send cash payment notification
   Future<void> _sendCashPayment() async {
     if (!_formKey.currentState!.validate()) return;
@@ -1834,7 +1834,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       paymentMethod: 'cash',
     );
   }
-  
+
   /// Common method to send payment notification
   Future<void> _sendPaymentNotification({
     required String paymentMethod,
@@ -1884,7 +1884,8 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       final guestId = authProvider.user!.userId;
 
       // Get booking ID from approved booking request (or generate fallback)
-      final bookingId = await _getApprovedBookingRequestId(guestId, selectedPgId);
+      final bookingId =
+          await _getApprovedBookingRequestId(guestId, selectedPgId);
 
       // Map payment method type to string
       String paymentMethodString;
@@ -1908,9 +1909,8 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
         amount: double.parse(_amountController.text),
         paymentMethod: paymentMethodString,
         transactionId: transactionId,
-        paymentNote: _messageController.text.isEmpty
-            ? null
-            : _messageController.text,
+        paymentNote:
+            _messageController.text.isEmpty ? null : _messageController.text,
         paymentScreenshot: paymentScreenshot,
       );
 
@@ -1921,8 +1921,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
             content: Text(
               widget.paymentMethod == PaymentMethodType.cash
                   ? (loc?.cashPaymentNotificationSent ??
-                      _text(
-                          'cashPaymentNotificationSent',
+                      _text('cashPaymentNotificationSent',
                           'Cash payment notification sent. Owner will confirm once they receive the payment.'))
                   : (loc?.paymentNotificationSentSuccessfully ??
                       _text('paymentNotificationSentSuccessfully',
@@ -1937,7 +1936,8 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(loc?.failedToSendNotification(e.toString()) ??
-                _text('failedToSendNotification', 'Failed to send notification: {error}',
+                _text('failedToSendNotification',
+                    'Failed to send notification: {error}',
                     parameters: {'error': e.toString()})),
             backgroundColor: AppColors.error,
           ),
@@ -1949,6 +1949,4 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
       }
     }
   }
-
 }
-

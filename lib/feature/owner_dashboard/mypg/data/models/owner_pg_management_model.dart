@@ -52,8 +52,9 @@ class OwnerBed {
       vacatingOn: data['vacatingOn']?.toDate(),
       createdAt: data['createdAt']?.toDate(),
       updatedAt: data['updatedAt']?.toDate(),
-      metadata:
-          data['metadata'] != null ? Map<String, dynamic>.from(data['metadata']) : null,
+      metadata: data['metadata'] != null
+          ? Map<String, dynamic>.from(data['metadata'])
+          : null,
     );
   }
 
@@ -66,7 +67,8 @@ class OwnerBed {
       'guestName': guestName,
       'guestUid': guestUid,
       'bookingId': bookingId,
-      'occupiedSince': occupiedSince != null ? Timestamp.fromDate(occupiedSince!) : null,
+      'occupiedSince':
+          occupiedSince != null ? Timestamp.fromDate(occupiedSince!) : null,
       'vacatingOn': vacatingOn != null ? Timestamp.fromDate(vacatingOn!) : null,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
@@ -126,7 +128,8 @@ class OwnerBed {
     }
   }
 
-  String get statusDisplay => status[0].toUpperCase() + status.substring(1).toLowerCase();
+  String get statusDisplay =>
+      status[0].toUpperCase() + status.substring(1).toLowerCase();
 }
 
 /// Model representing a room which contains beds
@@ -165,11 +168,14 @@ class OwnerRoom {
       capacity: data['capacity'] ?? 1,
       roomType: data['roomType'],
       rentPerBed: data['rentPerBed']?.toDouble(),
-      amenities: data['amenities'] != null ? List<String>.from(data['amenities']) : null,
+      amenities: data['amenities'] != null
+          ? List<String>.from(data['amenities'])
+          : null,
       createdAt: data['createdAt']?.toDate(),
       updatedAt: data['updatedAt']?.toDate(),
-      metadata:
-          data['metadata'] != null ? Map<String, dynamic>.from(data['metadata']) : null,
+      metadata: data['metadata'] != null
+          ? Map<String, dynamic>.from(data['metadata'])
+          : null,
     );
   }
 
@@ -187,8 +193,9 @@ class OwnerRoom {
     };
   }
 
-  String get formattedRent =>
-      rentPerBed != null ? '₹${NumberFormat('#,##0').format(rentPerBed)}/bed' : 'N/A';
+  String get formattedRent => rentPerBed != null
+      ? '₹${NumberFormat('#,##0').format(rentPerBed)}/bed'
+      : 'N/A';
 }
 
 /// Model representing a floor that contains rooms
@@ -221,8 +228,9 @@ class OwnerFloor {
       totalRooms: data['totalRooms'] ?? 0,
       createdAt: data['createdAt']?.toDate(),
       updatedAt: data['updatedAt']?.toDate(),
-      metadata:
-          data['metadata'] != null ? Map<String, dynamic>.from(data['metadata']) : null,
+      metadata: data['metadata'] != null
+          ? Map<String, dynamic>.from(data['metadata'])
+          : null,
     );
   }
 
@@ -295,8 +303,9 @@ class OwnerBooking {
       guestPhone: data['guestPhone'],
       createdAt: data['createdAt']?.toDate(),
       updatedAt: data['updatedAt']?.toDate(),
-      metadata:
-          data['metadata'] != null ? Map<String, dynamic>.from(data['metadata']) : null,
+      metadata: data['metadata'] != null
+          ? Map<String, dynamic>.from(data['metadata'])
+          : null,
     );
   }
 
@@ -322,7 +331,9 @@ class OwnerBooking {
 
   bool get isActive {
     final now = DateTime.now();
-    return now.isAfter(startDate) && now.isBefore(endDate) && status.toLowerCase() == 'approved';
+    return now.isAfter(startDate) &&
+        now.isBefore(endDate) &&
+        status.toLowerCase() == 'approved';
   }
 
   bool get isPending => status.toLowerCase() == 'pending';
@@ -358,8 +369,10 @@ class OwnerRevenueReport {
   })  : totalAmount = totalAmount ?? (collectedAmount + pendingAmount),
         generatedAt = generatedAt ?? DateTime.now();
 
-  String get formattedCollected => '₹${NumberFormat('#,##0').format(collectedAmount)}';
-  String get formattedPending => '₹${NumberFormat('#,##0').format(pendingAmount)}';
+  String get formattedCollected =>
+      '₹${NumberFormat('#,##0').format(collectedAmount)}';
+  String get formattedPending =>
+      '₹${NumberFormat('#,##0').format(pendingAmount)}';
   String get formattedTotal => '₹${NumberFormat('#,##0').format(totalAmount)}';
 
   double get collectionPercentage {
@@ -367,7 +380,8 @@ class OwnerRevenueReport {
     return (collectedAmount / totalAmount) * 100;
   }
 
-  String get formattedCollectionPercentage => '${collectionPercentage.toStringAsFixed(1)}%';
+  String get formattedCollectionPercentage =>
+      '${collectionPercentage.toStringAsFixed(1)}%';
 }
 
 /// Model representing occupancy statistics
@@ -396,4 +410,3 @@ class OwnerOccupancyReport {
   String get formattedOccupancy => '${occupancyPercentage.toStringAsFixed(1)}%';
   String get occupancyDisplay => '$occupiedBeds/$totalBeds occupied';
 }
-

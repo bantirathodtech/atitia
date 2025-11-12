@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
@@ -50,7 +51,8 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
   /// Handles image picker errors with user-friendly messages
   Future<void> _pickImage() async {
     try {
-      final file = await ImagePickerHelper.pickImageFromGallery(imageQuality: 75);
+      final file =
+          await ImagePickerHelper.pickImageFromGallery(imageQuality: 75);
       if (file != null && mounted) {
         setState(() {
           _imageFiles.add(file);
@@ -90,18 +92,20 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
   Future<void> _submitComplaint() async {
     final loc = AppLocalizations.of(context);
     if (loc == null) return;
-    
+
     // Validate form inputs
     // Local validation for shared inputs
     setState(() {
-      _subjectError = GeneralValidators.validateRequired(loc.subject, _subjectController.text);
-      _descriptionError = GeneralValidators.validateRequired(loc.description, _descriptionController.text);
+      _subjectError = GeneralValidators.validateRequired(
+          loc.subject, _subjectController.text);
+      _descriptionError = GeneralValidators.validateRequired(
+          loc.description, _descriptionController.text);
     });
     if (_subjectError != null || _descriptionError != null) return;
 
     final authProvider = context.read<AuthProvider>();
     final guestId = authProvider.user?.userId ?? '';
-    
+
     // Check user authentication
     if (guestId.isEmpty) {
       final loc = AppLocalizations.of(context);
@@ -115,14 +119,17 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
 
     // Get PG ID from GuestPgSelectionProvider (guest's selected/booked PG)
     final pgSelectionProvider = context.read<GuestPgSelectionProvider>();
-    final pgId = pgSelectionProvider.selectedPgId ?? 
-                 pgSelectionProvider.selectedPg?.pgId ?? '';
+    final pgId = pgSelectionProvider.selectedPgId ??
+        pgSelectionProvider.selectedPg?.pgId ??
+        '';
 
     // Validate that guest has selected a PG
     if (pgId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)?.pleaseSelectPgFirstToFileComplaint ?? 'Please select a PG first to file a complaint'),
+          content: Text(AppLocalizations.of(context)
+                  ?.pleaseSelectPgFirstToFileComplaint ??
+              'Please select a PG first to file a complaint'),
           duration: const Duration(seconds: 3),
         ),
       );
@@ -206,17 +213,17 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    
+
     return Scaffold(
       // =======================================================================
       // App Bar with Theme Toggle - Submit Complaint
       // =======================================================================
       appBar: AdaptiveAppBar(
         title: loc?.submitNewComplaint ?? 'Submit New Complaint',
-        showThemeToggle: true,  // Theme toggle for comfortable form filling
+        showThemeToggle: true, // Theme toggle for comfortable form filling
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.paddingM),
         child: Form(
           key: _formKey,
           child: Column(
@@ -226,7 +233,7 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
                 builder: (context) {
                   final loc = AppLocalizations.of(context);
                   if (loc == null) return const SizedBox.shrink();
-                  
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -237,10 +244,11 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
                         hint: loc.briefDescriptionOfYourComplaint,
                         error: _subjectError,
                         onChanged: (v) => setState(() {
-                          _subjectError = GeneralValidators.validateRequired(loc.subject, v);
+                          _subjectError = GeneralValidators.validateRequired(
+                              loc.subject, v);
                         }),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.paddingM),
 
                       // Complaint Description Input (shared TextInput)
                       TextInput(
@@ -250,14 +258,16 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
                         maxLines: 5,
                         error: _descriptionError,
                         onChanged: (v) => setState(() {
-                          _descriptionError = GeneralValidators.validateRequired(loc.description, v);
+                          _descriptionError =
+                              GeneralValidators.validateRequired(
+                                  loc.description, v);
                         }),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.paddingM),
 
                       // Image Attachment Section
                       _buildImageAttachmentSection(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.paddingL),
 
                       // Submit Button
                       PrimaryButton(
@@ -280,7 +290,7 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
   Widget _buildImageAttachmentSection() {
     final loc = AppLocalizations.of(context);
     if (loc == null) return const SizedBox.shrink();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -288,7 +298,7 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
           loc.attachPhotosOptional,
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.paddingS),
         Wrap(
           spacing: 10,
           runSpacing: 10,
@@ -315,7 +325,7 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
                     GestureDetector(
                       onTap: () => setState(() => _imageFiles.remove(file)),
                       child: Container(
-                        margin: const EdgeInsets.all(4),
+                        margin: const EdgeInsets.all(AppSpacing.paddingXS),
                         decoration: const BoxDecoration(
                           color: Colors.black54,
                           shape: BoxShape.circle,
@@ -344,7 +354,7 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.add_a_photo, size: 30, color: Colors.grey),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     Text(
                       loc.add,
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
@@ -356,7 +366,7 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
           ],
         ),
         if (_imageFiles.isNotEmpty) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.paddingS),
           Text(
             loc.imagesSelected(_imageFiles.length),
             style: const TextStyle(fontSize: 12, color: Colors.grey),

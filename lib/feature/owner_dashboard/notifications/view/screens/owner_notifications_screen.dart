@@ -13,6 +13,7 @@ import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
+import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../core/viewmodels/notification_viewmodel.dart';
@@ -95,9 +96,9 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
                     color: AppColors.textSecondary,
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
-                  ElevatedButton(
+                  PrimaryButton(
                     onPressed: () => viewModel.loadNotifications(),
-                    child: Text(loc.retry),
+                    label: loc.retry,
                   ),
                 ],
               ),
@@ -150,8 +151,8 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
           children: _filterKeys
               .map(
                 (key) => Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.paddingS),
                   child: _buildFilterChip(key, loc),
                 ),
               )
@@ -204,14 +205,14 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
     final timestamp = notification['timestamp'] as DateTime? ??
         DateTime.now().subtract(const Duration(days: 1));
     final type = notification['type'] as String? ?? '';
-    final title = notification['title'] as String? ??
-        loc.ownerNotificationsDefaultTitle;
-    final body = notification['body'] as String? ??
-        loc.ownerNotificationsDefaultBody;
+    final title =
+        notification['title'] as String? ?? loc.ownerNotificationsDefaultTitle;
+    final body =
+        notification['body'] as String? ?? loc.ownerNotificationsDefaultBody;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-        child: AdaptiveCard(
+      child: AdaptiveCard(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         onTap: () {
           final notificationId = notification['id'] as String?;
@@ -259,11 +260,11 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
                         ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.paddingXS),
                   CaptionText(
                     text: body,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.paddingXS),
                   CaptionText(
                     text: _formatTimestamp(timestamp, loc),
                     color: AppColors.textTertiary,
@@ -326,4 +327,3 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
     }
   }
 }
-

@@ -141,7 +141,7 @@ class GuestDrawer extends StatelessWidget {
   void _handleLogout(BuildContext context) {
     final loc = AppLocalizations.of(context);
     if (loc == null) return;
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

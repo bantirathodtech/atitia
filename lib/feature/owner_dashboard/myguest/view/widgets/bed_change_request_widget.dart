@@ -29,7 +29,7 @@ class BedChangeRequestWidget extends StatelessWidget {
     final AppLocalizations loc = AppLocalizations.of(context)!;
     if (requests.isEmpty) {
       return Center(
-      child: Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(Icons.bed_outlined, size: 64, color: Colors.grey),
@@ -146,7 +146,8 @@ class BedChangeRequestWidget extends StatelessWidget {
                     child: PrimaryButton(
                       label: loc.approve,
                       icon: Icons.check,
-                      onPressed: () => _showApproveDialog(context, request, loc),
+                      onPressed: () =>
+                          _showApproveDialog(context, request, loc),
                     ),
                   ),
                 ],

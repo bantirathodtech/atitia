@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../../common/styles/spacing.dart';
 import '../../data/models/guest_food_model.dart';
 
 /// Card widget representing a single food menu item
@@ -70,13 +71,13 @@ class GuestFoodCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.paddingS),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Food Image
               _buildFoodImage(context),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.paddingS),
               // Food Details
               Expanded(
                 child: _buildFoodDetails(context),
@@ -146,7 +147,7 @@ class GuestFoodCard extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.paddingXS),
         // Food Description
         Text(
           food.description,
@@ -158,7 +159,7 @@ class GuestFoodCard extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.paddingS),
         // Availability Badge
         if (food.isAvailable)
           Container(
@@ -212,7 +213,7 @@ class GuestFoodCard extends StatelessWidget {
             color: Colors.green,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.paddingS),
         // Category Badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -228,7 +229,7 @@ class GuestFoodCard extends StatelessWidget {
                 size: 14,
                 color: _categoryTextColor,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.paddingXS),
               Text(
                 food.category,
                 style: TextStyle(

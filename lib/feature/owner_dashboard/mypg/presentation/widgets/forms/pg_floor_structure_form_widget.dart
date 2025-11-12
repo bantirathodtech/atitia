@@ -189,8 +189,7 @@ class _PgFloorStructureFormWidgetState
           id: 'bed_${DateTime.now().millisecondsSinceEpoch}_$i',
           roomId: room.id,
           floorId: room.floorId,
-          bedNumber:
-              AppLocalizations.of(context)!.pgFloorBedLabel(i),
+          bedNumber: AppLocalizations.of(context)!.pgFloorBedLabel(i),
           status: 'vacant',
         );
         roomBeds.add(bed);
@@ -274,16 +273,15 @@ class _PgFloorStructureFormWidgetState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 HeadingSmall(text: floor.floorName),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: AppSpacing.paddingXS),
                                 BodyText(
-                                  text:
-                                      loc.pgFloorRoomsBedsSummary(
-                                        floorRooms.length,
-                                        floorRooms.fold(
-                                          0,
-                                          (sum, room) => sum + room.capacity,
-                                        ),
-                                      ),
+                                  text: loc.pgFloorRoomsBedsSummary(
+                                    floorRooms.length,
+                                    floorRooms.fold(
+                                      0,
+                                      (sum, room) => sum + room.capacity,
+                                    ),
+                                  ),
                                   color: Colors.grey[600],
                                 ),
                                 const SizedBox(height: 2),
@@ -331,8 +329,9 @@ class _PgFloorStructureFormWidgetState
                                         items: [1, 2, 3, 4, 5]
                                             .map((capacity) => DropdownMenuItem(
                                                   value: capacity,
-                                                  child:
-                                                      Text(loc.pgFloorCapacityOption(capacity)),
+                                                  child: Text(
+                                                      loc.pgFloorCapacityOption(
+                                                          capacity)),
                                                 ))
                                             .toList(),
                                         onChanged: (capacity) {
@@ -351,10 +350,9 @@ class _PgFloorStructureFormWidgetState
                                 ],
                               ),
                               BodyText(
-                                text:
-                                    loc.pgFloorBedsList(
-                                      roomBeds.map((b) => b.bedNumber).join(', '),
-                                    ),
+                                text: loc.pgFloorBedsList(
+                                  roomBeds.map((b) => b.bedNumber).join(', '),
+                                ),
                                 color: Colors.grey[600],
                               ),
                             ],

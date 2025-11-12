@@ -44,11 +44,9 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:exported="true" />
 
-        <!-- Google Sign-In Activity -->
-        <activity
-            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
-            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
-            android:exported="true" />
+        <!-- Google Sign-In Service (not an Activity) -->
+        <!-- Note: RevocationBoundService is a service, not an activity -->
+        <!-- This is handled automatically by Google Play Services SDK -->
 
         <meta-data
             android:name="flutterEmbedding"

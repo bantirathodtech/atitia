@@ -79,7 +79,8 @@ class GuestPgCard extends StatelessWidget {
               color: isDarkMode ? AppColors.darkCard : Colors.white,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
               border: Border.all(
-                color: isDarkMode ? AppColors.darkDivider : Colors.grey.shade300,
+                color:
+                    isDarkMode ? AppColors.darkDivider : Colors.grey.shade300,
               ),
               boxShadow: [
                 BoxShadow(
@@ -193,7 +194,7 @@ class GuestPgCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: AppSpacing.paddingS),
               _buildLocationRow(context, loc),
             ],
           ),
@@ -260,17 +261,18 @@ class GuestPgCard extends StatelessWidget {
     AppLocalizations? loc,
   ) {
     final summary = getSharingSummary(pg);
-    
+
     if (summary.isEmpty) {
       return const SizedBox.shrink();
     }
 
     // Get unique sharing types (1, 2, 3, 4, 5 sharing)
-    final sharingTypes = summary.keys.toList()..sort((a, b) {
-      final aNum = int.tryParse(a.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-      final bNum = int.tryParse(b.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-      return aNum.compareTo(bNum);
-    });
+    final sharingTypes = summary.keys.toList()
+      ..sort((a, b) {
+        final aNum = int.tryParse(a.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+        final bNum = int.tryParse(b.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+        return aNum.compareTo(bNum);
+      });
 
     return Wrap(
       spacing: AppSpacing.paddingS,
@@ -344,7 +346,7 @@ class GuestPgCard extends StatelessWidget {
             size: 12,
             color: AppColors.textOnPrimary,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.paddingXS),
           Text(
             isAvailable
                 ? (loc?.available ?? _text('available', 'Available'))
@@ -375,7 +377,7 @@ class GuestPgCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 12, color: AppColors.textOnPrimary),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.paddingXS),
           Text(
             text,
             style: const TextStyle(
@@ -400,7 +402,7 @@ class GuestPgCard extends StatelessWidget {
           size: 14,
           color: AppColors.textOnPrimary.withValues(alpha: 0.9),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.paddingXS),
         Expanded(
           child: GestureDetector(
             onTap: () => _openMap(context),
@@ -413,7 +415,7 @@ class GuestPgCard extends StatelessWidget {
           ),
         ),
         if (distanceText != null) ...[
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.paddingS),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 6,
@@ -459,7 +461,7 @@ class GuestPgCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.paddingXS),
           CaptionText(
             text: label,
             color: color,
@@ -508,13 +510,13 @@ class GuestPgCard extends StatelessWidget {
             size: 14,
             color: AppColors.primary,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.paddingXS),
           CaptionText(
             text: displayText,
             color: AppColors.primary,
           ),
           if (hasVacancy) ...[
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.paddingXS),
             Icon(
               Icons.check_circle,
               size: 12,
@@ -546,7 +548,7 @@ class GuestPgCard extends StatelessWidget {
             size: 48,
             color: AppColors.textTertiary,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.paddingS),
           CaptionText(
             text: AppLocalizations.of(context)?.noImageAvailable ??
                 _text('noImageAvailable', 'No Image Available'),
@@ -559,9 +561,7 @@ class GuestPgCard extends StatelessWidget {
 
   /// 📍 Get distance text from user location
   String? _getDistanceText(AppLocalizations? loc) {
-    if (userLatitude == null ||
-        userLongitude == null ||
-        !pg.hasLocation) {
+    if (userLatitude == null || userLongitude == null || !pg.hasLocation) {
       return null;
     }
 
@@ -592,8 +592,9 @@ class GuestPgCard extends StatelessWidget {
     if (!pg.hasLocation) {
       // Fallback to Google Maps search if coordinates not available
       final query = Uri.encodeComponent(pg.fullAddress);
-      final googleMapsUrl = Uri.parse('https://www.google.com/maps/search/?api=1&query=$query');
-      
+      final googleMapsUrl =
+          Uri.parse('https://www.google.com/maps/search/?api=1&query=$query');
+
       if (await canLaunchUrl(googleMapsUrl)) {
         await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
       }

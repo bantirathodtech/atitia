@@ -73,8 +73,8 @@ class UserLocationDisplay extends StatelessWidget {
   Widget _buildFullLocation(BuildContext context, Map<String, String> parts) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final iconColorFinal =
-        iconColor ?? (isDark ? AppColors.textTertiary : AppColors.textSecondary);
+    final iconColorFinal = iconColor ??
+        (isDark ? AppColors.textTertiary : AppColors.textSecondary);
     final loc = AppLocalizations.of(context);
 
     return Container(
@@ -143,11 +143,12 @@ class UserLocationDisplay extends StatelessWidget {
   }
 
   /// Builds compact location display (single line)
-  Widget _buildCompactLocation(BuildContext context, Map<String, String> parts) {
+  Widget _buildCompactLocation(
+      BuildContext context, Map<String, String> parts) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final iconColorFinal =
-        iconColor ?? (isDark ? AppColors.textTertiary : AppColors.textSecondary);
+    final iconColorFinal = iconColor ??
+        (isDark ? AppColors.textTertiary : AppColors.textSecondary);
 
     final locationText = _buildCompactLocationText(parts);
 
@@ -158,7 +159,7 @@ class UserLocationDisplay extends StatelessWidget {
           size: 16,
           color: iconColorFinal,
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.paddingXS),
         Flexible(
           child: CaptionText(
             text: locationText,
@@ -198,11 +199,12 @@ class UserLocationDisplay extends StatelessWidget {
   /// Builds compact location text (State, District, Area format)
   String _buildCompactLocationText(Map<String, String> parts) {
     final List<String> items = [];
-    
+
     if (parts['state'] != null) items.add(parts['state']!);
     if (parts['district'] != null) items.add(parts['district']!);
     if (parts['area'] != null) items.add(parts['area']!);
-    if (parts['society'] != null && items.length < 3) items.add(parts['society']!);
+    if (parts['society'] != null && items.length < 3)
+      items.add(parts['society']!);
 
     return items.join(', ');
   }
@@ -224,9 +226,10 @@ class UserLocationDisplay extends StatelessWidget {
     // Taluka/Mandal, Area, Society from metadata
     if (user.metadata != null) {
       final metadata = user.metadata!;
-      
+
       // Taluka or Mandal
-      final taluka = metadata['taluka'] as String? ?? metadata['mandal'] as String?;
+      final taluka =
+          metadata['taluka'] as String? ?? metadata['mandal'] as String?;
       if (taluka != null && taluka.isNotEmpty) {
         parts['taluka'] = taluka;
       }
@@ -264,4 +267,3 @@ class UserLocationDisplay extends StatelessWidget {
     return parts;
   }
 }
-

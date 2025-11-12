@@ -11,6 +11,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../common/styles/spacing.dart';
 import '../../../l10n/app_localizations.dart';
 import 'adaptive_app_bar.dart';
 import '../../../feature/owner_dashboard/shared/viewmodel/selected_pg_provider.dart';
@@ -73,9 +74,10 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
       leadingActions: [
         IconButton(
           icon: const Icon(Icons.menu),
-          onPressed: onDrawerTap ?? () {
-            Scaffold.of(context).openDrawer();
-          },
+          onPressed: onDrawerTap ??
+              () {
+                Scaffold.of(context).openDrawer();
+              },
           tooltip: menuLabel,
         ),
       ],
@@ -121,7 +123,7 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
                   size: 16,
                   color: Theme.of(context).primaryColor,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: AppSpacing.paddingS),
                 Text(
                   selectedPg['pgName'] as String? ??
                       selectedPg['name'] as String? ??
@@ -154,7 +156,7 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
                   size: 16,
                   color: Colors.orange,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: AppSpacing.paddingS),
                 Text(
                   noPgSelected,
                   style: TextStyle(

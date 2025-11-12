@@ -103,16 +103,13 @@ class AppDrawer extends StatelessWidget {
   Widget _buildProfileHeader(
       BuildContext context, dynamic user, ThemeData theme) {
     final loc = AppLocalizations.of(context);
-    final displayName = user?.displayName ??
-        loc?.drawerDefaultUserName ??
-        'User';
+    final displayName =
+        user?.displayName ?? loc?.drawerDefaultUserName ?? 'User';
     final roleText = user?.roleDisplay ??
-        (user?.isOwner == true
-            ? loc?.owner ?? 'Owner'
-            : loc?.guest ?? 'Guest');
+        (user?.isOwner == true ? loc?.owner ?? 'Owner' : loc?.guest ?? 'Guest');
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.paddingL),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -149,7 +146,7 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.all(3),
+                padding: const EdgeInsets.all(AppSpacing.paddingXXS),
                 child: CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.white,
@@ -167,7 +164,7 @@ class AppDrawer extends StatelessWidget {
                       : _buildDefaultAvatar(context, user),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.paddingM),
 
               // Enhanced User Info
               Expanded(
@@ -179,20 +176,20 @@ class AppDrawer extends StatelessWidget {
                       text: displayName,
                       color: Colors.white,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppSpacing.paddingS),
                     // Phone with icon
                     Row(
                       children: [
                         const Icon(Icons.phone,
                             size: 14, color: Colors.white70),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.paddingXS),
                         BodyText(
                           text: user?.phoneNumber ?? '',
                           color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppSpacing.paddingS),
                     // Role badge
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -216,7 +213,7 @@ class AppDrawer extends StatelessWidget {
                             size: 14,
                             color: Colors.white,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppSpacing.paddingXS),
                           BodyText(
                             text: roleText,
                             color: Colors.white,
@@ -232,7 +229,7 @@ class AppDrawer extends StatelessWidget {
 
           // Verification status badge (if owner)
           if (user?.isOwner == true) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.paddingS),
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -255,7 +252,7 @@ class AppDrawer extends StatelessWidget {
                         ? Colors.greenAccent
                         : Colors.orangeAccent,
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: AppSpacing.paddingS),
                   Builder(
                     builder: (context) {
                       final loc = AppLocalizations.of(context);

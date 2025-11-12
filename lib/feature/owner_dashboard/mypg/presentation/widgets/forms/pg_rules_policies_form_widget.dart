@@ -41,7 +41,6 @@ class PgRulesPoliciesFormWidget extends AdaptiveStatelessWidget {
       children: [
         HeadingMedium(text: loc.pgRulesTitle),
         const SizedBox(height: AppSpacing.paddingL),
-        
         ResponsiveGrid(
           targetTileWidth: 320,
           horizontalGap: AppSpacing.paddingM,
@@ -98,9 +97,7 @@ class PgRulesPoliciesFormWidget extends AdaptiveStatelessWidget {
             ),
           ],
         ),
-        
         const SizedBox(height: AppSpacing.paddingM),
-        
         TextInput(
           controller: guestPolicyController,
           label: loc.pgRulesGuestPolicyLabel,
@@ -108,9 +105,7 @@ class PgRulesPoliciesFormWidget extends AdaptiveStatelessWidget {
           maxLines: 4,
           keyboardType: TextInputType.multiline,
         ),
-        
         const SizedBox(height: AppSpacing.paddingM),
-        
         TextInput(
           controller: refundPolicyController,
           label: loc.pgRulesRefundPolicyLabel,
@@ -122,4 +117,3 @@ class PgRulesPoliciesFormWidget extends AdaptiveStatelessWidget {
     );
   }
 }
-

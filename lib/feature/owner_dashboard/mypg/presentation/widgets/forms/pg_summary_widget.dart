@@ -131,8 +131,7 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
       case 'Fan':
         return loc?.pgAmenityFan ?? _text('pgAmenityFan', 'Fan');
       case 'Lighting':
-        return loc?.pgAmenityLighting ??
-            _text('pgAmenityLighting', 'Lighting');
+        return loc?.pgAmenityLighting ?? _text('pgAmenityLighting', 'Lighting');
       case 'Balcony':
         return loc?.pgAmenityBalcony ?? _text('pgAmenityBalcony', 'Balcony');
       case 'Common Area':
@@ -160,8 +159,7 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
         return loc?.pgAmenityVisitorParking ??
             _text('pgAmenityVisitorParking', 'Visitor Parking');
       case 'Intercom':
-        return loc?.pgAmenityIntercom ??
-            _text('pgAmenityIntercom', 'Intercom');
+        return loc?.pgAmenityIntercom ?? _text('pgAmenityIntercom', 'Intercom');
       case 'Maintenance Staff':
         return loc?.pgAmenityMaintenanceStaff ??
             _text('pgAmenityMaintenanceStaff', 'Maintenance Staff');
@@ -183,23 +181,25 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
     final totalRentText = currencyFormatter.format(totalRent);
     final depositText = currencyFormatter.format(depositAmount);
     final maintenanceAmountText = currencyFormatter.format(maintenanceAmount);
-    final notSpecified =
-        loc?.pgSummaryNotSpecified ?? _text('pgSummaryNotSpecified', 'Not specified');
+    final notSpecified = loc?.pgSummaryNotSpecified ??
+        _text('pgSummaryNotSpecified', 'Not specified');
     final maintenanceTypeLabel = _maintenanceTypeLabel(loc, maintenanceType);
-    final summaryTitle = loc?.pgSummaryTitle ?? _text('pgSummaryTitle', 'PG Summary');
+    final summaryTitle =
+        loc?.pgSummaryTitle ?? _text('pgSummaryTitle', 'PG Summary');
     final basicInfoTitle = loc?.pgSummaryBasicInfoTitle ??
         _text('pgSummaryBasicInfoTitle', 'Basic Information');
     final floorStructureTitle = loc?.pgFloorStructureTitle ??
         _text('pgFloorStructureTitle', 'Floor Structure');
-    final rentInfoTitle =
-        loc?.pgSummaryRentInfoTitle ?? _text('pgSummaryRentInfoTitle', 'Rent Information');
-    final amenitiesTitle =
-        loc?.pgAmenitiesTitle ?? _text('pgAmenitiesTitle', 'Amenities & Facilities');
+    final rentInfoTitle = loc?.pgSummaryRentInfoTitle ??
+        _text('pgSummaryRentInfoTitle', 'Rent Information');
+    final amenitiesTitle = loc?.pgAmenitiesTitle ??
+        _text('pgAmenitiesTitle', 'Amenities & Facilities');
     final photosTitle =
         loc?.pgSummaryPhotosTitle ?? _text('pgSummaryPhotosTitle', 'Photos');
     final readyAction = pgName.isEmpty
         ? loc?.pgSummaryActionCreate ?? _text('pgSummaryActionCreate', 'create')
-        : loc?.pgSummaryActionUpdate ?? _text('pgSummaryActionUpdate', 'update');
+        : loc?.pgSummaryActionUpdate ??
+            _text('pgSummaryActionUpdate', 'update');
     final readyMessage = loc?.pgSummaryReadyMessage(readyAction) ??
         _text('pgSummaryReadyMessage', 'Ready to {action} your PG!',
             parameters: {'action': readyAction});
@@ -207,8 +207,8 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
         _text('pgSummaryReviewMessage',
             'Review all details above and click the save button to proceed.');
 
-    final pgNameLabel =
-        loc?.pgBasicInfoPgNameLabel ?? _text('pgBasicInfoPgNameLabel', 'PG Name');
+    final pgNameLabel = loc?.pgBasicInfoPgNameLabel ??
+        _text('pgBasicInfoPgNameLabel', 'PG Name');
     final addressLabel = loc?.pgBasicInfoAddressLabel ??
         _text('pgBasicInfoAddressLabel', 'Address');
     final locationLabel = loc?.pgSummaryLocationLabel ??
@@ -261,8 +261,7 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           context,
           basicInfoTitle,
           [
-            _buildSummaryRow(
-                pgNameLabel, pgNameValue),
+            _buildSummaryRow(pgNameLabel, pgNameValue),
             _buildSummaryRow(addressLabel, addressValue),
             _buildSummaryRow(locationLabel, locationValue),
           ],
@@ -275,12 +274,12 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           context,
           floorStructureTitle,
           [
-            _buildSummaryRow(
-                totalFloorsLabel, NumberFormat.decimalPattern(localeName).format(floors.length)),
-            _buildSummaryRow(
-                totalRoomsLabel, NumberFormat.decimalPattern(localeName).format(rooms.length)),
-            _buildSummaryRow(
-                totalBedsLabel, NumberFormat.decimalPattern(localeName).format(beds.length)),
+            _buildSummaryRow(totalFloorsLabel,
+                NumberFormat.decimalPattern(localeName).format(floors.length)),
+            _buildSummaryRow(totalRoomsLabel,
+                NumberFormat.decimalPattern(localeName).format(rooms.length)),
+            _buildSummaryRow(totalBedsLabel,
+                NumberFormat.decimalPattern(localeName).format(beds.length)),
           ],
         ),
 
@@ -312,7 +311,8 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           [
             _buildSummaryRow(
                 selectedAmenitiesLabel,
-                NumberFormat.decimalPattern(localeName).format(selectedAmenities.length)),
+                NumberFormat.decimalPattern(localeName)
+                    .format(selectedAmenities.length)),
             if (selectedAmenities.isNotEmpty)
               _buildSummaryRow(listLabel, amenitiesList),
           ],
@@ -327,7 +327,8 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           [
             _buildSummaryRow(
                 uploadedPhotosLabel,
-                NumberFormat.decimalPattern(localeName).format(uploadedPhotos.length)),
+                NumberFormat.decimalPattern(localeName)
+                    .format(uploadedPhotos.length)),
           ],
         ),
 
@@ -344,14 +345,13 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
                     Icon(Icons.check_circle, color: Colors.green[600]),
                     const SizedBox(width: AppSpacing.paddingS),
                     BodyText(
-                  text: readyMessage,
+                      text: readyMessage,
                     ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
                 BodyText(
-                  text:
-                  reviewMessage,
+                  text: reviewMessage,
                   color: Colors.grey[600],
                 ),
               ],

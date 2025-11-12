@@ -25,6 +25,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
@@ -305,8 +306,8 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
     );
   }
 
-  Widget _buildBody(
-      BuildContext context, OwnerProfileViewModel viewModel, AppLocalizations loc) {
+  Widget _buildBody(BuildContext context, OwnerProfileViewModel viewModel,
+      AppLocalizations loc) {
     return Column(
       children: [
         _buildTabBar(loc),
@@ -347,7 +348,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
           borderRadius: BorderRadius.circular(10),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
-        indicatorPadding: const EdgeInsets.all(4),
+        indicatorPadding: const EdgeInsets.all(AppSpacing.paddingXS),
         labelColor: AppColors.textOnPrimary,
         unselectedLabelColor: textSecondary,
         labelStyle: const TextStyle(
@@ -370,56 +371,79 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
   Widget _buildPersonalInfoTab(AppLocalizations loc) {
     // final theme = Theme.of(context);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Form(
-        // key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTextFormField(
-              controller: _fullNameController,
-              label: loc.ownerProfileFullNameLabel,
-              hint: loc.ownerProfileFullNameHint,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final responsiveConfig = ResponsiveSystem.getConfig(context);
+
+        // Max width constraint for form on larger screens
+        final maxFormWidth = responsiveConfig.isMobile
+            ? double.infinity
+            : responsiveConfig.isTablet
+                ? 700.0
+                : 800.0;
+
+        // Responsive padding
+        final formPadding = ResponsiveSystem.getResponsivePadding(context);
+
+        return Center(
+          child: SingleChildScrollView(
+            padding: formPadding,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: maxFormWidth,
+              ),
+              child: Form(
+                // key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildTextFormField(
+                      controller: _fullNameController,
+                      label: loc.ownerProfileFullNameLabel,
+                      hint: loc.ownerProfileFullNameHint,
+                    ),
+                    const SizedBox(height: AppSpacing.paddingM),
+                    _buildTextFormField(
+                      controller: _emailController,
+                      label: loc.ownerProfileEmailLabel,
+                      hint: loc.ownerProfileEmailHint,
+                    ),
+                    const SizedBox(height: AppSpacing.paddingM),
+                    _buildTextFormField(
+                      controller: _phoneController,
+                      label: loc.ownerProfilePhoneLabel,
+                      hint: loc.ownerProfilePhoneHint,
+                    ),
+                    const SizedBox(height: AppSpacing.paddingM),
+                    _buildTextFormField(
+                      controller: _pgAddressController,
+                      label: loc.ownerProfileAddressLabel,
+                      hint: loc.ownerProfileAddressHint,
+                    ),
+                    const SizedBox(height: AppSpacing.paddingM),
+                    _buildStateDropdown(loc),
+                    const SizedBox(height: AppSpacing.paddingM),
+                    _buildCityDropdown(loc),
+                    const SizedBox(height: AppSpacing.paddingM),
+                    _buildTextFormField(
+                      controller: _pincodeController,
+                      label: loc.ownerProfilePincodeLabel,
+                      hint: loc.ownerProfilePincodeHint,
+                    ),
+                    const SizedBox(height: AppSpacing.paddingL),
+                    PrimaryButton(
+                      onPressed: _saveProfile,
+                      label: loc.ownerProfileSavePersonal,
+                      icon: Icons.save_rounded,
+                      backgroundColor: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: AppSpacing.paddingM),
-            _buildTextFormField(
-              controller: _emailController,
-              label: loc.ownerProfileEmailLabel,
-              hint: loc.ownerProfileEmailHint,
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            _buildTextFormField(
-              controller: _phoneController,
-              label: loc.ownerProfilePhoneLabel,
-              hint: loc.ownerProfilePhoneHint,
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            _buildTextFormField(
-              controller: _pgAddressController,
-              label: loc.ownerProfileAddressLabel,
-              hint: loc.ownerProfileAddressHint,
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            _buildStateDropdown(loc),
-            const SizedBox(height: AppSpacing.paddingM),
-            _buildCityDropdown(loc),
-            const SizedBox(height: AppSpacing.paddingM),
-            _buildTextFormField(
-              controller: _pincodeController,
-              label: loc.ownerProfilePincodeLabel,
-              hint: loc.ownerProfilePincodeHint,
-            ),
-            const SizedBox(height: AppSpacing.paddingL),
-            PrimaryButton(
-              onPressed: _saveProfile,
-              label: loc.ownerProfileSavePersonal,
-              icon: Icons.save_rounded,
-              backgroundColor: AppColors.primary,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -517,75 +541,121 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
   Widget _buildBusinessInfoTab(AppLocalizations loc) {
     // final theme = Theme.of(context);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTextFormField(
-            controller: _businessNameController,
-            label: loc.ownerProfileBusinessNameLabel,
-            hint: loc.ownerProfileBusinessNameHint,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final responsiveConfig = ResponsiveSystem.getConfig(context);
+
+        // Max width constraint for form on larger screens
+        final maxFormWidth = responsiveConfig.isMobile
+            ? double.infinity
+            : responsiveConfig.isTablet
+                ? 700.0
+                : 800.0;
+
+        // Responsive padding
+        final formPadding = ResponsiveSystem.getResponsivePadding(context);
+
+        return Center(
+          child: SingleChildScrollView(
+            padding: formPadding,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: maxFormWidth,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTextFormField(
+                    controller: _businessNameController,
+                    label: loc.ownerProfileBusinessNameLabel,
+                    hint: loc.ownerProfileBusinessNameHint,
+                  ),
+                  const SizedBox(height: AppSpacing.paddingM),
+                  _buildTextFormField(
+                    controller: _businessTypeController,
+                    label: loc.ownerProfileBusinessTypeLabel,
+                    hint: loc.ownerProfileBusinessTypeHint,
+                  ),
+                  const SizedBox(height: AppSpacing.paddingM),
+                  _buildTextFormField(
+                    controller: _panNumberController,
+                    label: loc.ownerProfilePanLabel,
+                    hint: loc.ownerProfilePanHint,
+                  ),
+                  const SizedBox(height: AppSpacing.paddingM),
+                  _buildTextFormField(
+                    controller: _gstNumberController,
+                    label: loc.ownerProfileGstLabel,
+                    hint: loc.ownerProfileGstHint,
+                  ),
+                  const SizedBox(height: AppSpacing.paddingL),
+                  PrimaryButton(
+                    onPressed: _saveProfile,
+                    label: loc.ownerProfileSaveBusiness,
+                    icon: Icons.save_rounded,
+                    backgroundColor: AppColors.primary,
+                  ),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: AppSpacing.paddingM),
-          _buildTextFormField(
-            controller: _businessTypeController,
-            label: loc.ownerProfileBusinessTypeLabel,
-            hint: loc.ownerProfileBusinessTypeHint,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          _buildTextFormField(
-            controller: _panNumberController,
-            label: loc.ownerProfilePanLabel,
-            hint: loc.ownerProfilePanHint,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          _buildTextFormField(
-            controller: _gstNumberController,
-            label: loc.ownerProfileGstLabel,
-            hint: loc.ownerProfileGstHint,
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-          PrimaryButton(
-            onPressed: _saveProfile,
-            label: loc.ownerProfileSaveBusiness,
-            icon: Icons.save_rounded,
-            backgroundColor: AppColors.primary,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildDocumentsTab(AppLocalizations loc) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDocumentUploadCard(
-            title: loc.ownerProfileDocumentProfileTitle,
-            description: loc.ownerProfileDocumentProfileDescription,
-            icon: Icons.person_rounded,
-            imageUrl: _uploadedProfilePhotoUrl,
-            loc: loc,
-            onTap: () {
-              // TODO: Implement profile photo selection
-            },
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final responsiveConfig = ResponsiveSystem.getConfig(context);
+
+        // Max width constraint for form on larger screens
+        final maxFormWidth = responsiveConfig.isMobile
+            ? double.infinity
+            : responsiveConfig.isTablet
+                ? 700.0
+                : 800.0;
+
+        // Responsive padding
+        final formPadding = ResponsiveSystem.getResponsivePadding(context);
+
+        return Center(
+          child: SingleChildScrollView(
+            padding: formPadding,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: maxFormWidth,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDocumentUploadCard(
+                    title: loc.ownerProfileDocumentProfileTitle,
+                    description: loc.ownerProfileDocumentProfileDescription,
+                    icon: Icons.person_rounded,
+                    imageUrl: _uploadedProfilePhotoUrl,
+                    loc: loc,
+                    onTap: () {
+                      // TODO: Implement profile photo selection
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.paddingM),
+                  _buildDocumentUploadCard(
+                    title: loc.ownerProfileDocumentAadhaarTitle,
+                    description: loc.ownerProfileDocumentAadhaarDescription,
+                    icon: Icons.credit_card_rounded,
+                    imageUrl: _uploadedAadhaarPhotoUrl,
+                    loc: loc,
+                    onTap: () {
+                      // TODO: Implement Aadhaar photo selection
+                    },
+                  ),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: AppSpacing.paddingM),
-          _buildDocumentUploadCard(
-            title: loc.ownerProfileDocumentAadhaarTitle,
-            description: loc.ownerProfileDocumentAadhaarDescription,
-            icon: Icons.credit_card_rounded,
-            imageUrl: _uploadedAadhaarPhotoUrl,
-            loc: loc,
-            onTap: () {
-              // TODO: Implement Aadhaar photo selection
-            },
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -600,7 +670,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
     // final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
         color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
@@ -615,7 +685,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
           Row(
             children: [
               Icon(icon, color: AppColors.primary),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.paddingS),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -639,7 +709,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
                 ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.paddingS),
           PrimaryButton(
             onPressed: onTap,
             label: imageUrl != null

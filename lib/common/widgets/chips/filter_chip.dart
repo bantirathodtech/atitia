@@ -34,57 +34,62 @@ class CustomFilterChip extends AdaptiveStatelessWidget {
     final theme = Theme.of(context);
     final responsive = context.responsive;
     final screenWidth = context.screenWidth;
-    
+
     // Use ResponsiveSystem for true responsive sizing
     final fontScale = ResponsiveSystem.getResponsiveFontScale(context);
     final baseFontSize = AppTypography.bodySmall.fontSize ?? 12.0;
-    
+
     // Responsive sizing based on screen width and layout type
     final isMobile = responsive.isMobile;
     final isTablet = responsive.isTablet;
     final isDesktop = responsive.isDesktop || responsive.isLargeDesktop;
-    
+
     // Calculate responsive dimensions
-    final horizontalPadding = isMobile 
-        ? AppSpacing.paddingS 
-        : isTablet 
-            ? AppSpacing.paddingM 
+    final horizontalPadding = isMobile
+        ? AppSpacing.paddingS
+        : isTablet
+            ? AppSpacing.paddingM
             : AppSpacing.paddingL;
-    
-    final verticalPadding = isMobile 
-        ? AppSpacing.paddingXS 
-        : isTablet 
-            ? AppSpacing.paddingS 
-            : isDesktop 
-                ? AppSpacing.paddingM 
+
+    final verticalPadding = isMobile
+        ? AppSpacing.paddingXS
+        : isTablet
+            ? AppSpacing.paddingS
+            : isDesktop
+                ? AppSpacing.paddingM
                 : AppSpacing.paddingL;
-    
+
     // Responsive icon size - scales with screen width
-    final iconSize = isMobile ? 14.0 : isTablet ? 16.0 : 18.0;
-    
+    final iconSize = isMobile
+        ? 14.0
+        : isTablet
+            ? 16.0
+            : 18.0;
+
     // Responsive font size - uses fontScale from ResponsiveSystem
     final fontSize = baseFontSize * fontScale;
-    
+
     // Colors
     final effectiveSelectedColor = selectedColor ?? theme.primaryColor;
-    final effectiveBackgroundColor = backgroundColor ?? 
-        (theme.brightness == Brightness.dark ? AppColors.darkCard : Colors.white);
-    
+    final effectiveBackgroundColor = backgroundColor ??
+        (theme.brightness == Brightness.dark
+            ? AppColors.darkCard
+            : Colors.white);
+
     final textColor = selected
-        ? (theme.brightness == Brightness.dark 
-            ? AppColors.textOnPrimary 
+        ? (theme.brightness == Brightness.dark
+            ? AppColors.textOnPrimary
             : Colors.white)
-        : (theme.brightness == Brightness.dark 
-            ? AppColors.darkText 
+        : (theme.brightness == Brightness.dark
+            ? AppColors.darkText
             : AppColors.textPrimary);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         // Force full width expansion
-        final availableWidth = constraints.maxWidth.isFinite 
-            ? constraints.maxWidth 
-            : screenWidth;
-        
+        final availableWidth =
+            constraints.maxWidth.isFinite ? constraints.maxWidth : screenWidth;
+
         return SizedBox(
           width: availableWidth,
           child: Material(
@@ -95,27 +100,32 @@ class CustomFilterChip extends AdaptiveStatelessWidget {
               child: Container(
                 width: double.infinity,
                 constraints: BoxConstraints(
-                  minHeight: isMobile ? 36.0 : isTablet ? 40.0 : 44.0,
+                  minHeight: isMobile
+                      ? 36.0
+                      : isTablet
+                          ? 40.0
+                          : 44.0,
                 ),
                 padding: EdgeInsets.symmetric(
                   horizontal: horizontalPadding,
                   vertical: verticalPadding,
                 ),
                 decoration: BoxDecoration(
-                  color: selected 
-                      ? effectiveSelectedColor 
+                  color: selected
+                      ? effectiveSelectedColor
                       : effectiveBackgroundColor,
                   borderRadius: BorderRadius.circular(borderRadius),
                   border: Border.all(
-                    color: selected 
-                        ? effectiveSelectedColor 
+                    color: selected
+                        ? effectiveSelectedColor
                         : theme.dividerColor.withValues(alpha: 0.3),
                     width: selected ? 1.5 : 1.0,
                   ),
                   boxShadow: selected
                       ? [
                           BoxShadow(
-                            color: effectiveSelectedColor.withValues(alpha: 0.3),
+                            color:
+                                effectiveSelectedColor.withValues(alpha: 0.3),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -139,7 +149,8 @@ class CustomFilterChip extends AdaptiveStatelessWidget {
                         label,
                         style: AppTypography.bodySmall.copyWith(
                           fontSize: fontSize,
-                          fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight:
+                              selected ? FontWeight.w600 : FontWeight.w500,
                           color: textColor,
                         ),
                         overflow: TextOverflow.ellipsis,

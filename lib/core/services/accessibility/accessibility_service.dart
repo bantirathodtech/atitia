@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../common/styles/spacing.dart';
+
 import '../../di/firebase/di/firebase_service_locator.dart';
 
 /// Accessibility service for inclusive design
@@ -26,7 +28,7 @@ class AccessibilityService {
   /// Initialize accessibility service
   Future<void> initialize() async {
     try {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
 
       // Check system accessibility settings
       await _checkSystemAccessibilitySettings();
@@ -42,9 +44,9 @@ class AccessibilityService {
         },
       );
 
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -246,7 +248,7 @@ class AccessibilityService {
           onTap: onTap,
           borderRadius: BorderRadius.circular(8.0),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(AppSpacing.paddingM),
             child: child,
           ),
         ),

@@ -26,15 +26,16 @@ class OwnerPaymentDetailsWidget extends StatefulWidget {
   const OwnerPaymentDetailsWidget({super.key});
 
   @override
-  State<OwnerPaymentDetailsWidget> createState() => _OwnerPaymentDetailsWidgetState();
+  State<OwnerPaymentDetailsWidget> createState() =>
+      _OwnerPaymentDetailsWidgetState();
 }
 
-class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget> 
+class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   static final InternationalizationService _i18n =
       InternationalizationService.instance;
-  
+
   String _text(
     String key,
     String fallback, {
@@ -50,21 +51,21 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
     }
     return translated;
   }
-  
+
   // Bank Details Controllers
   final _bankNameController = TextEditingController();
   final _accountHolderController = TextEditingController();
   final _accountNumberController = TextEditingController();
   final _ifscController = TextEditingController();
-  
+
   // UPI Controllers
   final _upiIdController = TextEditingController();
   final _paymentNoteController = TextEditingController();
-  
+
   // QR Code
   String? _qrCodeUrl;
   dynamic _newQrCodeFile;
-  
+
   bool _initialized = false;
 
   @override
@@ -91,7 +92,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
     final authProvider = context.read<AuthProvider>();
     final viewModel = context.read<OwnerPaymentDetailsViewModel>();
     final ownerId = authProvider.user?.userId ?? '';
-    
+
     if (ownerId.isNotEmpty) {
       await viewModel.loadPaymentDetails(ownerId);
       if (mounted) {
@@ -117,30 +118,43 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
     final authProvider = context.read<AuthProvider>();
     final viewModel = context.read<OwnerPaymentDetailsViewModel>();
     final ownerId = authProvider.user?.userId ?? '';
-    
+
     if (ownerId.isEmpty) return;
 
     // Upload new QR code if selected
     String? qrCodeUrl = _qrCodeUrl;
     if (_newQrCodeFile != null) {
       final filename = 'qr_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      qrCodeUrl = await viewModel.uploadQrCode(ownerId, filename, _newQrCodeFile);
+      qrCodeUrl =
+          await viewModel.uploadQrCode(ownerId, filename, _newQrCodeFile);
     }
 
     final details = OwnerPaymentDetailsModel(
       ownerId: ownerId,
-      bankName: _bankNameController.text.trim().isEmpty ? null : _bankNameController.text.trim(),
-      accountHolderName: _accountHolderController.text.trim().isEmpty ? null : _accountHolderController.text.trim(),
-      accountNumber: _accountNumberController.text.trim().isEmpty ? null : _accountNumberController.text.trim(),
-      ifscCode: _ifscController.text.trim().isEmpty ? null : _ifscController.text.trim(),
-      upiId: _upiIdController.text.trim().isEmpty ? null : _upiIdController.text.trim(),
+      bankName: _bankNameController.text.trim().isEmpty
+          ? null
+          : _bankNameController.text.trim(),
+      accountHolderName: _accountHolderController.text.trim().isEmpty
+          ? null
+          : _accountHolderController.text.trim(),
+      accountNumber: _accountNumberController.text.trim().isEmpty
+          ? null
+          : _accountNumberController.text.trim(),
+      ifscCode: _ifscController.text.trim().isEmpty
+          ? null
+          : _ifscController.text.trim(),
+      upiId: _upiIdController.text.trim().isEmpty
+          ? null
+          : _upiIdController.text.trim(),
       upiQrCodeUrl: qrCodeUrl,
-      paymentNote: _paymentNoteController.text.trim().isEmpty ? null : _paymentNoteController.text.trim(),
+      paymentNote: _paymentNoteController.text.trim().isEmpty
+          ? null
+          : _paymentNoteController.text.trim(),
       isActive: true,
     );
 
     final success = await viewModel.savePaymentDetails(details);
-    
+
     if (!mounted) return;
 
     final loc = AppLocalizations.of(context)!;
@@ -200,130 +214,133 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
         children: [
           // Premium Header
           Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppSpacing.paddingL),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                theme.primaryColor,
-                theme.primaryColor.withValues(alpha: 0.7),
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  theme.primaryColor,
+                  theme.primaryColor.withValues(alpha: 0.7),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.primaryColor.withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
               ],
             ),
-            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-            boxShadow: [
-              BoxShadow(
-                color: theme.primaryColor.withValues(alpha: 0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.paddingM),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
+                  ),
+                  child: const Icon(
+                    Icons.account_balance_wallet_rounded,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.paddingM),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      HeadingMedium(
+                        text: loc?.paymentDetails ??
+                            _text('paymentDetails', 'Payment Details'),
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: AppSpacing.paddingXS),
+                      BodyText(
+                        text: loc?.configureHowGuestsCanPayYou ??
+                            _text('configureHowGuestsCanPayYou',
+                                'Configure how guests can pay you'),
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.paddingM),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+          const SizedBox(height: AppSpacing.paddingL),
+
+          // Tab Bar
+          Container(
+            decoration: BoxDecoration(
+              color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+              boxShadow: [
+                BoxShadow(
+                  color: isDarkMode
+                      ? Colors.black.withValues(alpha: 0.3)
+                      : Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
                 ),
-                child: const Icon(
-                  Icons.account_balance_wallet_rounded,
-                  color: Colors.white,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.paddingM),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    HeadingMedium(
-                      text: loc?.paymentDetails ??
-                          _text('paymentDetails', 'Payment Details'),
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 4),
-                    BodyText(
-                      text: loc?.configureHowGuestsCanPayYou ??
-                          _text('configureHowGuestsCanPayYou',
-                              'Configure how guests can pay you'),
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
+              ],
+            ),
+            child: TabBar(
+              controller: _tabController,
+              labelColor: AppColors.textOnPrimary,
+              unselectedLabelColor:
+                  isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+              indicator: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    theme.primaryColor,
+                    theme.primaryColor.withValues(alpha: 0.7)
                   ],
                 ),
+                borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.paddingL),
-        
-        // Tab Bar
-        Container(
-          decoration: BoxDecoration(
-            color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-            boxShadow: [
-              BoxShadow(
-                color: isDarkMode 
-                    ? Colors.black.withValues(alpha: 0.3)
-                    : Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: TabBar(
-            controller: _tabController,
-            labelColor: AppColors.textOnPrimary,
-            unselectedLabelColor: isDarkMode 
-                ? AppColors.textTertiary
-                : AppColors.textSecondary,
-            indicator: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [theme.primaryColor, theme.primaryColor.withValues(alpha: 0.7)],
-              ),
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+              tabs: [
+                Tab(
+                    icon: const Icon(Icons.account_balance),
+                    text: loc?.bank ?? _text('bank', 'Bank')),
+                Tab(
+                    icon: const Icon(Icons.payment),
+                    text: loc?.uPI ?? _text('uPI', 'UPI')),
+                Tab(
+                    icon: const Icon(Icons.qr_code),
+                    text: loc?.qrCode ?? _text('qrCode', 'QR Code')),
+              ],
             ),
-            tabs: [
-              Tab(
-                  icon: const Icon(Icons.account_balance),
-                  text: loc?.bank ?? _text('bank', 'Bank')),
-              Tab(
-                  icon: const Icon(Icons.payment),
-                  text: loc?.uPI ?? _text('uPI', 'UPI')),
-              Tab(
-                  icon: const Icon(Icons.qr_code),
-                  text: loc?.qrCode ?? _text('qrCode', 'QR Code')),
-            ],
           ),
-        ),
-        const SizedBox(height: AppSpacing.paddingL),
-        
-        // Tab Views
-        SizedBox(
-          height: 500, // Fixed height for tab content
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildBankDetailsTab(isDarkMode, loc),
-              _buildUpiDetailsTab(isDarkMode, loc),
-              _buildQrCodeTab(isDarkMode, loc),
-            ],
+          const SizedBox(height: AppSpacing.paddingL),
+
+          // Tab Views
+          SizedBox(
+            height: 500, // Fixed height for tab content
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildBankDetailsTab(isDarkMode, loc),
+                _buildUpiDetailsTab(isDarkMode, loc),
+                _buildQrCodeTab(isDarkMode, loc),
+              ],
+            ),
           ),
-        ),
-        
-        // Save Button
-        const SizedBox(height: AppSpacing.paddingL),
-        PrimaryButton(
-          label: loc?.savePaymentDetails ??
-              _text('savePaymentDetails', 'Save Payment Details'),
-          onPressed: viewModel.saving ? null : _savePaymentDetails,
-          isLoading: viewModel.saving,
-        ),
-        const SizedBox(height: AppSpacing.paddingL),
-      ],
-    ),
-  );
+
+          // Save Button
+          const SizedBox(height: AppSpacing.paddingL),
+          PrimaryButton(
+            label: loc?.savePaymentDetails ??
+                _text('savePaymentDetails', 'Save Payment Details'),
+            onPressed: viewModel.saving ? null : _savePaymentDetails,
+            isLoading: viewModel.saving,
+          ),
+          const SizedBox(height: AppSpacing.paddingL),
+        ],
+      ),
+    );
   }
 
   Widget _buildBankDetailsTab(bool isDarkMode, AppLocalizations? loc) {
@@ -343,7 +360,6 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             color: AppColors.textSecondary,
           ),
           const SizedBox(height: AppSpacing.paddingL),
-          
           _buildTextField(
             controller: _bankNameController,
             label: loc?.bankName ?? _text('bankName', 'Bank Name'),
@@ -353,7 +369,6 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          
           _buildTextField(
             controller: _accountHolderController,
             label: loc?.accountHolderName ??
@@ -364,11 +379,10 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          
           _buildTextField(
             controller: _accountNumberController,
-            label: loc?.accountNumber ??
-                _text('accountNumber', 'Account Number'),
+            label:
+                loc?.accountNumber ?? _text('accountNumber', 'Account Number'),
             hint: loc?.enterAccountNumber ??
                 _text('enterAccountNumber', 'Enter account number'),
             icon: Icons.numbers,
@@ -376,12 +390,10 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          
           _buildTextField(
             controller: _ifscController,
             label: loc?.ifscCode ?? _text('ifscCode', 'IFSC Code'),
-            hint: loc?.exampleIfsc ??
-                _text('exampleIfsc', 'e.g., SBIN0001234'),
+            hint: loc?.exampleIfsc ?? _text('exampleIfsc', 'e.g., SBIN0001234'),
             icon: Icons.code,
             isDarkMode: isDarkMode,
           ),
@@ -406,17 +418,14 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             color: AppColors.textSecondary,
           ),
           const SizedBox(height: AppSpacing.paddingL),
-          
           _buildTextField(
             controller: _upiIdController,
             label: loc?.upiID ?? _text('upiID', 'UPI ID'),
-            hint: loc?.exampleUpiId ??
-                _text('exampleUpiId', 'yourname@paytm'),
+            hint: loc?.exampleUpiId ?? _text('exampleUpiId', 'yourname@paytm'),
             icon: Icons.account_circle,
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: AppSpacing.paddingM),
-          
           _buildTextField(
             controller: _paymentNoteController,
             label: loc?.paymentInstructionsOptional ??
@@ -450,7 +459,6 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             color: AppColors.textSecondary,
           ),
           const SizedBox(height: AppSpacing.paddingL),
-          
           if (_newQrCodeFile != null || _qrCodeUrl != null) ...[
             Center(
               child: Container(
@@ -458,7 +466,8 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                 height: 250,
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+                    color:
+                        isDarkMode ? AppColors.darkDivider : AppColors.outline,
                     width: 2,
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
@@ -471,16 +480,12 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             ),
             const SizedBox(height: AppSpacing.paddingL),
           ],
-          
           PrimaryButton(
             onPressed: _pickQrCode,
-            label:
-                loc?.uploadQrCode ?? _text('uploadQrCode', 'Upload QR Code'),
+            label: loc?.uploadQrCode ?? _text('uploadQrCode', 'Upload QR Code'),
             icon: Icons.upload_rounded,
           ),
-          
           const SizedBox(height: AppSpacing.paddingL),
-          
           TextButton.icon(
             onPressed: () {
               setState(() {
@@ -492,9 +497,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             label: Text(
                 loc?.removeQrCode ?? _text('removeQrCode', 'Remove QR Code')),
           ),
-          
           const SizedBox(height: AppSpacing.paddingL),
-          
           Container(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             decoration: BoxDecoration(
@@ -588,9 +591,8 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
         hintText: hint,
         prefixIcon: Icon(icon),
         filled: true,
-        fillColor: isDarkMode 
-            ? AppColors.darkInputFill 
-            : AppColors.surfaceVariant,
+        fillColor:
+            isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         ),
@@ -598,4 +600,3 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
     );
   }
 }
-

@@ -65,7 +65,8 @@ class GuestComplaintRepository {
           complaint.pgId,
         );
         final pgData = pgDoc.data() as Map<String, dynamic>?;
-        final ownerId = pgData?['ownerUid'] as String? ?? pgData?['ownerId'] as String?;
+        final ownerId =
+            pgData?['ownerUid'] as String? ?? pgData?['ownerId'] as String?;
 
         if (ownerId != null && ownerId.isNotEmpty) {
           await _notificationRepository.sendUserNotification(

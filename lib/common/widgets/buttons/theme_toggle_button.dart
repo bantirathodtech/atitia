@@ -37,6 +37,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/app/theme/theme_provider.dart';
+import '../../../common/styles/spacing.dart';
 import '../../../l10n/app_localizations.dart';
 
 class ThemeToggleButton extends StatelessWidget {
@@ -87,7 +88,8 @@ class ThemeToggleButton extends StatelessWidget {
         case ThemeMode.dark:
           return AppLocalizations.of(context)?.darkMode ?? 'Dark Mode';
         case ThemeMode.system:
-          return AppLocalizations.of(context)?.systemDefault ?? 'System Default';
+          return AppLocalizations.of(context)?.systemDefault ??
+              'System Default';
       }
     }
 
@@ -157,7 +159,7 @@ class ThemeToggleButton extends StatelessWidget {
                   size: size,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.paddingS),
               // Theme mode name text
               Text(
                 modeName,
@@ -193,8 +195,9 @@ class ThemeToggleButton extends StatelessWidget {
           ),
         ),
         tooltip: tooltip ??
-            AppLocalizations.of(context)?.themeTooltip(modeName, nextModeName) ??
-                'Theme: $modeName\nTap for $nextModeName',
+            AppLocalizations.of(context)
+                ?.themeTooltip(modeName, nextModeName) ??
+            'Theme: $modeName\nTap for $nextModeName',
         onPressed: () {
           if (enableHapticFeedback) {
             // Optional: Add haptic feedback
@@ -238,7 +241,7 @@ class ThemeModeSelector extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.paddingM),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -249,7 +252,7 @@ class ThemeModeSelector extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.paddingS),
 
             // Light Mode Option
             _buildThemeOption(
@@ -312,7 +315,7 @@ class ThemeModeSelector extends StatelessWidget {
                   ? Theme.of(context).primaryColor
                   : Theme.of(context).textTheme.bodyMedium?.color,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.paddingM),
 
             // Title and subtitle
             Expanded(

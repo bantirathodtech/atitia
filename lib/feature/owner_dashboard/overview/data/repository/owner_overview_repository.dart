@@ -112,8 +112,8 @@ class OwnerOverviewRepository {
       // If specific PG selected, filter beds calculation to that PG only
       // But keep totalProperties as all published properties count
       if (pgId != null) {
-      final pgDoc =
-          publishedProperties.where((doc) => doc.id == pgId).firstOrNull;
+        final pgDoc =
+            publishedProperties.where((doc) => doc.id == pgId).firstOrNull;
         if (pgDoc != null) {
           // Don't change totalProperties - keep it as all published properties count
           // totalProperties remains = publishedProperties.length

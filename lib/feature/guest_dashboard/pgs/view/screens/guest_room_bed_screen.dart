@@ -197,7 +197,8 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     if (_booking == null) {
       return Center(
         child: EmptyState(
-          title: loc?.noActiveBooking ?? _text('noActiveBooking', 'No Active Booking'),
+          title: loc?.noActiveBooking ??
+              _text('noActiveBooking', 'No Active Booking'),
           message: loc?.noActiveBookingDescription ??
               _text(
                 'noActiveBookingDescription',
@@ -227,8 +228,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     );
   }
 
-  Widget _buildRoomBedCard(
-      BuildContext context, AppLocalizations? loc) {
+  Widget _buildRoomBedCard(BuildContext context, AppLocalizations? loc) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -296,8 +296,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
     );
   }
 
-  Widget _buildBookingInfoCard(
-      BuildContext context, AppLocalizations? loc) {
+  Widget _buildBookingInfoCard(BuildContext context, AppLocalizations? loc) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -312,24 +311,19 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                 loc?.bookingRequestPgName ??
                     _text('bookingRequestPgName', 'PG Name'),
                 _booking!.pgName),
-            _buildInfoRow(
-                loc?.startDate ?? _text('startDate', 'Start Date'),
+            _buildInfoRow(loc?.startDate ?? _text('startDate', 'Start Date'),
                 _formatDate(_booking!.startDate)),
             if (_booking!.endDate != null)
-              _buildInfoRow(
-                  loc?.endDate ?? _text('endDate', 'End Date'),
+              _buildInfoRow(loc?.endDate ?? _text('endDate', 'End Date'),
                   _formatDate(_booking!.endDate!)),
-            _buildInfoRow(
-                loc?.status ?? _text('status', 'Status'),
+            _buildInfoRow(loc?.status ?? _text('status', 'Status'),
                 _statusLabel(_booking!.status, loc)),
             if (_booking!.roomNumber.isNotEmpty)
               _buildInfoRow(
-                  loc?.room ?? _text('room', 'Room'),
-                  _booking!.roomNumber),
+                  loc?.room ?? _text('room', 'Room'), _booking!.roomNumber),
             if (_booking!.bedNumber.isNotEmpty)
               _buildInfoRow(
-                  loc?.bed ?? _text('bed', 'Bed'),
-                  _booking!.bedNumber),
+                  loc?.bed ?? _text('bed', 'Bed'), _booking!.bedNumber),
           ],
         ),
       ),
@@ -408,7 +402,9 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
               BodyText(
                 text: _booking!.roomNumber.isNotEmpty &&
                         _booking!.bedNumber.isNotEmpty
-                    ? '${loc?.roomLabelWithNumber(_booking!.roomNumber) ?? _text('roomLabelWithNumber', 'Room {roomNumber}', parameters: {'roomNumber': _booking!.roomNumber})}, ${loc?.bedLabelWithNumber(_booking!.bedNumber) ?? _text('bedLabelWithNumber', 'Bed {bedNumber}', parameters: {'bedNumber': _booking!.bedNumber})}'
+                    ? '${loc?.roomLabelWithNumber(_booking!.roomNumber) ?? _text('roomLabelWithNumber', 'Room {roomNumber}', parameters: {
+                              'roomNumber': _booking!.roomNumber
+                            })}, ${loc?.bedLabelWithNumber(_booking!.bedNumber) ?? _text('bedLabelWithNumber', 'Bed {bedNumber}', parameters: {'bedNumber': _booking!.bedNumber})}'
                     : loc?.notAssigned ?? _text('notAssigned', 'Not assigned'),
               ),
               const SizedBox(height: AppSpacing.paddingL),
@@ -419,7 +415,8 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                       _text('preferredRoomNumberOptional',
                           'Preferred Room Number (Optional)'),
                   hintText: loc?.preferredRoomNumberHint ??
-                      _text('preferredRoomNumberHint', 'Enter preferred room...'),
+                      _text(
+                          'preferredRoomNumberHint', 'Enter preferred room...'),
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.door_front_door),
                 ),
@@ -588,28 +585,21 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
               BodyText(
                 text: recentRequest.preferredRoomNumber != null &&
                         recentRequest.preferredBedNumber != null
-                    ? '${loc?.roomLabelWithNumber(recentRequest.preferredRoomNumber!) ?? _text('roomLabelWithNumber', 'Room {roomNumber}', parameters: {'roomNumber': recentRequest.preferredRoomNumber.toString()})}, ${loc?.bedLabelWithNumber(recentRequest.preferredBedNumber!) ?? _text('bedLabelWithNumber', 'Bed {bedNumber}', parameters: {'bedNumber': recentRequest.preferredBedNumber.toString()})}'
+                    ? '${loc?.roomLabelWithNumber(recentRequest.preferredRoomNumber!) ?? _text('roomLabelWithNumber', 'Room {roomNumber}', parameters: {
+                              'roomNumber':
+                                  recentRequest.preferredRoomNumber.toString()
+                            })}, ${loc?.bedLabelWithNumber(recentRequest.preferredBedNumber!) ?? _text('bedLabelWithNumber', 'Bed {bedNumber}', parameters: {'bedNumber': recentRequest.preferredBedNumber.toString()})}'
                     : recentRequest.preferredRoomNumber != null
-                        ? loc?.roomLabelWithNumber(
-                              recentRequest.preferredRoomNumber!) ??
-                            _text(
-                                'roomLabelWithNumber',
-                                'Room {roomNumber}',
-                                parameters: {
-                                  'roomNumber':
-                                      recentRequest.preferredRoomNumber
-                                          .toString(),
-                                })
-                        : loc?.bedLabelWithNumber(
-                              recentRequest.preferredBedNumber!) ??
-                            _text(
-                                'bedLabelWithNumber',
-                                'Bed {bedNumber}',
-                                parameters: {
-                                  'bedNumber':
-                                      recentRequest.preferredBedNumber
-                                          .toString(),
-                                }),
+                        ? loc?.roomLabelWithNumber(recentRequest.preferredRoomNumber!) ??
+                            _text('roomLabelWithNumber', 'Room {roomNumber}', parameters: {
+                              'roomNumber':
+                                  recentRequest.preferredRoomNumber.toString(),
+                            })
+                        : loc?.bedLabelWithNumber(recentRequest.preferredBedNumber!) ??
+                            _text('bedLabelWithNumber', 'Bed {bedNumber}', parameters: {
+                              'bedNumber':
+                                  recentRequest.preferredBedNumber.toString(),
+                            }),
               ),
               const SizedBox(height: AppSpacing.paddingM),
             ],
@@ -649,14 +639,15 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
             ],
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
-              text: loc?.requestedOnLabel(_formatDate(recentRequest.createdAt)) ??
-                  _text(
-                    'requestedLabel',
-                    'Requested: {date}',
-                    parameters: {
-                      'date': _formatDate(recentRequest.createdAt),
-                    },
-                  ),
+              text:
+                  loc?.requestedOnLabel(_formatDate(recentRequest.createdAt)) ??
+                      _text(
+                        'requestedLabel',
+                        'Requested: {date}',
+                        parameters: {
+                          'date': _formatDate(recentRequest.createdAt),
+                        },
+                      ),
               color: Colors.grey[600],
             ),
           ],

@@ -18,7 +18,8 @@ class GuestProfileRepository {
   final IDatabaseService _databaseService;
   final IStorageService _storageService;
   final IAnalyticsService _analyticsService;
-  final InternationalizationService _i18n = InternationalizationService.instance;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   /// Constructor with dependency injection
   /// If services are not provided, uses UnifiedServiceLocator as fallback
@@ -109,7 +110,8 @@ class GuestProfileRepository {
           'error': e.toString(),
         },
       );
-      throw Exception(_i18n.translate('failedToUpdateGuestProfile', parameters: {
+      throw Exception(
+          _i18n.translate('failedToUpdateGuestProfile', parameters: {
         'error': e.toString(),
       }));
     }
@@ -145,7 +147,8 @@ class GuestProfileRepository {
           'error': e.toString(),
         },
       );
-      throw Exception(_i18n.translate('failedToUpdateProfileFields', parameters: {
+      throw Exception(
+          _i18n.translate('failedToUpdateProfileFields', parameters: {
         'error': e.toString(),
       }));
     }
@@ -185,7 +188,8 @@ class GuestProfileRepository {
           'error': e.toString(),
         },
       );
-      throw Exception(_i18n.translate('failedToUploadProfilePhoto', parameters: {
+      throw Exception(
+          _i18n.translate('failedToUploadProfilePhoto', parameters: {
         'error': e.toString(),
       }));
     }
@@ -225,7 +229,8 @@ class GuestProfileRepository {
           'error': e.toString(),
         },
       );
-      throw Exception(_i18n.translate('failedToUploadAadhaarPhoto', parameters: {
+      throw Exception(
+          _i18n.translate('failedToUploadAadhaarPhoto', parameters: {
         'error': e.toString(),
       }));
     }
@@ -295,7 +300,8 @@ class GuestProfileRepository {
           'error': e.toString(),
         },
       );
-      throw Exception(_i18n.translate('failedToDeleteGuestProfile', parameters: {
+      throw Exception(
+          _i18n.translate('failedToDeleteGuestProfile', parameters: {
         'error': e.toString(),
       }));
     }

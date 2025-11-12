@@ -84,12 +84,15 @@ class GuestPaymentCardWidget extends StatelessWidget {
     switch (payment.status.toLowerCase()) {
       case 'paid':
         return loc?.paymentCompletedSuccessfully ??
-            _text('paymentCompletedSuccessfully', 'Payment completed successfully');
+            _text('paymentCompletedSuccessfully',
+                'Payment completed successfully');
       case 'pending':
         return payment.isOverdue
             ? (loc?.paymentOverdue ??
-                _text('paymentOverdue', 'Payment overdue — please pay immediately'))
-            : (loc?.paymentPending ?? _text('paymentPending', 'Payment pending'));
+                _text('paymentOverdue',
+                    'Payment overdue — please pay immediately'))
+            : (loc?.paymentPending ??
+                _text('paymentPending', 'Payment pending'));
       case 'failed':
         return loc?.paymentFailedMessage ??
             _text('paymentFailedMessage', 'Payment failed — please try again');
@@ -334,16 +337,14 @@ class GuestPaymentCardWidget extends StatelessWidget {
         return loc?.paymentMethodBankTransfer ??
             _text('paymentMethodBankTransfer', 'Bank Transfer');
       default:
-        return loc?.paymentMethodOther ??
-            _text('paymentMethodOther', 'Other');
+        return loc?.paymentMethodOther ?? _text('paymentMethodOther', 'Other');
     }
   }
 
   String _paymentTypeLabel(String type, AppLocalizations? loc) {
     switch (type.toLowerCase()) {
       case 'rent':
-        return loc?.paymentTypeRent ??
-            _text('paymentTypeRent', 'Rent Payment');
+        return loc?.paymentTypeRent ?? _text('paymentTypeRent', 'Rent Payment');
       case 'security deposit':
         return loc?.paymentTypeSecurityDeposit ??
             _text('paymentTypeSecurityDeposit', 'Security Deposit');

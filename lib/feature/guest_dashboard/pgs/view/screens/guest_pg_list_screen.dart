@@ -105,13 +105,13 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () => _toggleFilterPanel(),
-          tooltip: loc?.searchAndFilters ??
-              _text('searchAndFilters', 'Search & Filters'),
+            tooltip: loc?.searchAndFilters ??
+                _text('searchAndFilters', 'Search & Filters'),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => pgVM.refreshPGs(context),
-          tooltip: loc?.refresh ?? _text('refresh', 'Refresh'),
+            tooltip: loc?.refresh ?? _text('refresh', 'Refresh'),
           ),
         ],
         showBackButton: false,
@@ -149,8 +149,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           builder: (context) {
             final loc = AppLocalizations.of(context);
             return HeadingMedium(
-              text: loc?.findYourPg ??
-                  _text('findYourPg', 'Find Your PG'),
+              text: loc?.findYourPg ?? _text('findYourPg', 'Find Your PG'),
               color: AppColors.textOnPrimary,
             );
           },
@@ -193,10 +192,8 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           tooltip: () {
             final loc = AppLocalizations.of(context);
             return _showFilterPanel
-                ? (loc?.hideFilters ??
-                    _text('hideFilters', 'Hide Filters'))
-                : (loc?.showFilters ??
-                    _text('showFilters', 'Show Filters'));
+                ? (loc?.hideFilters ?? _text('hideFilters', 'Hide Filters'))
+                : (loc?.showFilters ?? _text('showFilters', 'Show Filters'));
           }(),
         ),
         // Refresh
@@ -270,7 +267,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(AppSpacing.paddingXS),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.2),
               shape: BoxShape.circle,
@@ -426,9 +423,9 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
               ),
               TextButton(
                 onPressed: () => pgVM.clearAllFilters(),
-            child: Text(
-              loc?.clearAll ?? _text('clearAll', 'Clear All'),
-            ),
+                child: Text(
+                  loc?.clearAll ?? _text('clearAll', 'Clear All'),
+                ),
               ),
             ],
           ),
@@ -664,41 +661,53 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
     // final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingL),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: AppColors.error,
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-          HeadingMedium(
-            text: loc?.errorLoadingPgs ??
-                _text('errorLoadingPgs', 'Error loading PGs'),
-            align: TextAlign.center,
-            color: AppColors.textPrimary,
-          ),
-          const SizedBox(height: AppSpacing.paddingS),
-          BodyText(
-            text: pgVM.errorMessage ??
-                (loc?.unknownErrorOccurred ??
-                    _text('unknownErrorOccurred', 'Unknown error occurred')),
-            align: TextAlign.center,
-            color: AppColors.textSecondary,
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-          PrimaryButton(
-            onPressed: () {
-              // pgVM.clearError();
-              pgVM.loadPGs(context);
-            },
-            label: loc?.tryAgain ?? _text('tryAgain', 'Try Again'),
-            icon: Icons.refresh,
-          ),
-        ],
+    return Semantics(
+      label: 'Error loading PG listings',
+      hint:
+          'An error occurred while loading PG properties. Use the retry button to try again.',
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.paddingL),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Semantics(
+              label: 'Error icon',
+              excludeSemantics: true,
+              child: Icon(
+                Icons.error_outline,
+                size: 64,
+                color: AppColors.error,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.paddingL),
+            Semantics(
+              header: true,
+              child: HeadingMedium(
+                text: loc?.errorLoadingPgs ??
+                    _text('errorLoadingPgs', 'Error loading PGs'),
+                align: TextAlign.center,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.paddingS),
+            BodyText(
+              text: pgVM.errorMessage ??
+                  (loc?.unknownErrorOccurred ??
+                      _text('unknownErrorOccurred', 'Unknown error occurred')),
+              align: TextAlign.center,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(height: AppSpacing.paddingL),
+            PrimaryButton(
+              onPressed: () {
+                // pgVM.clearError();
+                pgVM.loadPGs(context);
+              },
+              label: loc?.tryAgain ?? _text('tryAgain', 'Try Again'),
+              icon: Icons.refresh,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -21,10 +21,12 @@ class NotificationPreferencesWidget extends StatefulWidget {
   const NotificationPreferencesWidget({super.key});
 
   @override
-  State<NotificationPreferencesWidget> createState() => _NotificationPreferencesWidgetState();
+  State<NotificationPreferencesWidget> createState() =>
+      _NotificationPreferencesWidgetState();
 }
 
-class _NotificationPreferencesWidgetState extends State<NotificationPreferencesWidget> {
+class _NotificationPreferencesWidgetState
+    extends State<NotificationPreferencesWidget> {
   final _messagingService = enhancedMessagingService;
   Map<String, bool> _preferences = {};
   bool _loading = true;
@@ -46,7 +48,7 @@ class _NotificationPreferencesWidgetState extends State<NotificationPreferencesW
 
   Future<void> _updatePreference(String key, bool value) async {
     setState(() => _preferences[key] = value);
-    
+
     await _messagingService.updateNotificationPreferences(key, value);
   }
 
@@ -184,10 +186,12 @@ class NotificationSettingsDialog extends StatefulWidget {
   const NotificationSettingsDialog({super.key});
 
   @override
-  State<NotificationSettingsDialog> createState() => _NotificationSettingsDialogState();
+  State<NotificationSettingsDialog> createState() =>
+      _NotificationSettingsDialogState();
 }
 
-class _NotificationSettingsDialogState extends State<NotificationSettingsDialog> {
+class _NotificationSettingsDialogState
+    extends State<NotificationSettingsDialog> {
   final _messagingService = enhancedMessagingService;
   Map<String, bool> _preferences = {};
   bool _loading = true;
@@ -209,7 +213,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
 
   Future<void> _updatePreference(String key, bool value) async {
     setState(() => _preferences[key] = value);
-    
+
     await _messagingService.updateNotificationPreferences(key, value);
   }
 
@@ -258,7 +262,8 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
-                    children: _buildNotificationToggles(context, isDarkMode, loc),
+                    children:
+                        _buildNotificationToggles(context, isDarkMode, loc),
                   ),
                 ),
               ),
@@ -330,7 +335,8 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
         margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
         padding: const EdgeInsets.all(AppSpacing.paddingM),
         decoration: BoxDecoration(
-          color: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
+          color:
+              isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           border: Border.all(
             color: isDarkMode ? AppColors.darkDivider : AppColors.outline,

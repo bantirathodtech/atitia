@@ -32,17 +32,18 @@ class SectionContainer extends AdaptiveStatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (title != null) ...[
-              Row(
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: 24, color: Theme.of(context).colorScheme.primary),
-                    const SizedBox(width: AppSpacing.paddingS),
-                  ],
-                  Expanded(
-                    child: HeadingMedium(text: title!),
-                  ),
+            Row(
+              children: [
+                if (icon != null) ...[
+                  Icon(icon,
+                      size: 24, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: AppSpacing.paddingS),
                 ],
-              ),
+                Expanded(
+                  child: HeadingMedium(text: title!),
+                ),
+              ],
+            ),
             if (description != null) ...[
               const SizedBox(height: AppSpacing.paddingXS),
               Text(

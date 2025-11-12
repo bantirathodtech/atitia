@@ -671,12 +671,11 @@ class OwnerPgManagementRepository {
   /// Fetch the latest draft PG for an owner (isDraft == true), ordered by updatedAt desc
   Future<Map<String, dynamic>?> fetchLatestDraftForOwner(String ownerId) async {
     try {
-      final snapshot = await _databaseService
-          .queryCollection(FirestoreConstants.pgs, [
+      final snapshot =
+          await _databaseService.queryCollection(FirestoreConstants.pgs, [
         {'field': 'ownerUid', 'value': ownerId},
         {'field': 'isDraft', 'value': true},
-      ])
-          .then((qs) async {
+      ]).then((qs) async {
         // If interface lacks order/limit, emulate by picking max updatedAt
         final docs = qs.docs.map((d) => d).toList();
         if (docs.isEmpty) return null;

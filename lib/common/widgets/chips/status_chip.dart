@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../styles/spacing.dart';
+
 /// Compact status chip with colored dot and label, used for legends and tags
 class StatusChip extends StatelessWidget {
   final Color color;
@@ -25,7 +27,8 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = filled ? color.withValues(alpha: 0.16) : color.withValues(alpha: 0.12);
+    final bg =
+        filled ? color.withValues(alpha: 0.16) : color.withValues(alpha: 0.12);
     final border = color.withValues(alpha: 0.3);
     return Container(
       padding: EdgeInsets.symmetric(
@@ -48,7 +51,7 @@ class StatusChip extends StatelessWidget {
               height: iconSize - 6,
               decoration: BoxDecoration(color: color, shape: BoxShape.circle),
             ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.paddingS),
           DefaultTextStyle(
             style: TextStyle(
               color: color,

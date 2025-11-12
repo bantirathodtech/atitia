@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
@@ -28,7 +29,7 @@ class BookingRequestListWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         HeadingSmall(text: title),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         if (requests.isEmpty)
           BodyText(text: loc?.noRequestsFound ?? 'No requests found')
         else
@@ -41,7 +42,8 @@ class BookingRequestListWidget extends StatelessWidget {
               return AdaptiveCard(
                 child: ListTile(
                   title: BodyText(
-                    text: request['guestName'] ?? (loc?.unknownGuest ?? 'Unknown Guest'),
+                    text: request['guestName'] ??
+                        (loc?.unknownGuest ?? 'Unknown Guest'),
                   ),
                   subtitle: CaptionText(
                     text: request['pgName'] ?? (loc?.unknownPg ?? 'Unknown PG'),
@@ -58,8 +60,8 @@ class BookingRequestListWidget extends StatelessWidget {
     );
   }
 
-  void _showActionDialog(
-      BuildContext context, Map<String, dynamic> request, AppLocalizations? loc) {
+  void _showActionDialog(BuildContext context, Map<String, dynamic> request,
+      AppLocalizations? loc) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

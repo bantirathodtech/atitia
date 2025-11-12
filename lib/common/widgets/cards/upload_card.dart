@@ -100,7 +100,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                           children: [
                             HeadingSmall(text: title),
                             if (isRequired) ...[
-                              const SizedBox(width: 4),
+                              const SizedBox(width: AppSpacing.paddingXS),
                               const Text(
                                 '*',
                                 style: TextStyle(
@@ -124,7 +124,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                   // Status indicator (theme-aware)
                   if (hasImage && !isUploading)
                     Container(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(AppSpacing.paddingS),
                       decoration: BoxDecoration(
                         color: AppColors.successContainer,
                         shape: BoxShape.circle,
@@ -197,7 +197,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                         top: 8,
                         right: 8,
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(AppSpacing.paddingS),
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.6),
                             borderRadius: BorderRadius.circular(8),
@@ -227,7 +227,7 @@ class UploadCard extends AdaptiveStatelessWidget {
                     children: [
                       Icon(Icons.check_circle,
                           size: 16, color: AppColors.success),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.paddingXS),
                       CaptionText(
                         text: loc?.documentUploadedSuccessfully ??
                             'Document uploaded successfully',

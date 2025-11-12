@@ -70,7 +70,7 @@ class GuestComplaintCard extends StatelessWidget {
     if (subject.contains('noise')) return Icons.volume_off;
     return Icons.report_problem;
   }
-  
+
   String get _categoryKey {
     final subject = complaint.subject.toLowerCase();
     if (subject.contains('food')) return 'food';
@@ -146,7 +146,8 @@ class GuestComplaintCard extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
+                  color:
+                      Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -181,7 +182,8 @@ class GuestComplaintCard extends StatelessWidget {
                           borderRadius:
                               BorderRadius.circular(AppSpacing.borderRadiusS),
                         ),
-                        child: Icon(_categoryIcon, color: _statusColor, size: 20),
+                        child:
+                            Icon(_categoryIcon, color: _statusColor, size: 20),
                       ),
                       const SizedBox(width: AppSpacing.paddingM),
                       Expanded(
@@ -206,7 +208,7 @@ class GuestComplaintCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(_statusIcon, color: _statusColor, size: 14),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppSpacing.paddingXS),
                             Text(
                               displayStatus,
                               style: theme.textTheme.bodySmall?.copyWith(
@@ -246,10 +248,11 @@ class GuestComplaintCard extends StatelessWidget {
                               color: isDarkMode
                                   ? AppColors.darkInputFill
                                   : AppColors.surfaceVariant,
-                              borderRadius:
-                                  BorderRadius.circular(AppSpacing.borderRadiusS),
+                              borderRadius: BorderRadius.circular(
+                                  AppSpacing.borderRadiusS),
                               border: Border.all(
-                                color: theme.primaryColor.withValues(alpha: 0.3),
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(
@@ -260,7 +263,7 @@ class GuestComplaintCard extends StatelessWidget {
                                   size: 12,
                                   color: theme.primaryColor,
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: AppSpacing.paddingXS),
                                 CaptionText(
                                   text: categoryLabel,
                                   color: theme.primaryColor,
@@ -279,7 +282,7 @@ class GuestComplaintCard extends StatelessWidget {
                                     ? AppColors.textTertiary
                                     : AppColors.textSecondary,
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: AppSpacing.paddingXS),
                               CaptionText(
                                 text: _formatDate(complaint.complaintDate, loc),
                                 color: isDarkMode
@@ -306,14 +309,12 @@ class GuestComplaintCard extends StatelessWidget {
     final difference = now.difference(date);
 
     if (difference.inDays == 0) {
-      final time =
-          DateFormat('hh:mm a', loc?.localeName).format(date);
+      final time = DateFormat('hh:mm a', loc?.localeName).format(date);
       return loc?.todayAt(time) ?? 'Today $time';
     } else if (difference.inDays == 1) {
       return loc?.yesterday ?? 'Yesterday';
     } else if (difference.inDays < 7) {
-      return loc?.daysAgo(difference.inDays) ??
-          '${difference.inDays} days ago';
+      return loc?.daysAgo(difference.inDays) ?? '${difference.inDays} days ago';
     } else {
       return DateFormat('MMM dd, yyyy', loc?.localeName).format(date);
     }

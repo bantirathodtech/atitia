@@ -95,7 +95,7 @@ class OwnerBedMapWidget extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       children: [
-          _buildOverviewCard(context, loc,
+        _buildOverviewCard(context, loc,
             totalBeds: totalBeds,
             occupied: occupied,
             vacant: vacant,
@@ -105,12 +105,11 @@ class OwnerBedMapWidget extends StatelessWidget {
         ...roomBeds.keys.map((roomId) {
           final roomBedsList = roomBeds[roomId]!;
           final room = rooms.firstWhere((r) => r.id == roomId,
-              orElse: () =>
-                  OwnerRoom(
-                      id: roomId,
-                      floorId: '',
-                      roomNumber: loc?.ownerBedMapRoomUnknown ??
-                          _text('ownerBedMapRoomUnknown', 'Unknown')));
+              orElse: () => OwnerRoom(
+                  id: roomId,
+                  floorId: '',
+                  roomNumber: loc?.ownerBedMapRoomUnknown ??
+                      _text('ownerBedMapRoomUnknown', 'Unknown')));
 
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
@@ -141,11 +140,11 @@ class OwnerBedMapWidget extends StatelessWidget {
     final maintenanceCount = roomBeds.where((b) => b.isUnderMaintenance).length;
     final total = roomBeds.isEmpty ? 1 : roomBeds.length; // avoid /0
     final occupancy = occupiedCount / total;
-    final occupancySummary =
-        loc?.ownerBedMapOccupancySummary(occupiedCount, roomBeds.length,
-                room.capacity) ??
-            _text('ownerBedMapOccupancySummary',
-                '{occupied}/{total} occupied • Capacity {capacity}', parameters: {
+    final occupancySummary = loc?.ownerBedMapOccupancySummary(
+            occupiedCount, roomBeds.length, room.capacity) ??
+        _text('ownerBedMapOccupancySummary',
+            '{occupied}/{total} occupied • Capacity {capacity}',
+            parameters: {
               'occupied': occupiedCount,
               'total': roomBeds.length,
               'capacity': room.capacity,
@@ -260,11 +259,11 @@ class OwnerBedMapWidget extends StatelessWidget {
                 ),
                 StatusChip(
                   color: const Color(0xFFEF5350),
-                  label:
-                      loc?.ownerBedMapStatusChipMaintenance(maintenanceCount) ??
-                          _text('ownerBedMapStatusChipMaintenance',
-                              'Maint. {count}',
-                              parameters: {'count': maintenanceCount}),
+                  label: loc?.ownerBedMapStatusChipMaintenance(
+                          maintenanceCount) ??
+                      _text(
+                          'ownerBedMapStatusChipMaintenance', 'Maint. {count}',
+                          parameters: {'count': maintenanceCount}),
                   icon: Icons.build,
                   paddingH: 16,
                   paddingV: 10,
@@ -278,8 +277,9 @@ class OwnerBedMapWidget extends StatelessWidget {
               targetTileWidth: 120,
               horizontalGap: AppSpacing.paddingS,
               verticalGap: AppSpacing.paddingS,
-              children:
-                  roomBeds.map((bed) => _buildBedItem(context, bed, loc)).toList(),
+              children: roomBeds
+                  .map((bed) => _buildBedItem(context, bed, loc))
+                  .toList(),
             ),
           ],
         ),
@@ -306,7 +306,7 @@ class OwnerBedMapWidget extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.bed_rounded, color: theme.primaryColor, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
                     text: loc?.ownerBedMapBedsOverview ??
                         _text('ownerBedMapBedsOverview', 'Beds Overview')),
@@ -321,7 +321,8 @@ class OwnerBedMapWidget extends StatelessWidget {
                       '$totalBeds',
                       loc?.ownerBedMapMiniStatTotal ??
                           _text('ownerBedMapMiniStatTotal', 'Total'),
-                      Icons.inventory_2, theme.primaryColor),
+                      Icons.inventory_2,
+                      theme.primaryColor),
                 ),
                 Expanded(
                   child: _buildMiniStat(
@@ -329,7 +330,8 @@ class OwnerBedMapWidget extends StatelessWidget {
                       '$occupied',
                       loc?.ownerBedMapMiniStatOccupied ??
                           _text('ownerBedMapMiniStatOccupied', 'Occupied'),
-                      Icons.person, const Color(0xFF4CAF50)),
+                      Icons.person,
+                      const Color(0xFF4CAF50)),
                 ),
                 Expanded(
                   child: _buildMiniStat(
@@ -337,7 +339,8 @@ class OwnerBedMapWidget extends StatelessWidget {
                       '$vacant',
                       loc?.ownerBedMapMiniStatVacant ??
                           _text('ownerBedMapMiniStatVacant', 'Vacant'),
-                      Icons.bed_outlined, const Color(0xFFFFB300)),
+                      Icons.bed_outlined,
+                      const Color(0xFFFFB300)),
                 ),
                 Expanded(
                   child: _buildMiniStat(
@@ -345,7 +348,8 @@ class OwnerBedMapWidget extends StatelessWidget {
                       '$pending',
                       loc?.ownerBedMapMiniStatPending ??
                           _text('ownerBedMapMiniStatPending', 'Pending'),
-                      Icons.schedule, const Color(0xFFFFA726)),
+                      Icons.schedule,
+                      const Color(0xFFFFA726)),
                 ),
                 Expanded(
                   child: _buildMiniStat(
@@ -353,7 +357,8 @@ class OwnerBedMapWidget extends StatelessWidget {
                       '$maintenance',
                       loc?.ownerBedMapMiniStatMaintenance ??
                           _text('ownerBedMapMiniStatMaintenance', 'Maint.'),
-                      Icons.build, const Color(0xFFEF5350)),
+                      Icons.build,
+                      const Color(0xFFEF5350)),
                 ),
               ],
             ),
@@ -366,7 +371,7 @@ class OwnerBedMapWidget extends StatelessWidget {
   Widget _buildMiniStat(BuildContext context, String value, String label,
       IconData icon, Color color) {
     return Container(
-      margin: const EdgeInsets.all(4),
+      margin: const EdgeInsets.all(AppSpacing.paddingXS),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
@@ -376,7 +381,7 @@ class OwnerBedMapWidget extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: color, size: 20),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.paddingS),
           HeadingSmall(text: value, color: color),
           const SizedBox(height: 2),
           CaptionText(text: label, color: color.withValues(alpha: 0.9)),
@@ -427,8 +432,8 @@ class OwnerBedMapWidget extends StatelessWidget {
   Widget _buildBedPlaceholder(BuildContext context) {
     final theme = Theme.of(context);
     final border = theme.dividerColor.withValues(alpha: 0.5);
-    final muted =
-        theme.textTheme.bodySmall?.color?.withValues(alpha: 0.35) ?? Colors.grey;
+    final muted = theme.textTheme.bodySmall?.color?.withValues(alpha: 0.35) ??
+        Colors.grey;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -439,9 +444,9 @@ class OwnerBedMapWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.paddingS),
           Icon(Icons.bed_outlined, color: muted, size: 22),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.paddingS),
           HeadingSmall(text: '—', color: muted),
         ],
       ),
@@ -454,8 +459,8 @@ class OwnerBedMapWidget extends StatelessWidget {
       BuildContext context, OwnerBed bed, AppLocalizations? loc) {
     final theme = Theme.of(context);
     final statusColor = bed.statusColor;
-    final bg = statusColor
-        .withValues(alpha: theme.brightness == Brightness.dark ? 0.12 : 0.08);
+    final bg = statusColor.withValues(
+        alpha: theme.brightness == Brightness.dark ? 0.12 : 0.08);
     final border = statusColor;
     final icon = bed.isOccupied
         ? Icons.person
@@ -479,16 +484,16 @@ class OwnerBedMapWidget extends StatelessWidget {
               parameters: {'guest': guestName}));
     }
     if (bed.occupiedSince != null) {
-      tooltipLines.add(loc?.ownerBedMapTooltipFrom(
-              dateFormat.format(bed.occupiedSince!)) ??
-          _text('ownerBedMapTooltipFrom', 'From: {date}',
-              parameters: {'date': dateFormat.format(bed.occupiedSince!)}));
+      tooltipLines.add(
+          loc?.ownerBedMapTooltipFrom(dateFormat.format(bed.occupiedSince!)) ??
+              _text('ownerBedMapTooltipFrom', 'From: {date}',
+                  parameters: {'date': dateFormat.format(bed.occupiedSince!)}));
     }
     if (bed.vacatingOn != null) {
-      tooltipLines.add(loc?.ownerBedMapTooltipTill(
-              dateFormat.format(bed.vacatingOn!)) ??
-          _text('ownerBedMapTooltipTill', 'Till: {date}',
-              parameters: {'date': dateFormat.format(bed.vacatingOn!)}));
+      tooltipLines.add(
+          loc?.ownerBedMapTooltipTill(dateFormat.format(bed.vacatingOn!)) ??
+              _text('ownerBedMapTooltipTill', 'Till: {date}',
+                  parameters: {'date': dateFormat.format(bed.vacatingOn!)}));
     }
 
     final tooltipText = tooltipLines.join('\n');
@@ -531,9 +536,9 @@ class OwnerBedMapWidget extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppSpacing.paddingS),
                   Icon(icon, color: statusColor, size: 22),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppSpacing.paddingS),
                   HeadingSmall(text: bed.bedNumber, color: statusColor),
                 ],
               ),

@@ -212,7 +212,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
         await authProvider.uploadAadhaarDocument(file);
         if (mounted) {
           final loc = AppLocalizations.of(context);
-          _showSnackBar(loc?.aadhaarDocumentUploadedSuccessfully ?? 'Aadhaar document uploaded successfully!');
+          _showSnackBar(loc?.aadhaarDocumentUploadedSuccessfully ??
+              'Aadhaar document uploaded successfully!');
         }
       } catch (e) {
         if (mounted) {
@@ -526,9 +527,12 @@ class _RegistrationScreenState extends State<RegistrationScreen>
             const SizedBox(height: AppSpacing.sm),
 
             // Section header
-            HeadingMedium(text: loc?.personalInformation ?? 'Personal Information'),
+            HeadingMedium(
+                text: loc?.personalInformation ?? 'Personal Information'),
             const SizedBox(height: AppSpacing.xs),
-            CaptionText(text: loc?.pleaseProvideYourDetailsAsPerOfficialDocuments ?? 'Please provide your details as per your official documents'),
+            CaptionText(
+                text: loc?.pleaseProvideYourDetailsAsPerOfficialDocuments ??
+                    'Please provide your details as per your official documents'),
             const SizedBox(height: AppSpacing.lg),
 
             // Phone Number (Read-only) - Shows the number used during login
@@ -545,7 +549,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                 ),
                 decoration: InputDecoration(
                   labelText: loc?.phoneNumber ?? 'Phone Number',
-                  hintText: loc?.yourRegisteredPhoneNumber ?? 'Your registered phone number',
+                  hintText: loc?.yourRegisteredPhoneNumber ??
+                      'Your registered phone number',
                   prefixIcon: const Icon(Icons.phone),
                   suffixIcon:
                       Icon(Icons.verified, color: AppColors.success, size: 20),
@@ -554,7 +559,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   fillColor: isDarkMode
                       ? AppColors.darkCard.withValues(alpha: 0.5)
                       : AppColors.surfaceVariant.withValues(alpha: 0.5),
-                  helperText: loc?.verifiedDuringLogin ?? '✓ Verified during login',
+                  helperText:
+                      loc?.verifiedDuringLogin ?? '✓ Verified during login',
                   helperStyle: TextStyle(
                     color: AppColors.success,
                     fontWeight: FontWeight.w500,
@@ -585,7 +591,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                     _nameError = v.trim().isEmpty
                         ? (loc?.fullNameIsRequired ?? 'Full name is required')
                         : v.trim().length < 3
-                            ? (loc?.nameMustBeAtLeast3Characters ?? 'Name must be at least 3 characters')
+                            ? (loc?.nameMustBeAtLeast3Characters ??
+                                'Name must be at least 3 characters')
                             : null;
                   });
                 },
@@ -644,7 +651,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             BodyText(
-                              text: '${loc?.age ?? 'Age'}: $age ${loc?.years ?? 'years'}',
+                              text:
+                                  '${loc?.age ?? 'Age'}: $age ${loc?.years ?? 'years'}',
                               color: ageColor,
                             ),
                           ],
@@ -683,7 +691,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                     child: Row(
                       children: [
                         Icon(Icons.male, color: AppColors.info),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.paddingS),
                         Text(loc?.male ?? 'Male',
                             style: TextStyle(color: AppColors.textPrimary)),
                       ],
@@ -694,7 +702,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                     child: Row(
                       children: [
                         Icon(Icons.female, color: AppColors.secondary),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.paddingS),
                         Text(loc?.female ?? 'Female',
                             style: TextStyle(color: AppColors.textPrimary)),
                       ],
@@ -705,7 +713,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                     child: Row(
                       children: [
                         Icon(Icons.transgender, color: AppColors.purple),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.paddingS),
                         Text(loc?.other ?? 'Other',
                             style: TextStyle(color: AppColors.textPrimary)),
                       ],
@@ -738,7 +746,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                       _emailError = null;
                     } else if (!RegExp(ValidationConstants.emailRegex)
                         .hasMatch(v.trim())) {
-                      _emailError = loc?.pleaseEnterValidEmail ?? 'Please enter a valid email';
+                      _emailError = loc?.pleaseEnterValidEmail ??
+                          'Please enter a valid email';
                     } else {
                       _emailError = null;
                     }
@@ -755,7 +764,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
   /// Documents Tab
   Widget _buildDocumentsTab(AuthProvider authProvider) {
     final loc = AppLocalizations.of(context);
-    
+
     return FadeInAnimation(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -767,7 +776,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
             HeadingMedium(text: loc?.uploadDocuments ?? 'Upload Documents'),
             const SizedBox(height: AppSpacing.xs),
             CaptionText(
-              text: loc?.uploadClearPhotosOfYourDocuments ?? 'Upload clear photos of your documents for verification',
+              text: loc?.uploadClearPhotosOfYourDocuments ??
+                  'Upload clear photos of your documents for verification',
             ),
             const SizedBox(height: AppSpacing.lg),
 
@@ -776,7 +786,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
               delay: const Duration(milliseconds: 100),
               child: UploadCard(
                 title: loc?.profilePhoto ?? 'Profile Photo',
-                description: loc?.uploadClearPhotoOfYourself ?? 'Upload a clear photo of yourself',
+                description: loc?.uploadClearPhotoOfYourself ??
+                    'Upload a clear photo of yourself',
                 icon: Icons.person,
                 imageUrl: authProvider.profilePhotoUrl,
                 imageFile: authProvider.profilePhotoFile,
@@ -794,7 +805,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
               delay: const Duration(milliseconds: 200),
               child: UploadCard(
                 title: loc?.aadhaarDocument ?? 'Aadhaar Document',
-                description: loc?.uploadYourAadhaarCard ?? 'Upload your Aadhaar card (front or back)',
+                description: loc?.uploadYourAadhaarCard ??
+                    'Upload your Aadhaar card (front or back)',
                 icon: Icons.badge,
                 imageUrl: authProvider.aadhaarUrl,
                 imageFile: authProvider.aadhaarFile,
@@ -813,7 +825,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
               child: TextInput(
                 controller: _aadhaarNumberController,
                 label: loc?.aadhaarNumber ?? 'Aadhaar Number',
-                hint: loc?.enter12DigitAadhaarNumber ?? 'Enter 12-digit Aadhaar number',
+                hint: loc?.enter12DigitAadhaarNumber ??
+                    'Enter 12-digit Aadhaar number',
                 prefixIcon: const Icon(Icons.credit_card),
                 keyboardType: TextInputType.number,
                 maxLength: 12,
@@ -821,11 +834,14 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                 onChanged: (v) {
                   setState(() {
                     if (v.trim().isEmpty) {
-                      _aadhaarError = loc?.aadhaarNumberIsRequired ?? 'Aadhaar number is required';
+                      _aadhaarError = loc?.aadhaarNumberIsRequired ??
+                          'Aadhaar number is required';
                     } else if (v.length != 12) {
-                      _aadhaarError = loc?.aadhaarMustBe12Digits ?? 'Aadhaar must be 12 digits';
+                      _aadhaarError = loc?.aadhaarMustBe12Digits ??
+                          'Aadhaar must be 12 digits';
                     } else if (!RegExp(r'^\d{12}$').hasMatch(v)) {
-                      _aadhaarError = loc?.aadhaarMustContainOnlyDigits ?? 'Aadhaar must contain only digits';
+                      _aadhaarError = loc?.aadhaarMustContainOnlyDigits ??
+                          'Aadhaar must contain only digits';
                     } else {
                       _aadhaarError = null;
                     }
@@ -848,7 +864,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: CaptionText(
-                        text: loc?.yourDocumentsAreSecurelyStored ?? 'Your documents are securely stored and used only for verification purposes',
+                        text: loc?.yourDocumentsAreSecurelyStored ??
+                            'Your documents are securely stored and used only for verification purposes',
                       ),
                     ),
                   ],
@@ -883,7 +900,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
             HeadingMedium(text: loc?.emergencyContact ?? 'Emergency Contact'),
             const SizedBox(height: AppSpacing.xs),
             CaptionText(
-              text: loc?.provideDetailsOfSomeoneWeCanContact ?? 'Provide details of someone we can contact in case of emergency',
+              text: loc?.provideDetailsOfSomeoneWeCanContact ??
+                  'Provide details of someone we can contact in case of emergency',
             ),
             const SizedBox(height: AppSpacing.lg),
 
@@ -893,13 +911,16 @@ class _RegistrationScreenState extends State<RegistrationScreen>
               child: TextInput(
                 controller: _emergencyNameController,
                 label: loc?.contactName ?? 'Contact Name',
-                hint: loc?.fullNameOfEmergencyContact ?? 'Full name of emergency contact',
+                hint: loc?.fullNameOfEmergencyContact ??
+                    'Full name of emergency contact',
                 prefixIcon: const Icon(Icons.contact_emergency),
                 error: _emergencyNameError,
                 onChanged: (v) {
                   setState(() {
-                    _emergencyNameError =
-                        v.trim().isEmpty ? (loc?.contactNameIsRequired ?? 'Contact name is required') : null;
+                    _emergencyNameError = v.trim().isEmpty
+                        ? (loc?.contactNameIsRequired ??
+                            'Contact name is required')
+                        : null;
                   });
                 },
               ),
@@ -996,7 +1017,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   }
                 },
                 validator: (value) => value == null || value.isEmpty
-                    ? (loc?.pleaseSelectRelationship ?? 'Please select relationship')
+                    ? (loc?.pleaseSelectRelationship ??
+                        'Please select relationship')
                     : null,
               ),
             ),
@@ -1008,8 +1030,10 @@ class _RegistrationScreenState extends State<RegistrationScreen>
               delay: const Duration(milliseconds: 400),
               child: TextInput(
                 controller: _emergencyAddressController,
-                label: loc?.contactAddressOptional ?? 'Contact Address (Optional)',
-                hint: loc?.fullAddressOfEmergencyContact ?? 'Full address of emergency contact',
+                label:
+                    loc?.contactAddressOptional ?? 'Contact Address (Optional)',
+                hint: loc?.fullAddressOfEmergencyContact ??
+                    'Full address of emergency contact',
                 prefixIcon: const Icon(Icons.location_on),
                 maxLines: 3,
               ),
@@ -1041,7 +1065,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: BodyText(
-                          text: loc?.allRequiredFieldsCompletedReadyToSubmit ?? 'All required fields completed! Ready to submit.',
+                          text: loc?.allRequiredFieldsCompletedReadyToSubmit ??
+                              'All required fields completed! Ready to submit.',
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -1056,7 +1081,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
   }
 
   /// Bottom navigation bar with theme-aware styling
-  Widget _buildBottomNavigation(AuthProvider authProvider, AppLocalizations? loc) {
+  Widget _buildBottomNavigation(
+      AuthProvider authProvider, AppLocalizations? loc) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final surfaceColor = theme.colorScheme.surface;
@@ -1073,7 +1099,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
             color: isDarkMode
                 ? Colors.black
                     .withValues(alpha: 0.3) // Darker shadow in dark mode
-                : Colors.black.withValues(alpha: 0.05), // Light shadow in light mode
+                : Colors.black
+                    .withValues(alpha: 0.05), // Light shadow in light mode
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -1102,7 +1129,9 @@ class _RegistrationScreenState extends State<RegistrationScreen>
               child: PrimaryButton(
                 onPressed:
                     authProvider.loading || !canProceed ? null : _handleNext,
-                label: _currentStep == 2 ? (loc?.finish ?? 'Finish') : (loc?.continueButton ?? 'Continue'),
+                label: _currentStep == 2
+                    ? (loc?.finish ?? 'Finish')
+                    : (loc?.continueButton ?? 'Continue'),
                 icon: _currentStep == 2 ? Icons.check : Icons.arrow_forward,
                 isLoading: authProvider.loading,
               ),

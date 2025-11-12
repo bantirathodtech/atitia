@@ -272,8 +272,7 @@ class OwnerProfile {
       hasBankDetails;
 
   /// Checks if owner has business information
-  bool get hasBusinessInfo =>
-      businessName != null && businessName!.isNotEmpty;
+  bool get hasBusinessInfo => businessName != null && businessName!.isNotEmpty;
 
   String get initials {
     if (fullName.isEmpty) {
@@ -293,9 +292,7 @@ class OwnerProfile {
     if (city != null && city!.isNotEmpty) parts.add(city!);
     if (state != null && state!.isNotEmpty) parts.add(state!);
     if (pincode != null && pincode!.isNotEmpty) parts.add(pincode!);
-    return parts.isEmpty
-        ? _translate('notAvailable', 'N/A')
-        : parts.join(', ');
+    return parts.isEmpty ? _translate('notAvailable', 'N/A') : parts.join(', ');
   }
 
   /// Returns formatted date of birth
@@ -359,4 +356,3 @@ class OwnerProfile {
   @override
   int get hashCode => ownerId.hashCode;
 }
-

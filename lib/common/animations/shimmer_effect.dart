@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../styles/spacing.dart';
+
 /// Shimmer loading effect for placeholder content
 ///
 /// ## Usage:
@@ -150,13 +152,13 @@ class ShimmerLoading {
     return Row(
       children: [
         ShimmerLoading.circle(size: 48),
-        const SizedBox(width: 16),
+        const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ShimmerLoading.textLine(width: double.infinity, height: 16),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.paddingS),
               ShimmerLoading.textLine(width: 200, height: 14),
             ],
           ),

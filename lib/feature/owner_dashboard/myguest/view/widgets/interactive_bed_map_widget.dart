@@ -102,7 +102,8 @@ class InteractiveBedMapWidget extends StatelessWidget {
                     vertical: AppSpacing.paddingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    color:
+                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -155,7 +156,7 @@ class InteractiveBedMapWidget extends StatelessWidget {
             color: color,
             size: 24,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.paddingXS),
           CaptionText(
             text: loc.bedLabelWithNumber(booking.bedNumber),
             color: color,

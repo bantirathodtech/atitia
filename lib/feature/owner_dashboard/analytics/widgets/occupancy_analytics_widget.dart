@@ -54,8 +54,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildHeader(
-      BuildContext context, bool isDark, AppLocalizations loc) {
+  Widget _buildHeader(BuildContext context, bool isDark, AppLocalizations loc) {
     return Row(
       children: [
         Container(
@@ -311,7 +310,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.paddingS),
                     Text(
                       monthFormatter.format(DateTime(2000, months[index])),
                       style: TextStyle(
@@ -319,7 +318,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                         fontSize: 12,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     Text(
                       '${percentFormatter.format(value)}%',
                       style: TextStyle(

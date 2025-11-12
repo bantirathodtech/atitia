@@ -52,8 +52,8 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
   Widget buildAdaptive(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
-    final title =
-        loc?.pgAdditionalInfoTitle ?? _text('pgAdditionalInfoTitle', 'Additional Information');
+    final title = loc?.pgAdditionalInfoTitle ??
+        _text('pgAdditionalInfoTitle', 'Additional Information');
     final nearbyPlaceController = TextEditingController();
 
     return Column(
@@ -180,7 +180,8 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
         TextInput(
           controller: paymentInstructionsController,
           label: loc?.pgAdditionalInfoPaymentInstructionsLabel ??
-              _text('pgAdditionalInfoPaymentInstructionsLabel', 'Payment Instructions'),
+              _text('pgAdditionalInfoPaymentInstructionsLabel',
+                  'Payment Instructions'),
           hint: loc?.pgAdditionalInfoPaymentInstructionsHint ??
               _text(
                 'pgAdditionalInfoPaymentInstructionsHint',

@@ -94,9 +94,8 @@ class _ReviewCardState extends State<ReviewCard> {
         ? widget.review.guestName.trim()
         : fallbackInitials;
     final trimmedInitials = initialsSource.trim();
-    final displayInitial = trimmedInitials.isNotEmpty
-        ? trimmedInitials[0].toUpperCase()
-        : 'G';
+    final displayInitial =
+        trimmedInitials.isNotEmpty ? trimmedInitials[0].toUpperCase() : 'G';
     final displayName = widget.review.guestName.trim().isNotEmpty
         ? widget.review.guestName
         : (loc?.anonymousGuest ?? 'Anonymous Guest');
@@ -169,7 +168,7 @@ class _ReviewCardState extends State<ReviewCard> {
 
   Widget _buildRatingDisplay(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Row(
       children: [
         ...List.generate(5, (index) {
@@ -207,11 +206,11 @@ class _ReviewCardState extends State<ReviewCard> {
   }
 
   bool _hasAspectRatings() {
-    return widget.review.cleanlinessRating > 0 || 
-           widget.review.amenitiesRating > 0 || 
-           widget.review.locationRating > 0 || 
-           widget.review.foodRating > 0 || 
-           widget.review.staffRating > 0;
+    return widget.review.cleanlinessRating > 0 ||
+        widget.review.amenitiesRating > 0 ||
+        widget.review.locationRating > 0 ||
+        widget.review.foodRating > 0 ||
+        widget.review.staffRating > 0;
   }
 
   Map<String, double> _getAspectRatings(AppLocalizations? loc) {
@@ -224,8 +223,7 @@ class _ReviewCardState extends State<ReviewCard> {
       ratings[loc?.amenities ?? 'Amenities'] = widget.review.amenitiesRating;
     }
     if (widget.review.locationRating > 0) {
-      ratings[loc?.locationLabel ?? 'Location'] =
-          widget.review.locationRating;
+      ratings[loc?.locationLabel ?? 'Location'] = widget.review.locationRating;
     }
     if (widget.review.foodRating > 0) {
       ratings[loc?.foodQuality ?? 'Food Quality'] = widget.review.foodRating;
@@ -239,7 +237,7 @@ class _ReviewCardState extends State<ReviewCard> {
   Widget _buildAspectRatings(BuildContext context, AppLocalizations? loc) {
     final theme = Theme.of(context);
     final aspectRatings = _getAspectRatings(loc);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: aspectRatings.entries.map((entry) {
@@ -314,18 +312,20 @@ class _ReviewCardState extends State<ReviewCard> {
                     placeholder: Container(
                       width: 80,
                       height: 80,
-                      color: isDarkMode 
+                      color: isDarkMode
                           ? AppColors.darkSurface.withValues(alpha: 0.5)
                           : AppColors.background.withValues(alpha: 0.5),
-                      child: const Icon(Icons.image, color: AppColors.textSecondary),
+                      child: const Icon(Icons.image,
+                          color: AppColors.textSecondary),
                     ),
                     errorWidget: Container(
                       width: 80,
                       height: 80,
-                      color: isDarkMode 
+                      color: isDarkMode
                           ? AppColors.darkSurface.withValues(alpha: 0.5)
                           : AppColors.background.withValues(alpha: 0.5),
-                      child: const Icon(Icons.broken_image, color: AppColors.error),
+                      child: const Icon(Icons.broken_image,
+                          color: AppColors.error),
                     ),
                   ),
                 ),
@@ -350,12 +350,12 @@ class _ReviewCardState extends State<ReviewCard> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDarkMode 
+        color: isDarkMode
             ? AppColors.darkSurface.withValues(alpha: 0.5)
             : AppColors.background.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
         border: Border.all(
-          color: isDarkMode 
+          color: isDarkMode
               ? AppColors.borderDark.withValues(alpha: 0.3)
               : AppColors.border.withValues(alpha: 0.3),
         ),

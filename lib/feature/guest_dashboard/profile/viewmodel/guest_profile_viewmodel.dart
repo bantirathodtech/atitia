@@ -14,7 +14,8 @@ import '../data/repository/guest_profile_repository.dart';
 class GuestProfileViewModel extends BaseProviderState {
   final GuestProfileRepository _repository;
   final _analyticsService = getIt.analytics;
-  final InternationalizationService _i18n = InternationalizationService.instance;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   /// Constructor with dependency injection
   /// If repository is not provided, creates it with default services
@@ -52,9 +53,11 @@ class GuestProfileViewModel extends BaseProviderState {
         },
       );
     } catch (e) {
-      setError(true, _i18n.translate('failedToLoadProfile', parameters: {
-        'error': e.toString(),
-      }));
+      setError(
+          true,
+          _i18n.translate('failedToLoadProfile', parameters: {
+            'error': e.toString(),
+          }));
       _guest = null;
     } finally {
       setLoading(false);
@@ -74,9 +77,11 @@ class GuestProfileViewModel extends BaseProviderState {
         notifyListeners();
       },
       onError: (error) {
-        setError(true, _i18n.translate('failedToStreamProfile', parameters: {
-          'error': error.toString(),
-        }));
+        setError(
+            true,
+            _i18n.translate('failedToStreamProfile', parameters: {
+              'error': error.toString(),
+            }));
         setLoading(false);
       },
     );
@@ -102,9 +107,11 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, _i18n.translate('failedToUpdateGuestProfile', parameters: {
-        'error': e.toString(),
-      }));
+      setError(
+          true,
+          _i18n.translate('failedToUpdateGuestProfile', parameters: {
+            'error': e.toString(),
+          }));
       return false;
     } finally {
       setLoading(false);
@@ -135,9 +142,11 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, _i18n.translate('failedToUpdateProfileFields', parameters: {
-        'error': e.toString(),
-      }));
+      setError(
+          true,
+          _i18n.translate('failedToUpdateProfileFields', parameters: {
+            'error': e.toString(),
+          }));
       return false;
     } finally {
       setLoading(false);
@@ -168,9 +177,11 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return downloadUrl;
     } catch (e) {
-      setError(true, _i18n.translate('failedToUploadProfilePhoto', parameters: {
-        'error': e.toString(),
-      }));
+      setError(
+          true,
+          _i18n.translate('failedToUploadProfilePhoto', parameters: {
+            'error': e.toString(),
+          }));
       return null;
     } finally {
       setLoading(false);
@@ -201,9 +212,11 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return downloadUrl;
     } catch (e) {
-      setError(true, _i18n.translate('failedToUploadAadhaarPhoto', parameters: {
-        'error': e.toString(),
-      }));
+      setError(
+          true,
+          _i18n.translate('failedToUploadAadhaarPhoto', parameters: {
+            'error': e.toString(),
+          }));
       return null;
     } finally {
       setLoading(false);
@@ -244,9 +257,11 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return downloadUrl;
     } catch (e) {
-      setError(true, _i18n.translate('failedToUploadIdProof', parameters: {
-        'error': e.toString(),
-      }));
+      setError(
+          true,
+          _i18n.translate('failedToUploadIdProof', parameters: {
+            'error': e.toString(),
+          }));
       return null;
     } finally {
       setLoading(false);
@@ -273,9 +288,11 @@ class GuestProfileViewModel extends BaseProviderState {
 
       return true;
     } catch (e) {
-      setError(true, _i18n.translate('failedToUpdateGuestStatus', parameters: {
-        'error': e.toString(),
-      }));
+      setError(
+          true,
+          _i18n.translate('failedToUpdateGuestStatus', parameters: {
+            'error': e.toString(),
+          }));
       return false;
     } finally {
       setLoading(false);
@@ -357,8 +374,7 @@ class GuestProfileViewModel extends BaseProviderState {
   bool get hasCompleteProfile => _guest?.hasCompleteProfile ?? false;
 
   /// Gets formatted display name for UI
-  String get displayName =>
-      _guest?.displayName ?? _i18n.translate('guestUser');
+  String get displayName => _guest?.displayName ?? _i18n.translate('guestUser');
 
   /// Gets profile initials for avatar
   String get initials =>

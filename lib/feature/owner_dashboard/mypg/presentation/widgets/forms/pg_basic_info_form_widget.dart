@@ -177,7 +177,7 @@ class PgBasicInfoFormWidget extends AdaptiveStatelessWidget {
             ),
           ],
         ),
-        
+
         // Food & Meal Details Section
         if (mealTimingsController != null || foodQualityController != null) ...[
           const SizedBox(height: AppSpacing.paddingL),

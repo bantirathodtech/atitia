@@ -102,10 +102,8 @@ class PaymentListWidget extends StatelessWidget {
         id: payment.bookingId,
         guestUid: payment.guestUid,
         pgId: payment.pgId,
-        roomNumber:
-            loc?.notAvailable ?? _text('notAvailable', 'Not available'),
-        bedNumber:
-            loc?.notAvailable ?? _text('notAvailable', 'Not available'),
+        roomNumber: loc?.notAvailable ?? _text('notAvailable', 'Not available'),
+        bedNumber: loc?.notAvailable ?? _text('notAvailable', 'Not available'),
         startDate: DateTime.now(),
         endDate: DateTime.now(),
       ),
@@ -147,7 +145,7 @@ class PaymentListWidget extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.currency_rupee, size: 16, color: Colors.green),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: _formatCurrency(payment.amountPaid, loc),
                   medium: true,
@@ -161,14 +159,14 @@ class PaymentListWidget extends StatelessWidget {
               children: [
                 Icon(Icons.calendar_today,
                     size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: _formatDate(payment.date, loc),
                   color: Colors.grey.shade600,
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
                 Icon(Icons.payment, size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: payment.paymentMethodDisplay,
                   color: Colors.grey.shade600,
@@ -180,7 +178,7 @@ class PaymentListWidget extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.bed, size: 14, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: CaptionText(
                     text: booking.roomBedDisplay,
@@ -204,8 +202,8 @@ class PaymentListWidget extends StatelessWidget {
                   Expanded(
                     child: PrimaryButton(
                       label: loc?.markPaymentCollected ??
-                          _text(
-                              'markPaymentCollected', 'Mark Payment as Collected'),
+                          _text('markPaymentCollected',
+                              'Mark Payment as Collected'),
                       onPressed: () => _collectPayment(context, payment, loc),
                     ),
                   ),
@@ -242,36 +240,30 @@ class PaymentListWidget extends StatelessWidget {
                   loc?.guestName ?? _text('guestName', 'Guest Name'),
                   guest.fullName,
                   loc),
-              _buildDetailRow(
-                  loc?.phoneNumber ?? _text('phoneNumber', 'Phone'),
-                  guest.phoneNumber,
-                  loc),
-              _buildDetailRow(
-                  loc?.amount ?? _text('amount', 'Amount'),
-                  _formatCurrency(payment.amountPaid, loc),
-                  loc),
+              _buildDetailRow(loc?.phoneNumber ?? _text('phoneNumber', 'Phone'),
+                  guest.phoneNumber, loc),
+              _buildDetailRow(loc?.amount ?? _text('amount', 'Amount'),
+                  _formatCurrency(payment.amountPaid, loc), loc),
               _buildDetailRow(
                   loc?.paymentMethod ??
                       _text('paymentMethod', 'Payment Method'),
-                  payment.paymentMethodDisplay, loc),
+                  payment.paymentMethodDisplay,
+                  loc),
               _buildDetailRow(
                   loc?.paymentDate ?? _text('paymentDate', 'Payment Date'),
                   _formatDate(payment.date, loc),
                   loc),
-              _buildDetailRow(
-                  loc?.status ?? _text('status', 'Status'),
-                  payment.statusDisplay,
-                  loc),
-              _buildDetailRow(
-                  loc?.roomBed ?? _text('roomBed', 'Room/Bed'),
-                  booking.roomBedDisplay,
-                  loc),
+              _buildDetailRow(loc?.status ?? _text('status', 'Status'),
+                  payment.statusDisplay, loc),
+              _buildDetailRow(loc?.roomBed ?? _text('roomBed', 'Room/Bed'),
+                  booking.roomBedDisplay, loc),
               if (payment.transactionId != null &&
                   payment.transactionId!.isNotEmpty)
                 _buildDetailRow(
                     loc?.transactionId ??
                         _text('transactionId', 'Transaction ID'),
-                    payment.transactionId!, loc),
+                    payment.transactionId!,
+                    loc),
               if (payment.notes != null && payment.notes!.isNotEmpty)
                 _buildDetailRow(
                     loc?.notes ?? _text('notes', 'Notes'), payment.notes!, loc),
@@ -365,9 +357,8 @@ class PaymentListWidget extends StatelessWidget {
 
               final authProvider =
                   Provider.of<AuthProvider>(context, listen: false);
-              final ownerName =
-                  authProvider.user?.fullName ??
-                      (loc?.owner ?? _text('owner', 'Owner'));
+              final ownerName = authProvider.user?.fullName ??
+                  (loc?.owner ?? _text('owner', 'Owner'));
 
               final updatedPayment = payment.copyWith(
                 status: 'collected',
@@ -423,7 +414,8 @@ class PaymentListWidget extends StatelessWidget {
                 labelText: loc?.rejectionReason ??
                     _text('rejectionReason', 'Rejection Reason'),
                 hintText: loc?.enterRejectionReason ??
-                    _text('enterRejectionReason', 'Enter reason for rejection...'),
+                    _text('enterRejectionReason',
+                        'Enter reason for rejection...'),
                 border: const OutlineInputBorder(),
               ),
               maxLines: 3,

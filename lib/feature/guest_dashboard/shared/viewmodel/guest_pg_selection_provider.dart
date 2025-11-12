@@ -22,8 +22,9 @@ class GuestPgSelectionProvider extends ChangeNotifier {
   final _analyticsService = getIt.analytics;
   final _notificationRepository = NotificationRepository();
   final _localStorage = getIt.localStorage;
-  final InternationalizationService _i18n = InternationalizationService.instance;
-  
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
+
   // Storage keys for PG selection persistence
   static const String _storageKeyPgId = 'guest_selected_pg_id';
   static const String _storageKeyPgData = 'guest_selected_pg_data';
@@ -66,7 +67,8 @@ class GuestPgSelectionProvider extends ChangeNotifier {
         },
       );
     } catch (e) {
-      _setError(_i18n.translate('failedToInitializeGuestPgSelection', parameters: {
+      _setError(
+          _i18n.translate('failedToInitializeGuestPgSelection', parameters: {
         'error': e.toString(),
       }));
       _setLoading(false);
@@ -246,7 +248,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
     try {
       // Read saved PG data from local storage
       final savedPgData = await _localStorage.read(_storageKeyPgData);
-      
+
       if (savedPgData == null || savedPgData.isEmpty) {
         // No saved PG selection found
         return;
@@ -254,10 +256,10 @@ class GuestPgSelectionProvider extends ChangeNotifier {
 
       // Deserialize JSON to Map
       final pgMap = jsonDecode(savedPgData) as Map<String, dynamic>;
-      
+
       // Create GuestPgModel from saved data
       final savedPg = GuestPgModel.fromMap(pgMap);
-      
+
       // Restore selection (without triggering save to avoid loops)
       _selectedPg = savedPg;
       _selectedPgId = savedPg.pgId;
@@ -272,7 +274,7 @@ class GuestPgSelectionProvider extends ChangeNotifier {
     } catch (e) {
       // If loading fails, clear corrupted data
       await _clearSavedPgSelection();
-      
+
       _analyticsService.logEvent(
         name: _i18n.translate('guestPgSelectionRestoreFailedEvent'),
         parameters: {

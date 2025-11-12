@@ -96,7 +96,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   final _areaController = TextEditingController();
   final _mealTimingsController = TextEditingController();
   final _foodQualityController = TextEditingController();
-  
+
   // Rules & Policies controllers
   final _entryTimingsController = TextEditingController();
   final _exitTimingsController = TextEditingController();
@@ -105,7 +105,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   final _noticePeriodController = TextEditingController();
   String? _selectedSmokingPolicy;
   String? _selectedAlcoholPolicy;
-  
+
   // Additional Info controllers
   final _parkingDetailsController = TextEditingController();
   final _securityMeasuresController = TextEditingController();
@@ -219,38 +219,40 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     _pgNameController.text = _pgEntity!.name;
     _addressController.text = _pgEntity!.address;
     _contactController.text = _pgEntity!.contactNumber;
-    _descriptionController.text = ''; // Description field - keeping empty as it's not in entity
+    _descriptionController.text =
+        ''; // Description field - keeping empty as it's not in entity
     _mapLinkController.text = _pgEntity!.googleMapLink ?? '';
     _areaController.text = _pgEntity!.area ?? '';
-    
+
     // PG Type and Meal Type
     _selectedPgType = _pgEntity!.pgType.isNotEmpty ? _pgEntity!.pgType : null;
     _selectedMealType = _pgEntity!.mealType;
-    
+
     // State and City - ensure values exist in available options
-    _selectedState = _pgEntity!.state.isNotEmpty && 
-        IndianStatesCities.states.contains(_pgEntity!.state) 
-        ? _pgEntity!.state 
+    _selectedState = _pgEntity!.state.isNotEmpty &&
+            IndianStatesCities.states.contains(_pgEntity!.state)
+        ? _pgEntity!.state
         : null;
-    
+
     if (_selectedState != null && _pgEntity!.city.isNotEmpty) {
-      final availableCities = IndianStatesCities.getCitiesForState(_selectedState!);
-      _selectedCity = availableCities.contains(_pgEntity!.city) 
-          ? _pgEntity!.city 
-          : null;
+      final availableCities =
+          IndianStatesCities.getCitiesForState(_selectedState!);
+      _selectedCity =
+          availableCities.contains(_pgEntity!.city) ? _pgEntity!.city : null;
     } else {
       _selectedCity = null;
     }
     _selectedAmenities = List.from(_pgEntity!.amenities);
-    
+
     // Load photos - ensure it's a list and filter out empty values
     final photosFromEntity = _pgEntity!.photos;
     _uploadedPhotos = photosFromEntity
         .where((photo) => photo.trim().isNotEmpty)
         .map((photo) => photo.trim())
         .toList();
-    
-    debugPrint('[POPULATE_FORM] Loaded ${_uploadedPhotos.length} photos from entity');
+
+    debugPrint(
+        '[POPULATE_FORM] Loaded ${_uploadedPhotos.length} photos from entity');
     if (_uploadedPhotos.isNotEmpty) {
       debugPrint('[POPULATE_FORM] First photo: ${_uploadedPhotos.first}');
     }
@@ -263,14 +265,19 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       final threeShare = (rentConfig['threeShare'] ?? 0.0).toDouble();
       final fourShare = (rentConfig['fourShare'] ?? 0.0).toDouble();
       final fiveShare = (rentConfig['fiveShare'] ?? 0.0).toDouble();
-      
-      _rentControllers['1-share']?.text = oneShare > 0 ? oneShare.toStringAsFixed(0) : '';
-      _rentControllers['2-share']?.text = twoShare > 0 ? twoShare.toStringAsFixed(0) : '';
-      _rentControllers['3-share']?.text = threeShare > 0 ? threeShare.toStringAsFixed(0) : '';
-      _rentControllers['4-share']?.text = fourShare > 0 ? fourShare.toStringAsFixed(0) : '';
-      _rentControllers['5-share']?.text = fiveShare > 0 ? fiveShare.toStringAsFixed(0) : '';
+
+      _rentControllers['1-share']?.text =
+          oneShare > 0 ? oneShare.toStringAsFixed(0) : '';
+      _rentControllers['2-share']?.text =
+          twoShare > 0 ? twoShare.toStringAsFixed(0) : '';
+      _rentControllers['3-share']?.text =
+          threeShare > 0 ? threeShare.toStringAsFixed(0) : '';
+      _rentControllers['4-share']?.text =
+          fourShare > 0 ? fourShare.toStringAsFixed(0) : '';
+      _rentControllers['5-share']?.text =
+          fiveShare > 0 ? fiveShare.toStringAsFixed(0) : '';
     }
-    _depositController.text = _pgEntity!.depositAmount > 0 
+    _depositController.text = _pgEntity!.depositAmount > 0
         ? _pgEntity!.depositAmount.toStringAsFixed(0)
         : '';
     _maintenanceType = _pgEntity!.maintenanceType;
@@ -280,22 +287,27 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     // Parse floor structure
     _parseFloorStructure(_pgEntity!.floorStructure);
-    
+
     // Load new fields
     _mealTimingsController.text = _pgEntity!.mealTimings ?? '';
     _foodQualityController.text = _pgEntity!.foodQuality ?? '';
-    
+
     // Load Rules & Policies
     if (_pgEntity!.rules != null) {
-      _entryTimingsController.text = _pgEntity!.rules!['entryTimings']?.toString() ?? '';
-      _exitTimingsController.text = _pgEntity!.rules!['exitTimings']?.toString() ?? '';
-      _guestPolicyController.text = _pgEntity!.rules!['guestPolicy']?.toString() ?? '';
-      _refundPolicyController.text = _pgEntity!.rules!['refundPolicy']?.toString() ?? '';
-      _noticePeriodController.text = _pgEntity!.rules!['noticePeriod']?.toString() ?? '';
+      _entryTimingsController.text =
+          _pgEntity!.rules!['entryTimings']?.toString() ?? '';
+      _exitTimingsController.text =
+          _pgEntity!.rules!['exitTimings']?.toString() ?? '';
+      _guestPolicyController.text =
+          _pgEntity!.rules!['guestPolicy']?.toString() ?? '';
+      _refundPolicyController.text =
+          _pgEntity!.rules!['refundPolicy']?.toString() ?? '';
+      _noticePeriodController.text =
+          _pgEntity!.rules!['noticePeriod']?.toString() ?? '';
       _selectedSmokingPolicy = _pgEntity!.rules!['smokingPolicy']?.toString();
       _selectedAlcoholPolicy = _pgEntity!.rules!['alcoholPolicy']?.toString();
     }
-    
+
     // Load Additional Info
     _parkingDetailsController.text = _pgEntity!.parkingDetails ?? '';
     _securityMeasuresController.text = _pgEntity!.securityMeasures ?? '';
@@ -319,27 +331,32 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     // Normalize draft data: handle backward compatibility for old field names
     final normalizedDraft = Map<String, dynamic>.from(draft);
-    
+
     // Debug: Log raw draft data
-    debugPrint('[DRAFT_RESTORE] Raw draft keys: ${normalizedDraft.keys.toList()}');
-    debugPrint('[DRAFT_RESTORE] Raw photos field type: ${normalizedDraft['photos'].runtimeType}');
-    debugPrint('[DRAFT_RESTORE] Raw photos value: ${normalizedDraft['photos']}');
-    
+    debugPrint(
+        '[DRAFT_RESTORE] Raw draft keys: ${normalizedDraft.keys.toList()}');
+    debugPrint(
+        '[DRAFT_RESTORE] Raw photos field type: ${normalizedDraft['photos'].runtimeType}');
+    debugPrint(
+        '[DRAFT_RESTORE] Raw photos value: ${normalizedDraft['photos']}');
+
     // Handle old field name: rentConfiguration -> rentConfig
-    if (normalizedDraft.containsKey('rentConfiguration') && 
+    if (normalizedDraft.containsKey('rentConfiguration') &&
         !normalizedDraft.containsKey('rentConfig')) {
       normalizedDraft['rentConfig'] = normalizedDraft['rentConfiguration'];
     }
-    
+
     // Handle old field name: deposit -> depositAmount
-    if (normalizedDraft.containsKey('deposit') && 
+    if (normalizedDraft.containsKey('deposit') &&
         !normalizedDraft.containsKey('depositAmount')) {
       normalizedDraft['depositAmount'] = normalizedDraft['deposit'];
     }
 
     // Ensure photos field exists and is a list
-    if (!normalizedDraft.containsKey('photos') || normalizedDraft['photos'] == null) {
-      debugPrint('[DRAFT_RESTORE] Photos field missing or null, initializing as empty list');
+    if (!normalizedDraft.containsKey('photos') ||
+        normalizedDraft['photos'] == null) {
+      debugPrint(
+          '[DRAFT_RESTORE] Photos field missing or null, initializing as empty list');
       normalizedDraft['photos'] = <String>[];
     } else if (normalizedDraft['photos'] is! List) {
       // Convert to List if it's not already
@@ -348,46 +365,57 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     } else {
       // Ensure photos list contains only strings
       final photosList = normalizedDraft['photos'] as List;
-      debugPrint('[DRAFT_RESTORE] Photos list length before cleaning: ${photosList.length}');
+      debugPrint(
+          '[DRAFT_RESTORE] Photos list length before cleaning: ${photosList.length}');
       normalizedDraft['photos'] = photosList
           .where((p) => p != null && p.toString().trim().isNotEmpty)
           .map((p) => p.toString().trim())
           .toList();
-      debugPrint('[DRAFT_RESTORE] Photos list length after cleaning: ${normalizedDraft['photos'].length}');
+      debugPrint(
+          '[DRAFT_RESTORE] Photos list length after cleaning: ${normalizedDraft['photos'].length}');
     }
 
     // Map to entity-like fields used by form
     try {
       // Debug before creating entity
-      debugPrint('[DRAFT_RESTORE] Creating entity from draft, photos in normalizedDraft: ${normalizedDraft['photos']}');
-      debugPrint('[DRAFT_RESTORE] Photos type: ${normalizedDraft['photos'].runtimeType}');
-      debugPrint('[DRAFT_RESTORE] Photos length: ${(normalizedDraft['photos'] as List).length}');
-      
+      debugPrint(
+          '[DRAFT_RESTORE] Creating entity from draft, photos in normalizedDraft: ${normalizedDraft['photos']}');
+      debugPrint(
+          '[DRAFT_RESTORE] Photos type: ${normalizedDraft['photos'].runtimeType}');
+      debugPrint(
+          '[DRAFT_RESTORE] Photos length: ${(normalizedDraft['photos'] as List).length}');
+
       _pgEntity = OwnerPgEntity.fromMap(normalizedDraft);
-      
+
       // Debug after creating entity
       if (_pgEntity != null) {
-        debugPrint('[DRAFT_RESTORE] Entity created, entity.photos length: ${_pgEntity!.photos.length}');
+        debugPrint(
+            '[DRAFT_RESTORE] Entity created, entity.photos length: ${_pgEntity!.photos.length}');
         debugPrint('[DRAFT_RESTORE] Entity.photos: ${_pgEntity!.photos}');
       }
-      
+
       _populateFormFromEntity();
-      
+
       // Debug: Log photos restoration
-      debugPrint('[DRAFT_RESTORE] Restored photos: ${_uploadedPhotos.length} photos');
+      debugPrint(
+          '[DRAFT_RESTORE] Restored photos: ${_uploadedPhotos.length} photos');
       if (_uploadedPhotos.isNotEmpty) {
         debugPrint('[DRAFT_RESTORE] First photo URL: ${_uploadedPhotos.first}');
       }
-      
+
       // If draft has pgId, set widget.pgId? No: stay in create mode but allow updates via createOrUpdatePG using map
       setState(() {});
-      debugPrint('[DRAFT_RESTORE] Restored latest draft ${normalizedDraft['pgId'] ?? normalizedDraft['id']}');
+      debugPrint(
+          '[DRAFT_RESTORE] Restored latest draft ${normalizedDraft['pgId'] ?? normalizedDraft['id']}');
     } catch (e, stackTrace) {
       debugPrint('[DRAFT_RESTORE][ERROR] $e');
       debugPrint('[DRAFT_RESTORE][ERROR] Stack trace: $stackTrace');
-      debugPrint('[DRAFT_RESTORE][ERROR] Draft data keys: ${normalizedDraft.keys.toList()}');
-      debugPrint('[DRAFT_RESTORE][ERROR] Photos in draft: ${normalizedDraft['photos']}');
-      debugPrint('[DRAFT_RESTORE][ERROR] Photos type: ${normalizedDraft['photos']?.runtimeType}');
+      debugPrint(
+          '[DRAFT_RESTORE][ERROR] Draft data keys: ${normalizedDraft.keys.toList()}');
+      debugPrint(
+          '[DRAFT_RESTORE][ERROR] Photos in draft: ${normalizedDraft['photos']}');
+      debugPrint(
+          '[DRAFT_RESTORE][ERROR] Photos type: ${normalizedDraft['photos']?.runtimeType}');
     }
   }
 
@@ -437,7 +465,9 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: isEditMode ? (AppLocalizations.of(context)?.editPg ?? 'Edit PG') : (AppLocalizations.of(context)?.newPgSetup ?? 'New PG Setup'),
+        title: isEditMode
+            ? (AppLocalizations.of(context)?.editPg ?? 'Edit PG')
+            : (AppLocalizations.of(context)?.newPgSetup ?? 'New PG Setup'),
         showThemeToggle: true,
         actions: [
           // Progress indicator
@@ -522,8 +552,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             const AdaptiveLoader(),
             const SizedBox(height: AppSpacing.paddingL),
             BodyText(
-            text: AppLocalizations.of(context)?.ownerPgLoadingDetails ??
-                _text('ownerPgLoadingDetails', 'Loading PG details...'),
+              text: AppLocalizations.of(context)?.ownerPgLoadingDetails ??
+                  _text('ownerPgLoadingDetails', 'Loading PG details...'),
               color: Theme.of(context).disabledColor,
             ),
           ],
@@ -567,15 +597,22 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       BuildContext context, ResponsiveConfig responsive, bool isDark) {
     final tabs = [
       Tab(
-        text: responsive.isMobile ? (AppLocalizations.of(context)?.basic ?? 'Basic') : (AppLocalizations.of(context)?.basicInfo ?? 'Basic Info'),
+        text: responsive.isMobile
+            ? (AppLocalizations.of(context)?.basic ?? 'Basic')
+            : (AppLocalizations.of(context)?.basicInfo ?? 'Basic Info'),
         icon: const Icon(Icons.info_outline, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? (AppLocalizations.of(context)?.rent ?? 'Rent') : (AppLocalizations.of(context)?.rentConfig ?? 'Rent Config'),
+        text: responsive.isMobile
+            ? (AppLocalizations.of(context)?.rent ?? 'Rent')
+            : (AppLocalizations.of(context)?.rentConfig ?? 'Rent Config'),
         icon: const Icon(Icons.attach_money, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? (AppLocalizations.of(context)?.structure ?? 'Structure') : (AppLocalizations.of(context)?.floorStructure ?? 'Floor Structure'),
+        text: responsive.isMobile
+            ? (AppLocalizations.of(context)?.structure ?? 'Structure')
+            : (AppLocalizations.of(context)?.floorStructure ??
+                'Floor Structure'),
         icon: const Icon(Icons.home_work_outlined, size: 18),
       ),
       Tab(
@@ -587,11 +624,17 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         icon: const Icon(Icons.photo_library, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? (AppLocalizations.of(context)?.rules ?? 'Rules') : (AppLocalizations.of(context)?.rulesPolicies ?? 'Rules & Policies'),
+        text: responsive.isMobile
+            ? (AppLocalizations.of(context)?.rules ?? 'Rules')
+            : (AppLocalizations.of(context)?.rulesPolicies ??
+                'Rules & Policies'),
         icon: const Icon(Icons.rule, size: 18),
       ),
       Tab(
-        text: responsive.isMobile ? (AppLocalizations.of(context)?.more ?? 'More') : (AppLocalizations.of(context)?.additionalInfo ?? 'Additional Info'),
+        text: responsive.isMobile
+            ? (AppLocalizations.of(context)?.more ?? 'More')
+            : (AppLocalizations.of(context)?.additionalInfo ??
+                'Additional Info'),
         icon: const Icon(Icons.info, size: 18),
       ),
       Tab(
@@ -687,7 +730,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             _buildZeroStateHint(
               icon: Icons.info_outline,
               title: loc?.startBuildingYourPgProfile ??
-                  _text('startBuildingYourPgProfile', 'Start Building Your PG Profile'),
+                  _text('startBuildingYourPgProfile',
+                      'Start Building Your PG Profile'),
               message: loc?.ownerPgBasicInfoZeroStateMessage ??
                   _text(
                     'ownerPgBasicInfoZeroStateMessage',
@@ -726,8 +770,10 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             selectedMealType: _selectedMealType,
             onStateChanged: (state) => setState(() => _selectedState = state),
             onCityChanged: (city) => setState(() => _selectedCity = city),
-            onPgTypeChanged: (pgType) => setState(() => _selectedPgType = pgType),
-            onMealTypeChanged: (mealType) => setState(() => _selectedMealType = mealType),
+            onPgTypeChanged: (pgType) =>
+                setState(() => _selectedPgType = pgType),
+            onMealTypeChanged: (mealType) =>
+                setState(() => _selectedMealType = mealType),
             mealTimingsController: _mealTimingsController,
             foodQualityController: _foodQualityController,
           ),
@@ -997,10 +1043,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                     'Add photos of your PG to showcase it to potential guests.',
                   ),
               stats: [
-                _buildQuickStat(
-                    loc?.photos ?? _text('photos', 'Photos'),
-                    '${_uploadedPhotos.length}',
-                    Colors.pink),
+                _buildQuickStat(loc?.photos ?? _text('photos', 'Photos'),
+                    '${_uploadedPhotos.length}', Colors.pink),
               ],
             )
           else
@@ -1033,8 +1077,10 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             noticePeriodController: _noticePeriodController,
             selectedSmokingPolicy: _selectedSmokingPolicy,
             selectedAlcoholPolicy: _selectedAlcoholPolicy,
-            onSmokingPolicyChanged: (policy) => setState(() => _selectedSmokingPolicy = policy),
-            onAlcoholPolicyChanged: (policy) => setState(() => _selectedAlcoholPolicy = policy),
+            onSmokingPolicyChanged: (policy) =>
+                setState(() => _selectedSmokingPolicy = policy),
+            onAlcoholPolicyChanged: (policy) =>
+                setState(() => _selectedAlcoholPolicy = policy),
           ),
         ],
       ),
@@ -1189,7 +1235,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           // Save Draft
           TextButton(
             onPressed: vm.loading ? null : _saveDraft,
-            child: Text(AppLocalizations.of(context)?.saveDraft ?? 'Save Draft'),
+            child:
+                Text(AppLocalizations.of(context)?.saveDraft ?? 'Save Draft'),
           ),
           const SizedBox(width: AppSpacing.paddingM),
           // Publish button visible when minimally valid
@@ -1204,8 +1251,15 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             child: PrimaryButton(
               onPressed: vm.loading ? null : _submitForm,
               label: vm.loading
-                  ? (isEditMode ? (AppLocalizations.of(context)?.updating ?? 'Updating...') : (AppLocalizations.of(context)?.creating ?? 'Creating...'))
-                  : (isEditMode ? (AppLocalizations.of(context)?.updatePg ?? 'Update PG') : (AppLocalizations.of(context)?.createPg ?? 'Create PG')),
+                  ? (isEditMode
+                      ? (AppLocalizations.of(context)?.updating ??
+                          'Updating...')
+                      : (AppLocalizations.of(context)?.creating ??
+                          'Creating...'))
+                  : (isEditMode
+                      ? (AppLocalizations.of(context)?.updatePg ?? 'Update PG')
+                      : (AppLocalizations.of(context)?.createPg ??
+                          'Create PG')),
               icon: isEditMode ? Icons.save : Icons.add_business,
             ),
           ),
@@ -1224,7 +1278,9 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     final ownerId = authProvider.user?.userId ?? '';
     if (ownerId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)?.userNotAuthenticated ?? 'User not authenticated')),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)?.userNotAuthenticated ??
+                'User not authenticated')),
       );
       return;
     }
@@ -1232,7 +1288,10 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     // Require minimal publish fields
     if (_pgNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)?.pleaseEnterPgNameBeforePublishing ?? 'Please enter PG name before publishing')),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)
+                    ?.pleaseEnterPgNameBeforePublishing ??
+                'Please enter PG name before publishing')),
       );
       _tabController.animateTo(0);
       return;
@@ -1262,7 +1321,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         SnackBar(
           content: Text(
             AppLocalizations.of(context)?.pgPublishedSuccessfully ??
-                _text('ownerPgPublishedSuccessfully', 'PG published successfully'),
+                _text('ownerPgPublishedSuccessfully',
+                    'PG published successfully'),
           ),
           backgroundColor: Colors.green,
         ),
@@ -1293,7 +1353,9 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     if (ownerId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)?.userNotAuthenticated ?? 'User not authenticated')),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)?.userNotAuthenticated ??
+                'User not authenticated')),
       );
       return;
     }
@@ -1361,8 +1423,12 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       'maintenanceAmount':
           double.tryParse(_maintenanceAmountController.text) ?? 0.0,
       'ownerUid': ownerId,
-      'mealTimings': _mealTimingsController.text.trim().isNotEmpty ? _mealTimingsController.text.trim() : null,
-      'foodQuality': _foodQualityController.text.trim().isNotEmpty ? _foodQualityController.text.trim() : null,
+      'mealTimings': _mealTimingsController.text.trim().isNotEmpty
+          ? _mealTimingsController.text.trim()
+          : null,
+      'foodQuality': _foodQualityController.text.trim().isNotEmpty
+          ? _foodQualityController.text.trim()
+          : null,
       'rules': () {
         final rules = <String, dynamic>{};
         if (_entryTimingsController.text.trim().isNotEmpty) {
@@ -1388,9 +1454,16 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         }
         return rules.isNotEmpty ? rules : null;
       }(),
-      'parkingDetails': _parkingDetailsController.text.trim().isNotEmpty ? _parkingDetailsController.text.trim() : null,
-      'securityMeasures': _securityMeasuresController.text.trim().isNotEmpty ? _securityMeasuresController.text.trim() : null,
-      'paymentInstructions': _paymentInstructionsController.text.trim().isNotEmpty ? _paymentInstructionsController.text.trim() : null,
+      'parkingDetails': _parkingDetailsController.text.trim().isNotEmpty
+          ? _parkingDetailsController.text.trim()
+          : null,
+      'securityMeasures': _securityMeasuresController.text.trim().isNotEmpty
+          ? _securityMeasuresController.text.trim()
+          : null,
+      'paymentInstructions':
+          _paymentInstructionsController.text.trim().isNotEmpty
+              ? _paymentInstructionsController.text.trim()
+              : null,
       'nearbyPlaces': _nearbyPlaces.isNotEmpty ? _nearbyPlaces : null,
       'isDraft': false, // Explicitly set isDraft to false for Create PG
       'status': 'active', // Set status for created PG
@@ -1402,7 +1475,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     String? existingDraftId;
     if (!isEditMode && _pgEntity != null && _pgEntity!.id.isNotEmpty) {
       existingDraftId = _pgEntity!.id;
-      debugPrint('[CREATE_PG] Found existing draft ID: $existingDraftId, will update instead of create');
+      debugPrint(
+          '[CREATE_PG] Found existing draft ID: $existingDraftId, will update instead of create');
     }
 
     bool success;
@@ -1435,19 +1509,19 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         ),
       );
     } else {
-      final errorMsg = vm.errorMessage ?? 
+      final errorMsg = vm.errorMessage ??
           (isEditMode ? 'Failed to update PG' : 'Failed to create PG');
-      
+
       // Provide more helpful error message for permission issues
       String userFriendlyError = errorMsg;
-      if (errorMsg.toLowerCase().contains('permission') || 
+      if (errorMsg.toLowerCase().contains('permission') ||
           errorMsg.toLowerCase().contains('insufficient')) {
         userFriendlyError = 'Permission denied. Please check:\n'
             '1. You are logged in with the correct account\n'
             '2. Firestore security rules allow PG creation\n'
             '3. All required fields are filled correctly';
       }
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(userFriendlyError),
@@ -1466,7 +1540,9 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     if (ownerId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)?.userNotAuthenticated ?? 'User not authenticated')),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)?.userNotAuthenticated ??
+                'User not authenticated')),
       );
       debugPrint('[SAVE_DRAFT][ERROR] User not authenticated');
       return;
@@ -1497,18 +1573,19 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     }).toList();
 
     final now = DateTime.now();
-    
+
     // Debug: Log photos before saving draft
-    debugPrint('[SAVE_DRAFT] Photos before save: ${_uploadedPhotos.length} photos');
+    debugPrint(
+        '[SAVE_DRAFT] Photos before save: ${_uploadedPhotos.length} photos');
     if (_uploadedPhotos.isNotEmpty) {
       debugPrint('[SAVE_DRAFT] First photo URL: ${_uploadedPhotos.first}');
     }
-    
+
     // Ensure photos is always a List<String> (not null)
-    final photosToSave = _uploadedPhotos.isNotEmpty 
-        ? List<String>.from(_uploadedPhotos) 
+    final photosToSave = _uploadedPhotos.isNotEmpty
+        ? List<String>.from(_uploadedPhotos)
         : <String>[];
-    
+
     final pgData = {
       'name': _pgNameController.text.trim(),
       'pgName': _pgNameController.text.trim(),
@@ -1526,18 +1603,28 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       'photos': photosToSave, // Use explicit list, never null
       'floorStructure': floorStructure,
       'rentConfig': {
-        'oneShare': double.tryParse(_rentControllers['1-share']?.text ?? '0') ?? 0.0,
-        'twoShare': double.tryParse(_rentControllers['2-share']?.text ?? '0') ?? 0.0,
-        'threeShare': double.tryParse(_rentControllers['3-share']?.text ?? '0') ?? 0.0,
-        'fourShare': double.tryParse(_rentControllers['4-share']?.text ?? '0') ?? 0.0,
-        'fiveShare': double.tryParse(_rentControllers['5-share']?.text ?? '0') ?? 0.0,
+        'oneShare':
+            double.tryParse(_rentControllers['1-share']?.text ?? '0') ?? 0.0,
+        'twoShare':
+            double.tryParse(_rentControllers['2-share']?.text ?? '0') ?? 0.0,
+        'threeShare':
+            double.tryParse(_rentControllers['3-share']?.text ?? '0') ?? 0.0,
+        'fourShare':
+            double.tryParse(_rentControllers['4-share']?.text ?? '0') ?? 0.0,
+        'fiveShare':
+            double.tryParse(_rentControllers['5-share']?.text ?? '0') ?? 0.0,
       },
       'depositAmount': double.tryParse(_depositController.text) ?? 0.0,
       'maintenanceType': _maintenanceType,
-      'maintenanceAmount': double.tryParse(_maintenanceAmountController.text) ?? 0.0,
+      'maintenanceAmount':
+          double.tryParse(_maintenanceAmountController.text) ?? 0.0,
       'ownerUid': ownerId,
-      'mealTimings': _mealTimingsController.text.trim().isNotEmpty ? _mealTimingsController.text.trim() : null,
-      'foodQuality': _foodQualityController.text.trim().isNotEmpty ? _foodQualityController.text.trim() : null,
+      'mealTimings': _mealTimingsController.text.trim().isNotEmpty
+          ? _mealTimingsController.text.trim()
+          : null,
+      'foodQuality': _foodQualityController.text.trim().isNotEmpty
+          ? _foodQualityController.text.trim()
+          : null,
       'rules': () {
         final rules = <String, dynamic>{};
         if (_entryTimingsController.text.trim().isNotEmpty) {
@@ -1563,9 +1650,16 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         }
         return rules.isNotEmpty ? rules : null;
       }(),
-      'parkingDetails': _parkingDetailsController.text.trim().isNotEmpty ? _parkingDetailsController.text.trim() : null,
-      'securityMeasures': _securityMeasuresController.text.trim().isNotEmpty ? _securityMeasuresController.text.trim() : null,
-      'paymentInstructions': _paymentInstructionsController.text.trim().isNotEmpty ? _paymentInstructionsController.text.trim() : null,
+      'parkingDetails': _parkingDetailsController.text.trim().isNotEmpty
+          ? _parkingDetailsController.text.trim()
+          : null,
+      'securityMeasures': _securityMeasuresController.text.trim().isNotEmpty
+          ? _securityMeasuresController.text.trim()
+          : null,
+      'paymentInstructions':
+          _paymentInstructionsController.text.trim().isNotEmpty
+              ? _paymentInstructionsController.text.trim()
+              : null,
       'nearbyPlaces': _nearbyPlaces.isNotEmpty ? _nearbyPlaces : null,
       'status': 'draft',
       'isDraft': true,
@@ -1593,8 +1687,9 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-          content: Text(AppLocalizations.of(context)?.draftSaved ?? 'Draft saved'),
+        SnackBar(
+          content:
+              Text(AppLocalizations.of(context)?.draftSaved ?? 'Draft saved'),
           backgroundColor: Colors.green,
         ),
       );

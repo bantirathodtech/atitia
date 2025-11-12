@@ -76,7 +76,10 @@ class _OwnerPaymentNotificationsBadgeState
           ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AppColors.warning, AppColors.warning.withValues(alpha: 0.8)],
+              colors: [
+                AppColors.warning,
+                AppColors.warning.withValues(alpha: 0.8)
+              ],
             ),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
             boxShadow: [
@@ -91,7 +94,7 @@ class _OwnerPaymentNotificationsBadgeState
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
@@ -123,7 +126,7 @@ class _OwnerPaymentNotificationsBadgeState
               ),
               const SizedBox(width: AppSpacing.paddingS),
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -209,13 +212,13 @@ class _PaymentNotificationsSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      HeadingSmall(text: loc?.pendingPayments ?? 'Pending Payments'),
+                      HeadingSmall(
+                          text: loc?.pendingPayments ?? 'Pending Payments'),
                       CaptionText(
                         text: loc?.notificationsCount(notifications.length) ??
                             '${notifications.length} notifications',
-                        color: isDark
-                            ? Colors.white70
-                            : AppColors.textSecondary,
+                        color:
+                            isDark ? Colors.white70 : AppColors.textSecondary,
                       ),
                     ],
                   ),
@@ -283,7 +286,8 @@ class _PaymentNotificationCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-                  border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: AppColors.success.withValues(alpha: 0.3)),
                 ),
                 child: BodyText(
                   text: _formatCurrency(notification.amount, loc),
@@ -300,7 +304,8 @@ class _PaymentNotificationCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.info.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-                  border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+                  border:
+                      Border.all(color: AppColors.info.withValues(alpha: 0.3)),
                 ),
                 child: CaptionText(
                   text: _paymentMethodLabel(notification.paymentMethod, loc),
@@ -316,7 +321,7 @@ class _PaymentNotificationCard extends StatelessWidget {
               children: [
                 const Icon(Icons.receipt,
                     size: 14, color: AppColors.textSecondary),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 CaptionText(
                   text: loc?.transactionIdLabel(notification.transactionId!) ??
                       'TXN: ${notification.transactionId}',

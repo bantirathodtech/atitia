@@ -129,7 +129,8 @@ class _ReviewFormState extends State<ReviewForm> {
     );
   }
 
-  Widget _buildOverallRatingSection(BuildContext context, AppLocalizations? loc) {
+  Widget _buildOverallRatingSection(
+      BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -187,23 +188,22 @@ class _ReviewFormState extends State<ReviewForm> {
           setState(() => _cleanlinessRating = value);
         }),
         const SizedBox(height: AppSpacing.paddingS),
-        _buildAspectRating(
-            loc?.amenities ?? 'Amenities', _amenitiesRating, (value) {
+        _buildAspectRating(loc?.amenities ?? 'Amenities', _amenitiesRating,
+            (value) {
           setState(() => _amenitiesRating = value);
         }),
         const SizedBox(height: AppSpacing.paddingS),
-        _buildAspectRating(
-            loc?.locationLabel ?? 'Location', _locationRating, (value) {
+        _buildAspectRating(loc?.locationLabel ?? 'Location', _locationRating,
+            (value) {
           setState(() => _locationRating = value);
         }),
         const SizedBox(height: AppSpacing.paddingS),
-        _buildAspectRating(
-            loc?.foodQuality ?? 'Food Quality', _foodRating, (value) {
+        _buildAspectRating(loc?.foodQuality ?? 'Food Quality', _foodRating,
+            (value) {
           setState(() => _foodRating = value);
         }),
         const SizedBox(height: AppSpacing.paddingS),
-        _buildAspectRating(
-            loc?.staffLabel ?? 'Staff', _staffRating, (value) {
+        _buildAspectRating(loc?.staffLabel ?? 'Staff', _staffRating, (value) {
           setState(() => _staffRating = value);
         }),
       ],
@@ -309,8 +309,8 @@ class _ReviewFormState extends State<ReviewForm> {
     if (_overallRating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(loc?.pleaseProvideOverallRating ?? 'Please provide an overall rating'),
+          content: Text(loc?.pleaseProvideOverallRating ??
+              'Please provide an overall rating'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -327,7 +327,8 @@ class _ReviewFormState extends State<ReviewForm> {
 
       // Create review model
       final review = ReviewModel(
-        reviewId: '${widget.guestId}_${widget.pgId}_${DateTime.now().millisecondsSinceEpoch}',
+        reviewId:
+            '${widget.guestId}_${widget.pgId}_${DateTime.now().millisecondsSinceEpoch}',
         guestId: widget.guestId,
         guestName: widget.guestName,
         pgId: widget.pgId,
@@ -353,8 +354,8 @@ class _ReviewFormState extends State<ReviewForm> {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                loc?.reviewSubmittedSuccessfully ?? 'Review submitted successfully!'),
+            content: Text(loc?.reviewSubmittedSuccessfully ??
+                'Review submitted successfully!'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -396,8 +397,7 @@ class _ReviewFormState extends State<ReviewForm> {
     }
   }
 
-  Widget _buildPhotoUploadSection(
-      BuildContext context, AppLocalizations? loc) {
+  Widget _buildPhotoUploadSection(BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -454,7 +454,7 @@ class _ReviewFormState extends State<ReviewForm> {
                             });
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(4),
+                            padding: const EdgeInsets.all(AppSpacing.paddingXS),
                             decoration: const BoxDecoration(
                               color: AppColors.error,
                               shape: BoxShape.circle,

@@ -71,8 +71,8 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
 
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: loc?.paymentHistory ??
-            _text('paymentHistory', 'Payment History'),
+        title:
+            loc?.paymentHistory ?? _text('paymentHistory', 'Payment History'),
         showBackButton: true,
       ),
       body: Column(
@@ -164,14 +164,14 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                   setState(() {
                     _selectedFilter = filter;
                   });
-                  final paymentVM =
-                      Provider.of<GuestPaymentViewModel>(context, listen: false);
+                  final paymentVM = Provider.of<GuestPaymentViewModel>(context,
+                      listen: false);
                   paymentVM.setFilter(filter);
                 },
-                backgroundColor: isDarkMode
-                    ? AppColors.darkCard
-                    : AppColors.surface,
-                selectedColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                backgroundColor:
+                    isDarkMode ? AppColors.darkCard : AppColors.surface,
+                selectedColor:
+                    Theme.of(context).primaryColor.withValues(alpha: 0.2),
                 labelStyle: TextStyle(
                   color: isSelected
                       ? Theme.of(context).primaryColor
@@ -215,7 +215,8 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
                   padding: const EdgeInsets.all(AppSpacing.paddingS),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: Icon(statusIcon, color: statusColor, size: 24),
                 ),
@@ -359,16 +360,14 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
 
   Widget _buildEmptyState(BuildContext context, AppLocalizations? loc) {
     return EmptyState(
-      title: loc?.noPaymentsYet ??
-          _text('noPaymentsYet', 'No Payments Yet'),
+      title: loc?.noPaymentsYet ?? _text('noPaymentsYet', 'No Payments Yet'),
       message: loc?.noPaymentsYetDescription ??
           _text(
             'noPaymentsYetDescription',
             'You haven\'t made any payments yet. Payments will appear here once you make them.',
           ),
       icon: Icons.account_balance_wallet_outlined,
-      actionLabel:
-          loc?.makePayment ?? _text('makePayment', 'Make Payment'),
+      actionLabel: loc?.makePayment ?? _text('makePayment', 'Make Payment'),
       onAction: () {
         Navigator.of(context).pop();
       },
@@ -438,12 +437,12 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
         return loc?.paymentMethodBankTransfer ??
             _text('paymentMethodBankTransfer', 'Bank Transfer');
       default:
-        return loc?.paymentMethodOther ??
-            _text('paymentMethodOther', 'Other');
+        return loc?.paymentMethodOther ?? _text('paymentMethodOther', 'Other');
     }
   }
 
-  List<GuestPaymentModel> _getFilteredPayments(GuestPaymentViewModel paymentVM) {
+  List<GuestPaymentModel> _getFilteredPayments(
+      GuestPaymentViewModel paymentVM) {
     switch (_selectedFilter.toLowerCase()) {
       case 'pending':
         return paymentVM.pendingPayments;
@@ -518,8 +517,9 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
 
   String _formatAmount(double amount, AppLocalizations? loc) {
     final locale = loc?.localeName ?? 'en_IN';
-    final currencySymbol = NumberFormat.simpleCurrency(locale: locale).currencySymbol;
-    return NumberFormat.currency(locale: locale, symbol: currencySymbol).format(amount);
+    final currencySymbol =
+        NumberFormat.simpleCurrency(locale: locale).currencySymbol;
+    return NumberFormat.currency(locale: locale, symbol: currencySymbol)
+        .format(amount);
   }
 }
-

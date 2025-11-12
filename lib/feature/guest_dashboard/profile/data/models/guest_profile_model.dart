@@ -128,7 +128,8 @@ class GuestProfileModel extends UserModel {
       vehicleNo: map['vehicleNo'],
       vehicleName: map['vehicleName'],
       joiningDate: joiningTimestamp?.toDate(),
-      deposit: map['deposit'] != null ? (map['deposit'] as num).toDouble() : null,
+      deposit:
+          map['deposit'] != null ? (map['deposit'] as num).toDouble() : null,
       rent: map['rent'] != null ? (map['rent'] as num).toDouble() : null,
       bloodGroup: map['bloodGroup'],
       nationality: map['nationality'],
@@ -138,12 +139,17 @@ class GuestProfileModel extends UserModel {
       idProofType: map['idProofType'],
       idProofNumber: map['idProofNumber'],
       idProofUrl: map['idProofUrl'],
-      allergies: map['allergies'] != null ? List<String>.from(map['allergies']) : null,
+      allergies:
+          map['allergies'] != null ? List<String>.from(map['allergies']) : null,
       medicalConditions: map['medicalConditions'],
       isActive: map['isActive'] ?? true,
       lastUpdated: lastUpdatedTimestamp?.toDate() ?? DateTime.now(),
-      preferences: map['preferences'] != null ? Map<String, dynamic>.from(map['preferences']) : null,
-      metadata: map['metadata'] != null ? Map<String, dynamic>.from(map['metadata']) : null,
+      preferences: map['preferences'] != null
+          ? Map<String, dynamic>.from(map['preferences'])
+          : null,
+      metadata: map['metadata'] != null
+          ? Map<String, dynamic>.from(map['metadata'])
+          : null,
     );
   }
 
@@ -154,7 +160,8 @@ class GuestProfileModel extends UserModel {
       'phoneNumber': phoneNumber,
       'role': role,
       'fullName': fullName,
-      'dateOfBirth': dateOfBirth != null ? Timestamp.fromDate(dateOfBirth!) : null,
+      'dateOfBirth':
+          dateOfBirth != null ? Timestamp.fromDate(dateOfBirth!) : null,
       'age': age,
       'gender': gender,
       'email': email,
@@ -173,7 +180,8 @@ class GuestProfileModel extends UserModel {
       'organizationAddress': organizationAddress,
       'vehicleNo': vehicleNo,
       'vehicleName': vehicleName,
-      'joiningDate': joiningDate != null ? Timestamp.fromDate(joiningDate!) : null,
+      'joiningDate':
+          joiningDate != null ? Timestamp.fromDate(joiningDate!) : null,
       'deposit': deposit,
       'rent': rent,
       'bloodGroup': bloodGroup,
@@ -187,7 +195,9 @@ class GuestProfileModel extends UserModel {
       'allergies': allergies,
       'medicalConditions': medicalConditions,
       'isActive': isActive,
-      'lastUpdated': lastUpdated != null ? Timestamp.fromDate(lastUpdated!) : Timestamp.fromDate(DateTime.now()),
+      'lastUpdated': lastUpdated != null
+          ? Timestamp.fromDate(lastUpdated!)
+          : Timestamp.fromDate(DateTime.now()),
       'preferences': preferences,
       'metadata': metadata,
     };
@@ -309,14 +319,12 @@ class GuestProfileModel extends UserModel {
       : 'N/A';
 
   /// Returns formatted deposit amount
-  String get formattedDeposit => deposit != null
-      ? '₹${NumberFormat('#,##0').format(deposit)}'
-      : 'N/A';
+  String get formattedDeposit =>
+      deposit != null ? '₹${NumberFormat('#,##0').format(deposit)}' : 'N/A';
 
   /// Returns formatted rent amount
-  String get formattedRent => rent != null
-      ? '₹${NumberFormat('#,##0').format(rent)}'
-      : 'N/A';
+  String get formattedRent =>
+      rent != null ? '₹${NumberFormat('#,##0').format(rent)}' : 'N/A';
 
   /// Returns formatted monthly payment (rent + deposit)
   String get formattedMonthlyPayment {
@@ -355,24 +363,22 @@ class GuestProfileModel extends UserModel {
       emergencyContact != null && emergencyContact!.isNotEmpty;
 
   /// Returns true if profile has guardian information
-  bool get hasGuardianInfo =>
-      guardianName != null && guardianName!.isNotEmpty;
+  bool get hasGuardianInfo => guardianName != null && guardianName!.isNotEmpty;
 
   /// Returns true if profile has vehicle information
-  bool get hasVehicleInfo =>
-      vehicleNo != null && vehicleNo!.isNotEmpty;
+  bool get hasVehicleInfo => vehicleNo != null && vehicleNo!.isNotEmpty;
 
   /// Returns true if profile has medical information
   bool get hasMedicalInfo =>
-      bloodGroup != null || medicalConditions != null || (allergies != null && allergies!.isNotEmpty);
+      bloodGroup != null ||
+      medicalConditions != null ||
+      (allergies != null && allergies!.isNotEmpty);
 
   /// Returns true if profile has professional information
-  bool get hasProfessionalInfo =>
-      occupation != null && occupation!.isNotEmpty;
+  bool get hasProfessionalInfo => occupation != null && occupation!.isNotEmpty;
 
   /// Returns true if profile has ID proof
-  bool get hasIdProof =>
-      idProofType != null && idProofNumber != null;
+  bool get hasIdProof => idProofType != null && idProofNumber != null;
 
   /// Returns profile completion percentage
   int get profileCompletionPercentage {

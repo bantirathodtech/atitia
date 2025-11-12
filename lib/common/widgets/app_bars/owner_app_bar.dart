@@ -73,9 +73,10 @@ class OwnerAppBar extends StatelessWidget implements PreferredSizeWidget {
       leadingActions: [
         IconButton(
           icon: const Icon(Icons.menu),
-          onPressed: onDrawerTap ?? () {
-            Scaffold.of(context).openDrawer();
-          },
+          onPressed: onDrawerTap ??
+              () {
+                Scaffold.of(context).openDrawer();
+              },
           tooltip: menuLabel,
         ),
       ],

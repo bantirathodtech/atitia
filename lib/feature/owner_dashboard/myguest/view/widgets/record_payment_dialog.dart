@@ -178,7 +178,8 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
         DropdownButtonFormField<OwnerBookingModel>(
           initialValue: _selectedBooking,
           decoration: InputDecoration(
-            labelText: loc?.selectBookingOptional ?? 'Select Booking (Optional)',
+            labelText:
+                loc?.selectBookingOptional ?? 'Select Booking (Optional)',
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.book_online),
           ),
@@ -227,7 +228,8 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
             }
             final amount = double.tryParse(value);
             if (amount == null || amount <= 0) {
-              return loc?.pleaseEnterValidAmount ?? 'Please enter a valid amount';
+              return loc?.pleaseEnterValidAmount ??
+                  'Please enter a valid amount';
             }
             return null;
           },
@@ -250,8 +252,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
                 value: 'card', child: Text(loc?.paymentMethodCard ?? 'Card')),
             DropdownMenuItem(
                 value: 'bank_transfer',
-                child:
-                    Text(loc?.paymentMethodBankTransfer ?? 'Bank Transfer')),
+                child: Text(loc?.paymentMethodBankTransfer ?? 'Bank Transfer')),
           ],
           onChanged: (value) {
             setState(() {
@@ -288,8 +289,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
                 Expanded(
                   child: BodyText(
                     text:
-                        DateFormat.yMMMd(loc?.localeName)
-                            .format(_selectedDate),
+                        DateFormat.yMMMd(loc?.localeName).format(_selectedDate),
                   ),
                 ),
               ],
@@ -301,7 +301,8 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
         TextFormField(
           controller: _transactionIdController,
           decoration: InputDecoration(
-            labelText: loc?.transactionIdOptional ?? 'Transaction ID (Optional)',
+            labelText:
+                loc?.transactionIdOptional ?? 'Transaction ID (Optional)',
             hintText: loc?.enterTransactionIdHint ??
                 'Enter transaction ID or reference number',
             border: const OutlineInputBorder(),
@@ -314,7 +315,8 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
           controller: _notesController,
           decoration: InputDecoration(
             labelText: loc?.notesOptional ?? 'Notes (Optional)',
-            hintText: loc?.notesHint ?? 'Any additional notes about this payment',
+            hintText:
+                loc?.notesHint ?? 'Any additional notes about this payment',
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.note),
           ),
@@ -357,9 +359,8 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
     if (_selectedGuest == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              AppLocalizations.of(context)?.pleaseSelectGuest ??
-                  'Please select a guest'),
+          content: Text(AppLocalizations.of(context)?.pleaseSelectGuest ??
+              'Please select a guest'),
           backgroundColor: Colors.red,
         ),
       );
@@ -374,8 +375,8 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final viewModel =
           Provider.of<OwnerGuestViewModel>(context, listen: false);
-      final ownerName =
-          authProvider.user?.fullName ?? (AppLocalizations.of(context)?.owner ?? 'Owner');
+      final ownerName = authProvider.user?.fullName ??
+          (AppLocalizations.of(context)?.owner ?? 'Owner');
 
       final amount = double.parse(_amountController.text.trim());
       final paymentId = DateTime.now().millisecondsSinceEpoch.toString();

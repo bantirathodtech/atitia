@@ -47,14 +47,12 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context);
     final numberFormatter = NumberFormat.decimalPattern(loc?.localeName);
-    final percentageFormatter =
-        NumberFormat.decimalPattern(loc?.localeName);
+    final percentageFormatter = NumberFormat.decimalPattern(loc?.localeName);
     final totalBedsText = numberFormatter.format(report.totalBeds);
     final occupiedBedsText = numberFormatter.format(report.occupiedBeds);
     final vacantBedsText = numberFormatter.format(report.vacantBeds);
     final pendingBedsText = numberFormatter.format(report.pendingBeds);
-    final maintenanceBedsText =
-        numberFormatter.format(report.maintenanceBeds);
+    final maintenanceBedsText = numberFormatter.format(report.maintenanceBeds);
     final occupancyRateText =
         '${percentageFormatter.format(report.occupancyPercentage)}%';
 
@@ -67,7 +65,7 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.analytics_rounded, color: AppColors.info, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.paddingS),
                 HeadingMedium(
                   text: loc?.ownerOccupancyReportTitle ??
                       _text('ownerOccupancyReportTitle', 'Occupancy Report'),
@@ -140,7 +138,7 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
   Widget _buildStatItem(
       String label, String value, IconData icon, Color color) {
     return Container(
-      margin: const EdgeInsets.all(4),
+      margin: const EdgeInsets.all(AppSpacing.paddingXS),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),

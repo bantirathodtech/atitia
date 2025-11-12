@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import '../../../common/styles/spacing.dart';
 import '../../utils/performance/memory_manager.dart';
 // NetworkOptimizer temporarily disabled
 // import '../../utils/performance/network_optimizer.dart';
@@ -107,7 +108,7 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
       right: 16,
       child: Container(
         width: 200,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.paddingS),
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(8),
@@ -125,7 +126,7 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
                 fontSize: 14,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.paddingS),
             _buildMetricRow('Controllers', _memoryStats['controllers'] ?? 0),
             _buildMetricRow(
                 'Scroll Controllers', _memoryStats['scrollControllers'] ?? 0),
@@ -136,7 +137,7 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
                 'Subscriptions', _memoryStats['subscriptions'] ?? 0),
             const Divider(color: Colors.white30),
             _buildMetricRow('Cache Size', _cacheSize, isBytes: true),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.paddingS),
             Row(
               children: [
                 Expanded(
@@ -155,7 +156,7 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {

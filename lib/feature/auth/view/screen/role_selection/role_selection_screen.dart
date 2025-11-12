@@ -21,6 +21,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/utils/responsive/responsive_breakpoints.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/widgets/buttons/theme_toggle_button.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
@@ -52,113 +54,99 @@ class RoleSelectionScreen extends StatelessWidget {
         children: [
           // Main scrollable content
           SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 32.0),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final responsiveConfig = ResponsiveSystem.getConfig(context);
 
-                  // App Logo with theme-aware color
-                  Icon(
-                    Icons.home_work,
-                    size: 100,
-                    color: Theme.of(context).primaryColor,
+                // Determine layout: single column for mobile/tablet, two columns for desktop+
+                final useTwoColumns = responsiveConfig.isDesktop ||
+                    responsiveConfig.isLargeDesktop;
+
+                // Max width constraint for cards
+                final maxCardWidth = responsiveConfig.isMobile
+                    ? double.infinity
+                    : responsiveConfig.isTablet
+                        ? 600.0
+                        : 500.0; // Smaller for two-column layout
+
+                // Responsive padding
+                final horizontalPadding =
+                    ResponsiveSystem.getResponsivePadding(context).horizontal;
+
+                return SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                    vertical: AppSpacing.paddingL,
                   ),
-                  const SizedBox(height: 24.0),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: useTwoColumns ? 1200.0 : maxCardWidth,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(height: AppSpacing.paddingXL),
 
-                  // Welcome Text
-                  const HeadingLarge(
-                    text: 'Welcome to Atitia PG',
-                    align: TextAlign.center,
+                          // App Logo with theme-aware color
+                          Icon(
+                            Icons.home_work,
+                            size: _getResponsiveIconSize(
+                                responsiveConfig.layoutType),
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          SizedBox(height: AppSpacing.paddingL),
+
+                          // Welcome Text
+                          const HeadingLarge(
+                            text: 'Welcome to Atitia PG',
+                            align: TextAlign.center,
+                          ),
+                          SizedBox(height: AppSpacing.sm),
+
+                          const BodyText(
+                            text: 'Your Home Away From Home',
+                            align: TextAlign.center,
+                          ),
+                          SizedBox(height: AppSpacing.xl),
+
+                          // Role Selection Title
+                          Semantics(
+                            header: true,
+                            child: const HeadingMedium(
+                              text: 'Select Your Role',
+                              align: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(height: AppSpacing.sm),
+
+                          Semantics(
+                            label: 'Choose how you want to use the app',
+                            child: const CaptionText(
+                              text: 'Choose how you want to use the app',
+                              align: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(height: AppSpacing.xl),
+
+                          // Role Cards - Responsive Layout
+                          useTwoColumns
+                              ? _buildTwoColumnLayout(
+                                  context: context,
+                                  authProvider: authProvider,
+                                  maxCardWidth: maxCardWidth,
+                                )
+                              : _buildSingleColumnLayout(
+                                  context: context,
+                                  authProvider: authProvider,
+                                  maxCardWidth: maxCardWidth,
+                                ),
+                        ],
+                      ),
+                    ),
                   ),
-                  SizedBox(height: AppSpacing.sm),
-
-                  const BodyText(
-                    text: 'Your Home Away From Home',
-                    align: TextAlign.center,
-                  ),
-                  SizedBox(height: AppSpacing.xl),
-
-                  // Role Selection Title
-                  const HeadingMedium(
-                    text: 'Select Your Role',
-                    align: TextAlign.center,
-                  ),
-                  SizedBox(height: AppSpacing.sm),
-
-                  const CaptionText(
-                    text: 'Choose how you want to use the app',
-                    align: TextAlign.center,
-                  ),
-                  SizedBox(height: AppSpacing.xl),
-
-                  // Guest Role Card with theme-aware colors
-                  _buildRoleCard(
-                    context: context,
-                    title: 'Guest',
-                    description: 'Find and book PG accommodations',
-                    icon: Icons.person,
-                    color: AppColors.info, // Theme-aware blue
-                    onTap: () {
-                      authProvider.setRole('guest');
-
-                      // Check if user is already authenticated (Google Sign-In)
-                      if (authProvider.user != null &&
-                          authProvider.user!.userId.isNotEmpty) {
-                        // Validate that stored role matches selected role
-                        if (authProvider.user!.role == 'guest') {
-                          // User is already authenticated with guest role, navigate to dashboard
-                          getIt<NavigationService>().goToGuestHome();
-                        } else if (authProvider.user!.role == 'owner') {
-                          // User is registered as owner, cannot switch to guest without proper flow
-                          // For now, still navigate to phone auth for role validation
-                          getIt<NavigationService>().goToPhoneAuth();
-                        } else {
-                          // No role set, proceed with auth
-                          getIt<NavigationService>().goToPhoneAuth();
-                        }
-                      } else {
-                        // User needs to authenticate, go to phone auth
-                        getIt<NavigationService>().goToPhoneAuth();
-                      }
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Owner Role Card with theme-aware colors
-                  _buildRoleCard(
-                    context: context,
-                    title: 'Owner',
-                    description: 'Manage your PG properties and guests',
-                    icon: Icons.business,
-                    color: AppColors.success, // Theme-aware green
-                    onTap: () {
-                      authProvider.setRole('owner');
-
-                      // Check if user is already authenticated (Google Sign-In)
-                      if (authProvider.user != null &&
-                          authProvider.user!.userId.isNotEmpty) {
-                        // Validate that stored role matches selected role
-                        if (authProvider.user!.role == 'owner') {
-                          // User is already authenticated with owner role, navigate to dashboard
-                          getIt<NavigationService>().goToOwnerHome();
-                        } else if (authProvider.user!.role == 'guest') {
-                          // User is registered as guest, cannot switch to owner without proper flow
-                          // For now, still navigate to phone auth for role validation
-                          getIt<NavigationService>().goToPhoneAuth();
-                        } else {
-                          // No role set, proceed with auth
-                          getIt<NavigationService>().goToPhoneAuth();
-                        }
-                      } else {
-                        // User needs to authenticate, go to phone auth
-                        getIt<NavigationService>().goToPhoneAuth();
-                      }
-                    },
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ),
 
@@ -169,8 +157,8 @@ class RoleSelectionScreen extends StatelessWidget {
           // User can change theme before selecting role
           // =================================================================
           Positioned(
-            top: 16,
-            right: 16,
+            top: AppSpacing.paddingM,
+            right: AppSpacing.paddingM,
             child: SafeArea(
               child: Container(
                 decoration: BoxDecoration(
@@ -193,6 +181,151 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 
+  /// Builds single column layout for mobile/tablet
+  Widget _buildSingleColumnLayout({
+    required BuildContext context,
+    required AuthProvider authProvider,
+    required double maxCardWidth,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Guest Role Card
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxCardWidth),
+          child: _buildRoleCard(
+            context: context,
+            title: 'Guest',
+            description: 'Find and book PG accommodations',
+            icon: Icons.person,
+            color: AppColors.info,
+            onTap: () => _handleGuestRoleSelection(context, authProvider),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        // Owner Role Card
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxCardWidth),
+          child: _buildRoleCard(
+            context: context,
+            title: 'Owner',
+            description: 'Manage your PG properties and guests',
+            icon: Icons.business,
+            color: AppColors.success,
+            onTap: () => _handleOwnerRoleSelection(context, authProvider),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Builds two-column layout for desktop/large desktop
+  Widget _buildTwoColumnLayout({
+    required BuildContext context,
+    required AuthProvider authProvider,
+    required double maxCardWidth,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Guest Role Card
+        Expanded(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxCardWidth),
+            child: _buildRoleCard(
+              context: context,
+              title: 'Guest',
+              description: 'Find and book PG accommodations',
+              icon: Icons.person,
+              color: AppColors.info,
+              onTap: () => _handleGuestRoleSelection(context, authProvider),
+            ),
+          ),
+        ),
+        SizedBox(width: AppSpacing.paddingM),
+        // Owner Role Card
+        Expanded(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxCardWidth),
+            child: _buildRoleCard(
+              context: context,
+              title: 'Owner',
+              description: 'Manage your PG properties and guests',
+              icon: Icons.business,
+              color: AppColors.success,
+              onTap: () => _handleOwnerRoleSelection(context, authProvider),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Handles guest role selection logic
+  void _handleGuestRoleSelection(
+      BuildContext context, AuthProvider authProvider) {
+    authProvider.setRole('guest');
+
+    // Check if user is already authenticated (Google Sign-In)
+    if (authProvider.user != null && authProvider.user!.userId.isNotEmpty) {
+      // Validate that stored role matches selected role
+      if (authProvider.user!.role == 'guest') {
+        // User is already authenticated with guest role, navigate to dashboard
+        getIt<NavigationService>().goToGuestHome();
+      } else if (authProvider.user!.role == 'owner') {
+        // User is registered as owner, cannot switch to guest without proper flow
+        // For now, still navigate to phone auth for role validation
+        getIt<NavigationService>().goToPhoneAuth();
+      } else {
+        // No role set, proceed with auth
+        getIt<NavigationService>().goToPhoneAuth();
+      }
+    } else {
+      // User needs to authenticate, go to phone auth
+      getIt<NavigationService>().goToPhoneAuth();
+    }
+  }
+
+  /// Handles owner role selection logic
+  void _handleOwnerRoleSelection(
+      BuildContext context, AuthProvider authProvider) {
+    authProvider.setRole('owner');
+
+    // Check if user is already authenticated (Google Sign-In)
+    if (authProvider.user != null && authProvider.user!.userId.isNotEmpty) {
+      // Validate that stored role matches selected role
+      if (authProvider.user!.role == 'owner') {
+        // User is already authenticated with owner role, navigate to dashboard
+        getIt<NavigationService>().goToOwnerHome();
+      } else if (authProvider.user!.role == 'guest') {
+        // User is registered as guest, cannot switch to owner without proper flow
+        // For now, still navigate to phone auth for role validation
+        getIt<NavigationService>().goToPhoneAuth();
+      } else {
+        // No role set, proceed with auth
+        getIt<NavigationService>().goToPhoneAuth();
+      }
+    } else {
+      // User needs to authenticate, go to phone auth
+      getIt<NavigationService>().goToPhoneAuth();
+    }
+  }
+
+  /// Get responsive icon size based on layout type
+  double _getResponsiveIconSize(ResponsiveLayoutType layoutType) {
+    switch (layoutType) {
+      case ResponsiveLayoutType.mobile:
+        return 80.0;
+      case ResponsiveLayoutType.tablet:
+        return 100.0;
+      case ResponsiveLayoutType.desktop:
+        return 120.0;
+      case ResponsiveLayoutType.largeDesktop:
+        return 140.0;
+    }
+  }
+
   /// Builds role selection card
   Widget _buildRoleCard({
     required BuildContext context,
@@ -202,44 +335,49 @@ class RoleSelectionScreen extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return AdaptiveCard(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+    return Semantics(
+      button: true,
+      label: '$title role. $description',
+      hint: 'Double tap to select $title role and continue',
+      child: AdaptiveCard(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  size: 40,
+                  color: color,
+                ),
               ),
-              child: Icon(
-                icon,
-                size: 40,
+              SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    HeadingMedium(
+                      text: title,
+                      color: color,
+                    ),
+                    SizedBox(height: AppSpacing.xs),
+                    BodyText(text: description),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
                 color: color,
+                size: 20,
               ),
-            ),
-            SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  HeadingMedium(
-                    text: title,
-                    color: color,
-                  ),
-                  SizedBox(height: AppSpacing.xs),
-                  BodyText(text: description),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: color,
-              size: 20,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

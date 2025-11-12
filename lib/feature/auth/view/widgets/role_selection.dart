@@ -37,7 +37,7 @@ class RoleSelectionWidget extends StatelessWidget {
           align: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.lg),
-        
+
         // Guest Role Card
         _buildRoleCard(
           context: context,
@@ -48,9 +48,9 @@ class RoleSelectionWidget extends StatelessWidget {
           isSelected: selectedRole == 'guest',
           onTap: () => authProvider.setRole('guest'),
         ),
-        
+
         const SizedBox(height: AppSpacing.md),
-        
+
         // Owner Role Card
         _buildRoleCard(
           context: context,
@@ -80,9 +80,7 @@ class RoleSelectionWidget extends StatelessWidget {
       elevation: isSelected ? 8 : 2,
       child: Container(
         decoration: BoxDecoration(
-          border: isSelected
-              ? Border.all(color: color, width: 2)
-              : null,
+          border: isSelected ? Border.all(color: color, width: 2) : null,
           borderRadius: BorderRadius.circular(12),
         ),
         padding: const EdgeInsets.all(AppSpacing.md),

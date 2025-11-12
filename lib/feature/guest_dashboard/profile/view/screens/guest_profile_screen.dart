@@ -23,7 +23,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/loaders/adaptive_loader.dart';
+import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
 import '../../../../../l10n/app_localizations.dart';
@@ -211,7 +217,10 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)?.errorPickingImage(e.toString()) ?? 'Error picking image: $e')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)
+                      ?.errorPickingImage(e.toString()) ??
+                  'Error picking image: $e')),
         );
       }
       return null;
@@ -248,7 +257,10 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         // Changed to: Check mounted before using context
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)?.failedToUploadProfilePhoto(e.toString()) ?? 'Failed to upload profile photo: $e')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)
+                      ?.failedToUploadProfilePhoto(e.toString()) ??
+                  'Failed to upload profile photo: $e')),
         );
       } finally {
         if (mounted) {
@@ -288,7 +300,10 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         // Changed to: Check mounted before using context
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)?.failedToUploadAadhaarPhoto(e.toString()) ?? 'Failed to upload Aadhaar photo: $e')),
+          SnackBar(
+              content: Text(AppLocalizations.of(context)
+                      ?.failedToUploadAadhaarPhoto(e.toString()) ??
+                  'Failed to upload Aadhaar photo: $e')),
         );
       } finally {
         if (mounted) {
@@ -307,7 +322,9 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
 
     if (currentGuest == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)?.noProfileDataFound ?? 'No profile data found')),
+        SnackBar(
+            content: Text(AppLocalizations.of(context)?.noProfileDataFound ??
+                'No profile data found')),
       );
       return;
     }
@@ -358,7 +375,10 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
     if (mounted) {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)?.profileUpdatedSuccessfully ?? 'Profile updated successfully')),
+          SnackBar(
+              content: Text(
+                  AppLocalizations.of(context)?.profileUpdatedSuccessfully ??
+                      'Profile updated successfully')),
         );
 
         // Navigate back using GetIt NavigationService
@@ -366,7 +386,10 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
         navigationService.goBack();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)?.failedToUpdateProfile ?? 'Failed to update profile')),
+          SnackBar(
+              content: Text(
+                  AppLocalizations.of(context)?.failedToUpdateProfile ??
+                      'Failed to update profile')),
         );
       }
     }
@@ -402,7 +425,8 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () => _saveProfile(),
-            tooltip: AppLocalizations.of(context)?.saveProfile ?? 'Save Profile',
+            tooltip:
+                AppLocalizations.of(context)?.saveProfile ?? 'Save Profile',
           ),
         ],
         showBackButton: true, // Back button to go back
@@ -416,79 +440,114 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
   /// Builds appropriate body content based on current state
   Widget _buildBody(BuildContext context, GuestProfileViewModel viewModel) {
     if (viewModel.loading && viewModel.guest == null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Text(AppLocalizations.of(context)?.loadingYourProfile ?? 'Loading your profile...'),
-          ],
+      return Semantics(
+        label: 'Loading profile information',
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const AdaptiveLoader(
+                center: false,
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              BodyText(
+                text: AppLocalizations.of(context)?.loadingYourProfile ??
+                    'Loading your profile...',
+              ),
+            ],
+          ),
         ),
       );
     }
 
     if (viewModel.error) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)?.errorLoadingProfile ?? 'Error Loading Profile',
-              style: Theme.of(context).textTheme.titleMedium,
+      return Semantics(
+        label: 'Error loading profile',
+        hint: 'An error occurred while loading your profile',
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const SizedBox(height: AppSpacing.paddingL),
+                HeadingMedium(
+                  text: AppLocalizations.of(context)?.errorLoadingProfile ??
+                      'Error Loading Profile',
+                  align: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.paddingS),
+                BodyText(
+                  text: AppLocalizations.of(context)?.somethingWentWrong ??
+                      'Unknown error occurred',
+                  align: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.paddingL),
+                PrimaryButton(
+                  onPressed: _loadGuestProfile,
+                  label: AppLocalizations.of(context)?.tryAgain ?? 'Try Again',
+                  icon: Icons.refresh,
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              AppLocalizations.of(context)?.somethingWentWrong ?? 'Unknown error occurred',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadGuestProfile,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-              child: Text(
-                AppLocalizations.of(context)?.tryAgain ?? 'Try Again',
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
+          ),
         ),
       );
     }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            // User Location Display
-            const Padding(
-              padding: EdgeInsets.only(bottom: 16),
-              child: UserLocationDisplay(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final responsiveConfig = ResponsiveSystem.getConfig(context);
+
+        // Max width constraint for form on larger screens
+        final maxFormWidth = responsiveConfig.isMobile
+            ? double.infinity
+            : responsiveConfig.isTablet
+                ? 700.0
+                : 800.0;
+
+        // Responsive padding
+        final formPadding = ResponsiveSystem.getResponsivePadding(context);
+
+        return Center(
+          child: SingleChildScrollView(
+            padding: formPadding,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: maxFormWidth,
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    // User Location Display
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: AppSpacing.paddingM),
+                      child: UserLocationDisplay(),
+                    ),
+                    // Profile Photos Section
+                    _buildPhotosSection(context),
+                    const SizedBox(height: AppSpacing.paddingL),
+                    // Personal Information Section
+                    _buildPersonalInfoSection(context),
+                    const SizedBox(height: AppSpacing.paddingL),
+                    // Contact & Guardian Section
+                    _buildContactSection(context),
+                    const SizedBox(height: AppSpacing.paddingL),
+                    // Preferences Section
+                    _buildPreferencesSection(context),
+                    const SizedBox(height: AppSpacing.paddingXL),
+                    // Save Button
+                    _buildSaveButton(context, viewModel),
+                  ],
+                ),
+              ),
             ),
-            // Profile Photos Section
-            _buildPhotosSection(context),
-            const SizedBox(height: 24),
-            // Personal Information Section
-            _buildPersonalInfoSection(context),
-            const SizedBox(height: 24),
-            // Contact & Guardian Section
-            _buildContactSection(context),
-            const SizedBox(height: 24),
-            // Preferences Section
-            _buildPreferencesSection(context),
-            const SizedBox(height: 32),
-            // Save Button
-            _buildSaveButton(context, viewModel),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -502,7 +561,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
                 fontWeight: FontWeight.bold,
               ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -562,7 +621,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.paddingS),
         Text(
           label,
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
@@ -583,35 +642,39 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
                 fontWeight: FontWeight.bold,
               ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         TextFormField(
           controller: _fullNameController,
           decoration: InputDecoration(
             labelText: AppLocalizations.of(context)?.fullName ?? 'Full Name',
             border: const OutlineInputBorder(),
-            hintText: AppLocalizations.of(context)?.enterYourCompleteName ?? 'Enter your complete name',
+            hintText: AppLocalizations.of(context)?.enterYourCompleteName ??
+                'Enter your complete name',
           ),
           validator: (value) => value == null || value.trim().isEmpty
-              ? (AppLocalizations.of(context)?.fullNameIsRequired ?? 'Full name is required')
+              ? (AppLocalizations.of(context)?.fullNameIsRequired ??
+                  'Full name is required')
               : null,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         TextFormField(
           controller: _emailController,
           decoration: InputDecoration(
             labelText: AppLocalizations.of(context)?.email ?? 'Email Address',
             border: const OutlineInputBorder(),
-            hintText: AppLocalizations.of(context)?.yourEmailExampleCom ?? 'your.email@example.com',
+            hintText: AppLocalizations.of(context)?.yourEmailExampleCom ??
+                'your.email@example.com',
           ),
           keyboardType: TextInputType.emailAddress,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         TextFormField(
           controller: _dobController,
           readOnly: true,
           onTap: _selectDateOfBirth,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)?.dateOfBirth ?? 'Date of Birth',
+            labelText:
+                AppLocalizations.of(context)?.dateOfBirth ?? 'Date of Birth',
             border: const OutlineInputBorder(),
             hintText: loc.dateFormatDdMmYyyy,
             suffixIcon: IconButton(
@@ -620,7 +683,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         DropdownButtonFormField<String>(
           initialValue: _selectedGender,
           decoration: InputDecoration(
@@ -629,11 +692,14 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
           ),
           items: [
             DropdownMenuItem(
-                value: 'Male', child: Text(AppLocalizations.of(context)?.male ?? 'Male')),
+                value: 'Male',
+                child: Text(AppLocalizations.of(context)?.male ?? 'Male')),
             DropdownMenuItem(
-                value: 'Female', child: Text(AppLocalizations.of(context)?.female ?? 'Female')),
+                value: 'Female',
+                child: Text(AppLocalizations.of(context)?.female ?? 'Female')),
             DropdownMenuItem(
-                value: 'Other', child: Text(AppLocalizations.of(context)?.other ?? 'Other')),
+                value: 'Other',
+                child: Text(AppLocalizations.of(context)?.other ?? 'Other')),
           ],
           onChanged: (value) {
             if (value != null) {
@@ -651,42 +717,53 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          AppLocalizations.of(context)?.contactAndGuardianInformation ?? 'Contact & Guardian Information',
+          AppLocalizations.of(context)?.contactAndGuardianInformation ??
+              'Contact & Guardian Information',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         TextFormField(
           controller: _addressController,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)?.currentAddress ?? 'Current Address',
+            labelText: AppLocalizations.of(context)?.currentAddress ??
+                'Current Address',
             border: const OutlineInputBorder(),
-            hintText: AppLocalizations.of(context)?.yourCurrentResidentialAddress ?? 'Your current residential address',
+            hintText:
+                AppLocalizations.of(context)?.yourCurrentResidentialAddress ??
+                    'Your current residential address',
           ),
           maxLines: 3,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         TextFormField(
           controller: _guardianNameController,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)?.guardianName ?? 'Guardian Name',
+            labelText:
+                AppLocalizations.of(context)?.guardianName ?? 'Guardian Name',
             border: const OutlineInputBorder(),
-            hintText: AppLocalizations.of(context)?.nameOfYourParentOrGuardian ?? 'Name of your parent or guardian',
+            hintText:
+                AppLocalizations.of(context)?.nameOfYourParentOrGuardian ??
+                    'Name of your parent or guardian',
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         TextFormField(
           controller: _guardianPhoneController,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)?.guardianPhone ?? 'Guardian Phone',
+            labelText:
+                AppLocalizations.of(context)?.guardianPhone ?? 'Guardian Phone',
             border: const OutlineInputBorder(),
-            hintText: AppLocalizations.of(context)?.tenDigitPhoneNumber ?? '10-digit phone number',
+            hintText: AppLocalizations.of(context)?.tenDigitPhoneNumber ??
+                '10-digit phone number',
           ),
           keyboardType: TextInputType.phone,
           validator: (value) {
             if (value != null && value.isNotEmpty && value.length != 10) {
-              return AppLocalizations.of(context)?.pleaseEnterValidPhoneNumber ?? 'Enter valid 10-digit phone number';
+              return AppLocalizations.of(context)
+                      ?.pleaseEnterValidPhoneNumber ??
+                  'Enter valid 10-digit phone number';
             }
             return null;
           },
@@ -706,21 +783,27 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
                 fontWeight: FontWeight.bold,
               ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         DropdownButtonFormField<String>(
           initialValue: _selectedFoodPreference,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)?.foodPreference ?? 'Food Preference',
+            labelText: AppLocalizations.of(context)?.foodPreference ??
+                'Food Preference',
             border: const OutlineInputBorder(),
           ),
           items: [
             DropdownMenuItem(
-                value: 'Vegetarian', child: Text(AppLocalizations.of(context)?.vegetarian ?? 'Vegetarian')),
+                value: 'Vegetarian',
+                child: Text(
+                    AppLocalizations.of(context)?.vegetarian ?? 'Vegetarian')),
             DropdownMenuItem(
                 value: 'Non-Vegetarian',
-                child: Text(AppLocalizations.of(context)?.nonVegetarian ?? 'Non-Vegetarian')),
+                child: Text(AppLocalizations.of(context)?.nonVegetarian ??
+                    'Non-Vegetarian')),
             DropdownMenuItem(
-                value: 'Eggetarian', child: Text(AppLocalizations.of(context)?.eggetarian ?? 'Eggetarian')),
+                value: 'Eggetarian',
+                child: Text(
+                    AppLocalizations.of(context)?.eggetarian ?? 'Eggetarian')),
           ],
           onChanged: (value) {
             if (value != null) {
@@ -728,20 +811,26 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
             }
           },
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.paddingM),
         DropdownButtonFormField<String>(
           initialValue: _selectedMaritalStatus,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)?.maritalStatus ?? 'Marital Status',
+            labelText:
+                AppLocalizations.of(context)?.maritalStatus ?? 'Marital Status',
             border: const OutlineInputBorder(),
           ),
           items: [
             DropdownMenuItem(
-                value: 'Single', child: Text(AppLocalizations.of(context)?.single ?? 'Single')),
+                value: 'Single',
+                child: Text(AppLocalizations.of(context)?.single ?? 'Single')),
             DropdownMenuItem(
-                value: 'Married', child: Text(AppLocalizations.of(context)?.married ?? 'Married')),
+                value: 'Married',
+                child:
+                    Text(AppLocalizations.of(context)?.married ?? 'Married')),
             DropdownMenuItem(
-                value: 'Divorced', child: Text(AppLocalizations.of(context)?.divorced ?? 'Divorced')),
+                value: 'Divorced',
+                child:
+                    Text(AppLocalizations.of(context)?.divorced ?? 'Divorced')),
           ],
           onChanged: (value) {
             if (value != null) {
@@ -756,26 +845,13 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
   /// Builds save button with loading state
   Widget _buildSaveButton(
       BuildContext context, GuestProfileViewModel viewModel) {
-    return ElevatedButton(
+    final loc = AppLocalizations.of(context);
+    return PrimaryButton(
       onPressed: viewModel.loading ? null : _saveProfile,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).primaryColor,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        minimumSize: const Size(double.infinity, 50),
-      ),
-      child: viewModel.loading
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-          : Text(
-              AppLocalizations.of(context)?.saveProfile ?? 'Save Profile',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
+      label: loc?.saveProfile ?? 'Save Profile',
+      isLoading: viewModel.loading,
+      enabled: !viewModel.loading,
+      width: double.infinity,
     );
   }
 }

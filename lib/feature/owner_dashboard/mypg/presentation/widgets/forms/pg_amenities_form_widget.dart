@@ -147,8 +147,7 @@ class PgAmenitiesFormWidget extends AdaptiveStatelessWidget {
       case 'Fan':
         return loc?.pgAmenityFan ?? _text('pgAmenityFan', 'Fan');
       case 'Lighting':
-        return loc?.pgAmenityLighting ??
-            _text('pgAmenityLighting', 'Lighting');
+        return loc?.pgAmenityLighting ?? _text('pgAmenityLighting', 'Lighting');
       case 'Balcony':
         return loc?.pgAmenityBalcony ?? _text('pgAmenityBalcony', 'Balcony');
       case 'Common Area':
@@ -176,8 +175,7 @@ class PgAmenitiesFormWidget extends AdaptiveStatelessWidget {
         return loc?.pgAmenityVisitorParking ??
             _text('pgAmenityVisitorParking', 'Visitor Parking');
       case 'Intercom':
-        return loc?.pgAmenityIntercom ??
-            _text('pgAmenityIntercom', 'Intercom');
+        return loc?.pgAmenityIntercom ?? _text('pgAmenityIntercom', 'Intercom');
       case 'Maintenance Staff':
         return loc?.pgAmenityMaintenanceStaff ??
             _text('pgAmenityMaintenanceStaff', 'Maintenance Staff');
@@ -192,7 +190,8 @@ class PgAmenitiesFormWidget extends AdaptiveStatelessWidget {
     final title = loc?.pgAmenitiesTitle ??
         _text('pgAmenitiesTitle', 'Amenities & Facilities');
     final description = loc?.pgAmenitiesDescription ??
-        _text('pgAmenitiesDescription', 'Select all amenities available in your PG:');
+        _text('pgAmenitiesDescription',
+            'Select all amenities available in your PG:');
     final selectedLabel = loc?.pgAmenitiesSelectedLabel ??
         _text('pgAmenitiesSelectedLabel', 'Selected');
     return Column(

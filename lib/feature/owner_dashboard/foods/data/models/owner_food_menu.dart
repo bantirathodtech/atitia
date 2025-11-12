@@ -6,14 +6,15 @@ import 'package:intl/intl.dart';
 /// Represents a weekly or daily menu item for owner-managed food.
 /// Each day has breakfast, lunch, dinner meals and photos.
 /// Enhanced with timestamps, metadata, and helper methods
-/// 
+///
 /// Multi-PG Support:
 /// - pgId field links menu to specific PG
 /// - Backward compatible: null pgId means menu applies to all owner's PGs (legacy data)
 class OwnerFoodMenu {
   final String menuId;
   final String ownerId;
-  final String? pgId; // NEW: Links menu to specific PG (null for backward compatibility)
+  final String?
+      pgId; // NEW: Links menu to specific PG (null for backward compatibility)
   final String day;
   final List<String> breakfast;
   final List<String> lunch;
@@ -166,14 +167,15 @@ class OwnerFoodMenu {
 /// Represents an optional override menu for a specific date
 /// such as festival or special occasions.
 /// Null fields fallback to weekly defaults.
-/// 
+///
 /// Multi-PG Support:
 /// - pgId field links override to specific PG
 /// - Backward compatible: null pgId means override applies to all owner's PGs (legacy data)
 class OwnerMenuOverride {
   final String overrideId;
   final String ownerId;
-  final String? pgId; // NEW: Links override to specific PG (null for backward compatibility)
+  final String?
+      pgId; // NEW: Links override to specific PG (null for backward compatibility)
   final DateTime date;
   final String? festivalName;
   final List<String>? breakfast;
@@ -213,14 +215,12 @@ class OwnerMenuOverride {
       pgId: map['pgId'], // Nullable for backward compatibility
       date: map['date']?.toDate() ?? DateTime.now(),
       festivalName: map['festivalName'],
-      breakfast: map['breakfast'] != null
-          ? List<String>.from(map['breakfast'])
-          : null,
+      breakfast:
+          map['breakfast'] != null ? List<String>.from(map['breakfast']) : null,
       lunch: map['lunch'] != null ? List<String>.from(map['lunch']) : null,
       dinner: map['dinner'] != null ? List<String>.from(map['dinner']) : null,
-      photoUrls: map['photoUrls'] != null
-          ? List<String>.from(map['photoUrls'])
-          : null,
+      photoUrls:
+          map['photoUrls'] != null ? List<String>.from(map['photoUrls']) : null,
       createdAt: map['createdAt']?.toDate(),
       updatedAt: map['updatedAt']?.toDate(),
       isActive: map['isActive'] ?? true,
@@ -329,4 +329,3 @@ class OwnerMenuOverride {
   @override
   int get hashCode => overrideId.hashCode;
 }
-

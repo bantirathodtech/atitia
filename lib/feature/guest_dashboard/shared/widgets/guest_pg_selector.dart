@@ -92,7 +92,7 @@ class GuestPgSelector extends StatelessWidget {
                           _text('noPgSelected', 'No PG Selected'),
                       color: AppColors.textPrimary,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     BodyText(
                       text: loc?.selectPgPrompt ??
                           _text('selectPgPrompt',
@@ -123,10 +123,7 @@ class GuestPgSelector extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
-    final pgName = (selectedPg.pgName as String?)
-                ?.trim()
-                .isNotEmpty ==
-            true
+    final pgName = (selectedPg.pgName as String?)?.trim().isNotEmpty == true
         ? selectedPg.pgName
         : loc?.unknownPg ?? _text('unknownPg', 'Unknown PG');
     final pgLocation = _resolveLocation(
@@ -165,7 +162,7 @@ class GuestPgSelector extends StatelessWidget {
                       text: pgName,
                       color: AppColors.textPrimary,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.paddingXS),
                     CaptionText(
                       text: pgLocation,
                       color: isDark
@@ -199,18 +196,16 @@ class GuestPgSelector extends StatelessWidget {
     switch (status.toLowerCase()) {
       case 'active':
         chipColor = Colors.green;
-        chipText =
-            loc?.statusActive ?? _text('statusActive', 'Active');
+        chipText = loc?.statusActive ?? _text('statusActive', 'Active');
         break;
       case 'inactive':
         chipColor = Colors.orange;
-        chipText =
-            loc?.statusInactive ?? _text('statusInactive', 'Inactive');
+        chipText = loc?.statusInactive ?? _text('statusInactive', 'Inactive');
         break;
       case 'maintenance':
         chipColor = Colors.red;
-        chipText = loc?.statusMaintenance ??
-            _text('statusMaintenance', 'Maintenance');
+        chipText =
+            loc?.statusMaintenance ?? _text('statusMaintenance', 'Maintenance');
         break;
       default:
         chipColor = Colors.grey;
@@ -274,10 +269,12 @@ class GuestPgSelector extends StatelessWidget {
           _text('pgLocationFallback', 'Location unavailable');
     }
 
-    final cityValue =
-        hasCity ? city!.trim() : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
-    final areaValue =
-        hasArea ? area!.trim() : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
+    final cityValue = hasCity
+        ? city!.trim()
+        : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
+    final areaValue = hasArea
+        ? area!.trim()
+        : loc?.unknownValue ?? _text('unknownValue', 'Unknown');
 
     return '$cityValue, $areaValue';
   }

@@ -9,6 +9,7 @@ import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../core/models/booking_model.dart';
 import '../../../../../core/repositories/booking_repository.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
@@ -120,19 +121,16 @@ class _BookingDialogState extends State<BookingDialog> {
                   child: Text(loc?.cancel ?? _text('cancel', 'Cancel')),
                 ),
                 const SizedBox(width: AppSpacing.paddingS),
-                ElevatedButton(
+                PrimaryButton(
                   onPressed:
                       _selectedBed != null && _startDate != null && !_booking
                           ? _confirmBooking
                           : null,
-                  child: _booking
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(loc?.confirmBooking ??
-                          _text('confirmBooking', 'Confirm Booking')),
+                  label: loc?.confirmBooking ??
+                      _text('confirmBooking', 'Confirm Booking'),
+                  isLoading: _booking,
+                  enabled:
+                      _selectedBed != null && _startDate != null && !_booking,
                 ),
               ],
             ),
@@ -191,21 +189,20 @@ class _BookingDialogState extends State<BookingDialog> {
                 room.beds.where((b) => b.status == 'vacant').length;
 
             return FilterChip(
-              label: Text(
-                  loc?.roomOptionLabel(
-                        room.roomNumber,
-                        room.sharingType,
-                        availableBeds,
-                      ) ??
-                      _text(
-                        'roomOptionLabel',
-                        '{roomNumber} ({sharingType}-sharing) - {availableBeds} available',
-                        parameters: {
-                          'roomNumber': room.roomNumber,
-                          'sharingType': room.sharingType,
-                          'availableBeds': availableBeds.toString(),
-                        },
-                      )),
+              label: Text(loc?.roomOptionLabel(
+                    room.roomNumber,
+                    room.sharingType,
+                    availableBeds,
+                  ) ??
+                  _text(
+                    'roomOptionLabel',
+                    '{roomNumber} ({sharingType}-sharing) - {availableBeds} available',
+                    parameters: {
+                      'roomNumber': room.roomNumber,
+                      'sharingType': room.sharingType,
+                      'availableBeds': availableBeds.toString(),
+                    },
+                  )),
               selected: isSelected,
               onSelected: availableBeds > 0
                   ? (selected) {

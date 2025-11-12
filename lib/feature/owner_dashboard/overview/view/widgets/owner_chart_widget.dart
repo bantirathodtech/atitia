@@ -434,7 +434,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
                 text: _formatCurrency(0, localeName),
                 color: Colors.grey.shade400,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.paddingXS),
 
               // Placeholder bar
               Container(
