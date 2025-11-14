@@ -83,15 +83,32 @@ jobs:
 
       - name: 🔧 Get Dependencies
         run: |
+          set +e  # Disable exit on error temporarily
           echo "📦 Resolving dependencies..."
-          flutter pub get --no-example || {
-            echo "⚠️ First attempt failed, retrying..."
-            flutter pub get --verbose 2>&1 | tail -50 || {
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          flutter pub get --no-example
+          PUB_GET_EXIT=$?
+          
+          if [ "$PUB_GET_EXIT" -ne 0 ]; then
+            echo "⚠️ First attempt failed (exit code: $PUB_GET_EXIT), retrying with verbose output..."
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            flutter pub get --verbose 2>&1 | tail -50
+            RETRY_EXIT=$?
+            
+            if [ "$RETRY_EXIT" -ne 0 ]; then
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               echo "❌ Dependency resolution failed"
+              echo "📊 Exit code: $RETRY_EXIT"
+              echo "💡 Check pubspec.yaml for dependency issues"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               exit 1
-            }
-          }
-          echo "✅ Dependencies resolved"
+            fi
+          fi
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Dependencies resolved successfully"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
       - name: ✅ Verify Dependencies
         run: |
@@ -125,67 +142,108 @@ jobs:
 
       - name: 🔍 Analyze Code
         run: |
+          set +e  # Disable exit on error temporarily
           echo "🔍 Running static analysis..."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
           # Run analysis and capture output
-          ANALYSIS_OUTPUT=$(flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1) || ANALYSIS_EXIT_CODE=$?
+          ANALYSIS_OUTPUT=$(flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1)
+          ANALYSIS_EXIT_CODE=$?
+          
+          echo "📊 Analysis exit code: $ANALYSIS_EXIT_CODE"
+          echo ""
           
           # Check for errors (blocking)
-          if echo "$ANALYSIS_OUTPUT" | grep -q "error •"; then
+          if echo "$ANALYSIS_OUTPUT" | grep -q "error •" 2>/dev/null; then
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "❌ Code analysis found ERRORS (blocking):"
-            echo "$ANALYSIS_OUTPUT" | grep "error •" | head -20
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "$ANALYSIS_OUTPUT" | grep "error •" | head -30
+            echo ""
+            echo "💡 Fix errors before proceeding"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             exit 1
           fi
           
           # Check for warnings (non-blocking)
-          if echo "$ANALYSIS_OUTPUT" | grep -q "warning •"; then
+          if echo "$ANALYSIS_OUTPUT" | grep -q "warning •" 2>/dev/null; then
             echo "⚠️ Code analysis found warnings (non-blocking):"
             echo "$ANALYSIS_OUTPUT" | grep "warning •" | head -20
+            echo ""
           fi
           
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "✅ Code analysis complete"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         timeout-minutes: 10
 
       - name: 📝 Check Formatting
         run: |
+          set +e  # Disable exit on error temporarily
           echo "📝 Checking code formatting..."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
           # Run format check and capture output
           FORMAT_OUTPUT=$(dart format --set-exit-if-changed . 2>&1)
           FORMAT_EXIT_CODE=$?
           
           # Show the output for visibility
+          echo "📄 Format check output:"
           echo "$FORMAT_OUTPUT"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 Exit code: $FORMAT_EXIT_CODE"
           
           # Parse the output to check if files were actually changed
           # Format: "Formatted X files (Y changed)" - we need Y to be 0
           # The issue: dart format returns exit code 1 even when "(0 changed)"
           
           # Extract the "changed" count from output like "Formatted 393 files (0 changed)"
-          CHANGED_COUNT=$(echo "$FORMAT_OUTPUT" | grep -oE "\([0-9]+ changed\)" | grep -oE "[0-9]+" || echo "")
+          # Use set +e to prevent grep failures from exiting
+          CHANGED_COUNT=$(echo "$FORMAT_OUTPUT" | grep -oE "\([0-9]+ changed\)" 2>/dev/null | grep -oE "[0-9]+" 2>/dev/null || echo "")
+          
+          echo "🔍 Parsed changed count: '${CHANGED_COUNT:-empty}'"
           
           if [ -n "$CHANGED_COUNT" ]; then
             # We found a changed count in the output
             if [ "$CHANGED_COUNT" -eq 0 ]; then
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               echo "✅ Code properly formatted (0 files changed)"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               exit 0
             else
-              echo "❌ Formatting issues detected (blocking): $CHANGED_COUNT files need formatting"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "❌ Formatting issues detected (blocking)"
+              echo "📊 Files needing formatting: $CHANGED_COUNT"
               echo ""
-              echo "💡 Run 'dart format .' to fix formatting issues"
+              echo "💡 To fix locally, run:"
+              echo "   dart format ."
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               exit 1
             fi
           elif [ "$FORMAT_EXIT_CODE" -eq 0 ]; then
             # Exit code 0 means no issues
-            echo "✅ Code properly formatted"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "✅ Code properly formatted (exit code 0)"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             exit 0
           else
             # Exit code 1 but no changed count found - check output for success indicators
-            if echo "$FORMAT_OUTPUT" | grep -qiE "(0 changed|no files|already formatted)"; then
+            if echo "$FORMAT_OUTPUT" | grep -qiE "(0 changed|no files|already formatted)" 2>/dev/null; then
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               echo "✅ Code properly formatted (no changes needed)"
+              echo "📝 Output indicates no formatting changes required"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               exit 0
             else
-              # Unknown case - fail to be safe
+              # Unknown case - show detailed error
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               echo "⚠️ Format check returned exit code $FORMAT_EXIT_CODE"
-              echo "❌ Formatting check failed - please review output above"
+              echo "📄 Full output:"
+              echo "$FORMAT_OUTPUT"
+              echo ""
+              echo "❌ Formatting check failed - unable to determine status"
+              echo "💡 Please review the output above and fix formatting issues"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               exit 1
             fi
           fi
@@ -234,27 +292,55 @@ jobs:
       - name: 🧪 Run Unit Tests with Coverage
         if: matrix.test-type == 'unit'
         run: |
+          set +e  # Disable exit on error temporarily
           echo "🧪 Running unit tests with coverage..."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           
           # Run CI-safe tests first (critical - must pass)
-          echo "📋 Running CI-safe tests..."
-          flutter test test/ci_test_runner.dart --no-pub --coverage || {
+          echo "📋 Step 1: Running CI-safe tests..."
+          flutter test test/ci_test_runner.dart --no-pub --coverage
+          CI_TEST_EXIT=$?
+          
+          if [ "$CI_TEST_EXIT" -ne 0 ]; then
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "❌ CI-safe tests failed (blocking)"
+            echo "📊 Exit code: $CI_TEST_EXIT"
+            echo "💡 Fix CI-safe tests before proceeding"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             exit 1
-          }
+          fi
+          
+          echo "✅ CI-safe tests passed"
+          echo ""
           
           # Try unit tests (may fail if Firebase-dependent)
-          echo "📋 Running unit tests..."
-          if flutter test test/unit/ --no-pub --coverage --reporter expanded; then
+          echo "📋 Step 2: Running unit tests..."
+          flutter test test/unit/ --no-pub --coverage --reporter expanded
+          UNIT_TEST_EXIT=$?
+          
+          if [ "$UNIT_TEST_EXIT" -eq 0 ]; then
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "✅ All unit tests passed"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           else
-            echo "⚠️ Some unit tests failed (may require Firebase) - checking if critical..."
+            echo "⚠️ Unit tests failed (exit code: $UNIT_TEST_EXIT)"
+            echo "🔍 Checking if failures are Firebase-dependent..."
+            
             # Check if any non-Firebase tests failed
-            flutter test test/unit/ --no-pub --reporter expanded 2>&1 | grep -i "firebase\|network\|connection" || {
+            TEST_OUTPUT=$(flutter test test/unit/ --no-pub --reporter expanded 2>&1)
+            if echo "$TEST_OUTPUT" | grep -qiE "firebase|network|connection" 2>/dev/null; then
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "⚠️ Unit tests skipped (Firebase-dependent)"
+              echo "💡 These tests require Firebase configuration"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            else
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               echo "❌ Non-Firebase unit tests failed (blocking)"
+              echo "📄 Test output:"
+              echo "$TEST_OUTPUT" | tail -50
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               exit 1
-            }
-            echo "⚠️ Unit tests skipped (Firebase-dependent)"
+            fi
           fi
           
           echo "✅ Unit tests completed"
@@ -263,12 +349,25 @@ jobs:
       - name: 🎨 Run Widget Tests with Coverage
         if: matrix.test-type == 'widget'
         run: |
+          set +e  # Disable exit on error temporarily
           echo "🎨 Running widget tests with coverage..."
-          flutter test test/widget_test.dart --no-pub --coverage || {
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          flutter test test/widget_test.dart --no-pub --coverage
+          WIDGET_TEST_EXIT=$?
+          
+          if [ "$WIDGET_TEST_EXIT" -ne 0 ]; then
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "❌ Widget tests failed (blocking)"
+            echo "📊 Exit code: $WIDGET_TEST_EXIT"
+            echo "💡 Review test failures above"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             exit 1
-          }
-          echo "✅ Widget tests completed"
+          fi
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Widget tests completed successfully"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         timeout-minutes: 8
 
       - name: 🔗 Run Integration Tests
@@ -580,28 +679,41 @@ jobs:
       - name: 🔒 Security Audit
         id: security-audit
         run: |
+          set +e  # Disable exit on error temporarily
           echo "🔒 Running security audit..."
-          AUDIT_OUTPUT=$(flutter pub audit 2>&1) || AUDIT_EXIT_CODE=$?
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          AUDIT_OUTPUT=$(flutter pub audit 2>&1)
+          AUDIT_EXIT_CODE=$?
+          
+          echo "📊 Audit exit code: $AUDIT_EXIT_CODE"
+          echo ""
           
           # Check for critical/high severity vulnerabilities
-          if echo "$AUDIT_OUTPUT" | grep -qiE "(critical|high severity)"; then
+          if echo "$AUDIT_OUTPUT" | grep -qiE "(critical|high severity)" 2>/dev/null; then
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "❌ CRITICAL/HIGH severity vulnerabilities found (blocking):"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "$AUDIT_OUTPUT" | grep -iE "(critical|high severity)" || echo "$AUDIT_OUTPUT"
             echo ""
             echo "💡 Review and update vulnerable dependencies before proceeding"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             exit 1
           fi
           
           # Medium/low severity vulnerabilities (non-blocking)
-          if echo "$AUDIT_OUTPUT" | grep -qiE "(medium|low severity|advisory)"; then
+          if echo "$AUDIT_OUTPUT" | grep -qiE "(medium|low severity|advisory)" 2>/dev/null; then
             echo "⚠️ Medium/Low severity advisories found (non-blocking):"
             echo "$AUDIT_OUTPUT" | grep -iE "(medium|low severity|advisory)" | head -20 || true
             echo ""
             echo "💡 Consider updating dependencies when possible"
+            echo ""
           fi
           
           if [ "$AUDIT_EXIT_CODE" = "0" ] || [ -z "$AUDIT_EXIT_CODE" ]; then
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "✅ Security audit passed - no critical vulnerabilities"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           fi
         timeout-minutes: 10
 
