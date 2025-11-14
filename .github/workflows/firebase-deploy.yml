@@ -1,8 +1,8 @@
-name: 🚀 Firebase Deployment - Staging & Dev
+name: 🚀 Firebase Deployment - Staging Only
 
 on:
   push:
-    branches: [staging, dev]  # Deploy to Firebase on both staging and dev
+    branches: [staging]  # Deploy to Firebase only on staging branch
     paths-ignore:
       - '**.md'
       - '.gitignore'
@@ -11,14 +11,10 @@ on:
       - 'README*.md'
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'Branch to deploy (staging or dev)'
+      confirm:
+        description: 'Type "deploy" to confirm Firebase deployment'
         required: true
-        default: 'staging'
-        type: choice
-        options:
-          - staging
-          - dev
+        default: 'deploy'
 
 # Prevent concurrent deployments for same branch
 concurrency:
