@@ -36,6 +36,50 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: 🔍 Verify Branch & Tag
+        run: |
+          echo "🔍 Validating deployment branch and tag..."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Check if this is a tag push
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG_NAME="${{ github.ref_name }}"
+            echo "📌 Tag detected: $TAG_NAME"
+            
+            # Verify tag is on main branch
+            echo "🔍 Checking if tag is on main branch..."
+            git fetch origin main:main 2>/dev/null || true
+            
+            # Check if tag exists on main branch
+            if git branch -r --contains "$TAG_NAME" | grep -q "origin/main"; then
+              echo "✅ Tag $TAG_NAME is on main branch"
+            else
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "❌ ERROR: Tag $TAG_NAME is not on main branch"
+              echo "💡 Production deployment only allowed from main branch"
+              echo "💡 Please ensure tag is created on main branch:"
+              echo "   git checkout main"
+              echo "   git tag $TAG_NAME"
+              echo "   git push origin main --tags"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              exit 1
+            fi
+          else
+            echo "📌 Branch detected: ${{ github.ref_name }}"
+            if [[ "${{ github.ref_name }}" != "main" ]]; then
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "❌ ERROR: Production deployment only allowed from main branch"
+              echo "💡 Current branch: ${{ github.ref_name }}"
+              echo "💡 Expected branch: main"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              exit 1
+            fi
+          fi
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Branch/tag validation complete"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
       - name: 🔍 Verify Deployment Config
         run: |
           echo "🔍 Validating deployment configuration..."
