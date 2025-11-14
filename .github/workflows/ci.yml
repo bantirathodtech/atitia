@@ -152,27 +152,40 @@ jobs:
           FORMAT_OUTPUT=$(dart format --set-exit-if-changed . 2>&1)
           FORMAT_EXIT_CODE=$?
           
+          # Show the output for visibility
+          echo "$FORMAT_OUTPUT"
+          
           # Parse the output to check if files were actually changed
-          # Format: "Formatted X files (Y changed)" or similar
-          if echo "$FORMAT_OUTPUT" | grep -qE "\(0 changed\)|0 files changed"; then
-            echo "✅ Code properly formatted (0 files changed)"
-          elif echo "$FORMAT_OUTPUT" | grep -qE "\([1-9][0-9]* changed\)|[1-9][0-9]* files changed"; then
-            echo "❌ Formatting issues detected (blocking):"
-            echo "$FORMAT_OUTPUT" | head -30
-            echo ""
-            echo "💡 Run 'dart format .' to fix formatting issues"
-            exit 1
-          elif [ "$FORMAT_EXIT_CODE" -eq 0 ]; then
-            echo "✅ Code properly formatted"
-          else
-            # Exit code 1 but check if it's a false positive
-            # Show output for debugging
-            echo "$FORMAT_OUTPUT"
-            # Check if output indicates no changes
-            if echo "$FORMAT_OUTPUT" | grep -qE "\(0 changed\)|0 files changed|No files changed"; then
-              echo "✅ Code properly formatted (no changes needed)"
+          # Format: "Formatted X files (Y changed)" - we need Y to be 0
+          # The issue: dart format returns exit code 1 even when "(0 changed)"
+          
+          # Extract the "changed" count from output like "Formatted 393 files (0 changed)"
+          CHANGED_COUNT=$(echo "$FORMAT_OUTPUT" | grep -oE "\([0-9]+ changed\)" | grep -oE "[0-9]+" || echo "")
+          
+          if [ -n "$CHANGED_COUNT" ]; then
+            # We found a changed count in the output
+            if [ "$CHANGED_COUNT" -eq 0 ]; then
+              echo "✅ Code properly formatted (0 files changed)"
+              exit 0
             else
-              echo "❌ Formatting issues detected"
+              echo "❌ Formatting issues detected (blocking): $CHANGED_COUNT files need formatting"
+              echo ""
+              echo "💡 Run 'dart format .' to fix formatting issues"
+              exit 1
+            fi
+          elif [ "$FORMAT_EXIT_CODE" -eq 0 ]; then
+            # Exit code 0 means no issues
+            echo "✅ Code properly formatted"
+            exit 0
+          else
+            # Exit code 1 but no changed count found - check output for success indicators
+            if echo "$FORMAT_OUTPUT" | grep -qiE "(0 changed|no files|already formatted)"; then
+              echo "✅ Code properly formatted (no changes needed)"
+              exit 0
+            else
+              # Unknown case - fail to be safe
+              echo "⚠️ Format check returned exit code $FORMAT_EXIT_CODE"
+              echo "❌ Formatting check failed - please review output above"
               exit 1
             fi
           fi
