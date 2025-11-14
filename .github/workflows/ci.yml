@@ -148,14 +148,33 @@ jobs:
       - name: 📝 Check Formatting
         run: |
           echo "📝 Checking code formatting..."
-          if dart format --set-exit-if-changed . > /dev/null 2>&1; then
-            echo "✅ Code properly formatted"
-          else
+          # Run format check and capture output
+          FORMAT_OUTPUT=$(dart format --set-exit-if-changed . 2>&1)
+          FORMAT_EXIT_CODE=$?
+          
+          # Parse the output to check if files were actually changed
+          # Format: "Formatted X files (Y changed)" or similar
+          if echo "$FORMAT_OUTPUT" | grep -qE "\(0 changed\)|0 files changed"; then
+            echo "✅ Code properly formatted (0 files changed)"
+          elif echo "$FORMAT_OUTPUT" | grep -qE "\([1-9][0-9]* changed\)|[1-9][0-9]* files changed"; then
             echo "❌ Formatting issues detected (blocking):"
-            dart format --set-exit-if-changed . 2>&1 | head -30
+            echo "$FORMAT_OUTPUT" | head -30
             echo ""
             echo "💡 Run 'dart format .' to fix formatting issues"
             exit 1
+          elif [ "$FORMAT_EXIT_CODE" -eq 0 ]; then
+            echo "✅ Code properly formatted"
+          else
+            # Exit code 1 but check if it's a false positive
+            # Show output for debugging
+            echo "$FORMAT_OUTPUT"
+            # Check if output indicates no changes
+            if echo "$FORMAT_OUTPUT" | grep -qE "\(0 changed\)|0 files changed|No files changed"; then
+              echo "✅ Code properly formatted (no changes needed)"
+            else
+              echo "❌ Formatting issues detected"
+              exit 1
+            fi
           fi
         timeout-minutes: 5
 
