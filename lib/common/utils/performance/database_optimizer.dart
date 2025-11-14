@@ -38,8 +38,7 @@ class DatabaseOptimizer {
 
     // Cache the result
     if (useCache) {
-      _queryCache[cacheKey] =
-          result.docs.isNotEmpty ? result.docs.last : null;
+      _queryCache[cacheKey] = result.docs.isNotEmpty ? result.docs.last : null;
       _cacheTimestamps[cacheKey] = DateTime.now();
     }
 

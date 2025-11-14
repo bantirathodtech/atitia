@@ -1850,10 +1850,10 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
             final errorMessage = response.message ?? 'Unknown error';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(AppLocalizations.of(context)
-                        ?.paymentFailed(errorMessage) ??
-                    _text('paymentFailed', 'Payment failed: {message}',
-                        parameters: {'message': errorMessage})),
+                content: Text(
+                    AppLocalizations.of(context)?.paymentFailed(errorMessage) ??
+                        _text('paymentFailed', 'Payment failed: {message}',
+                            parameters: {'message': errorMessage})),
                 backgroundColor: AppColors.error,
               ),
             );
