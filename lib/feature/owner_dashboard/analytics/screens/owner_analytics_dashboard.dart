@@ -231,7 +231,12 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
           Icon(
             Icons.apartment_outlined,
             size: 64,
-            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.5) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: AppSpacing.paddingL),
           HeadingMedium(text: loc.analyticsNoPgTitle),
@@ -363,7 +368,9 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
               HeadingMedium(text: loc.performanceAnalyticsTitle),
               CaptionText(
                 text: loc.performanceAnalyticsSubtitle,
-                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                color:
+                    theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ??
+                        theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -460,7 +467,9 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                 child: Text(
                   title,
                   style: TextStyle(
-                    color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: theme.textTheme.bodySmall?.color
+                            ?.withValues(alpha: 0.7) ??
+                        theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                 ),
@@ -531,13 +540,17 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                             '• ',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: theme.textTheme.bodyMedium?.color ?? theme.colorScheme.onSurface,
+                              color: theme.textTheme.bodyMedium?.color ??
+                                  theme.colorScheme.onSurface,
                             ),
                           ),
                           Expanded(
                             child: BodyText(
                               text: rec,
-                              color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.8) ?? theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                              color: theme.textTheme.bodySmall?.color
+                                      ?.withValues(alpha: 0.8) ??
+                                  theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.8),
                             ),
                           ),
                         ],

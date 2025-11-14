@@ -47,5 +47,6 @@ void example() {
   // Relative time examples
 
   // Form validation
-  DateManager.validateFormDate('15/08/2020', minAge: 18, maxAge: 100); // Example usage
+  DateManager.validateFormDate('15/08/2020',
+      minAge: 18, maxAge: 100); // Example usage
 }

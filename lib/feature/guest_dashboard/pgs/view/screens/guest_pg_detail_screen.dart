@@ -235,9 +235,16 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                     placeholder: Container(
                       color: isDark
                           ? AppColors.darkInputFill
-                          : Theme.of(context).colorScheme.surfaceContainerHighest,
+                          : Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                       child: Center(
-                        child: Icon(Icons.image, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                        child: Icon(Icons.image,
+                            size: 64,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.5)),
                       ),
                     ),
                   );
@@ -249,14 +256,21 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           Container(
             height: 300,
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkInputFill : Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: isDark
+                  ? AppColors.darkInputFill
+                  : Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
             ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.apartment, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                  Icon(Icons.apartment,
+                      size: 64,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.5)),
                   const SizedBox(height: AppSpacing.paddingS),
                   CaptionText(
                     text: loc?.noPhotosAvailable ??

@@ -43,7 +43,9 @@ class AdaptiveCard extends AdaptiveStatelessWidget {
       child: Card(
         elevation: hasShadow ? elevation : 0, // NEW: Conditional shadow
         color: backgroundColor ??
-            (isDark ? AppColors.darkInputFill : Theme.of(context).colorScheme.surface),
+            (isDark
+                ? AppColors.darkInputFill
+                : Theme.of(context).colorScheme.surface),
         shape: RoundedRectangleBorder(
           borderRadius:
               borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusM),

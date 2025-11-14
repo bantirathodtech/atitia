@@ -3,7 +3,7 @@
 // ============================================================================
 // Manages application theme mode with three options:
 // 1. Light Mode (Day Theme) - Manual bright theme
-// 2. Dark Mode (Night Theme) - Manual dark theme  
+// 2. Dark Mode (Night Theme) - Manual dark theme
 // 3. System Mode - Follows device system settings
 //
 // FEATURES:
@@ -43,7 +43,7 @@ class ThemeProvider extends ChangeNotifier {
   // ==========================================================================
   // Public Getters
   // ==========================================================================
-  
+
   /// Get current theme mode (light, dark, or system)
   ThemeMode get themeMode => _themeMode;
 
@@ -80,11 +80,11 @@ class ThemeProvider extends ChangeNotifier {
   IconData get themeModeIcon {
     switch (_themeMode) {
       case ThemeMode.light:
-        return Icons.light_mode;  // Sun icon for light mode
+        return Icons.light_mode; // Sun icon for light mode
       case ThemeMode.dark:
-        return Icons.dark_mode;   // Moon icon for dark mode
+        return Icons.dark_mode; // Moon icon for dark mode
       case ThemeMode.system:
-        return Icons.brightness_auto;  // Auto icon for system mode
+        return Icons.brightness_auto; // Auto icon for system mode
     }
   }
 
@@ -106,17 +106,17 @@ class ThemeProvider extends ChangeNotifier {
   void cycleTheme() {
     switch (_themeMode) {
       case ThemeMode.light:
-        _themeMode = ThemeMode.dark;    // Light → Dark
+        _themeMode = ThemeMode.dark; // Light → Dark
         break;
       case ThemeMode.dark:
-        _themeMode = ThemeMode.system;  // Dark → System
+        _themeMode = ThemeMode.system; // Dark → System
         break;
       case ThemeMode.system:
-        _themeMode = ThemeMode.light;   // System → Light
+        _themeMode = ThemeMode.light; // System → Light
         break;
     }
     notifyListeners();
-    
+
     // TODO: Persist theme preference to SharedPreferences
     // Example: await _prefs.setString('theme_mode', _themeMode.toString());
   }
@@ -127,7 +127,7 @@ class ThemeProvider extends ChangeNotifier {
     if (_themeMode != mode) {
       _themeMode = mode;
       notifyListeners();
-      
+
       // TODO: Persist theme preference to SharedPreferences
       // Example: await _prefs.setString('theme_mode', mode.toString());
     }
@@ -148,7 +148,7 @@ class ThemeProvider extends ChangeNotifier {
   // Call this in main.dart after initializing SharedPreferences to load
   // saved theme preference
   // ==========================================================================
-  
+
   /// Load saved theme preference from SharedPreferences
   /// Call this in main.dart before runApp() to restore user's choice
   Future<void> loadThemePreference() async {

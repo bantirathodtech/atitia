@@ -11,7 +11,8 @@ import '../utils/exceptions/exceptions.dart';
 class ErrorHandlerService {
   final _analyticsService = getIt.analytics;
   final _crashlyticsService = getIt.crashlytics;
-  final InternationalizationService _i18n = InternationalizationService.instance;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
 
   ErrorHandlerService._privateConstructor();
   static final ErrorHandlerService _instance =

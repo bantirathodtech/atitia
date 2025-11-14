@@ -107,7 +107,8 @@ class AppIntegrityServiceWrapper {
           await _appCheck.activate(androidProvider: AndroidProvider.debug);
         }
       } catch (fallbackError) {
-        debugPrint('⚠️ App Integrity Service: Fallback initialization also failed: $fallbackError');
+        debugPrint(
+            '⚠️ App Integrity Service: Fallback initialization also failed: $fallbackError');
       }
     }
   }

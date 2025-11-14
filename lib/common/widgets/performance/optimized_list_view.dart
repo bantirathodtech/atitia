@@ -160,13 +160,26 @@ class _OptimizedListViewState<T> extends State<OptimizedListView<T>> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inbox_outlined, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+          Icon(Icons.inbox_outlined,
+              size: 64,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.5)),
           const SizedBox(height: AppSpacing.paddingM),
           Text(
             loc?.noItemsFound ?? 'No items found',
             style: TextStyle(
               fontSize: 16,
-              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -336,13 +349,26 @@ class _OptimizedGridViewState<T> extends State<OptimizedGridView<T>> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.grid_view_outlined, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+          Icon(Icons.grid_view_outlined,
+              size: 64,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.5)),
           const SizedBox(height: AppSpacing.paddingM),
           Text(
             loc?.noItemsFound ?? 'No items found',
             style: TextStyle(
               fontSize: 16,
-              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
             ),
           ),
         ],

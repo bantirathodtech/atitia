@@ -262,7 +262,10 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                         text: loc?.configureHowGuestsCanPayYou ??
                             _text('configureHowGuestsCanPayYou',
                                 'Configure how guests can pay you'),
-                        color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onPrimary
+                            .withValues(alpha: 0.9),
                       ),
                     ],
                   ),

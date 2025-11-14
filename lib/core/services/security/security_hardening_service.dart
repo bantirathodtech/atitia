@@ -39,7 +39,7 @@ class SecurityHardeningService {
     if (_isInitialized) return;
 
     try {
-    // Logger not available: _logger.info call removed
+      // Logger not available: _logger.info call removed
 
       // Generate or retrieve encryption key
       await _initializeEncryption();
@@ -55,9 +55,9 @@ class SecurityHardeningService {
         },
       );
 
-    // Logger not available: _logger.info call removed
+      // Logger not available: _logger.info call removed
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -71,7 +71,7 @@ class SecurityHardeningService {
       // Initialize encrypter with AES encryption
       _encrypter = encrypt.Encrypter(encrypt.AES(_encryptionKey));
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       rethrow;
     }
   }
@@ -86,7 +86,7 @@ class SecurityHardeningService {
       final encrypted = _encrypter.encrypt(plainText, iv: _encryptionIV);
       return encrypted.base64;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       rethrow;
     }
   }
@@ -102,7 +102,7 @@ class SecurityHardeningService {
       final decrypted = _encrypter.decrypt(encrypted, iv: _encryptionIV);
       return decrypted;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       rethrow;
     }
   }
@@ -118,7 +118,7 @@ class SecurityHardeningService {
       final hash = sha256.convert(saltedPassword);
       return base64Encode(hash.bytes);
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       rethrow;
     }
   }
@@ -135,7 +135,7 @@ class SecurityHardeningService {
       final expectedHash = hashPassword(password, salt: salt);
       return expectedHash == hash;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return false;
     }
   }
@@ -297,7 +297,7 @@ class SecurityHardeningService {
       final encrypted = _encrypter.encryptBytes(fileBytes, iv: _encryptionIV);
       return encrypted.base64;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       rethrow;
     }
   }
@@ -309,7 +309,7 @@ class SecurityHardeningService {
       final decrypted = _encrypter.decryptBytes(encrypted, iv: _encryptionIV);
       return decrypted;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       rethrow;
     }
   }
@@ -321,7 +321,7 @@ class SecurityHardeningService {
       final digest = sha256.convert(bytes);
       return base64Encode(digest.bytes);
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       rethrow;
     }
   }
@@ -332,7 +332,7 @@ class SecurityHardeningService {
       final expectedSignature = generateDigitalSignature(data);
       return expectedSignature == signature;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return false;
     }
   }
@@ -384,23 +384,23 @@ class SecurityHardeningService {
   bool _hasHardcodedSecrets() {
     // This is a basic check - in production, you'd use more sophisticated tools
     // like git-secrets, truffleHog, or similar secret scanning tools
-    
+
     // Basic validation: Check if EnvironmentConfig is properly configured
     // and doesn't contain obvious placeholder values
-    
+
     try {
       // Import EnvironmentConfig to check for secrets
       // Note: We can't actually scan source code at runtime, so we check
       // that configuration is properly set up
-      
+
       // Check Firebase project configuration
       final projectId = EnvironmentConfig.firebaseProjectId;
-      
+
       // Common patterns that indicate hardcoded secrets or placeholders:
       // - Empty strings
       // - "example", "test", "placeholder", "your-project-id"
       // - API keys that look like placeholders
-      
+
       final suspiciousPatterns = [
         'example',
         'test',
@@ -411,7 +411,7 @@ class SecurityHardeningService {
         'changeme',
         'todo',
       ];
-      
+
       // Check if project ID contains suspicious patterns
       final projectIdLower = projectId.toLowerCase();
       for (final pattern in suspiciousPatterns) {
@@ -419,18 +419,18 @@ class SecurityHardeningService {
           return true; // Suspicious pattern detected
         }
       }
-      
+
       // Check if project ID is empty or too short (likely placeholder)
       if (projectId.isEmpty || projectId.length < 5) {
         return true; // Invalid project ID
       }
-      
+
       // In a full implementation, you would:
       // 1. Scan source code files for API key patterns (e.g., "AIza", "sk-", etc.)
       // 2. Check for hardcoded passwords or tokens
       // 3. Verify no secrets in version control
       // 4. Use static analysis tools to detect secrets
-      
+
       return false; // No obvious hardcoded secrets detected
     } catch (e) {
       // If we can't check, assume there might be issues

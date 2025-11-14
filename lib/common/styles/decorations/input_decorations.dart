@@ -254,7 +254,8 @@ class InputDecorations {
       labelText: labelText,
       hintText: hintText,
     ).copyWith(
-      suffixIcon: const Icon(Icons.check_circle, color: AppColors.success, size: 18),
+      suffixIcon:
+          const Icon(Icons.check_circle, color: AppColors.success, size: 18),
       labelStyle: AppTypography.inputLabel.copyWith(color: AppColors.success),
     );
   }
@@ -271,9 +272,10 @@ class InputDecorations {
       labelText: labelText,
       hintText: hintText,
     ).copyWith(
-      suffixIcon:
-          const Icon(Icons.warning_amber, color: AppColors.statusOrange, size: 18),
-      labelStyle: AppTypography.inputLabel.copyWith(color: AppColors.statusOrange),
+      suffixIcon: const Icon(Icons.warning_amber,
+          color: AppColors.statusOrange, size: 18),
+      labelStyle:
+          AppTypography.inputLabel.copyWith(color: AppColors.statusOrange),
     );
   }
 }

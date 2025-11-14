@@ -191,4 +191,3 @@ class NotificationViewModel extends BaseProviderState
     super.dispose();
   }
 }
-

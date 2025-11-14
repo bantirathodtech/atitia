@@ -71,11 +71,15 @@ class AppColors {
   // ==================== DECORATIVE STATUS COLORS ====================
   // Use these for status indicators, badges, and decorative purposes
   // NOT for actual warnings/errors - use semantic colors for those
-  static const Color statusOrange = Color(0xFFFF9800); // For pending, waiting, etc.
-  static const Color statusRed = Color(0xFFE53935); // For rejected, declined, etc.
-  static const Color statusGreen = Color(0xFF4CAF50); // For approved, available, etc.
+  static const Color statusOrange =
+      Color(0xFFFF9800); // For pending, waiting, etc.
+  static const Color statusRed =
+      Color(0xFFE53935); // For rejected, declined, etc.
+  static const Color statusGreen =
+      Color(0xFF4CAF50); // For approved, available, etc.
   static const Color statusBlue = Color(0xFF2196F3); // For info, new, etc.
-  static const Color statusGrey = Color(0xFF757575); // For inactive, neutral, etc.
+  static const Color statusGrey =
+      Color(0xFF757575); // For inactive, neutral, etc.
 
   // ==================== NEUTRAL COLORS ====================
   static const Color background = Color(0xFFFAFAFA);

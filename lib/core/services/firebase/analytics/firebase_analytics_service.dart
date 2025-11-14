@@ -81,7 +81,8 @@ class AnalyticsServiceWrapper {
         value: safeValue,
       );
     } catch (e) {
-      debugPrint('⚠️ Firebase Analytics: Failed to set user property "$name": $e');
+      debugPrint(
+          '⚠️ Firebase Analytics: Failed to set user property "$name": $e');
     }
   }
 

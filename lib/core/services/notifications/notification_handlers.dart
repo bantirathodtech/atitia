@@ -57,7 +57,7 @@ class NotificationHandlers {
         await _handleGuestGeneralAnnouncement(data);
         break;
       default:
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -96,7 +96,7 @@ class NotificationHandlers {
         await _handleOwnerMaintenanceReminder(data);
         break;
       default:
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -128,7 +128,8 @@ class NotificationHandlers {
         content: Text(
           message,
         ),
-        backgroundColor: status == 'approved' ? AppColors.success : AppColors.statusOrange,
+        backgroundColor:
+            status == 'approved' ? AppColors.success : AppColors.statusOrange,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -229,9 +230,7 @@ class NotificationHandlers {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(
-          data['title'] ??
-              loc?.guestAnnouncementDefaultTitle ??
-              'Announcement',
+          data['title'] ?? loc?.guestAnnouncementDefaultTitle ?? 'Announcement',
         ),
         content: Text(
           data['message'] ??
@@ -407,17 +406,17 @@ class NotificationHandlers {
   // ==========================================================================
 
   /// Gets the current navigation context
-  /// 
+  ///
   /// **LIMITATION:** This method returns null because Flutter's BuildContext
   /// cannot be stored or accessed outside of the widget tree. This is by design
   /// for security and lifecycle management.
-  /// 
+  ///
   /// **SOLUTION:** Instead of storing context, use:
   /// 1. `GlobalKey<NavigatorState>` for navigation (already implemented via AppRouter)
   /// 2. Pass context as parameter to methods that need it
   /// 3. Use `context.push()` / `context.pop()` from within widgets
   /// 4. Use `NavigationService` for programmatic navigation
-  /// 
+  ///
   /// This placeholder remains for backward compatibility and future reference.
   BuildContext? _getCurrentContext() {
     try {
@@ -451,7 +450,11 @@ class NotificationHandlers {
             const SizedBox(height: 4),
             Text(
               message,
-              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7)),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onPrimary
+                      .withValues(alpha: 0.7)),
             ),
           ],
         ),
@@ -460,8 +463,7 @@ class NotificationHandlers {
         duration: const Duration(seconds: 4),
         action: onTap != null
             ? SnackBarAction(
-                label:
-                    AppLocalizations.of(context)?.viewAction ?? 'View',
+                label: AppLocalizations.of(context)?.viewAction ?? 'View',
                 textColor: Theme.of(context).colorScheme.onPrimary,
                 onPressed: onTap,
               )

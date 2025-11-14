@@ -10,7 +10,7 @@ import '../constants/environment_config.dart';
 
 class EnvironmentValidationService {
   /// Validate all environment configuration
-  /// 
+  ///
   /// FIXED: Async credential validation
   /// Flutter recommends: Validate runtime-loaded credentials asynchronously
   /// Changed from: Only validating static const fields
@@ -26,7 +26,8 @@ class EnvironmentValidationService {
     if (missingCredentials.isNotEmpty) {
       // Log missing credentials for debugging (non-critical)
       if (kDebugMode) {
-        debugPrint('⚠️ Missing optional credentials: ${missingCredentials.join(', ')}');
+        debugPrint(
+            '⚠️ Missing optional credentials: ${missingCredentials.join(', ')}');
       }
     }
 
@@ -70,7 +71,7 @@ class EnvironmentValidationService {
   }
 
   /// Validate Google Sign-In configuration (async)
-  /// 
+  ///
   /// FIXED: Async credential validation
   /// Flutter recommends: Validate runtime-loaded credentials asynchronously
   /// Changed from: Only validating static const fields
@@ -79,7 +80,7 @@ class EnvironmentValidationService {
     try {
       // Use async validation which checks both static and runtime credentials
       final isValid = await EnvironmentConfig.validateCredentialsAsync();
-      
+
       if (!isValid && kDebugMode) {
         // Log which credentials are missing for debugging
         try {
@@ -88,21 +89,21 @@ class EnvironmentValidationService {
         } catch (e) {
           debugPrint('❌ Google Web Client ID: Not configured');
         }
-        
+
         try {
           await EnvironmentConfig.getGoogleSignInAndroidClientIdAsync();
           debugPrint('✅ Google Android Client ID: Configured');
         } catch (e) {
           debugPrint('❌ Google Android Client ID: Not configured');
         }
-        
+
         try {
           await EnvironmentConfig.getGoogleSignInIosClientIdAsync();
           debugPrint('✅ Google iOS Client ID: Configured');
         } catch (e) {
           debugPrint('❌ Google iOS Client ID: Not configured');
         }
-        
+
         try {
           await EnvironmentConfig.getGoogleSignInClientSecretAsync();
           debugPrint('✅ Google Client Secret: Configured');
@@ -110,7 +111,7 @@ class EnvironmentValidationService {
           debugPrint('❌ Google Client Secret: Not configured');
         }
       }
-      
+
       return isValid;
     } catch (e) {
       debugPrint('⚠️ Google Sign-In configuration validation error: $e');
@@ -147,7 +148,8 @@ class EnvironmentValidationService {
   static void printEnvironmentSummary() {
     final missingCredentials = EnvironmentConfig.getMissingCredentials();
     if (missingCredentials.isNotEmpty) {
-      debugPrint('⚠️ Missing optional credentials: ${missingCredentials.join(', ')}');
+      debugPrint(
+          '⚠️ Missing optional credentials: ${missingCredentials.join(', ')}');
     } else {
       debugPrint('✅ All required credentials are configured');
     }

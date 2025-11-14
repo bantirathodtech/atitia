@@ -84,7 +84,17 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
           children: [
             BodyText(text: 'Failed to load food details', medium: true),
             const SizedBox(height: AppSpacing.paddingS),
-            BodyText(text: _error ?? 'Unknown error', color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+            BodyText(
+                text: _error ?? 'Unknown error',
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7)),
             const SizedBox(height: AppSpacing.paddingM),
             PrimaryButton(onPressed: _load, label: 'Retry'),
           ],
@@ -122,7 +132,9 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
           // Availability
           BodyText(
             text: food.isCurrentlyAvailable ? 'Available' : 'Out of Stock',
-            color: food.isCurrentlyAvailable ? AppColors.success : context.decorativeRed,
+            color: food.isCurrentlyAvailable
+                ? AppColors.success
+                : context.decorativeRed,
           ),
         ],
       ),

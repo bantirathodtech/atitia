@@ -32,7 +32,7 @@ class AutomatedTestingService {
     _testMetrics.clear();
 
     try {
-    // Logger not available: _logger.info call removed
+      // Logger not available: _logger.info call removed
 
       final startTime = DateTime.now();
 
@@ -71,11 +71,11 @@ class AutomatedTestingService {
         },
       );
 
-    // Logger not available: _logger.info call removed
+      // Logger not available: _logger.info call removed
 
       return result;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       rethrow;
     } finally {
       _isRunning = false;

@@ -37,6 +37,7 @@ class NavigationService {
       pathParameters: {'pgId': pgId},
     );
   }
+
   void goToGuestPGAdd() => _router.go(AppRoutes.guestPGAdd());
   void goToGuestFoods() => _router.go(AppRoutes.guestFoods);
   void goToGuestFoodDetails(String foodId) =>
@@ -48,11 +49,13 @@ class NavigationService {
       pathParameters: {'paymentId': paymentId},
     );
   }
+
   void goToGuestPaymentAdd() => _router.go(AppRoutes.guestPaymentAdd());
   void goToGuestComplaints() => _router.go(AppRoutes.guestComplaints);
   void goToGuestComplaintAdd() {
     _router.pushNamed('guestComplaintsAdd');
   }
+
   void goToGuestComplaintDetails(String complaintId) =>
       _router.go(AppRoutes.guestComplaintDetails(complaintId));
   void goToGuestProfile() => _router.go(AppRoutes.guestProfile);

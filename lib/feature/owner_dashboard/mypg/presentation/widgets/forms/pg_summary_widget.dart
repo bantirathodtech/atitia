@@ -292,11 +292,13 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           rentInfoTitle,
           [
             _buildSummaryRow(context, estimatedRevenueLabel, totalRentText),
-            _buildSummaryRow(context,
+            _buildSummaryRow(
+              context,
               securityDepositLabel,
               depositText,
             ),
-            _buildSummaryRow(context,
+            _buildSummaryRow(
+              context,
               maintenanceLabel,
               '$maintenanceTypeLabel - $maintenanceAmountText',
             ),
@@ -310,12 +312,13 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           context,
           amenitiesTitle,
           [
-            _buildSummaryRow(context,
+            _buildSummaryRow(
+                context,
                 selectedAmenitiesLabel,
                 NumberFormat.decimalPattern(localeName)
                     .format(selectedAmenities.length)),
             if (selectedAmenities.isNotEmpty)
-              _buildSummaryRow(context,listLabel, amenitiesList),
+              _buildSummaryRow(context, listLabel, amenitiesList),
           ],
         ),
 
@@ -326,7 +329,8 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           context,
           photosTitle,
           [
-            _buildSummaryRow(context,
+            _buildSummaryRow(
+                context,
                 uploadedPhotosLabel,
                 NumberFormat.decimalPattern(localeName)
                     .format(uploadedPhotos.length)),
@@ -353,7 +357,15 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
                 const SizedBox(height: AppSpacing.paddingS),
                 BodyText(
                   text: reviewMessage,
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -390,7 +402,15 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
             width: 120,
             child: BodyText(
               text: '$label:',
-              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
             ),
           ),
           Expanded(

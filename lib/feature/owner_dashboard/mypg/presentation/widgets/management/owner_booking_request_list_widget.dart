@@ -63,7 +63,15 @@ class OwnerBookingRequestListWidget extends StatelessWidget {
                       BodyText(text: booking.roomBedDisplay),
                       BodyText(
                         text: booking.formattedStartDate,
-                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                       ),
                     ],
                   ),

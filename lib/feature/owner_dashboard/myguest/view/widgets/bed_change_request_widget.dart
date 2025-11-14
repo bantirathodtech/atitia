@@ -33,7 +33,12 @@ class BedChangeRequestWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.bed_outlined, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+            Icon(Icons.bed_outlined,
+                size: 64,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.5)),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingSmall(
               text: loc.noBedChangeRequests,
@@ -187,7 +192,17 @@ class BedChangeRequestWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          BodyText(text: '$label:', color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+          BodyText(
+              text: '$label:',
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7)),
           BodyText(text: value, medium: true),
         ],
       ),
@@ -275,7 +290,8 @@ class BedChangeRequestWidget extends StatelessWidget {
                           ? loc.bedChangeApproveSuccess
                           : loc.bedChangeApproveFailure,
                     ),
-                    backgroundColor: success ? AppColors.success : AppColors.error,
+                    backgroundColor:
+                        success ? AppColors.success : AppColors.error,
                   ),
                 );
               }
@@ -348,7 +364,8 @@ class BedChangeRequestWidget extends StatelessWidget {
                           ? loc.bedChangeRejectSuccess
                           : loc.bedChangeRejectFailure,
                     ),
-                    backgroundColor: success ? AppColors.warning : AppColors.error,
+                    backgroundColor:
+                        success ? AppColors.warning : AppColors.error,
                   ),
                 );
               }

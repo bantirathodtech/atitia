@@ -188,9 +188,8 @@ class GeneralValidators {
       {String? fileType}) {
     if (fileSizeInBytes > maxSizeInBytes) {
       final maxSizeMB = (maxSizeInBytes / (1024 * 1024)).toStringAsFixed(1);
-      final fileTypeText = fileType != null && fileType.isNotEmpty
-          ? '$fileType '
-          : '';
+      final fileTypeText =
+          fileType != null && fileType.isNotEmpty ? '$fileType ' : '';
       return _msg(
         'validationFileSizeExceededDetailed',
         '{fileType}File size must be less than {max}MB',

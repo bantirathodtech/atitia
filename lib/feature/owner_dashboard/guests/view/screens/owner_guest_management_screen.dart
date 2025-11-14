@@ -207,7 +207,12 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.home_work_outlined, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+          Icon(Icons.home_work_outlined,
+              size: 64,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.5)),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(text: loc.ownerGuestNoPgSelectedTitle),
           const SizedBox(height: AppSpacing.paddingS),
@@ -249,8 +254,8 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
             Semantics(
               label: 'Error icon',
               excludeSemantics: true,
-              child:
-                  Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+              child: Icon(Icons.error_outline,
+                  size: 64, color: Theme.of(context).colorScheme.error),
             ),
             const SizedBox(height: AppSpacing.paddingM),
             Semantics(

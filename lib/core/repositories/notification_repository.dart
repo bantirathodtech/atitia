@@ -67,21 +67,19 @@ class NotificationRepository {
   Stream<List<Map<String, dynamic>>> streamNotificationsForUser(String userId) {
     return _databaseService
         .getCollectionStreamWithFilter(
-          FirestoreConstants.notifications,
-          'userId',
-          userId,
-        )
+      FirestoreConstants.notifications,
+      'userId',
+      userId,
+    )
         .map((snapshot) {
-      final notifications = snapshot.docs
-          .map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return {
-              ...data,
-              'id': data['id'] ?? doc.id,
-              'timestamp': _parseTimestamp(data['createdAt']),
-            };
-          })
-          .toList();
+      final notifications = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return {
+          ...data,
+          'id': data['id'] ?? doc.id,
+          'timestamp': _parseTimestamp(data['createdAt']),
+        };
+      }).toList();
 
       // Sort by timestamp (newest first)
       notifications.sort((a, b) {

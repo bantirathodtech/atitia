@@ -140,7 +140,9 @@ class InteractiveBedMapWidget extends StatelessWidget {
     AppLocalizations loc,
   ) {
     final isOccupied = booking.isActive;
-    final color = isOccupied ? AppColors.success : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
+    final color = isOccupied
+        ? AppColors.success
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
 
     return Container(
       width: 80,

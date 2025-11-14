@@ -16,7 +16,8 @@ import '../../core/services/localization/internationalization_service.dart';
 /// Uses interface-based services for dependency injection (swappable backends)
 class BookingRepository {
   final IDatabaseService _databaseService;
-  final InternationalizationService _i18n = InternationalizationService.instance;
+  final InternationalizationService _i18n =
+      InternationalizationService.instance;
   static const String _bookingsCollection = 'bookings';
 
   /// Constructor with dependency injection
@@ -179,7 +180,8 @@ class BookingRepository {
         },
       );
     } catch (e) {
-      throw Exception(_i18n.translate('failedToUpdateBookingStatus', parameters: {
+      throw Exception(
+          _i18n.translate('failedToUpdateBookingStatus', parameters: {
         'error': e.toString(),
       }));
     }

@@ -35,12 +35,12 @@ class AuthenticationServiceWrapper {
   factory AuthenticationServiceWrapper() => _instance;
 
   /// Initialize Google Sign-In with platform-specific configuration
-  /// 
+  ///
   /// FIXED: Async credential loading from secure storage
   /// Flutter recommends: Load credentials from secure storage at runtime
   /// Changed from: Synchronous initialization with static const values
   /// Changed to: Async initialization with runtime credential loading
-  /// 
+  ///
   /// This method loads credentials from secure storage or environment variables
   /// before initializing Google Sign-In
   Future<void> _initializeGoogleSignIn() async {
@@ -48,7 +48,7 @@ class AuthenticationServiceWrapper {
       // Load credentials asynchronously from secure storage or environment
       final clientId = await _getClientIdAsync();
       final clientSecret = await _getClientSecretAsync();
-      
+
       _googleSignIn = GoogleSignIn(
         params: GoogleSignInParams(
           clientId: clientId,
@@ -56,12 +56,14 @@ class AuthenticationServiceWrapper {
           scopes: ['openid', 'profile', 'email'],
         ),
       );
-      
-      debugPrint('✅ Google Sign-In initialized with credentials loaded from secure storage/environment');
+
+      debugPrint(
+          '✅ Google Sign-In initialized with credentials loaded from secure storage/environment');
     } catch (e) {
       debugPrint('⚠️ Google Sign-In initialization error: $e');
-      debugPrint('   Attempting fallback initialization with environment variables');
-      
+      debugPrint(
+          '   Attempting fallback initialization with environment variables');
+
       try {
         // Fallback: Try with static environment variables (may have placeholders)
         _googleSignIn = GoogleSignIn(
@@ -71,9 +73,11 @@ class AuthenticationServiceWrapper {
             scopes: ['openid', 'profile', 'email'],
           ),
         );
-        debugPrint('⚠️ Google Sign-In initialized with fallback credentials (may have placeholders)');
+        debugPrint(
+            '⚠️ Google Sign-In initialized with fallback credentials (may have placeholders)');
       } catch (fallbackError) {
-        debugPrint('❌ Google Sign-In fallback initialization failed: $fallbackError');
+        debugPrint(
+            '❌ Google Sign-In fallback initialization failed: $fallbackError');
         // Create a minimal instance that will fail gracefully when used
         _googleSignIn = GoogleSignIn(
           params: GoogleSignInParams(
@@ -162,7 +166,7 @@ class AuthenticationServiceWrapper {
   }
 
   /// Initialize authentication service
-  /// 
+  ///
   /// FIXED: Async Google Sign-In initialization
   /// Flutter recommends: Initialize Google Sign-In asynchronously with runtime credentials
   /// Changed from: Synchronous initialization in constructor

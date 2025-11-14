@@ -96,7 +96,10 @@ class _OwnerPaymentNotificationsBadgeState
               Container(
                 padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onPrimary
+                      .withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -120,7 +123,10 @@ class _OwnerPaymentNotificationsBadgeState
                           viewModel.pendingNotifications.length,
                         ) ??
                         '${viewModel.pendingNotifications.length} waiting',
-                    color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onPrimary
+                        .withValues(alpha: 0.9),
                   ),
                 ],
               ),
@@ -149,7 +155,8 @@ class _OwnerPaymentNotificationsBadgeState
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent, // Modal bottom sheet - transparent is fine
+      backgroundColor:
+          Colors.transparent, // Modal bottom sheet - transparent is fine
       builder: (context) =>
           _PaymentNotificationsSheet(notifications: notifications),
     );
@@ -170,7 +177,8 @@ class _PaymentNotificationsSheet extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Theme.of(context).colorScheme.surface,
+        color:
+            isDark ? AppColors.darkCard : Theme.of(context).colorScheme.surface,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.borderRadiusL),
         ),
@@ -217,8 +225,15 @@ class _PaymentNotificationsSheet extends StatelessWidget {
                       CaptionText(
                         text: loc?.notificationsCount(notifications.length) ??
                             '${notifications.length} notifications',
-                        color:
-                            Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                       ),
                     ],
                   ),

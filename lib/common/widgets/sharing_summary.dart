@@ -66,7 +66,17 @@ class SharingSummaryRow extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.bed, size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                  Icon(Icons.bed,
+                      size: 14,
+                      color: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.color
+                              ?.withValues(alpha: 0.7) ??
+                          Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7)),
                   const SizedBox(width: AppSpacing.paddingXS),
                   BodyText(text: e.key, small: true),
                   const SizedBox(width: AppSpacing.paddingS),
@@ -137,7 +147,15 @@ class SharingSummaryTable extends StatelessWidget {
 
   Widget _th(BuildContext context, String text) => Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingS),
-      child: BodyText(text: text, small: true, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)));
+      child: BodyText(
+          text: text,
+          small: true,
+          color: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.color
+                  ?.withValues(alpha: 0.7) ??
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)));
   Widget _td(String text) => Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingS),
       child: BodyText(text: text, small: true));

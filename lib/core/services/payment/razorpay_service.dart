@@ -14,7 +14,8 @@ class RazorpayService with LoggingMixin {
   Function(String, PaymentSuccessResponse)? _onSuccess;
   Function(PaymentFailureResponse)? _onFailure;
   Function(ExternalWalletResponse)? _onExternalWallet;
-  final OwnerPaymentDetailsRepository _paymentDetailsRepo = OwnerPaymentDetailsRepository();
+  final OwnerPaymentDetailsRepository _paymentDetailsRepo =
+      OwnerPaymentDetailsRepository();
 
   /// Initialize Razorpay
   /// Note: Razorpay key should be stored in environment config
@@ -78,9 +79,10 @@ class RazorpayService with LoggingMixin {
     try {
       // Get Razorpay key from owner's payment settings
       final razorpayKey = await _getRazorpayKey(ownerId: ownerId);
-      
+
       if (razorpayKey == null || razorpayKey.isEmpty) {
-        throw Exception('Razorpay key not configured for this owner. Please contact the PG owner.');
+        throw Exception(
+            'Razorpay key not configured for this owner. Please contact the PG owner.');
       }
 
       final options = {
@@ -189,8 +191,9 @@ class RazorpayService with LoggingMixin {
     }
 
     try {
-      final paymentDetails = await _paymentDetailsRepo.getPaymentDetails(ownerId);
-      
+      final paymentDetails =
+          await _paymentDetailsRepo.getPaymentDetails(ownerId);
+
       if (paymentDetails == null) {
         logError(
           'Payment details not found for owner',
@@ -210,7 +213,7 @@ class RazorpayService with LoggingMixin {
       }
 
       final razorpayKey = paymentDetails.razorpayKey;
-      
+
       if (razorpayKey == null || razorpayKey.isEmpty) {
         logError(
           'Razorpay key is empty in payment details',
@@ -261,4 +264,3 @@ class RazorpayService with LoggingMixin {
     _cachedOwnerId = null;
   }
 }
-

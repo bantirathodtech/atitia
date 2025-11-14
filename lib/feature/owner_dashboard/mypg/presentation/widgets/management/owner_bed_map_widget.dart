@@ -177,7 +177,8 @@ class OwnerBedMapWidget extends StatelessWidget {
                       const SizedBox(height: 2),
                       CaptionText(
                         text: occupancySummary,
-                        color: theme.textTheme.bodySmall?.color ?? theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: theme.textTheme.bodySmall?.color ??
+                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ],
                   ),
@@ -237,7 +238,10 @@ class OwnerBedMapWidget extends StatelessWidget {
                   fontSize: 13,
                 ),
                 StatusChip(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.5),
                   label: loc?.ownerBedMapStatusChipVacant(vacantCount) ??
                       _text('ownerBedMapStatusChipVacant', 'Vacant {count}',
                           parameters: {'count': vacantCount}),

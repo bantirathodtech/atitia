@@ -294,7 +294,12 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
           // Month label
           CaptionText(
             text: monthName,
-            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ],
       ),
@@ -433,7 +438,15 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
               // Placeholder value label (subtle)
               CaptionText(
                 text: _formatCurrency(0, localeName),
-                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.4) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.4) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.4),
               ),
               const SizedBox(height: AppSpacing.paddingXS),
 
@@ -453,7 +466,15 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
               // Month label
               CaptionText(
                 text: monthName,
-                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.6) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.6),
               ),
             ],
           ),

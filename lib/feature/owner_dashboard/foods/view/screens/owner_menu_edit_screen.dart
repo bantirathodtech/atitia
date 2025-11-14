@@ -520,7 +520,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                         url,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.error, color: Theme.of(context).colorScheme.error);
+                          return Icon(Icons.error,
+                              color: Theme.of(context).colorScheme.error);
                         },
                       ),
                       onDelete: () => _deletePhoto(index, isNewPhoto: false),
@@ -546,7 +547,17 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             const SizedBox(height: AppSpacing.paddingS),
             const LinearProgressIndicator(),
             const SizedBox(height: AppSpacing.paddingXS),
-            BodyText(text: loc.ownerMenuEditUploadingPhoto, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+            BodyText(
+                text: loc.ownerMenuEditUploadingPhoto,
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7)),
           ],
         ],
       ),

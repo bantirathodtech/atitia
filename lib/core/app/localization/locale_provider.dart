@@ -42,8 +42,8 @@ class LocaleProvider extends ChangeNotifier {
       if (savedLocaleCode != null) {
         // Load saved locale preference
         final savedLocale = Locale(savedLocaleCode);
-        if (supportedLocales.any(
-            (l) => l.languageCode == savedLocale.languageCode)) {
+        if (supportedLocales
+            .any((l) => l.languageCode == savedLocale.languageCode)) {
           _locale = savedLocale;
         }
       } else {
@@ -75,8 +75,7 @@ class LocaleProvider extends ChangeNotifier {
 
   /// Change app locale if supported and persist to SharedPreferences
   Future<void> setLocale(Locale locale) async {
-    if (!supportedLocales
-        .any((l) => l.languageCode == locale.languageCode)) {
+    if (!supportedLocales.any((l) => l.languageCode == locale.languageCode)) {
       return;
     }
 
@@ -96,9 +95,8 @@ class LocaleProvider extends ChangeNotifier {
 
   /// Toggle between English and Telugu
   Future<void> toggleLanguage() async {
-    final newLocale = _locale.languageCode == 'en'
-        ? const Locale('te')
-        : const Locale('en');
+    final newLocale =
+        _locale.languageCode == 'en' ? const Locale('te') : const Locale('en');
     await setLocale(newLocale);
   }
 }

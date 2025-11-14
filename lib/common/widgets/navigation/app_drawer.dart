@@ -137,11 +137,20 @@ class AppDrawer extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: [Theme.of(context).colorScheme.onPrimary, Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7)],
+                    colors: [
+                      Theme.of(context).colorScheme.onPrimary,
+                      Theme.of(context)
+                          .colorScheme
+                          .onPrimary
+                          .withValues(alpha: 0.7)
+                    ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onPrimary
+                          .withValues(alpha: 0.3),
                       blurRadius: 15,
                       offset: const Offset(0, 5),
                     ),
@@ -182,11 +191,18 @@ class AppDrawer extends StatelessWidget {
                     Row(
                       children: [
                         Icon(Icons.phone,
-                            size: 14, color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7)),
+                            size: 14,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimary
+                                .withValues(alpha: 0.7)),
                         const SizedBox(width: AppSpacing.paddingXS),
                         BodyText(
                           text: user?.phoneNumber ?? '',
-                          color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withValues(alpha: 0.9),
                         ),
                       ],
                     ),
@@ -198,10 +214,16 @@ class AppDrawer extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onPrimary
+                            .withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -237,10 +259,16 @@ class AppDrawer extends StatelessWidget {
                 vertical: 6,
               ),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.15),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onPrimary
+                    .withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onPrimary
+                      .withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -560,7 +588,7 @@ class AppDrawer extends StatelessWidget {
           SnackBar(
             content: BodyText(
               text: '${loc.failedToSwitchAccount}: $e',
-                color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
             backgroundColor: AppColors.error,
           ),
@@ -621,7 +649,7 @@ class AppDrawer extends StatelessWidget {
           SnackBar(
             content: BodyText(
               text: '${loc.logoutFailed}: $e',
-                color: Theme.of(context).colorScheme.onPrimary,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
             backgroundColor: AppColors.error,
           ),

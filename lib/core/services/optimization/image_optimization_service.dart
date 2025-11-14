@@ -37,7 +37,7 @@ class ImageOptimizationService {
     bool createThumbnail = false,
   }) async {
     try {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
 
       // Decode image
       final originalImage = img.decodeImage(imageBytes);
@@ -83,11 +83,11 @@ class ImageOptimizationService {
         },
       );
 
-    // Logger not available: _logger.info call removed
+      // Logger not available: _logger.info call removed
 
       return optimizedBytes;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return imageBytes; // Return original if optimization fails
     }
   }
@@ -100,7 +100,7 @@ class ImageOptimizationService {
     int quality = _thumbnailQuality,
   }) async {
     try {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
 
       final thumbnailBytes = await optimizeImage(
         imageBytes,
@@ -121,7 +121,7 @@ class ImageOptimizationService {
 
       return thumbnailBytes;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return imageBytes;
     }
   }
@@ -130,7 +130,7 @@ class ImageOptimizationService {
   Future<Map<String, Uint8List>> optimizeForMultipleUseCases(
       Uint8List imageBytes) async {
     try {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
 
       final results = <String, Uint8List>{};
 
@@ -168,7 +168,7 @@ class ImageOptimizationService {
 
       return results;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return {'original': imageBytes};
     }
   }
@@ -192,7 +192,7 @@ class ImageOptimizationService {
         'isSquare': image.width == image.height,
       };
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return {};
     }
   }
@@ -241,7 +241,7 @@ class ImageOptimizationService {
     int? maxHeight,
   }) async {
     try {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
 
       final optimizedImages = <Uint8List>[];
 
@@ -255,7 +255,7 @@ class ImageOptimizationService {
           );
           optimizedImages.add(optimized);
         } catch (e) {
-    // Logger not available: _logger call removed
+          // Logger not available: _logger call removed
           optimizedImages
               .add(imageBytesList[i]); // Use original if optimization fails
         }
@@ -272,7 +272,7 @@ class ImageOptimizationService {
 
       return optimizedImages;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return imageBytesList; // Return originals if batch optimization fails
     }
   }

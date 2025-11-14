@@ -146,8 +146,10 @@ class GuestComplaintCard extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color:
-                      Theme.of(context).colorScheme.shadow.withValues(alpha: isDarkMode ? 0.3 : 0.05),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .shadow
+                      .withValues(alpha: isDarkMode ? 0.3 : 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

@@ -102,7 +102,12 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
           text: loc?.pgAdditionalInfoNearbyPlacesDescription ??
               _text('pgAdditionalInfoNearbyPlacesDescription',
                   'Add nearby landmarks, locations, or points of interest'),
-          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+          color: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.color
+                  ?.withValues(alpha: 0.6) ??
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         const SizedBox(height: AppSpacing.paddingM),
 
@@ -161,7 +166,15 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
                       Icon(
                         Icons.close,
                         size: 16,
-                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.6) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6),
                       ),
                     ],
                   ),

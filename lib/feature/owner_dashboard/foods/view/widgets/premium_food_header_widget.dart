@@ -93,7 +93,10 @@ class PremiumFoodHeaderWidget extends StatelessWidget
             boxShadow: [
               BoxShadow(
                 color: isDarkMode
-                    ? Theme.of(context).colorScheme.shadow.withValues(alpha: 0.2)
+                    ? Theme.of(context)
+                        .colorScheme
+                        .shadow
+                        .withValues(alpha: 0.2)
                     : dayColors[currentTabIndex].withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
@@ -151,7 +154,9 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
-                              color: Theme.of(context).colorScheme.onPrimary, // Required for ShaderMask
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimary, // Required for ShaderMask
                             ),
                           ),
                         ),

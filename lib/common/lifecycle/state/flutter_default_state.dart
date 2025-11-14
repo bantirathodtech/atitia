@@ -77,7 +77,8 @@ class _SelectorWidgetState<StateData, Selected>
   }
 
   @override
-  void didUpdateWidget(covariant _SelectorWidget<StateData, Selected> oldWidget) {
+  void didUpdateWidget(
+      covariant _SelectorWidget<StateData, Selected> oldWidget) {
     super.didUpdateWidget(oldWidget);
     final newSelected = widget.selector(widget.stateProvider());
     if (newSelected != selectedValue) {

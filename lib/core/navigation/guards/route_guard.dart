@@ -16,13 +16,13 @@ class RouteGuard {
         debugPrint('🔒 RouteGuard: No authenticated user found');
         return false;
       }
-      
+
       // Additional validation: ensure user ID is not empty
       if (authUser.uid.isEmpty) {
         debugPrint('🔒 RouteGuard: Invalid user ID (empty)');
         return false;
       }
-      
+
       return true;
     } catch (e) {
       debugPrint('🔒 RouteGuard: Authentication check failed: $e');
@@ -32,7 +32,7 @@ class RouteGuard {
 
   /// Gets current user role from Firestore
   /// Returns 'guest', 'owner', or null if not authenticated or role not found
-  /// 
+  ///
   /// This method:
   /// 1. Checks if user is authenticated via Firebase Auth
   /// 2. Fetches user document from Firestore 'users' collection
@@ -62,30 +62,35 @@ class RouteGuard {
 
       // Check if document exists
       if (!userDoc.exists) {
-        debugPrint('🔒 RouteGuard: User document not found in Firestore for userId: $userId');
+        debugPrint(
+            '🔒 RouteGuard: User document not found in Firestore for userId: $userId');
         return null;
       }
 
       // Extract role from document data
       final userData = userDoc.data() as Map<String, dynamic>?;
       if (userData == null) {
-        debugPrint('🔒 RouteGuard: User document data is null for userId: $userId');
+        debugPrint(
+            '🔒 RouteGuard: User document data is null for userId: $userId');
         return null;
       }
 
       final role = userData['role'] as String?;
       if (role == null || role.isEmpty) {
-        debugPrint('🔒 RouteGuard: Role field is missing or empty for userId: $userId');
+        debugPrint(
+            '🔒 RouteGuard: Role field is missing or empty for userId: $userId');
         return null;
       }
 
       // Validate role is either 'guest' or 'owner'
       if (role != 'guest' && role != 'owner') {
-        debugPrint('🔒 RouteGuard: Invalid role value "$role" for userId: $userId');
+        debugPrint(
+            '🔒 RouteGuard: Invalid role value "$role" for userId: $userId');
         return null;
       }
 
-      debugPrint('🔒 RouteGuard: Successfully retrieved role "$role" for userId: $userId');
+      debugPrint(
+          '🔒 RouteGuard: Successfully retrieved role "$role" for userId: $userId');
       return role;
     } catch (e) {
       debugPrint('🔒 RouteGuard: Error getting user role: $e');

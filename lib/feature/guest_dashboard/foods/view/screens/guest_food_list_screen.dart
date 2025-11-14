@@ -413,7 +413,10 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withValues(alpha: isDarkMode ? 0.3 : 0.05),
+            color: Theme.of(context)
+                .colorScheme
+                .shadow
+                .withValues(alpha: isDarkMode ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -582,8 +585,12 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                             ? AppColors.darkInputFill
                             : AppColors.surfaceVariant,
                         child: Center(
-                          child:
-                              Icon(Icons.image, size: 32, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                          child: Icon(Icons.image,
+                              size: 32,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.5)),
                         ),
                       ),
                     ),
@@ -692,7 +699,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDarkMode ? AppColors.darkDivider : Theme.of(context).dividerColor,
+          color: isDarkMode
+              ? AppColors.darkDivider
+              : Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -701,7 +710,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           HeadingMedium(
             text: AppLocalizations.of(context)?.foodMenuStatistics ??
                 'Food Menu Statistics',
-            color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
+            color: Theme.of(context).textTheme.bodyLarge?.color ??
+                Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -828,7 +838,15 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             label,
             style: TextStyle(
               fontSize: 12,
-              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -846,7 +864,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         children: [
           HeadingMedium(
             text: 'Weekly Menu Preview',
-            color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
+            color: Theme.of(context).textTheme.bodyLarge?.color ??
+                Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -890,7 +909,15 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     child: Text(
                       days[index],
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                         fontSize: 12,
                       ),
                     ),
@@ -945,8 +972,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color:
-              Theme.of(context).dividerColor,
+          color: Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -965,7 +991,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ??
+                      Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -1003,7 +1030,10 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             ),
             child: Icon(
               Icons.restaurant,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.5),
               size: 20,
             ),
           ),
@@ -1016,7 +1046,10 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   height: 12,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
@@ -1044,7 +1077,10 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                 height: 8,
                 width: 40,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -1068,7 +1104,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDarkMode ? AppColors.darkDivider : Theme.of(context).dividerColor,
+          color: isDarkMode
+              ? AppColors.darkDivider
+              : Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -1076,18 +1114,32 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           Icon(
             Icons.restaurant_menu,
             size: 48,
-            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.5) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(
             text: 'No Menu Available',
-            color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
+            color: Theme.of(context).textTheme.bodyLarge?.color ??
+                Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingS),
           Text(
             'Your PG owner hasn\'t set up a weekly menu yet. The menu will appear here once it\'s configured.',
             style: TextStyle(
-              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
               fontSize: 14,
             ),
             textAlign: TextAlign.center,

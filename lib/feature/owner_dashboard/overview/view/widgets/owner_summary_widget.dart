@@ -128,7 +128,17 @@ class OwnerSummaryWidget extends StatelessWidget {
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(text: value, color: color),
           const SizedBox(height: AppSpacing.paddingXS),
-          CaptionText(text: title, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+          CaptionText(
+              text: title,
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7)),
         ],
       ),
     );

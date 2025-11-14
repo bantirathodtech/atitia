@@ -470,7 +470,8 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+                Icon(Icons.error_outline,
+                    size: 64, color: Theme.of(context).colorScheme.error),
                 const SizedBox(height: AppSpacing.paddingL),
                 HeadingMedium(
                   text: AppLocalizations.of(context)?.errorLoadingProfile ??
@@ -599,14 +600,20 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
           children: [
             CircleAvatar(
               radius: 50,
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              backgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
               backgroundImage: imageUrl != null
                   ? NetworkImage(imageUrl) as ImageProvider
                   : selectedFile != null
                       ? FileImage(selectedFile)
                       : null,
               child: imageUrl == null && selectedFile == null
-                  ? Icon(Icons.person, size: 40, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))
+                  ? Icon(Icons.person,
+                      size: 40,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.5))
                   : null,
             ),
             Positioned(

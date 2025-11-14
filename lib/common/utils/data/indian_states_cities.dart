@@ -1,5 +1,5 @@
 /// Indian states and cities data for dropdown selections
-/// 
+///
 /// Provides comprehensive list of Indian states and their cities
 /// Used for address forms, location selection, and geographic filtering
 class IndianStatesCities {
@@ -328,4 +328,3 @@ class IndianStatesCities {
         .toList();
   }
 }
-

@@ -1,7 +1,6 @@
 import '../../../../core/services/localization/internationalization_service.dart';
 
-final InternationalizationService _i18n =
-    InternationalizationService.instance;
+final InternationalizationService _i18n = InternationalizationService.instance;
 
 String _translate(
   String key,
@@ -59,8 +58,7 @@ class AppException implements Exception {
     final parts = <String>[baseString];
 
     if (details != null && details!.isNotEmpty) {
-      final detailsLabel =
-          _translate('appExceptionDetailsLabel', 'Details');
+      final detailsLabel = _translate('appExceptionDetailsLabel', 'Details');
       parts.add('$detailsLabel: $details');
     }
 
@@ -101,8 +99,7 @@ class NetworkException extends AppException {
                 'networkExceptionRecovery',
                 'Check your connection and try again',
               ),
-          prefix:
-              _translate('networkExceptionPrefix', 'Network Error'),
+          prefix: _translate('networkExceptionPrefix', 'Network Error'),
           severity: ErrorSeverity.medium,
         );
 }
@@ -140,8 +137,7 @@ class DataParsingException extends AppException {
                 'dataParsingExceptionRecovery',
                 'Please try again or contact support if the problem persists',
               ),
-          prefix:
-              _translate('dataParsingExceptionPrefix', 'Parsing Error'),
+          prefix: _translate('dataParsingExceptionPrefix', 'Parsing Error'),
           severity: ErrorSeverity.medium,
         );
 }
@@ -154,14 +150,14 @@ class ConfigurationException extends AppException {
     super.originalError,
   }) : super(
           message: message ??
-              _translate('configurationExceptionMessage', 'Configuration error'),
+              _translate(
+                  'configurationExceptionMessage', 'Configuration error'),
           recoverySuggestion: recoverySuggestion ??
               _translate(
                 'configurationExceptionRecovery',
                 'Please restart the app or contact support',
               ),
-          prefix:
-              _translate('configurationExceptionPrefix', 'Config Error'),
+          prefix: _translate('configurationExceptionPrefix', 'Config Error'),
           severity: ErrorSeverity.critical,
         );
 }

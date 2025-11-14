@@ -160,16 +160,20 @@ class FirebaseServiceInitializer {
     // Changed to: Using async methods that load from secure storage or environment
     try {
       // Load credentials asynchronously from secure storage or environment
-      final clientId = await EnvironmentConfig.getGoogleSignInWebClientIdAsync();
-      final clientSecret = await EnvironmentConfig.getGoogleSignInClientSecretAsync();
-      
+      final clientId =
+          await EnvironmentConfig.getGoogleSignInWebClientIdAsync();
+      final clientSecret =
+          await EnvironmentConfig.getGoogleSignInClientSecretAsync();
+
       await getIt.googleSignIn.initialize(
         clientId: clientId,
         serverClientId: clientSecret,
       );
-      debugPrint('✅ Google Sign-In service initialized with credentials from secure storage');
+      debugPrint(
+          '✅ Google Sign-In service initialized with credentials from secure storage');
     } catch (e) {
-      debugPrint('⚠️ Firebase Service Initializer: Google Sign-In initialization failed: $e');
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Google Sign-In initialization failed: $e');
       debugPrint('   App will continue but Google Sign-In may not work');
     }
 
@@ -177,50 +181,58 @@ class FirebaseServiceInitializer {
     try {
       await getIt.appleSignIn.initialize();
     } catch (e) {
-      debugPrint('⚠️ Firebase Service Initializer: Apple Sign-In initialization failed: $e');
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Apple Sign-In initialization failed: $e');
     }
 
     // OPTIONAL Firebase services (failures are logged but don't crash app)
     try {
       await getIt.appCheck.initialize(); // Security & anti-abuse
     } catch (e) {
-      debugPrint('⚠️ Firebase Service Initializer: App Check initialization failed: $e');
+      debugPrint(
+          '⚠️ Firebase Service Initializer: App Check initialization failed: $e');
     }
 
     try {
       await getIt.analytics.initialize(); // User behavior tracking
     } catch (e) {
-      debugPrint('⚠️ Firebase Service Initializer: Analytics initialization failed: $e');
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Analytics initialization failed: $e');
     }
 
     try {
       await getIt.messaging.initialize(); // Push notifications
     } catch (e) {
-      debugPrint('⚠️ Firebase Service Initializer: Messaging initialization failed: $e');
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Messaging initialization failed: $e');
     }
 
     try {
       await getIt.crashlytics.initialize(); // Crash reporting
     } catch (e) {
-      debugPrint('⚠️ Firebase Service Initializer: Crashlytics initialization failed: $e');
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Crashlytics initialization failed: $e');
     }
 
     try {
       await getIt.remoteConfig.initialize(); // Feature flags & A/B testing
     } catch (e) {
-      debugPrint('⚠️ Firebase Service Initializer: Remote Config initialization failed: $e');
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Remote Config initialization failed: $e');
     }
 
     try {
       await getIt.performance.initialize(); // Performance monitoring
     } catch (e) {
-      debugPrint('⚠️ Firebase Service Initializer: Performance initialization failed: $e');
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Performance initialization failed: $e');
     }
 
     try {
       await getIt.functions.initialize(); // Cloud functions/backend logic
     } catch (e) {
-      debugPrint('⚠️ Firebase Service Initializer: Cloud Functions initialization failed: $e');
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Cloud Functions initialization failed: $e');
     }
 
     // Initialize Supabase storage lazily on first access; nothing to do here.

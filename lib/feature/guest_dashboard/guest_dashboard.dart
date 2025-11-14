@@ -262,8 +262,12 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
         type: BottomNavigationBarType.fixed,
         showUnselectedLabels: true,
         selectedItemColor: theme.primaryColor,
-        unselectedItemColor:
-            Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+        unselectedItemColor: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 12,
@@ -330,7 +334,12 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
           size: 28,
         ),
         unselectedIconTheme: IconThemeData(
-          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          color: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.color
+                  ?.withValues(alpha: 0.7) ??
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           size: 24,
         ),
         selectedLabelTextStyle: TextStyle(
@@ -339,7 +348,12 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
           fontSize: 14,
         ),
         unselectedLabelTextStyle: TextStyle(
-          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          color: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.color
+                  ?.withValues(alpha: 0.7) ??
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           fontWeight: FontWeight.w400,
           fontSize: 12,
         ),

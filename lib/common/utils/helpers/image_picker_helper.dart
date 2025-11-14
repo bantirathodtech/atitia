@@ -121,7 +121,7 @@ class ImagePickerHelper {
     int? limit,
   }) async {
     final picker = ImagePicker();
-    
+
     try {
       // Use pickMultipleMedia for multiple selection (works on web and mobile)
       final List<XFile> pickedFiles = await picker.pickMultiImage(

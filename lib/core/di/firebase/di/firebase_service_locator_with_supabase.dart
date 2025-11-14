@@ -20,54 +20,54 @@ import '../../../services/supabase/storage/supabase_storage_service.dart';
 final GetIt getIt = GetIt.instance;
 
 /// Firebase Service Locator with Supabase Storage
-/// 
+///
 /// This version uses:
 /// - ✅ Firebase for: Auth, Firestore, Analytics, Crashlytics, Messaging, etc.
 /// - ✅ Supabase for: Storage only (cheaper alternative)
-/// 
+///
 /// To use this setup:
 /// 1. Add supabase_flutter to pubspec.yaml
 /// 2. Configure Supabase credentials in supabase_config.dart
 /// 3. Replace firebase_service_locator.dart import with this file
 void setupFirebaseDependenciesWithSupabaseStorage() {
   // ==================== FIREBASE SERVICES (Keep all) ====================
-  
+
   getIt.registerLazySingleton<AuthenticationServiceWrapper>(
     () => AuthenticationServiceWrapper(),
   );
-  
+
   getIt.registerLazySingleton<FirestoreServiceWrapper>(
     () => FirestoreServiceWrapper(),
   );
-  
+
   getIt.registerLazySingleton<AppIntegrityServiceWrapper>(
     () => AppIntegrityServiceWrapper(),
   );
-  
+
   getIt.registerLazySingleton<AnalyticsServiceWrapper>(
     () => AnalyticsServiceWrapper(),
   );
-  
+
   getIt.registerLazySingleton<CloudMessagingServiceWrapper>(
     () => CloudMessagingServiceWrapper(),
   );
-  
+
   getIt.registerLazySingleton<CrashlyticsServiceWrapper>(
     () => CrashlyticsServiceWrapper(),
   );
-  
+
   getIt.registerLazySingleton<RemoteConfigServiceWrapper>(
     () => RemoteConfigServiceWrapper(),
   );
-  
+
   getIt.registerLazySingleton<PerformanceMonitoringServiceWrapper>(
     () => PerformanceMonitoringServiceWrapper(),
   );
-  
+
   getIt.registerLazySingleton<CloudFunctionsServiceWrapper>(
     () => CloudFunctionsServiceWrapper(),
   );
-  
+
   getIt.registerLazySingleton<LocalStorageService>(
     () => LocalStorageService(),
   );
@@ -79,7 +79,7 @@ void setupFirebaseDependenciesWithSupabaseStorage() {
   );
 
   // ==================== SUPABASE STORAGE (Replaces Firebase Storage) ====================
-  
+
   /// 🎯 KEY CHANGE: Using Supabase Storage instead of Firebase Storage
   /// This is the ONLY line that changes!
   getIt.registerLazySingleton<SupabaseStorageServiceWrapper>(
@@ -96,19 +96,24 @@ void setupFirebaseDependenciesWithSupabaseStorage() {
 extension FirebaseServiceLocatorWithSupabaseStorage on GetIt {
   AuthenticationServiceWrapper get auth => get<AuthenticationServiceWrapper>();
   FirestoreServiceWrapper get firestore => get<FirestoreServiceWrapper>();
-  
+
   /// 🎯 Storage now points to Supabase instead of Firebase
-  SupabaseStorageServiceWrapper get storage => get<SupabaseStorageServiceWrapper>();
-  
+  SupabaseStorageServiceWrapper get storage =>
+      get<SupabaseStorageServiceWrapper>();
+
   AppIntegrityServiceWrapper get appCheck => get<AppIntegrityServiceWrapper>();
   AnalyticsServiceWrapper get analytics => get<AnalyticsServiceWrapper>();
-  CloudMessagingServiceWrapper get messaging => get<CloudMessagingServiceWrapper>();
+  CloudMessagingServiceWrapper get messaging =>
+      get<CloudMessagingServiceWrapper>();
   CrashlyticsServiceWrapper get crashlytics => get<CrashlyticsServiceWrapper>();
-  RemoteConfigServiceWrapper get remoteConfig => get<RemoteConfigServiceWrapper>();
-  PerformanceMonitoringServiceWrapper get performance => get<PerformanceMonitoringServiceWrapper>();
-  CloudFunctionsServiceWrapper get functions => get<CloudFunctionsServiceWrapper>();
-  GoogleSignInServiceWrapper get googleSignIn => get<GoogleSignInServiceWrapper>();
+  RemoteConfigServiceWrapper get remoteConfig =>
+      get<RemoteConfigServiceWrapper>();
+  PerformanceMonitoringServiceWrapper get performance =>
+      get<PerformanceMonitoringServiceWrapper>();
+  CloudFunctionsServiceWrapper get functions =>
+      get<CloudFunctionsServiceWrapper>();
+  GoogleSignInServiceWrapper get googleSignIn =>
+      get<GoogleSignInServiceWrapper>();
   LocalStorageService get localStorage => get<LocalStorageService>();
   NavigationService get navigation => get<NavigationService>();
 }
-

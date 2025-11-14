@@ -145,7 +145,8 @@ class GuestPgSelector extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(context, pgStatus).withValues(alpha: 0.1),
+                  color:
+                      _getStatusColor(context, pgStatus).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: Icon(
@@ -209,7 +210,12 @@ class GuestPgSelector extends StatelessWidget {
             loc?.statusMaintenance ?? _text('statusMaintenance', 'Maintenance');
         break;
       default:
-        chipColor = Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
+        chipColor = Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
         chipText = status;
     }
 
@@ -247,7 +253,12 @@ class GuestPgSelector extends StatelessWidget {
       case 'maintenance':
         return context.decorativeRed;
       default:
-        return Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
+        return Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     }
   }
 

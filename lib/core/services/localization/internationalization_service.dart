@@ -46,7 +46,7 @@ class InternationalizationService {
     if (_isInitialized) return;
 
     try {
-    // Logger not available: _logger.info call removed
+      // Logger not available: _logger.info call removed
 
       // Load translations for all supported locales
       await _loadTranslations();
@@ -62,9 +62,9 @@ class InternationalizationService {
         },
       );
 
-    // Logger not available: _logger.info call removed
+      // Logger not available: _logger.info call removed
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -75,7 +75,7 @@ class InternationalizationService {
         final translations = await _loadLocaleTranslations(locale);
         _translations[locale.languageCode] = translations;
       } catch (e) {
-    // Logger not available: _logger call removed
+        // Logger not available: _logger call removed
       }
     }
   }
@@ -98,7 +98,7 @@ class InternationalizationService {
 
       return translations;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
 
       // Return fallback translations
       return _getFallbackTranslations();
@@ -177,13 +177,13 @@ class InternationalizationService {
   /// Get translated text
   String translate(String key, {Map<String, dynamic>? parameters}) {
     if (!_isInitialized) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return key;
     }
 
     final localeTranslations = _translations[_currentLocale.languageCode];
     if (localeTranslations == null) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return key;
     }
 
@@ -221,7 +221,7 @@ class InternationalizationService {
   /// Change locale
   Future<void> changeLocale(Locale locale) async {
     if (!supportedLocales.contains(locale)) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return;
     }
 

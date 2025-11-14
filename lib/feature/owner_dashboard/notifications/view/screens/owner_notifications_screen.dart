@@ -88,7 +88,8 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
+                  Icon(Icons.error_outline,
+                      size: 48, color: Theme.of(context).colorScheme.error),
                   const SizedBox(height: AppSpacing.paddingM),
                   BodyText(
                     text: viewModel.errorMessage ??

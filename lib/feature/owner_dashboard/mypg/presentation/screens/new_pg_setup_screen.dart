@@ -1177,7 +1177,17 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             HeadingSmall(text: value),
-            CaptionText(text: label, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+            CaptionText(
+                text: label,
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7)),
           ],
         ),
       ),

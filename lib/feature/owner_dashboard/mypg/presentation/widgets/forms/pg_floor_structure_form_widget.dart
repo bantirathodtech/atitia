@@ -282,7 +282,15 @@ class _PgFloorStructureFormWidgetState
                                       (sum, room) => sum + room.capacity,
                                     ),
                                   ),
-                                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                  color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color
+                                          ?.withValues(alpha: 0.7) ??
+                                      Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.7),
                                 ),
                                 const SizedBox(height: 2),
                               ],
@@ -308,7 +316,8 @@ class _PgFloorStructureFormWidgetState
                               bottom: AppSpacing.paddingS),
                           padding: const EdgeInsets.all(AppSpacing.paddingM),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Theme.of(context).dividerColor),
+                            border: Border.all(
+                                color: Theme.of(context).dividerColor),
                             borderRadius:
                                 BorderRadius.circular(AppSpacing.borderRadiusM),
                           ),
@@ -342,7 +351,9 @@ class _PgFloorStructureFormWidgetState
                                       ),
                                       IconButton(
                                         icon: Icon(Icons.delete,
-                                            color: Theme.of(context).colorScheme.error),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .error),
                                         onPressed: () => _removeRoom(room),
                                       ),
                                     ],
@@ -353,7 +364,15 @@ class _PgFloorStructureFormWidgetState
                                 text: loc.pgFloorBedsList(
                                   roomBeds.map((b) => b.bedNumber).join(', '),
                                 ),
-                                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color
+                                        ?.withValues(alpha: 0.7) ??
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
                               ),
                             ],
                           ),
@@ -366,7 +385,15 @@ class _PgFloorStructureFormWidgetState
                           child: Center(
                             child: BodyText(
                               text: loc.pgFloorNoRoomsMessage,
-                              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color
+                                      ?.withValues(alpha: 0.7) ??
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
                             ),
                           ),
                         ),
@@ -386,7 +413,11 @@ class _PgFloorStructureFormWidgetState
               child: Column(
                 children: [
                   Icon(Icons.home_work_outlined,
-                      size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
+                      size: 64,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.4)),
                   const SizedBox(height: AppSpacing.paddingM),
                   HeadingMedium(text: loc.pgFloorEmptyTitle),
                   const SizedBox(height: AppSpacing.paddingS),

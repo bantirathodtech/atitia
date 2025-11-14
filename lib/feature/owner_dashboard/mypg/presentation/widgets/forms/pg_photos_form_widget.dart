@@ -91,7 +91,15 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                         'Uploading {count} photo(s)...',
                         parameters: {'count': imageFiles.length},
                       ),
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -263,7 +271,12 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
 
         BodyText(
           text: loc.pgPhotosSubtitle,
-          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          color: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.color
+                  ?.withValues(alpha: 0.7) ??
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         const SizedBox(height: AppSpacing.paddingL),
 
@@ -276,7 +289,12 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
         const SizedBox(height: AppSpacing.paddingS),
         BodyText(
           text: loc.pgPhotosLimitHint,
-          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+          color: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.color
+                  ?.withValues(alpha: 0.6) ??
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           small: true,
         ),
         const SizedBox(height: AppSpacing.paddingL),
@@ -291,17 +309,41 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                   Icon(
                     Icons.photo_library_outlined,
                     size: 64,
-                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.4) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.4) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
                   BodyText(
                     text: loc.pgPhotosEmptyTitle,
-                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
                   BodyText(
                     text: loc.pgPhotosEmptySubtitle,
-                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.6) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6),
                   ),
                 ],
               ),
@@ -328,8 +370,14 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                       imageUrl: uploadedPhotos[index],
                       fit: BoxFit.cover,
                       placeholder: Container(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                        child: Icon(Icons.image, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
+                        child: Icon(Icons.image,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.5)),
                       ),
                     ),
                   ),

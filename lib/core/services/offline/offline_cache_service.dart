@@ -33,7 +33,7 @@ class OfflineCacheService {
     if (_isInitialized) return;
 
     try {
-    // Logger not available: _logger.info call removed
+      // Logger not available: _logger.info call removed
 
       // Get cache directory
       final directory = await getApplicationDocumentsDirectory();
@@ -58,9 +58,9 @@ class OfflineCacheService {
         },
       );
 
-    // Logger not available: _logger.info call removed
+      // Logger not available: _logger.info call removed
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -80,9 +80,9 @@ class OfflineCacheService {
       _offlineData[key] = cacheEntry;
       await _saveOfflineData();
 
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -107,13 +107,13 @@ class OfflineCacheService {
 
       final data = cacheEntry['data'];
       if (data is T) {
-    // Logger not available: _logger call removed
+        // Logger not available: _logger call removed
         return data;
       }
 
       return null;
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return null;
     }
   }
@@ -268,7 +268,7 @@ class OfflineCacheService {
         await _cleanupExpiredEntries();
       }
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       _offlineData = {};
     }
   }
@@ -280,7 +280,7 @@ class OfflineCacheService {
       final dataString = jsonEncode(_offlineData);
       await prefs.setString(_offlineDataKey, dataString);
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -305,7 +305,7 @@ class OfflineCacheService {
 
     if (keysToRemove.isNotEmpty) {
       await _saveOfflineData();
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -319,9 +319,9 @@ class OfflineCacheService {
       final file = File('$_cacheDirectoryPath/$fileName');
       await file.writeAsBytes(imageBytes);
 
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -338,7 +338,7 @@ class OfflineCacheService {
         return file;
       }
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
 
     return null;

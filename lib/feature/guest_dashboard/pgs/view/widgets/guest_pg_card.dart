@@ -70,7 +70,8 @@ class GuestPgCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
       child: Material(
-        color: Colors.transparent, // Material color for InkWell - transparent is fine
+        color: Colors
+            .transparent, // Material color for InkWell - transparent is fine
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
@@ -79,12 +80,14 @@ class GuestPgCard extends StatelessWidget {
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
               border: Border.all(
-                color:
-                    Theme.of(context).dividerColor,
+                color: Theme.of(context).dividerColor,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .shadow
+                      .withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

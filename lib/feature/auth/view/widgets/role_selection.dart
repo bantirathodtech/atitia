@@ -111,7 +111,15 @@ class RoleSelectionWidget extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xs),
                   BodyText(
                     text: description,
-                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.8) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.8),
                   ),
                 ],
               ),
@@ -125,7 +133,15 @@ class RoleSelectionWidget extends StatelessWidget {
             else
               Icon(
                 Icons.arrow_forward_ios,
-                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.5) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5),
                 size: 20,
               ),
           ],

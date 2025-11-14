@@ -115,23 +115,23 @@ class EnvironmentConfig {
   /// Google Sign-In Web Client ID
   /// ⚠️ SECRET: Store in environment variable or secure storage
   /// Get from: Google Cloud Console → APIs & Services → Credentials
-  static const String googleSignInWebClientId =
-      String.fromEnvironment('GOOGLE_SIGN_IN_WEB_CLIENT_ID',
-          defaultValue: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com');
+  static const String googleSignInWebClientId = String.fromEnvironment(
+      'GOOGLE_SIGN_IN_WEB_CLIENT_ID',
+      defaultValue: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com');
 
   /// Google Sign-In Android Client ID
   /// ⚠️ SECRET: Store in environment variable or secure storage
   /// Get from: Google Cloud Console → APIs & Services → Credentials
-  static const String googleSignInAndroidClientId =
-      String.fromEnvironment('GOOGLE_SIGN_IN_ANDROID_CLIENT_ID',
-          defaultValue: 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com');
+  static const String googleSignInAndroidClientId = String.fromEnvironment(
+      'GOOGLE_SIGN_IN_ANDROID_CLIENT_ID',
+      defaultValue: 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com');
 
   /// Google Sign-In iOS Client ID
   /// ⚠️ SECRET: Store in environment variable or secure storage
   /// Get from: Google Cloud Console → APIs & Services → Credentials
-  static const String googleSignInIosClientId =
-      String.fromEnvironment('GOOGLE_SIGN_IN_IOS_CLIENT_ID',
-          defaultValue: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com');
+  static const String googleSignInIosClientId = String.fromEnvironment(
+      'GOOGLE_SIGN_IN_IOS_CLIENT_ID',
+      defaultValue: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com');
 
   /// Google Sign-In Client Secret (for desktop platforms and server-side flows)
   ///
@@ -158,9 +158,9 @@ class EnvironmentConfig {
   /// - See `GOOGLE_CLIENT_SECRET_SETUP.md` for setup guide
   /// - See `GOOGLE_CLIENT_SECRET_CREATE_NEW.md` for creating new secrets
   /// - See `.secrets/README.md` for secure storage setup
-  static const String googleSignInClientSecret =
-      String.fromEnvironment('GOOGLE_SIGN_IN_CLIENT_SECRET',
-          defaultValue: 'YOUR_CLIENT_SECRET_HERE');
+  static const String googleSignInClientSecret = String.fromEnvironment(
+      'GOOGLE_SIGN_IN_CLIENT_SECRET',
+      defaultValue: 'YOUR_CLIENT_SECRET_HERE');
 
   // ==========================================================================
   // GOOGLE OAUTH JAVASCRIPT ORIGINS (for web development)
@@ -321,12 +321,12 @@ class EnvironmentConfig {
   // ==========================================================================
 
   /// Get Google Sign-In Web Client ID from secure storage or environment
-  /// 
+  ///
   /// FIXED: Runtime credential loading from secure storage
   /// Flutter recommends: Load sensitive credentials from secure storage at runtime
   /// Changed from: Static const with environment variable fallback only
   /// Changed to: Check secure storage first, then environment variable, then throw error
-  /// 
+  ///
   /// Priority:
   /// 1. Secure storage (if available)
   /// 2. Environment variable (build-time)
@@ -336,24 +336,23 @@ class EnvironmentConfig {
       // Try to load from secure storage first
       final storage = LocalStorageService();
       final clientId = await storage.read('google_web_client_id');
-      if (clientId != null && 
-          clientId.isNotEmpty && 
+      if (clientId != null &&
+          clientId.isNotEmpty &&
           !clientId.contains('YOUR_') &&
           !clientId.contains('REPLACE_WITH')) {
         return clientId;
       }
     } catch (e) {
-      debugPrint('⚠️ EnvironmentConfig: Could not load Google Web Client ID from storage: $e');
+      debugPrint(
+          '⚠️ EnvironmentConfig: Could not load Google Web Client ID from storage: $e');
     }
-    
+
     // Fallback to environment variable
     final envClientId = googleSignInWebClientId;
     if (envClientId.contains('YOUR_') || envClientId.contains('REPLACE_WITH')) {
-      throw Exception(
-        'Google Web Client ID not configured. '
-        'Set GOOGLE_SIGN_IN_WEB_CLIENT_ID environment variable or '
-        'store in secure storage with key "google_web_client_id"'
-      );
+      throw Exception('Google Web Client ID not configured. '
+          'Set GOOGLE_SIGN_IN_WEB_CLIENT_ID environment variable or '
+          'store in secure storage with key "google_web_client_id"');
     }
     return envClientId;
   }
@@ -363,23 +362,22 @@ class EnvironmentConfig {
     try {
       final storage = LocalStorageService();
       final clientId = await storage.read('google_android_client_id');
-      if (clientId != null && 
-          clientId.isNotEmpty && 
+      if (clientId != null &&
+          clientId.isNotEmpty &&
           !clientId.contains('YOUR_') &&
           !clientId.contains('REPLACE_WITH')) {
         return clientId;
       }
     } catch (e) {
-      debugPrint('⚠️ EnvironmentConfig: Could not load Google Android Client ID from storage: $e');
+      debugPrint(
+          '⚠️ EnvironmentConfig: Could not load Google Android Client ID from storage: $e');
     }
-    
+
     final envClientId = googleSignInAndroidClientId;
     if (envClientId.contains('YOUR_') || envClientId.contains('REPLACE_WITH')) {
-      throw Exception(
-        'Google Android Client ID not configured. '
-        'Set GOOGLE_SIGN_IN_ANDROID_CLIENT_ID environment variable or '
-        'store in secure storage with key "google_android_client_id"'
-      );
+      throw Exception('Google Android Client ID not configured. '
+          'Set GOOGLE_SIGN_IN_ANDROID_CLIENT_ID environment variable or '
+          'store in secure storage with key "google_android_client_id"');
     }
     return envClientId;
   }
@@ -389,23 +387,22 @@ class EnvironmentConfig {
     try {
       final storage = LocalStorageService();
       final clientId = await storage.read('google_ios_client_id');
-      if (clientId != null && 
-          clientId.isNotEmpty && 
+      if (clientId != null &&
+          clientId.isNotEmpty &&
           !clientId.contains('YOUR_') &&
           !clientId.contains('REPLACE_WITH')) {
         return clientId;
       }
     } catch (e) {
-      debugPrint('⚠️ EnvironmentConfig: Could not load Google iOS Client ID from storage: $e');
+      debugPrint(
+          '⚠️ EnvironmentConfig: Could not load Google iOS Client ID from storage: $e');
     }
-    
+
     final envClientId = googleSignInIosClientId;
     if (envClientId.contains('YOUR_') || envClientId.contains('REPLACE_WITH')) {
-      throw Exception(
-        'Google iOS Client ID not configured. '
-        'Set GOOGLE_SIGN_IN_IOS_CLIENT_ID environment variable or '
-        'store in secure storage with key "google_ios_client_id"'
-      );
+      throw Exception('Google iOS Client ID not configured. '
+          'Set GOOGLE_SIGN_IN_IOS_CLIENT_ID environment variable or '
+          'store in secure storage with key "google_ios_client_id"');
     }
     return envClientId;
   }
@@ -415,23 +412,23 @@ class EnvironmentConfig {
     try {
       final storage = LocalStorageService();
       final clientSecret = await storage.read('google_client_secret');
-      if (clientSecret != null && 
-          clientSecret.isNotEmpty && 
+      if (clientSecret != null &&
+          clientSecret.isNotEmpty &&
           !clientSecret.contains('YOUR_') &&
           !clientSecret.contains('REPLACE_WITH')) {
         return clientSecret;
       }
     } catch (e) {
-      debugPrint('⚠️ EnvironmentConfig: Could not load Google Client Secret from storage: $e');
+      debugPrint(
+          '⚠️ EnvironmentConfig: Could not load Google Client Secret from storage: $e');
     }
-    
+
     final envClientSecret = googleSignInClientSecret;
-    if (envClientSecret.contains('YOUR_') || envClientSecret.contains('REPLACE_WITH')) {
-      throw Exception(
-        'Google Client Secret not configured. '
-        'Set GOOGLE_SIGN_IN_CLIENT_SECRET environment variable or '
-        'store in secure storage with key "google_client_secret"'
-      );
+    if (envClientSecret.contains('YOUR_') ||
+        envClientSecret.contains('REPLACE_WITH')) {
+      throw Exception('Google Client Secret not configured. '
+          'Set GOOGLE_SIGN_IN_CLIENT_SECRET environment variable or '
+          'store in secure storage with key "google_client_secret"');
     }
     return envClientSecret;
   }
@@ -441,7 +438,7 @@ class EnvironmentConfig {
   // ==========================================================================
 
   /// Validate that all required credentials are present (static fields)
-  /// 
+  ///
   /// Note: For runtime credentials (Google OAuth), use validateCredentialsAsync()
   static bool validateCredentials() {
     final requiredFields = [
@@ -458,7 +455,7 @@ class EnvironmentConfig {
   }
 
   /// Validate that all required credentials are present (including runtime credentials)
-  /// 
+  ///
   /// FIXED: Async credential validation
   /// Flutter recommends: Validate runtime-loaded credentials asynchronously
   /// Changed from: Only validating static const fields
@@ -468,18 +465,18 @@ class EnvironmentConfig {
     if (!validateCredentials()) {
       return false;
     }
-    
+
     // Check runtime credentials (Google OAuth)
     try {
       final webClientId = await getGoogleSignInWebClientIdAsync();
       final androidClientId = await getGoogleSignInAndroidClientIdAsync();
       final iosClientId = await getGoogleSignInIosClientIdAsync();
       final clientSecret = await getGoogleSignInClientSecretAsync();
-      
+
       return !webClientId.contains('YOUR_') &&
-             !androidClientId.contains('YOUR_') &&
-             !iosClientId.contains('YOUR_') &&
-             !clientSecret.contains('YOUR_');
+          !androidClientId.contains('YOUR_') &&
+          !iosClientId.contains('YOUR_') &&
+          !clientSecret.contains('YOUR_');
     } catch (e) {
       debugPrint('⚠️ EnvironmentConfig: Credential validation error: $e');
       return false;

@@ -10,7 +10,8 @@ class TextDecorations {
 
   /// Subtle text shadow for better readability - theme-aware via BuildContext
   static List<Shadow> subtle(BuildContext context, {Color? shadowColor}) {
-    final defaultShadowColor = shadowColor ?? Theme.of(context).colorScheme.shadow;
+    final defaultShadowColor =
+        shadowColor ?? Theme.of(context).colorScheme.shadow;
     return [
       Shadow(
         color: defaultShadowColor.withValues(alpha: 0.1),
@@ -22,7 +23,8 @@ class TextDecorations {
 
   /// Strong text shadow for emphasis - theme-aware via BuildContext
   static List<Shadow> strong(BuildContext context, {Color? shadowColor}) {
-    final defaultShadowColor = shadowColor ?? Theme.of(context).colorScheme.shadow;
+    final defaultShadowColor =
+        shadowColor ?? Theme.of(context).colorScheme.shadow;
     return [
       Shadow(
         color: defaultShadowColor.withValues(alpha: 0.3),
@@ -92,7 +94,9 @@ class TextDecorations {
     bool withShadow = true,
   }) {
     return AppTypography.headingLarge.copyWith(
-      color: color ?? Theme.of(context).textTheme.headlineLarge?.color ?? Theme.of(context).colorScheme.onSurface,
+      color: color ??
+          Theme.of(context).textTheme.headlineLarge?.color ??
+          Theme.of(context).colorScheme.onSurface,
       shadows: withShadow ? subtle(context) : null,
     );
   }
@@ -103,7 +107,10 @@ class TextDecorations {
     Color? textColor,
     BuildContext? context,
   }) {
-    final finalTextColor = textColor ?? (context != null ? Theme.of(context).colorScheme.onPrimary : AppColors.textOnPrimary);
+    final finalTextColor = textColor ??
+        (context != null
+            ? Theme.of(context).colorScheme.onPrimary
+            : AppColors.textOnPrimary);
     return AppTypography.bodyMedium.copyWith(
       color: finalTextColor,
       backgroundColor: backgroundColor.withValues(alpha: 0.8),
@@ -117,11 +124,16 @@ class TextDecorations {
     bool isDiscounted = false,
     BuildContext? context,
   }) {
-    final finalColor = color ?? (context != null ? Theme.of(context).colorScheme.primary : AppColors.lightPrimary);
+    final finalColor = color ??
+        (context != null
+            ? Theme.of(context).colorScheme.primary
+            : AppColors.lightPrimary);
     return AppTypography.headingMedium.copyWith(
       color: finalColor,
       decoration: isDiscounted ? TextDecoration.lineThrough : null,
-      decorationColor: context != null ? Theme.of(context).colorScheme.error : AppColors.error,
+      decorationColor: context != null
+          ? Theme.of(context).colorScheme.error
+          : AppColors.error,
       decorationThickness: 2,
     );
   }
@@ -132,7 +144,10 @@ class TextDecorations {
     Color? textColor,
     BuildContext? context,
   }) {
-    final finalTextColor = textColor ?? (context != null ? Theme.of(context).colorScheme.onPrimary : AppColors.textOnPrimary);
+    final finalTextColor = textColor ??
+        (context != null
+            ? Theme.of(context).colorScheme.onPrimary
+            : AppColors.textOnPrimary);
     return AppTypography.bodySmall.copyWith(
       color: finalTextColor,
       backgroundColor: backgroundColor,

@@ -12,7 +12,7 @@
 import 'package:atitia/common/utils/security/credential_storage_helper.dart';
 
 /// Example: Store Google OAuth credentials in secure storage
-/// 
+///
 /// This script demonstrates how to use CredentialStorageHelper
 /// to store credentials securely.
 void main() async {
@@ -26,22 +26,27 @@ void main() async {
   // Check current stored credentials
   print('📋 Checking current stored credentials...');
   final stored = await helper.checkStoredCredentials();
-  
+
   print('Current Status:');
-  print('  Web Client ID: ${stored['web_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
-  print('  Android Client ID: ${stored['android_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
-  print('  iOS Client ID: ${stored['ios_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
-  print('  Client Secret: ${stored['client_secret'] == true ? "✅ Stored" : "❌ Not stored"}');
+  print(
+      '  Web Client ID: ${stored['web_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
+  print(
+      '  Android Client ID: ${stored['android_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
+  print(
+      '  iOS Client ID: ${stored['ios_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
+  print(
+      '  Client Secret: ${stored['client_secret'] == true ? "✅ Stored" : "❌ Not stored"}');
   print('');
 
   // Example: Store credentials (replace with your actual values)
   print('💾 Storing credentials...');
-  print('   (Replace these with your actual credentials from Google Cloud Console)');
+  print(
+      '   (Replace these with your actual credentials from Google Cloud Console)');
   print('');
 
   // Example credentials - REPLACE WITH YOUR ACTUAL VALUES
   // Get these from: https://console.cloud.google.com/apis/credentials?project=atitia-87925
-  
+
   // Store Web Client ID
   final webResult = await helper.storeGoogleWebClientId(
     'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com', // REPLACE THIS
@@ -70,12 +75,16 @@ void main() async {
   // Verify stored credentials
   print('🔍 Verifying stored credentials...');
   final verified = await helper.checkStoredCredentials();
-  
+
   print('Final Status:');
-  print('  Web Client ID: ${verified['web_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
-  print('  Android Client ID: ${verified['android_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
-  print('  iOS Client ID: ${verified['ios_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
-  print('  Client Secret: ${verified['client_secret'] == true ? "✅ Stored" : "❌ Not stored"}');
+  print(
+      '  Web Client ID: ${verified['web_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
+  print(
+      '  Android Client ID: ${verified['android_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
+  print(
+      '  iOS Client ID: ${verified['ios_client_id'] == true ? "✅ Stored" : "❌ Not stored"}');
+  print(
+      '  Client Secret: ${verified['client_secret'] == true ? "✅ Stored" : "❌ Not stored"}');
   print('');
 
   // Example: Store all credentials at once
@@ -87,8 +96,8 @@ void main() async {
   print('');
   print('📝 Next Steps:');
   print('   1. Replace placeholder values with your actual credentials');
-  print('   2. Run this script: dart run scripts/store_credentials_example.dart');
+  print(
+      '   2. Run this script: dart run scripts/store_credentials_example.dart');
   print('   3. Credentials will be automatically loaded when app starts');
   print('   4. See CREDENTIAL_STORAGE_GUIDE.md for detailed instructions');
 }
-

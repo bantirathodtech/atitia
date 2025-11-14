@@ -192,7 +192,8 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+            Icon(Icons.error_outline,
+                size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingL),
             HeadingMedium(
               text: loc.ownerReportsErrorTitle,
@@ -645,7 +646,8 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: percentage / 100,
-                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         Theme.of(context).primaryColor,
                       ),

@@ -131,8 +131,7 @@ class AuthValidators {
         'validationPasswordTooShort',
         'Password must be at least ${ValidationConstants.minPasswordLength} characters',
         parameters: {
-          'min':
-              ValidationConstants.minPasswordLength.toString(),
+          'min': ValidationConstants.minPasswordLength.toString(),
         },
       );
     }

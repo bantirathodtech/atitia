@@ -31,7 +31,6 @@ class AppleSignInServiceWrapper {
       if (!await SignInWithApple.isAvailable()) {
         return;
       }
-      
     } catch (e) {
       // Don't throw - let the app continue without Apple Sign-In
     }
@@ -40,16 +39,15 @@ class AppleSignInServiceWrapper {
   /// Signs in a user with Apple ID and returns Firebase [User]
   Future<User?> signInWithApple() async {
     try {
-      
       // Check if Apple Sign-In is available
       if (!await SignInWithApple.isAvailable()) {
         throw AppException(
           message: 'Apple Sign-In not available on this platform',
-          details: 'Apple Sign-In is only available on iOS 13+ and macOS 10.15+',
+          details:
+              'Apple Sign-In is only available on iOS 13+ and macOS 10.15+',
         );
       }
 
-      
       // Request Apple ID authentication
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -57,7 +55,7 @@ class AppleSignInServiceWrapper {
           AppleIDAuthorizationScopes.fullName,
         ],
       );
-      
+
       _currentCredential = credential;
 
       // Create Firebase credential from Apple ID credential
@@ -66,13 +64,14 @@ class AppleSignInServiceWrapper {
         accessToken: credential.authorizationCode,
       );
 
-      
       if (oauthCredential.accessToken == null) {
-        throw AppException(message: 'Apple Sign-In failed: No access token received');
+        throw AppException(
+            message: 'Apple Sign-In failed: No access token received');
       }
 
-      final userCredential = await _authService.signInWithCredential(oauthCredential);
-      
+      final userCredential =
+          await _authService.signInWithCredential(oauthCredential);
+
       return userCredential.user;
     } on SignInWithAppleAuthorizationException catch (e) {
       if (e.code == AuthorizationErrorCode.canceled) {
@@ -80,11 +79,14 @@ class AppleSignInServiceWrapper {
       } else if (e.code == AuthorizationErrorCode.failed) {
         throw AppException(message: 'Apple sign-in failed. Please try again.');
       } else if (e.code == AuthorizationErrorCode.invalidResponse) {
-        throw AppException(message: 'Invalid response from Apple. Please try again.');
+        throw AppException(
+            message: 'Invalid response from Apple. Please try again.');
       } else if (e.code == AuthorizationErrorCode.notHandled) {
-        throw AppException(message: 'Apple sign-in not handled. Please try again.');
+        throw AppException(
+            message: 'Apple sign-in not handled. Please try again.');
       } else if (e.code == AuthorizationErrorCode.unknown) {
-        throw AppException(message: 'Unknown Apple sign-in error. Please try again.');
+        throw AppException(
+            message: 'Unknown Apple sign-in error. Please try again.');
       }
       throw AppException(message: 'Apple sign-in failed: ${e.message}');
     } catch (e) {
@@ -93,7 +95,8 @@ class AppleSignInServiceWrapper {
           message: 'Apple Sign-In not available',
           details: 'Apple Sign-In requires iOS 13+ or macOS 10.15+',
           severity: ErrorSeverity.medium,
-          recoverySuggestion: 'Please update your device or use phone authentication instead.',
+          recoverySuggestion:
+              'Please update your device or use phone authentication instead.',
         );
       }
       throw AppException(message: 'Apple sign-in failed: ${e.toString()}');
@@ -137,14 +140,14 @@ class AppleSignInServiceWrapper {
   String? get currentUserFullName {
     final credential = _currentCredential;
     if (credential == null) return null;
-    
+
     final givenName = credential.givenName ?? '';
     final familyName = credential.familyName ?? '';
-    
+
     if (givenName.isEmpty && familyName.isEmpty) return null;
     if (givenName.isEmpty) return familyName;
     if (familyName.isEmpty) return givenName;
-    
+
     return '$givenName $familyName';
   }
 

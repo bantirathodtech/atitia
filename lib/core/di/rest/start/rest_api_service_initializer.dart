@@ -7,18 +7,15 @@ import '../di/rest_api_service_locator.dart';
 class RestApiServiceInitializer {
   /// Initializes complete REST API service stack.
   static Future<void> initialize() async {
-
     // Step 1: Register ONLY REST API services
     setupRestApiDependencies();
 
     // Step 2: Verify REST API services
     _verifyRestApiServices();
-
   }
 
   /// Verifies ALL REST API services are properly initialized.
   static void _verifyRestApiServices() {
-
     final services = [
       _ServiceInfo('API Service', getIt.get<ApiService>()),
       // _ServiceInfo('Auth API', getIt.get<AuthApiService>()),

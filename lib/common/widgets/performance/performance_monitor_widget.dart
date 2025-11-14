@@ -113,7 +113,11 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2)),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onPrimary
+                  .withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +140,11 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
             _buildMetricRow('Focus Nodes', _memoryStats['focusNodes'] ?? 0),
             _buildMetricRow(
                 'Subscriptions', _memoryStats['subscriptions'] ?? 0),
-            Divider(color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3)),
+            Divider(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onPrimary
+                    .withValues(alpha: 0.3)),
             _buildMetricRow('Cache Size', _cacheSize, isBytes: true),
             const SizedBox(height: AppSpacing.paddingS),
             Row(
@@ -197,7 +205,10 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
           Text(
             label,
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onPrimary
+                  .withValues(alpha: 0.7),
               fontSize: 12,
             ),
           ),

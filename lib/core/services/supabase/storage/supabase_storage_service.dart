@@ -117,19 +117,16 @@ class SupabaseStorageServiceWrapper {
             allowedMimeTypes: ['image/*', 'application/pdf'],
           ),
         );
-        
+
         // Note: After bucket creation, you still need to add RLS policies
         // in Supabase Dashboard to allow INSERT operations
-        debugPrint(
-          '⚠️ Supabase Storage Bucket "$defaultBucket" created.\n'
-          '⚠️ IMPORTANT: You must add RLS policies in Supabase Dashboard:\n'
-          '   1. Go to Storage → Policies → $defaultBucket\n'
-          '   2. Create policy: Allow INSERT for "anon" role\n'
-          '   3. Policy SQL: bucket_id = \'$defaultBucket\'::text\n'
-          '   See SUPABASE_STORAGE_SETUP.md for detailed instructions.'
-        );
-      } else {
-      }
+        debugPrint('⚠️ Supabase Storage Bucket "$defaultBucket" created.\n'
+            '⚠️ IMPORTANT: You must add RLS policies in Supabase Dashboard:\n'
+            '   1. Go to Storage → Policies → $defaultBucket\n'
+            '   2. Create policy: Allow INSERT for "anon" role\n'
+            '   3. Policy SQL: bucket_id = \'$defaultBucket\'::text\n'
+            '   See SUPABASE_STORAGE_SETUP.md for detailed instructions.');
+      } else {}
     } catch (e) {
       // Bucket might already exist or permissions issue - continue anyway
     }

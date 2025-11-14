@@ -273,12 +273,17 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
+              border: Border.all(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
                 Icon(Icons.two_wheeler_outlined,
-                    size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                    size: 20,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5)),
                 const SizedBox(width: AppSpacing.paddingS),
                 BodyText(text: loc.bikeRegistry),
                 const Spacer(),
@@ -286,7 +291,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.paddingS, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -314,12 +320,17 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+              border: Border.all(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             ),
             child: Column(
               children: [
                 Icon(Icons.two_wheeler_outlined,
-                    size: 48, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                    size: 48,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5)),
                 const SizedBox(height: AppSpacing.paddingM),
                 HeadingMedium(text: loc.noBikesRegistered),
                 const SizedBox(height: AppSpacing.paddingS),
@@ -343,7 +354,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
@@ -356,7 +368,11 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
               borderRadius: BorderRadius.circular(24),
             ),
             child: Icon(Icons.two_wheeler,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4), size: 24),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.4),
+                size: 24),
           ),
           const SizedBox(width: AppSpacing.paddingM),
           // Placeholder content
@@ -368,7 +384,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   height: 16,
                   width: 120,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -377,7 +394,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   height: 12,
                   width: 80,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -386,7 +404,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   height: 12,
                   width: 100,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -405,7 +424,10 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
               height: 12,
               width: 60,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -436,7 +458,9 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   children: [
                     Icon(
                       Icons.two_wheeler,
-                      color: bike.hasViolation ? AppColors.error : AppColors.primary,
+                      color: bike.hasViolation
+                          ? AppColors.error
+                          : AppColors.primary,
                       size: 24,
                     ),
                     const SizedBox(width: AppSpacing.paddingS),
@@ -455,7 +479,15 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                           Text(
                             bike.guestInfo,
                             style: TextStyle(
-                              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color
+                                      ?.withValues(alpha: 0.7) ??
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
                               fontSize: 14,
                             ),
                           ),
@@ -560,7 +592,14 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+        Icon(icon,
+            size: 16,
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
         const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: Column(
@@ -570,7 +609,15 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
               Text(
@@ -624,13 +671,17 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
         statusLabel = loc.premium;
         break;
       case 'removed':
-        chipColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
-        textColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
+        chipColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+        textColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
         statusLabel = loc.removed;
         break;
       default:
-        chipColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
-        textColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
+        chipColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+        textColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
         statusLabel = status;
     }
 

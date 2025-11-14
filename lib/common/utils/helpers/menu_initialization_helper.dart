@@ -225,9 +225,8 @@ class MenuInitializationHelper {
   /// Returns default breakfast items based on day
   static List<String> _getDefaultBreakfast(String day) {
     final key = 'menuBreakfast_${day.toLowerCase()}';
-    final fallback =
-        _defaultBreakfastMenus[day.toLowerCase()] ??
-            _defaultBreakfastMenus['monday']!;
+    final fallback = _defaultBreakfastMenus[day.toLowerCase()] ??
+        _defaultBreakfastMenus['monday']!;
     return _getMenuItems(
       key,
       fallback,
@@ -238,8 +237,7 @@ class MenuInitializationHelper {
   static List<String> _getDefaultLunch(String day) {
     final key = 'menuLunch_${day.toLowerCase()}';
     final fallback =
-        _defaultLunchMenus[day.toLowerCase()] ??
-            _defaultLunchMenus['monday']!;
+        _defaultLunchMenus[day.toLowerCase()] ?? _defaultLunchMenus['monday']!;
     return _getMenuItems(
       key,
       fallback,
@@ -249,9 +247,8 @@ class MenuInitializationHelper {
   /// Returns default dinner items based on day
   static List<String> _getDefaultDinner(String day) {
     final key = 'menuDinner_${day.toLowerCase()}';
-    final fallback =
-        _defaultDinnerMenus[day.toLowerCase()] ??
-            _defaultDinnerMenus['monday']!;
+    final fallback = _defaultDinnerMenus[day.toLowerCase()] ??
+        _defaultDinnerMenus['monday']!;
     return _getMenuItems(
       key,
       fallback,

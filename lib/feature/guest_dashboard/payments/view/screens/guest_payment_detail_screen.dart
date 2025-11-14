@@ -526,13 +526,20 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
       case 'paid':
         return AppColors.statusGreen;
       case 'pending':
-        return _payment!.isOverdue ? AppColors.statusRed : AppColors.statusOrange;
+        return _payment!.isOverdue
+            ? AppColors.statusRed
+            : AppColors.statusOrange;
       case 'failed':
         return Theme.of(context).colorScheme.error;
       case 'refunded':
         return AppColors.statusBlue;
       default:
-        return Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
+        return Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     }
   }
 

@@ -46,7 +46,7 @@ class ConnectivityService {
   /// Initialize connectivity monitoring
   Future<void> initialize() async {
     try {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
 
       // Get initial connectivity status
       final connectivityResults = await _connectivity.checkConnectivity();
@@ -56,7 +56,7 @@ class ConnectivityService {
       _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
         _updateConnectivityStatus,
         onError: (error) {
-    // Logger not available: _logger call removed
+          // Logger not available: _logger call removed
         },
       );
 
@@ -68,9 +68,9 @@ class ConnectivityService {
         },
       );
 
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
     }
   }
 
@@ -141,7 +141,7 @@ class ConnectivityService {
       return connectivityResults
           .any((result) => result != ConnectivityResult.none);
     } catch (e) {
-    // Logger not available: _logger call removed
+      // Logger not available: _logger call removed
       return false;
     }
   }

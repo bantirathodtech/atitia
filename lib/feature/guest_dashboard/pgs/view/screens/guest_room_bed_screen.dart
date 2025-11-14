@@ -177,7 +177,8 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+            Icon(Icons.error_outline,
+                size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(
               text: loc?.errorTitle ?? _text('errorTitle', 'Error'),
@@ -336,7 +337,17 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          BodyText(text: '$label:', color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+          BodyText(
+              text: '$label:',
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7)),
           BodyText(text: value, medium: true),
         ],
       ),
@@ -579,7 +590,15 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                 text: loc?.preferredLabel ??
                     _text('preferredLabel', 'Preferred:'),
                 medium: true,
-                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.8) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.8),
               ),
               const SizedBox(height: AppSpacing.paddingXS),
               BodyText(
@@ -606,7 +625,15 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
             BodyText(
               text: loc?.reasonLabel ?? _text('reasonLabel', 'Reason:'),
               medium: true,
-              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.8) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.8),
             ),
             const SizedBox(height: AppSpacing.paddingXS),
             BodyText(text: recentRequest.reason),
@@ -648,7 +675,15 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                           'date': _formatDate(recentRequest.createdAt),
                         },
                       ),
-              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
             ),
           ],
         ),

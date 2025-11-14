@@ -82,7 +82,8 @@ class AppLogger {
     Map<String, dynamic>? metadata,
     String? feature,
   }) {
-    _log(levelInfo, message, action: action, metadata: metadata, feature: feature);
+    _log(levelInfo, message,
+        action: action, metadata: metadata, feature: feature);
   }
 
   /// Log warnings

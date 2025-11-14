@@ -149,7 +149,15 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
                 text: loc?.sendBookingRequestToOwner ??
                     _text('sendBookingRequestToOwner',
                         'Send a booking request to the owner'),
-                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -167,10 +175,13 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Theme.of(context).colorScheme.surfaceContainerHighest,
+        color: isDark
+            ? AppColors.darkCard
+            : Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDark ? AppColors.darkDivider : Theme.of(context).dividerColor,
+          color:
+              isDark ? AppColors.darkDivider : Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -187,7 +198,8 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
               Expanded(
                 child: HeadingSmall(
                   text: widget.pg.pgName,
-                  color: Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ??
+                      Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -197,14 +209,30 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
             children: [
               Icon(
                 Icons.location_on,
-                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                 size: 16,
               ),
               const SizedBox(width: AppSpacing.paddingS),
               Expanded(
                 child: BodyText(
                   text: widget.pg.fullAddress,
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
             ],

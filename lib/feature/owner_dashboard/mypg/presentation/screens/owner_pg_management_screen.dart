@@ -115,7 +115,8 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             controller: _tabController,
             indicatorColor: Theme.of(context).colorScheme.onPrimary,
             labelColor: Theme.of(context).colorScheme.onPrimary,
-            unselectedLabelColor: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
+            unselectedLabelColor:
+                Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
             tabs: [
               Tab(
                   text: AppLocalizations.of(context)?.dashboard ?? 'Dashboard',
@@ -148,7 +149,12 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.home_outlined, size: 80, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+            Icon(Icons.home_outlined,
+                size: 80,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.5)),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(
                 text: AppLocalizations.of(context)?.noPgsListedYet ??
@@ -190,7 +196,8 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+            Icon(Icons.error_outline,
+                size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingL),
             HeadingMedium(
               text: AppLocalizations.of(context)?.errorLoadingData ??
@@ -430,7 +437,15 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             BodyText(
               text:
                   '${booking.formattedStartDate} - ${booking.formattedEndDate}',
-              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
             ),
             if (booking.isPending) ...[
               const SizedBox(height: AppSpacing.paddingS),

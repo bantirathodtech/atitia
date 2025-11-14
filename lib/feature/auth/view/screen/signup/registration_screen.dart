@@ -408,7 +408,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
           text: message,
           color: Theme.of(context).colorScheme.onPrimary,
         ),
-        backgroundColor: isError ? Theme.of(context).colorScheme.error : AppColors.success,
+        backgroundColor:
+            isError ? Theme.of(context).colorScheme.error : AppColors.success,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

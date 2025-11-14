@@ -741,11 +741,17 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
+              border: Border.all(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
-                Icon(Icons.build_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                Icon(Icons.build_outlined,
+                    size: 20,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5)),
                 const SizedBox(width: AppSpacing.paddingS),
                 BodyText(text: loc.serviceRequests),
                 const Spacer(),
@@ -753,7 +759,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.paddingS, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -785,11 +792,17 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+              border: Border.all(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             ),
             child: Column(
               children: [
-                Icon(Icons.build_outlined, size: 48, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                Icon(Icons.build_outlined,
+                    size: 48,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5)),
                 const SizedBox(height: AppSpacing.paddingM),
                 HeadingMedium(text: loc.noServiceRequestsYet),
                 const SizedBox(height: AppSpacing.paddingS),
@@ -813,7 +826,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -837,7 +851,9 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                       height: 16,
                       width: 120,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -846,7 +862,9 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                       height: 12,
                       width: 80,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -864,7 +882,10 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                   height: 12,
                   width: 60,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -934,7 +955,15 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                           Text(
                             '${service.guestName} - ${loc.room} ${service.roomNumber}',
                             style: TextStyle(
-                              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color
+                                      ?.withValues(alpha: 0.7) ??
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
                               fontSize: 14,
                             ),
                           ),
@@ -1105,7 +1134,14 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+        Icon(icon,
+            size: 16,
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
         const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: Column(
@@ -1115,7 +1151,15 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
               Text(
@@ -1153,12 +1197,16 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
         textColor = AppColors.success;
         break;
       case 'cancelled':
-        chipColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
-        textColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
+        chipColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+        textColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
         break;
       default:
-        chipColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
-        textColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
+        chipColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+        textColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
     }
 
     return Container(
@@ -1392,7 +1440,15 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 message.formattedTimestamp,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
             ],

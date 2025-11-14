@@ -30,7 +30,7 @@ class EnhancedAnalyticsService {
     final prefs = await SharedPreferences.getInstance();
     final sessionStart = DateTime.now();
     await prefs.setString(_sessionStartKey, sessionStart.toIso8601String());
-    
+
     await _analytics.logEvent(
       name: 'session_start',
       parameters: {
@@ -52,10 +52,10 @@ class EnhancedAnalyticsService {
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'parameters': parameters ?? {},
     };
-    
+
     journey.add(stepData);
     await _saveUserJourney(journey);
-    
+
     await _analytics.logEvent(
       name: 'user_journey_step',
       parameters: {
@@ -77,13 +77,13 @@ class EnhancedAnalyticsService {
       screenName: screenName,
       screenClass: screenClass,
     );
-    
+
     await trackUserJourneyStep(
       step: 'screen_view',
       screen: screenName,
       parameters: parameters,
     );
-    
+
     // Track screen engagement time
     _trackScreenEngagement(screenName);
   }
@@ -91,11 +91,12 @@ class EnhancedAnalyticsService {
   /// Track screen engagement time
   DateTime? _screenStartTime;
   String? _currentScreen;
-  
+
   void _trackScreenEngagement(String screenName) {
     // End previous screen engagement
     if (_currentScreen != null && _screenStartTime != null) {
-      final engagementTime = DateTime.now().difference(_screenStartTime!).inSeconds;
+      final engagementTime =
+          DateTime.now().difference(_screenStartTime!).inSeconds;
       _analytics.logEvent(
         name: 'screen_engagement_time',
         parameters: {
@@ -104,7 +105,7 @@ class EnhancedAnalyticsService {
         },
       );
     }
-    
+
     // Start new screen engagement
     _currentScreen = screenName;
     _screenStartTime = DateTime.now();
@@ -127,7 +128,7 @@ class EnhancedAnalyticsService {
         ...(parameters ?? {}),
       },
     );
-    
+
     await trackUserJourneyStep(
       step: 'action',
       screen: screen,
@@ -156,7 +157,7 @@ class EnhancedAnalyticsService {
         ...(parameters ?? {}),
       },
     );
-    
+
     // Store performance metrics for analysis
     await _storePerformanceMetric(metricName, value, unit, parameters);
   }
@@ -177,7 +178,7 @@ class EnhancedAnalyticsService {
         ...(parameters ?? {}),
       },
     );
-    
+
     await trackUserJourneyStep(
       step: 'business_event',
       screen: 'unknown',
@@ -344,24 +345,24 @@ class EnhancedAnalyticsService {
   Future<List<Map<String, dynamic>>> _getUserJourney() async {
     final prefs = await SharedPreferences.getInstance();
     final journeyString = prefs.getString(_userJourneyKey);
-    
+
     if (journeyString != null) {
       final List<dynamic> journeyList = jsonDecode(journeyString);
       return journeyList.cast<Map<String, dynamic>>();
     }
-    
+
     return [];
   }
 
   /// Save user journey data
   Future<void> _saveUserJourney(List<Map<String, dynamic>> journey) async {
     final prefs = await SharedPreferences.getInstance();
-    
+
     // Keep only last 100 steps
     if (journey.length > 100) {
       journey = journey.sublist(journey.length - 100);
     }
-    
+
     await prefs.setString(_userJourneyKey, jsonEncode(journey));
   }
 
@@ -374,21 +375,22 @@ class EnhancedAnalyticsService {
   ) async {
     final prefs = await SharedPreferences.getInstance();
     var metrics = await getPerformanceMetrics();
-    
-    metrics.add({
-      'metric_name': metricName,
-      'value': value,
-      'unit': unit ?? 'seconds',
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'parameters': parameters ?? {},
-    },
+
+    metrics.add(
+      {
+        'metric_name': metricName,
+        'value': value,
+        'unit': unit ?? 'seconds',
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'parameters': parameters ?? {},
+      },
     );
-    
+
     // Keep only last 50 metrics
     if (metrics.length > 50) {
       metrics = metrics.sublist(metrics.length - 50);
     }
-    
+
     await prefs.setString(_performanceMetricsKey, jsonEncode(metrics));
   }
 
@@ -396,12 +398,12 @@ class EnhancedAnalyticsService {
   Future<List<Map<String, dynamic>>> getPerformanceMetrics() async {
     final prefs = await SharedPreferences.getInstance();
     final metricsString = prefs.getString(_performanceMetricsKey);
-    
+
     if (metricsString != null) {
       final List<dynamic> metricsList = jsonDecode(metricsString);
       return metricsList.cast<Map<String, dynamic>>();
     }
-    
+
     return [];
   }
 
@@ -414,7 +416,8 @@ class EnhancedAnalyticsService {
   }
 
   /// Standard logEvent method for backward compatibility
-  Future<void> logEvent(String eventName, {Map<String, Object>? parameters}) async {
+  Future<void> logEvent(String eventName,
+      {Map<String, Object>? parameters}) async {
     await _analytics.logEvent(
       name: eventName,
       parameters: parameters,

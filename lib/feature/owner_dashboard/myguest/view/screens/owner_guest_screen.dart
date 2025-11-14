@@ -70,7 +70,11 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.request_page_outlined,
-                size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                size: 64,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.5)),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(
               text: loc.noRequests,
@@ -145,7 +149,11 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.report_problem_outlined,
-                size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                size: 64,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.5)),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(text: loc.noComplaintsFound),
             const SizedBox(height: AppSpacing.paddingS),
@@ -175,7 +183,9 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                     children: [
                       Icon(
                         Icons.report_problem,
-                        color: c.isResolved ? AppColors.success : AppColors.statusOrange,
+                        color: c.isResolved
+                            ? AppColors.success
+                            : AppColors.statusOrange,
                       ),
                       const SizedBox(width: AppSpacing.paddingS),
                       Expanded(
@@ -186,7 +196,9 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                         padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.paddingS, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                           borderRadius:
                               BorderRadius.circular(AppSpacing.borderRadiusS),
                         ),
@@ -201,13 +213,33 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                   const SizedBox(height: AppSpacing.paddingS),
                   Row(
                     children: [
-                      Icon(Icons.person, size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                      Icon(Icons.person,
+                          size: 14,
+                          color: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.color
+                                  ?.withValues(alpha: 0.7) ??
+                              Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7)),
                       const SizedBox(width: AppSpacing.paddingXS),
                       CaptionText(
                         text: c.guestName.isEmpty ? loc.guest : c.guestName,
                       ),
                       const SizedBox(width: AppSpacing.paddingM),
-                      Icon(Icons.schedule, size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                      Icon(Icons.schedule,
+                          size: 14,
+                          color: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.color
+                                  ?.withValues(alpha: 0.7) ??
+                              Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7)),
                       const SizedBox(width: AppSpacing.paddingXS),
                       CaptionText(text: _formatShortDate(c.createdAt)),
                     ],
@@ -404,7 +436,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             controller: _tabController,
             indicatorColor: Theme.of(context).colorScheme.onPrimary,
             labelColor: Theme.of(context).colorScheme.onPrimary,
-            unselectedLabelColor: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
+            unselectedLabelColor:
+                Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
             tabs: [
               Tab(text: loc.guests, icon: const Icon(Icons.people, size: 16)),
               Tab(
@@ -457,7 +490,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+            Icon(Icons.error_outline,
+                size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingL),
             HeadingMedium(
               text: loc.errorLoadingData,
@@ -544,7 +578,10 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
               vertical: 4,
             ),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onPrimary
+                  .withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: BodyText(
@@ -580,12 +617,14 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
           const Spacer(),
           // Bulk actions
           IconButton(
-            icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.onPrimary),
+            icon: Icon(Icons.edit,
+                color: Theme.of(context).colorScheme.onPrimary),
             onPressed: () => _showBulkStatusDialog(context, viewModel),
             tooltip: loc.changeStatus,
           ),
           IconButton(
-            icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.onPrimary),
+            icon: Icon(Icons.delete,
+                color: Theme.of(context).colorScheme.onPrimary),
             onPressed: () => _confirmBulkDelete(context, viewModel),
             tooltip: loc.deleteSelected,
           ),
@@ -753,7 +792,15 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         Text(
           title,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
               ),
         ),
       ],
@@ -1090,12 +1137,30 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             // PG name
             Row(
               children: [
-                Icon(Icons.apartment, size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                Icon(Icons.apartment,
+                    size: 14,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: BodyText(
                     text: request.pgName,
-                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -1104,11 +1169,29 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             // Contact info
             Row(
               children: [
-                Icon(Icons.phone, size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                Icon(Icons.phone,
+                    size: 14,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: request.guestPhone,
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -1117,11 +1200,28 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             Row(
               children: [
                 Icon(Icons.calendar_today,
-                    size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                    size: 14,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: request.formattedCreatedAt,
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -1129,7 +1229,15 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
               const SizedBox(height: AppSpacing.paddingS),
               BodyText(
                 text: request.requestSummary,
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withValues(alpha: 0.8) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.8),
               ),
             ],
             // Action buttons for pending requests

@@ -147,7 +147,8 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+            Icon(Icons.error_outline,
+                size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingL),
             HeadingMedium(
               text: loc.errorLoadingDashboard,
@@ -261,7 +262,15 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                 const SizedBox(height: AppSpacing.paddingS),
                 BodyText(
                   text: loc.heresYourBusinessOverview,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ],
             ),

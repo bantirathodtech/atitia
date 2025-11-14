@@ -141,7 +141,8 @@ class AppTheme {
         borderRadius: BorderRadius.circular(AppSpacing.inputBorderRadius),
         borderSide: const BorderSide(color: AppColors.error, width: 2),
       ),
-      labelStyle: AppTypography.inputLabel.copyWith(color: AppColors.textSecondary),
+      labelStyle:
+          AppTypography.inputLabel.copyWith(color: AppColors.textSecondary),
       hintStyle: AppTypography.input.copyWith(color: AppColors.textTertiary),
       errorStyle: AppTypography.bodySmall.copyWith(color: AppColors.error),
     ),
@@ -164,7 +165,8 @@ class AppTheme {
       secondarySelectedColor: AppColors.secondaryContainer,
       disabledColor: AppColors.textDisabled,
       labelStyle: AppTypography.labelMedium,
-      secondaryLabelStyle: AppTypography.labelMedium.copyWith(color: AppColors.textOnPrimary),
+      secondaryLabelStyle:
+          AppTypography.labelMedium.copyWith(color: AppColors.textOnPrimary),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingS,
         vertical: AppSpacing.paddingXS,
@@ -184,29 +186,42 @@ class AppTheme {
     // Comprehensive Text Theme
     textTheme: TextTheme(
       // Display
-      displayLarge: AppTypography.displayLarge.copyWith(color: AppColors.textPrimary),
-      displayMedium: AppTypography.displayMedium.copyWith(color: AppColors.textPrimary),
-      displaySmall: AppTypography.displaySmall.copyWith(color: AppColors.textPrimary),
+      displayLarge:
+          AppTypography.displayLarge.copyWith(color: AppColors.textPrimary),
+      displayMedium:
+          AppTypography.displayMedium.copyWith(color: AppColors.textPrimary),
+      displaySmall:
+          AppTypography.displaySmall.copyWith(color: AppColors.textPrimary),
 
       // Headline
-      headlineLarge: AppTypography.headlineLarge.copyWith(color: AppColors.textPrimary),
-      headlineMedium: AppTypography.headlineMedium.copyWith(color: AppColors.textPrimary),
-      headlineSmall: AppTypography.headlineSmall.copyWith(color: AppColors.textPrimary),
+      headlineLarge:
+          AppTypography.headlineLarge.copyWith(color: AppColors.textPrimary),
+      headlineMedium:
+          AppTypography.headlineMedium.copyWith(color: AppColors.textPrimary),
+      headlineSmall:
+          AppTypography.headlineSmall.copyWith(color: AppColors.textPrimary),
 
       // Title
-      titleLarge: AppTypography.titleLarge.copyWith(color: AppColors.textPrimary),
-      titleMedium: AppTypography.titleMedium.copyWith(color: AppColors.textPrimary),
-      titleSmall: AppTypography.titleSmall.copyWith(color: AppColors.textPrimary),
+      titleLarge:
+          AppTypography.titleLarge.copyWith(color: AppColors.textPrimary),
+      titleMedium:
+          AppTypography.titleMedium.copyWith(color: AppColors.textPrimary),
+      titleSmall:
+          AppTypography.titleSmall.copyWith(color: AppColors.textPrimary),
 
       // Body
       bodyLarge: AppTypography.bodyLarge.copyWith(color: AppColors.textPrimary),
-      bodyMedium: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary),
+      bodyMedium:
+          AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary),
       bodySmall: AppTypography.bodySmall.copyWith(color: AppColors.textPrimary),
 
       // Label
-      labelLarge: AppTypography.labelLarge.copyWith(color: AppColors.textPrimary),
-      labelMedium: AppTypography.labelMedium.copyWith(color: AppColors.textPrimary),
-      labelSmall: AppTypography.labelSmall.copyWith(color: AppColors.textPrimary),
+      labelLarge:
+          AppTypography.labelLarge.copyWith(color: AppColors.textPrimary),
+      labelMedium:
+          AppTypography.labelMedium.copyWith(color: AppColors.textPrimary),
+      labelSmall:
+          AppTypography.labelSmall.copyWith(color: AppColors.textPrimary),
     ),
   );
 
@@ -221,10 +236,10 @@ class AppTheme {
       secondary: AppColors.secondaryLight,
       tertiary: Color(0xFFFF6B6B), // Brighter decorative red for dark mode
       surface: AppColors.darkCard,
-      error: Color(0xFFFF6B6B),  // Brighter error color for dark mode
+      error: Color(0xFFFF6B6B), // Brighter error color for dark mode
       onPrimary: Colors.white,
       onSecondary: Colors.white,
-      onSurface: Color(0xFFE0E0E0),  // Lighter text for better contrast
+      onSurface: Color(0xFFE0E0E0), // Lighter text for better contrast
       onError: Colors.white,
     ),
     fontFamily: AppTypography.primaryFont,
@@ -233,19 +248,20 @@ class AppTheme {
 
     // App Bar - Enhanced for dark mode visibility
     appBarTheme: AppBarTheme(
-      backgroundColor: const Color(0xFF1E1E1E),  // Slightly lighter than scaffold for contrast
-      foregroundColor: const Color(0xFFE0E0E0),  // Bright text for readability
+      backgroundColor: const Color(
+          0xFF1E1E1E), // Slightly lighter than scaffold for contrast
+      foregroundColor: const Color(0xFFE0E0E0), // Bright text for readability
       elevation: AppSpacing.elevationMedium,
       centerTitle: false,
       titleTextStyle: AppTypography.appBarTitle.copyWith(
-        color: const Color(0xFFE0E0E0),  // Bright white-ish for title
+        color: const Color(0xFFE0E0E0), // Bright white-ish for title
       ),
       iconTheme: const IconThemeData(
-        color: Color(0xFFE0E0E0),  // Bright icons
+        color: Color(0xFFE0E0E0), // Bright icons
         size: 24,
       ),
       actionsIconTheme: const IconThemeData(
-        color: Color(0xFFE0E0E0),  // Bright action icons
+        color: Color(0xFFE0E0E0), // Bright action icons
         size: 24,
       ),
     ),
@@ -365,8 +381,10 @@ class AppTheme {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.cardBorderRadius),
       ),
-      titleTextStyle: AppTypography.headlineMedium.copyWith(color: AppColors.darkText),
-      contentTextStyle: AppTypography.bodyMedium.copyWith(color: AppColors.darkText),
+      titleTextStyle:
+          AppTypography.headlineMedium.copyWith(color: AppColors.darkText),
+      contentTextStyle:
+          AppTypography.bodyMedium.copyWith(color: AppColors.darkText),
     ),
 
     // Chip Theme
@@ -376,7 +394,8 @@ class AppTheme {
       secondarySelectedColor: AppColors.secondaryContainer,
       disabledColor: AppColors.textDisabled,
       labelStyle: AppTypography.labelMedium.copyWith(color: AppColors.darkText),
-      secondaryLabelStyle: AppTypography.labelMedium.copyWith(color: AppColors.textOnPrimary),
+      secondaryLabelStyle:
+          AppTypography.labelMedium.copyWith(color: AppColors.textOnPrimary),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingS,
         vertical: AppSpacing.paddingXS,
@@ -397,7 +416,7 @@ class AppTheme {
     textTheme: TextTheme(
       // Display - Large headers with high contrast
       displayLarge: AppTypography.displayLarge.copyWith(
-        color: const Color(0xFFFFFFFF),  // Pure white for maximum visibility
+        color: const Color(0xFFFFFFFF), // Pure white for maximum visibility
       ),
       displayMedium: AppTypography.displayMedium.copyWith(
         color: const Color(0xFFFFFFFF),
@@ -430,13 +449,13 @@ class AppTheme {
 
       // Body - Main content text with comfortable reading contrast
       bodyLarge: AppTypography.bodyLarge.copyWith(
-        color: const Color(0xFFE0E0E0),  // Bright enough to read easily
+        color: const Color(0xFFE0E0E0), // Bright enough to read easily
       ),
       bodyMedium: AppTypography.bodyMedium.copyWith(
-        color: const Color(0xFFD0D0D0),  // Slightly dimmer but still clear
+        color: const Color(0xFFD0D0D0), // Slightly dimmer but still clear
       ),
       bodySmall: AppTypography.bodySmall.copyWith(
-        color: const Color(0xFFC0C0C0),  // Secondary text still readable
+        color: const Color(0xFFC0C0C0), // Secondary text still readable
       ),
 
       // Label - UI labels and buttons with good contrast

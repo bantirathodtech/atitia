@@ -65,7 +65,9 @@ class GuestListWidget extends StatelessWidget {
   /// Builds individual guest card
   Widget _buildGuestCard(BuildContext context, OwnerGuestModel guest) {
     final theme = Theme.of(context);
-    final textSecondary = theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? theme.colorScheme.onSurface.withValues(alpha: 0.7);
+    final textSecondary =
+        theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ??
+            theme.colorScheme.onSurface.withValues(alpha: 0.7);
     final isSelected = selectedGuestIds.contains(guest.uid);
 
     return AdaptiveCard(
@@ -240,7 +242,9 @@ class GuestListWidget extends StatelessWidget {
 
   Widget _buildDetailRow(BuildContext context, String label, String value) {
     final theme = Theme.of(context);
-    final textSecondary = theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? theme.colorScheme.onSurface.withValues(alpha: 0.7);
+    final textSecondary =
+        theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ??
+            theme.colorScheme.onSurface.withValues(alpha: 0.7);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
@@ -317,7 +321,8 @@ class GuestListWidget extends StatelessWidget {
                     content: Text(success
                         ? loc.ownerGuestRoomBedUpdateSuccess
                         : loc.ownerGuestRoomBedUpdateFailure),
-                    backgroundColor: success ? AppColors.success : AppColors.error,
+                    backgroundColor:
+                        success ? AppColors.success : AppColors.error,
                   ),
                 );
               }

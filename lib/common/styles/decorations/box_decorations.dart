@@ -129,7 +129,8 @@ class BoxDecorations {
             ),
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusL),
-      boxShadow: enabled ? ShadowDecorations.button(context) : ShadowDecorations.none,
+      boxShadow:
+          enabled ? ShadowDecorations.button(context) : ShadowDecorations.none,
     );
   }
 
@@ -162,7 +163,8 @@ class BoxDecorations {
     return BoxDecoration(
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusL),
-      border: Border.all(color: theme.colorScheme.onPrimary.withValues(alpha: 0.2)),
+      border:
+          Border.all(color: theme.colorScheme.onPrimary.withValues(alpha: 0.2)),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
