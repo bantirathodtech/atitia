@@ -347,7 +347,8 @@ class FirebaseServiceInitializer {
         if (e.toString().contains('duplicate-app') ||
             e.toString().contains('already exists')) {
           // Firebase is already initialized - this is fine
-          final defaultApp = Firebase.app();
+          // Verify app exists but don't need to store it
+          Firebase.app();
         } else {
           // Different error - re-throw it
           rethrow;
@@ -432,6 +433,8 @@ class FirebaseServiceInitializer {
     ];
 
     bool allCriticalReady = true;
+    // Track optional services ready count for future use
+    // ignore: unused_local_variable
     int optionalReady = 0;
 
     for (final service in criticalServices) {
@@ -443,7 +446,7 @@ class FirebaseServiceInitializer {
 
     for (final service in optionalServices) {
       if (service.instance != null) {
-        optionalReady++;
+        optionalReady++; // Track count for future monitoring/logging
       } else {}
     }
 

@@ -8,7 +8,7 @@ import 'dart:async';
 class DatabaseOptimizer {
   static const int _defaultPageSize = 20;
   static const int _maxPageSize = 50;
-  static final Map<String, DocumentSnapshot> _queryCache = {};
+  static final Map<String, DocumentSnapshot<Object?>?> _queryCache = {};
   static final Map<String, DateTime> _cacheTimestamps = {};
   static const Duration _cacheExpiry = Duration(minutes: 5);
 
@@ -39,7 +39,7 @@ class DatabaseOptimizer {
     // Cache the result
     if (useCache) {
       _queryCache[cacheKey] =
-          result.docs.isNotEmpty ? result.docs.last : null as DocumentSnapshot;
+          result.docs.isNotEmpty ? result.docs.last : null;
       _cacheTimestamps[cacheKey] = DateTime.now();
     }
 

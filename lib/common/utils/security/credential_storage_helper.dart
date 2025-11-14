@@ -175,9 +175,12 @@ class CredentialStorageHelper {
   ///
   /// Client IDs typically end with .apps.googleusercontent.com
   bool _isValidClientId(String clientId) {
-    if (clientId.isEmpty) return false;
-    if (clientId.contains('YOUR_') || clientId.contains('REPLACE_WITH'))
+    if (clientId.isEmpty) {
       return false;
+    }
+    if (clientId.contains('YOUR_') || clientId.contains('REPLACE_WITH')) {
+      return false;
+    }
     // Basic format check - should contain .apps.googleusercontent.com
     return clientId.contains('.apps.googleusercontent.com') ||
         clientId.length > 20; // Allow for other formats
@@ -187,9 +190,13 @@ class CredentialStorageHelper {
   ///
   /// Client secrets typically start with GOCSPX-
   bool _isValidClientSecret(String clientSecret) {
-    if (clientSecret.isEmpty) return false;
-    if (clientSecret.contains('YOUR_') || clientSecret.contains('REPLACE_WITH'))
+    if (clientSecret.isEmpty) {
       return false;
+    }
+    if (clientSecret.contains('YOUR_') ||
+        clientSecret.contains('REPLACE_WITH')) {
+      return false;
+    }
     // Basic format check - should start with GOCSPX- or be a reasonable length
     return clientSecret.startsWith('GOCSPX-') || clientSecret.length > 20;
   }

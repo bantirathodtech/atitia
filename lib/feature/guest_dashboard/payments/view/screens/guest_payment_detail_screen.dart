@@ -659,9 +659,9 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
           // Payment successful - update payment with Razorpay details
           final updatedPayment = _payment!.copyWith(
             status: 'Paid',
-            transactionId: response.paymentId,
+            transactionId: response.paymentId ?? '',
             razorpayOrderId: orderId,
-            razorpayPaymentId: response.paymentId,
+            razorpayPaymentId: response.paymentId ?? '',
             paymentMethod: 'razorpay',
             updatedAt: DateTime.now(),
           );
@@ -681,11 +681,12 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
         },
         onFailure: (response) {
           if (!mounted) return;
+          final errorMessage = response.message ?? 'Unknown error';
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: Text(loc?.paymentFailed(response.message ?? '') ??
+              content: Text(loc?.paymentFailed(errorMessage) ??
                   _text('paymentFailed', 'Payment failed: {message}',
-                      parameters: {'message': response.message ?? ''})),
+                      parameters: {'message': errorMessage})),
               backgroundColor: AppColors.error,
             ),
           );

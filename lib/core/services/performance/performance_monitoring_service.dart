@@ -53,6 +53,8 @@ class PerformanceMonitoringService {
   }
 
   /// Collect current performance metrics
+  // Keep for future use when performance metrics collection is needed
+  // ignore: unused_element
   void _collectPerformanceMetrics() {
     try {
       // Memory usage (approximate)

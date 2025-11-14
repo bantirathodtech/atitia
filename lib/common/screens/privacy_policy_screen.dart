@@ -105,10 +105,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
     );
 
     if (!launched) {
-      final loc = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(loc.privacyPolicyOpenLinkError)),
-      );
+      final loc = AppLocalizations.of(context);
+      if (loc != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.privacyPolicyOpenLinkError)),
+        );
+      }
     }
   }
 

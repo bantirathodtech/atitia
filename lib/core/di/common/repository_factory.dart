@@ -7,6 +7,8 @@ import 'service_factory.dart';
 /// Factory for creating repositories with injected service dependencies
 /// This ensures repositories use interfaces instead of direct service access
 class RepositoryFactory {
+  // ServiceFactory is kept for future use when repositories need injected services
+  // ignore: unused_field
   final ServiceFactory _serviceFactory;
 
   RepositoryFactory(this._serviceFactory);

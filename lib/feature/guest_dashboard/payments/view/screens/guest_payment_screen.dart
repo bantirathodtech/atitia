@@ -1827,9 +1827,9 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
           // Payment successful - create payment record and notification
           await _sendPaymentNotification(
             paymentMethod: 'razorpay',
-            transactionId: response.paymentId,
+            transactionId: response.paymentId ?? '',
             razorpayOrderId: orderId,
-            razorpayPaymentId: response.paymentId,
+            razorpayPaymentId: response.paymentId ?? '',
           );
 
           if (mounted) {
@@ -1847,12 +1847,13 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
         },
         onFailure: (response) {
           if (mounted) {
+            final errorMessage = response.message ?? 'Unknown error';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(AppLocalizations.of(context)
-                        ?.paymentFailed(response.message ?? '') ??
+                        ?.paymentFailed(errorMessage) ??
                     _text('paymentFailed', 'Payment failed: {message}',
-                        parameters: {'message': response.message ?? ''})),
+                        parameters: {'message': errorMessage})),
                 backgroundColor: AppColors.error,
               ),
             );

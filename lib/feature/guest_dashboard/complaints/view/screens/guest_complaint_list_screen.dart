@@ -172,6 +172,8 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
   }
 
   /// 🎨 Premium Sliver App Bar
+  // Keep for future use when premium UI features are enabled
+  // ignore: unused_element
   Widget _buildPremiumSliverAppBar(BuildContext context, bool isDarkMode) {
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
@@ -327,6 +329,8 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
   }
 
   /// 📱 Sliver Body
+  // Keep for future use when sliver-based layout is needed
+  // ignore: unused_element
   List<Widget> _buildSliverBody(
       BuildContext context, GuestComplaintViewModel complaintVM) {
     if (complaintVM.loading && complaintVM.complaints.isEmpty) {

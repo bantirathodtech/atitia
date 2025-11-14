@@ -265,6 +265,8 @@ class InternationalizationService {
   }
 
   /// Get date pattern for current locale
+  // Keep for future use when date formatting is needed
+  // ignore: unused_element
   String _getDatePattern() {
     switch (_currentLocale.languageCode) {
       case 'hi':

@@ -130,6 +130,8 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
   }
 
   /// 🎨 Premium Sliver App Bar with gradient and stats
+  // Keep for future use when premium UI features are enabled
+  // ignore: unused_element
   Widget _buildPremiumSliverAppBar(
       BuildContext context, GuestPgViewModel pgVM) {
     // final theme = Theme.of(context);
