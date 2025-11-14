@@ -68,7 +68,7 @@ class OwnerUpcomingVacatingWidget extends StatelessWidget {
                       BodyText(text: booking.roomBedDisplay),
                       CaptionText(
                         text: booking.formattedEndDate,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ],
                   ),

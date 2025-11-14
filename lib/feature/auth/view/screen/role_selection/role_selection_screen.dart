@@ -155,6 +155,7 @@ class RoleSelectionScreen extends StatelessWidget {
           // =================================================================
           // Positioned absolutely in top-right for easy access
           // User can change theme before selecting role
+          // Theme-aware colors for day/night modes
           // =================================================================
           Positioned(
             top: AppSpacing.paddingM,
@@ -164,11 +165,18 @@ class RoleSelectionScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Theme.of(context).colorScheme.shadow.withValues(
+                        alpha: Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.1,
+                      ),
                       blurRadius: 8,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
+                      spreadRadius: 0,
                     ),
                   ],
                 ),

@@ -45,9 +45,9 @@ class GuestPhotoGallery extends StatelessWidget {
       return Container(
         height: height,
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Center(
           child: Column(
@@ -56,13 +56,29 @@ class GuestPhotoGallery extends StatelessWidget {
               Icon(
                 Icons.photo_library_outlined,
                 size: 48,
-                color: Colors.grey.shade400,
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.5) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5),
               ),
               const SizedBox(height: AppSpacing.paddingS),
               BodyText(
                 text: loc?.noPhotosAvailable ??
                     _text('noPhotosAvailable', 'No photos available'),
-                color: Colors.grey.shade600,
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                 align: TextAlign.center,
               ),
             ],
@@ -82,7 +98,7 @@ class GuestPhotoGallery extends StatelessWidget {
           return Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -94,20 +110,36 @@ class GuestPhotoGallery extends StatelessWidget {
                 errorBuilder: (_, __, ___) => Container(
                   height: height,
                   width: width,
-                  color: Colors.grey.shade100,
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.broken_image,
                         size: 40,
-                        color: Colors.grey.shade400,
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.5) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.5),
                       ),
                       const SizedBox(height: AppSpacing.paddingS / 2),
                       BodyText(
                         text: loc?.failedToLoadImage ??
                             _text('failedToLoadImage', 'Failed to load image'),
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                       ),
                     ],
                   ),
@@ -117,7 +149,8 @@ class GuestPhotoGallery extends StatelessWidget {
                   return Container(
                     height: height,
                     width: width,
-                    color: Colors.grey.shade100,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     alignment: Alignment.center,
                     child: SizedBox(
                       width: 24,

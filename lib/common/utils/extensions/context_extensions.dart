@@ -30,6 +30,11 @@ extension ContextExtensions on BuildContext {
   /// Returns primary color from theme
   Color get primaryColor => theme.primaryColor;
 
+  /// Returns decorative red color (tertiary) - theme-aware for day/night
+  /// Use this for decorative red purposes, not for errors
+  /// For errors, use colors.error instead
+  Color get decorativeRed => colors.tertiary;
+
   // MARK: - Media Query Helpers
   // ==========================================
 
@@ -94,7 +99,7 @@ extension ContextExtensions on BuildContext {
         content: Text(
           message,
           style: textTheme.bodyMedium?.copyWith(
-            color: Colors.white,
+            color: colors.onPrimary,
           ),
         ),
         duration: duration,

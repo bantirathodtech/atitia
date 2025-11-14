@@ -91,8 +91,6 @@ class GuestPgAppBarDisplay extends StatelessWidget {
 
   /// Builds the display when a PG is selected
   Widget _buildPgSelected(BuildContext context, dynamic selectedPg) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     final pgName = (selectedPg.pgName as String?)?.trim().isNotEmpty == true
@@ -135,11 +133,11 @@ class GuestPgAppBarDisplay extends StatelessWidget {
             children: [
               HeadingSmall(
                 text: pgName,
-                color: isDark ? Colors.white : Colors.black,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               CaptionText(
                 text: pgLocation,
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -181,13 +179,13 @@ class GuestPgAppBarDisplay extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return Colors.green;
+        return AppColors.success;
       case 'inactive':
-        return Colors.orange;
+        return AppColors.warning;
       case 'maintenance':
-        return Colors.red;
+        return AppColors.error;
       default:
-        return Colors.grey;
+        return AppColors.primary;
     }
   }
 }

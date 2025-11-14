@@ -96,12 +96,12 @@ class _OwnerPaymentNotificationsBadgeState
               Container(
                 padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.payment_rounded,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                   size: 20,
                 ),
               ),
@@ -112,7 +112,7 @@ class _OwnerPaymentNotificationsBadgeState
                 children: [
                   BodyText(
                     text: loc?.pendingPayments ?? 'Pending Payments',
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     medium: true,
                   ),
                   CaptionText(
@@ -120,15 +120,15 @@ class _OwnerPaymentNotificationsBadgeState
                           viewModel.pendingNotifications.length,
                         ) ??
                         '${viewModel.pendingNotifications.length} waiting',
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9),
                   ),
                 ],
               ),
               const SizedBox(width: AppSpacing.paddingS),
               Container(
                 padding: const EdgeInsets.all(AppSpacing.paddingS),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onPrimary,
                   shape: BoxShape.circle,
                 ),
                 child: BodyText(
@@ -149,7 +149,7 @@ class _OwnerPaymentNotificationsBadgeState
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent, // Modal bottom sheet - transparent is fine
       builder: (context) =>
           _PaymentNotificationsSheet(notifications: notifications),
     );
@@ -170,7 +170,7 @@ class _PaymentNotificationsSheet extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.white,
+        color: isDark ? AppColors.darkCard : Theme.of(context).colorScheme.surface,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.borderRadiusL),
         ),
@@ -204,8 +204,8 @@ class _PaymentNotificationsSheet extends StatelessWidget {
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusM),
                   ),
-                  child: const Icon(Icons.payment_rounded,
-                      color: Colors.white, size: 24),
+                  child: Icon(Icons.payment_rounded,
+                      color: Theme.of(context).colorScheme.onPrimary, size: 24),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
@@ -218,7 +218,7 @@ class _PaymentNotificationsSheet extends StatelessWidget {
                         text: loc?.notificationsCount(notifications.length) ??
                             '${notifications.length} notifications',
                         color:
-                            isDark ? Colors.white70 : AppColors.textSecondary,
+                            Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ],
                   ),

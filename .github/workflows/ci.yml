@@ -23,6 +23,7 @@ concurrency:
 
 env:
   JAVA_VERSION: '17'
+  FLUTTER_VERSION: '3.35.7'  # Pinned for reproducibility
 
 jobs:
   # ============================================================================
@@ -64,6 +65,7 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
@@ -113,6 +115,7 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
@@ -123,24 +126,37 @@ jobs:
       - name: 🔍 Analyze Code
         run: |
           echo "🔍 Running static analysis..."
-          flutter analyze --no-fatal-infos --no-fatal-warnings || {
-            echo "⚠️ Analysis completed with warnings (non-blocking)"
-            flutter analyze --no-fatal-infos 2>&1 | grep -E "(error|warning)" | head -20 || true
-            exit 0
-          }
+          # Run analysis and capture output
+          ANALYSIS_OUTPUT=$(flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1) || ANALYSIS_EXIT_CODE=$?
+          
+          # Check for errors (blocking)
+          if echo "$ANALYSIS_OUTPUT" | grep -q "error •"; then
+            echo "❌ Code analysis found ERRORS (blocking):"
+            echo "$ANALYSIS_OUTPUT" | grep "error •" | head -20
+            exit 1
+          fi
+          
+          # Check for warnings (non-blocking)
+          if echo "$ANALYSIS_OUTPUT" | grep -q "warning •"; then
+            echo "⚠️ Code analysis found warnings (non-blocking):"
+            echo "$ANALYSIS_OUTPUT" | grep "warning •" | head -20
+          fi
+          
           echo "✅ Code analysis complete"
-        continue-on-error: true
         timeout-minutes: 10
 
       - name: 📝 Check Formatting
         run: |
           echo "📝 Checking code formatting..."
-          dart format --set-exit-if-changed . > /dev/null 2>&1 && echo "✅ Code properly formatted" || {
-            echo "⚠️ Formatting issues detected (showing first 20 lines)"
-            dart format --set-exit-if-changed . 2>&1 | head -20 || true
-            exit 0
-          }
-        continue-on-error: true
+          if dart format --set-exit-if-changed . > /dev/null 2>&1; then
+            echo "✅ Code properly formatted"
+          else
+            echo "❌ Formatting issues detected (blocking):"
+            dart format --set-exit-if-changed . 2>&1 | head -30
+            echo ""
+            echo "💡 Run 'dart format .' to fix formatting issues"
+            exit 1
+          fi
         timeout-minutes: 5
 
   # ============================================================================
@@ -149,13 +165,13 @@ jobs:
   test:
     name: 🧪 Run Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     needs: dependencies
     
     strategy:
       fail-fast: false
       matrix:
-        test-type: [unit, widget]
+        test-type: [unit, widget, integration]
     
     steps:
       - name: 📥 Checkout Code
@@ -164,40 +180,107 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      - name: 📦 Cache Test Results
+        uses: actions/cache@v4
+        id: test-cache
+        with:
+          path: |
+            .dart_tool/test
+            test/.test_coverage
+          key: ${{ runner.os }}-test-${{ hashFiles('test/**/*.dart', 'lib/**/*.dart') }}
+          restore-keys: |
+            ${{ runner.os }}-test-
 
       - name: 📦 Get Dependencies
         run: flutter pub get
         timeout-minutes: 3
 
-      - name: 🧪 Run CI-Safe Tests
+      - name: 🧪 Run Unit Tests with Coverage
         if: matrix.test-type == 'unit'
         run: |
-          echo "🧪 Running CI-safe tests..."
-          # Run simple CI-safe tests first
-          flutter test test/ci_test_runner.dart --no-pub || echo "CI test runner completed"
+          echo "🧪 Running unit tests with coverage..."
+          
+          # Run CI-safe tests first (critical - must pass)
+          echo "📋 Running CI-safe tests..."
+          flutter test test/ci_test_runner.dart --no-pub --coverage || {
+            echo "❌ CI-safe tests failed (blocking)"
+            exit 1
+          }
           
           # Try unit tests (may fail if Firebase-dependent)
-          flutter test test/unit/ --no-pub --reporter expanded || {
-            echo "⚠️ Some unit tests skipped (may require Firebase)"
-            exit 0
-          }
-          echo "✅ CI-safe tests completed"
-        continue-on-error: true
-        timeout-minutes: 10
+          echo "📋 Running unit tests..."
+          if flutter test test/unit/ --no-pub --coverage --reporter expanded; then
+            echo "✅ All unit tests passed"
+          else
+            echo "⚠️ Some unit tests failed (may require Firebase) - checking if critical..."
+            # Check if any non-Firebase tests failed
+            flutter test test/unit/ --no-pub --reporter expanded 2>&1 | grep -i "firebase\|network\|connection" || {
+              echo "❌ Non-Firebase unit tests failed (blocking)"
+              exit 1
+            }
+            echo "⚠️ Unit tests skipped (Firebase-dependent)"
+          fi
+          
+          echo "✅ Unit tests completed"
+        timeout-minutes: 12
 
-      - name: 🎨 Run Widget Tests
+      - name: 🎨 Run Widget Tests with Coverage
         if: matrix.test-type == 'widget'
         run: |
-          echo "🎨 Running widget tests..."
-          flutter test test/widget_test.dart --no-pub || {
-            echo "⚠️ Widget test completed with notes"
-            exit 0
+          echo "🎨 Running widget tests with coverage..."
+          flutter test test/widget_test.dart --no-pub --coverage || {
+            echo "❌ Widget tests failed (blocking)"
+            exit 1
           }
           echo "✅ Widget tests completed"
+        timeout-minutes: 8
+
+      - name: 🔗 Run Integration Tests
+        if: matrix.test-type == 'integration'
+        run: |
+          echo "🔗 Running integration tests..."
+          # Check if integration tests exist
+          if [ -d "test/integration" ] && [ "$(ls -A test/integration/*.dart 2>/dev/null)" ]; then
+            echo "📋 Found integration tests, running..."
+            flutter test test/integration/ --no-pub --coverage || {
+              echo "⚠️ Integration tests failed (may require Firebase/network)"
+              echo "💡 Integration tests are non-blocking in CI"
+              exit 0
+            }
+            echo "✅ Integration tests completed"
+          else
+            echo "ℹ️ No integration tests found, skipping..."
+          fi
         continue-on-error: true
-        timeout-minutes: 5
+        timeout-minutes: 15
+
+      - name: 📊 Generate Coverage Report
+        if: always() && (matrix.test-type == 'unit' || matrix.test-type == 'widget')
+        run: |
+          echo "📊 Generating coverage report..."
+          if [ -d "coverage" ]; then
+            # Install lcov if available
+            if command -v lcov &> /dev/null; then
+              lcov --list coverage/lcov.info | head -50 || true
+            fi
+            echo "✅ Coverage data available in coverage/"
+          fi
+        continue-on-error: true
+
+      - name: 📤 Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.test-type }}
+          path: |
+            coverage/
+            test/.test_coverage
+          retention-days: 7
+          if-no-files-found: ignore
 
   # ============================================================================
   # STAGE 5: Platform Builds (Parallel Execution)
@@ -207,7 +290,7 @@ jobs:
     name: 🤖 Build Android
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    needs: [dependencies, code-quality]
+    needs: [dependencies, code-quality, test]
     if: "!failure() && !cancelled()"
     
     steps:
@@ -224,6 +307,7 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
@@ -254,8 +338,8 @@ jobs:
   build-ios:
     name: 🍎 Build iOS
     runs-on: macos-15
-    timeout-minutes: 30
-    needs: [dependencies, code-quality]
+    timeout-minutes: 45
+    needs: [dependencies, code-quality, test]
     if: "!failure() && !cancelled()"
     
     steps:
@@ -265,8 +349,42 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      - name: 📦 Cache CocoaPods
+        uses: actions/cache@v4
+        id: pod-cache
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: 📦 Cache Flutter Build
+        uses: actions/cache@v4
+        id: flutter-build-cache
+        with:
+          path: |
+            build/ios
+            .dart_tool
+          key: ${{ runner.os }}-flutter-ios-${{ hashFiles('pubspec.lock', 'ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-ios-
+
+      - name: 📦 Cache Xcode Derived Data
+        uses: actions/cache@v4
+        id: xcode-cache
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-xcode-${{ hashFiles('ios/Podfile.lock', 'pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-xcode-
 
       - name: 📦 Get Dependencies
         run: flutter pub get
@@ -276,32 +394,74 @@ jobs:
         run: |
           echo "📦 Setting up CocoaPods..."
           cd ios
-          pod install --repo-update || {
-            echo "⚠️ CocoaPods setup completed with notes"
-            cd ..
-            exit 0
-          }
+          
+          # Check if Podfile.lock exists and if pods are cached
+          if [ -f "Podfile.lock" ] && [ -d "Pods" ]; then
+            echo "✅ Using cached CocoaPods dependencies"
+            # Only update if Podfile.lock changed
+            pod install --deployment || {
+              echo "⚠️ Cached pods may be outdated, updating..."
+              pod install || {
+                echo "⚠️ CocoaPods setup completed with notes"
+                cd ..
+                exit 0
+              }
+            }
+          else
+            echo "📥 Installing CocoaPods dependencies (first time or cache miss)..."
+            # Only update repo if Podfile.lock doesn't exist
+            if [ ! -f "Podfile.lock" ]; then
+              pod install --repo-update || {
+                echo "⚠️ CocoaPods setup completed with notes"
+                cd ..
+                exit 0
+              }
+            else
+              pod install || {
+                echo "⚠️ CocoaPods setup completed with notes"
+                cd ..
+                exit 0
+              }
+            fi
+          fi
+          
           cd ..
           echo "✅ CocoaPods ready"
         continue-on-error: true
-        timeout-minutes: 10
+        timeout-minutes: 8
 
       - name: 🍎 Build iOS (No Codesign)
         run: |
           echo "🔨 Building iOS..."
-          flutter build ios --no-codesign --no-pub --release || {
+          echo "⏱️ Build started at: $(date)"
+          
+          # Clean only if cache miss
+          if [ "${{ steps.flutter-build-cache.cache-hit }}" != "true" ]; then
+            echo "🧹 Cleaning build directory (cache miss)..."
+            flutter clean || true
+            flutter pub get
+          fi
+          
+          # Build with optimizations
+          flutter build ios \
+            --no-codesign \
+            --no-pub \
+            --release \
+            --split-debug-info=build/ios/debug-info || {
             echo "⚠️ iOS build completed with notes"
             exit 0
           }
+          
           echo "✅ iOS build completed"
+          echo "⏱️ Build finished at: $(date)"
         continue-on-error: true
-        timeout-minutes: 25
+        timeout-minutes: 35
 
   build-web:
     name: 🌐 Build Web
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [dependencies, code-quality]
+    needs: [dependencies, code-quality, test]
     if: "!failure() && !cancelled()"
     
     steps:
@@ -311,8 +471,20 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      - name: 📦 Cache Web Build
+        uses: actions/cache@v4
+        id: web-build-cache
+        with:
+          path: |
+            build/web
+            .dart_tool
+          key: ${{ runner.os }}-web-${{ hashFiles('pubspec.lock', 'lib/**/*.dart', 'web/**') }}
+          restore-keys: |
+            ${{ runner.os }}-web-
 
       - name: 📦 Get Dependencies
         run: flutter pub get
@@ -321,12 +493,22 @@ jobs:
       - name: 🌐 Build Web
         run: |
           echo "🔨 Building Web..."
+          echo "⏱️ Build started at: $(date)"
+          
+          # Clean only if cache miss
+          if [ "${{ steps.web-build-cache.cache-hit }}" != "true" ]; then
+            echo "🧹 Cleaning build directory (cache miss)..."
+            flutter clean || true
+            flutter pub get
+          fi
+          
           flutter build web --release --no-pub || {
-            echo "⚠️ Web build completed with notes"
-            exit 0
+            echo "❌ Web build failed"
+            exit 1
           }
+          
           echo "✅ Web build completed"
-        continue-on-error: true
+          echo "⏱️ Build finished at: $(date)"
         timeout-minutes: 15
 
       - name: 📤 Upload Web Artifact
@@ -344,7 +526,7 @@ jobs:
   security:
     name: 🔒 Security Audit
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     needs: dependencies
     if: "!failure() && !cancelled()"
     
@@ -355,6 +537,7 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
@@ -363,15 +546,40 @@ jobs:
         timeout-minutes: 3
 
       - name: 🔒 Security Audit
+        id: security-audit
         run: |
           echo "🔒 Running security audit..."
-          flutter pub audit || {
-            echo "⚠️ Security audit completed with advisories (non-blocking)"
-            exit 0
-          }
-          echo "✅ Security audit passed"
+          AUDIT_OUTPUT=$(flutter pub audit 2>&1) || AUDIT_EXIT_CODE=$?
+          
+          # Check for critical/high severity vulnerabilities
+          if echo "$AUDIT_OUTPUT" | grep -qiE "(critical|high severity)"; then
+            echo "❌ CRITICAL/HIGH severity vulnerabilities found (blocking):"
+            echo "$AUDIT_OUTPUT" | grep -iE "(critical|high severity)" || echo "$AUDIT_OUTPUT"
+            echo ""
+            echo "💡 Review and update vulnerable dependencies before proceeding"
+            exit 1
+          fi
+          
+          # Medium/low severity vulnerabilities (non-blocking)
+          if echo "$AUDIT_OUTPUT" | grep -qiE "(medium|low severity|advisory)"; then
+            echo "⚠️ Medium/Low severity advisories found (non-blocking):"
+            echo "$AUDIT_OUTPUT" | grep -iE "(medium|low severity|advisory)" | head -20 || true
+            echo ""
+            echo "💡 Consider updating dependencies when possible"
+          fi
+          
+          if [ "$AUDIT_EXIT_CODE" = "0" ] || [ -z "$AUDIT_EXIT_CODE" ]; then
+            echo "✅ Security audit passed - no critical vulnerabilities"
+          fi
+        timeout-minutes: 10
+
+      - name: 🔍 Dependency Vulnerability Scan
+        run: |
+          echo "🔍 Running additional dependency vulnerability scan..."
+          # Check for known vulnerable packages
+          flutter pub deps --style=tree | grep -iE "(vulnerable|deprecated|outdated)" || echo "✅ No obvious vulnerabilities detected"
         continue-on-error: true
-        timeout-minutes: 5
+        timeout-minutes: 3
 
   # ============================================================================
   # STAGE 7: Pipeline Summary (Always Runs)
@@ -397,6 +605,7 @@ jobs:
           echo "| 📦 Dependencies | ${{ needs.dependencies.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 📊 Code Quality | ${{ needs.code-quality.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🧪 Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📊 Test Coverage | Available in artifacts |" >> $GITHUB_STEP_SUMMARY
           echo "| 🤖 Android Build | ${{ needs.build-android.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🍎 iOS Build | ${{ needs.build-ios.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🌐 Web Build | ${{ needs.build-web.result }} |" >> $GITHUB_STEP_SUMMARY
@@ -404,8 +613,14 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # Determine overall status
-          if [ "${{ needs.validate.result }}" == "success" ] && \
-             [ "${{ needs.dependencies.result }}" == "success" ]; then
+          CRITICAL_JOBS="${{ needs.validate.result }} ${{ needs.dependencies.result }} ${{ needs.code-quality.result }}"
+          if echo "$CRITICAL_JOBS" | grep -q "failure"; then
+            echo "### ❌ Overall Status: **PIPELINE FAILED**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Critical jobs failed. Please review and fix issues before merging." >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.validate.result }}" == "success" ] && \
+               [ "${{ needs.dependencies.result }}" == "success" ] && \
+               [ "${{ needs.code-quality.result }}" == "success" ]; then
             echo "### ✅ Overall Status: **PIPELINE PASSED**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "All critical jobs completed successfully. Check individual jobs for details." >> $GITHUB_STEP_SUMMARY
@@ -414,3 +629,12 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Some jobs completed with warnings. Review individual job logs for details." >> $GITHUB_STEP_SUMMARY
           fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Performance Metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Flutter Version | ${{ env.FLUTTER_VERSION }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Java Version | ${{ env.JAVA_VERSION }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Coverage | Available in artifacts |" >> $GITHUB_STEP_SUMMARY

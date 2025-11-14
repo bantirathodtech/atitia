@@ -193,7 +193,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingM),
             BodyText(text: loc.failedToLoadMenus),
             const SizedBox(height: AppSpacing.paddingM),
@@ -232,7 +232,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.restaurant_menu, size: 64, color: Colors.grey),
+          Icon(Icons.restaurant_menu, size: 64, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(text: loc.noPgMenusFound),
           const SizedBox(height: AppSpacing.paddingS),

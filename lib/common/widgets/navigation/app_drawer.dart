@@ -6,6 +6,7 @@ import '../../../core/navigation/navigation_service.dart';
 import '../../../feature/auth/logic/auth_provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../styles/spacing.dart';
+import '../../styles/colors.dart';
 import '../../styles/typography.dart';
 import '../buttons/secondary_button.dart';
 import '../dialogs/confirmation_dialog.dart';
@@ -80,7 +81,7 @@ class AppDrawer extends StatelessWidget {
                             context: context,
                             icon: Icons.logout,
                             title: loc.logout,
-                            iconColor: Colors.red,
+                            iconColor: AppColors.error,
                             onTap: () => _showLogoutDialog(context),
                           ),
                         ],
@@ -136,11 +137,11 @@ class AppDrawer extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: [Colors.white, Colors.white.withValues(alpha: 0.7)],
+                    colors: [Theme.of(context).colorScheme.onPrimary, Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7)],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.3),
+                      color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
                       blurRadius: 15,
                       offset: const Offset(0, 5),
                     ),
@@ -149,7 +150,7 @@ class AppDrawer extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSpacing.paddingXXS),
                 child: CircleAvatar(
                   radius: 40,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.onPrimary,
                   child: user?.hasProfilePhoto == true
                       ? ClipOval(
                           child: Image.network(
@@ -174,18 +175,18 @@ class AppDrawer extends StatelessWidget {
                     // Name
                     HeadingMedium(
                       text: displayName,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                     const SizedBox(height: AppSpacing.paddingS),
                     // Phone with icon
                     Row(
                       children: [
-                        const Icon(Icons.phone,
-                            size: 14, color: Colors.white70),
+                        Icon(Icons.phone,
+                            size: 14, color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7)),
                         const SizedBox(width: AppSpacing.paddingXS),
                         BodyText(
                           text: user?.phoneNumber ?? '',
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9),
                         ),
                       ],
                     ),
@@ -197,10 +198,10 @@ class AppDrawer extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3),
+                          color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -211,12 +212,12 @@ class AppDrawer extends StatelessWidget {
                                 ? Icons.business
                                 : Icons.person,
                             size: 14,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                           const SizedBox(width: AppSpacing.paddingXS),
                           BodyText(
                             text: roleText,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ],
                       ),
@@ -236,10 +237,10 @@ class AppDrawer extends StatelessWidget {
                 vertical: 6,
               ),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
+                color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -249,8 +250,8 @@ class AppDrawer extends StatelessWidget {
                     user?.isVerified == true ? Icons.verified : Icons.pending,
                     size: 16,
                     color: user?.isVerified == true
-                        ? Colors.greenAccent
-                        : Colors.orangeAccent,
+                        ? AppColors.success
+                        : AppColors.warning,
                   ),
                   const SizedBox(width: AppSpacing.paddingS),
                   Builder(
@@ -261,7 +262,7 @@ class AppDrawer extends StatelessWidget {
                             ? (loc?.verifiedOwner ?? 'Verified Owner')
                             : (loc?.pendingVerification ??
                                 'Pending Verification'),
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       );
                     },
                   ),
@@ -285,15 +286,15 @@ class AppDrawer extends StatelessWidget {
     return Container(
       width: 64,
       height: 64,
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onPrimary,
         shape: BoxShape.circle,
       ),
       child: Center(
         child: Text(
           displayInitial,
           style: AppTypography.headingLarge.copyWith(
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
       ),
@@ -542,9 +543,9 @@ class AppDrawer extends StatelessWidget {
             SnackBar(
               content: BodyText(
                 text: loc.switchedToAccount(roleDisplay),
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.success,
             ),
           );
         }
@@ -559,9 +560,9 @@ class AppDrawer extends StatelessWidget {
           SnackBar(
             content: BodyText(
               text: '${loc.failedToSwitchAccount}: $e',
-              color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -604,9 +605,9 @@ class AppDrawer extends StatelessWidget {
           SnackBar(
             content: BodyText(
               text: loc.loggedOutSuccessfully,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
       }
@@ -620,9 +621,9 @@ class AppDrawer extends StatelessWidget {
           SnackBar(
             content: BodyText(
               text: '${loc.logoutFailed}: $e',
-              color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }

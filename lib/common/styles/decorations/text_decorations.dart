@@ -8,22 +8,24 @@ class TextDecorations {
   // MARK: - Text Shadow Effects
   // ==========================================
 
-  /// Subtle text shadow for better readability
-  static List<Shadow> subtle({Color? shadowColor}) {
+  /// Subtle text shadow for better readability - theme-aware via BuildContext
+  static List<Shadow> subtle(BuildContext context, {Color? shadowColor}) {
+    final defaultShadowColor = shadowColor ?? Theme.of(context).colorScheme.shadow;
     return [
       Shadow(
-        color: shadowColor ?? Colors.black.withValues(alpha: 0.1),
+        color: defaultShadowColor.withValues(alpha: 0.1),
         offset: const Offset(1, 1),
         blurRadius: 2,
       ),
     ];
   }
 
-  /// Strong text shadow for emphasis
-  static List<Shadow> strong({Color? shadowColor}) {
+  /// Strong text shadow for emphasis - theme-aware via BuildContext
+  static List<Shadow> strong(BuildContext context, {Color? shadowColor}) {
+    final defaultShadowColor = shadowColor ?? Theme.of(context).colorScheme.shadow;
     return [
       Shadow(
-        color: shadowColor ?? Colors.black.withValues(alpha: 0.3),
+        color: defaultShadowColor.withValues(alpha: 0.3),
         offset: const Offset(2, 2),
         blurRadius: 4,
       ),
@@ -75,7 +77,7 @@ class TextDecorations {
 
   /// Success gradient for text
   static Gradient get successGradient => const LinearGradient(
-        colors: [Colors.green, Colors.lightGreen],
+        colors: [AppColors.success, AppColors.statusGreen],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       );
@@ -83,24 +85,27 @@ class TextDecorations {
   // MARK: - Pre-styled Text Decorations
   // ==========================================
 
-  /// Decoration for important headings
-  static TextStyle headingDecoration({
+  /// Decoration for important headings - theme-aware via BuildContext
+  static TextStyle headingDecoration(
+    BuildContext context, {
     Color? color,
     bool withShadow = true,
   }) {
     return AppTypography.headingLarge.copyWith(
-      color: color ?? AppColors.lightText,
-      shadows: withShadow ? subtle() : null,
+      color: color ?? Theme.of(context).textTheme.headlineLarge?.color ?? Theme.of(context).colorScheme.onSurface,
+      shadows: withShadow ? subtle(context) : null,
     );
   }
 
   /// Decoration for highlighted text
   static TextStyle highlighted({
     Color backgroundColor = AppColors.lightAccent,
-    Color textColor = Colors.white,
+    Color? textColor,
+    BuildContext? context,
   }) {
+    final finalTextColor = textColor ?? (context != null ? Theme.of(context).colorScheme.onPrimary : AppColors.textOnPrimary);
     return AppTypography.bodyMedium.copyWith(
-      color: textColor,
+      color: finalTextColor,
       backgroundColor: backgroundColor.withValues(alpha: 0.8),
       fontWeight: FontWeight.bold,
     );
@@ -110,11 +115,13 @@ class TextDecorations {
   static TextStyle price({
     Color? color,
     bool isDiscounted = false,
+    BuildContext? context,
   }) {
+    final finalColor = color ?? (context != null ? Theme.of(context).colorScheme.primary : AppColors.lightPrimary);
     return AppTypography.headingMedium.copyWith(
-      color: color ?? AppColors.lightPrimary,
+      color: finalColor,
       decoration: isDiscounted ? TextDecoration.lineThrough : null,
-      decorationColor: Colors.red,
+      decorationColor: context != null ? Theme.of(context).colorScheme.error : AppColors.error,
       decorationThickness: 2,
     );
   }
@@ -122,10 +129,12 @@ class TextDecorations {
   /// Decoration for badge text
   static TextStyle badge({
     Color backgroundColor = AppColors.lightPrimary,
-    Color textColor = Colors.white,
+    Color? textColor,
+    BuildContext? context,
   }) {
+    final finalTextColor = textColor ?? (context != null ? Theme.of(context).colorScheme.onPrimary : AppColors.textOnPrimary);
     return AppTypography.bodySmall.copyWith(
-      color: textColor,
+      color: finalTextColor,
       backgroundColor: backgroundColor,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.5,

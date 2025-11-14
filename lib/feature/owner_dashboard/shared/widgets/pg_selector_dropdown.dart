@@ -43,7 +43,8 @@ class PgSelectorDropdown extends StatelessWidget {
             child: Tooltip(
               message: provider.error!,
               child: IconButton(
-                icon: const Icon(Icons.error_outline, color: Colors.red),
+                icon: Icon(Icons.error_outline,
+                    color: Theme.of(context).colorScheme.error),
                 onPressed: () => provider.refreshPgs(),
                 tooltip: 'Retry loading PGs',
               ),
@@ -243,7 +244,7 @@ class _FullWidthPgSelector extends StatelessWidget {
     return Semantics(
       label: 'Select paying guest property',
       child: DropdownButtonFormField<String>(
-        value: selectedPgId,
+        initialValue: selectedPgId,
         items: options
             .map(
               (entry) => DropdownMenuItem<String>(

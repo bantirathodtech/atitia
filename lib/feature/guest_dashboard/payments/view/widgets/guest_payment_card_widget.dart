@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
@@ -50,18 +51,18 @@ class GuestPaymentCardWidget extends StatelessWidget {
     return translated;
   }
 
-  Color _getStatusColor() {
+  Color _getStatusColor(BuildContext context) {
     switch (payment.status.toLowerCase()) {
       case 'paid':
-        return Colors.green;
+        return AppColors.success;
       case 'pending':
-        return payment.isOverdue ? Colors.red : Colors.orange;
+        return payment.isOverdue ? AppColors.error : AppColors.statusOrange;
       case 'failed':
-        return Colors.red;
+        return AppColors.error;
       case 'refunded':
-        return Colors.blue;
+        return AppColors.info;
       default:
-        return Colors.grey;
+        return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
     }
   }
 
@@ -133,7 +134,7 @@ class GuestPaymentCardWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.paddingS),
           decoration: BoxDecoration(
-            color: _getStatusColor().withValues(alpha: 0.1),
+            color: _getStatusColor(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
           ),
           child: Text(
@@ -172,13 +173,13 @@ class GuestPaymentCardWidget extends StatelessWidget {
             vertical: AppSpacing.paddingXS,
           ),
           decoration: BoxDecoration(
-            color: _getStatusColor(),
+            color: _getStatusColor(context),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
           ),
           child: Text(
             _statusLabel(payment.status, loc),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
@@ -214,7 +215,7 @@ class GuestPaymentCardWidget extends StatelessWidget {
             ),
             BodyText(
               text: _formatDate(payment.dueDate, loc),
-              color: payment.isOverdue ? Colors.red : null,
+              color: payment.isOverdue ? AppColors.error : null,
             ),
           ],
         ),
@@ -246,14 +247,14 @@ class GuestPaymentCardWidget extends StatelessWidget {
       children: [
         Icon(
           _getStatusIcon(),
-          color: _getStatusColor(),
+          color: _getStatusColor(context),
           size: 16,
         ),
         const SizedBox(width: AppSpacing.paddingXS),
         Expanded(
           child: CaptionText(
             text: _getStatusMessage(loc),
-            color: _getStatusColor(),
+            color: _getStatusColor(context),
           ),
         ),
         if (payment.paymentMethod.isNotEmpty)
@@ -289,7 +290,7 @@ class GuestPaymentCardWidget extends StatelessWidget {
             onPressed: onPay,
             label: loc?.payNow ?? _text('payNow', 'Pay Now'),
             icon: Icons.payment,
-            backgroundColor: _getStatusColor(),
+            backgroundColor: _getStatusColor(context),
           ),
         ),
       ],

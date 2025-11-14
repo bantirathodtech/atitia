@@ -50,7 +50,6 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
 
   @override
   Widget buildAdaptive(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
     final title = loc?.pgAdditionalInfoTitle ??
         _text('pgAdditionalInfoTitle', 'Additional Information');
@@ -103,7 +102,7 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
           text: loc?.pgAdditionalInfoNearbyPlacesDescription ??
               _text('pgAdditionalInfoNearbyPlacesDescription',
                   'Add nearby landmarks, locations, or points of interest'),
-          color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         const SizedBox(height: AppSpacing.paddingM),
 
@@ -162,9 +161,7 @@ class PgAdditionalInfoFormWidget extends AdaptiveStatelessWidget {
                       Icon(
                         Icons.close,
                         size: 16,
-                        color: isDark
-                            ? Colors.grey.shade400
-                            : Colors.grey.shade600,
+                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ],
                   ),

@@ -257,10 +257,10 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
         vertical: AppSpacing.paddingXS,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.3),
+          color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -405,7 +405,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

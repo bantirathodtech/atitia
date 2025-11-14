@@ -459,10 +459,10 @@ class _ReviewFormState extends State<ReviewForm> {
                               color: AppColors.error,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.close,
                               size: 16,
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onPrimary,
                             ),
                           ),
                         ),

@@ -247,8 +247,8 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
                 widget.label,
                 style: AppTypography.inputLabel.copyWith(
                   color: widget.error != null
-                      ? Colors.red
-                      : (isDark ? Colors.white70 : Colors.black87),
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -263,8 +263,8 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               borderRadius: BorderRadius.circular(_getBorderRadius(context)),
               border: Border.all(
                 color: widget.error != null
-                    ? Colors.red
-                    : (isDark ? Colors.white12 : Colors.black12),
+                    ? Theme.of(context).colorScheme.error.withValues(alpha: 0.12)
+                    : Theme.of(context).colorScheme.shadow.withValues(alpha: 0.12),
                 width: 0.5,
               ),
             ),
@@ -282,7 +282,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               enabled: widget.enabled,
               padding: _getInputPadding(context),
               style: AppTypography.input.copyWith(
-                color: isDark ? Colors.white : Colors.black,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
               ),
               decoration: const BoxDecoration(),
               prefix: widget.prefixIcon,
@@ -296,7 +296,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               padding: const EdgeInsets.only(top: AppSpacing.paddingXS),
               child: Text(
                 widget.error!,
-                style: AppTypography.caption.copyWith(color: Colors.red),
+                style: AppTypography.caption.copyWith(color: Theme.of(context).colorScheme.error),
               ),
             ),
         ],
@@ -324,7 +324,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
                 widget.label,
                 style: AppTypography.inputLabel.copyWith(
                   color: widget.error != null
-                      ? Colors.red
+                      ? theme.colorScheme.error
                       : theme.textTheme.labelMedium?.color,
                 ),
               ),
@@ -348,7 +348,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
             decoration: InputDecoration(
               hintText: widget.hint,
               hintStyle: AppTypography.input.copyWith(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
               prefixIcon: widget.prefixIcon,
               suffixIcon: widget.suffixIcon,
@@ -357,13 +357,13 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(_getBorderRadius(context)),
                 borderSide: BorderSide(
-                  color: widget.error != null ? Colors.red : Colors.grey,
+                  color: widget.error != null ? Theme.of(context).colorScheme.error : Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(_getBorderRadius(context)),
                 borderSide: BorderSide(
-                  color: widget.error != null ? Colors.red : theme.primaryColor,
+                  color: widget.error != null ? theme.colorScheme.error : theme.primaryColor,
                   width: 2,
                 ),
               ),
@@ -398,8 +398,8 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
                 widget.label,
                 style: AppTypography.inputLabel.copyWith(
                   color: widget.error != null
-                      ? Colors.red
-                      : (isDark ? Colors.white70 : Colors.black87),
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -412,8 +412,8 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               borderRadius: BorderRadius.circular(_getBorderRadius(context)),
               border: Border.all(
                 color: widget.error != null
-                    ? Colors.red
-                    : (isDark ? Colors.white12 : Colors.black12),
+                    ? Theme.of(context).colorScheme.error.withValues(alpha: 0.12)
+                    : Theme.of(context).colorScheme.shadow.withValues(alpha: 0.12),
                 width: 0.5,
               ),
             ),
@@ -429,12 +429,12 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               maxLength: widget.maxLength,
               enabled: widget.enabled,
               style: AppTypography.input.copyWith(
-                color: isDark ? Colors.white : Colors.black,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
               ),
               decoration: InputDecoration(
                 hintText: widget.hint,
                 hintStyle: AppTypography.input.copyWith(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 prefixIcon: widget.prefixIcon,
                 suffixIcon: widget.suffixIcon,
@@ -451,7 +451,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               padding: const EdgeInsets.only(top: AppSpacing.paddingXS),
               child: Text(
                 widget.error!,
-                style: AppTypography.caption.copyWith(color: Colors.red),
+                style: AppTypography.caption.copyWith(color: Theme.of(context).colorScheme.error),
               ),
             ),
         ],
@@ -461,8 +461,6 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
 
   /// Build Web-optimized Input
   Widget _buildWebInput(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
@@ -479,8 +477,8 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
                 widget.label,
                 style: AppTypography.inputLabel.copyWith(
                   color: widget.error != null
-                      ? Colors.red
-                      : (isDark ? Colors.white70 : Colors.black87),
+                      ? Theme.of(context).colorScheme.error
+                      : Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -489,17 +487,17 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
           Container(
             height: _getInputHeight(context),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(_getBorderRadius(context)),
               border: Border.all(
                 color: widget.error != null
-                    ? Colors.red
-                    : (isDark ? Colors.white12 : Colors.black12),
+                    ? Theme.of(context).colorScheme.error.withValues(alpha: 0.12)
+                    : Theme.of(context).colorScheme.shadow.withValues(alpha: 0.12),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -517,12 +515,12 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               maxLength: widget.maxLength,
               enabled: widget.enabled,
               style: AppTypography.input.copyWith(
-                color: isDark ? Colors.white : Colors.black,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
               ),
               decoration: InputDecoration(
                 hintText: widget.hint,
                 hintStyle: AppTypography.input.copyWith(
-                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 prefixIcon: widget.prefixIcon,
                 suffixIcon: widget.suffixIcon,
@@ -541,7 +539,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               padding: const EdgeInsets.only(top: AppSpacing.paddingXS),
               child: Text(
                 widget.error!,
-                style: AppTypography.caption.copyWith(color: Colors.red),
+                style: AppTypography.caption.copyWith(color: Theme.of(context).colorScheme.error),
               ),
             ),
         ],
@@ -569,7 +567,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
                 widget.label,
                 style: AppTypography.inputLabel.copyWith(
                   color: widget.error != null
-                      ? Colors.red
+                      ? theme.colorScheme.error
                       : theme.textTheme.labelMedium?.color,
                 ),
               ),
@@ -593,7 +591,7 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
             decoration: InputDecoration(
               hintText: widget.hint,
               hintStyle: AppTypography.input.copyWith(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
               prefixIcon: widget.prefixIcon,
               suffixIcon: widget.suffixIcon,
@@ -602,13 +600,13 @@ class TextInputState extends AdaptiveStatefulWidgetState<TextInput> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(_getBorderRadius(context)),
                 borderSide: BorderSide(
-                  color: widget.error != null ? Colors.red : Colors.grey,
+                  color: widget.error != null ? Theme.of(context).colorScheme.error : Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(_getBorderRadius(context)),
                 borderSide: BorderSide(
-                  color: widget.error != null ? Colors.red : theme.primaryColor,
+                  color: widget.error != null ? theme.colorScheme.error : theme.primaryColor,
                   width: 2,
                 ),
               ),

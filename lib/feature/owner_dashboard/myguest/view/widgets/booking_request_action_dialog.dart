@@ -12,6 +12,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_booking_request_model.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
@@ -99,13 +100,14 @@ class _BookingRequestActionDialogState
           padding: const EdgeInsets.all(AppSpacing.paddingS),
           decoration: BoxDecoration(
             color: widget.isApproval
-                ? Colors.green.withValues(alpha: 0.1)
-                : Colors.red.withValues(alpha: 0.1),
+                ? AppColors.success.withValues(alpha: 0.1)
+                : context.decorativeRed.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           ),
           child: Icon(
             widget.isApproval ? Icons.check_circle : Icons.cancel,
-            color: widget.isApproval ? Colors.green : Colors.red,
+            color:
+                widget.isApproval ? AppColors.success : context.decorativeRed,
             size: 24,
           ),
         ),
@@ -120,7 +122,8 @@ class _BookingRequestActionDialogState
                         'Approve Booking Request')
                     : (loc?.rejectBookingRequestTitle ??
                         'Reject Booking Request'),
-                color: isDark ? Colors.white : Colors.black,
+                color: Theme.of(context).textTheme.titleLarge?.color ??
+                    Theme.of(context).colorScheme.onSurface,
               ),
               CaptionText(
                 text: widget.isApproval
@@ -128,7 +131,15 @@ class _BookingRequestActionDialogState
                         'Approve this guest\'s request to join your PG')
                     : (loc?.rejectBookingRequestSubtitle ??
                         'Reject this guest\'s request to join your PG'),
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -143,10 +154,10 @@ class _BookingRequestActionDialogState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+          color: Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -163,7 +174,8 @@ class _BookingRequestActionDialogState
               Expanded(
                 child: HeadingSmall(
                   text: widget.request.guestDisplayName,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: Theme.of(context).textTheme.titleLarge?.color ??
+                      Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -173,14 +185,30 @@ class _BookingRequestActionDialogState
             children: [
               Icon(
                 Icons.phone,
-                color: Colors.grey[600],
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                 size: 16,
               ),
               const SizedBox(width: AppSpacing.paddingS),
               BodyText(
                 text:
                     '${loc?.contactNumberLabel ?? 'Contact Number'}: ${widget.request.guestPhone}',
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -189,14 +217,30 @@ class _BookingRequestActionDialogState
             children: [
               Icon(
                 Icons.email,
-                color: Colors.grey[600],
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                 size: 16,
               ),
               const SizedBox(width: AppSpacing.paddingS),
               BodyText(
                 text:
                     '${loc?.emailLabel ?? 'Email'}: ${widget.request.guestEmail}',
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -212,7 +256,15 @@ class _BookingRequestActionDialogState
               Expanded(
                 child: BodyText(
                   text: '${loc?.pgLabel ?? 'PG'}: ${widget.request.pgName}',
-                  color: isDark ? Colors.white70 : Colors.grey[700],
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -235,7 +287,8 @@ class _BookingRequestActionDialogState
             text: widget.isApproval
                 ? (loc?.approvalDetails ?? 'Approval Details')
                 : (loc?.rejectionDetails ?? 'Rejection Details'),
-            color: isDark ? Colors.white : Colors.black,
+            color: Theme.of(context).textTheme.titleLarge?.color ??
+                Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -298,7 +351,8 @@ class _BookingRequestActionDialogState
                         child: Container(
                           padding: const EdgeInsets.all(AppSpacing.paddingM),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
+                            border: Border.all(
+                                color: Theme.of(context).dividerColor),
                             borderRadius:
                                 BorderRadius.circular(AppSpacing.borderRadiusS),
                           ),
@@ -335,7 +389,8 @@ class _BookingRequestActionDialogState
                         child: Container(
                           padding: const EdgeInsets.all(AppSpacing.paddingM),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
+                            border: Border.all(
+                                color: Theme.of(context).dividerColor),
                             borderRadius:
                                 BorderRadius.circular(AppSpacing.borderRadiusS),
                           ),
@@ -454,7 +509,7 @@ class _BookingRequestActionDialogState
             SnackBar(
               content: Text(loc?.roomBedNumbersRequired ??
                   'Room and bed numbers are required for approval'),
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.warning,
             ),
           );
           setState(() => _isSubmitting = false);
@@ -490,9 +545,10 @@ class _BookingRequestActionDialogState
                       'Booking request approved successfully!')
                   : (loc?.bookingRequestRejectedSuccess ??
                       'Booking request rejected successfully!'),
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
-            backgroundColor: widget.isApproval ? Colors.green : Colors.red,
+            backgroundColor:
+                widget.isApproval ? AppColors.success : context.decorativeRed,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -508,9 +564,9 @@ class _BookingRequestActionDialogState
               text: loc?.bookingRequestActionFailed(
                       actionLabel, e.toString()) ??
                   'Failed to ${widget.isApproval ? 'approve' : 'reject'} request: $e',
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
             behavior: SnackBarBehavior.floating,
           ),
         );

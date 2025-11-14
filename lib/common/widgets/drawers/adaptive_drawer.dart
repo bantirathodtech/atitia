@@ -198,7 +198,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
             : CupertinoColors.systemBackground,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(2, 0),
           ),
@@ -231,16 +231,13 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
   /// Build macOS-style Drawer
   Widget _buildMacOSDrawer(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Container(
       width: 300,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2D2D2D) : const Color(0xFFF5F5F5),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         border: Border(
           right: BorderSide(
-            color: isDark ? Colors.white12 : Colors.black12,
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.12),
             width: 0.5,
           ),
         ),
@@ -258,16 +255,13 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
   /// Build Web-optimized Drawer
   Widget _buildWebDrawer(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Container(
       width: 320,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(3, 0),
           ),
@@ -676,14 +670,11 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
 
   /// Build Footer Section with App Info & Legal
   Widget _buildFooter(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppSpacing.paddingL),
       decoration: BoxDecoration(
-        color: isDark ? Colors.black12 : Colors.grey.shade50,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         border: Border(
           top: BorderSide(
             color: Theme.of(context).dividerColor,

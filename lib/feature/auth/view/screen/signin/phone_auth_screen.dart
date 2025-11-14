@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/utils/constants/validation.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
@@ -131,7 +132,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 SnackBar(
                   content: BodyText(
                       text: loc.otpSentSuccessfullyPleaseCheckYourPhone),
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppColors.success,
                   duration: Duration(seconds: 3),
                 ),
               );
@@ -160,7 +161,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: BodyText(text: errorMessage),
-                  backgroundColor: Colors.red,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                   duration: Duration(seconds: 3),
                 ),
               );
@@ -173,7 +174,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: BodyText(text: loc.requestTimedOutPleaseTryAgain),
-                backgroundColor: Colors.orange,
+                backgroundColor: AppColors.warning,
                 duration: Duration(seconds: 3),
               ),
             );
@@ -186,7 +187,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(text: loc.error(e.toString())),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
             duration: Duration(seconds: 3),
           ),
         );
@@ -227,7 +228,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(text: msg),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
             duration: Duration(seconds: 3),
           ),
         );
@@ -242,7 +243,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(text: loc.userDataNotFound),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
         return;
@@ -280,7 +281,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: BodyText(text: loc.invalidUserRolePleaseSelectRole),
-              backgroundColor: Colors.red,
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
           navigation.goToRoleSelection();
@@ -292,7 +293,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(text: loc.verificationFailed(e.toString())),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
             duration: Duration(seconds: 3),
           ),
         );
@@ -318,7 +319,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: BodyText(text: loc.googleSignInFailedError(e.toString())),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -395,13 +396,23 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
+                    border: Border.all(color: Theme.of(context).dividerColor),
                     borderRadius: BorderRadius.circular(8),
-                    color: Colors.grey.shade50,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.phone_disabled, color: Colors.grey.shade500),
+                      Icon(Icons.phone_disabled,
+                          color: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.color
+                                  ?.withValues(alpha: 0.5) ??
+                              Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.5)),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: Column(
@@ -411,7 +422,15 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                               loc.phoneAuthentication,
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
-                                color: Colors.grey.shade700,
+                                color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color
+                                        ?.withValues(alpha: 0.8) ??
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.8),
                               ),
                             ),
                             const SizedBox(height: AppSpacing.paddingXS),
@@ -419,7 +438,15 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                               loc.notAvailableOnMacOS,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey.shade600,
+                                color: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.color
+                                        ?.withValues(alpha: 0.7) ??
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
                               ),
                             ),
                           ],
@@ -499,7 +526,15 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                       child: CaptionText(
                         text: loc.or,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                       ),
                     ),
                     const Expanded(child: Divider()),

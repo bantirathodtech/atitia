@@ -36,9 +36,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/app/theme/theme_provider.dart';
 import '../../../common/styles/spacing.dart';
+import '../../../core/app/theme/theme_provider.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../styles/colors.dart';
 
 class ThemeToggleButton extends StatelessWidget {
   // ==========================================================================
@@ -116,7 +117,7 @@ class ThemeToggleButton extends StatelessWidget {
     // This ensures the icon is always visible regardless of background
     // ==========================================================================
     final iconColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.amber // Warm amber in dark mode (sun/moon color)
+        ? AppColors.statusOrange // Warm orange in dark mode (sun/moon color)
         : Theme.of(context)
             .appBarTheme
             .foregroundColor; // Theme-based white color in light mode

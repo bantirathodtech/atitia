@@ -10,6 +10,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../l10n/app_localizations.dart';
 
 /// Advanced revenue analytics widget for Owner dashboard
@@ -79,7 +80,15 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                 text: widget.selectedPgId != null
                     ? loc.revenueAnalyticsSelectedPg
                     : loc.revenueAnalyticsOverall,
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -112,7 +121,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
             loc.revenueMetricTotalRevenue,
             totalRevenueValue,
             Icons.account_balance_wallet,
-            Colors.green,
+            AppColors.success,
             isDark,
           ),
         ),
@@ -122,7 +131,9 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
             loc.revenueMetricMonthlyGrowth,
             '${percentFormatter.format(monthlyGrowthValue)}%',
             Icons.trending_up,
-            metrics['monthlyGrowth'] >= 0 ? Colors.green : Colors.red,
+            metrics['monthlyGrowth'] >= 0
+                ? AppColors.success
+                : context.decorativeRed,
             isDark,
           ),
         ),
@@ -132,7 +143,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
             loc.revenueMetricAvgPerGuest,
             avgPerGuestValue,
             Icons.person,
-            Colors.blue,
+            AppColors.info,
             isDark,
           ),
         ),
@@ -160,7 +171,15 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                 Expanded(
                   child: CaptionText(
                     text: title,
-                    color: isDark ? Colors.white70 : Colors.grey[600],
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -208,15 +227,15 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
-        border:
-            Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
       ),
       child: DropdownButton<String>(
         value: _selectedPeriod,
         underline: const SizedBox(),
         style: TextStyle(
-          color: isDark ? Colors.white : Colors.black,
+          color: Theme.of(context).textTheme.titleLarge?.color ??
+              Theme.of(context).colorScheme.onSurface,
           fontSize: 14,
         ),
         items: [
@@ -246,15 +265,15 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
-        border:
-            Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
       ),
       child: DropdownButton<String>(
         value: _selectedMetric,
         underline: const SizedBox(),
         style: TextStyle(
-          color: isDark ? Colors.white : Colors.black,
+          color: Theme.of(context).textTheme.titleLarge?.color ??
+              Theme.of(context).colorScheme.onSurface,
           fontSize: 14,
         ),
         items: [
@@ -291,7 +310,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[800] : Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
       ),
       child: Column(
@@ -321,7 +340,15 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                     Text(
                       monthFormatter.format(DateTime(2000, months[index])),
                       style: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.grey[600],
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                         fontSize: 12,
                       ),
                     ),
@@ -329,7 +356,8 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                     Text(
                       compactCurrency.format(value),
                       style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
+                        color: Theme.of(context).textTheme.titleLarge?.color ??
+                            Theme.of(context).colorScheme.onSurface,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
@@ -363,20 +391,22 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
               children: [
                 Expanded(
                   child: _buildForecastCard(
+                    context,
                     loc.revenueForecastNextMonth,
                     currencyFormatter.format(forecast['nextMonth']),
                     forecast['nextMonthGrowth'],
-                    Colors.blue,
+                    AppColors.info,
                     isDark,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildForecastCard(
+                    context,
                     loc.revenueForecastNextQuarter,
                     currencyFormatter.format(forecast['nextQuarter']),
                     forecast['nextQuarterGrowth'],
-                    Colors.green,
+                    AppColors.success,
                     isDark,
                   ),
                 ),
@@ -391,6 +421,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
   }
 
   Widget _buildForecastCard(
+    BuildContext context,
     String title,
     String value,
     double growth,
@@ -409,7 +440,12 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
         children: [
           CaptionText(
             text: title,
-            color: isDark ? Colors.white70 : Colors.grey[600],
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
           const SizedBox(height: AppSpacing.paddingS),
           HeadingSmall(
@@ -421,13 +457,13 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
             children: [
               Icon(
                 growth >= 0 ? Icons.trending_up : Icons.trending_down,
-                color: growth >= 0 ? Colors.green : Colors.red,
+                color: growth >= 0 ? AppColors.success : context.decorativeRed,
                 size: 16,
               ),
               const SizedBox(width: AppSpacing.paddingXS),
               CaptionText(
                 text: '${growth >= 0 ? '+' : ''}${growth.toStringAsFixed(1)}%',
-                color: growth >= 0 ? Colors.green : Colors.red,
+                color: growth >= 0 ? AppColors.success : context.decorativeRed,
               ),
             ],
           ),
@@ -441,7 +477,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[800] : Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
       ),
       child: Column(
@@ -451,7 +487,12 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
           const SizedBox(height: AppSpacing.paddingS),
           BodyText(
             text: forecast['insights'],
-            color: isDark ? Colors.white70 : Colors.grey[600],
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ],
       ),

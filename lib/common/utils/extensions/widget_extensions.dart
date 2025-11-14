@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../constants/app.dart';
+import '../../styles/colors.dart';
 
 /// Extension methods for Widget for common operations
 ///
@@ -143,15 +144,20 @@ extension WidgetExtensions on Widget {
     );
   }
 
-  /// Wraps widget with border
+  /// Wraps widget with border - theme-aware via BuildContext
+  /// Note: This extension method doesn't have direct access to BuildContext
+  /// Users should pass theme-aware color when calling this method
   Widget withBorder({
-    Color color = Colors.grey,
+    Color? color,
     double width = 1,
     BorderRadius? borderRadius,
   }) {
+    // Note: Default color removed - caller should provide theme-aware color
+    // Example: widget.withBorder(color: Theme.of(context).dividerColor)
+    final borderColor = color ?? AppColors.outline;
     return DecoratedBox(
       decoration: BoxDecoration(
-        border: Border.all(color: color, width: width),
+        border: Border.all(color: borderColor, width: width),
         borderRadius: borderRadius,
       ),
       child: this,

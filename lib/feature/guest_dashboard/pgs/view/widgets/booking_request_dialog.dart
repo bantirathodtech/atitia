@@ -149,7 +149,7 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
                 text: loc?.sendBookingRequestToOwner ??
                     _text('sendBookingRequestToOwner',
                         'Send a booking request to the owner'),
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -167,10 +167,10 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCard : Colors.grey[50],
+        color: isDark ? AppColors.darkCard : Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+          color: isDark ? AppColors.darkDivider : Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -187,7 +187,7 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
               Expanded(
                 child: HeadingSmall(
                   text: widget.pg.pgName,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: Theme.of(context).textTheme.bodyMedium?.color ?? Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -197,14 +197,14 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
             children: [
               Icon(
                 Icons.location_on,
-                color: Colors.grey[600],
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 size: 16,
               ),
               const SizedBox(width: AppSpacing.paddingS),
               Expanded(
                 child: BodyText(
                   text: widget.pg.fullAddress,
-                  color: isDark ? Colors.white70 : Colors.grey[600],
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -214,13 +214,13 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
             children: [
               Icon(
                 Icons.attach_money,
-                color: Colors.green,
+                color: AppColors.success,
                 size: 16,
               ),
               const SizedBox(width: AppSpacing.paddingS),
               BodyText(
                 text: _buildMonthlyRentText(loc),
-                color: Colors.green,
+                color: AppColors.success,
               ),
             ],
           ),
@@ -401,7 +401,7 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
                   'Booking request sent! Owner will confirm shortly.',
                 ),
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -418,7 +418,7 @@ class _BookingRequestDialogState extends State<BookingRequestDialog> {
                   parameters: {'error': e.toString()},
                 ),
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
       );

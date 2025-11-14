@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
@@ -32,7 +33,7 @@ class BedChangeRequestWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.bed_outlined, size: 64, color: Colors.grey),
+            Icon(Icons.bed_outlined, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingSmall(
               text: loc.noBedChangeRequests,
@@ -186,7 +187,7 @@ class BedChangeRequestWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          BodyText(text: '$label:', color: Colors.grey[600]),
+          BodyText(text: '$label:', color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
           BodyText(text: value, medium: true),
         ],
       ),
@@ -196,13 +197,13 @@ class BedChangeRequestWidget extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'approved':
-        return Colors.green;
+        return AppColors.success;
       case 'rejected':
-        return Colors.red;
+        return AppColors.error;
       case 'pending':
-        return Colors.orange;
+        return AppColors.warning;
       default:
-        return Colors.grey;
+        return AppColors.primary;
     }
   }
 
@@ -274,7 +275,7 @@ class BedChangeRequestWidget extends StatelessWidget {
                           ? loc.bedChangeApproveSuccess
                           : loc.bedChangeApproveFailure,
                     ),
-                    backgroundColor: success ? Colors.green : Colors.red,
+                    backgroundColor: success ? AppColors.success : AppColors.error,
                   ),
                 );
               }
@@ -329,7 +330,7 @@ class BedChangeRequestWidget extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(loc.provideRejectionReason),
-                    backgroundColor: Colors.orange,
+                    backgroundColor: AppColors.warning,
                   ),
                 );
                 return;
@@ -347,7 +348,7 @@ class BedChangeRequestWidget extends StatelessWidget {
                           ? loc.bedChangeRejectSuccess
                           : loc.bedChangeRejectFailure,
                     ),
-                    backgroundColor: success ? Colors.orange : Colors.red,
+                    backgroundColor: success ? AppColors.warning : AppColors.error,
                   ),
                 );
               }

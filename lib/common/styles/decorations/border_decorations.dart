@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../colors.dart';
 import '../spacing.dart';
 
 /// Border decoration utilities for consistent border styling
@@ -7,21 +8,21 @@ class BorderDecorations {
   // MARK: - BorderSide Presets
   // ==========================================
 
-  /// Standard border side
-  static BorderSide get standard => BorderSide(
-        color: Colors.grey.shade300,
+  /// Standard border side - theme-aware via BuildContext
+  static BorderSide standard(BuildContext context) => BorderSide(
+        color: Theme.of(context).dividerColor,
         width: 1.0,
       );
 
-  /// Light border side for subtle separation
-  static BorderSide get light => BorderSide(
-        color: Colors.grey.shade200,
+  /// Light border side for subtle separation - theme-aware via BuildContext
+  static BorderSide light(BuildContext context) => BorderSide(
+        color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
         width: 0.5,
       );
 
-  /// Strong border side for emphasis
-  static BorderSide get strong => BorderSide(
-        color: Colors.grey.shade400,
+  /// Strong border side for emphasis - theme-aware via BuildContext
+  static BorderSide strong(BuildContext context) => BorderSide(
+        color: Theme.of(context).dividerColor,
         width: 2.0,
       );
 
@@ -33,46 +34,46 @@ class BorderDecorations {
 
   /// Primary color border side
   static BorderSide get primary => BorderSide(
-        color: Colors.blue.shade500,
+        color: AppColors.info,
         width: 1.5,
       );
 
   /// Success color border side
   static BorderSide get success => BorderSide(
-        color: Colors.green.shade500,
+        color: AppColors.success,
         width: 1.5,
       );
 
   /// Warning color border side
   static BorderSide get warning => BorderSide(
-        color: Colors.orange.shade500,
+        color: AppColors.statusOrange,
         width: 1.5,
       );
 
   /// Error color border side
   static BorderSide get error => BorderSide(
-        color: Colors.red.shade500,
+        color: AppColors.error,
         width: 1.5,
       );
 
   // MARK: - BoxBorder Presets
   // ==========================================
 
-  /// Standard border for containers
-  static BoxBorder get standardBorder => Border.all(
-        color: Colors.grey.shade300,
+  /// Standard border for containers - theme-aware via BuildContext
+  static BoxBorder standardBorder(BuildContext context) => Border.all(
+        color: Theme.of(context).dividerColor,
         width: 1.0,
       );
 
-  /// Light border for subtle separation
-  static BoxBorder get lightBorder => Border.all(
-        color: Colors.grey.shade200,
+  /// Light border for subtle separation - theme-aware via BuildContext
+  static BoxBorder lightBorder(BuildContext context) => Border.all(
+        color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
         width: 0.5,
       );
 
-  /// Strong border for emphasis
-  static BoxBorder get strongBorder => Border.all(
-        color: Colors.grey.shade400,
+  /// Strong border for emphasis - theme-aware via BuildContext
+  static BoxBorder strongBorder(BuildContext context) => Border.all(
+        color: Theme.of(context).dividerColor,
         width: 2.0,
       );
 
@@ -84,25 +85,25 @@ class BorderDecorations {
 
   /// Primary color border
   static BoxBorder get primaryBorder => Border.all(
-        color: Colors.blue.shade500,
+        color: AppColors.info,
         width: 1.5,
       );
 
   /// Success color border
   static BoxBorder get successBorder => Border.all(
-        color: Colors.green.shade500,
+        color: AppColors.success,
         width: 1.5,
       );
 
   /// Warning color border
   static BoxBorder get warningBorder => Border.all(
-        color: Colors.orange.shade500,
+        color: AppColors.statusOrange,
         width: 1.5,
       );
 
   /// Error color border
   static BoxBorder get errorBorder => Border.all(
-        color: Colors.red.shade500,
+        color: AppColors.error,
         width: 1.5,
       );
 
@@ -139,8 +140,9 @@ class BorderDecorations {
   // MARK: - Complex Border Combinations
   // ==========================================
 
-  /// Border with shadow effect
-  static BoxDecoration borderedWithShadow({
+  /// Border with shadow effect - theme-aware via BuildContext
+  static BoxDecoration borderedWithShadow(
+    BuildContext context, {
     BoxBorder? border,
     List<BoxShadow>? boxShadow,
     BorderRadius? borderRadius,
@@ -148,12 +150,12 @@ class BorderDecorations {
   }) {
     return BoxDecoration(
       color: backgroundColor,
-      border: border ?? standardBorder,
+      border: border ?? standardBorder(context),
       borderRadius: borderRadius ?? radiusMedium,
       boxShadow: boxShadow ??
           [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -161,25 +163,29 @@ class BorderDecorations {
     );
   }
 
-  /// Outline input border with custom color
-  static OutlineInputBorder outlineInput({
-    Color color = Colors.grey,
+  /// Outline input border with custom color - theme-aware via BuildContext
+  static OutlineInputBorder outlineInput(
+    BuildContext context, {
+    Color? color,
     double width = 1.0,
     double borderRadius = AppSpacing.borderRadiusM,
   }) {
+    final borderColor = color ?? Theme.of(context).dividerColor;
     return OutlineInputBorder(
-      borderSide: BorderSide(color: color, width: width),
+      borderSide: BorderSide(color: borderColor, width: width),
       borderRadius: BorderRadius.circular(borderRadius),
     );
   }
 
-  /// Underline input border with custom color
-  static UnderlineInputBorder underlineInput({
-    Color color = Colors.grey,
+  /// Underline input border with custom color - theme-aware via BuildContext
+  static UnderlineInputBorder underlineInput(
+    BuildContext context, {
+    Color? color,
     double width = 1.0,
   }) {
+    final borderColor = color ?? Theme.of(context).dividerColor;
     return UnderlineInputBorder(
-      borderSide: BorderSide(color: color, width: width),
+      borderSide: BorderSide(color: borderColor, width: width),
     );
   }
 
@@ -201,16 +207,18 @@ class BorderDecorations {
     );
   }
 
-  /// Create border with only specific sides
-  static BoxBorder only({
+  /// Create border with only specific sides - theme-aware via BuildContext
+  static BoxBorder only(
+    BuildContext context, {
     bool left = false,
     bool top = false,
     bool right = false,
     bool bottom = false,
-    Color color = Colors.grey,
+    Color? color,
     double width = 1.0,
   }) {
-    final borderSide = BorderSide(color: color, width: width);
+    final borderColor = color ?? Theme.of(context).dividerColor;
+    final borderSide = BorderSide(color: borderColor, width: width);
     return Border(
       left: left ? borderSide : BorderSide.none,
       top: top ? borderSide : BorderSide.none,
@@ -219,23 +227,27 @@ class BorderDecorations {
     );
   }
 
-  /// Create symmetric vertical borders
-  static BoxBorder vertical({
-    Color color = Colors.grey,
+  /// Create symmetric vertical borders - theme-aware via BuildContext
+  static BoxBorder vertical(
+    BuildContext context, {
+    Color? color,
     double width = 1.0,
   }) {
-    final borderSide = BorderSide(color: color, width: width);
+    final borderColor = color ?? Theme.of(context).dividerColor;
+    final borderSide = BorderSide(color: borderColor, width: width);
     return Border.symmetric(
       vertical: borderSide,
     );
   }
 
-  /// Create symmetric horizontal borders
-  static BoxBorder horizontal({
-    Color color = Colors.grey,
+  /// Create symmetric horizontal borders - theme-aware via BuildContext
+  static BoxBorder horizontal(
+    BuildContext context, {
+    Color? color,
     double width = 1.0,
   }) {
-    final borderSide = BorderSide(color: color, width: width);
+    final borderColor = color ?? Theme.of(context).dividerColor;
+    final borderSide = BorderSide(color: borderColor, width: width);
     return Border.symmetric(
       horizontal: borderSide,
     );
@@ -244,23 +256,26 @@ class BorderDecorations {
   // MARK: - Border Style Helpers
   // ==========================================
 
-  /// Create a border with rounded corners
-  static BoxDecoration roundedBorder({
-    Color color = Colors.grey,
+  /// Create a border with rounded corners - theme-aware via BuildContext
+  static BoxDecoration roundedBorder(
+    BuildContext context, {
+    Color? color,
     double width = 1.0,
     double borderRadius = AppSpacing.borderRadiusM,
     Color? fillColor,
   }) {
+    final borderColor = color ?? Theme.of(context).dividerColor;
     return BoxDecoration(
       color: fillColor,
-      border: Border.all(color: color, width: width),
+      border: Border.all(color: borderColor, width: width),
       borderRadius: BorderRadius.circular(borderRadius),
     );
   }
 
-  /// Create a border with different radius per corner
-  static BoxDecoration customRadiusBorder({
-    Color color = Colors.grey,
+  /// Create a border with different radius per corner - theme-aware via BuildContext
+  static BoxDecoration customRadiusBorder(
+    BuildContext context, {
+    Color? color,
     double width = 1.0,
     double topLeft = 0,
     double topRight = 0,
@@ -268,9 +283,10 @@ class BorderDecorations {
     double bottomRight = 0,
     Color? fillColor,
   }) {
+    final borderColor = color ?? Theme.of(context).dividerColor;
     return BoxDecoration(
       color: fillColor,
-      border: Border.all(color: color, width: width),
+      border: Border.all(color: borderColor, width: width),
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(topLeft),
         topRight: Radius.circular(topRight),

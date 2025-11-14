@@ -172,3 +172,8 @@ All screens should use one of these patterns:
 - `lib/common/widgets/buttons/theme_toggle_button.dart` - Theme toggle button widget
 - `lib/feature/auth/view/screen/role_selection/role_selection_screen.dart` - Floating button example
 
+
+
+
+
+

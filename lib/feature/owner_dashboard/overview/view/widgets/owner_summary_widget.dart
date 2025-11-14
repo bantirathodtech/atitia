@@ -6,6 +6,7 @@ import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_overview_model.dart';
 
@@ -31,7 +32,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                 loc.totalRevenue,
                 overview.formattedTotalRevenue,
                 Icons.account_balance_wallet,
-                Colors.green,
+                AppColors.success,
               ),
             ),
             const SizedBox(width: AppSpacing.paddingS),
@@ -41,7 +42,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                 loc.properties,
                 '${overview.totalProperties}',
                 Icons.apartment,
-                Colors.blue,
+                AppColors.info,
               ),
             ),
           ],
@@ -55,7 +56,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                 loc.activeTenants,
                 '${overview.activeTenants}',
                 Icons.people,
-                Colors.orange,
+                AppColors.info,
               ),
             ),
             const SizedBox(width: AppSpacing.paddingS),
@@ -65,7 +66,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                 loc.occupancy,
                 overview.formattedOccupancyRate,
                 Icons.bed,
-                Colors.purple,
+                AppColors.purple,
               ),
             ),
           ],
@@ -81,7 +82,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                     loc.pendingBookings,
                     '${overview.pendingBookings}',
                     Icons.pending_actions,
-                    Colors.amber,
+                    AppColors.statusOrange,
                   ),
                 ),
               if (overview.hasPendingBookings && overview.hasPendingComplaints)
@@ -93,7 +94,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                     loc.pendingComplaints,
                     '${overview.pendingComplaints}',
                     Icons.report_problem,
-                    Colors.red,
+                    AppColors.error,
                   ),
                 ),
             ],
@@ -127,7 +128,7 @@ class OwnerSummaryWidget extends StatelessWidget {
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(text: value, color: color),
           const SizedBox(height: AppSpacing.paddingXS),
-          CaptionText(text: title, color: Colors.grey.shade600),
+          CaptionText(text: title, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
         ],
       ),
     );

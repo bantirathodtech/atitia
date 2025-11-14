@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/chips/filter_chip.dart';
@@ -112,9 +113,9 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: TabBar(
             controller: _tabController,
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
+            indicatorColor: Theme.of(context).colorScheme.onPrimary,
+            labelColor: Theme.of(context).colorScheme.onPrimary,
+            unselectedLabelColor: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
             tabs: [
               Tab(
                   text: AppLocalizations.of(context)?.dashboard ?? 'Dashboard',
@@ -147,7 +148,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.home_outlined, size: 80, color: Colors.grey),
+            Icon(Icons.home_outlined, size: 80, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(
                 text: AppLocalizations.of(context)?.noPgsListedYet ??
@@ -189,7 +190,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingL),
             HeadingMedium(
               text: AppLocalizations.of(context)?.errorLoadingData ??
@@ -312,7 +313,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                         '$approved',
                         AppLocalizations.of(context)?.approved ?? 'Approved',
                         Icons.check_circle,
-                        Colors.green,
+                        AppColors.success,
                       ),
                     ),
                     Expanded(
@@ -321,7 +322,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                         '$pending',
                         AppLocalizations.of(context)?.pending ?? 'Pending',
                         Icons.schedule,
-                        Colors.orange,
+                        AppColors.warning,
                       ),
                     ),
                     Expanded(
@@ -330,7 +331,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                         '$rejected',
                         AppLocalizations.of(context)?.rejected ?? 'Rejected',
                         Icons.cancel,
-                        Colors.red,
+                        AppColors.error,
                       ),
                     ),
                   ],
@@ -429,7 +430,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             BodyText(
               text:
                   '${booking.formattedStartDate} - ${booking.formattedEndDate}',
-              color: Colors.grey.shade600,
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             if (booking.isPending) ...[
               const SizedBox(height: AppSpacing.paddingS),
@@ -448,7 +449,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                       onPressed: () => viewModel.rejectBooking(booking.id),
                       label: AppLocalizations.of(context)?.reject ?? 'Reject',
                       icon: Icons.close,
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.error,
                     ),
                   ),
                 ],
@@ -463,13 +464,13 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'approved':
-        return Colors.green;
+        return AppColors.success;
       case 'pending':
-        return Colors.orange;
+        return AppColors.warning;
       case 'rejected':
-        return Colors.red;
+        return AppColors.error;
       default:
-        return Colors.grey;
+        return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
     }
   }
 
@@ -498,8 +499,9 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
   }
 
   List<Widget> _buildBookingPlaceholders(BuildContext context) {
-    final muted = Colors.grey.shade400;
-    final border = Theme.of(context).dividerColor.withValues(alpha: 0.5);
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onSurface.withValues(alpha: 0.3);
+    final border = theme.dividerColor.withValues(alpha: 0.5);
 
     Widget placeholderRow() {
       return Row(

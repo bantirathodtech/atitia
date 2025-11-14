@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/styles/spacing.dart';
+import '../../../../common/styles/colors.dart';
 import '../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../common/widgets/text/body_text.dart';
 import '../../../../common/widgets/text/heading_medium.dart';
@@ -44,7 +45,7 @@ class RoleSelectionWidget extends StatelessWidget {
           title: loc.guest,
           description: loc.findAndBookPgAccommodations,
           icon: Icons.person,
-          color: Colors.blue,
+          color: AppColors.statusBlue,
           isSelected: selectedRole == 'guest',
           onTap: () => authProvider.setRole('guest'),
         ),
@@ -57,7 +58,7 @@ class RoleSelectionWidget extends StatelessWidget {
           title: loc.owner,
           description: loc.manageYourPgPropertiesAndGuests,
           icon: Icons.business,
-          color: Colors.green,
+          color: AppColors.statusGreen,
           isSelected: selectedRole == 'owner',
           onTap: () => authProvider.setRole('owner'),
         ),
@@ -110,7 +111,7 @@ class RoleSelectionWidget extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xs),
                   BodyText(
                     text: description,
-                    color: Colors.grey.shade700,
+                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                 ],
               ),
@@ -124,7 +125,7 @@ class RoleSelectionWidget extends StatelessWidget {
             else
               Icon(
                 Icons.arrow_forward_ios,
-                color: Colors.grey.shade400,
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                 size: 20,
               ),
           ],

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
@@ -230,7 +231,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
           Icon(
             Icons.apartment_outlined,
             size: 64,
-            color: Colors.grey[400],
+            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: AppSpacing.paddingL),
           HeadingMedium(text: loc.analyticsNoPgTitle),
@@ -275,7 +276,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
               child: Icon(
                 Icons.error_outline,
                 size: 64,
-                color: Colors.red[400],
+                color: Theme.of(context).colorScheme.error,
               ),
             ),
             const SizedBox(height: AppSpacing.paddingL),
@@ -338,7 +339,6 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
 
   Widget _buildPerformanceHeader(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
 
     return Row(
@@ -346,12 +346,12 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
         Container(
           padding: const EdgeInsets.all(AppSpacing.paddingM),
           decoration: BoxDecoration(
-            color: Colors.purple.withValues(alpha: 0.1),
+            color: theme.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.analytics,
-            color: Colors.purple,
+            color: theme.primaryColor,
             size: 24,
           ),
         ),
@@ -363,7 +363,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
               HeadingMedium(text: loc.performanceAnalyticsTitle),
               CaptionText(
                 text: loc.performanceAnalyticsSubtitle,
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -393,32 +393,35 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
               children: [
                 Expanded(
                   child: _buildKpiCard(
+                    context,
                     loc.performanceKpiGuestSatisfaction,
                     loc.performanceKpiGuestSatisfactionValue(
                       guestSatisfactionScore,
                     ),
                     Icons.star,
-                    Colors.amber,
+                    AppColors.warning,
                     isDark,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildKpiCard(
+                    context,
                     loc.performanceKpiResponseTime,
                     loc.performanceKpiResponseTimeValue(responseTimeHours),
                     Icons.timer,
-                    Colors.blue,
+                    AppColors.info,
                     isDark,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildKpiCard(
+                    context,
                     loc.performanceKpiMaintenanceScore,
                     loc.performanceKpiMaintenanceScoreValue(maintenanceScore),
                     Icons.build,
-                    Colors.green,
+                    AppColors.success,
                     isDark,
                   ),
                 ),
@@ -431,12 +434,14 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   Widget _buildKpiCard(
+    BuildContext context,
     String title,
     String value,
     IconData icon,
     Color color,
     bool isDark,
   ) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
@@ -455,7 +460,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                 child: Text(
                   title,
                   style: TextStyle(
-                    color: isDark ? Colors.white70 : Colors.grey[600],
+                    color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                 ),
@@ -478,7 +483,6 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
 
   Widget _buildPerformanceInsights(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
     final recommendations = [
       loc.performanceRecommendationMaintainSchedule,
@@ -498,7 +502,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingM),
               decoration: BoxDecoration(
-                color: isDark ? Colors.grey[800] : Colors.grey[50],
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
               ),
               child: Column(
@@ -527,13 +531,13 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                             '• ',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white70 : Colors.grey[700],
+                              color: theme.textTheme.bodyMedium?.color ?? theme.colorScheme.onSurface,
                             ),
                           ),
                           Expanded(
                             child: BodyText(
                               text: rec,
-                              color: isDark ? Colors.white70 : Colors.grey[600],
+                              color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.8) ?? theme.colorScheme.onSurface.withValues(alpha: 0.8),
                             ),
                           ),
                         ],

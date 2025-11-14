@@ -82,7 +82,7 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
                   const SizedBox(height: AppSpacing.paddingM),
                   BodyText(
                     text: viewModel.errorMessage ??
@@ -277,25 +277,25 @@ class _GuestNotificationsScreenState extends State<GuestNotificationsScreen> {
   Color _getNotificationColor(String type) {
     switch (type) {
       case 'booking_approved':
-        return Colors.green;
+        return AppColors.success;
       case 'booking_rejected':
-        return Colors.red;
+        return AppColors.error;
       case 'payment_reminder':
-        return Colors.orange;
+        return AppColors.statusOrange;
       case 'payment_confirmed':
-        return Colors.green;
+        return AppColors.success;
       case 'payment_overdue':
-        return Colors.red;
+        return AppColors.error;
       case 'complaint_response':
-        return Colors.blue;
+        return AppColors.info;
       case 'bed_change_approved':
-        return Colors.green;
+        return AppColors.success;
       case 'bed_change_rejected':
-        return Colors.red;
+        return AppColors.error;
       case 'pg_announcement':
         return AppColors.secondary;
       case 'service_response':
-        return Colors.blue;
+        return AppColors.info;
       default:
         return AppColors.primary;
     }

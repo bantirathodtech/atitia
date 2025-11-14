@@ -201,7 +201,7 @@ class PgAmenitiesFormWidget extends AdaptiveStatelessWidget {
         const SizedBox(height: AppSpacing.paddingL),
         BodyText(
           text: description,
-          color: Colors.grey[600],
+          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         const SizedBox(height: AppSpacing.paddingL),
         Wrap(
@@ -231,7 +231,7 @@ class PgAmenitiesFormWidget extends AdaptiveStatelessWidget {
           BodyText(
             text:
                 '$selectedLabel: ${selectedAmenities.map((amenity) => _amenityLabel(loc, amenity)).join(', ')}',
-            color: Colors.grey[700],
+            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ],
       ],

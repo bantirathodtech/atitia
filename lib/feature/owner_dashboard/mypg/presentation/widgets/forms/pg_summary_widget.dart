@@ -4,6 +4,7 @@ import '../../../../../../common/lifecycle/stateless/adaptive_stateless_widget.d
 import '../../../../../../common/styles/spacing.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/heading_medium.dart';
@@ -261,9 +262,9 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           context,
           basicInfoTitle,
           [
-            _buildSummaryRow(pgNameLabel, pgNameValue),
-            _buildSummaryRow(addressLabel, addressValue),
-            _buildSummaryRow(locationLabel, locationValue),
+            _buildSummaryRow(context, pgNameLabel, pgNameValue),
+            _buildSummaryRow(context, addressLabel, addressValue),
+            _buildSummaryRow(context, locationLabel, locationValue),
           ],
         ),
 
@@ -274,11 +275,11 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           context,
           floorStructureTitle,
           [
-            _buildSummaryRow(totalFloorsLabel,
+            _buildSummaryRow(context, totalFloorsLabel,
                 NumberFormat.decimalPattern(localeName).format(floors.length)),
-            _buildSummaryRow(totalRoomsLabel,
+            _buildSummaryRow(context, totalRoomsLabel,
                 NumberFormat.decimalPattern(localeName).format(rooms.length)),
-            _buildSummaryRow(totalBedsLabel,
+            _buildSummaryRow(context, totalBedsLabel,
                 NumberFormat.decimalPattern(localeName).format(beds.length)),
           ],
         ),
@@ -290,12 +291,12 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           context,
           rentInfoTitle,
           [
-            _buildSummaryRow(estimatedRevenueLabel, totalRentText),
-            _buildSummaryRow(
+            _buildSummaryRow(context, estimatedRevenueLabel, totalRentText),
+            _buildSummaryRow(context,
               securityDepositLabel,
               depositText,
             ),
-            _buildSummaryRow(
+            _buildSummaryRow(context,
               maintenanceLabel,
               '$maintenanceTypeLabel - $maintenanceAmountText',
             ),
@@ -309,12 +310,12 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           context,
           amenitiesTitle,
           [
-            _buildSummaryRow(
+            _buildSummaryRow(context,
                 selectedAmenitiesLabel,
                 NumberFormat.decimalPattern(localeName)
                     .format(selectedAmenities.length)),
             if (selectedAmenities.isNotEmpty)
-              _buildSummaryRow(listLabel, amenitiesList),
+              _buildSummaryRow(context,listLabel, amenitiesList),
           ],
         ),
 
@@ -325,7 +326,7 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
           context,
           photosTitle,
           [
-            _buildSummaryRow(
+            _buildSummaryRow(context,
                 uploadedPhotosLabel,
                 NumberFormat.decimalPattern(localeName)
                     .format(uploadedPhotos.length)),
@@ -342,7 +343,7 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green[600]),
+                    Icon(Icons.check_circle, color: AppColors.success),
                     const SizedBox(width: AppSpacing.paddingS),
                     BodyText(
                       text: readyMessage,
@@ -352,7 +353,7 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
                 const SizedBox(height: AppSpacing.paddingS),
                 BodyText(
                   text: reviewMessage,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -379,7 +380,7 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value) {
+  Widget _buildSummaryRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
       child: Row(
@@ -389,7 +390,7 @@ class PgSummaryWidget extends AdaptiveStatelessWidget {
             width: 120,
             child: BodyText(
               text: '$label:',
-              color: Colors.grey[600],
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           Expanded(

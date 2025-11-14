@@ -26,6 +26,7 @@ import '../widgets/guest_amenities_list.dart';
 import '../widgets/booking_request_dialog.dart';
 import '../../../../../common/widgets/sharing_summary.dart';
 import '../../../../../common/widgets/containers/section_container.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../l10n/app_localizations.dart';
 
@@ -89,7 +90,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           IconButton(
             icon: Icon(
               _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: _isFavorite ? Colors.red : null,
+              color: _isFavorite ? context.decorativeRed : null,
             ),
             onPressed: () {
               setState(() {
@@ -128,8 +129,8 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
               Semantics(
                 label: 'Error icon',
                 excludeSemantics: true,
-                child: const Icon(Icons.error_outline,
-                    size: 64, color: Colors.red),
+                child: Icon(Icons.error_outline,
+                    size: 64, color: Theme.of(context).colorScheme.error),
               ),
               const SizedBox(height: AppSpacing.paddingL),
               Semantics(
@@ -234,9 +235,9 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
                     placeholder: Container(
                       color: isDark
                           ? AppColors.darkInputFill
-                          : Colors.grey.shade200,
-                      child: const Center(
-                        child: Icon(Icons.image, size: 64, color: Colors.grey),
+                          : Theme.of(context).colorScheme.surfaceContainerHighest,
+                      child: Center(
+                        child: Icon(Icons.image, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                       ),
                     ),
                   );
@@ -248,14 +249,14 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
           Container(
             height: 300,
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkInputFill : Colors.grey.shade200,
+              color: isDark ? AppColors.darkInputFill : Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
             ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.apartment, size: 64, color: Colors.grey),
+                  Icon(Icons.apartment, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                   const SizedBox(height: AppSpacing.paddingS),
                   CaptionText(
                     text: loc?.noPhotosAvailable ??
@@ -853,9 +854,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
 
     final successColor = colorScheme.tertiaryContainer != colorScheme.surface
         ? colorScheme.tertiary
-        : Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF4CAF50)
-            : const Color(0xFF2E7D32);
+        : AppColors.success;
 
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -1329,7 +1328,7 @@ class _GuestPgDetailScreenState extends State<GuestPgDetailScreen> {
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),

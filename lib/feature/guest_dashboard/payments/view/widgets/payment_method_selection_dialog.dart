@@ -87,7 +87,7 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
                 description: loc?.razorpayPaymentDescription ??
                     _text('razorpayPaymentDescription',
                         'Secure online payment via Razorpay'),
-                color: Colors.blue,
+                color: AppColors.statusBlue,
                 isDark: isDark,
                 onTap: () {
                   Navigator.of(context).pop();
@@ -104,7 +104,7 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
               description: loc?.upiPaymentDescription ??
                   _text('upiPaymentDescription',
                       'Pay via PhonePe, Paytm, Google Pay, etc. and share screenshot'),
-              color: Colors.green,
+              color: AppColors.statusGreen,
               isDark: isDark,
               onTap: () {
                 Navigator.of(context).pop();
@@ -121,7 +121,7 @@ class PaymentMethodSelectionDialog extends StatelessWidget {
               description: loc?.cashPaymentDescription ??
                   _text('cashPaymentDescription',
                       'Pay in cash and request owner confirmation'),
-              color: Colors.orange,
+              color: AppColors.statusOrange,
               isDark: isDark,
               onTap: () {
                 Navigator.of(context).pop();

@@ -11,6 +11,7 @@ import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
 import '../../../../../l10n/app_localizations.dart';
@@ -144,12 +145,12 @@ class PaymentListWidget extends StatelessWidget {
             // Payment amount
             Row(
               children: [
-                Icon(Icons.currency_rupee, size: 16, color: Colors.green),
+                Icon(Icons.currency_rupee, size: 16, color: AppColors.success),
                 const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: _formatCurrency(payment.amountPaid, loc),
                   medium: true,
-                  color: Colors.green,
+                  color: AppColors.success,
                 ),
               ],
             ),
@@ -158,18 +159,18 @@ class PaymentListWidget extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.calendar_today,
-                    size: 14, color: Colors.grey.shade600),
+                    size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: _formatDate(payment.date, loc),
-                  color: Colors.grey.shade600,
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
-                Icon(Icons.payment, size: 14, color: Colors.grey.shade600),
+                Icon(Icons.payment, size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: payment.paymentMethodDisplay,
-                  color: Colors.grey.shade600,
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -177,12 +178,12 @@ class PaymentListWidget extends StatelessWidget {
             // Room/Bed info
             Row(
               children: [
-                Icon(Icons.bed, size: 14, color: Colors.grey.shade600),
+                Icon(Icons.bed, size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: CaptionText(
                     text: booking.roomBedDisplay,
-                    color: Colors.grey.shade600,
+                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -379,7 +380,7 @@ class PaymentListWidget extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(message),
-                    backgroundColor: success ? Colors.green : Colors.red,
+                    backgroundColor: success ? AppColors.success : AppColors.error,
                   ),
                 );
               }
@@ -459,7 +460,7 @@ class PaymentListWidget extends StatelessWidget {
                               _text('failedToRejectPayment',
                                   'Failed to reject payment')),
                     ),
-                    backgroundColor: success ? Colors.orange : Colors.red,
+                    backgroundColor: success ? AppColors.warning : AppColors.error,
                   ),
                 );
               }

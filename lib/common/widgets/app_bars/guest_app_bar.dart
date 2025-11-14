@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../common/styles/spacing.dart';
+import '../../../common/styles/colors.dart';
 import '../../../l10n/app_localizations.dart';
 import 'adaptive_app_bar.dart';
 import '../../../feature/owner_dashboard/shared/viewmodel/selected_pg_provider.dart';
@@ -141,10 +142,10 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.orange.withValues(alpha: 0.1),
+              color: AppColors.statusOrange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Colors.orange.withValues(alpha: 0.3),
+                color: AppColors.statusOrange.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -154,13 +155,13 @@ class GuestAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Icon(
                   Icons.home_outlined,
                   size: 16,
-                  color: Colors.orange,
+                  color: AppColors.statusOrange,
                 ),
                 const SizedBox(width: AppSpacing.paddingS),
                 Text(
                   noPgSelected,
                   style: TextStyle(
-                    color: Colors.orange,
+                    color: AppColors.statusOrange,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),

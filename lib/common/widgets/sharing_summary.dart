@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../common/styles/spacing.dart';
+import '../../common/styles/colors.dart';
 import '../../core/services/localization/internationalization_service.dart';
 import '../../feature/guest_dashboard/pgs/data/models/guest_pg_model.dart';
 import '../../feature/owner_dashboard/mypg/data/models/pg_room_model.dart';
@@ -59,19 +60,19 @@ class SharingSummaryRow extends StatelessWidget {
               margin: const EdgeInsets.only(right: 12),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(color: Theme.of(context).dividerColor),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.bed, size: 14, color: Colors.blueGrey),
+                  Icon(Icons.bed, size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                   const SizedBox(width: AppSpacing.paddingXS),
                   BodyText(text: e.key, small: true),
                   const SizedBox(width: AppSpacing.paddingS),
                   BodyText(
                     text: priceLabel,
-                    color: Colors.indigo,
+                    color: AppColors.primary,
                     small: true,
                   ),
                 ],
@@ -104,11 +105,11 @@ class SharingSummaryTable extends StatelessWidget {
       children: [
         HeadingSmall(
           text: loc?.sharingAndVacancy ?? 'Sharing & Vacancy',
-          color: Colors.deepPurple,
+          color: AppColors.primary,
         ),
         const SizedBox(height: AppSpacing.paddingS),
         Table(
-          border: TableBorder.all(color: Colors.grey.shade200),
+          border: TableBorder.all(color: Theme.of(context).dividerColor),
           columnWidths: const {
             0: FlexColumnWidth(2),
             1: FlexColumnWidth(2),
@@ -117,10 +118,10 @@ class SharingSummaryTable extends StatelessWidget {
           },
           children: [
             TableRow(children: [
-              _th(loc?.sharingColumn ?? 'Sharing'),
-              _th(loc?.roomsColumn ?? 'Rooms'),
-              _th(loc?.vacantBedsColumn ?? 'Vacant beds'),
-              _th(loc?.rentPerBedColumn ?? 'Rent / bed'),
+              _th(context, loc?.sharingColumn ?? 'Sharing'),
+              _th(context, loc?.roomsColumn ?? 'Rooms'),
+              _th(context, loc?.vacantBedsColumn ?? 'Vacant beds'),
+              _th(context, loc?.rentPerBedColumn ?? 'Rent / bed'),
             ]),
             ...summary.entries.map((e) => TableRow(children: [
                   _td(e.key),
@@ -134,9 +135,9 @@ class SharingSummaryTable extends StatelessWidget {
     );
   }
 
-  Widget _th(String text) => Padding(
+  Widget _th(BuildContext context, String text) => Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingS),
-      child: BodyText(text: text, small: true, color: Colors.grey));
+      child: BodyText(text: text, small: true, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)));
   Widget _td(String text) => Padding(
       padding: const EdgeInsets.all(AppSpacing.paddingS),
       child: BodyText(text: text, small: true));

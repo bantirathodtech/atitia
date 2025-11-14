@@ -177,7 +177,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red),
+            Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(
               text: loc?.errorTitle ?? _text('errorTitle', 'Error'),
@@ -336,7 +336,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          BodyText(text: '$label:', color: Colors.grey[600]),
+          BodyText(text: '$label:', color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
           BodyText(text: value, medium: true),
         ],
       ),
@@ -466,7 +466,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                     content: Text(loc?.provideReasonError ??
                         _text('provideReasonError',
                             'Please provide a reason for the change')),
-                    backgroundColor: Colors.orange,
+                    backgroundColor: AppColors.warning,
                   ),
                 );
                 return;
@@ -502,7 +502,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                     content: Text(loc?.changeRequestSuccess ??
                         _text('changeRequestSuccess',
                             'Change request submitted successfully')),
-                    backgroundColor: Colors.green,
+                    backgroundColor: AppColors.success,
                   ),
                 );
               }
@@ -524,17 +524,17 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
 
     switch (status) {
       case 'approved':
-        statusColor = Colors.green;
+        statusColor = AppColors.statusGreen;
         statusText = _statusLabel(status, loc);
         statusIcon = Icons.check_circle;
         break;
       case 'rejected':
-        statusColor = Colors.red;
+        statusColor = AppColors.statusRed;
         statusText = _statusLabel(status, loc);
         statusIcon = Icons.cancel;
         break;
       default:
-        statusColor = Colors.orange;
+        statusColor = AppColors.statusOrange;
         statusText = _statusLabel(status, loc);
         statusIcon = Icons.pending;
     }
@@ -579,7 +579,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                 text: loc?.preferredLabel ??
                     _text('preferredLabel', 'Preferred:'),
                 medium: true,
-                color: Colors.grey[700],
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
               ),
               const SizedBox(height: AppSpacing.paddingXS),
               BodyText(
@@ -606,7 +606,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
             BodyText(
               text: loc?.reasonLabel ?? _text('reasonLabel', 'Reason:'),
               medium: true,
-              color: Colors.grey[700],
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.8) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
             ),
             const SizedBox(height: AppSpacing.paddingXS),
             BodyText(text: recentRequest.reason),
@@ -648,7 +648,7 @@ class _GuestRoomBedScreenState extends State<GuestRoomBedScreen>
                           'date': _formatDate(recentRequest.createdAt),
                         },
                       ),
-              color: Colors.grey[600],
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ],
         ),

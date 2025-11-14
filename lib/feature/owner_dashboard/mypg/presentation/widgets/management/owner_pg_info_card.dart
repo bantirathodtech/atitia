@@ -156,7 +156,7 @@ class OwnerPgInfoCard extends StatelessWidget {
       return AdaptiveCard(
         child: Column(
           children: [
-            Icon(Icons.home_outlined, size: 64, color: Colors.grey),
+            Icon(Icons.home_outlined, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
             const SizedBox(height: AppSpacing.paddingM),
             HeadingMedium(
               text: loc?.pgInfoNoPgSelected ??
@@ -218,7 +218,7 @@ class OwnerPgInfoCard extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: isDarkMode
-                    ? Colors.black.withValues(alpha: 0.2)
+                    ? Theme.of(context).colorScheme.shadow.withValues(alpha: 0.2)
                     : theme.primaryColor.withValues(alpha: 0.05),
                 blurRadius: 15,
                 offset: const Offset(0, 5),

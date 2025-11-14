@@ -123,32 +123,36 @@ class _SplashScreenState extends State<SplashScreen> {
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) {
                             // Fallback to icon if asset not found
+                            final theme = Theme.of(context);
                             return Icon(
                               Icons.home_work,
                               size: iconSize,
-                              color: Colors.white,
+                              color: theme.colorScheme.onPrimary,
                             );
                           },
                         ),
                         SizedBox(height: spacingBetweenIconAndTitle),
 
                         // App Name
-                        const HeadingLarge(
+                        HeadingLarge(
                           text: 'Atitia PG',
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                         SizedBox(height: spacingBetweenTitleAndTagline),
 
                         // Tagline
-                        const BodyText(
+                        BodyText(
                           text: 'Your Home Away From Home',
-                          color: Colors.white70,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withValues(alpha: 0.9),
                         ),
                         SizedBox(height: spacingBetweenTaglineAndLoader),
 
                         // Loading indicator
-                        const AdaptiveLoader(
-                          color: Colors.white,
+                        AdaptiveLoader(
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                         SizedBox(height: spacingBetweenLoaderAndMessage),
 
@@ -157,7 +161,10 @@ class _SplashScreenState extends State<SplashScreen> {
                           text: authProvider.loading
                               ? 'Initializing...'
                               : authProvider.errorMessage ?? 'Loading...',
-                          color: Colors.white70,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withValues(alpha: 0.9),
                         ),
                       ],
                     ),

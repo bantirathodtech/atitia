@@ -14,6 +14,7 @@ import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../feature/owner_dashboard/shared/viewmodel/selected_pg_provider.dart';
@@ -144,12 +145,12 @@ class GuestPgSelector extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(pgStatus).withValues(alpha: 0.1),
+                  color: _getStatusColor(context, pgStatus).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: Icon(
                   Icons.home,
-                  color: _getStatusColor(pgStatus),
+                  color: _getStatusColor(context, pgStatus),
                   size: 24,
                 ),
               ),
@@ -195,20 +196,20 @@ class GuestPgSelector extends StatelessWidget {
 
     switch (status.toLowerCase()) {
       case 'active':
-        chipColor = Colors.green;
+        chipColor = AppColors.success;
         chipText = loc?.statusActive ?? _text('statusActive', 'Active');
         break;
       case 'inactive':
-        chipColor = Colors.orange;
+        chipColor = AppColors.statusGrey;
         chipText = loc?.statusInactive ?? _text('statusInactive', 'Inactive');
         break;
       case 'maintenance':
-        chipColor = Colors.red;
+        chipColor = context.decorativeRed;
         chipText =
             loc?.statusMaintenance ?? _text('statusMaintenance', 'Maintenance');
         break;
       default:
-        chipColor = Colors.grey;
+        chipColor = Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
         chipText = status;
     }
 
@@ -237,16 +238,16 @@ class GuestPgSelector extends StatelessWidget {
   }
 
   /// Gets color for PG status
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return Colors.green;
+        return AppColors.success;
       case 'inactive':
-        return Colors.orange;
+        return AppColors.statusGrey;
       case 'maintenance':
-        return Colors.red;
+        return context.decorativeRed;
       default:
-        return Colors.grey;
+        return Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     }
   }
 

@@ -8,9 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../../common/styles/spacing.dart';
+import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../../common/widgets/text/index.dart';
+import '../../../../../../common/utils/extensions/context_extensions.dart';
 import '../../data/models/guest_food_model.dart';
 import '../../viewmodel/guest_food_viewmodel.dart';
 
@@ -82,7 +84,7 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
           children: [
             BodyText(text: 'Failed to load food details', medium: true),
             const SizedBox(height: AppSpacing.paddingS),
-            BodyText(text: _error ?? 'Unknown error', color: Colors.grey),
+            BodyText(text: _error ?? 'Unknown error', color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
             const SizedBox(height: AppSpacing.paddingM),
             PrimaryButton(onPressed: _load, label: 'Retry'),
           ],
@@ -120,7 +122,7 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
           // Availability
           BodyText(
             text: food.isCurrentlyAvailable ? 'Available' : 'Out of Stock',
-            color: food.isCurrentlyAvailable ? Colors.green : Colors.red,
+            color: food.isCurrentlyAvailable ? AppColors.success : context.decorativeRed,
           ),
         ],
       ),

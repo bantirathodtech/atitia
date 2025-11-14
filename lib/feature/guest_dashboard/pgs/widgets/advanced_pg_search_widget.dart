@@ -114,7 +114,15 @@ class _AdvancedPgSearchWidgetState extends State<AdvancedPgSearchWidget> {
               const HeadingMedium(text: 'Advanced PG Search'),
               CaptionText(
                 text: 'Find your perfect PG with detailed filters',
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -474,10 +482,10 @@ class _AdvancedPgSearchWidgetState extends State<AdvancedPgSearchWidget> {
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[800] : Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+          color: Theme.of(context).dividerColor,
         ),
       ),
       child: Row(
@@ -491,7 +499,15 @@ class _AdvancedPgSearchWidgetState extends State<AdvancedPgSearchWidget> {
                 ),
                 CaptionText(
                   text: search.description,
-                  color: isDark ? Colors.white70 : Colors.grey[600],
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ],
             ),

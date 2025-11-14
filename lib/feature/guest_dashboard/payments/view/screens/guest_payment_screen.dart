@@ -269,7 +269,10 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
+            color: Theme.of(context)
+                .colorScheme
+                .shadow
+                .withValues(alpha: isDarkMode ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -745,8 +748,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -755,7 +757,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           HeadingMedium(
             text: loc?.paymentStatistics ??
                 _text('paymentStatistics', 'Payment Statistics'),
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -769,7 +771,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       _text('totalPayments', 'Total Payments'),
                   '0',
                   Icons.payment,
-                  Colors.blue,
+                  AppColors.info,
                   isDarkMode,
                 ),
               ),
@@ -780,7 +782,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   loc?.pending ?? _text('pending', 'Pending'),
                   '0',
                   Icons.pending,
-                  Colors.orange,
+                  AppColors.warning,
                   isDarkMode,
                 ),
               ),
@@ -795,7 +797,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   loc?.completed ?? _text('completed', 'Completed'),
                   '0',
                   Icons.check_circle,
-                  Colors.green,
+                  AppColors.success,
                   isDarkMode,
                 ),
               ),
@@ -806,7 +808,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   loc?.failed ?? _text('failed', 'Failed'),
                   '0',
                   Icons.error,
-                  Colors.red,
+                  AppColors.error,
                   isDarkMode,
                 ),
               ),
@@ -821,7 +823,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   loc?.totalAmount ?? _text('totalAmount', 'Total Amount'),
                   '₹0',
                   Icons.currency_rupee,
-                  Colors.purple,
+                  AppColors.purple,
                   isDarkMode,
                 ),
               ),
@@ -832,7 +834,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   loc?.thisMonth ?? _text('thisMonth', 'This Month'),
                   '₹0',
                   Icons.calendar_month,
-                  Colors.teal,
+                  AppColors.accent,
                   isDarkMode,
                 ),
               ),
@@ -883,7 +885,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
             label,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -903,7 +913,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           HeadingMedium(
             text: loc?.recentPaymentsPreview ??
                 _text('recentPaymentsPreview', 'Recent Payments Preview'),
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -930,8 +940,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -943,12 +952,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: Icon(
                   Icons.payment,
-                  color: Colors.grey.withValues(alpha: 0.5),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.5),
                   size: 20,
                 ),
               ),
@@ -961,7 +973,9 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       height: 12,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.3),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
@@ -970,7 +984,9 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       height: 8,
                       width: 100,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.2),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -981,7 +997,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 width: 80,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: Center(
@@ -989,7 +1005,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                     height: 8,
                     width: 60,
                     decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.4),
+                      color: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.color
+                              ?.withValues(alpha: 0.4) ??
+                          Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -1008,7 +1032,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       loc?.amount ?? _text('amount', 'Amount'),
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.paddingXS),
@@ -1016,7 +1048,10 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       height: 16,
                       width: 80,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.3),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -1031,7 +1066,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       loc?.status ?? _text('status', 'Status'),
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.paddingXS),
@@ -1039,7 +1082,10 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       height: 16,
                       width: 60,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.3),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -1054,7 +1100,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       loc?.date ?? _text('date', 'Date'),
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.paddingXS),
@@ -1062,7 +1116,10 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                       height: 16,
                       width: 70,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.3),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -1089,8 +1146,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1098,13 +1154,14 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           Icon(
             Icons.payment,
             size: 48,
-            color: isDarkMode ? Colors.white54 : Colors.grey[400],
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(
             text: loc?.noPaymentHistory ??
                 _text('noPaymentHistory', 'No Payment History'),
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingS),
           Text(
@@ -1114,7 +1171,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   'Your payment notifications and history will appear here once you make payments.',
                 ),
             style: TextStyle(
-              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withValues(alpha: 0.7) ??
+                  Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
               fontSize: 14,
             ),
             textAlign: TextAlign.center,
@@ -1132,7 +1197,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   loc?.sendPayment ?? _text('sendPayment', 'Send Payment')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding:
                     const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
                 shape: RoundedRectangleBorder(
@@ -1156,8 +1221,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1184,14 +1248,17 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 Icon(
                   Icons.account_balance_wallet_outlined,
                   size: 64,
-                  color: isDarkMode ? Colors.white54 : Colors.grey[400],
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
                 HeadingMedium(
                   text: loc?.paymentDetailsNotAvailable ??
                       _text('paymentDetailsNotAvailable',
                           'Payment Details Not Available'),
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 const SizedBox(height: AppSpacing.paddingS),
                 Text(
@@ -1201,7 +1268,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         'Owner payment details are not configured yet. Please contact your PG owner to set up payment information.',
                       ),
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
                     fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
@@ -1212,7 +1287,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.paddingM),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.05),
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusM),
                   ),
@@ -1225,7 +1301,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                                 'Payment Methods Preview:'),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.paddingM),
@@ -1271,7 +1347,8 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           width: 8,
           height: 8,
           decoration: BoxDecoration(
-            color: Colors.grey.withValues(alpha: 0.3),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
         ),
@@ -1280,7 +1357,12 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isDarkMode ? Colors.white70 : Colors.grey[600],
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         const Spacer(),
@@ -1288,7 +1370,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
           height: 12,
           width: 80,
           decoration: BoxDecoration(
-            color: Colors.grey.withValues(alpha: 0.2),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -1596,7 +1678,8 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
                         top: 8,
                         right: 8,
                         child: IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white),
+                          icon: Icon(Icons.close,
+                              color: Theme.of(context).colorScheme.onPrimary),
                           onPressed: () {
                             setState(() => _screenshotFile = null);
                           },

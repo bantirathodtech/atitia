@@ -32,7 +32,7 @@ class GuestComplaintCard extends StatelessWidget {
   Color get _statusColor {
     switch (complaint.status.toLowerCase()) {
       case 'pending':
-        return AppColors.warning;
+        return AppColors.statusOrange;
       case 'in progress':
         return AppColors.info;
       case 'resolved':
@@ -147,7 +147,7 @@ class GuestComplaintCard extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color:
-                      Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
+                      Theme.of(context).colorScheme.shadow.withValues(alpha: isDarkMode ? 0.3 : 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

@@ -56,7 +56,7 @@ class AdaptiveDropdownState<T>
             widget.label,
             style: AppTypography.inputLabel.copyWith(
               color: widget.error != null
-                  ? Colors.red
+                  ? Theme.of(context).colorScheme.error
                   : theme.textTheme.labelMedium?.color,
             ),
           ),
@@ -68,7 +68,7 @@ class AdaptiveDropdownState<T>
             color: isDark ? AppColors.darkInputFill : AppColors.lightInputFill,
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
             border: Border.all(
-              color: widget.error != null ? Colors.red : Colors.transparent,
+              color: widget.error != null ? Theme.of(context).colorScheme.error : Colors.transparent,
               width: 1,
             ),
           ),
@@ -84,7 +84,7 @@ class AdaptiveDropdownState<T>
                       child: Text(
                         widget.hint!,
                         style: AppTypography.input.copyWith(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     )
@@ -109,7 +109,7 @@ class AdaptiveDropdownState<T>
           Text(
             widget.error!,
             style: AppTypography.bodySmall.copyWith(
-              color: Colors.red,
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
         ],

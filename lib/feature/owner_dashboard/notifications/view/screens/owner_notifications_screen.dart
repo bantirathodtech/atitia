@@ -88,7 +88,7 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
                   const SizedBox(height: AppSpacing.paddingM),
                   BodyText(
                     text: viewModel.errorMessage ??
@@ -283,13 +283,13 @@ class _OwnerNotificationsScreenState extends State<OwnerNotificationsScreen> {
       case 'booking_request':
         return AppColors.secondary;
       case 'payment_received':
-        return Colors.green;
+        return AppColors.success;
       case 'complaint_filed':
-        return Colors.red;
+        return AppColors.error;
       case 'bed_change_request':
-        return Colors.blue;
+        return AppColors.info;
       case 'service_request':
-        return Colors.orange;
+        return AppColors.warning;
       default:
         return AppColors.primary;
     }

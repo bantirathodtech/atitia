@@ -49,7 +49,7 @@ class ConfirmationDialog extends StatelessWidget {
           if (icon != null) ...[
             Icon(
               icon,
-              color: isDestructive ? Colors.red : theme.primaryColor,
+              color: isDestructive ? theme.colorScheme.error : theme.primaryColor,
             ),
             const SizedBox(width: AppSpacing.sm),
           ],
@@ -73,7 +73,7 @@ class ConfirmationDialog extends StatelessWidget {
           onPressed: () {
             onConfirm?.call();
           },
-          backgroundColor: isDestructive ? Colors.red : null,
+          backgroundColor: isDestructive ? Theme.of(context).colorScheme.error : null,
         ),
       ],
       actionsPadding: const EdgeInsets.all(AppSpacing.md),

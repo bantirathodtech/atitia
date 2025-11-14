@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
@@ -144,12 +145,12 @@ class OwnerMenuDayTab extends StatelessWidget {
                     _text('guestFeedbackToday', 'Guest Feedback (Today)'),
               ),
               const SizedBox(height: AppSpacing.paddingS),
-              _buildRow(loc?.breakfast ?? _text('breakfast', 'Breakfast'),
+              _buildRow(context, loc?.breakfast ?? _text('breakfast', 'Breakfast'),
                   agg['breakfast']!),
               const SizedBox(height: AppSpacing.paddingXS),
-              _buildRow(loc?.lunch ?? _text('lunch', 'Lunch'), agg['lunch']!),
+              _buildRow(context, loc?.lunch ?? _text('lunch', 'Lunch'), agg['lunch']!),
               const SizedBox(height: AppSpacing.paddingXS),
-              _buildRow(
+              _buildRow(context,
                   loc?.dinner ?? _text('dinner', 'Dinner'), agg['dinner']!),
             ],
           ),
@@ -158,18 +159,18 @@ class OwnerMenuDayTab extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(String label, Map<String, int> counts) {
+  Widget _buildRow(BuildContext context, String label, Map<String, int> counts) {
     final likes = counts['likes'] ?? 0;
     final dislikes = counts['dislikes'] ?? 0;
     return Row(
       children: [
         Expanded(child: BodyText(text: label)),
         const SizedBox(width: AppSpacing.paddingS),
-        Icon(Icons.thumb_up_alt_outlined, size: 16, color: Colors.green),
+        Icon(Icons.thumb_up_alt_outlined, size: 16, color: AppColors.success),
         const SizedBox(width: AppSpacing.paddingXS),
         CaptionText(text: likes.toString()),
         const SizedBox(width: AppSpacing.paddingM),
-        Icon(Icons.thumb_down_alt_outlined, size: 16, color: Colors.red),
+        Icon(Icons.thumb_down_alt_outlined, size: 16, color: context.decorativeRed),
         const SizedBox(width: AppSpacing.paddingXS),
         CaptionText(text: dislikes.toString()),
       ],
@@ -182,7 +183,7 @@ class OwnerMenuDayTab extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.restaurant_menu, size: 64, color: Colors.grey),
+          Icon(Icons.restaurant_menu, size: 64, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(
             text: loc?.noMenuForDay(dayLabel) ??
@@ -222,11 +223,11 @@ class OwnerMenuDayTab extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.calendar_today, color: Colors.white, size: 24),
+          Icon(Icons.calendar_today, color: Theme.of(context).colorScheme.onPrimary, size: 24),
           const SizedBox(width: AppSpacing.paddingS),
           HeadingMedium(
             text: dayLabel,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ],
       ),
@@ -267,7 +268,7 @@ class OwnerMenuDayTab extends StatelessWidget {
                     text: (AppLocalizations.of(context)?.special ??
                             _text('special', 'Special'))
                         .toUpperCase(),
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onPrimary,
                     small: true,
                   ),
                 ),
@@ -275,7 +276,7 @@ class OwnerMenuDayTab extends StatelessWidget {
               const Spacer(),
               BodyText(
                 text: time,
-                color: Colors.grey[600],
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 small: true,
               ),
             ],
@@ -285,14 +286,14 @@ class OwnerMenuDayTab extends StatelessWidget {
             BodyText(
               text: AppLocalizations.of(context)?.ownerFoodNoItemsAddedYet ??
                   _text('ownerFoodNoItemsAddedYet', 'No items added yet'),
-              color: Colors.grey,
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             )
           else
             ...items.map((item) => Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.paddingXS),
                   child: Row(
                     children: [
-                      const Icon(Icons.circle, size: 6, color: Colors.grey),
+                      Icon(Icons.circle, size: 6, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                       const SizedBox(width: AppSpacing.paddingS),
                       Expanded(child: BodyText(text: item)),
                     ],
@@ -328,7 +329,7 @@ class OwnerMenuDayTab extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.celebration, color: Colors.white, size: 24),
+          Icon(Icons.celebration, color: Theme.of(context).colorScheme.onPrimary, size: 24),
           const SizedBox(width: AppSpacing.paddingS),
           Expanded(
             child: Column(
@@ -338,13 +339,13 @@ class OwnerMenuDayTab extends StatelessWidget {
                   text: specialOverride.festivalName ??
                       loc?.specialMenuLabel ??
                       _text('specialMenuLabel', 'Special Menu'),
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
                 if (specialOverride.specialNote != null &&
                     specialOverride.specialNote!.isNotEmpty)
                   BodyText(
                     text: specialOverride.specialNote!,
-                    color: Colors.white70,
+                    color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
                     small: true,
                   ),
               ],

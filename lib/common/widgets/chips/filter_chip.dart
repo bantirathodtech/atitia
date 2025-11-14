@@ -74,12 +74,12 @@ class CustomFilterChip extends AdaptiveStatelessWidget {
     final effectiveBackgroundColor = backgroundColor ??
         (theme.brightness == Brightness.dark
             ? AppColors.darkCard
-            : Colors.white);
+            : Theme.of(context).colorScheme.surface);
 
     final textColor = selected
         ? (theme.brightness == Brightness.dark
             ? AppColors.textOnPrimary
-            : Colors.white)
+            : Theme.of(context).colorScheme.onPrimary)
         : (theme.brightness == Brightness.dark
             ? AppColors.darkText
             : AppColors.textPrimary);

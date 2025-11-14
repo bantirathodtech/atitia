@@ -311,7 +311,8 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
+                        border:
+                            Border.all(color: Theme.of(context).dividerColor),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Image.file(
@@ -326,13 +327,16 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
                       onTap: () => setState(() => _imageFiles.remove(file)),
                       child: Container(
                         margin: const EdgeInsets.all(AppSpacing.paddingXS),
-                        decoration: const BoxDecoration(
-                          color: Colors.black54,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .shadow
+                              .withValues(alpha: 0.54),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.close,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                           size: 16,
                         ),
                       ),
@@ -346,18 +350,38 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  border: Border.all(color: Colors.grey.shade300),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  border: Border.all(color: Theme.of(context).dividerColor),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.add_a_photo, size: 30, color: Colors.grey),
+                    Icon(Icons.add_a_photo,
+                        size: 30,
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7)),
                     const SizedBox(height: AppSpacing.paddingXS),
                     Text(
                       loc.add,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.color
+                                  ?.withValues(alpha: 0.7) ??
+                              Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7)),
                     ),
                   ],
                 ),
@@ -369,7 +393,17 @@ class _GuestComplaintAddScreenState extends State<GuestComplaintAddScreen> {
           const SizedBox(height: AppSpacing.paddingS),
           Text(
             loc.imagesSelected(_imageFiles.length),
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7)),
           ),
         ],
       ],

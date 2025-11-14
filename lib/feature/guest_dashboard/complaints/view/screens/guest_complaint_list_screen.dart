@@ -276,10 +276,10 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
       ),
       decoration: BoxDecoration(
         color: isDarkMode
-            ? Colors.white.withValues(alpha: 0.1)
-            : Colors.white.withValues(alpha: 0.2),
+            ? Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.1)
+            : Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+        border: Border.all(color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -595,7 +595,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
           color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+              Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -603,7 +603,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
         children: [
           HeadingMedium(
             text: loc?.complaintStatistics ?? 'Complaint Statistics',
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -616,7 +616,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                   loc?.totalComplaints ?? 'Total Complaints',
                   '0',
                   Icons.report_problem,
-                  Colors.blue,
+                  AppColors.info,
                   isDarkMode,
                 ),
               ),
@@ -627,7 +627,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                   loc?.pending ?? 'Pending',
                   '0',
                   Icons.pending,
-                  Colors.orange,
+                  AppColors.warning,
                   isDarkMode,
                 ),
               ),
@@ -642,7 +642,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                   loc?.inProgress ?? 'In Progress',
                   '0',
                   Icons.hourglass_empty,
-                  Colors.amber,
+                  AppColors.warning,
                   isDarkMode,
                 ),
               ),
@@ -653,7 +653,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                   loc?.resolved ?? 'Resolved',
                   '0',
                   Icons.check_circle,
-                  Colors.green,
+                  AppColors.success,
                   isDarkMode,
                 ),
               ),
@@ -668,7 +668,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                   loc?.highPriority ?? 'High Priority',
                   '0',
                   Icons.priority_high,
-                  Colors.red,
+                  AppColors.error,
                   isDarkMode,
                 ),
               ),
@@ -679,7 +679,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                   loc?.thisMonth ?? 'This Month',
                   '0',
                   Icons.calendar_month,
-                  Colors.purple,
+                  AppColors.purple,
                   isDarkMode,
                 ),
               ),
@@ -730,7 +730,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -751,7 +751,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
         children: [
           HeadingMedium(
             text: loc?.recentComplaintsPreview ?? 'Recent Complaints Preview',
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -773,7 +773,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
           color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+              Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -785,12 +785,12 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: Icon(
                   Icons.report_problem,
-                  color: Colors.grey.withValues(alpha: 0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   size: 20,
                 ),
               ),
@@ -803,7 +803,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                       height: 12,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.3),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
@@ -812,7 +812,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                       height: 8,
                       width: 120,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.2),
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -823,7 +823,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                 width: 80,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: Center(
@@ -831,7 +831,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                     height: 8,
                     width: 60,
                     decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.4),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -846,7 +846,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
             height: 40,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.1),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
           ),
@@ -863,7 +863,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                       'Category',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.paddingXS),
@@ -871,7 +871,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                       height: 16,
                       width: 80,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.3),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -886,7 +886,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                       'Priority',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.paddingXS),
@@ -894,7 +894,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                       height: 16,
                       width: 60,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.3),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -909,7 +909,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                       'Date',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.paddingXS),
@@ -917,7 +917,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                       height: 16,
                       width: 70,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.3),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -945,7 +945,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
           color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+              Theme.of(context).dividerColor.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -953,20 +953,20 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
           Icon(
             Icons.report_problem_outlined,
             size: 48,
-            color: isDarkMode ? Colors.white54 : Colors.grey[400],
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(
             text: AppLocalizations.of(context)?.noComplaintsYet ??
                 'No Complaints Yet',
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingS),
           Text(
             AppLocalizations.of(context)?.noComplaintsYetDescription ??
                 'You haven\'t submitted any complaints yet. Tap the + button to add your first complaint.',
             style: TextStyle(
-              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               fontSize: 14,
             ),
             textAlign: TextAlign.center,
@@ -977,7 +977,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
             ),
             child: Column(
@@ -988,7 +988,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                       'Common Complaint Categories:',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.paddingM),
@@ -1020,7 +1020,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                   'Submit First Complaint'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding:
                     const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
                 shape: RoundedRectangleBorder(
@@ -1043,7 +1043,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
           width: 8,
           height: 8,
           decoration: BoxDecoration(
-            color: Colors.grey.withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
         ),
@@ -1052,7 +1052,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
           category,
           style: TextStyle(
             fontSize: 12,
-            color: isDarkMode ? Colors.white70 : Colors.grey[600],
+            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ],

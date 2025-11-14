@@ -124,7 +124,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
         showUnselectedLabels: true,
         selectedItemColor: theme.primaryColor,
         unselectedItemColor:
-            isDarkMode ? AppColors.textTertiary : Colors.grey.shade600,
+            Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 12,
@@ -224,7 +224,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
           size: 28,
         ),
         unselectedIconTheme: IconThemeData(
-          color: isDarkMode ? AppColors.textTertiary : Colors.grey.shade600,
+          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           size: 24,
         ),
         selectedLabelTextStyle: TextStyle(
@@ -233,7 +233,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
           fontSize: 14,
         ),
         unselectedLabelTextStyle: TextStyle(
-          color: isDarkMode ? AppColors.textTertiary : Colors.grey.shade600,
+          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           fontWeight: FontWeight.w400,
           fontSize: 12,
         ),

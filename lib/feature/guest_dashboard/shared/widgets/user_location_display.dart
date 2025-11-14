@@ -203,8 +203,9 @@ class UserLocationDisplay extends StatelessWidget {
     if (parts['state'] != null) items.add(parts['state']!);
     if (parts['district'] != null) items.add(parts['district']!);
     if (parts['area'] != null) items.add(parts['area']!);
-    if (parts['society'] != null && items.length < 3)
+    if (parts['society'] != null && items.length < 3) {
       items.add(parts['society']!);
+    }
 
     return items.join(', ');
   }

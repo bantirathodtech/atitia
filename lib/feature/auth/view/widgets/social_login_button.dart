@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../common/styles/colors.dart';
+
 enum SocialLoginType { google, facebook }
 
 class SocialLoginButton extends StatelessWidget {
@@ -21,12 +23,12 @@ class SocialLoginButton extends StatelessWidget {
     switch (type) {
       case SocialLoginType.google:
         label = 'Continue with Google';
-        color = Colors.redAccent;
+        color = AppColors.statusRed;
         icon = Icons.g_mobiledata;
         break;
       case SocialLoginType.facebook:
         label = 'Continue with Facebook';
-        color = Colors.blue;
+        color = AppColors.statusBlue;
         icon = Icons.facebook;
         break;
       // default:

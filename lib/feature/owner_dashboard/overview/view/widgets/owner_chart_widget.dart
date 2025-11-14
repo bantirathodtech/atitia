@@ -9,6 +9,7 @@ import '../../../../../common/widgets/cards/info_card.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../l10n/app_localizations.dart';
 
@@ -283,7 +284,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
             Container(
               height: 2,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: Theme.of(context).dividerColor,
                 borderRadius: BorderRadius.circular(1),
               ),
             ),
@@ -293,7 +294,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
           // Month label
           CaptionText(
             text: monthName,
-            color: Colors.grey.shade600,
+            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ],
       ),
@@ -347,19 +348,19 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
         'label': loc.totalRevenue,
         'value': totalRevenueValue,
         'icon': Icons.account_balance_wallet_outlined,
-        'color': Colors.blue,
+        'color': AppColors.info,
       },
       {
         'label': loc.ownerOverviewAveragePerMonth,
         'value': averagePerMonthValue,
         'icon': Icons.trending_flat,
-        'color': Colors.green,
+        'color': AppColors.success,
       },
       {
         'label': loc.ownerOverviewHighestMonth,
         'value': '$highestMonthValueFormatted ($highestMonthName)',
         'icon': Icons.trending_up,
-        'color': Colors.orange,
+        'color': AppColors.warning,
       },
     ];
 
@@ -432,7 +433,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
               // Placeholder value label (subtle)
               CaptionText(
                 text: _formatCurrency(0, localeName),
-                color: Colors.grey.shade400,
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.4) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
               ),
               const SizedBox(height: AppSpacing.paddingXS),
 
@@ -440,7 +441,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
               Container(
                 height: placeholderHeight,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: Theme.of(context).dividerColor,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(4),
                   ),
@@ -452,7 +453,7 @@ class OwnerChartWidget extends AdaptiveStatelessWidget {
               // Month label
               CaptionText(
                 text: monthName,
-                color: Colors.grey.shade500,
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ],
           ),

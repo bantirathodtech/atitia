@@ -520,7 +520,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                         url,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.error, color: Colors.red);
+                          return Icon(Icons.error, color: Theme.of(context).colorScheme.error);
                         },
                       ),
                       onDelete: () => _deletePhoto(index, isNewPhoto: false),
@@ -546,7 +546,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             const SizedBox(height: AppSpacing.paddingS),
             const LinearProgressIndicator(),
             const SizedBox(height: AppSpacing.paddingXS),
-            BodyText(text: loc.ownerMenuEditUploadingPhoto, color: Colors.grey),
+            BodyText(text: loc.ownerMenuEditUploadingPhoto, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
           ],
         ],
       ),
@@ -1184,7 +1184,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(loc.ownerMenuEditClearSnackbar),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
         ),
       );
     }

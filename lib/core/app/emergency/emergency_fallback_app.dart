@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../common/styles/colors.dart';
 import '../../../common/styles/spacing.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -22,75 +23,95 @@ class EmergencyFallbackApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.grey[100],
-        body: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.paddingL),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Warning Icon
-                  Icon(Icons.warning_amber_rounded,
-                      size: 80, color: Colors.orange),
-                  const SizedBox(height: AppSpacing.paddingL),
-
-                  // Title
-                  Text(
-                      AppLocalizations.of(context)?.appInitializationIssue ??
-                          'App Initialization Issue',
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800]),
-                      textAlign: TextAlign.center),
-                  const SizedBox(height: AppSpacing.paddingM),
-
-                  // Description
-                  Text(
-                    AppLocalizations.of(context)?.troubleConnectingServices ??
-                        'We\'re having trouble connecting to our services. This might be due to network issues or maintenance.',
-                    style: TextStyle(
-                        fontSize: 16, color: Colors.grey[600], height: 1.4),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.paddingXL),
-
-                  // Action Buttons
-                  Row(
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: ThemeMode.system,
+      home: Builder(
+        builder: (context) {
+          final theme = Theme.of(context);
+          return Scaffold(
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
+            body: SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.paddingL),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Retry Button
-                      ElevatedButton.icon(
-                        onPressed: _retryAppInitialization,
-                        icon: const Icon(Icons.refresh),
-                        label: Text(AppLocalizations.of(context)?.tryAgain ??
-                            'Try Again'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.paddingM),
+                      // Warning Icon
+                      Icon(Icons.warning_amber_rounded,
+                          size: 80, color: AppColors.statusOrange),
+                      const SizedBox(height: AppSpacing.paddingL),
 
-                      // Exit Button
-                      TextButton.icon(
-                        onPressed: _exitApp,
-                        icon: const Icon(Icons.exit_to_app),
-                        label:
-                            Text(AppLocalizations.of(context)?.exit ?? 'Exit'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.grey[600],
-                        ),
+                      // Title
+                      Text(
+                          AppLocalizations.of(context)
+                                  ?.appInitializationIssue ??
+                              'App Initialization Issue',
+                          style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: theme.textTheme.titleLarge?.color ??
+                                  theme.colorScheme.onSurface),
+                          textAlign: TextAlign.center),
+                      const SizedBox(height: AppSpacing.paddingM),
+
+                      // Description
+                      Text(
+                        AppLocalizations.of(context)
+                                ?.troubleConnectingServices ??
+                            'We\'re having trouble connecting to our services. This might be due to network issues or maintenance.',
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: theme.textTheme.bodySmall?.color
+                                    ?.withValues(alpha: 0.7) ??
+                                theme.colorScheme.onSurface
+                                    .withValues(alpha: 0.7),
+                            height: 1.4),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.paddingXL),
+
+                      // Action Buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Retry Button
+                          ElevatedButton.icon(
+                            onPressed: _retryAppInitialization,
+                            icon: const Icon(Icons.refresh),
+                            label: Text(
+                                AppLocalizations.of(context)?.tryAgain ??
+                                    'Try Again'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.info,
+                              foregroundColor: AppColors.textOnPrimary,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.paddingM),
+
+                          // Exit Button
+                          TextButton.icon(
+                            onPressed: _exitApp,
+                            icon: const Icon(Icons.exit_to_app),
+                            label: Text(
+                                AppLocalizations.of(context)?.exit ?? 'Exit'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: theme.textTheme.bodySmall?.color
+                                      ?.withValues(alpha: 0.7) ??
+                                  theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.7),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

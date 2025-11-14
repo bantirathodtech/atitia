@@ -3,12 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../l10n/app_localizations.dart';
 
 /// Occupancy analytics widget for Owner dashboard
@@ -60,12 +62,12 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.paddingM),
           decoration: BoxDecoration(
-            color: Colors.blue.withValues(alpha: 0.1),
+            color: AppColors.info.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.bed,
-            color: Colors.blue,
+            color: AppColors.info,
             size: 24,
           ),
         ),
@@ -79,7 +81,15 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                 text: widget.selectedPgId != null
                     ? loc.occupancyAnalyticsSelectedPg
                     : loc.occupancyAnalyticsOverall,
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.7) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -106,7 +116,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
             loc.occupancyMetricCurrent,
             '${percentFormatter.format(metrics['currentOccupancy'])}%',
             Icons.bed,
-            _getOccupancyColor(metrics['currentOccupancy']),
+            _getOccupancyColor(context, metrics['currentOccupancy']),
             isDark,
           ),
         ),
@@ -116,7 +126,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
             loc.occupancyMetricAverage,
             '${percentFormatter.format(metrics['avgOccupancy'])}%',
             Icons.trending_up,
-            Colors.blue,
+            AppColors.statusBlue,
             isDark,
           ),
         ),
@@ -126,7 +136,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
             loc.occupancyMetricPeak,
             '${percentFormatter.format(metrics['peakOccupancy'])}%',
             Icons.flag,
-            Colors.orange,
+            AppColors.statusOrange,
             isDark,
           ),
         ),
@@ -154,7 +164,15 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                 Expanded(
                   child: CaptionText(
                     text: title,
-                    color: isDark ? Colors.white70 : Colors.grey[600],
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -202,15 +220,15 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
-        border:
-            Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
       ),
       child: DropdownButton<String>(
         value: _selectedPeriod,
         underline: const SizedBox(),
         style: TextStyle(
-          color: isDark ? Colors.white : Colors.black,
+          color: Theme.of(context).textTheme.bodyLarge?.color ??
+              Theme.of(context).colorScheme.onSurface,
           fontSize: 14,
         ),
         items: [
@@ -240,15 +258,15 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
-        border:
-            Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
       ),
       child: DropdownButton<String>(
         value: _selectedView,
         underline: const SizedBox(),
         style: TextStyle(
-          color: isDark ? Colors.white : Colors.black,
+          color: Theme.of(context).textTheme.bodyLarge?.color ??
+              Theme.of(context).colorScheme.onSurface,
           fontSize: 14,
         ),
         items: [
@@ -284,7 +302,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[800] : Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
       ),
       child: Column(
@@ -306,7 +324,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                       width: 30,
                       height: height,
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: AppColors.statusBlue,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -314,7 +332,15 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                     Text(
                       monthFormatter.format(DateTime(2000, months[index])),
                       style: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.grey[600],
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                         fontSize: 12,
                       ),
                     ),
@@ -322,7 +348,8 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                     Text(
                       '${percentFormatter.format(value)}%',
                       style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
+                        color: Theme.of(context).textTheme.titleLarge?.color ??
+                            Theme.of(context).colorScheme.onSurface,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
@@ -359,7 +386,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                     loc.occupancyCapacityAvailableBeds,
                     numberFormatter.format(analysis['availableBeds']),
                     Icons.bed_outlined,
-                    Colors.green,
+                    AppColors.success,
                     isDark,
                   ),
                 ),
@@ -369,7 +396,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                     loc.occupancyCapacityOccupiedBeds,
                     numberFormatter.format(analysis['occupiedBeds']),
                     Icons.bed,
-                    Colors.blue,
+                    AppColors.statusBlue,
                     isDark,
                   ),
                 ),
@@ -379,7 +406,15 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                     loc.occupancyCapacityTotal,
                     numberFormatter.format(analysis['totalCapacity']),
                     Icons.home,
-                    Colors.grey,
+                    Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.5) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5),
                     isDark,
                   ),
                 ),
@@ -417,7 +452,15 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
               Expanded(
                 child: CaptionText(
                   text: title,
-                  color: isDark ? Colors.white70 : Colors.grey[600],
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -437,7 +480,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[800] : Colors.grey[50],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
       ),
       child: Column(
@@ -447,7 +490,12 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
           const SizedBox(height: AppSpacing.paddingS),
           BodyText(
             text: analysis['insights'],
-            color: isDark ? Colors.white70 : Colors.grey[600],
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
           if (analysis['recommendations'].isNotEmpty) ...[
             const SizedBox(height: AppSpacing.paddingM),
@@ -465,7 +513,15 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                           Expanded(
                             child: BodyText(
                               text: rec,
-                              color: isDark ? Colors.white70 : Colors.grey[600],
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color
+                                      ?.withValues(alpha: 0.7) ??
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
                             ),
                           ),
                         ],
@@ -577,10 +633,10 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     };
   }
 
-  Color _getOccupancyColor(int occupancy) {
-    if (occupancy >= 90) return Colors.red;
-    if (occupancy >= 70) return Colors.orange;
-    if (occupancy >= 50) return Colors.blue;
-    return Colors.green;
+  Color _getOccupancyColor(BuildContext context, int occupancy) {
+    if (occupancy >= 90) return context.decorativeRed;
+    if (occupancy >= 70) return AppColors.statusOrange;
+    if (occupancy >= 50) return AppColors.info;
+    return AppColors.success;
   }
 }

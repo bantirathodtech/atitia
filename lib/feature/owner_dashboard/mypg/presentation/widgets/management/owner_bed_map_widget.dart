@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../../common/styles/spacing.dart';
+import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../../common/widgets/grids/responsive_grid.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
@@ -176,7 +177,7 @@ class OwnerBedMapWidget extends StatelessWidget {
                       const SizedBox(height: 2),
                       CaptionText(
                         text: occupancySummary,
-                        color: theme.textTheme.bodySmall?.color ?? Colors.grey,
+                        color: theme.textTheme.bodySmall?.color ?? theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                     ],
                   ),
@@ -225,7 +226,7 @@ class OwnerBedMapWidget extends StatelessWidget {
               childAspectRatio: 5.0,
               children: [
                 StatusChip(
-                  color: const Color(0xFF4CAF50),
+                  color: AppColors.success,
                   label: loc?.ownerBedMapStatusChipOccupied(occupiedCount) ??
                       _text('ownerBedMapStatusChipOccupied', 'Occupied {count}',
                           parameters: {'count': occupiedCount}),
@@ -236,7 +237,7 @@ class OwnerBedMapWidget extends StatelessWidget {
                   fontSize: 13,
                 ),
                 StatusChip(
-                  color: const Color(0xFF9E9E9E),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   label: loc?.ownerBedMapStatusChipVacant(vacantCount) ??
                       _text('ownerBedMapStatusChipVacant', 'Vacant {count}',
                           parameters: {'count': vacantCount}),
@@ -247,7 +248,7 @@ class OwnerBedMapWidget extends StatelessWidget {
                   fontSize: 13,
                 ),
                 StatusChip(
-                  color: const Color(0xFFFFA726),
+                  color: AppColors.warning,
                   label: loc?.ownerBedMapStatusChipPending(pendingCount) ??
                       _text('ownerBedMapStatusChipPending', 'Pending {count}',
                           parameters: {'count': pendingCount}),
@@ -258,7 +259,7 @@ class OwnerBedMapWidget extends StatelessWidget {
                   fontSize: 13,
                 ),
                 StatusChip(
-                  color: const Color(0xFFEF5350),
+                  color: AppColors.error,
                   label: loc?.ownerBedMapStatusChipMaintenance(
                           maintenanceCount) ??
                       _text(
@@ -331,7 +332,7 @@ class OwnerBedMapWidget extends StatelessWidget {
                       loc?.ownerBedMapMiniStatOccupied ??
                           _text('ownerBedMapMiniStatOccupied', 'Occupied'),
                       Icons.person,
-                      const Color(0xFF4CAF50)),
+                      AppColors.success),
                 ),
                 Expanded(
                   child: _buildMiniStat(
@@ -340,7 +341,7 @@ class OwnerBedMapWidget extends StatelessWidget {
                       loc?.ownerBedMapMiniStatVacant ??
                           _text('ownerBedMapMiniStatVacant', 'Vacant'),
                       Icons.bed_outlined,
-                      const Color(0xFFFFB300)),
+                      AppColors.warning),
                 ),
                 Expanded(
                   child: _buildMiniStat(
@@ -349,7 +350,7 @@ class OwnerBedMapWidget extends StatelessWidget {
                       loc?.ownerBedMapMiniStatPending ??
                           _text('ownerBedMapMiniStatPending', 'Pending'),
                       Icons.schedule,
-                      const Color(0xFFFFA726)),
+                      AppColors.warning),
                 ),
                 Expanded(
                   child: _buildMiniStat(
@@ -358,7 +359,7 @@ class OwnerBedMapWidget extends StatelessWidget {
                       loc?.ownerBedMapMiniStatMaintenance ??
                           _text('ownerBedMapMiniStatMaintenance', 'Maint.'),
                       Icons.build,
-                      const Color(0xFFEF5350)),
+                      AppColors.error),
                 ),
               ],
             ),
@@ -433,7 +434,7 @@ class OwnerBedMapWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final border = theme.dividerColor.withValues(alpha: 0.5);
     final muted = theme.textTheme.bodySmall?.color?.withValues(alpha: 0.35) ??
-        Colors.grey;
+        theme.colorScheme.onSurface.withValues(alpha: 0.35);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingS),
       decoration: BoxDecoration(

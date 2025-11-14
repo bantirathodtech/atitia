@@ -221,7 +221,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
   Widget _buildIOSButton(BuildContext context) {
     final theme = Theme.of(context);
     final bgColor = widget.backgroundColor ?? theme.primaryColor;
-    final fgColor = widget.foregroundColor ?? Colors.white;
+    final fgColor = widget.foregroundColor ?? Theme.of(context).colorScheme.onPrimary;
 
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
@@ -251,7 +251,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
   Widget _buildAndroidButton(BuildContext context) {
     final theme = Theme.of(context);
     final bgColor = widget.backgroundColor ?? theme.primaryColor;
-    final fgColor = widget.foregroundColor ?? Colors.white;
+    final fgColor = widget.foregroundColor ?? Theme.of(context).colorScheme.onPrimary;
 
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
@@ -273,7 +273,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
               borderRadius: BorderRadius.circular(_getBorderRadius(context)),
             ),
             elevation: _getElevation(context),
-            shadowColor: Colors.black26,
+            shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.26),
             surfaceTintColor: Colors.transparent,
           ),
           child: _buildChild(),
@@ -285,7 +285,6 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
   /// Build macOS-style Button
   Widget _buildMacOSButton(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final bgColor = widget.backgroundColor ?? theme.primaryColor;
 
     return Semantics(
@@ -304,14 +303,14 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
             boxShadow: _getElevation(context) > 0
                 ? [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
                       blurRadius: _getElevation(context),
                       offset: Offset(0, _getElevation(context) / 2),
                     ),
                   ]
                 : null,
             border: Border.all(
-              color: isDark ? Colors.white12 : Colors.black12,
+              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.12),
               width: 0.5,
             ),
           ),
@@ -353,7 +352,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
             boxShadow: _getElevation(context) > 0
                 ? [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
                       blurRadius: _getElevation(context),
                       offset: Offset(0, _getElevation(context) / 2),
                     ),
@@ -388,7 +387,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
   Widget _buildMaterialButton(BuildContext context) {
     final theme = Theme.of(context);
     final bgColor = widget.backgroundColor ?? theme.primaryColor;
-    final fgColor = widget.foregroundColor ?? Colors.white;
+    final fgColor = widget.foregroundColor ?? Theme.of(context).colorScheme.onPrimary;
 
     return Semantics(
       label: widget.semanticLabel ?? widget.label,
@@ -426,7 +425,7 @@ class PrimaryButtonState extends AdaptiveStatefulWidgetState<PrimaryButton> {
     if (widget.isLoading) {
       return AdaptiveLoader(
         size: 18,
-        color: widget.foregroundColor ?? Colors.white,
+        color: widget.foregroundColor ?? Theme.of(context).colorScheme.onPrimary,
         strokeWidth: 2,
       );
     }

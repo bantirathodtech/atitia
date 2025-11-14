@@ -10,8 +10,9 @@ class InputDecorations {
   // MARK: - Text Field Decorations
   // ==========================================
 
-  /// Standard text field decoration
-  static InputDecoration textField({
+  /// Standard text field decoration - theme-aware via BuildContext
+  static InputDecoration textField(
+    BuildContext context, {
     String? labelText,
     String? hintText,
     String? errorText,
@@ -32,11 +33,11 @@ class InputDecorations {
       // In the textField method, update the border sections:
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        borderSide: BorderDecorations.standard, // Now using BorderSide
+        borderSide: BorderDecorations.standard(context),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        borderSide: BorderDecorations.standard, // Now using BorderSide
+        borderSide: BorderDecorations.standard(context),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
@@ -57,21 +58,21 @@ class InputDecorations {
       disabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         borderSide: BorderSide(
-          color: Colors.grey.shade400,
+          color: AppColors.outline,
           width: 1.0,
         ),
       ),
       labelStyle: AppTypography.inputLabel.copyWith(
-        color: enabled ? null : Colors.grey.shade500,
+        color: enabled ? null : AppColors.textTertiary,
       ),
       hintStyle: AppTypography.input.copyWith(
-        color: Colors.grey.shade600,
+        color: AppColors.textTertiary,
       ),
       errorStyle: AppTypography.bodySmall.copyWith(
-        color: Colors.red,
+        color: AppColors.error,
       ),
       filled: true,
-      fillColor: enabled ? AppColors.lightInputFill : Colors.grey.shade100,
+      fillColor: enabled ? AppColors.lightInputFill : AppColors.surfaceVariant,
     );
   }
 
@@ -114,8 +115,9 @@ class InputDecorations {
     );
   }
 
-  /// Outlined text field (no fill)
-  static InputDecoration outlined({
+  /// Outlined text field (no fill) - theme-aware via BuildContext
+  static InputDecoration outlined(
+    BuildContext context, {
     String? labelText,
     String? hintText,
     String? errorText,
@@ -123,6 +125,7 @@ class InputDecorations {
     Widget? suffixIcon,
   }) {
     return textField(
+      context,
       labelText: labelText,
       hintText: hintText,
       errorText: errorText,
@@ -137,12 +140,14 @@ class InputDecorations {
   // MARK: - Specialized Input Decorations
   // ==========================================
 
-  /// Phone number input decoration
-  static InputDecoration phoneNumber({
+  /// Phone number input decoration - theme-aware via BuildContext
+  static InputDecoration phoneNumber(
+    BuildContext context, {
     String? errorText,
     String countryCode = '+91',
   }) {
     return textField(
+      context,
       labelText: 'Phone Number',
       hintText: 'Enter your phone number',
       errorText: errorText,
@@ -157,9 +162,10 @@ class InputDecorations {
     );
   }
 
-  /// Email input decoration
-  static InputDecoration email({String? errorText}) {
+  /// Email input decoration - theme-aware via BuildContext
+  static InputDecoration email(BuildContext context, {String? errorText}) {
     return textField(
+      context,
       labelText: 'Email Address',
       hintText: 'Enter your email',
       errorText: errorText,
@@ -167,13 +173,15 @@ class InputDecorations {
     );
   }
 
-  /// Password input decoration
-  static InputDecoration password({
+  /// Password input decoration - theme-aware via BuildContext
+  static InputDecoration password(
+    BuildContext context, {
     String? errorText,
     bool obscureText = true,
     VoidCallback? onToggleVisibility,
   }) {
     return textField(
+      context,
       labelText: 'Password',
       hintText: 'Enter your password',
       errorText: errorText,
@@ -190,9 +198,10 @@ class InputDecorations {
     );
   }
 
-  /// Amount input decoration
-  static InputDecoration amount({String? errorText}) {
+  /// Amount input decoration - theme-aware via BuildContext
+  static InputDecoration amount(BuildContext context, {String? errorText}) {
     return textField(
+      context,
       labelText: 'Amount',
       hintText: '0.00',
       errorText: errorText,
@@ -208,14 +217,16 @@ class InputDecorations {
   // MARK: - Dropdown Decorations
   // ==========================================
 
-  /// Dropdown form field decoration
-  static InputDecoration dropdown({
+  /// Dropdown form field decoration - theme-aware via BuildContext
+  static InputDecoration dropdown(
+    BuildContext context, {
     String? labelText,
     String? hintText,
     String? errorText,
     bool enabled = true,
   }) {
     return textField(
+      context,
       labelText: labelText,
       hintText: hintText,
       errorText: errorText,
@@ -231,34 +242,38 @@ class InputDecorations {
   // MARK: - Validation States
   // ==========================================
 
-  /// Success state decoration
-  static InputDecoration success({
+  /// Success state decoration - theme-aware via BuildContext
+  static InputDecoration success(
+    BuildContext context, {
     String? labelText,
     String? hintText,
     String successText = 'Valid',
   }) {
     return textField(
+      context,
       labelText: labelText,
       hintText: hintText,
     ).copyWith(
-      suffixIcon: const Icon(Icons.check_circle, color: Colors.green, size: 18),
-      labelStyle: AppTypography.inputLabel.copyWith(color: Colors.green),
+      suffixIcon: const Icon(Icons.check_circle, color: AppColors.success, size: 18),
+      labelStyle: AppTypography.inputLabel.copyWith(color: AppColors.success),
     );
   }
 
-  /// Warning state decoration
-  static InputDecoration warning({
+  /// Warning state decoration - theme-aware via BuildContext
+  static InputDecoration warning(
+    BuildContext context, {
     String? labelText,
     String? hintText,
     String warningText = 'Needs attention',
   }) {
     return textField(
+      context,
       labelText: labelText,
       hintText: hintText,
     ).copyWith(
       suffixIcon:
-          const Icon(Icons.warning_amber, color: Colors.orange, size: 18),
-      labelStyle: AppTypography.inputLabel.copyWith(color: Colors.orange),
+          const Icon(Icons.warning_amber, color: AppColors.statusOrange, size: 18),
+      labelStyle: AppTypography.inputLabel.copyWith(color: AppColors.statusOrange),
     );
   }
 }

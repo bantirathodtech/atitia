@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
@@ -139,7 +140,7 @@ class InteractiveBedMapWidget extends StatelessWidget {
     AppLocalizations loc,
   ) {
     final isOccupied = booking.isActive;
-    final color = isOccupied ? Colors.green : Colors.grey;
+    final color = isOccupied ? AppColors.success : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
 
     return Container(
       width: 80,

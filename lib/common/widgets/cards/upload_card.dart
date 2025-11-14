@@ -101,10 +101,10 @@ class UploadCard extends AdaptiveStatelessWidget {
                             HeadingSmall(text: title),
                             if (isRequired) ...[
                               const SizedBox(width: AppSpacing.paddingXS),
-                              const Text(
+                              Text(
                                 '*',
                                 style: TextStyle(
-                                  color: Colors.red,
+                                  color: Theme.of(context).colorScheme.error,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -199,12 +199,12 @@ class UploadCard extends AdaptiveStatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(AppSpacing.paddingS),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.6),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.edit,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             size: 16,
                           ),
                         ),

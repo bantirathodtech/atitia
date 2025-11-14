@@ -10,30 +10,32 @@ class BoxDecorations {
   // MARK: - Card Decorations
   // ==========================================
 
-  /// Standard card decoration with subtle shadow
-  static BoxDecoration card({
+  /// Standard card decoration with subtle shadow - theme-aware via BuildContext
+  static BoxDecoration card(
+    BuildContext context, {
     Color? color,
     BorderRadius? borderRadius,
     double? elevation,
   }) {
     return BoxDecoration(
-      color: color ?? AppColors.lightScaffold,
+      color: color ?? Theme.of(context).colorScheme.surface,
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusM),
-      boxShadow: ShadowDecorations.card(elevation: elevation),
+      boxShadow: ShadowDecorations.card(context, elevation: elevation),
     );
   }
 
-  /// Elevated card with stronger shadow
-  static BoxDecoration elevatedCard({
+  /// Elevated card with stronger shadow - theme-aware via BuildContext
+  static BoxDecoration elevatedCard(
+    BuildContext context, {
     Color? color,
     BorderRadius? borderRadius,
   }) {
     return BoxDecoration(
-      color: color ?? AppColors.lightScaffold,
+      color: color ?? Theme.of(context).colorScheme.surface,
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusM),
-      boxShadow: ShadowDecorations.elevated,
+      boxShadow: ShadowDecorations.elevated(context),
     );
   }
 
@@ -73,7 +75,7 @@ class BoxDecorations {
     BorderRadius? borderRadius,
   }) {
     return BoxDecoration(
-      color: Colors.green.shade50,
+      color: AppColors.successContainer,
       border: BorderDecorations.successBorder,
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusM),
@@ -85,7 +87,7 @@ class BoxDecorations {
     BorderRadius? borderRadius,
   }) {
     return BoxDecoration(
-      color: Colors.orange.shade50,
+      color: AppColors.warningContainer,
       border: BorderDecorations.warningBorder,
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusM),
@@ -97,7 +99,7 @@ class BoxDecorations {
     BorderRadius? borderRadius,
   }) {
     return BoxDecoration(
-      color: Colors.red.shade50,
+      color: AppColors.errorContainer,
       border: BorderDecorations.errorBorder,
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusM),
@@ -107,8 +109,9 @@ class BoxDecorations {
   // MARK: - Button Decorations
   // ==========================================
 
-  /// Primary button decoration
-  static BoxDecoration primaryButton({
+  /// Primary button decoration - theme-aware via BuildContext
+  static BoxDecoration primaryButton(
+    BuildContext context, {
     BorderRadius? borderRadius,
     bool enabled = true,
   }) {
@@ -122,11 +125,11 @@ class BoxDecorations {
           : LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.grey.shade400, Colors.grey.shade500],
+              colors: [AppColors.statusGrey, AppColors.statusGrey],
             ),
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusL),
-      boxShadow: enabled ? ShadowDecorations.button : ShadowDecorations.none,
+      boxShadow: enabled ? ShadowDecorations.button(context) : ShadowDecorations.none,
     );
   }
 
@@ -136,11 +139,11 @@ class BoxDecorations {
     bool enabled = true,
   }) {
     return BoxDecoration(
-      color: enabled ? Colors.transparent : Colors.grey.shade300,
+      color: enabled ? Colors.transparent : AppColors.surfaceVariant,
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusL),
       border: Border.all(
-        color: enabled ? AppColors.lightPrimary : Colors.grey.shade400,
+        color: enabled ? AppColors.lightPrimary : AppColors.outline,
         width: 2,
       ),
     );
@@ -149,26 +152,28 @@ class BoxDecorations {
   // MARK: - Special Effects
   // ==========================================
 
-  /// Glass morphism effect
-  static BoxDecoration glassmorphism({
+  /// Glass morphism effect - theme-aware via BuildContext
+  static BoxDecoration glassmorphism(
+    BuildContext context, {
     double blur = 10.0,
     BorderRadius? borderRadius,
   }) {
+    final theme = Theme.of(context);
     return BoxDecoration(
       borderRadius:
           borderRadius ?? BorderRadius.circular(AppSpacing.borderRadiusL),
-      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+      border: Border.all(color: theme.colorScheme.onPrimary.withValues(alpha: 0.2)),
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Colors.white.withValues(alpha: 0.1),
-          Colors.white.withValues(alpha: 0.05),
+          theme.colorScheme.onPrimary.withValues(alpha: 0.1),
+          theme.colorScheme.onPrimary.withValues(alpha: 0.05),
         ],
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.1),
+          color: theme.colorScheme.shadow.withValues(alpha: 0.1),
           blurRadius: blur,
           spreadRadius: 1,
         ),

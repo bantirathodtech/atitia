@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../common/widgets/text/body_text.dart';
@@ -111,12 +112,12 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
         Container(
           padding: const EdgeInsets.all(AppSpacing.paddingS),
           decoration: BoxDecoration(
-            color: Colors.green.withValues(alpha: 0.1),
+            color: AppColors.success.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           ),
           child: Icon(
             Icons.payment,
-            color: Colors.green,
+            color: AppColors.success,
             size: 24,
           ),
         ),
@@ -129,7 +130,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
               CaptionText(
                 text: loc?.recordPaymentDescription ??
                     'Manually record a payment received from a guest',
-                color: isDark ? Colors.white70 : Colors.grey[600],
+                color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ],
           ),
@@ -279,7 +280,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: Theme.of(context).dividerColor),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: Row(
@@ -361,7 +362,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
         SnackBar(
           content: Text(AppLocalizations.of(context)?.pleaseSelectGuest ??
               'Please select a guest'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
       return;
@@ -409,9 +410,9 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
               text: success
                   ? 'Payment recorded successfully!'
                   : 'Failed to record payment',
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
-            backgroundColor: success ? Colors.green : Colors.red,
+            backgroundColor: success ? AppColors.success : AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -425,7 +426,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
                       ?.errorRecordingPayment(e.toString()) ??
                   'Error recording payment: $e',
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
         );

@@ -237,13 +237,13 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.paddingM),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: theme.colorScheme.onPrimary.withValues(alpha: 0.2),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusM),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.account_balance_wallet_rounded,
-                    color: Colors.white,
+                    color: theme.colorScheme.onPrimary,
                     size: 32,
                   ),
                 ),
@@ -255,14 +255,14 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                       HeadingMedium(
                         text: loc?.paymentDetails ??
                             _text('paymentDetails', 'Payment Details'),
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimary,
                       ),
                       const SizedBox(height: AppSpacing.paddingXS),
                       BodyText(
                         text: loc?.configureHowGuestsCanPayYou ??
                             _text('configureHowGuestsCanPayYou',
                                 'Configure how guests can pay you'),
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9),
                       ),
                     ],
                   ),
@@ -280,8 +280,8 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
               boxShadow: [
                 BoxShadow(
                   color: isDarkMode
-                      ? Colors.black.withValues(alpha: 0.3)
-                      : Colors.black.withValues(alpha: 0.05),
+                      ? theme.colorScheme.shadow.withValues(alpha: 0.3)
+                      : theme.colorScheme.shadow.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),

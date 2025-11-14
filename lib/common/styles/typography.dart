@@ -193,11 +193,13 @@ class AppTypography {
   // ============ COMPATIBILITY ALIASES ============
 
   // App Bar (Backward Compatibility)
+  // Note: This is a static TextStyle, so color should be set at usage site
+  // Use Theme.of(context).textTheme.titleLarge?.color ?? Theme.of(context).colorScheme.onSurface
   static const TextStyle appBarTitle = TextStyle(
     fontFamily: primaryFont,
     fontSize: 20,
     fontWeight: FontWeight.w600,
-    color: Colors.white,
+    // color removed - use theme-aware color at usage site
   );
 
   // Buttons (Backward Compatibility)

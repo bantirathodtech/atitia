@@ -21,6 +21,7 @@ import '../../../../../l10n/app_localizations.dart';
 // Using centralized OwnerDrawer instead of direct AdaptiveDrawer
 import '../../../shared/widgets/owner_drawer.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../../shared/widgets/pg_selector_dropdown.dart';
@@ -146,7 +147,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingL),
             HeadingMedium(
               text: loc.errorLoadingDashboard,
@@ -260,7 +261,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                 const SizedBox(height: AppSpacing.paddingS),
                 BodyText(
                   text: loc.heresYourBusinessOverview,
-                  color: Colors.grey.shade600,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -332,17 +333,18 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   }
 
   Color _getPerformanceColor(String indicator) {
+    final theme = Theme.of(context);
     switch (indicator.toLowerCase()) {
       case 'excellent':
-        return Colors.green;
+        return AppColors.success;
       case 'good':
-        return Colors.lightGreen;
+        return AppColors.success.withValues(alpha: 0.8);
       case 'fair':
-        return Colors.orange;
+        return AppColors.warning;
       case 'needs attention':
-        return Colors.red;
+        return theme.colorScheme.error;
       default:
-        return Colors.red;
+        return theme.colorScheme.error;
     }
   }
 

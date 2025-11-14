@@ -35,12 +35,12 @@ class AdaptiveImage extends AdaptiveStatelessWidget {
         height: height,
         fit: fit,
         placeholder: (context, url) =>
-            placeholder ?? _buildDefaultPlaceholder(),
+            placeholder ?? _buildDefaultPlaceholder(context),
         errorWidget: (context, url, error) {
           // Log error for debugging but show graceful fallback
           debugPrint('Image load failed for URL: $url');
           debugPrint('Error: $error');
-          return errorWidget ?? _buildDefaultErrorWidget();
+          return errorWidget ?? _buildDefaultErrorWidget(context);
         },
         // Performance optimizations
         memCacheWidth: width?.isFinite == true ? width!.toInt() : null,
@@ -63,27 +63,39 @@ class AdaptiveImage extends AdaptiveStatelessWidget {
     return url;
   }
 
-  Widget _buildDefaultPlaceholder() {
+  Widget _buildDefaultPlaceholder(BuildContext context) {
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.grey[300],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
-      child: const Icon(Icons.image, color: Colors.grey),
+      child: Icon(Icons.image,
+          color: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.color
+                  ?.withValues(alpha: 0.5) ??
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
     );
   }
 
-  Widget _buildDefaultErrorWidget() {
+  Widget _buildDefaultErrorWidget(BuildContext context) {
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
-      child: const Icon(Icons.broken_image, color: Colors.grey),
+      child: Icon(Icons.broken_image,
+          color: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.color
+                  ?.withValues(alpha: 0.5) ??
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import '../../../common/styles/spacing.dart';
+import '../../../common/styles/colors.dart';
 import '../../utils/performance/memory_manager.dart';
 // NetworkOptimizer temporarily disabled
 // import '../../utils/performance/network_optimizer.dart';
@@ -93,10 +94,10 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
             _isVisible = !_isVisible;
           });
         },
-        backgroundColor: _isVisible ? Colors.red : Colors.blue,
+        backgroundColor: _isVisible ? AppColors.error : AppColors.info,
         child: Icon(
           _isVisible ? Icons.close : Icons.speed,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
         ),
       ),
     );
@@ -110,9 +111,9 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
         width: 200,
         padding: const EdgeInsets.all(AppSpacing.paddingS),
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.8),
+          color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          border: Border.all(color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +122,7 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
             Text(
               'Performance Monitor',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -135,7 +136,7 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
             _buildMetricRow('Focus Nodes', _memoryStats['focusNodes'] ?? 0),
             _buildMetricRow(
                 'Subscriptions', _memoryStats['subscriptions'] ?? 0),
-            const Divider(color: Colors.white30),
+            Divider(color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3)),
             _buildMetricRow('Cache Size', _cacheSize, isBytes: true),
             const SizedBox(height: AppSpacing.paddingS),
             Row(
@@ -147,7 +148,7 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
                       setState(() {});
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.error,
                       padding: const EdgeInsets.symmetric(vertical: 4),
                     ),
                     child: Text(
@@ -165,7 +166,7 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
                       setState(() {});
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
+                      backgroundColor: AppColors.warning,
                       padding: const EdgeInsets.symmetric(vertical: 4),
                     ),
                     child: Text(
@@ -196,7 +197,7 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white70,
+              color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
               fontSize: 12,
             ),
           ),
@@ -215,14 +216,14 @@ class _PerformanceMonitorWidgetState extends State<PerformanceMonitorWidget> {
 
   Color _getValueColor(int value, bool isBytes) {
     if (isBytes) {
-      if (value > 50 * 1024 * 1024) return Colors.red; // > 50MB
-      if (value > 20 * 1024 * 1024) return Colors.orange; // > 20MB
-      return Colors.green;
+      if (value > 50 * 1024 * 1024) return AppColors.error; // > 50MB
+      if (value > 20 * 1024 * 1024) return AppColors.warning; // > 20MB
+      return AppColors.success;
     }
 
-    if (value > 20) return Colors.red;
-    if (value > 10) return Colors.orange;
-    return Colors.green;
+    if (value > 20) return AppColors.error;
+    if (value > 10) return AppColors.warning;
+    return AppColors.success;
   }
 
   String _formatBytes(int bytes) {

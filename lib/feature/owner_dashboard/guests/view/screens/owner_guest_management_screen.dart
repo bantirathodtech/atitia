@@ -207,7 +207,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.home_work_outlined, size: 64, color: Colors.grey),
+          Icon(Icons.home_work_outlined, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(text: loc.ownerGuestNoPgSelectedTitle),
           const SizedBox(height: AppSpacing.paddingS),
@@ -250,7 +250,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
               label: 'Error icon',
               excludeSemantics: true,
               child:
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
             ),
             const SizedBox(height: AppSpacing.paddingM),
             Semantics(
@@ -296,7 +296,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
                 child: _buildRequestStatCard(
                   loc.pending,
                   guestVM.pendingBookingRequests.length,
-                  Colors.orange,
+                  AppColors.warning,
                 ),
               ),
               const SizedBox(width: AppSpacing.paddingS),
@@ -304,7 +304,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
                 child: _buildRequestStatCard(
                   loc.approved,
                   guestVM.approvedBookingRequests.length,
-                  Colors.green,
+                  AppColors.success,
                 ),
               ),
               const SizedBox(width: AppSpacing.paddingS),
@@ -312,7 +312,7 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
                 child: _buildRequestStatCard(
                   loc.rejected,
                   guestVM.rejectedBookingRequests.length,
-                  Colors.red,
+                  AppColors.error,
                 ),
               ),
             ],
@@ -374,16 +374,16 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
                           ),
                           decoration: BoxDecoration(
                             color: ((status == 'approved')
-                                    ? Colors.green
-                                    : Colors.red)
+                                    ? AppColors.success
+                                    : AppColors.error)
                                 .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: CaptionText(
                             text: _statusLabel(status, loc),
                             color: status == 'approved'
-                                ? Colors.green
-                                : Colors.red,
+                                ? AppColors.success
+                                : AppColors.error,
                           ),
                         ),
                       ],

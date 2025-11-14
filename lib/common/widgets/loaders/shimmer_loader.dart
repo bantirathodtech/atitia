@@ -17,13 +17,11 @@ class ShimmerLoader extends AdaptiveStatelessWidget {
 
   @override
   Widget buildAdaptive(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[700] : Colors.grey[300],
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
     );

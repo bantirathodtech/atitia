@@ -228,7 +228,8 @@ class _GuestBookingRequestsScreenState
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            Icon(Icons.error_outline,
+                size: 64, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: AppSpacing.paddingL),
             HeadingMedium(
               text: loc?.bookingRequestsErrorTitle ??
@@ -326,19 +327,19 @@ class _GuestBookingRequestsScreenState
                 loc?.bookingRequestPending ??
                     _text('bookingRequestPending', 'Pending'),
                 pendingCount,
-                Colors.orange,
+                AppColors.statusOrange,
               ),
               _buildStatItem(
                 loc?.bookingRequestApproved ??
                     _text('bookingRequestApproved', 'Approved'),
                 approvedCount,
-                Colors.green,
+                AppColors.success,
               ),
               _buildStatItem(
                 loc?.bookingRequestRejected ??
                     _text('bookingRequestRejected', 'Rejected'),
                 rejectedCount,
-                Colors.red,
+                AppColors.statusRed,
               ),
             ],
           ),
@@ -441,7 +442,8 @@ class _GuestBookingRequestsScreenState
                     vertical: AppSpacing.paddingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.2),
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -457,7 +459,17 @@ class _GuestBookingRequestsScreenState
             // Location placeholder
             Row(
               children: [
-                Icon(Icons.location_on, size: 14, color: Colors.grey.shade400),
+                Icon(Icons.location_on,
+                    size: 14,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.5) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 ShimmerLoader(
                   width: 150,
@@ -471,7 +483,16 @@ class _GuestBookingRequestsScreenState
             Row(
               children: [
                 Icon(Icons.calendar_today,
-                    size: 14, color: Colors.grey.shade400),
+                    size: 14,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.5) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 ShimmerLoader(
                   width: 120,
@@ -489,7 +510,7 @@ class _GuestBookingRequestsScreenState
   /// Builds individual request card
   Widget _buildRequestCard(OwnerBookingRequestModel request) {
     final status = request.status;
-    final statusColor = _getStatusColor(status);
+    final statusColor = _getStatusColor(context, status);
     final requestDate = request.createdAt;
     final respondedAt = request.respondedAt;
     final loc = AppLocalizations.of(context);
@@ -530,12 +551,30 @@ class _GuestBookingRequestsScreenState
             // PG address (if available from PG info)
             Row(
               children: [
-                Icon(Icons.location_on, size: 14, color: Colors.grey.shade600),
+                Icon(Icons.location_on,
+                    size: 14,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: BodyText(
                     text: request.pgName,
-                    color: Colors.grey.shade600,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -545,7 +584,16 @@ class _GuestBookingRequestsScreenState
             Row(
               children: [
                 Icon(Icons.calendar_today,
-                    size: 14, color: Colors.grey.shade600),
+                    size: 14,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: loc?.bookingRequestRequestedOn(
@@ -553,7 +601,15 @@ class _GuestBookingRequestsScreenState
                       ) ??
                       _text('bookingRequestRequestedOn', 'Requested: {date}',
                           parameters: {'date': _formatDate(requestDate)}),
-                  color: Colors.grey.shade600,
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -563,7 +619,16 @@ class _GuestBookingRequestsScreenState
               Row(
                 children: [
                   Icon(Icons.check_circle,
-                      size: 14, color: Colors.grey.shade600),
+                      size: 14,
+                      color: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.color
+                              ?.withValues(alpha: 0.7) ??
+                          Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7)),
                   const SizedBox(width: AppSpacing.paddingXS),
                   BodyText(
                     text: loc?.bookingRequestRespondedOn(
@@ -571,7 +636,15 @@ class _GuestBookingRequestsScreenState
                         ) ??
                         _text('bookingRequestRespondedOn', 'Responded: {date}',
                             parameters: {'date': _formatDate(respondedAt)}),
-                    color: Colors.grey.shade600,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
                   ),
                 ],
               ),
@@ -585,7 +658,15 @@ class _GuestBookingRequestsScreenState
                 text: loc?.bookingRequestFrom(request.guestName) ??
                     _text('bookingRequestFrom', 'Request from: {name}',
                         parameters: {'name': request.guestName}),
-                color: Colors.grey.shade700,
+                color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withValues(alpha: 0.8) ??
+                    Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.8),
               ),
             ],
             // Response message preview
@@ -695,16 +776,21 @@ class _GuestBookingRequestsScreenState
   }
 
   /// Gets color for request status
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return Colors.orange;
+        return AppColors.statusOrange;
       case 'approved':
-        return Colors.green;
+        return AppColors.success;
       case 'rejected':
-        return Colors.red;
+        return AppColors.statusRed;
       default:
-        return Colors.grey;
+        return Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     }
   }
 

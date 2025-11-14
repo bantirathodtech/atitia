@@ -48,9 +48,6 @@ class AdaptiveBottomSheet extends AdaptiveStatelessWidget {
 
   @override
   Widget buildAdaptive(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -58,7 +55,7 @@ class AdaptiveBottomSheet extends AdaptiveStatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (showDragHandle) _buildDragHandle(isDark),
+          if (showDragHandle) _buildDragHandle(context),
           if (title != null) _buildTitle(context),
           child,
         ],
@@ -66,14 +63,14 @@ class AdaptiveBottomSheet extends AdaptiveStatelessWidget {
     );
   }
 
-  Widget _buildDragHandle(bool isDark) {
+  Widget _buildDragHandle(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.paddingM),
       child: Container(
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: isDark ? Colors.grey[600] : Colors.grey[400],
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(2),
         ),
       ),

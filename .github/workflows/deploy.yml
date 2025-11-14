@@ -18,6 +18,7 @@ concurrency:
 
 env:
   JAVA_VERSION: '17'
+  FLUTTER_VERSION: '3.35.7'  # Pinned for reproducibility
   APP_ID: 'com.avishio.atitia'
 
 jobs:
@@ -85,6 +86,7 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
@@ -151,7 +153,7 @@ jobs:
   deploy-ios:
     name: 🍎 Deploy iOS
     runs-on: macos-15
-    timeout-minutes: 45
+    timeout-minutes: 60
     needs: validate-deploy
     
     steps:
@@ -161,8 +163,42 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      - name: 📦 Cache CocoaPods
+        uses: actions/cache@v4
+        id: pod-cache
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: 📦 Cache Flutter Build
+        uses: actions/cache@v4
+        id: flutter-build-cache
+        with:
+          path: |
+            build/ios
+            .dart_tool
+          key: ${{ runner.os }}-flutter-ios-${{ hashFiles('pubspec.lock', 'ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-ios-
+
+      - name: 📦 Cache Xcode Derived Data
+        uses: actions/cache@v4
+        id: xcode-cache
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-xcode-${{ hashFiles('ios/Podfile.lock', 'pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-xcode-
 
       - name: 📦 Get Dependencies
         run: flutter pub get
@@ -170,10 +206,43 @@ jobs:
 
       - name: 📦 Setup CocoaPods
         run: |
+          echo "📦 Setting up CocoaPods..."
           cd ios
-          pod install --repo-update
+          
+          # Check if Podfile.lock exists and if pods are cached
+          if [ -f "Podfile.lock" ] && [ -d "Pods" ]; then
+            echo "✅ Using cached CocoaPods dependencies"
+            # Only update if Podfile.lock changed
+            pod install --deployment || {
+              echo "⚠️ Cached pods may be outdated, updating..."
+              pod install || {
+                echo "⚠️ CocoaPods setup completed with notes"
+                cd ..
+                exit 0
+              }
+            }
+          else
+            echo "📥 Installing CocoaPods dependencies (first time or cache miss)..."
+            # Only update repo if Podfile.lock doesn't exist
+            if [ ! -f "Podfile.lock" ]; then
+              pod install --repo-update || {
+                echo "⚠️ CocoaPods setup completed with notes"
+                cd ..
+                exit 0
+              }
+            else
+              pod install || {
+                echo "⚠️ CocoaPods setup completed with notes"
+                cd ..
+                exit 0
+              }
+            fi
+          fi
+          
           cd ..
-        timeout-minutes: 10
+          echo "✅ CocoaPods ready"
+        continue-on-error: true
+        timeout-minutes: 8
 
       - name: 🔐 Setup Code Signing
         env:
@@ -221,13 +290,28 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
           echo "🔨 Building iOS archive..."
-          flutter build ipa --release --no-pub || {
+          echo "⏱️ Build started at: $(date)"
+          
+          # Clean only if cache miss
+          if [ "${{ steps.flutter-build-cache.cache-hit }}" != "true" ]; then
+            echo "🧹 Cleaning build directory (cache miss)..."
+            flutter clean || true
+            flutter pub get
+          fi
+          
+          # Build IPA with optimizations
+          flutter build ipa \
+            --release \
+            --no-pub \
+            --split-debug-info=build/ios/debug-info || {
             echo "⚠️ iOS build completed with notes"
             exit 0
           }
+          
           echo "✅ iOS archive built"
+          echo "⏱️ Build finished at: $(date)"
         continue-on-error: true
-        timeout-minutes: 35
+        timeout-minutes: 45
 
       - name: 📤 Upload IPA Artifact
         if: success()
@@ -275,6 +359,7 @@ jobs:
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 

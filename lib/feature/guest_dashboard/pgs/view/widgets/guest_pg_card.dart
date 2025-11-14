@@ -70,21 +70,21 @@ class GuestPgCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
       child: Material(
-        color: Colors.transparent,
+        color: Colors.transparent, // Material color for InkWell - transparent is fine
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
           child: Container(
             decoration: BoxDecoration(
-              color: isDarkMode ? AppColors.darkCard : Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
               border: Border.all(
                 color:
-                    isDarkMode ? AppColors.darkDivider : Colors.grey.shade300,
+                    Theme.of(context).dividerColor,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -145,7 +145,7 @@ class GuestPgCard extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [
                 Colors.transparent,
-                Colors.black.withValues(alpha: 0.6),
+                Theme.of(context).colorScheme.shadow.withValues(alpha: 0.6),
               ],
               stops: const [0.5, 1.0],
             ),
@@ -173,7 +173,7 @@ class GuestPgCard extends StatelessWidget {
                           'count': pg.photos.length.toString(),
                         },
                       ),
-                  Colors.black.withValues(alpha: 0.7),
+                  Theme.of(context).colorScheme.shadow.withValues(alpha: 0.7),
                   Icons.photo_library,
                 ),
             ],
@@ -534,7 +534,7 @@ class GuestPgCard extends StatelessWidget {
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkInputFill : Colors.grey.shade200,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(AppSpacing.borderRadiusL),
           topRight: Radius.circular(AppSpacing.borderRadiusL),

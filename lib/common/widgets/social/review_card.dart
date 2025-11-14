@@ -148,16 +148,16 @@ class _ReviewCardState extends State<ReviewCard> {
               vertical: 2,
             ),
             decoration: BoxDecoration(
-              color: AppColors.warning.withValues(alpha: 0.1),
+              color: AppColors.statusOrange.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
               border: Border.all(
-                color: AppColors.warning.withValues(alpha: 0.3),
+                color: AppColors.statusOrange.withValues(alpha: 0.3),
               ),
             ),
             child: Text(
               loc?.pending ?? 'Pending',
               style: AppTypography.caption.copyWith(
-                color: AppColors.warning,
+                color: AppColors.statusOrange,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -174,7 +174,7 @@ class _ReviewCardState extends State<ReviewCard> {
         ...List.generate(5, (index) {
           return Icon(
             index < widget.review.rating ? Icons.star : Icons.star_border,
-            color: AppColors.warning,
+            color: AppColors.statusOrange,
             size: 16,
           );
         }),
@@ -265,7 +265,7 @@ class _ReviewCardState extends State<ReviewCard> {
                   ...List.generate(5, (index) {
                     return Icon(
                       index < entry.value ? Icons.star : Icons.star_border,
-                      color: AppColors.warning,
+                      color: AppColors.statusOrange,
                       size: 12,
                     );
                   }),

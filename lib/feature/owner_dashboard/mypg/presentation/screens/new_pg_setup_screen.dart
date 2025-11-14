@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/utils/data/indian_states_cities.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
@@ -648,7 +649,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -671,17 +672,17 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                      color: AppColors.success,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: Theme.of(context).scaffoldBackgroundColor,
                         width: 2,
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.check,
                       size: 12,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 ),
@@ -741,13 +742,13 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                 _buildQuickStat(
                   loc?.progress ?? _text('progress', 'Progress'),
                   '$_completedSections/$_totalSections',
-                  Colors.blue,
+                  AppColors.info,
                 ),
                 _buildQuickStat(
                   loc?.ownerPgQuickStatRequired ??
                       _text('ownerPgQuickStatRequired', 'Required'),
                   '5',
-                  Colors.orange,
+                  AppColors.warning,
                 ),
               ],
             )
@@ -806,17 +807,17 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                     loc?.ownerPgQuickStatFloors ??
                         _text('ownerPgQuickStatFloors', 'Floors'),
                     '${_floors.length}',
-                    Colors.purple),
+                    AppColors.purple),
                 _buildQuickStat(
                     loc?.ownerPgQuickStatRooms ??
                         _text('ownerPgQuickStatRooms', 'Rooms'),
                     '${_rooms.length}',
-                    Colors.teal),
+                    AppColors.accent),
                 _buildQuickStat(
                     loc?.ownerPgQuickStatBeds ??
                         _text('ownerPgQuickStatBeds', 'Beds'),
                     '${_beds.length}',
-                    Colors.indigo),
+                    AppColors.primary),
               ],
             )
           else
@@ -955,7 +956,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                     loc?.ownerPgQuickStatRentTypes ??
                         _text('ownerPgQuickStatRentTypes', 'Rent Types'),
                     '$rentCount/5',
-                    Colors.green),
+                    AppColors.success),
                 _buildQuickStat(
                     loc?.ownerPgQuickStatDeposit ??
                         _text('ownerPgQuickStatDeposit', 'Deposit'),
@@ -964,7 +965,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                             _text('ownerPgStatusNotSet', 'Not Set'))
                         : (loc?.ownerPgStatusSet ??
                             _text('ownerPgStatusSet', 'Set')),
-                    Colors.amber),
+                    AppColors.warning),
               ],
             )
           else
@@ -1007,7 +1008,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                     loc?.ownerPgQuickStatSelected ??
                         _text('ownerPgQuickStatSelected', 'Selected'),
                     '${_selectedAmenities.length}',
-                    Colors.cyan),
+                    AppColors.accent),
               ],
             )
           else
@@ -1044,7 +1045,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                   ),
               stats: [
                 _buildQuickStat(loc?.photos ?? _text('photos', 'Photos'),
-                    '${_uploadedPhotos.length}', Colors.pink),
+                    '${_uploadedPhotos.length}', AppColors.secondary),
               ],
             )
           else
@@ -1176,7 +1177,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             HeadingSmall(text: value),
-            CaptionText(text: label, color: Colors.grey[600]),
+            CaptionText(text: label, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
           ],
         ),
       ),
@@ -1218,7 +1219,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -1324,7 +1325,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
                 _text('ownerPgPublishedSuccessfully',
                     'PG published successfully'),
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
         ),
       );
       Navigator.of(context).pop(true);
@@ -1335,7 +1336,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             vm.errorMessage ??
                 _text('ownerPgPublishFailed', 'Failed to publish PG'),
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -1505,7 +1506,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           content: Text(isEditMode
               ? 'PG updated successfully!'
               : 'PG created successfully!'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
         ),
       );
     } else {
@@ -1525,7 +1526,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(userFriendlyError),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
           duration: const Duration(seconds: 5),
         ),
       );
@@ -1690,7 +1691,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
         SnackBar(
           content:
               Text(AppLocalizations.of(context)?.draftSaved ?? 'Draft saved'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
         ),
       );
       debugPrint('[SAVE_DRAFT] Draft saved successfully');
@@ -1698,7 +1699,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(vm.errorMessage ?? 'Failed to save draft'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
       debugPrint('[SAVE_DRAFT][ERROR] Save failed: ${vm.errorMessage}');

@@ -211,7 +211,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.paddingM),
                 decoration: BoxDecoration(
-                  color: _getStatusColor().withValues(alpha: 0.1),
+                  color: _getStatusColor(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 ),
                 child: Text(
@@ -242,13 +242,13 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
                   vertical: AppSpacing.paddingS,
                 ),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(),
+                  color: _getStatusColor(context),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 ),
                 child: Text(
                   _statusLabel(_payment!.status, loc),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -353,7 +353,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
             loc?.created ?? _text('created', 'Created'),
             _formatDateTime(_payment!.createdAt ?? _payment!.paymentDate, loc),
             Icons.add_circle_outline,
-            Colors.blue,
+            AppColors.statusBlue,
           ),
           if (_payment!.status.toLowerCase() == 'paid') ...[
             const SizedBox(height: AppSpacing.paddingS),
@@ -363,7 +363,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
               _formatDateTime(
                   _payment!.updatedAt ?? _payment!.paymentDate, loc),
               Icons.check_circle_outline,
-              Colors.green,
+              AppColors.statusGreen,
             ),
           ],
           if (_payment!.status.toLowerCase() == 'failed') ...[
@@ -374,7 +374,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
               _formatDateTime(
                   _payment!.updatedAt ?? _payment!.paymentDate, loc),
               Icons.error_outline,
-              Colors.red,
+              Theme.of(context).colorScheme.error,
             ),
           ],
           if (_payment!.status.toLowerCase() == 'confirmed') ...[
@@ -385,7 +385,7 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
               _formatDateTime(
                   _payment!.updatedAt ?? _payment!.paymentDate, loc),
               Icons.verified_outlined,
-              Colors.blueGrey,
+              AppColors.statusGrey,
             ),
           ],
         ],
@@ -521,18 +521,18 @@ class _GuestPaymentDetailScreenState extends State<GuestPaymentDetailScreen> {
     }
   }
 
-  Color _getStatusColor() {
+  Color _getStatusColor(BuildContext context) {
     switch (_payment!.status.toLowerCase()) {
       case 'paid':
-        return Colors.green;
+        return AppColors.statusGreen;
       case 'pending':
-        return _payment!.isOverdue ? Colors.red : Colors.orange;
+        return _payment!.isOverdue ? AppColors.statusRed : AppColors.statusOrange;
       case 'failed':
-        return Colors.red;
+        return Theme.of(context).colorScheme.error;
       case 'refunded':
-        return Colors.blue;
+        return AppColors.statusBlue;
       default:
-        return Colors.grey;
+        return Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     }
   }
 

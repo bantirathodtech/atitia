@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../common/styles/colors.dart';
 import '../../../common/styles/spacing.dart';
 
 import '../../di/firebase/di/firebase_service_locator.dart';
@@ -93,11 +94,11 @@ class AccessibilityService {
     return baseStyle.copyWith(
       backgroundColor: WidgetStateProperty.all(
         backgroundColor ??
-            (baseStyle.backgroundColor?.resolve({}) ?? Colors.blue),
+            (baseStyle.backgroundColor?.resolve({}) ?? AppColors.info),
       ),
       foregroundColor: WidgetStateProperty.all(
         foregroundColor ??
-            (baseStyle.foregroundColor?.resolve({}) ?? Colors.white),
+            (baseStyle.foregroundColor?.resolve({}) ?? AppColors.textOnPrimary),
       ),
       minimumSize: WidgetStateProperty.all(
         Size(minimumSize ?? 48,
@@ -114,7 +115,7 @@ class AccessibilityService {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
         side: _isHighContrastEnabled
-            ? BorderSide(color: Colors.grey.shade400, width: 1.0)
+            ? BorderSide(color: AppColors.outline, width: 1.0)
             : BorderSide.none,
       ),
     );
@@ -140,22 +141,22 @@ class AccessibilityService {
         borderRadius: BorderRadius.circular(8.0),
         borderSide: BorderSide(
           color: _isHighContrastEnabled
-              ? Colors.grey.shade600
-              : Colors.grey.shade300,
+              ? AppColors.outline
+              : AppColors.outlineVariant,
           width: _isHighContrastEnabled ? 2.0 : 1.0,
         ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8.0),
         borderSide: BorderSide(
-          color: _isHighContrastEnabled ? Colors.blue.shade800 : Colors.blue,
+          color: _isHighContrastEnabled ? AppColors.info : AppColors.info,
           width: _isHighContrastEnabled ? 3.0 : 2.0,
         ),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8.0),
         borderSide: BorderSide(
-          color: Colors.red,
+          color: AppColors.error,
           width: _isHighContrastEnabled ? 3.0 : 2.0,
         ),
       ),
@@ -306,7 +307,7 @@ class AccessibilityService {
             child: Container(
               width: width,
               height: height,
-              color: Colors.grey.shade300,
+              color: AppColors.surfaceVariant,
               child: const Icon(Icons.broken_image),
             ),
           );
@@ -327,8 +328,8 @@ class AccessibilityService {
         value: value,
         color: color,
         backgroundColor: _isHighContrastEnabled
-            ? Colors.grey.shade600
-            : Colors.grey.shade300,
+            ? AppColors.outline
+            : AppColors.surfaceVariant,
       ),
     );
   }
@@ -345,8 +346,7 @@ class AccessibilityService {
       child: Switch(
         value: value,
         onChanged: onChanged,
-        activeThumbColor:
-            _isHighContrastEnabled ? Colors.blue.shade800 : Colors.blue,
+        activeThumbColor: AppColors.info,
       ),
     );
   }
@@ -363,8 +363,7 @@ class AccessibilityService {
       child: Checkbox(
         value: value,
         onChanged: onChanged,
-        activeColor:
-            _isHighContrastEnabled ? Colors.blue.shade800 : Colors.blue,
+        activeColor: AppColors.info,
       ),
     );
   }
@@ -386,8 +385,7 @@ class AccessibilityService {
         groupValue: groupValue,
         // ignore: deprecated_member_use
         onChanged: onChanged,
-        activeColor:
-            _isHighContrastEnabled ? Colors.blue.shade800 : Colors.blue,
+        activeColor: AppColors.info,
       ),
     );
   }

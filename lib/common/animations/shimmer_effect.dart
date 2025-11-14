@@ -95,8 +95,9 @@ class _SlidingGradientTransform extends GradientTransform {
 
 /// Pre-built shimmer loading widgets
 class ShimmerLoading {
-  /// Shimmer effect for text line
-  static Widget textLine({
+  /// Shimmer effect for text line - theme-aware via BuildContext
+  static Widget textLine(
+    BuildContext context, {
     double width = double.infinity,
     double height = 16,
     double borderRadius = 4,
@@ -106,31 +107,33 @@ class ShimmerLoading {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),
     );
   }
 
-  /// Shimmer effect for circular avatar
-  static Widget circle({
+  /// Shimmer effect for circular avatar - theme-aware via BuildContext
+  static Widget circle(
+    BuildContext context, {
     double size = 40,
   }) {
     return ShimmerEffect(
       child: Container(
         width: size,
         height: size,
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
         ),
       ),
     );
   }
 
-  /// Shimmer effect for card
-  static Widget card({
+  /// Shimmer effect for card - theme-aware via BuildContext
+  static Widget card(
+    BuildContext context, {
     double width = double.infinity,
     double height = 100,
     double borderRadius = 8,
@@ -140,26 +143,27 @@ class ShimmerLoading {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),
     );
   }
 
-  /// Shimmer effect for list item
-  static Widget listItem() {
+  /// Shimmer effect for list item - theme-aware via BuildContext
+  static Widget listItem(BuildContext context) {
     return Row(
       children: [
-        ShimmerLoading.circle(size: 48),
+        ShimmerLoading.circle(context, size: 48),
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ShimmerLoading.textLine(width: double.infinity, height: 16),
+              ShimmerLoading.textLine(context,
+                  width: double.infinity, height: 16),
               const SizedBox(height: AppSpacing.paddingS),
-              ShimmerLoading.textLine(width: 200, height: 14),
+              ShimmerLoading.textLine(context, width: 200, height: 14),
             ],
           ),
         ),

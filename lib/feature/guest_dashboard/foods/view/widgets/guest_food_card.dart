@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../../common/styles/spacing.dart';
+import '../../../../../../common/styles/colors.dart';
+import '../../../../../../common/utils/extensions/context_extensions.dart';
 import '../../data/models/guest_food_model.dart';
 
 /// Card widget representing a single food menu item
@@ -20,16 +22,16 @@ class GuestFoodCard extends StatelessWidget {
 
   /// Determines background color based on food category
   /// Helps users quickly identify food types
-  Color get _categoryColor {
+  Color _categoryColor(BuildContext context) {
     switch (food.category.toLowerCase()) {
       case 'veg':
-        return Colors.green.shade50;
+        return AppColors.success.withValues(alpha: 0.1);
       case 'non-veg':
-        return Colors.red.shade50;
+        return context.decorativeRed.withValues(alpha: 0.1);
       case 'beverage':
-        return Colors.blue.shade50;
+        return AppColors.info.withValues(alpha: 0.1);
       default:
-        return Colors.grey.shade50;
+        return Theme.of(context).colorScheme.surfaceContainerHighest;
     }
   }
 
@@ -48,16 +50,21 @@ class GuestFoodCard extends StatelessWidget {
   }
 
   /// Returns category text color for better contrast and readability
-  Color get _categoryTextColor {
+  Color _categoryTextColor(BuildContext context) {
     switch (food.category.toLowerCase()) {
       case 'veg':
-        return Colors.green.shade800;
+        return AppColors.success;
       case 'non-veg':
-        return Colors.red.shade800;
+        return context.decorativeRed;
       case 'beverage':
-        return Colors.blue.shade800;
+        return AppColors.info;
       default:
-        return Colors.grey.shade800;
+        return Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     }
   }
 
@@ -98,7 +105,7 @@ class GuestFoodCard extends StatelessWidget {
       height: 80,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: Colors.grey.shade200,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
       ),
       child: food.photos.isNotEmpty
           ? ClipRRect(
@@ -109,7 +116,7 @@ class GuestFoodCard extends StatelessWidget {
                 height: 80,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  return _buildImagePlaceholder();
+                  return _buildImagePlaceholder(context);
                 },
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
@@ -117,17 +124,22 @@ class GuestFoodCard extends StatelessWidget {
                 },
               ),
             )
-          : _buildImagePlaceholder(),
+          : _buildImagePlaceholder(context),
     );
   }
 
   /// Builds placeholder when no image is available
-  Widget _buildImagePlaceholder() {
-    return const Center(
+  Widget _buildImagePlaceholder(BuildContext context) {
+    return Center(
       child: Icon(
         Icons.fastfood,
         size: 40,
-        color: Colors.grey,
+        color: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.5) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
       ),
     );
   }
@@ -153,7 +165,12 @@ class GuestFoodCard extends StatelessWidget {
           food.description,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey.shade600,
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             height: 1.3,
           ),
           maxLines: 2,
@@ -165,15 +182,16 @@ class GuestFoodCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.green.shade50,
+              color: AppColors.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: Colors.green.shade200),
+              border:
+                  Border.all(color: AppColors.success.withValues(alpha: 0.3)),
             ),
             child: Text(
               'Available',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.green.shade800,
+                color: AppColors.success,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -182,15 +200,16 @@ class GuestFoodCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.red.shade50,
+              color: context.decorativeRed.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: Colors.red.shade200),
+              border: Border.all(
+                  color: context.decorativeRed.withValues(alpha: 0.3)),
             ),
             child: Text(
               'Out of Stock',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.red.shade800,
+                color: context.decorativeRed,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -207,10 +226,10 @@ class GuestFoodCard extends StatelessWidget {
         // Price
         Text(
           '₹${food.price.toStringAsFixed(2)}',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.green,
+            color: AppColors.success,
           ),
         ),
         const SizedBox(height: AppSpacing.paddingS),
@@ -218,7 +237,7 @@ class GuestFoodCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: _categoryColor,
+            color: _categoryColor(context),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
@@ -227,7 +246,7 @@ class GuestFoodCard extends StatelessWidget {
               Icon(
                 _categoryIcon,
                 size: 14,
-                color: _categoryTextColor,
+                color: _categoryTextColor(context),
               ),
               const SizedBox(width: AppSpacing.paddingXS),
               Text(
@@ -235,7 +254,7 @@ class GuestFoodCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: _categoryTextColor,
+                  color: _categoryTextColor(context),
                 ),
               ),
             ],

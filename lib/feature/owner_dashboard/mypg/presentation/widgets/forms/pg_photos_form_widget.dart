@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../../../common/lifecycle/stateless/adaptive_stateless_widget.dart';
 import '../../../../../../common/styles/spacing.dart';
+import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../../common/widgets/images/adaptive_image.dart';
@@ -90,7 +91,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                         'Uploading {count} photo(s)...',
                         parameters: {'count': imageFiles.length},
                       ),
-                  color: Colors.grey[700],
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -189,7 +190,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                       parameters: {'count': successCount},
                     ),
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.success,
             ),
           );
         } else if (successCount > 0 && failCount > 0) {
@@ -207,7 +208,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                       },
                     ),
               ),
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.warning,
             ),
           );
         } else {
@@ -218,7 +219,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                 loc?.pgPhotosUploadFailed ??
                     _text('pgPhotosUploadFailed', 'Failed to upload photos'),
               ),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               duration: const Duration(seconds: 5),
             ),
           );
@@ -239,7 +240,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                     parameters: {'error': e.toString()},
                   ),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -262,7 +263,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
 
         BodyText(
           text: loc.pgPhotosSubtitle,
-          color: Colors.grey[600],
+          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         const SizedBox(height: AppSpacing.paddingL),
 
@@ -275,7 +276,7 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
         const SizedBox(height: AppSpacing.paddingS),
         BodyText(
           text: loc.pgPhotosLimitHint,
-          color: Colors.grey[500],
+          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           small: true,
         ),
         const SizedBox(height: AppSpacing.paddingL),
@@ -290,17 +291,17 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                   Icon(
                     Icons.photo_library_outlined,
                     size: 64,
-                    color: Colors.grey[400],
+                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.4) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
                   BodyText(
                     text: loc.pgPhotosEmptyTitle,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
                   BodyText(
                     text: loc.pgPhotosEmptySubtitle,
-                    color: Colors.grey[500],
+                    color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ],
               ),
@@ -327,8 +328,8 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                       imageUrl: uploadedPhotos[index],
                       fit: BoxFit.cover,
                       placeholder: Container(
-                        color: Colors.grey[200],
-                        child: const Icon(Icons.image),
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        child: Icon(Icons.image, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                       ),
                     ),
                   ),
@@ -339,13 +340,13 @@ class PgPhotosFormWidget extends AdaptiveStatelessWidget {
                       onTap: () => _removePhoto(index),
                       child: Container(
                         padding: const EdgeInsets.all(AppSpacing.paddingXS),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
+                        decoration: BoxDecoration(
+                          color: AppColors.error,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.close,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                           size: 16,
                         ),
                       ),

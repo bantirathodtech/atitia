@@ -179,7 +179,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -340,7 +340,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -364,7 +364,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               loc?.active ?? 'Active',
               guestVM.activeGuests.toString(),
               Icons.check_circle,
-              Colors.green,
+              AppColors.success,
             ),
           ),
           const SizedBox(width: AppSpacing.paddingM),
@@ -374,7 +374,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               loc?.inactive ?? 'Inactive',
               (guestVM.totalGuests - guestVM.activeGuests).toString(),
               Icons.pause_circle,
-              Colors.orange,
+              AppColors.warning,
             ),
           ),
         ],
@@ -409,11 +409,21 @@ class _GuestListWidgetState extends State<GuestListWidget> {
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: Row(
               children: [
-                const Icon(Icons.people_outline, size: 20, color: Colors.grey),
+                Icon(Icons.people_outline,
+                    size: 20,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.5) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5)),
                 const SizedBox(width: AppSpacing.paddingS),
                 BodyText(
                   text: loc?.guestListTitle ?? 'Guest List',
@@ -423,7 +433,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.paddingS, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.1),
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -450,13 +461,23 @@ class _GuestListWidgetState extends State<GuestListWidget> {
             margin: const EdgeInsets.all(AppSpacing.paddingM),
             padding: const EdgeInsets.all(AppSpacing.paddingL),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: Column(
               children: [
-                const Icon(Icons.people_outline, size: 48, color: Colors.grey),
+                Icon(Icons.people_outline,
+                    size: 48,
+                    color: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.5) ??
+                        Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5)),
                 const SizedBox(height: AppSpacing.paddingM),
                 HeadingMedium(
                   text: loc?.noGuestsYet ?? 'No Guests Yet',
@@ -481,9 +502,9 @@ class _GuestListWidgetState extends State<GuestListWidget> {
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -492,7 +513,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.2),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(24),
             ),
           ),
@@ -506,7 +527,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                   height: 16,
                   width: 120,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.2),
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -515,7 +537,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                   height: 12,
                   width: 80,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.2),
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -527,14 +550,17 @@ class _GuestListWidgetState extends State<GuestListWidget> {
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.paddingS, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.2),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: Container(
               height: 12,
               width: 60,
               decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.3),
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -630,13 +656,15 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.green,
+                                    color: AppColors.success,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
                                     (loc?.statusNew ?? 'New').toUpperCase(),
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary,
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -648,7 +676,15 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                           Text(
                             guest.roomAssignment,
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color
+                                      ?.withValues(alpha: 0.7) ??
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
                               fontSize: 14,
                             ),
                           ),
@@ -660,13 +696,14 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.amber,
+                                color: AppColors.warning,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 (loc?.statusVip ?? 'VIP').toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onPrimary,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -811,7 +848,14 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey[600]),
+        Icon(icon,
+            size: 16,
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
         const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: Column(
@@ -821,7 +865,15 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
               Text(
@@ -848,28 +900,48 @@ class _GuestListWidgetState extends State<GuestListWidget> {
 
     switch (status.toLowerCase()) {
       case 'active':
-        chipColor = Colors.green.withValues(alpha: 0.1);
-        textColor = Colors.green;
+        chipColor = AppColors.success.withValues(alpha: 0.1);
+        textColor = AppColors.success;
         break;
       case 'inactive':
-        chipColor = Colors.grey.withValues(alpha: 0.1);
-        textColor = Colors.grey;
+        chipColor = Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.1) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+        textColor = Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
         break;
       case 'pending':
-        chipColor = Colors.orange.withValues(alpha: 0.1);
-        textColor = Colors.orange;
+        chipColor = AppColors.warning.withValues(alpha: 0.1);
+        textColor = AppColors.warning;
         break;
       case 'new':
-        chipColor = Colors.blue.withValues(alpha: 0.1);
-        textColor = Colors.blue;
+        chipColor = AppColors.info.withValues(alpha: 0.1);
+        textColor = AppColors.info;
         break;
       case 'vip':
-        chipColor = Colors.purple.withValues(alpha: 0.1);
-        textColor = Colors.purple;
+        chipColor = AppColors.purple.withValues(alpha: 0.1);
+        textColor = AppColors.purple;
         break;
       default:
-        chipColor = Colors.grey.withValues(alpha: 0.1);
-        textColor = Colors.grey;
+        chipColor = Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.1) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+        textColor = Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     }
 
     return Container(
@@ -1081,15 +1153,20 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return Colors.green;
+        return AppColors.success;
       case 'inactive':
-        return Colors.red;
+        return Theme.of(context).colorScheme.error;
       case 'pending':
-        return Colors.orange;
+        return AppColors.warning;
       case 'new':
-        return Colors.blue;
+        return AppColors.info;
       default:
-        return Colors.grey;
+        return Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     }
   }
 

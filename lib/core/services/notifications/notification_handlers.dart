@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../common/styles/colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../di/firebase/di/firebase_service_locator.dart';
 import '../../navigation/app_router.dart';
@@ -127,7 +128,7 @@ class NotificationHandlers {
         content: Text(
           message,
         ),
-        backgroundColor: status == 'approved' ? Colors.green : Colors.orange,
+        backgroundColor: status == 'approved' ? AppColors.success : AppColors.statusOrange,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -152,7 +153,7 @@ class NotificationHandlers {
           loc?.guestPaymentReminder ??
               'Payment reminder: Please complete your pending payment',
         ),
-        backgroundColor: Colors.orange,
+        backgroundColor: AppColors.statusOrange,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -177,7 +178,7 @@ class NotificationHandlers {
           loc?.guestFoodMenuUpdated ??
               'Food menu has been updated! Check out the new items',
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.info,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -207,7 +208,7 @@ class NotificationHandlers {
         content: Text(
           message,
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -273,7 +274,7 @@ class NotificationHandlers {
           loc?.ownerBookingRequestMessage(guestName) ??
               'New booking request from $guestName',
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.info,
         behavior: SnackBarBehavior.floating,
         action: SnackBarAction(
           label: loc?.viewAction ?? 'View',
@@ -310,7 +311,7 @@ class NotificationHandlers {
           loc?.ownerPaymentReceivedMessage(amount, guestName) ??
               'Payment received: ₹$amount from $guestName',
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -338,7 +339,7 @@ class NotificationHandlers {
           loc?.ownerComplaintSubmittedMessage(guestName) ??
               'New complaint from $guestName',
         ),
-        backgroundColor: Colors.orange,
+        backgroundColor: AppColors.statusOrange,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -366,7 +367,7 @@ class NotificationHandlers {
           loc?.ownerGuestCheckInMessage(guestName) ??
               '$guestName has checked in',
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -395,7 +396,7 @@ class NotificationHandlers {
           loc?.ownerMaintenanceReminderMessage(task) ??
               'Maintenance reminder: $task',
         ),
-        backgroundColor: Colors.amber,
+        backgroundColor: AppColors.statusOrange,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -442,15 +443,15 @@ class NotificationHandlers {
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               message,
-              style: const TextStyle(color: Colors.white70),
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7)),
             ),
           ],
         ),
@@ -461,7 +462,7 @@ class NotificationHandlers {
             ? SnackBarAction(
                 label:
                     AppLocalizations.of(context)?.viewAction ?? 'View',
-                textColor: Colors.white,
+                textColor: Theme.of(context).colorScheme.onPrimary,
                 onPressed: onTap,
               )
             : null,

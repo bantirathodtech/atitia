@@ -76,7 +76,7 @@ class AdaptiveDialog extends AdaptiveStatelessWidget {
         PrimaryButton(
           onPressed: onConfirm,
           label: finalConfirmText,
-          backgroundColor: destructive ? Colors.red : confirmColor,
+          backgroundColor: destructive ? Theme.of(context).colorScheme.error : confirmColor,
         ),
       ],
       shape: RoundedRectangleBorder(

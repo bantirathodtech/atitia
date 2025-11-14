@@ -406,9 +406,9 @@ class _RegistrationScreenState extends State<RegistrationScreen>
       SnackBar(
         content: BodyText(
           text: message,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
         ),
-        backgroundColor: isError ? Colors.red.shade600 : Colors.green.shade600,
+        backgroundColor: isError ? Theme.of(context).colorScheme.error : AppColors.success,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -794,7 +794,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                 isUploading: authProvider.uploadingProfile,
                 isRequired: true,
                 onUpload: _onProfilePhotoSelected,
-                accentColor: Colors.blue,
+                accentColor: AppColors.statusBlue,
               ),
             ),
 
@@ -813,7 +813,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                 isUploading: authProvider.uploadingAadhaar,
                 isRequired: true,
                 onUpload: _onAadhaarSelected,
-                accentColor: Colors.orange,
+                accentColor: AppColors.statusOrange,
               ),
             ),
 
@@ -860,7 +860,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                 child: Row(
                   children: [
                     Icon(Icons.info_outline,
-                        color: Colors.blue.shade700, size: 24),
+                        color: AppColors.statusBlue, size: 24),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: CaptionText(
@@ -1097,10 +1097,8 @@ class _RegistrationScreenState extends State<RegistrationScreen>
           BoxShadow(
             // Theme-aware shadow
             color: isDarkMode
-                ? Colors.black
-                    .withValues(alpha: 0.3) // Darker shadow in dark mode
-                : Colors.black
-                    .withValues(alpha: 0.05), // Light shadow in light mode
+                ? Theme.of(context).colorScheme.shadow.withValues(alpha: 0.3)
+                : Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

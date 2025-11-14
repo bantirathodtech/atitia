@@ -209,7 +209,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -233,7 +233,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
               loc.statusNew,
               guestVM.newComplaints.toString(),
               Icons.new_releases,
-              Colors.red,
+              AppColors.statusBlue,
             ),
           ),
           const SizedBox(width: AppSpacing.paddingM),
@@ -243,7 +243,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
               loc.statusResolved,
               guestVM.complaints.where((c) => c.isResolved).length.toString(),
               Icons.check_circle,
-              Colors.green,
+              AppColors.success,
             ),
           ),
         ],
@@ -278,12 +278,17 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+              border: Border.all(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.report_problem_outlined,
-                    size: 20, color: Colors.grey),
+                Icon(Icons.report_problem_outlined,
+                    size: 20,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5)),
                 const SizedBox(width: AppSpacing.paddingS),
                 BodyText(text: loc.complaints),
                 const Spacer(),
@@ -291,7 +296,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.paddingS, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.1),
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -316,14 +322,19 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
             margin: const EdgeInsets.all(AppSpacing.paddingM),
             padding: const EdgeInsets.all(AppSpacing.paddingL),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+              border: Border.all(
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             ),
             child: Column(
               children: [
-                const Icon(Icons.report_problem_outlined,
-                    size: 48, color: Colors.grey),
+                Icon(Icons.report_problem_outlined,
+                    size: 48,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5)),
                 const SizedBox(height: AppSpacing.paddingM),
                 HeadingMedium(text: loc.noComplaintsYet),
                 const SizedBox(height: AppSpacing.paddingS),
@@ -345,9 +356,9 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +369,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
@@ -371,7 +382,9 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                       height: 16,
                       width: 120,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.2),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -380,7 +393,9 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                       height: 12,
                       width: 80,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withValues(alpha: 0.2),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -391,14 +406,17 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.paddingS, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: Container(
                   height: 12,
                   width: 60,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.3),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -410,7 +428,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
             height: 14,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.2),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(4),
             ),
           ),
@@ -419,7 +437,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
             height: 12,
             width: 200,
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.2),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(4),
             ),
           ),
@@ -449,7 +467,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                   children: [
                     Icon(
                       _getComplaintIcon(complaint.complaintType),
-                      color: _getComplaintColor(complaint.priority),
+                      color: _getComplaintColor(context, complaint.priority),
                       size: 24,
                     ),
                     const SizedBox(width: AppSpacing.paddingS),
@@ -468,7 +486,15 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                           Text(
                             '${complaint.guestName} - ${loc.room} ${complaint.roomNumber}',
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.color
+                                      ?.withValues(alpha: 0.7) ??
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
                               fontSize: 14,
                             ),
                           ),
@@ -546,7 +572,14 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey[600]),
+        Icon(icon,
+            size: 16,
+            color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7) ??
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
         const SizedBox(width: AppSpacing.paddingS),
         Expanded(
           child: Column(
@@ -556,7 +589,15 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
               Text(
@@ -585,28 +626,32 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
 
     switch (status.toLowerCase()) {
       case 'new':
-        chipColor = Colors.blue.withValues(alpha: 0.1);
-        textColor = Colors.blue;
+        chipColor = AppColors.info.withValues(alpha: 0.1);
+        textColor = AppColors.info;
         label = loc.statusNew;
         break;
       case 'in_progress':
-        chipColor = Colors.orange.withValues(alpha: 0.1);
-        textColor = Colors.orange;
+        chipColor = AppColors.statusOrange.withValues(alpha: 0.1);
+        textColor = AppColors.statusOrange;
         label = loc.statusInProgress;
         break;
       case 'resolved':
-        chipColor = Colors.green.withValues(alpha: 0.1);
-        textColor = Colors.green;
+        chipColor = AppColors.success.withValues(alpha: 0.1);
+        textColor = AppColors.success;
         label = loc.statusResolved;
         break;
       case 'closed':
-        chipColor = Colors.grey.withValues(alpha: 0.1);
-        textColor = Colors.grey;
+        chipColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+        textColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
         label = loc.statusClosed;
         break;
       default:
-        chipColor = Colors.grey.withValues(alpha: 0.1);
-        textColor = Colors.grey;
+        chipColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1);
+        textColor =
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
         label = status;
     }
 
@@ -646,18 +691,23 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
   }
 
   /// Gets complaint color based on priority
-  Color _getComplaintColor(String priority) {
+  Color _getComplaintColor(BuildContext context, String priority) {
     switch (priority.toLowerCase()) {
       case 'urgent':
-        return Colors.red;
+        return AppColors.statusRed;
       case 'high':
-        return Colors.orange;
+        return AppColors.statusOrange;
       case 'medium':
-        return Colors.blue;
+        return AppColors.info;
       case 'low':
-        return Colors.green;
+        return AppColors.success;
       default:
-        return Colors.grey;
+        return Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.color
+                ?.withValues(alpha: 0.7) ??
+            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7);
     }
   }
 
@@ -762,7 +812,7 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
       padding: const EdgeInsets.all(AppSpacing.paddingS),
       decoration: BoxDecoration(
         color: message.isFromGuest
-            ? Colors.grey[100]
+            ? Theme.of(context).colorScheme.surfaceContainerHighest
             : AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
@@ -780,7 +830,15 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                 message.formattedTimestamp,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color
+                          ?.withValues(alpha: 0.7) ??
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
             ],
@@ -911,7 +969,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+        border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [

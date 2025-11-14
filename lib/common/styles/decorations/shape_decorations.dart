@@ -100,14 +100,15 @@ class ShapeDecorations {
     );
   }
 
-  /// Secondary button shape (outlined)
-  static ShapeBorder secondaryButton({
+  /// Secondary button shape (outlined) - theme-aware via BuildContext
+  static ShapeBorder secondaryButton(
+    BuildContext context, {
     double borderRadius = AppSpacing.borderRadiusL,
   }) {
     return RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(borderRadius),
       side: BorderSide(
-        color: Colors.grey.shade400,
+        color: Theme.of(context).dividerColor,
         width: 1.0,
       ),
     );

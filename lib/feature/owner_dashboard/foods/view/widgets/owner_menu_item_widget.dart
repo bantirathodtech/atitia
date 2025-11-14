@@ -63,7 +63,7 @@ class OwnerMenuItemWidget extends StatelessWidget {
           if (items.isEmpty)
             BodyText(
               text: 'No items listed for $title',
-              color: Colors.grey.shade600,
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             )
           else
             ...items.asMap().entries.map((entry) {

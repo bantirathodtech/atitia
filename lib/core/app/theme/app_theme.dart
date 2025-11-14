@@ -15,6 +15,7 @@ class AppTheme {
     colorScheme: const ColorScheme.light(
       primary: AppColors.primary,
       secondary: AppColors.secondary,
+      tertiary: Color(0xFFFF5252), // Decorative red for light mode
       surface: AppColors.surface,
       error: AppColors.error,
       onPrimary: AppColors.textOnPrimary,
@@ -218,6 +219,7 @@ class AppTheme {
     colorScheme: const ColorScheme.dark(
       primary: AppColors.primaryLight,
       secondary: AppColors.secondaryLight,
+      tertiary: Color(0xFFFF6B6B), // Brighter decorative red for dark mode
       surface: AppColors.darkCard,
       error: Color(0xFFFF6B6B),  // Brighter error color for dark mode
       onPrimary: Colors.white,

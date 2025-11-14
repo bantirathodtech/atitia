@@ -143,7 +143,7 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -195,7 +195,7 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
     AppLocalizations? loc,
   ) {
     final theme = Theme.of(context);
-    final statusColor = _getStatusColor(payment.status);
+    final statusColor = _getStatusColor(context, payment.status);
     final statusIcon = _getStatusIcon(payment.status);
     final statusLabel = _statusLabel(payment.status, loc);
 
@@ -461,20 +461,20 @@ class _GuestPaymentHistoryScreenState extends State<GuestPaymentHistoryScreen> {
     }
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'paid':
-        return Colors.green;
+        return AppColors.success;
       case 'pending':
-        return Colors.orange;
+        return AppColors.warning;
       case 'overdue':
-        return Colors.red;
+        return AppColors.error;
       case 'failed':
-        return Colors.red;
+        return AppColors.error;
       case 'refunded':
-        return Colors.blue;
+        return AppColors.info;
       default:
-        return Colors.grey;
+        return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
     }
   }
 

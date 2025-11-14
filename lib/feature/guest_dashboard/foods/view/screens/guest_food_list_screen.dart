@@ -413,7 +413,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: isDarkMode ? 0.3 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -581,9 +581,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                         color: isDarkMode
                             ? AppColors.darkInputFill
                             : AppColors.surfaceVariant,
-                        child: const Center(
+                        child: Center(
                           child:
-                              Icon(Icons.image, size: 32, color: Colors.grey),
+                              Icon(Icons.image, size: 32, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                         ),
                       ),
                     ),
@@ -692,8 +692,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+          color: isDarkMode ? AppColors.darkDivider : Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -702,7 +701,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           HeadingMedium(
             text: AppLocalizations.of(context)?.foodMenuStatistics ??
                 'Food Menu Statistics',
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -715,7 +714,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   AppLocalizations.of(context)?.weeklyMenus ?? 'Weekly Menus',
                   '0',
                   Icons.calendar_view_week,
-                  Colors.blue,
+                  AppColors.info,
                   isDarkMode,
                 ),
               ),
@@ -726,7 +725,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   'Total Items',
                   '0',
                   Icons.restaurant_menu,
-                  Colors.green,
+                  AppColors.success,
                   isDarkMode,
                 ),
               ),
@@ -741,7 +740,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   'Breakfast Items',
                   '0',
                   Icons.free_breakfast,
-                  Colors.orange,
+                  AppColors.breakfast,
                   isDarkMode,
                 ),
               ),
@@ -752,7 +751,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   'Lunch Items',
                   '0',
                   Icons.lunch_dining,
-                  Colors.purple,
+                  AppColors.lunch,
                   isDarkMode,
                 ),
               ),
@@ -767,7 +766,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   'Dinner Items',
                   '0',
                   Icons.dinner_dining,
-                  Colors.red,
+                  AppColors.dinner,
                   isDarkMode,
                 ),
               ),
@@ -778,7 +777,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   'Snack Items',
                   '0',
                   Icons.cookie,
-                  Colors.brown,
+                  AppColors.statusGrey, // Using statusGrey for brown color
                   isDarkMode,
                 ),
               ),
@@ -829,7 +828,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             label,
             style: TextStyle(
               fontSize: 12,
-              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -847,7 +846,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         children: [
           HeadingMedium(
             text: 'Weekly Menu Preview',
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -859,8 +858,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
               border: Border.all(
                 color: isDarkMode
-                    ? Colors.white12
-                    : Colors.grey.withValues(alpha: 0.2),
+                    ? AppColors.darkDivider
+                    : Theme.of(context).dividerColor,
               ),
             ),
             child: ListView.builder(
@@ -883,7 +882,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.paddingM),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.1),
+                    color: Theme.of(context).dividerColor,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -891,7 +890,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     child: Text(
                       days[index],
                       style: TextStyle(
-                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         fontSize: 12,
                       ),
                     ),
@@ -908,7 +907,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             context,
             'Breakfast',
             Icons.free_breakfast,
-            Colors.orange,
+            AppColors.breakfast,
             isDarkMode,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -916,7 +915,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             context,
             'Lunch',
             Icons.lunch_dining,
-            Colors.purple,
+            AppColors.lunch,
             isDarkMode,
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -924,7 +923,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             context,
             'Dinner',
             Icons.dinner_dining,
-            Colors.red,
+            AppColors.dinner,
             isDarkMode,
           ),
         ],
@@ -947,7 +946,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
           color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+              Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -966,7 +965,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -987,10 +986,10 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
       margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
         border: Border.all(
-          color: Colors.grey.withValues(alpha: 0.1),
+          color: Theme.of(context).dividerColor,
         ),
       ),
       child: Row(
@@ -999,12 +998,12 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.2),
+              color: Theme.of(context).dividerColor,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: Icon(
               Icons.restaurant,
-              color: Colors.grey.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               size: 20,
             ),
           ),
@@ -1017,7 +1016,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   height: 12,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.3),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
@@ -1026,7 +1025,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   height: 8,
                   width: 120,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.2),
+                    color: Theme.of(context).dividerColor,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -1037,7 +1036,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             width: 60,
             height: 24,
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.2),
+              color: Theme.of(context).dividerColor,
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: Center(
@@ -1045,7 +1044,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                 height: 8,
                 width: 40,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.4),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -1069,8 +1068,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         color: isDarkMode ? AppColors.darkCard : AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color:
-              isDarkMode ? Colors.white12 : Colors.grey.withValues(alpha: 0.2),
+          color: isDarkMode ? AppColors.darkDivider : Theme.of(context).dividerColor,
         ),
       ),
       child: Column(
@@ -1078,18 +1076,18 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           Icon(
             Icons.restaurant_menu,
             size: 48,
-            color: isDarkMode ? Colors.white54 : Colors.grey[400],
+            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.5) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(
             text: 'No Menu Available',
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: Theme.of(context).textTheme.bodyLarge?.color ?? Theme.of(context).colorScheme.onSurface,
           ),
           const SizedBox(height: AppSpacing.paddingS),
           Text(
             'Your PG owner hasn\'t set up a weekly menu yet. The menu will appear here once it\'s configured.',
             style: TextStyle(
-              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               fontSize: 14,
             ),
             textAlign: TextAlign.center,
@@ -1104,7 +1102,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   AppLocalizations.of(context)?.refreshMenu ?? 'Refresh Menu'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding:
                     const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
                 shape: RoundedRectangleBorder(

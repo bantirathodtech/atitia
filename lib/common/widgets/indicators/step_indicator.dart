@@ -102,15 +102,15 @@ class StepIndicator extends AdaptiveStatelessWidget {
                           ),
                           child: Center(
                             child: isCompleted
-                                ? const Icon(
+                                ? Icon(
                                     Icons.check,
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onPrimary,
                                     size: 20,
                                   )
                                 : Text(
                                     '$stepNumber',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: Theme.of(context).colorScheme.onPrimary,
                                       fontWeight: isActive
                                           ? FontWeight.bold
                                           : FontWeight.normal,

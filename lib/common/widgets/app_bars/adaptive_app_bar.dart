@@ -237,16 +237,14 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
 
   /// Build iOS-style CupertinoNavigationBar
   Widget _buildIOSAppBar(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return CupertinoNavigationBar(
       // Title: Use titleWidget if provided, otherwise Text
       middle: titleWidget ??
           Text(
             title!,
             style: AppTypography.appBarTitle.copyWith(
-              color: isDark ? Colors.white : Colors.black,
+              color: Theme.of(context).textTheme.titleLarge?.color ??
+                  Theme.of(context).colorScheme.onSurface,
             ),
           ),
 
@@ -266,7 +264,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
       // iOS-specific styling
       border: Border(
         bottom: BorderSide(
-          color: isDark ? Colors.white12 : Colors.black12,
+          color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.12),
           width: 0.5,
         ),
       ),
@@ -318,15 +316,13 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
       bottom: bottom,
 
       // Android-specific styling
-      shadowColor: Colors.black26,
+      shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.26),
       surfaceTintColor: Colors.transparent,
     );
   }
 
   /// Build macOS-style AppBar
   Widget _buildMacOSAppBar(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final platformElevation = _getPlatformElevation(context);
 
     return Container(
@@ -337,7 +333,10 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
         boxShadow: platformElevation > 0
             ? [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .shadow
+                      .withValues(alpha: 0.1),
                   blurRadius: platformElevation,
                   offset: Offset(0, platformElevation / 2),
                 ),
@@ -345,7 +344,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
             : null,
         border: Border(
           bottom: BorderSide(
-            color: isDark ? Colors.white12 : Colors.black12,
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.12),
             width: 0.5,
           ),
         ),
@@ -369,7 +368,11 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                 Text(
                                   title!,
                                   style: AppTypography.appBarTitle.copyWith(
-                                    color: isDark ? Colors.white : Colors.black,
+                                    color: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.color ??
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                           )
@@ -380,7 +383,11 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                 Text(
                                   title!,
                                   style: AppTypography.appBarTitle.copyWith(
-                                    color: isDark ? Colors.white : Colors.black,
+                                    color: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.color ??
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                           ),
@@ -419,7 +426,10 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
         boxShadow: platformElevation > 0
             ? [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .shadow
+                      .withValues(alpha: 0.1),
                   blurRadius: platformElevation,
                   offset: Offset(0, platformElevation / 2),
                 ),
@@ -461,8 +471,12 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                         style:
                                             AppTypography.appBarTitle.copyWith(
                                           color: isDark
-                                              ? Colors.white
-                                              : Colors.black,
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .onPrimary
+                                              : Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
@@ -499,7 +513,11 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                 Text(
                                   title!,
                                   style: AppTypography.appBarTitle.copyWith(
-                                    color: isDark ? Colors.white : Colors.black,
+                                    color: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.color ??
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                           ),
@@ -561,18 +579,15 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
     if (backgroundColor != null) return backgroundColor!;
 
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     if (_isIOS(context)) {
-      return isDark
-          ? CupertinoColors.systemGrey6
-          : CupertinoColors.systemBackground;
+      return Theme.of(context).colorScheme.surfaceContainerHighest;
     } else if (_isAndroid(context)) {
       return theme.appBarTheme.backgroundColor ?? theme.primaryColor;
     } else if (_isMacOS(context)) {
-      return isDark ? const Color(0xFF2D2D2D) : const Color(0xFFF5F5F5);
+      return Theme.of(context).colorScheme.surfaceContainerHighest;
     } else if (_isWeb(context)) {
-      return isDark ? const Color(0xFF1E1E1E) : Colors.white;
+      return Theme.of(context).colorScheme.surface;
     }
 
     return theme.appBarTheme.backgroundColor ?? theme.primaryColor;
@@ -649,8 +664,6 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
 
   /// Build platform-specific back button
   Widget _buildPlatformBackButton(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
     final backLabel = loc?.back ?? 'Back';
 
@@ -663,14 +676,16 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
           children: [
             Icon(
               CupertinoIcons.back,
-              color: isDark ? Colors.white : Colors.black,
+              color: Theme.of(context).textTheme.titleLarge?.color ??
+                  Theme.of(context).colorScheme.onSurface,
               size: 20,
             ),
             const SizedBox(width: AppSpacing.paddingXS),
             Text(
               backLabel,
               style: TextStyle(
-                color: isDark ? Colors.white : Colors.black,
+                color: Theme.of(context).textTheme.titleLarge?.color ??
+                    Theme.of(context).colorScheme.onSurface,
                 fontSize: 17,
               ),
             ),
@@ -682,7 +697,8 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
       return IconButton(
         icon: Icon(
           Icons.arrow_back,
-          color: isDark ? Colors.white : Colors.black,
+          color: Theme.of(context).textTheme.titleLarge?.color ??
+              Theme.of(context).colorScheme.onSurface,
         ),
         onPressed: () => Navigator.of(context).pop(),
         tooltip: backLabel,
@@ -693,16 +709,13 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
   /// Build drawer button (hamburger menu)
   Widget _buildDrawerButton(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
     final menuLabel = loc?.menu ?? 'Menu';
 
     return IconButton(
       icon: Icon(
         Icons.menu,
-        color: isDark
-            ? theme.appBarTheme.foregroundColor
-            : theme.appBarTheme.foregroundColor,
+        color: theme.appBarTheme.foregroundColor,
         size: 24,
       ),
       onPressed: onDrawerTap ??

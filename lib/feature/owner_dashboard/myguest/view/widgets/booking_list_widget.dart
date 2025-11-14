@@ -8,6 +8,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_guest_model.dart';
@@ -94,13 +95,13 @@ class BookingListWidget extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color:
-                        _getStatusColor(booking.status).withValues(alpha: 0.2),
+                        _getStatusColor(context, booking.status).withValues(alpha: 0.2),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: CaptionText(
                     text: booking.statusDisplay,
-                    color: _getStatusColor(booking.status),
+                    color: _getStatusColor(context, booking.status),
                   ),
                 ),
               ],
@@ -110,12 +111,12 @@ class BookingListWidget extends StatelessWidget {
             Row(
               children: [
                 Icon(Icons.calendar_today,
-                    size: 14, color: Colors.grey.shade600),
+                    size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text:
                       '${booking.formattedStartDate} - ${booking.formattedEndDate}',
-                  color: Colors.grey.shade600,
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -123,13 +124,13 @@ class BookingListWidget extends StatelessWidget {
             // Duration
             Row(
               children: [
-                Icon(Icons.access_time, size: 14, color: Colors.grey.shade600),
+                Icon(Icons.access_time, size: 14, color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 CaptionText(
                   text: loc?.durationDays(booking.durationInDays) ??
                       _text('durationDays', '{count} days',
                           parameters: {'count': booking.durationInDays}),
-                  color: Colors.grey.shade600,
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ],
             ),
@@ -143,7 +144,7 @@ class BookingListWidget extends StatelessWidget {
                   children: [
                     CaptionText(
                       text: loc?.rentLabel ?? _text('rentLabel', 'Rent'),
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     BodyText(
                       text: booking.formattedRent,
@@ -157,7 +158,7 @@ class BookingListWidget extends StatelessWidget {
                     CaptionText(
                       text:
                           loc?.depositLabel ?? _text('depositLabel', 'Deposit'),
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     BodyText(
                       text: booking.formattedDeposit,
@@ -170,12 +171,12 @@ class BookingListWidget extends StatelessWidget {
                   children: [
                     CaptionText(
                       text: loc?.paidLabel ?? _text('paidLabel', 'Paid'),
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     BodyText(
                       text: booking.formattedPaid,
                       medium: true,
-                      color: Colors.green,
+                      color: AppColors.success,
                     ),
                   ],
                 ),
@@ -188,18 +189,18 @@ class BookingListWidget extends StatelessWidget {
   }
 
   /// Gets status color
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'approved':
-        return Colors.green;
+        return AppColors.success;
       case 'pending':
-        return Colors.orange;
+        return AppColors.warning;
       case 'rejected':
-        return Colors.red;
+        return AppColors.error;
       case 'cancelled':
-        return Colors.grey;
+        return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
       default:
-        return Colors.grey;
+        return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
     }
   }
 
@@ -220,41 +221,41 @@ class BookingListWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow(
+              _buildDetailRow(context,
                 loc?.roomBedLabel ?? _text('roomBedLabel', 'Room/Bed'),
                 booking.roomBedDisplay,
               ),
-              _buildDetailRow(
+              _buildDetailRow(context,
                   loc?.startDate ?? _text('startDate', 'Start Date'),
                   booking.formattedStartDate),
-              _buildDetailRow(loc?.endDate ?? _text('endDate', 'End Date'),
+              _buildDetailRow(context, loc?.endDate ?? _text('endDate', 'End Date'),
                   booking.formattedEndDate),
-              _buildDetailRow(
+              _buildDetailRow(context,
                 loc?.durationLabel ?? _text('durationLabel', 'Duration'),
                 loc?.durationDays(booking.durationInDays) ??
                     _text('durationDays', '{count} days',
                         parameters: {'count': booking.durationInDays}),
               ),
-              _buildDetailRow(loc?.rentLabel ?? _text('rentLabel', 'Rent'),
+              _buildDetailRow(context, loc?.rentLabel ?? _text('rentLabel', 'Rent'),
                   booking.formattedRent),
-              _buildDetailRow(
+              _buildDetailRow(context,
                   loc?.depositLabel ?? _text('depositLabel', 'Deposit'),
                   booking.formattedDeposit),
-              _buildDetailRow(loc?.paidLabel ?? _text('paidLabel', 'Paid'),
+              _buildDetailRow(context, loc?.paidLabel ?? _text('paidLabel', 'Paid'),
                   booking.formattedPaid),
-              _buildDetailRow(
+              _buildDetailRow(context,
                   loc?.remainingLabel ?? _text('remainingLabel', 'Remaining'),
                   booking.formattedRemaining),
-              _buildDetailRow(
+              _buildDetailRow(context,
                   loc?.statusLabel ?? _text('statusLabel', 'Status'),
                   booking.statusDisplay),
-              _buildDetailRow(
+              _buildDetailRow(context,
                 loc?.paymentStatusLabel ??
                     _text('paymentStatusLabel', 'Payment Status'),
                 booking.paymentStatusDisplay,
               ),
               if (booking.notes != null && booking.notes!.isNotEmpty)
-                _buildDetailRow(loc?.notesLabel ?? _text('notesLabel', 'Notes'),
+                _buildDetailRow(context, loc?.notesLabel ?? _text('notesLabel', 'Notes'),
                     booking.notes!),
             ],
           ),
@@ -269,13 +270,13 @@ class BookingListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          BodyText(text: '$label:', color: Colors.grey.shade600),
+          BodyText(text: '$label:', color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7) ?? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
           Expanded(
             child: BodyText(
               text: value,
