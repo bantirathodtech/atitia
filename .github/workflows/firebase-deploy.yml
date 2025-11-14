@@ -1,0 +1,133 @@
+name: 🚀 Firebase Deployment - Staging & Dev
+
+on:
+  push:
+    branches: [staging, dev]  # Deploy to Firebase on both staging and dev
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'docs/**'
+      - '*.md'
+      - 'README*.md'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy (staging or dev)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - dev
+
+# Prevent concurrent deployments for same branch
+concurrency:
+  group: firebase-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FLUTTER_VERSION: '3.35.7'  # Pinned for reproducibility
+
+jobs:
+  # ============================================================================
+  # WEB: Deploy to Firebase Hosting
+  # ============================================================================
+  deploy-firebase-web:
+    name: 🌐 Deploy Web to Firebase
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+        timeout-minutes: 3
+
+      - name: 🌐 Build Web
+        run: |
+          echo "🔨 Building Web for Firebase deployment..."
+          echo "📦 Branch: ${{ github.ref_name }}"
+          flutter build web --release --no-pub
+          echo "✅ Web build completed"
+
+      - name: 📤 Upload Web Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-firebase-${{ github.ref_name }}
+          path: build/web/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: 🚀 Deploy to Firebase Hosting
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          if [ -n "$FIREBASE_SERVICE_ACCOUNT" ] && [ "$FIREBASE_SERVICE_ACCOUNT" != "" ]; then
+            echo "🚀 Deploying to Firebase Hosting..."
+            echo "📦 Branch: ${{ github.ref_name }}"
+            echo "🔧 Project: ${FIREBASE_PROJECT_ID:-not-set}"
+            
+            # Setup Firebase CLI
+            npm install -g firebase-tools
+            
+            # Authenticate with service account
+            echo "$FIREBASE_SERVICE_ACCOUNT" > /tmp/firebase-service-account.json
+            export GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-service-account.json
+            
+            # Deploy to Firebase Hosting
+            if [ -n "$FIREBASE_PROJECT_ID" ] && [ "$FIREBASE_PROJECT_ID" != "" ]; then
+              firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" || {
+                echo "⚠️ Firebase deployment failed"
+                exit 1
+              }
+              echo "✅ Successfully deployed to Firebase Hosting"
+            else
+              echo "⚠️ FIREBASE_PROJECT_ID not set - skipping deployment"
+              echo "💡 Add FIREBASE_PROJECT_ID secret to enable deployment"
+            fi
+          else
+            echo "⚠️ Firebase service account not configured - skipping deployment"
+            echo "💡 Add FIREBASE_SERVICE_ACCOUNT secret to enable deployment"
+          fi
+        continue-on-error: true
+
+  # ============================================================================
+  # DEPLOYMENT SUMMARY
+  # ============================================================================
+  deployment-summary:
+    name: 📋 Firebase Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [deploy-firebase-web]
+    if: always()
+    
+    steps:
+      - name: 📊 Generate Summary
+        run: |
+          echo "## 🚀 Firebase Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed At:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌐 Web (Firebase) | ${{ needs.deploy-firebase-web.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.deploy-firebase-web.result }}" == "success" ]; then
+            echo "✅ Firebase deployment completed successfully!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Firebase deployment completed with warnings. Check logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+

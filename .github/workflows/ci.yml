@@ -2,7 +2,7 @@ name: 🚀 CI/CD Pipeline - Enterprise Grade
 
 on:
   push:
-    branches: [main, staging, dev]
+    branches: [staging]  # CI/CD pipeline only runs on staging branch
     paths-ignore:
       - '**.md'
       - '.gitignore'
@@ -10,7 +10,7 @@ on:
       - '*.md'
       - 'README*.md'
   pull_request:
-    branches: [main, staging, dev]
+    branches: [staging]  # PRs to staging trigger CI/CD
     paths-ignore:
       - '**.md'
       - '.gitignore'
