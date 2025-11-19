@@ -39,7 +39,6 @@ import 'package:provider/provider.dart';
 import '../../../common/styles/spacing.dart';
 import '../../../core/app/theme/theme_provider.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../styles/colors.dart';
 
 class ThemeToggleButton extends StatelessWidget {
   // ==========================================================================
@@ -112,15 +111,13 @@ class ThemeToggleButton extends StatelessWidget {
     // ==========================================================================
     // Get icon color based on current theme
     // ==========================================================================
-    // In light mode: Use primary color for visibility
-    // In dark mode: Use light color for contrast
-    // This ensures the icon is always visible regardless of background
+    // Fully theme-aware icon color that adapts to day/night modes
+    // Uses theme's color scheme for proper contrast and visibility
     // ==========================================================================
+    final colorScheme = Theme.of(context).colorScheme;
     final iconColor = Theme.of(context).brightness == Brightness.dark
-        ? AppColors.statusOrange // Warm orange in dark mode (sun/moon color)
-        : Theme.of(context)
-            .appBarTheme
-            .foregroundColor; // Theme-based white color in light mode
+        ? colorScheme.primary // Primary color in dark mode for visibility
+        : colorScheme.onSurface; // On-surface color in light mode for contrast
 
     // ==========================================================================
     // Build button based on showLabel parameter

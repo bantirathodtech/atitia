@@ -21,14 +21,11 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
-import '../../../../../common/utils/responsive/responsive_breakpoints.dart';
 import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/widgets/buttons/theme_toggle_button.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/widgets/text/heading_large.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
 import '../../../logic/auth_provider.dart';
@@ -52,7 +49,7 @@ class RoleSelectionScreen extends StatelessWidget {
       // =======================================================================
       body: Stack(
         children: [
-          // Main scrollable content
+          // Main content - fits screen without scrolling
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -73,77 +70,77 @@ class RoleSelectionScreen extends StatelessWidget {
                 final horizontalPadding =
                     ResponsiveSystem.getResponsivePadding(context).horizontal;
 
-                return SingleChildScrollView(
+                return Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: horizontalPadding,
-                    vertical: AppSpacing.paddingL,
+                    vertical: AppSpacing.paddingS,
                   ),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: useTwoColumns ? 1200.0 : maxCardWidth,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // App Logo with theme-aware color - Reduced size
+                      Icon(
+                        Icons.home_work,
+                        size: 48.0, // Reduced from responsive size
+                        color: Theme.of(context).primaryColor,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(height: AppSpacing.paddingXL),
+                      SizedBox(height: AppSpacing.paddingS),
 
-                          // App Logo with theme-aware color
-                          Icon(
-                            Icons.home_work,
-                            size: _getResponsiveIconSize(
-                                responsiveConfig.layoutType),
-                            color: Theme.of(context).primaryColor,
-                          ),
-                          SizedBox(height: AppSpacing.paddingL),
-
-                          // Welcome Text
-                          const HeadingLarge(
-                            text: 'Welcome to Atitia PG',
-                            align: TextAlign.center,
-                          ),
-                          SizedBox(height: AppSpacing.sm),
-
-                          const BodyText(
-                            text: 'Your Home Away From Home',
-                            align: TextAlign.center,
-                          ),
-                          SizedBox(height: AppSpacing.xl),
-
-                          // Role Selection Title
-                          Semantics(
-                            header: true,
-                            child: const HeadingMedium(
-                              text: 'Select Your Role',
-                              align: TextAlign.center,
-                            ),
-                          ),
-                          SizedBox(height: AppSpacing.sm),
-
-                          Semantics(
-                            label: 'Choose how you want to use the app',
-                            child: const CaptionText(
-                              text: 'Choose how you want to use the app',
-                              align: TextAlign.center,
-                            ),
-                          ),
-                          SizedBox(height: AppSpacing.xl),
-
-                          // Role Cards - Responsive Layout
-                          useTwoColumns
-                              ? _buildTwoColumnLayout(
-                                  context: context,
-                                  authProvider: authProvider,
-                                  maxCardWidth: maxCardWidth,
-                                )
-                              : _buildSingleColumnLayout(
-                                  context: context,
-                                  authProvider: authProvider,
-                                  maxCardWidth: maxCardWidth,
-                                ),
-                        ],
+                      // Welcome Text - Reduced size
+                      const HeadingSmall(
+                        text: 'Welcome to Atitia PG',
+                        align: TextAlign.center,
                       ),
-                    ),
+                      SizedBox(height: AppSpacing.xs),
+
+                      const CaptionText(
+                        text: 'Your Home Away From Home',
+                        align: TextAlign.center,
+                      ),
+                      SizedBox(height: AppSpacing.paddingM),
+
+                      // Role Selection Title - Reduced size
+                      Semantics(
+                        header: true,
+                        child: const HeadingSmall(
+                          text: 'Select Your Role',
+                          align: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(height: AppSpacing.xs),
+
+                      Semantics(
+                        label: 'Choose how you want to use the app',
+                        child: const CaptionText(
+                          text: 'Choose how you want to use the app',
+                          align: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(height: AppSpacing.paddingM),
+
+                      // Role Cards - Responsive Layout
+                      Flexible(
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: useTwoColumns ? 1200.0 : maxCardWidth,
+                            ),
+                            child: useTwoColumns
+                                ? _buildTwoColumnLayout(
+                                    context: context,
+                                    authProvider: authProvider,
+                                    maxCardWidth: maxCardWidth,
+                                  )
+                                : _buildSingleColumnLayout(
+                                    context: context,
+                                    authProvider: authProvider,
+                                    maxCardWidth: maxCardWidth,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
@@ -155,36 +152,41 @@ class RoleSelectionScreen extends StatelessWidget {
           // =================================================================
           // Positioned absolutely in top-right for easy access
           // User can change theme before selecting role
-          // Theme-aware colors for day/night modes
+          // Fully theme-aware colors for day/night modes
           // =================================================================
           Positioned(
             top: AppSpacing.paddingM,
             right: AppSpacing.paddingM,
             child: SafeArea(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color:
-                        Theme.of(context).dividerColor.withValues(alpha: 0.2),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).colorScheme.shadow.withValues(
-                            alpha:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? 0.3
-                                    : 0.1,
-                          ),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                      spreadRadius: 0,
+              child: Builder(
+                builder: (context) {
+                  final isDark = Theme.of(context).brightness == Brightness.dark;
+                  final colorScheme = Theme.of(context).colorScheme;
+                  
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isDark
+                            ? colorScheme.outline.withValues(alpha: 0.3)
+                            : colorScheme.outline.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.4)
+                              : Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                          spreadRadius: 0,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: const ThemeToggleButton(),
+                    child: const ThemeToggleButton(),
+                  );
+                },
               ),
             ),
           ),
@@ -200,31 +202,36 @@ class RoleSelectionScreen extends StatelessWidget {
     required double maxCardWidth,
   }) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Guest Role Card
-        ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: maxCardWidth),
-          child: _buildRoleCard(
-            context: context,
-            title: 'Guest',
-            description: 'Find and book PG accommodations',
-            icon: Icons.person,
-            color: AppColors.info,
-            onTap: () => _handleGuestRoleSelection(context, authProvider),
+        Flexible(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxCardWidth),
+            child: _buildRoleCard(
+              context: context,
+              title: 'Guest',
+              description: 'Find and book PG accommodations',
+              icon: Icons.person,
+              color: AppColors.info,
+              onTap: () => _handleGuestRoleSelection(context, authProvider),
+            ),
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        SizedBox(height: AppSpacing.paddingS), // Reduced spacing
         // Owner Role Card
-        ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: maxCardWidth),
-          child: _buildRoleCard(
-            context: context,
-            title: 'Owner',
-            description: 'Manage your PG properties and guests',
-            icon: Icons.business,
-            color: AppColors.success,
-            onTap: () => _handleOwnerRoleSelection(context, authProvider),
+        Flexible(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxCardWidth),
+            child: _buildRoleCard(
+              context: context,
+              title: 'Owner',
+              description: 'Manage your PG properties and guests',
+              icon: Icons.business,
+              color: AppColors.success,
+              onTap: () => _handleOwnerRoleSelection(context, authProvider),
+            ),
           ),
         ),
       ],
@@ -324,19 +331,6 @@ class RoleSelectionScreen extends StatelessWidget {
     }
   }
 
-  /// Get responsive icon size based on layout type
-  double _getResponsiveIconSize(ResponsiveLayoutType layoutType) {
-    switch (layoutType) {
-      case ResponsiveLayoutType.mobile:
-        return 80.0;
-      case ResponsiveLayoutType.tablet:
-        return 100.0;
-      case ResponsiveLayoutType.desktop:
-        return 120.0;
-      case ResponsiveLayoutType.largeDesktop:
-        return 140.0;
-    }
-  }
 
   /// Builds role selection card
   Widget _buildRoleCard({
@@ -354,39 +348,41 @@ class RoleSelectionScreen extends StatelessWidget {
       child: AdaptiveCard(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.paddingM), // Reduced padding
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
+                padding: const EdgeInsets.all(AppSpacing.paddingS), // Reduced padding
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10), // Slightly smaller radius
                 ),
                 child: Icon(
                   icon,
-                  size: 40,
+                  size: 28, // Reduced icon size
                   color: color,
                 ),
               ),
-              SizedBox(width: AppSpacing.md),
+              SizedBox(width: AppSpacing.paddingS), // Reduced spacing
               Expanded(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    HeadingMedium(
+                    HeadingSmall( // Reduced from HeadingMedium
                       text: title,
                       color: color,
                     ),
                     SizedBox(height: AppSpacing.xs),
-                    BodyText(text: description),
+                    CaptionText(text: description), // Reduced from BodyText
                   ],
                 ),
               ),
               Icon(
                 Icons.arrow_forward_ios,
                 color: color,
-                size: 20,
+                size: 16, // Reduced arrow size
               ),
             ],
           ),

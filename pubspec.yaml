@@ -48,6 +48,10 @@ dependencies:
   # Image Picker (for profile, Aadhaar)
   image_picker: ^1.2.0
   
+  # Gallery Saver (for saving screenshots to device gallery)
+  # Using image_gallery_saver_plus - maintained fork with Android 10+ support
+  image_gallery_saver_plus: ^4.0.1
+  
   # Performance and Caching
   cached_network_image: ^3.3.1
   flutter_cache_manager: ^3.3.1

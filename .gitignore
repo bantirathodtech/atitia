@@ -121,3 +121,10 @@ ios/Flutter/Generated.xcconfig
 ios/Flutter/ephemeral/
 *.xcworkspace
 !default.xcworkspace
+
+# Screenshots (may contain sensitive data)
+screenshots/**/*.png
+screenshots/**/*.jpg
+screenshots/**/*.jpeg
+screenshots/**/*.gif
+!screenshots/README.md

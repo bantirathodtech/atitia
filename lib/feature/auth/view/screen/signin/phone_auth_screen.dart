@@ -9,6 +9,7 @@ import '../../../../../common/utils/constants/validation.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../../common/widgets/buttons/theme_toggle_button.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
@@ -337,12 +338,55 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     final role = authProvider.user?.role;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AdaptiveAppBar(
         title: role != null ? loc.loginAs(role) : loc.login,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => getIt<NavigationService>().goToRoleSelection(),
         ),
+        showThemeToggle: false, // Disable automatic theme toggle
+        actions: [
+          // Theme toggle button with styled container - full day/night theme support
+          Builder(
+            builder: (context) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              final colorScheme = Theme.of(context).colorScheme;
+
+              return Container(
+                margin: const EdgeInsets.only(
+                  top: 8.0, // 4px gap from top app bar border
+                  right: 8.0, // 4px gap from right app bar border
+                  bottom: 8.0, // 4px gap from bottom app bar border
+                ),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark
+                        ? colorScheme.outline.withValues(alpha: 0.3)
+                        : colorScheme.outline.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDark
+                          ? Colors.black.withValues(alpha: 0.4)
+                          : Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                      spreadRadius: 0,
+                    ),
+                  ],
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(2.0), // Reduced container padding
+                  child: ThemeToggleButton(), // Default button size
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -493,6 +537,11 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           : _sendOTP,
                   label: _otpSent ? loc.verify : loc.sendOTP,
                   isLoading: _loading,
+                  height: 48.0, // Compact button height
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.paddingL,
+                    vertical: AppSpacing.paddingS,
+                  ),
                 ),
               ],
 
@@ -554,7 +603,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               PrimaryButton(
                 onPressed: _loading ? null : _handleGoogleSignIn,
                 label: loc.googleSignIn,
-                icon: Icons.g_mobiledata,
+                icon: Icons.g_mobiledata, // Google icon
+                height: 48.0, // Compact button height
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.paddingL,
+                  vertical: AppSpacing.paddingS,
+                ),
               ),
             ],
           ),
