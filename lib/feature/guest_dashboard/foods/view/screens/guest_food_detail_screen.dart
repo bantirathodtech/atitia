@@ -12,6 +12,8 @@ import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../../common/widgets/text/index.dart';
+import '../../../../../../common/widgets/images/adaptive_image.dart';
+import '../../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../../common/utils/extensions/context_extensions.dart';
 import '../../data/models/guest_food_model.dart';
 import '../../viewmodel/guest_food_viewmodel.dart';
@@ -75,7 +77,7 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: AdaptiveLoader());
     }
     if (_error != null || _food == null) {
       return Center(
@@ -113,14 +115,12 @@ class _GuestFoodDetailScreenState extends State<GuestFoodDetailScreen> {
           const SizedBox(height: AppSpacing.paddingS),
           // Image
           if (food.firstImageUrl != null)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                food.firstImageUrl!,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+            AdaptiveImage(
+              imageUrl: food.firstImageUrl!,
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              borderRadius: 12,
             ),
           const SizedBox(height: AppSpacing.paddingS),
           // Description

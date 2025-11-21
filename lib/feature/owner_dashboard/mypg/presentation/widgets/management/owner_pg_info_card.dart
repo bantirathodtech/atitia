@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 
 import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/styles/spacing.dart';
+import '../../../../../../common/styles/theme_colors.dart';
+import '../../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
@@ -180,12 +182,8 @@ class OwnerPgInfoCard extends StatelessWidget {
 
     // Parse PG data
     final pgModel = GuestPgModel.fromMap(pgDetails!);
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    final textPrimary =
-        theme.textTheme.bodyLarge?.color ?? AppColors.textPrimary;
-    final textSecondary =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+    final textPrimary = context.textTheme.bodyLarge?.color ?? context.colors.onSurface;
+    final textSecondary = ThemeColors.getTextSecondary(context);
     final numberFormatter = NumberFormat.decimalPattern(loc?.localeName);
     final city = pgModel.city.trim();
     final state = pgModel.state.trim();
@@ -204,35 +202,8 @@ class OwnerPgInfoCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // PG Header Card with Gradient
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppSpacing.paddingL),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                theme.primaryColor.withValues(alpha: 0.1),
-                theme.colorScheme.surface,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-            border: Border.all(
-              color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: isDarkMode
-                    ? Theme.of(context)
-                        .colorScheme
-                        .shadow
-                        .withValues(alpha: 0.2)
-                    : theme.primaryColor.withValues(alpha: 0.05),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
+        AdaptiveCard(
+          padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -240,18 +211,18 @@ class OwnerPgInfoCard extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(AppSpacing.paddingS),
+                    padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          theme.primaryColor,
-                          theme.primaryColor.withValues(alpha: 0.7),
+                          context.primaryColor,
+                          context.primaryColor.withValues(alpha: 0.7),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: theme.primaryColor.withValues(alpha: 0.3),
+                          color: context.primaryColor.withValues(alpha: 0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -260,10 +231,10 @@ class OwnerPgInfoCard extends StatelessWidget {
                     child: Icon(
                       Icons.home_rounded,
                       color: AppColors.textOnPrimary,
-                      size: 28,
+                      size: context.isMobile ? 20 : 28,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.paddingM),
+                  SizedBox(width: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,16 +243,17 @@ class OwnerPgInfoCard extends StatelessWidget {
                           text: pgModel.pgName,
                           color: textPrimary,
                         ),
-                        const SizedBox(height: AppSpacing.paddingXS),
+                        SizedBox(height: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
                         Row(
                           children: [
                             Icon(Icons.location_on,
-                                size: 14, color: AppColors.info),
-                            const SizedBox(width: AppSpacing.paddingXS),
+                                size: context.isMobile ? 12 : 14, color: AppColors.info),
+                            SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
                             Expanded(
                               child: BodyText(
                                 text: locationText,
                                 color: textSecondary,
+                                small: context.isMobile,
                               ),
                             ),
                           ],
@@ -294,27 +266,28 @@ class OwnerPgInfoCard extends StatelessWidget {
                     onPressed: () => _editPG(context, pgModel.pgId),
                     icon: Icon(
                       Icons.edit_rounded,
-                      color: theme.primaryColor,
-                      size: 20,
+                      color: context.primaryColor,
+                      size: context.isMobile ? 18 : 20,
                     ),
                     tooltip: loc?.pgInfoEditTooltip ??
                         _text('pgInfoEditTooltip', 'Edit PG details'),
                     style: IconButton.styleFrom(
                       backgroundColor:
-                          theme.primaryColor.withValues(alpha: 0.1),
+                          context.primaryColor.withValues(alpha: 0.1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
+                      padding: EdgeInsets.all(context.isMobile ? 8 : 12),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.paddingM),
+              SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
 
               // Address and Contact
               _buildInfoRow(
                   context, Icons.location_city, pgModel.address, textSecondary),
-              const SizedBox(height: AppSpacing.paddingS),
+              SizedBox(height: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
               _buildInfoRow(
                   context,
                   Icons.phone,
@@ -322,7 +295,7 @@ class OwnerPgInfoCard extends StatelessWidget {
                       (loc?.pgInfoContactNotProvided ??
                           _text('pgInfoContactNotProvided', 'Not provided')),
                   textSecondary),
-              const SizedBox(height: AppSpacing.paddingS),
+              SizedBox(height: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
               _buildInfoRow(
                   context,
                   Icons.business,
@@ -334,34 +307,29 @@ class OwnerPgInfoCard extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: AppSpacing.paddingM),
+        SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
 
         // Structure Stats Card
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.paddingL),
-          decoration: BoxDecoration(
-            color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-            border: Border.all(
-              color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
-            ),
-          ),
+        AdaptiveCard(
+          padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Icon(Icons.analytics_rounded,
-                      color: AppColors.info, size: 20),
-                  const SizedBox(width: AppSpacing.paddingS),
-                  HeadingSmall(
-                      text: loc?.pgInfoStructureOverview ??
-                          _text('pgInfoStructureOverview',
-                              'PG structure overview'),
-                      color: textPrimary),
+                      color: AppColors.info, size: context.isMobile ? 16 : 20),
+                  SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+                  Expanded(
+                    child: HeadingSmall(
+                        text: loc?.pgInfoStructureOverview ??
+                            _text('pgInfoStructureOverview',
+                                'PG structure overview'),
+                        color: textPrimary),
+                  ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.paddingM),
+              SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
               Row(
                 children: [
                   Expanded(
@@ -372,6 +340,7 @@ class OwnerPgInfoCard extends StatelessWidget {
                               _text('pgInfoFloorsLabel', 'Floors'),
                           Icons.layers,
                           AppColors.info)),
+                  SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
                   Expanded(
                       child: _buildStatItem(
                           context,
@@ -380,6 +349,7 @@ class OwnerPgInfoCard extends StatelessWidget {
                               _text('pgInfoRoomsLabel', 'Rooms'),
                           Icons.meeting_room,
                           AppColors.success)),
+                  SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
                   Expanded(
                       child: _buildStatItem(
                           context,
@@ -388,7 +358,8 @@ class OwnerPgInfoCard extends StatelessWidget {
                               _text('pgInfoBedsLabel', 'Beds'),
                           Icons.bed,
                           AppColors.warning)),
-                  if (pgModel.totalRevenuePotential > 0)
+                  if (pgModel.totalRevenuePotential > 0) ...[
+                    SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
                     Expanded(
                         child: _buildStatItem(
                             context,
@@ -400,7 +371,8 @@ class OwnerPgInfoCard extends StatelessWidget {
                             loc?.pgInfoPotentialLabel ??
                                 _text('pgInfoPotentialLabel', 'Potential'),
                             Icons.currency_rupee,
-                            theme.primaryColor)),
+                            context.primaryColor)),
+                  ],
                 ],
               ),
             ],
@@ -411,77 +383,67 @@ class OwnerPgInfoCard extends StatelessWidget {
 
         // Floor Structure Details
         if (pgModel.hasFlexibleStructure) ...[
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.paddingL),
-            decoration: BoxDecoration(
-              color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-              border: Border.all(
-                color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
-              ),
-            ),
+          AdaptiveCard(
+            padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Icon(Icons.apartment_rounded,
-                        color: AppColors.success, size: 20),
-                    const SizedBox(width: AppSpacing.paddingS),
-                    HeadingSmall(
-                        text: loc?.pgInfoFloorRoomDetails ??
-                            _text('pgInfoFloorRoomDetails',
-                                'Floor & room details'),
-                        color: textPrimary),
+                        color: AppColors.success, size: context.isMobile ? 18 : 20),
+                    SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+                    Expanded(
+                      child: HeadingSmall(
+                          text: loc?.pgInfoFloorRoomDetails ??
+                              _text('pgInfoFloorRoomDetails',
+                                  'Floor & room details'),
+                          color: textPrimary),
+                    ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.paddingM),
+                SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
                 ...pgModel.floorStructure.map((floor) => _buildFloorInfo(
                     context,
                     floor,
-                    isDarkMode,
                     textPrimary,
                     textSecondary,
                     loc)),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
         ],
 
         // Amenities
         if (pgModel.hasAmenities) ...[
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.paddingL),
-            decoration: BoxDecoration(
-              color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-              border: Border.all(
-                color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
-              ),
-            ),
+          AdaptiveCard(
+            padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Icon(Icons.star_rounded,
-                        color: AppColors.warning, size: 20),
-                    const SizedBox(width: AppSpacing.paddingS),
-                    HeadingSmall(
-                        text: loc?.pgAmenitiesTitle ??
-                            _text('pgAmenitiesTitle', 'Amenities & Facilities'),
-                        color: textPrimary),
+                        color: AppColors.warning, size: context.isMobile ? 16 : 20),
+                    SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+                    Expanded(
+                      child: HeadingSmall(
+                          text: loc?.pgAmenitiesTitle ??
+                              _text('pgAmenitiesTitle', 'Amenities & Facilities'),
+                          color: textPrimary),
+                    ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.paddingM),
+                SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: context.isMobile ? 6 : 8,
+                  runSpacing: context.isMobile ? 6 : 8,
                   children: pgModel.amenities.map((amenity) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: context.isMobile ? 8 : 12,
+                          vertical: context.isMobile ? 4 : 6),
                       decoration: BoxDecoration(
                         color: AppColors.info.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -492,8 +454,8 @@ class OwnerPgInfoCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.check_circle,
-                              size: 14, color: AppColors.info),
-                          const SizedBox(width: AppSpacing.paddingXS),
+                              size: context.isMobile ? 12 : 14, color: AppColors.info),
+                          SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
                           CaptionText(
                               text: _amenityLabel(loc, amenity),
                               color: AppColors.info),
@@ -514,10 +476,14 @@ class OwnerPgInfoCard extends StatelessWidget {
       BuildContext context, IconData icon, String text, Color textColor) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: textColor),
-        const SizedBox(width: AppSpacing.paddingS),
+        Icon(icon, size: context.isMobile ? 14 : 16, color: textColor),
+        SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
         Expanded(
-          child: BodyText(text: text, color: textColor),
+          child: BodyText(
+            text: text,
+            color: textColor,
+            small: context.isMobile,
+          ),
         ),
       ],
     );
@@ -525,30 +491,35 @@ class OwnerPgInfoCard extends StatelessWidget {
 
   Widget _buildStatItem(BuildContext context, String value, String label,
       IconData icon, Color color) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
     return Container(
-      margin: const EdgeInsets.only(right: AppSpacing.paddingS),
-      padding: const EdgeInsets.all(AppSpacing.paddingS),
+      padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: isDarkMode ? 0.15 : 0.1),
+        color: color.withValues(alpha: context.isDarkMode ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 24, color: color),
-          const SizedBox(height: AppSpacing.paddingS),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
+          // Row 1: Icon and Number side by side
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: context.isMobile ? 18 : 24, color: color),
+              SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: context.isMobile ? 14 : 16,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.paddingXS),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+          // Row 2: Label below
           CaptionText(text: label, color: color.withValues(alpha: 0.8)),
         ],
       ),
@@ -558,7 +529,6 @@ class OwnerPgInfoCard extends StatelessWidget {
   Widget _buildFloorInfo(
     BuildContext context,
     dynamic floor,
-    bool isDarkMode,
     Color textPrimary,
     Color textSecondary,
     AppLocalizations? loc,
@@ -571,23 +541,19 @@ class OwnerPgInfoCard extends StatelessWidget {
             : _text('pgFloorLabelFallback', 'Floor'));
     final rooms = floor.rooms as List<dynamic>? ?? [];
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-      padding: const EdgeInsets.all(AppSpacing.paddingS),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
-        ),
-      ),
+    return AdaptiveCard(
+      margin: EdgeInsets.only(bottom: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+      padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.isMobile ? 6 : 8,
+                  vertical: context.isMobile ? 3 : 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.success.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
@@ -595,8 +561,8 @@ class OwnerPgInfoCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.layers, size: 14, color: AppColors.success),
-                    const SizedBox(width: AppSpacing.paddingXS),
+                    Icon(Icons.layers, size: context.isMobile ? 12 : 14, color: AppColors.success),
+                    SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
                     BodyText(
                         text: floorName,
                         color: AppColors.success,
@@ -613,34 +579,32 @@ class OwnerPgInfoCard extends StatelessWidget {
             ],
           ),
           if (rooms.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.paddingS),
+            SizedBox(height: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
             Wrap(
-              spacing: 6,
-              runSpacing: 6,
+              spacing: context.isMobile ? 4 : 6,
+              runSpacing: context.isMobile ? 4 : 6,
               children: rooms.map<Widget>((room) {
                 final roomNumber = room.roomNumber ?? '?';
                 final sharingType = room.sharingType ?? '?';
                 final bedsCount = room.bedsCount ?? 0;
 
                 return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.isMobile ? 6 : 8,
+                    vertical: context.isMobile ? 3 : 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? AppColors.darkCard.withValues(alpha: 0.5)
-                        : AppColors.surface,
+                    color: ThemeColors.getCardBackground(context).withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isDarkMode
-                          ? AppColors.darkDivider
-                          : AppColors.outline,
+                      color: ThemeColors.getDivider(context),
                     ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.meeting_room, size: 12, color: textSecondary),
-                      const SizedBox(width: AppSpacing.paddingXS),
+                      Icon(Icons.meeting_room, size: context.isMobile ? 10 : 12, color: textSecondary),
+                      SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
                       CaptionText(
                           text: loc?.pgInfoRoomChip(
                                   roomNumber, sharingType, bedsCount) ??

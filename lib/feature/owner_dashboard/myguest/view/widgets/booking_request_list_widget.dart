@@ -3,10 +3,14 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
+import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../l10n/app_localizations.dart';
 
 /// Widget for displaying a list of booking requests
@@ -48,9 +52,9 @@ class BookingRequestListWidget extends StatelessWidget {
                   subtitle: CaptionText(
                     text: request['pgName'] ?? (loc?.unknownPg ?? 'Unknown PG'),
                   ),
-                  trailing: TextButton(
+                  trailing: TextButtonWidget(
                     onPressed: () => _showActionDialog(context, request, loc),
-                    child: Text(loc?.bookingRequestAction ?? 'Action'),
+                    text: loc?.bookingRequestAction ?? 'Action',
                   ),
                 ),
               );
@@ -64,48 +68,73 @@ class BookingRequestListWidget extends StatelessWidget {
       AppLocalizations? loc) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(loc?.bookingRequestDialogTitle ?? 'Booking Request'),
-        content: SingleChildScrollView(
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '${loc?.guestLabel ?? 'Guest'}: ${request['guestName'] ?? (loc?.unknownValue ?? 'Unknown')}',
+              HeadingMedium(text: loc?.bookingRequestDialogTitle ?? 'Booking Request'),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BodyText(
+                        text: '${loc?.guestLabel ?? 'Guest'}: ${request['guestName'] ?? (loc?.unknownValue ?? 'Unknown')}',
+                      ),
+                      const SizedBox(height: AppSpacing.paddingS),
+                      BodyText(
+                        text: '${loc?.pgLabel ?? 'PG'}: ${request['pgName'] ?? (loc?.unknownPg ?? 'Unknown PG')}',
+                      ),
+                      const SizedBox(height: AppSpacing.paddingS),
+                      BodyText(
+                        text: '${loc?.dateLabel ?? 'Date'}: ${request['requestDate'] ?? (loc?.unknownValue ?? 'Unknown')}',
+                      ),
+                      const SizedBox(height: AppSpacing.paddingS),
+                      BodyText(
+                        text: '${loc?.statusLabel ?? 'Status'}: ${request['status'] ?? (loc?.unknownValue ?? 'Unknown')}',
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              Text(
-                '${loc?.pgLabel ?? 'PG'}: ${request['pgName'] ?? (loc?.unknownPg ?? 'Unknown PG')}',
-              ),
-              Text(
-                '${loc?.dateLabel ?? 'Date'}: ${request['requestDate'] ?? (loc?.unknownValue ?? 'Unknown')}',
-              ),
-              Text(
-                '${loc?.statusLabel ?? 'Status'}: ${request['status'] ?? (loc?.unknownValue ?? 'Unknown')}',
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.pop(context),
+                    text: loc?.close ?? 'Close',
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    onPressed: () {
+                      // Handle approval
+                      Navigator.pop(context);
+                    },
+                    label: loc?.approve ?? 'Approve',
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  TextButtonWidget(
+                    onPressed: () {
+                      // Handle rejection
+                      Navigator.pop(context);
+                    },
+                    text: loc?.reject ?? 'Reject',
+                    color: AppColors.error,
+                  ),
+                ],
               ),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(loc?.close ?? 'Close'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Handle approval
-              Navigator.pop(context);
-            },
-            child: Text(loc?.approve ?? 'Approve'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Handle rejection
-              Navigator.pop(context);
-            },
-            child: Text(loc?.reject ?? 'Reject'),
-          ),
-        ],
       ),
     );
   }

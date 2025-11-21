@@ -9,12 +9,18 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
+import '../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
@@ -102,9 +108,10 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Use select to only rebuild when specific properties change
+    final currentPgId =
+        context.select<SelectedPgProvider, String?>((p) => p.selectedPgId);
     final guestVM = context.watch<OwnerGuestViewModel>();
-    final selectedPgProvider = context.watch<SelectedPgProvider>();
-    final currentPgId = selectedPgProvider.selectedPgId;
     final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -113,53 +120,68 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
         titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
 
+        // Theme-aware background color
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
+
         // Left: Drawer button (automatic with showDrawer: true)
         showDrawer: true,
-
-        // Right: Refresh button
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => _refreshData(),
-            tooltip: loc.refreshGuestData,
-          ),
-        ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: TabBar(
-            controller: _tabController,
-            tabs: [
-              Tab(
-                icon: const Icon(Icons.people),
-                text: loc.guests,
+          preferredSize: const Size.fromHeight(80),
+          child: Container(
+            decoration: BoxDecoration(
+              color: context.isDarkMode ? Colors.black : Colors.white,
+              border: Border(
+                top: BorderSide(
+                  color: ThemeColors.getDivider(context),
+                  width: 1,
+                ),
               ),
-              Tab(
-                icon: const Icon(Icons.request_page),
-                text: loc.requests,
+            ),
+            child: IconTheme(
+              data: IconThemeData(
+                color: context.isDarkMode ? Colors.white : Colors.black,
               ),
-              Tab(
-                icon: const Icon(Icons.report_problem),
-                text: loc.complaints,
+              child: TabBar(
+                controller: _tabController,
+                indicatorColor:
+                    context.isDarkMode ? Colors.white : Colors.black,
+                labelColor: context.isDarkMode ? Colors.white : Colors.black,
+                unselectedLabelColor:
+                    context.isDarkMode ? Colors.white70 : Colors.black87,
+                tabs: [
+                  Tab(
+                    icon: Icon(Icons.people),
+                    text: loc.guests,
+                  ),
+                  Tab(
+                    icon: Icon(Icons.request_page),
+                    text: loc.requests,
+                  ),
+                  Tab(
+                    icon: Icon(Icons.report_problem),
+                    text: loc.complaints,
+                  ),
+                  Tab(
+                    icon: Icon(Icons.two_wheeler),
+                    text: loc.bikes,
+                  ),
+                  Tab(
+                    icon: Icon(Icons.build),
+                    text: loc.services,
+                  ),
+                ],
+                onTap: (index) {
+                  final tabs = [
+                    'guests',
+                    'requests',
+                    'complaints',
+                    'bikes',
+                    'services'
+                  ];
+                  guestVM.setSelectedTab(tabs[index]);
+                },
               ),
-              Tab(
-                icon: const Icon(Icons.two_wheeler),
-                text: loc.bikes,
-              ),
-              Tab(
-                icon: const Icon(Icons.build),
-                text: loc.services,
-              ),
-            ],
-            onTap: (index) {
-              final tabs = [
-                'guests',
-                'requests',
-                'complaints',
-                'bikes',
-                'services'
-              ];
-              guestVM.setSelectedTab(tabs[index]);
-            },
+            ),
           ),
         ),
         showBackButton: false,
@@ -294,27 +316,38 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
       children: [
         // Header with stats
         Container(
-          padding: const EdgeInsets.all(AppSpacing.paddingM),
+          padding: EdgeInsets.all(context.isMobile
+              ? context.responsivePadding.top * 0.75
+              : AppSpacing.paddingM),
           child: Row(
             children: [
               Expanded(
                 child: _buildRequestStatCard(
+                  context,
                   loc.pending,
                   guestVM.pendingBookingRequests.length,
                   AppColors.warning,
                 ),
               ),
-              const SizedBox(width: AppSpacing.paddingS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
               Expanded(
                 child: _buildRequestStatCard(
+                  context,
                   loc.approved,
                   guestVM.approvedBookingRequests.length,
                   AppColors.success,
                 ),
               ),
-              const SizedBox(width: AppSpacing.paddingS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
               Expanded(
                 child: _buildRequestStatCard(
+                  context,
                   loc.rejected,
                   guestVM.rejectedBookingRequests.length,
                   AppColors.error,
@@ -328,16 +361,20 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
         Expanded(
           child: ListView.builder(
             itemCount: guestVM.bookingRequests.length,
+            cacheExtent: 512,
+            addAutomaticKeepAlives: false,
+            addRepaintBoundaries: true,
             itemBuilder: (context, index) {
               final req = guestVM.bookingRequests[index];
               final status = (req['status'] ?? '').toString().toLowerCase();
               final isPending = status == 'pending';
-              return Card(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.paddingM,
-                  vertical: AppSpacing.paddingXS,
-                ),
-                child: Padding(
+              return RepaintBoundary(
+                key: ValueKey('booking_request_${req['id']}_$index'),
+                child: AdaptiveCard(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.paddingM,
+                    vertical: AppSpacing.paddingXS,
+                  ),
                   padding: const EdgeInsets.all(AppSpacing.paddingM),
                   child: Row(
                     children: [
@@ -355,16 +392,17 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
                           ],
                         ),
                       ),
-                      TextButton(
+                      TextButtonWidget(
                         onPressed: () =>
                             _showRequestDetailsDialog(context, req),
-                        child: Text(loc.viewAction),
+                        text: loc.viewAction,
                       ),
                       const SizedBox(width: AppSpacing.paddingS),
                       if (isPending) ...[
-                        TextButton(
+                        TextButtonWidget(
                           onPressed: () => _showRejectDialog(context, req),
-                          child: Text(loc.reject),
+                          text: loc.reject,
+                          color: AppColors.error,
                         ),
                         const SizedBox(width: AppSpacing.paddingS),
                         PrimaryButton(
@@ -404,23 +442,40 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
   }
 
   /// Builds a request stat card
-  Widget _buildRequestStatCard(String label, int count, Color color) {
+  Widget _buildRequestStatCard(
+      BuildContext context, String label, int count, Color color) {
+    final padding = context.responsivePadding;
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(
+          context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          BodyText(
-            text: count.toString(),
+          // Row 1: Number
+          Text(
+            count.toString(),
+            style: TextStyle(
+              fontSize: context.isMobile ? 16 : 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppSpacing.paddingXS),
-          CaptionText(
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS * 0.5
+                  : AppSpacing.paddingXS),
+          // Row 2: Label below
+          BodyText(
             text: label,
+            small: true,
             color: color,
+            align: TextAlign.center,
           ),
         ],
       ),
@@ -433,35 +488,56 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
     final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: HeadingMedium(text: loc.bookingRequestDetailsTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BodyText(
-              text:
-                  '${loc.bookingRequestGuestNameLabel}: ${req['guestName'] ?? '-'}',
-            ),
-            BodyText(
-              text:
-                  '${loc.bookingRequestPhoneLabel}: ${req['guestPhone'] ?? '-'}',
-            ),
-            const SizedBox(height: AppSpacing.paddingS),
-            BodyText(
-              text: '${loc.bookingRequestPgNameLabel}: ${req['pgName'] ?? '-'}',
-            ),
-            BodyText(
-              text:
-                  '${loc.bookingRequestStatusLabel}: ${_statusLabel((req['status'] ?? '-').toString().toLowerCase(), loc)}',
-            ),
-          ],
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(loc.close)),
-        ],
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: loc.bookingRequestDetailsTitle),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      BodyText(
+                        text:
+                            '${loc.bookingRequestGuestNameLabel}: ${req['guestName'] ?? '-'}',
+                      ),
+                      BodyText(
+                        text:
+                            '${loc.bookingRequestPhoneLabel}: ${req['guestPhone'] ?? '-'}',
+                      ),
+                      const SizedBox(height: AppSpacing.paddingS),
+                      BodyText(
+                        text:
+                            '${loc.bookingRequestPgNameLabel}: ${req['pgName'] ?? '-'}',
+                      ),
+                      BodyText(
+                        text:
+                            '${loc.bookingRequestStatusLabel}: ${_statusLabel((req['status'] ?? '-').toString().toLowerCase(), loc)}',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButtonWidget(
+                  onPressed: () => Navigator.of(context).pop(),
+                  text: loc.close,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -471,41 +547,58 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
     final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: HeadingMedium(text: loc.approveBookingRequestTitle),
-        content: TextField(
-          controller: responseController,
-          decoration: InputDecoration(
-            labelText: loc.welcomeMessageOptional,
-            border: const OutlineInputBorder(),
-          ),
-          maxLines: 3,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(loc.cancel)),
-          PrimaryButton(
-            onPressed: () async {
-              final vm = context.read<OwnerGuestViewModel>();
-              final requestId =
-                  (req['requestId'] ?? req['id'] ?? '').toString();
-              await vm.approveBookingRequest(requestId,
-                  responseMessage: responseController.text.trim().isEmpty
-                      ? null
-                      : responseController.text.trim());
-              // FIXED: BuildContext async gap warning
-              // Flutter recommends: Check mounted immediately before using context after async operations
-              // Changed from: Using context with mounted check after async gap
-              // Changed to: Check mounted immediately before context usage
-              // Note: Navigator is safe to use after async when mounted check is performed, analyzer flags as false positive
-              if (!mounted) return;
-              // ignore: use_build_context_synchronously
-              Navigator.of(context).pop();
-            },
-            label: loc.approve,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: loc.approveBookingRequestTitle),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: responseController,
+                label: loc.welcomeMessageOptional,
+                maxLines: 3,
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    onPressed: () async {
+                      final vm = context.read<OwnerGuestViewModel>();
+                      final requestId =
+                          (req['requestId'] ?? req['id'] ?? '').toString();
+                      await vm.approveBookingRequest(requestId,
+                          responseMessage:
+                              responseController.text.trim().isEmpty
+                                  ? null
+                                  : responseController.text.trim());
+                      // FIXED: BuildContext async gap warning
+                      // Flutter recommends: Check mounted immediately before using context after async operations
+                      // Changed from: Using context with mounted check after async gap
+                      // Changed to: Check mounted immediately before context usage
+                      // Note: Navigator is safe to use after async when mounted check is performed, analyzer flags as false positive
+                      if (!mounted) return;
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).pop();
+                    },
+                    label: loc.approve,
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -515,42 +608,59 @@ class _OwnerGuestManagementScreenState extends State<OwnerGuestManagementScreen>
     final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: HeadingMedium(text: loc.rejectBookingRequestTitle),
-        content: TextField(
-          controller: responseController,
-          decoration: InputDecoration(
-            labelText: loc.rejectionReasonOptional,
-            border: const OutlineInputBorder(),
-          ),
-          maxLines: 3,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(loc.cancel)),
-          PrimaryButton(
-            onPressed: () async {
-              final vm = context.read<OwnerGuestViewModel>();
-              final requestId =
-                  (req['requestId'] ?? req['id'] ?? '').toString();
-              await vm.rejectBookingRequest(requestId,
-                  responseMessage: responseController.text.trim().isEmpty
-                      ? null
-                      : responseController.text.trim());
-              // FIXED: BuildContext async gap warning
-              // Flutter recommends: Check mounted immediately before using context after async operations
-              // Changed from: Using context with unrelated mounted check in compound condition
-              // Changed to: Check mounted immediately before context usage
-              // Note: Navigator is safe to use after async when mounted check is performed, analyzer flags as false positive
-              if (!mounted) return;
-              // ignore: use_build_context_synchronously
-              Navigator.of(context).pop();
-            },
-            label: loc.reject,
-            backgroundColor: AppColors.error,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: loc.rejectBookingRequestTitle),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: responseController,
+                label: loc.rejectionReasonOptional,
+                maxLines: 3,
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    onPressed: () async {
+                      final vm = context.read<OwnerGuestViewModel>();
+                      final requestId =
+                          (req['requestId'] ?? req['id'] ?? '').toString();
+                      await vm.rejectBookingRequest(requestId,
+                          responseMessage:
+                              responseController.text.trim().isEmpty
+                                  ? null
+                                  : responseController.text.trim());
+                      // FIXED: BuildContext async gap warning
+                      // Flutter recommends: Check mounted immediately before using context after async operations
+                      // Changed from: Using context with unrelated mounted check in compound condition
+                      // Changed to: Check mounted immediately before context usage
+                      // Note: Navigator is safe to use after async when mounted check is performed, analyzer flags as false positive
+                      if (!mounted) return;
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).pop();
+                    },
+                    label: loc.reject,
+                    backgroundColor: AppColors.error,
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

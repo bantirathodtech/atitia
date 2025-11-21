@@ -6,12 +6,15 @@ import 'package:provider/provider.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
+import '../../../../../common/widgets/chips/filter_chip.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 import '../../data/models/owner_guest_model.dart';
@@ -65,9 +68,16 @@ class _GuestListWidgetState extends State<GuestListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final guestVM = context.watch<OwnerGuestViewModel>();
-    final filteredGuests = guestVM.filteredGuests;
     final loc = AppLocalizations.of(context);
+
+    // Use select to only rebuild when filteredGuests changes, not on every viewmodel change
+    final filteredGuests =
+        context.select<OwnerGuestViewModel, List<OwnerGuestModel>>(
+      (vm) => vm.filteredGuests,
+    );
+
+    // Read viewmodel for methods, don't watch it
+    final guestVM = context.read<OwnerGuestViewModel>();
 
     return Column(
       children: [
@@ -82,8 +92,10 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   /// Builds search bar and filter controls
   Widget _buildSearchAndFilters(BuildContext context,
       OwnerGuestViewModel guestVM, AppLocalizations? loc) {
+    final padding =
+        context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM;
     return Padding(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(padding),
       child: Column(
         children: [
           // Search bar with advanced options
@@ -109,17 +121,23 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                       : null,
                 ),
               ),
-              const SizedBox(width: AppSpacing.paddingS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
               // Advanced search button
               IconButton(
-                icon: const Icon(Icons.tune),
+                icon: Icon(Icons.tune, size: context.isMobile ? 18 : 24),
                 onPressed: () => _showAdvancedSearch(context, guestVM),
                 tooltip: loc?.advancedSearch ??
                     _text('advancedSearch', 'Advanced Search'),
+                padding: EdgeInsets.all(context.isMobile ? 8 : 12),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
 
           // Filter chips with enhanced options
           SingleChildScrollView(
@@ -128,25 +146,23 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               children: [
                 _buildFilterChip(loc?.all ?? _text('all', 'All'), 'all',
                     guestVM.statusFilter, guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
                 _buildFilterChip(loc?.active ?? _text('active', 'Active'),
                     'active', guestVM.statusFilter, guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
                 _buildFilterChip(loc?.inactive ?? _text('inactive', 'Inactive'),
                     'inactive', guestVM.statusFilter, guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
                 _buildFilterChip(loc?.pending ?? _text('pending', 'Pending'),
                     'pending', guestVM.statusFilter, guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
                 _buildFilterChip(loc?.statusNew ?? _text('statusNew', 'New'),
                     'new', guestVM.statusFilter, guestVM.setStatusFilter),
-                const SizedBox(width: AppSpacing.paddingS),
                 _buildFilterChip(loc?.statusVip ?? _text('statusVip', 'VIP'),
                     'vip', guestVM.statusFilter, guestVM.setStatusFilter),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.paddingS),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS
+                  : AppSpacing.paddingS),
 
           // Quick stats and bulk actions
           _buildQuickStatsAndActions(context, guestVM, loc),
@@ -155,31 +171,31 @@ class _GuestListWidgetState extends State<GuestListWidget> {
     );
   }
 
-  /// Builds filter chip
+  /// Builds filter chip using reusable CustomFilterChip
   Widget _buildFilterChip(String label, String value, String currentFilter,
       Function(String) onTap) {
     final isSelected = currentFilter == value;
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) => onTap(selected ? value : 'all'),
-      selectedColor: AppColors.primary.withValues(alpha: 0.2),
-      checkmarkColor: AppColors.primary,
+    return Padding(
+      padding: EdgeInsets.only(right: AppSpacing.paddingS),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 150),
+        child: CustomFilterChip(
+          label: label,
+          selected: isSelected,
+          onSelected: (selected) => onTap(selected ? value : 'all'),
+        ),
+      ),
     );
   }
 
   /// Builds quick stats and bulk actions bar
   Widget _buildQuickStatsAndActions(BuildContext context,
       OwnerGuestViewModel guestVM, AppLocalizations? loc) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingM,
-        vertical: AppSpacing.paddingS,
-      ),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: Theme.of(context).dividerColor),
+    return AdaptiveCard(
+      padding: EdgeInsets.symmetric(
+        horizontal:
+            context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM,
+        vertical: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
       ),
       child: Row(
         children: [
@@ -188,25 +204,32 @@ class _GuestListWidgetState extends State<GuestListWidget> {
             child: Row(
               children: [
                 _buildStatChip(context, loc?.total ?? _text('total', 'Total'),
-                    '${guestVM.guests.length}'),
-                const SizedBox(width: AppSpacing.paddingS),
+                    '${guestVM.totalGuests}'),
+                SizedBox(
+                    width: context.isMobile
+                        ? AppSpacing.paddingXS
+                        : AppSpacing.paddingS),
                 _buildStatChip(
                     context,
                     loc?.active ?? _text('active', 'Active'),
-                    '${guestVM.guests.where((g) => g.status == 'active').length}'),
-                const SizedBox(width: AppSpacing.paddingS),
+                    '${guestVM.activeGuests}'),
+                SizedBox(
+                    width: context.isMobile
+                        ? AppSpacing.paddingXS
+                        : AppSpacing.paddingS),
                 _buildStatChip(
                     context,
                     loc?.statusNew ?? _text('statusNew', 'New'),
-                    '${guestVM.guests.where((g) => g.status == 'new').length}'),
+                    '${guestVM.newGuests}'),
               ],
             ),
           ),
           // Bulk actions
           IconButton(
-            icon: const Icon(Icons.download),
+            icon: Icon(Icons.download, size: context.isMobile ? 18 : 24),
             onPressed: () => _exportGuests(context, guestVM, loc),
             tooltip: loc?.exportData ?? _text('exportData', 'Export Data'),
+            padding: EdgeInsets.all(context.isMobile ? 8 : 12),
           ),
         ],
       ),
@@ -216,9 +239,10 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   /// Builds stat chip
   Widget _buildStatChip(BuildContext context, String label, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingS,
-        vertical: 4,
+      padding: EdgeInsets.symmetric(
+        horizontal:
+            context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
+        vertical: context.isMobile ? 3 : 4,
       ),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
@@ -239,47 +263,71 @@ class _GuestListWidgetState extends State<GuestListWidget> {
     final loc = AppLocalizations.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingMedium(
-            text: loc?.advancedSearch ??
-                _text('advancedSearch', 'Advanced Search')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextInput(
-              label: loc?.guestName ?? _text('guestName', 'Guest Name'),
-              hint: _text('guestNameHint', 'Guest full name'),
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: loc?.phoneNumber ?? _text('phoneNumber', 'Phone'),
-              hint: _text('phoneNumberHint', 'Phone number'),
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: _text('roomLabel', 'Room'),
-              hint: _text('roomHint', 'Room number'),
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label: loc?.emailLabel ?? _text('emailLabel', 'Email'),
-              hint: _text('emailHint', 'Email address'),
-            ),
-          ],
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: BodyText(text: loc?.cancel ?? _text('cancel', 'Cancel')),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(
+                  text: loc?.advancedSearch ??
+                      _text('advancedSearch', 'Advanced Search')),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextInput(
+                        label:
+                            loc?.guestName ?? _text('guestName', 'Guest Name'),
+                        hint: _text('guestNameHint', 'Guest full name'),
+                      ),
+                      const SizedBox(height: AppSpacing.paddingM),
+                      TextInput(
+                        label:
+                            loc?.phoneNumber ?? _text('phoneNumber', 'Phone'),
+                        hint: _text('phoneNumberHint', 'Phone number'),
+                      ),
+                      const SizedBox(height: AppSpacing.paddingM),
+                      TextInput(
+                        label: _text('roomLabel', 'Room'),
+                        hint: _text('roomHint', 'Room number'),
+                      ),
+                      const SizedBox(height: AppSpacing.paddingM),
+                      TextInput(
+                        label: loc?.emailLabel ?? _text('emailLabel', 'Email'),
+                        hint: _text('emailHint', 'Email address'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.pop(context),
+                    text: loc?.cancel ?? _text('cancel', 'Cancel'),
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    label: loc?.search ?? _text('search', 'Search'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // TODO: Implement advanced search
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-          PrimaryButton(
-            label: loc?.search ?? _text('search', 'Search'),
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implement advanced search
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -310,18 +358,28 @@ class _GuestListWidgetState extends State<GuestListWidget> {
       children: [
         // Stats header
         _buildStatsHeader(context, guestVM, loc),
-        const SizedBox(height: AppSpacing.paddingM),
+        SizedBox(
+            height:
+                context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
         // Guest list or structured empty state
         Expanded(
           child: guests.isEmpty
               ? _buildStructuredEmptyState(context, guestVM, loc)
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.paddingM),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: context.isMobile
+                          ? AppSpacing.paddingS
+                          : AppSpacing.paddingM),
                   itemCount: guests.length,
+                  cacheExtent: 512,
+                  addAutomaticKeepAlives: false,
+                  addRepaintBoundaries: true,
                   itemBuilder: (context, index) {
                     final guest = guests[index];
-                    return _buildGuestCard(context, guestVM, guest, loc);
+                    return RepaintBoundary(
+                      key: ValueKey('guest_${guest.guestId}_$index'),
+                      child: _buildGuestCard(context, guestVM, guest, loc),
+                    );
                   },
                 ),
         ),
@@ -332,20 +390,12 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   /// Builds stats header
   Widget _buildStatsHeader(BuildContext context, OwnerGuestViewModel guestVM,
       AppLocalizations? loc) {
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    final padding =
+        context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM;
+    final gap = context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS;
+    return AdaptiveCard(
+      margin: EdgeInsets.all(padding),
+      padding: EdgeInsets.all(padding),
       child: Row(
         children: [
           Expanded(
@@ -357,7 +407,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               AppColors.primary,
             ),
           ),
-          const SizedBox(width: AppSpacing.paddingM),
+          SizedBox(width: gap),
           Expanded(
             child: _buildStatCard(
               context,
@@ -367,7 +417,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               AppColors.success,
             ),
           ),
-          const SizedBox(width: AppSpacing.paddingM),
+          SizedBox(width: gap),
           Expanded(
             child: _buildStatCard(
               context,
@@ -386,11 +436,29 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   Widget _buildStatCard(BuildContext context, String label, String value,
       IconData icon, Color color) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: AppSpacing.paddingXS),
-        HeadingMedium(text: value, color: color),
-        const SizedBox(height: AppSpacing.paddingXS),
+        // Row 1: Icon and Number side by side
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: context.isMobile ? 18 : 24),
+            SizedBox(
+                width: context.isMobile
+                    ? AppSpacing.paddingXS * 0.5
+                    : AppSpacing.paddingXS),
+            HeadingMedium(
+              text: value,
+              color: color,
+            ),
+          ],
+        ),
+        SizedBox(
+            height: context.isMobile
+                ? AppSpacing.paddingXS * 0.5
+                : AppSpacing.paddingXS),
+        // Row 2: Label below
         BodyText(text: label),
       ],
     );
@@ -573,322 +641,222 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   /// Builds individual guest card
   Widget _buildGuestCard(BuildContext context, OwnerGuestViewModel guestVM,
       OwnerGuestModel guest, AppLocalizations? loc) {
+    final padding =
+        context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM;
+    final gap = context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS;
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
+      padding: EdgeInsets.only(
+          bottom: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
       child: AdaptiveCard(
+        padding: EdgeInsets.all(padding),
         child: InkWell(
           onTap: () => _showGuestDetails(context, guestVM, guest, loc),
           borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.paddingM),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Guest header with selection and actions
-                Row(
-                  children: [
-                    // Selection checkbox
-                    Checkbox(
-                      value: false,
-                      onChanged: (selected) {
-                        // TODO: Implement selection
-                      },
-                    ),
+          child: Row(
+            children: [
+              // Selection checkbox
+              Checkbox(
+                value: false,
+                onChanged: (selected) {
+                  // TODO: Implement selection
+                },
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
 
-                    // Avatar with status indicator
-                    Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor:
-                              AppColors.primary.withValues(alpha: 0.1),
-                          child: Text(
-                            guest.guestName.isNotEmpty
-                                ? guest.guestName[0].toUpperCase()
-                                : 'G',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                          ),
+              // Avatar with status indicator
+              Stack(
+                children: [
+                  CircleAvatar(
+                    radius: context.isMobile ? 18 : 24,
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    child: Text(
+                      guest.guestName.isNotEmpty
+                          ? guest.guestName[0].toUpperCase()
+                          : 'G',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                        fontSize: context.isMobile ? 14 : 16,
+                      ),
+                    ),
+                  ),
+                  // Status indicator dot
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: context.isMobile ? 10 : 12,
+                      height: context.isMobile ? 10 : 12,
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(context, guest.status),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context).cardColor,
+                          width: 2,
                         ),
-                        // Status indicator dot
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: _getStatusColor(guest.status),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Theme.of(context).cardColor,
-                                width: 2,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: AppSpacing.paddingM),
-
-                    // Guest info
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  guest.displayName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              if (guest.status == 'new')
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.success,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(
-                                    (loc?.statusNew ?? 'New').toUpperCase(),
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.paddingXS),
-                          Text(
-                            guest.roomAssignment,
-                            style: TextStyle(
-                              color: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.color
-                                      ?.withValues(alpha: 0.7) ??
-                                  Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withValues(alpha: 0.7),
-                              fontSize: 14,
-                            ),
-                          ),
-                          if (guest.status == 'vip')
-                            Container(
-                              margin: const EdgeInsets.only(top: 4),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.warning,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                (loc?.statusVip ?? 'VIP').toUpperCase(),
-                                style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                        ],
                       ),
                     ),
-
-                    // Status chip and actions
-                    Column(
-                      children: [
-                        _buildStatusChip(context, guest.status, loc),
-                        const SizedBox(height: AppSpacing.paddingXS),
-                        PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_vert, size: 16),
-                          onSelected: (value) => _handleGuestAction(
-                              context, guestVM, guest, value, loc),
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              value: 'view',
-                              child: ListTile(
-                                leading: const Icon(Icons.visibility, size: 16),
-                                title: Text(
-                                    AppLocalizations.of(context)?.viewDetails ??
-                                        'View Details'),
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'edit',
-                              child: ListTile(
-                                leading: const Icon(Icons.edit, size: 16),
-                                title: Text(
-                                    AppLocalizations.of(context)?.editGuest ??
-                                        'Edit Guest'),
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'message',
-                              child: ListTile(
-                                leading: const Icon(Icons.message, size: 16),
-                                title: Text(
-                                    AppLocalizations.of(context)?.sendMessage ??
-                                        'Send Message'),
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'call',
-                              child: ListTile(
-                                leading: const Icon(Icons.phone, size: 16),
-                                title: Text(
-                                    AppLocalizations.of(context)?.callGuest ??
-                                        'Call Guest'),
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'checkout',
-                              child: ListTile(
-                                leading: const Icon(Icons.logout, size: 16),
-                                title: Text(
-                                    AppLocalizations.of(context)?.checkOut ??
-                                        'Check Out'),
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: AppSpacing.paddingM),
-
-                // Guest details
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDetailItem(
-                        icon: Icons.phone,
-                        label: loc?.phoneNumber ?? 'Phone',
-                        value: guest.phoneNumber,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildDetailItem(
-                        icon: Icons.email,
-                        label: loc?.email ?? 'Email',
-                        value: guest.email,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: AppSpacing.paddingS),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDetailItem(
-                        icon: Icons.calendar_today,
-                        label: loc?.checkIn ?? 'Check-in',
-                        value: _formatDate(guest.checkInDate),
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildDetailItem(
-                        icon: Icons.timer,
-                        label: loc?.duration ?? 'Duration',
-                        value: guest.formattedStayDuration,
-                      ),
-                    ),
-                  ],
-                ),
-
-                if (guest.emergencyContact.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.paddingS),
-                  _buildDetailItem(
-                    icon: Icons.emergency,
-                    label: loc?.emergencyContact ?? 'Emergency Contact',
-                    value:
-                        '${guest.emergencyContact} (${guest.emergencyPhone})',
                   ),
                 ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+              ),
+              SizedBox(width: gap),
 
-  /// Builds detail item
-  Widget _buildDetailItem({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      children: [
-        Icon(icon,
-            size: 16,
-            color: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.color
-                    ?.withValues(alpha: 0.7) ??
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
-        const SizedBox(width: AppSpacing.paddingS),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.color
-                          ?.withValues(alpha: 0.7) ??
-                      Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
+              // Guest info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            guest.displayName,
+                            style: TextStyle(
+                              fontSize: context.isMobile ? 14 : 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (guest.status == 'new')
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.isMobile ? 4 : 6,
+                              vertical: context.isMobile ? 1 : 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.success,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              (loc?.statusNew ?? 'New').toUpperCase(),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontSize: context.isMobile ? 8 : 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    SizedBox(
+                        height: context.isMobile
+                            ? AppSpacing.paddingXS * 0.5
+                            : AppSpacing.paddingXS),
+                    Text(
+                      guest.roomAssignment,
+                      style: TextStyle(
+                        color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7) ??
+                            Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
+                        fontSize: context.isMobile ? 12 : 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (guest.status == 'vip')
+                      Container(
+                        margin: EdgeInsets.only(top: context.isMobile ? 2 : 4),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.isMobile ? 4 : 6,
+                          vertical: context.isMobile ? 1 : 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          (loc?.statusVip ?? 'VIP').toUpperCase(),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            fontSize: context.isMobile ? 8 : 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+
+              // Status chip and actions
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildStatusChip(context, guest.status, loc),
+                  SizedBox(
+                      height: context.isMobile
+                          ? AppSpacing.paddingXS * 0.5
+                          : AppSpacing.paddingXS),
+                  PopupMenuButton<String>(
+                    icon:
+                        Icon(Icons.more_vert, size: context.isMobile ? 14 : 16),
+                    onSelected: (value) =>
+                        _handleGuestAction(context, guestVM, guest, value, loc),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'view',
+                        child: ListTile(
+                          leading: const Icon(Icons.visibility, size: 16),
+                          title: Text(
+                              AppLocalizations.of(context)?.viewDetails ??
+                                  'View Details'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: ListTile(
+                          leading: const Icon(Icons.edit, size: 16),
+                          title: Text(AppLocalizations.of(context)?.editGuest ??
+                              'Edit Guest'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'message',
+                        child: ListTile(
+                          leading: const Icon(Icons.message, size: 16),
+                          title: Text(
+                              AppLocalizations.of(context)?.sendMessage ??
+                                  'Send Message'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'call',
+                        child: ListTile(
+                          leading: const Icon(Icons.phone, size: 16),
+                          title: Text(AppLocalizations.of(context)?.callGuest ??
+                              'Call Guest'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'checkout',
+                        child: ListTile(
+                          leading: const Icon(Icons.logout, size: 16),
+                          title: Text(AppLocalizations.of(context)?.checkOut ??
+                              'Check Out'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -983,52 +951,78 @@ class _GuestListWidgetState extends State<GuestListWidget> {
       OwnerGuestModel guest, AppLocalizations? loc) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(guest.displayName),
-        content: SingleChildScrollView(
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow(loc?.room ?? 'Room', guest.roomAssignment),
-              _buildDetailRow(loc?.phoneNumber ?? 'Phone', guest.phoneNumber),
-              _buildDetailRow(loc?.email ?? 'Email', guest.email),
-              _buildDetailRow(
-                  loc?.checkIn ?? 'Check-in', _formatDate(guest.checkInDate)),
-              if (guest.checkOutDate != null)
-                _buildDetailRow(loc?.checkOut ?? 'Check-out',
-                    _formatDate(guest.checkOutDate!)),
-              _buildDetailRow(
-                  loc?.duration ?? 'Duration', guest.formattedStayDuration),
-              if (guest.emergencyContact.isNotEmpty) ...[
-                _buildDetailRow(loc?.emergencyContact ?? 'Emergency Contact',
-                    guest.emergencyContact),
-                _buildDetailRow(loc?.emergencyPhone ?? 'Emergency Phone',
-                    guest.emergencyPhone),
-              ],
-              if (guest.address.isNotEmpty)
-                _buildDetailRow(loc?.address ?? 'Address', guest.address),
-              if (guest.occupation.isNotEmpty)
-                _buildDetailRow(
-                    loc?.occupation ?? 'Occupation', guest.occupation),
-              if (guest.company.isNotEmpty)
-                _buildDetailRow(loc?.company ?? 'Company', guest.company),
+              HeadingMedium(text: guest.displayName),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildDetailRow(
+                          loc?.room ?? 'Room', guest.roomAssignment),
+                      _buildDetailRow(
+                          loc?.phoneNumber ?? 'Phone', guest.phoneNumber),
+                      _buildDetailRow(loc?.email ?? 'Email', guest.email),
+                      _buildDetailRow(loc?.checkIn ?? 'Check-in',
+                          _formatDate(guest.checkInDate)),
+                      if (guest.checkOutDate != null)
+                        _buildDetailRow(loc?.checkOut ?? 'Check-out',
+                            _formatDate(guest.checkOutDate!)),
+                      _buildDetailRow(loc?.duration ?? 'Duration',
+                          guest.formattedStayDuration),
+                      if (guest.emergencyContact.isNotEmpty) ...[
+                        _buildDetailRow(
+                            loc?.emergencyContact ?? 'Emergency Contact',
+                            guest.emergencyContact),
+                        _buildDetailRow(
+                            loc?.emergencyPhone ?? 'Emergency Phone',
+                            guest.emergencyPhone),
+                      ],
+                      if (guest.address.isNotEmpty)
+                        _buildDetailRow(
+                            loc?.address ?? 'Address', guest.address),
+                      if (guest.occupation.isNotEmpty)
+                        _buildDetailRow(
+                            loc?.occupation ?? 'Occupation', guest.occupation),
+                      if (guest.company.isNotEmpty)
+                        _buildDetailRow(
+                            loc?.company ?? 'Company', guest.company),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc?.close ?? 'Close',
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    label: loc?.editGuest ?? 'Edit Guest',
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _editGuest(context, guestVM, guest, loc);
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc?.close ?? 'Close'),
-          ),
-          PrimaryButton(
-            label: loc?.editGuest ?? 'Edit Guest',
-            onPressed: () {
-              Navigator.of(context).pop();
-              _editGuest(context, guestVM, guest, loc);
-            },
-          ),
-        ],
       ),
     );
   }
@@ -1072,73 +1066,94 @@ class _GuestListWidgetState extends State<GuestListWidget> {
       context: context,
       builder: (dialogContext) {
         final locDialog = AppLocalizations.of(dialogContext) ?? locOuter;
-        return AlertDialog(
-          title: Text(locDialog?.editGuest ?? 'Edit Guest'),
-          content: SingleChildScrollView(
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextInput(
-                  controller: nameController,
-                  label: locDialog?.guestName ?? 'Guest Name',
-                ),
+                HeadingMedium(text: locDialog?.editGuest ?? 'Edit Guest'),
                 const SizedBox(height: AppSpacing.paddingM),
-                TextInput(
-                  controller: phoneController,
-                  label: locDialog?.phoneNumber ?? 'Phone Number',
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextInput(
+                          controller: nameController,
+                          label: locDialog?.guestName ?? 'Guest Name',
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          controller: phoneController,
+                          label: locDialog?.phoneNumber ?? 'Phone Number',
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          controller: emailController,
+                          label: locDialog?.email ?? 'Email',
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          controller: emergencyController,
+                          label: locDialog?.emergencyContact ??
+                              'Emergency Contact',
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          controller: emergencyPhoneController,
+                          label: locDialog?.emergencyPhone ?? 'Emergency Phone',
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: AppSpacing.paddingM),
-                TextInput(
-                  controller: emailController,
-                  label: locDialog?.email ?? 'Email',
-                ),
-                const SizedBox(height: AppSpacing.paddingM),
-                TextInput(
-                  controller: emergencyController,
-                  label: locDialog?.emergencyContact ?? 'Emergency Contact',
-                ),
-                const SizedBox(height: AppSpacing.paddingM),
-                TextInput(
-                  controller: emergencyPhoneController,
-                  label: locDialog?.emergencyPhone ?? 'Emergency Phone',
+                const SizedBox(height: AppSpacing.paddingL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      text: locDialog?.cancel ?? 'Cancel',
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                    PrimaryButton(
+                      label: locDialog?.saveChanges ?? 'Save Changes',
+                      onPressed: () async {
+                        final navigator = Navigator.of(dialogContext);
+                        final updatedGuest = guest.copyWith(
+                          guestName: nameController.text,
+                          phoneNumber: phoneController.text,
+                          email: emailController.text,
+                          emergencyContact: emergencyController.text,
+                          emergencyPhone: emergencyPhoneController.text,
+                          updatedAt: DateTime.now(),
+                        );
+
+                        final success = await guestVM.updateGuest(updatedGuest);
+                        if (!success || !mounted) return;
+                        navigator.pop();
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              locOuter?.guestUpdatedSuccessfully ??
+                                  _text('guestUpdatedSuccessfully',
+                                      'Guest updated successfully'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(locDialog?.cancel ?? 'Cancel'),
-            ),
-            PrimaryButton(
-              label: locDialog?.saveChanges ?? 'Save Changes',
-              onPressed: () async {
-                final navigator = Navigator.of(dialogContext);
-                final updatedGuest = guest.copyWith(
-                  guestName: nameController.text,
-                  phoneNumber: phoneController.text,
-                  email: emailController.text,
-                  emergencyContact: emergencyController.text,
-                  emergencyPhone: emergencyPhoneController.text,
-                  updatedAt: DateTime.now(),
-                );
-
-                final success = await guestVM.updateGuest(updatedGuest);
-                if (!success || !mounted) return;
-                navigator.pop();
-                if (!mounted) return;
-                messenger.showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      locOuter?.guestUpdatedSuccessfully ??
-                          _text('guestUpdatedSuccessfully',
-                              'Guest updated successfully'),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
         );
       },
     );
@@ -1150,7 +1165,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   }
 
   /// Gets status color for indicator
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(BuildContext context, String status) {
     switch (status.toLowerCase()) {
       case 'active':
         return AppColors.success;
@@ -1197,51 +1212,64 @@ class _GuestListWidgetState extends State<GuestListWidget> {
       OwnerGuestModel guest, AppLocalizations? loc) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingMedium(
-            text: (AppLocalizations.of(context) ?? loc)?.sendMessage ??
-                'Send Message'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            BodyText(
-                text: (AppLocalizations.of(context) ?? loc)
-                        ?.messageToGuest(guest.displayName) ??
-                    'To: ${guest.displayName}'),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextInput(
-              label:
-                  (AppLocalizations.of(context) ?? loc)?.message ?? 'Message',
-              hint: (AppLocalizations.of(context) ?? loc)?.enterMessageHint ??
-                  'Enter your message...',
-              maxLines: 3,
-            ),
-          ],
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: BodyText(
-                text:
-                    (AppLocalizations.of(context) ?? loc)?.cancel ?? 'Cancel'),
-          ),
-          PrimaryButton(
-            label: (AppLocalizations.of(context) ?? loc)?.send ?? 'Send',
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implement send message
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: BodyText(
-                    text: (AppLocalizations.of(context) ?? loc)
-                            ?.messageSentSuccessfully ??
-                        'Message sent successfully',
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(
+                  text: (AppLocalizations.of(context) ?? loc)?.sendMessage ??
+                      'Send Message'),
+              const SizedBox(height: AppSpacing.paddingM),
+              BodyText(
+                  text: (AppLocalizations.of(context) ?? loc)
+                          ?.messageToGuest(guest.displayName) ??
+                      'To: ${guest.displayName}'),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                label:
+                    (AppLocalizations.of(context) ?? loc)?.message ?? 'Message',
+                hint: (AppLocalizations.of(context) ?? loc)?.enterMessageHint ??
+                    'Enter your message...',
+                maxLines: 3,
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.pop(context),
+                    text: (AppLocalizations.of(context) ?? loc)?.cancel ??
+                        'Cancel',
                   ),
-                ),
-              );
-            },
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    label:
+                        (AppLocalizations.of(context) ?? loc)?.send ?? 'Send',
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // TODO: Implement send message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: BodyText(
+                            text: (AppLocalizations.of(context) ?? loc)
+                                    ?.messageSentSuccessfully ??
+                                'Message sent successfully',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -1256,40 +1284,57 @@ class _GuestListWidgetState extends State<GuestListWidget> {
       OwnerGuestModel guest, AppLocalizations? loc) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingMedium(
-            text: (AppLocalizations.of(context) ?? loc)?.checkOutGuest ??
-                'Check Out Guest'),
-        content: BodyText(
-          text: (AppLocalizations.of(context) ?? loc)
-                  ?.checkOutGuestConfirmation ??
-              'Are you sure you want to check out this guest? This action cannot be undone.',
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: BodyText(
-                text:
-                    (AppLocalizations.of(context) ?? loc)?.cancel ?? 'Cancel'),
-          ),
-          PrimaryButton(
-            label:
-                (AppLocalizations.of(context) ?? loc)?.checkOut ?? 'Check Out',
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implement checkout
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: BodyText(
-                    text: (AppLocalizations.of(context) ?? loc)
-                            ?.guestCheckedOutSuccessfully ??
-                        'Guest checked out successfully',
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(
+                  text: (AppLocalizations.of(context) ?? loc)?.checkOutGuest ??
+                      'Check Out Guest'),
+              const SizedBox(height: AppSpacing.paddingM),
+              BodyText(
+                text: (AppLocalizations.of(context) ?? loc)
+                        ?.checkOutGuestConfirmation ??
+                    'Are you sure you want to check out this guest? This action cannot be undone.',
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.pop(context),
+                    text: (AppLocalizations.of(context) ?? loc)?.cancel ??
+                        'Cancel',
                   ),
-                ),
-              );
-            },
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    label: (AppLocalizations.of(context) ?? loc)?.checkOut ??
+                        'Check Out',
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // TODO: Implement checkout
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: BodyText(
+                            text: (AppLocalizations.of(context) ?? loc)
+                                    ?.guestCheckedOutSuccessfully ??
+                                'Guest checked out successfully',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

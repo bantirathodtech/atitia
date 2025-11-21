@@ -68,7 +68,7 @@ class GuestPgCard extends StatelessWidget {
     final loc = AppLocalizations.of(context);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
+      margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
       child: Material(
         color: Colors
             .transparent, // Material color for InkWell - transparent is fine
@@ -124,10 +124,10 @@ class GuestPgCard extends StatelessWidget {
           child: pg.hasPhotos
               ? SizedBox(
                   width: double.infinity,
-                  height: 200,
+                  height: 150,
                   child: AdaptiveImage(
                     imageUrl: pg.photos.first,
-                    height: 200,
+                    height: 150,
                     fit: BoxFit.cover,
                     placeholder: _buildImagePlaceholder(context, isDarkMode),
                   ),
@@ -137,7 +137,7 @@ class GuestPgCard extends StatelessWidget {
 
         // Gradient Overlay for text readability
         Container(
-          height: 200,
+          height: 150,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(AppSpacing.borderRadiusL),
@@ -157,9 +157,9 @@ class GuestPgCard extends StatelessWidget {
 
         // Top badges row
         Positioned(
-          top: AppSpacing.paddingM,
-          left: AppSpacing.paddingM,
-          right: AppSpacing.paddingM,
+          top: AppSpacing.paddingS,
+          left: AppSpacing.paddingS,
+          right: AppSpacing.paddingS,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -185,9 +185,9 @@ class GuestPgCard extends StatelessWidget {
 
         // Bottom overlay: PG Name and Location
         Positioned(
-          bottom: AppSpacing.paddingM,
-          left: AppSpacing.paddingM,
-          right: AppSpacing.paddingM,
+          bottom: AppSpacing.paddingS,
+          left: AppSpacing.paddingS,
+          right: AppSpacing.paddingS,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -213,13 +213,13 @@ class GuestPgCard extends StatelessWidget {
     AppLocalizations? loc,
   ) {
     return Padding(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: const EdgeInsets.all(AppSpacing.paddingS),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Quick Decision Factors Row
           _buildQuickDecisionFactors(context, isDarkMode, loc),
-          const SizedBox(height: AppSpacing.paddingM),
+          const SizedBox(height: AppSpacing.paddingS),
           // Sharing Summary Preview
           _buildSharingPreview(context, isDarkMode, loc),
         ],
@@ -300,10 +300,10 @@ class GuestPgCard extends StatelessWidget {
   ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(
-        AppSpacing.paddingM,
+        AppSpacing.paddingS,
         0,
-        AppSpacing.paddingM,
-        AppSpacing.paddingM,
+        AppSpacing.paddingS,
+        AppSpacing.paddingS,
       ),
       child: Row(
         children: [
@@ -535,7 +535,7 @@ class GuestPgCard extends StatelessWidget {
   Widget _buildImagePlaceholder(BuildContext context, bool isDarkMode) {
     return Container(
       width: double.infinity,
-      height: 200,
+      height: 150,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: const BorderRadius.only(

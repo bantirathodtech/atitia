@@ -7,6 +7,7 @@ import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
@@ -60,11 +61,17 @@ class BookingListWidget extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       itemCount: bookings.length,
+      cacheExtent: 512,
+      addAutomaticKeepAlives: false,
+      addRepaintBoundaries: true,
       itemBuilder: (context, index) {
         final booking = bookings[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-          child: _buildBookingCard(context, booking, loc),
+        return RepaintBoundary(
+          key: ValueKey('booking_${booking.id}_$index'),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+            child: _buildBookingCard(context, booking, loc),
+          ),
         );
       },
     );
@@ -271,75 +278,92 @@ class BookingListWidget extends StatelessWidget {
   ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingSmall(
-            text: loc?.bookingDetailsTitle ??
-                _text('bookingDetailsTitle', 'Booking Details')),
-        content: SingleChildScrollView(
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow(
-                context,
-                loc?.roomBedLabel ?? _text('roomBedLabel', 'Room/Bed'),
-                booking.roomBedDisplay,
+              HeadingSmall(
+                  text: loc?.bookingDetailsTitle ??
+                      _text('bookingDetailsTitle', 'Booking Details')),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailRow(
+                        context,
+                        loc?.roomBedLabel ?? _text('roomBedLabel', 'Room/Bed'),
+                        booking.roomBedDisplay,
+                      ),
+                      _buildDetailRow(
+                          context,
+                          loc?.startDate ?? _text('startDate', 'Start Date'),
+                          booking.formattedStartDate),
+                      _buildDetailRow(
+                          context,
+                          loc?.endDate ?? _text('endDate', 'End Date'),
+                          booking.formattedEndDate),
+                      _buildDetailRow(
+                        context,
+                        loc?.durationLabel ?? _text('durationLabel', 'Duration'),
+                        loc?.durationDays(booking.durationInDays) ??
+                            _text('durationDays', '{count} days',
+                                parameters: {'count': booking.durationInDays}),
+                      ),
+                      _buildDetailRow(
+                          context,
+                          loc?.rentLabel ?? _text('rentLabel', 'Rent'),
+                          booking.formattedRent),
+                      _buildDetailRow(
+                          context,
+                          loc?.depositLabel ?? _text('depositLabel', 'Deposit'),
+                          booking.formattedDeposit),
+                      _buildDetailRow(
+                          context,
+                          loc?.paidLabel ?? _text('paidLabel', 'Paid'),
+                          booking.formattedPaid),
+                      _buildDetailRow(
+                          context,
+                          loc?.remainingLabel ?? _text('remainingLabel', 'Remaining'),
+                          booking.formattedRemaining),
+                      _buildDetailRow(
+                          context,
+                          loc?.statusLabel ?? _text('statusLabel', 'Status'),
+                          booking.statusDisplay),
+                      _buildDetailRow(
+                        context,
+                        loc?.paymentStatusLabel ??
+                            _text('paymentStatusLabel', 'Payment Status'),
+                        booking.paymentStatusDisplay,
+                      ),
+                      if (booking.notes != null && booking.notes!.isNotEmpty)
+                        _buildDetailRow(
+                            context,
+                            loc?.notesLabel ?? _text('notesLabel', 'Notes'),
+                            booking.notes!),
+                    ],
+                  ),
+                ),
               ),
-              _buildDetailRow(
-                  context,
-                  loc?.startDate ?? _text('startDate', 'Start Date'),
-                  booking.formattedStartDate),
-              _buildDetailRow(
-                  context,
-                  loc?.endDate ?? _text('endDate', 'End Date'),
-                  booking.formattedEndDate),
-              _buildDetailRow(
-                context,
-                loc?.durationLabel ?? _text('durationLabel', 'Duration'),
-                loc?.durationDays(booking.durationInDays) ??
-                    _text('durationDays', '{count} days',
-                        parameters: {'count': booking.durationInDays}),
+              const SizedBox(height: AppSpacing.paddingM),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButtonWidget(
+                  onPressed: () => Navigator.of(context).pop(),
+                  text: loc?.close ?? _text('close', 'Close'),
+                ),
               ),
-              _buildDetailRow(
-                  context,
-                  loc?.rentLabel ?? _text('rentLabel', 'Rent'),
-                  booking.formattedRent),
-              _buildDetailRow(
-                  context,
-                  loc?.depositLabel ?? _text('depositLabel', 'Deposit'),
-                  booking.formattedDeposit),
-              _buildDetailRow(
-                  context,
-                  loc?.paidLabel ?? _text('paidLabel', 'Paid'),
-                  booking.formattedPaid),
-              _buildDetailRow(
-                  context,
-                  loc?.remainingLabel ?? _text('remainingLabel', 'Remaining'),
-                  booking.formattedRemaining),
-              _buildDetailRow(
-                  context,
-                  loc?.statusLabel ?? _text('statusLabel', 'Status'),
-                  booking.statusDisplay),
-              _buildDetailRow(
-                context,
-                loc?.paymentStatusLabel ??
-                    _text('paymentStatusLabel', 'Payment Status'),
-                booking.paymentStatusDisplay,
-              ),
-              if (booking.notes != null && booking.notes!.isNotEmpty)
-                _buildDetailRow(
-                    context,
-                    loc?.notesLabel ?? _text('notesLabel', 'Notes'),
-                    booking.notes!),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc?.close ?? _text('close', 'Close')),
-          ),
-        ],
       ),
     );
   }

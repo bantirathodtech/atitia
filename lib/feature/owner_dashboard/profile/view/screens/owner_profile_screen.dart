@@ -31,7 +31,7 @@ import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/dropdowns/adaptive_dropdown.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
-// import '../../../../../common/widgets/images/adaptive_image.dart';
+import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 // import '../../../../../common/widgets/text/heading_large.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
@@ -699,10 +699,12 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
                 Container(
                   width: 60,
                   height: 60,
-                  decoration: BoxDecoration(
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    image: DecorationImage(
-                      image: NetworkImage(imageUrl),
+                    child: AdaptiveImage(
+                      imageUrl: imageUrl,
+                      width: 60,
+                      height: 60,
                       fit: BoxFit.cover,
                     ),
                   ),

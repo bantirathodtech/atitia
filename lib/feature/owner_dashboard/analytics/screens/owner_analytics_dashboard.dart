@@ -6,10 +6,14 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../l10n/app_localizations.dart';
@@ -163,13 +167,6 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
             tooltip: loc.menuTooltip,
           ),
         ],
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshData,
-            tooltip: loc.analyticsRefreshData,
-          ),
-        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: TabBar(
@@ -238,9 +235,9 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                     ?.withValues(alpha: 0.5) ??
                 Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
           HeadingMedium(text: loc.analyticsNoPgTitle),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           BodyText(
             text: loc.analyticsNoPgMessage,
           ),
@@ -257,7 +254,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const AdaptiveLoader(),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
           BodyText(text: loc.analyticsLoading),
         ],
       ),
@@ -284,16 +281,16 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                 color: Theme.of(context).colorScheme.error,
               ),
             ),
-            const SizedBox(height: AppSpacing.paddingL),
+            SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
             Semantics(
               header: true,
               child: HeadingMedium(text: loc.analyticsErrorTitle),
             ),
-            const SizedBox(height: AppSpacing.paddingM),
+            SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
             BodyText(
               text: _error ?? loc.analyticsUnknownError,
             ),
-            const SizedBox(height: AppSpacing.paddingL),
+            SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
             PrimaryButton(
               onPressed: _refreshData,
               label: loc.retry,
@@ -305,8 +302,9 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   Widget _buildRevenueTab(BuildContext context) {
+    final padding = context.responsivePadding;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       child: RevenueAnalyticsWidget(
         revenueData: _revenueData,
         selectedPgId: _lastLoadedPgId,
@@ -316,8 +314,9 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   Widget _buildOccupancyTab(BuildContext context) {
+    final padding = context.responsivePadding;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       child: OccupancyAnalyticsWidget(
         occupancyData: _occupancyData,
         selectedPgId: _lastLoadedPgId,
@@ -327,15 +326,17 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   Widget _buildPerformanceTab(BuildContext context) {
+    final padding = context.responsivePadding;
+    final cardGap = context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildPerformanceHeader(context),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: cardGap),
           _buildPerformanceMetrics(context),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: cardGap),
           _buildPerformanceInsights(context),
         ],
       ),
@@ -343,24 +344,23 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   Widget _buildPerformanceHeader(BuildContext context) {
-    final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
 
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(AppSpacing.paddingM),
+          padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           decoration: BoxDecoration(
-            color: theme.primaryColor.withValues(alpha: 0.1),
+            color: context.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           ),
           child: Icon(
             Icons.analytics,
-            color: theme.primaryColor,
-            size: 24,
+            color: context.primaryColor,
+            size: context.isMobile ? 20 : 24,
           ),
         ),
-        const SizedBox(width: AppSpacing.paddingM),
+        SizedBox(width: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,9 +368,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
               HeadingMedium(text: loc.performanceAnalyticsTitle),
               CaptionText(
                 text: loc.performanceAnalyticsSubtitle,
-                color:
-                    theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ??
-                        theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                color: ThemeColors.getTextSecondary(context),
               ),
             ],
           ),
@@ -380,62 +378,57 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   Widget _buildPerformanceMetrics(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
     final decimalFormatter = NumberFormat('0.0', loc.localeName);
     final guestSatisfactionScore = decimalFormatter.format(4.8);
     final responseTimeHours = decimalFormatter.format(2.3);
     final maintenanceScore = decimalFormatter.format(9.2);
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.paddingL),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            HeadingMedium(text: loc.performanceKpiTitle),
-            const SizedBox(height: AppSpacing.paddingL),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildKpiCard(
-                    context,
-                    loc.performanceKpiGuestSatisfaction,
-                    loc.performanceKpiGuestSatisfactionValue(
-                      guestSatisfactionScore,
-                    ),
-                    Icons.star,
-                    AppColors.warning,
-                    isDark,
+    final padding = context.responsivePadding;
+    final cardGap = context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM;
+    return AdaptiveCard(
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : AppSpacing.paddingL),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HeadingMedium(text: loc.performanceKpiTitle),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+          Row(
+            children: [
+              Expanded(
+                child: _buildKpiCard(
+                  context,
+                  loc.performanceKpiGuestSatisfaction,
+                  loc.performanceKpiGuestSatisfactionValue(
+                    guestSatisfactionScore,
                   ),
+                  Icons.star,
+                  AppColors.warning,
                 ),
-                const SizedBox(width: AppSpacing.paddingM),
-                Expanded(
-                  child: _buildKpiCard(
-                    context,
-                    loc.performanceKpiResponseTime,
-                    loc.performanceKpiResponseTimeValue(responseTimeHours),
-                    Icons.timer,
-                    AppColors.info,
-                    isDark,
-                  ),
+              ),
+              SizedBox(width: cardGap),
+              Expanded(
+                child: _buildKpiCard(
+                  context,
+                  loc.performanceKpiResponseTime,
+                  loc.performanceKpiResponseTimeValue(responseTimeHours),
+                  Icons.timer,
+                  AppColors.info,
                 ),
-                const SizedBox(width: AppSpacing.paddingM),
-                Expanded(
-                  child: _buildKpiCard(
-                    context,
-                    loc.performanceKpiMaintenanceScore,
-                    loc.performanceKpiMaintenanceScoreValue(maintenanceScore),
-                    Icons.build,
-                    AppColors.success,
-                    isDark,
-                  ),
+              ),
+              SizedBox(width: cardGap),
+              Expanded(
+                child: _buildKpiCard(
+                  context,
+                  loc.performanceKpiMaintenanceScore,
+                  loc.performanceKpiMaintenanceScoreValue(maintenanceScore),
+                  Icons.build,
+                  AppColors.success,
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -446,11 +439,10 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
     String value,
     IconData icon,
     Color color,
-    bool isDark,
   ) {
-    final theme = Theme.of(context);
+    final padding = context.responsivePadding;
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
@@ -461,26 +453,26 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
         children: [
           Row(
             children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: AppSpacing.paddingS),
+              Icon(icon, color: color, size: context.isMobile ? 16 : 20),
+              SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
               Expanded(
                 child: Text(
                   title,
                   style: TextStyle(
-                    color: theme.textTheme.bodySmall?.color
+                    color: context.textTheme.bodySmall?.color
                             ?.withValues(alpha: 0.7) ??
-                        theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                    fontSize: 12,
+                        context.colors.onSurface.withValues(alpha: 0.7),
+                    fontSize: context.isMobile ? 10 : 12,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingS),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: context.isMobile ? 14 : 18,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -491,7 +483,6 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   Widget _buildPerformanceInsights(BuildContext context) {
-    final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
     final recommendations = [
       loc.performanceRecommendationMaintainSchedule,
@@ -511,7 +502,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingM),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
+                color: context.colors.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
               ),
               child: Column(
@@ -540,17 +531,14 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                             '• ',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: theme.textTheme.bodyMedium?.color ??
-                                  theme.colorScheme.onSurface,
+                              color: context.textTheme.bodyMedium?.color ??
+                                  context.colors.onSurface,
                             ),
                           ),
                           Expanded(
                             child: BodyText(
                               text: rec,
-                              color: theme.textTheme.bodySmall?.color
-                                      ?.withValues(alpha: 0.8) ??
-                                  theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.8),
+                              color: ThemeColors.getTextSecondary(context),
                             ),
                           ),
                         ],

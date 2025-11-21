@@ -39,11 +39,18 @@ class ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
     final finalConfirmText = confirmText ?? loc?.confirm ?? 'Confirm';
     final finalCancelText = cancelText ?? loc?.cancel ?? 'Cancel';
 
     return AlertDialog(
+      backgroundColor: isDarkMode 
+          ? theme.colorScheme.surface 
+          : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       title: Row(
         children: [
           if (icon != null) ...[

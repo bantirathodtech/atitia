@@ -10,6 +10,8 @@ import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/widgets/inputs/text_input.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/models/bed_change_request_model.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
@@ -244,35 +246,36 @@ class BedChangeRequestWidget extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingSmall(
-          text: loc.approveBedChangeTitle,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BodyText(
-              text: loc.approveBedChangeDescription,
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextField(
-              controller: notesController,
-              decoration: InputDecoration(
-                labelText: loc.notesOptional,
-                hintText: loc.approvalNotesHint,
-                border: const OutlineInputBorder(),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingSmall(text: loc.approveBedChangeTitle),
+              const SizedBox(height: AppSpacing.paddingM),
+              BodyText(text: loc.approveBedChangeDescription),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: notesController,
+                label: loc.notesOptional,
+                hint: loc.approvalNotesHint,
+                maxLines: 3,
               ),
-              maxLines: 3,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc.cancel),
-          ),
-          PrimaryButton(
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
             label: loc.approve,
             onPressed: () async {
               final success = await viewModel.approveBedChangeRequest(
@@ -295,9 +298,13 @@ class BedChangeRequestWidget extends StatelessWidget {
                   ),
                 );
               }
-            },
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -311,67 +318,72 @@ class BedChangeRequestWidget extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingSmall(
-          text: loc.rejectBedChangeTitle,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BodyText(
-              text: loc.rejectBedChangeDescription,
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextField(
-              controller: notesController,
-              decoration: InputDecoration(
-                labelText: loc.rejectionReasonRequired,
-                hintText: loc.rejectionReasonHintDetailed,
-                border: const OutlineInputBorder(),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingSmall(text: loc.rejectBedChangeTitle),
+              const SizedBox(height: AppSpacing.paddingM),
+              BodyText(text: loc.rejectBedChangeDescription),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: notesController,
+                label: loc.rejectionReasonRequired,
+                hint: loc.rejectionReasonHintDetailed,
+                maxLines: 3,
               ),
-              maxLines: 3,
-            ),
-          ],
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    label: loc.reject,
+                    onPressed: () async {
+                      if (notesController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(loc.provideRejectionReason),
+                            backgroundColor: AppColors.warning,
+                          ),
+                        );
+                        return;
+                      }
+                      final success = await viewModel.rejectBedChangeRequest(
+                        request.requestId,
+                        decisionNotes: notesController.text.trim(),
+                      );
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              success
+                                  ? loc.bedChangeRejectSuccess
+                                  : loc.bedChangeRejectFailure,
+                            ),
+                            backgroundColor:
+                                success ? AppColors.warning : AppColors.error,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc.cancel),
-          ),
-          PrimaryButton(
-            label: loc.reject,
-            onPressed: () async {
-              if (notesController.text.trim().isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(loc.provideRejectionReason),
-                    backgroundColor: AppColors.warning,
-                  ),
-                );
-                return;
-              }
-              final success = await viewModel.rejectBedChangeRequest(
-                request.requestId,
-                decisionNotes: notesController.text.trim(),
-              );
-              if (context.mounted) {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      success
-                          ? loc.bedChangeRejectSuccess
-                          : loc.bedChangeRejectFailure,
-                    ),
-                    backgroundColor:
-                        success ? AppColors.warning : AppColors.error,
-                  ),
-                );
-              }
-            },
-          ),
-        ],
       ),
     );
   }

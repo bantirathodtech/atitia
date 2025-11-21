@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
@@ -16,6 +18,8 @@ import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/chips/filter_chip.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/widgets/inputs/text_input.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/owner_drawer.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
@@ -94,18 +98,31 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
       length: 2,
       child: Column(
         children: [
-          TabBar(
-            tabs: [
-              Tab(
-                text: '${loc.bookingRequests} (${bookingRequests.length})',
-                icon: const Icon(Icons.book_online, size: 16),
+          Container(
+            color: context.isDarkMode ? Colors.black : Colors.white,
+            child: IconTheme(
+              data: IconThemeData(
+                color: context.isDarkMode ? Colors.white : Colors.black,
               ),
-              Tab(
-                text:
-                    '${loc.bedChanges} (${pendingBedChangeRequests.length} ${loc.pending})',
-                icon: const Icon(Icons.bed, size: 16),
+              child: TabBar(
+                indicatorColor:
+                    context.isDarkMode ? Colors.white : Colors.black,
+                labelColor: context.isDarkMode ? Colors.white : Colors.black,
+                unselectedLabelColor:
+                    context.isDarkMode ? Colors.white70 : Colors.black87,
+                tabs: [
+                  Tab(
+                    text: '${loc.bookingRequests} (${bookingRequests.length})',
+                    icon: Icon(Icons.book_online, size: 16),
+                  ),
+                  Tab(
+                    text:
+                        '${loc.bedChanges} (${pendingBedChangeRequests.length} ${loc.pending})',
+                    icon: Icon(Icons.bed, size: 16),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
           Expanded(
             child: TabBarView(
@@ -215,15 +232,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                     children: [
                       Icon(Icons.person,
                           size: 14,
-                          color: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.color
-                                  ?.withValues(alpha: 0.7) ??
-                              Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.7)),
+                          color: ThemeColors.getTextTertiary(context)),
                       const SizedBox(width: AppSpacing.paddingXS),
                       CaptionText(
                         text: c.guestName.isEmpty ? loc.guest : c.guestName,
@@ -231,15 +240,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                       const SizedBox(width: AppSpacing.paddingM),
                       Icon(Icons.schedule,
                           size: 14,
-                          color: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.color
-                                  ?.withValues(alpha: 0.7) ??
-                              Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withValues(alpha: 0.7)),
+                          color: ThemeColors.getTextTertiary(context)),
                       const SizedBox(width: AppSpacing.paddingXS),
                       CaptionText(text: _formatShortDate(c.createdAt)),
                     ],
@@ -280,23 +281,34 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     final AppLocalizations loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingSmall(text: loc.replyToComplaint),
-        content: TextField(
-          controller: controller,
-          maxLines: 4,
-          decoration: InputDecoration(
-            labelText: loc.reply,
-            hintText: loc.typeYourReply,
-            border: const OutlineInputBorder(),
-          ),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc.cancel),
-          ),
-          PrimaryButton(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingSmall(text: loc.replyToComplaint),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: controller,
+                label: loc.reply,
+                hint: loc.typeYourReply,
+                maxLines: 4,
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
             label: loc.send,
             onPressed: () async {
               final text = controller.text.trim();
@@ -315,9 +327,13 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                   ),
                 );
               }
-            },
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -328,45 +344,60 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     final AppLocalizations loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingSmall(text: loc.resolveComplaint),
-        content: TextField(
-          controller: notes,
-          maxLines: 3,
-          decoration: InputDecoration(
-            labelText: loc.resolutionNotesOptional,
-            border: const OutlineInputBorder(),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingSmall(text: loc.resolveComplaint),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: notes,
+                label: loc.resolutionNotesOptional,
+                maxLines: 3,
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    label: loc.markResolved,
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      final ok = await viewModel.updateComplaintStatus(
+                        complaintId,
+                        'resolved',
+                        resolutionNotes:
+                            notes.text.trim().isEmpty ? null : notes.text.trim(),
+                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: BodyText(
+                              text: ok ? loc.complaintResolved : loc.failedToResolve,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            backgroundColor: ok ? AppColors.success : AppColors.error,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc.cancel),
-          ),
-          PrimaryButton(
-            label: loc.markResolved,
-            onPressed: () async {
-              Navigator.of(context).pop();
-              final ok = await viewModel.updateComplaintStatus(
-                complaintId,
-                'resolved',
-                resolutionNotes:
-                    notes.text.trim().isEmpty ? null : notes.text.trim(),
-              );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: BodyText(
-                      text: ok ? loc.complaintResolved : loc.failedToResolve,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    backgroundColor: ok ? AppColors.success : AppColors.error,
-                  ),
-                );
-              }
-            },
-          ),
-        ],
       ),
     );
   }
@@ -416,44 +447,57 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
 
+        // Theme-aware background color
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
+
         // Left: Drawer button
         showDrawer: true,
 
-        // Right: Add PG + Refresh
+        // Right: Add PG
         actions: [
           const AddPgActionButton(),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: viewModel.refreshData,
-            tooltip: loc.refreshGuestData,
-          ),
         ],
 
-        // Bottom: Guest tab bar
+        // Bottom: Guest tab bar with theme-aware colors and border to prevent overlap
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: TabBar(
-            controller: _tabController,
-            indicatorColor: Theme.of(context).colorScheme.onPrimary,
-            labelColor: Theme.of(context).colorScheme.onPrimary,
-            unselectedLabelColor:
-                Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
-            tabs: [
-              Tab(text: loc.guests, icon: const Icon(Icons.people, size: 16)),
-              Tab(
-                  text: loc.booking,
-                  icon: const Icon(Icons.book_online, size: 16)),
-              Tab(
-                  text: loc.payments,
-                  icon: const Icon(Icons.payment, size: 16)),
-              Tab(
-                  text: loc.complaints,
-                  icon: const Icon(Icons.report_problem, size: 16)),
-              Tab(
-                  text: loc.requests,
-                  icon: const Icon(Icons.request_page, size: 16)),
-              Tab(text: loc.bedMap, icon: const Icon(Icons.bed, size: 16)),
-            ],
+          child: Container(
+            decoration: BoxDecoration(
+              color: context.isDarkMode ? Colors.black : Colors.white,
+              border: Border(
+                top: BorderSide(
+                  color: ThemeColors.getDivider(context),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: IconTheme(
+              data: IconThemeData(
+                color: context.isDarkMode ? Colors.white : Colors.black,
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicatorColor:
+                    context.isDarkMode ? Colors.white : Colors.black,
+                labelColor: context.isDarkMode ? Colors.white : Colors.black,
+                unselectedLabelColor:
+                    context.isDarkMode ? Colors.white70 : Colors.black87,
+                tabs: [
+                  Tab(text: loc.guests, icon: Icon(Icons.people, size: 16)),
+                  Tab(
+                      text: loc.booking,
+                      icon: Icon(Icons.book_online, size: 16)),
+                  Tab(text: loc.payments, icon: Icon(Icons.payment, size: 16)),
+                  Tab(
+                      text: loc.complaints,
+                      icon: Icon(Icons.report_problem, size: 16)),
+                  Tab(
+                      text: loc.requests,
+                      icon: Icon(Icons.request_page, size: 16)),
+                  Tab(text: loc.bedMap, icon: Icon(Icons.bed, size: 16)),
+                ],
+              ),
+            ),
           ),
         ),
 
@@ -549,8 +593,6 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   /// Builds bulk action bar when guests are selected
   Widget _buildBulkActionBar(
       BuildContext context, OwnerGuestViewModel viewModel) {
-    // final theme = Theme.of(context);
-    // final true = theme.brightness == Brightness.dark;
     final AppLocalizations loc = AppLocalizations.of(context)!;
 
     return Container(
@@ -639,27 +681,42 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
 
     final newStatus = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(loc.changeStatus),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.check_circle, color: AppColors.success),
-              title: Text(loc.active),
-              onTap: () => Navigator.pop(context, 'active'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.pending, color: AppColors.statusOrange),
-              title: Text(loc.pending),
-              onTap: () => Navigator.pop(context, 'pending'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.cancel, color: AppColors.error),
-              title: Text(loc.inactive),
-              onTap: () => Navigator.pop(context, 'inactive'),
-            ),
-          ],
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: loc.changeStatus),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.check_circle, color: AppColors.success),
+                      title: BodyText(text: loc.active),
+                      onTap: () => Navigator.pop(context, 'active'),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.pending, color: AppColors.statusOrange),
+                      title: BodyText(text: loc.pending),
+                      onTap: () => Navigator.pop(context, 'pending'),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.cancel, color: AppColors.error),
+                      title: BodyText(text: loc.inactive),
+                      onTap: () => Navigator.pop(context, 'inactive'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -688,22 +745,41 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(loc.confirmBulkDelete),
-        content: Text(
-          loc.areYouSureYouWantToDeleteGuests(viewModel.selectedCount),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(loc.cancel),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: loc.confirmBulkDelete),
+              const SizedBox(height: AppSpacing.paddingM),
+              BodyText(
+                text: loc.areYouSureYouWantToDeleteGuests(viewModel.selectedCount),
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.pop(context, false),
+                    text: loc.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  TextButtonWidget(
+                    onPressed: () => Navigator.pop(context, true),
+                    text: loc.delete,
+                    color: AppColors.error,
+                    bold: true,
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: Text(loc.delete),
-          ),
-        ],
+        ),
       ),
     );
 
@@ -791,17 +867,9 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         ),
         Text(
           title,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.color
-                        ?.withValues(alpha: 0.7) ??
-                    Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.7),
-              ),
+          style: context.textTheme.bodySmall?.copyWith(
+            color: ThemeColors.getTextTertiary(context),
+          ),
         ),
       ],
     );
@@ -810,37 +878,33 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   /// Builds filter chips
   /// Builds search bar with debouncing
   Widget _buildSearchBar(BuildContext context, OwnerGuestViewModel viewModel) {
-    // final theme = Theme.of(context);
-    // final true = theme.brightness == Brightness.dark;
     final AppLocalizations loc = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.all(AppSpacing.paddingM),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: AppColors.darkInputFill,
+        color: context.theme.inputDecorationTheme.fillColor,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color: AppColors.darkDivider,
+          color: ThemeColors.getDivider(context),
         ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.search,
-            color: AppColors.textTertiary,
+            color: ThemeColors.getTextTertiary(context),
           ),
           const SizedBox(width: AppSpacing.paddingS),
           Expanded(
             child: TextField(
               onChanged: viewModel.setSearchQuery,
-              style: TextStyle(
-                color: AppColors.textOnPrimary,
-              ),
+              style: context.textTheme.bodyLarge,
               decoration: InputDecoration(
                 hintText: loc.ownerGuestSearchHint,
                 hintStyle: TextStyle(
-                  color: AppColors.textTertiary,
+                  color: ThemeColors.getTextTertiary(context),
                 ),
                 border: InputBorder.none,
               ),
@@ -850,7 +914,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             IconButton(
               icon: Icon(
                 Icons.clear,
-                color: AppColors.textTertiary,
+                color: ThemeColors.getTextTertiary(context),
               ),
               onPressed: viewModel.clearSearch,
               tooltip: loc.ownerGuestClearSearchTooltip,
@@ -1138,29 +1202,12 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             Row(
               children: [
                 Icon(Icons.apartment,
-                    size: 14,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7)),
+                    size: 14, color: ThemeColors.getTextTertiary(context)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: BodyText(
                     text: request.pgName,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7),
+                    color: ThemeColors.getTextTertiary(context),
                   ),
                 ),
               ],
@@ -1170,28 +1217,11 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             Row(
               children: [
                 Icon(Icons.phone,
-                    size: 14,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7)),
+                    size: 14, color: ThemeColors.getTextTertiary(context)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: request.guestPhone,
-                  color: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.color
-                          ?.withValues(alpha: 0.7) ??
-                      Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
+                  color: ThemeColors.getTextTertiary(context),
                 ),
               ],
             ),
@@ -1200,28 +1230,11 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             Row(
               children: [
                 Icon(Icons.calendar_today,
-                    size: 14,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7)),
+                    size: 14, color: ThemeColors.getTextTertiary(context)),
                 const SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: request.formattedCreatedAt,
-                  color: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.color
-                          ?.withValues(alpha: 0.7) ??
-                      Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
+                  color: ThemeColors.getTextTertiary(context),
                 ),
               ],
             ),
@@ -1229,15 +1242,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
               const SizedBox(height: AppSpacing.paddingS),
               BodyText(
                 text: request.requestSummary,
-                color: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.color
-                        ?.withValues(alpha: 0.8) ??
-                    Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.8),
+                color: ThemeColors.getTextSecondary(context),
               ),
             ],
             // Action buttons for pending requests
@@ -1275,56 +1280,76 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
     final AppLocalizations loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingSmall(
-          text: loc.bookingRequestDetailsTitle,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        content: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow(
-                  loc.bookingRequestGuestNameLabel, request.guestDisplayName),
-              _buildDetailRow(loc.bookingRequestPhoneLabel, request.guestPhone),
-              _buildDetailRow(loc.bookingRequestEmailLabel, request.guestEmail),
-              _buildDetailRow(loc.bookingRequestPgNameLabel, request.pgName),
-              _buildDetailRow(
-                  loc.bookingRequestDateLabel, request.formattedCreatedAt),
-              _buildDetailRow(
-                  loc.bookingRequestStatusLabel, request.statusDisplay),
-              if (request.message != null && request.message!.isNotEmpty)
-                _buildDetailRow(
-                    loc.bookingRequestMessageLabel, request.message!),
-              if (request.responseMessage != null &&
-                  request.responseMessage!.isNotEmpty)
-                _buildDetailRow(
-                    loc.bookingRequestResponseLabel, request.responseMessage!),
+              HeadingSmall(text: loc.bookingRequestDetailsTitle),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailRow(
+                          loc.bookingRequestGuestNameLabel, request.guestDisplayName),
+                      _buildDetailRow(loc.bookingRequestPhoneLabel, request.guestPhone),
+                      _buildDetailRow(loc.bookingRequestEmailLabel, request.guestEmail),
+                      _buildDetailRow(loc.bookingRequestPgNameLabel, request.pgName),
+                      _buildDetailRow(
+                          loc.bookingRequestDateLabel, request.formattedCreatedAt),
+                      _buildDetailRow(
+                          loc.bookingRequestStatusLabel, request.statusDisplay),
+                      if (request.message != null && request.message!.isNotEmpty)
+                        _buildDetailRow(
+                            loc.bookingRequestMessageLabel, request.message!),
+                      if (request.responseMessage != null &&
+                          request.responseMessage!.isNotEmpty)
+                        _buildDetailRow(
+                            loc.bookingRequestResponseLabel, request.responseMessage!),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc.close,
+                  ),
+                  if (request.isPending) ...[
+                    const SizedBox(width: AppSpacing.paddingS),
+                    TextButtonWidget(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showRejectDialog(context, request, viewModel);
+                      },
+                      text: loc.reject,
+                      color: AppColors.error,
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                    PrimaryButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showApproveDialog(context, request, viewModel);
+                      },
+                      label: loc.approve,
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc.close),
-          ),
-          if (request.isPending) ...[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showRejectDialog(context, request, viewModel);
-              },
-              child: Text(loc.reject),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showApproveDialog(context, request, viewModel);
-              },
-              child: Text(loc.approve),
-            ),
-          ],
-        ],
       ),
     );
   }

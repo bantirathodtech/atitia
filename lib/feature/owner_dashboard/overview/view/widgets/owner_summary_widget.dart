@@ -3,10 +3,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
-import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_overview_model.dart';
 
@@ -22,6 +24,7 @@ class OwnerSummaryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final cardGap = context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS;
     return Column(
       children: [
         Row(
@@ -35,7 +38,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                 AppColors.success,
               ),
             ),
-            const SizedBox(width: AppSpacing.paddingS),
+            SizedBox(width: cardGap),
             Expanded(
               child: _buildSummaryCard(
                 context,
@@ -47,7 +50,7 @@ class OwnerSummaryWidget extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: AppSpacing.paddingS),
+        SizedBox(height: cardGap),
         Row(
           children: [
             Expanded(
@@ -59,7 +62,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                 AppColors.info,
               ),
             ),
-            const SizedBox(width: AppSpacing.paddingS),
+            SizedBox(width: cardGap),
             Expanded(
               child: _buildSummaryCard(
                 context,
@@ -72,7 +75,7 @@ class OwnerSummaryWidget extends StatelessWidget {
           ],
         ),
         if (overview.hasPendingBookings || overview.hasPendingComplaints) ...[
-          const SizedBox(height: AppSpacing.paddingS),
+          SizedBox(height: cardGap),
           Row(
             children: [
               if (overview.hasPendingBookings)
@@ -86,7 +89,7 @@ class OwnerSummaryWidget extends StatelessWidget {
                   ),
                 ),
               if (overview.hasPendingBookings && overview.hasPendingComplaints)
-                const SizedBox(width: AppSpacing.paddingS),
+                SizedBox(width: cardGap),
               if (overview.hasPendingComplaints)
                 Expanded(
                   child: _buildSummaryCard(
@@ -106,39 +109,45 @@ class OwnerSummaryWidget extends StatelessWidget {
 
   Widget _buildSummaryCard(BuildContext context, String title, String value,
       IconData icon, Color color) {
+    final padding = context.responsivePadding;
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
+          // Row 1: Icon and number side by side
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(icon, color: color, size: 24),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.paddingS),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: color, size: 20),
+              Icon(
+                icon,
+                color: color,
+                size: context.isMobile ? 18 : 24,
+              ),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
+              HeadingMedium(
+                text: value,
+                color: color,
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingM),
-          HeadingMedium(text: value, color: color),
-          const SizedBox(height: AppSpacing.paddingXS),
-          CaptionText(
-              text: title,
-              color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.7) ??
-                  Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7)),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS
+                  : AppSpacing.paddingS),
+          // Row 2: Text below
+          BodyText(
+            text: title,
+            small: true,
+            color: (context.textTheme.bodySmall?.color ??
+                    context.colors.onSurface)
+                .withValues(alpha: 0.7),
+            align: TextAlign.center,
+          ),
         ],
       ),
     );

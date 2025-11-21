@@ -38,25 +38,23 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeader(context, isDark, loc),
+        _buildHeader(context, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildOccupancyMetrics(context, isDark, loc),
+        _buildOccupancyMetrics(context, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildOccupancyChart(context, isDark, loc),
+        _buildOccupancyChart(context, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildCapacityAnalysis(context, isDark, loc),
+        _buildCapacityAnalysis(context, loc),
       ],
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, AppLocalizations loc) {
+  Widget _buildHeader(BuildContext context, AppLocalizations loc) {
     return Row(
       children: [
         Container(
@@ -105,7 +103,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
   }
 
   Widget _buildOccupancyMetrics(
-      BuildContext context, bool isDark, AppLocalizations loc) {
+      BuildContext context, AppLocalizations loc) {
     final metrics = _calculateOccupancyMetrics();
     final percentFormatter = NumberFormat.decimalPattern(loc.localeName);
 
@@ -113,31 +111,31 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
       children: [
         Expanded(
           child: _buildMetricCard(
+            context,
             loc.occupancyMetricCurrent,
             '${percentFormatter.format(metrics['currentOccupancy'])}%',
             Icons.bed,
             _getOccupancyColor(context, metrics['currentOccupancy']),
-            isDark,
           ),
         ),
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: _buildMetricCard(
+            context,
             loc.occupancyMetricAverage,
             '${percentFormatter.format(metrics['avgOccupancy'])}%',
             Icons.trending_up,
             AppColors.statusBlue,
-            isDark,
           ),
         ),
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: _buildMetricCard(
+            context,
             loc.occupancyMetricPeak,
             '${percentFormatter.format(metrics['peakOccupancy'])}%',
             Icons.flag,
             AppColors.statusOrange,
-            isDark,
           ),
         ),
       ],
@@ -145,11 +143,11 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
   }
 
   Widget _buildMetricCard(
+    BuildContext context,
     String title,
     String value,
     IconData icon,
     Color color,
-    bool isDark,
   ) {
     return AdaptiveCard(
       child: Padding(
@@ -189,7 +187,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
   }
 
   Widget _buildOccupancyChart(
-      BuildContext context, bool isDark, AppLocalizations loc) {
+      BuildContext context, AppLocalizations loc) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -200,15 +198,15 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
               children: [
                 HeadingSmall(text: loc.occupancyTrendsLabel),
                 const Spacer(),
-                _buildPeriodSelector(isDark, loc),
+                _buildPeriodSelector(context, loc),
                 const SizedBox(width: AppSpacing.paddingM),
-                _buildViewSelector(isDark, loc),
+                _buildViewSelector(context, loc),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingL),
             SizedBox(
               height: 300,
-              child: _buildSimpleOccupancyChart(isDark, loc),
+              child: _buildSimpleOccupancyChart(context, loc),
             ),
           ],
         ),
@@ -216,7 +214,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildPeriodSelector(bool isDark, AppLocalizations loc) {
+  Widget _buildPeriodSelector(BuildContext context, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -254,7 +252,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildViewSelector(bool isDark, AppLocalizations loc) {
+  Widget _buildViewSelector(BuildContext context, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -292,7 +290,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildSimpleOccupancyChart(bool isDark, AppLocalizations loc) {
+  Widget _buildSimpleOccupancyChart(BuildContext context, AppLocalizations loc) {
     final chartData = _getOccupancyChartData();
     final months = chartData['months'] as List<int>;
     final values = chartData['data'] as List<int>;
@@ -367,7 +365,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
   }
 
   Widget _buildCapacityAnalysis(
-      BuildContext context, bool isDark, AppLocalizations loc) {
+      BuildContext context, AppLocalizations loc) {
     final analysis = _calculateCapacityAnalysis(loc);
     final numberFormatter = NumberFormat.decimalPattern(loc.localeName);
 
@@ -383,26 +381,27 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
               children: [
                 Expanded(
                   child: _buildCapacityCard(
+                    context,
                     loc.occupancyCapacityAvailableBeds,
                     numberFormatter.format(analysis['availableBeds']),
                     Icons.bed_outlined,
                     AppColors.success,
-                    isDark,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildCapacityCard(
+                    context,
                     loc.occupancyCapacityOccupiedBeds,
                     numberFormatter.format(analysis['occupiedBeds']),
                     Icons.bed,
                     AppColors.statusBlue,
-                    isDark,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
                 Expanded(
                   child: _buildCapacityCard(
+                    context,
                     loc.occupancyCapacityTotal,
                     numberFormatter.format(analysis['totalCapacity']),
                     Icons.home,
@@ -415,13 +414,12 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
                             .colorScheme
                             .onSurface
                             .withValues(alpha: 0.5),
-                    isDark,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildOccupancyInsights(analysis, isDark, loc),
+            _buildOccupancyInsights(context, analysis, loc),
           ],
         ),
       ),
@@ -429,11 +427,11 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
   }
 
   Widget _buildCapacityCard(
+    BuildContext context,
     String title,
     String value,
     IconData icon,
     Color color,
-    bool isDark,
   ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -476,7 +474,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
   }
 
   Widget _buildOccupancyInsights(
-      Map<String, dynamic> analysis, bool isDark, AppLocalizations loc) {
+      BuildContext context, Map<String, dynamic> analysis, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(

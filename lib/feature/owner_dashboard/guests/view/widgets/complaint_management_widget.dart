@@ -7,8 +7,10 @@ import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
@@ -719,54 +721,73 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
       builder: (dialogContext) {
         final loc = AppLocalizations.of(dialogContext)!;
 
-        return AlertDialog(
-          title: Text(complaint.title),
-          content: SingleChildScrollView(
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDetailRow(loc.guest, complaint.guestName),
-                _buildDetailRow(loc.room, complaint.roomNumber),
-                _buildDetailRow(loc.complaintTitle, complaint.title),
-                _buildDetailRow(loc.priority, complaint.priorityDisplay),
-                _buildDetailRow(loc.status, complaint.statusDisplay),
-                _buildDetailRow(loc.created, _formatDate(complaint.createdAt)),
-                if (complaint.resolvedAt != null)
-                  _buildDetailRow(
-                      loc.statusResolved, _formatDate(complaint.resolvedAt!)),
+                HeadingMedium(text: complaint.title),
                 const SizedBox(height: AppSpacing.paddingM),
-                Text(loc.description,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: AppSpacing.paddingXS),
-                Text(complaint.description),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildDetailRow(loc.guest, complaint.guestName),
+                        _buildDetailRow(loc.room, complaint.roomNumber),
+                        _buildDetailRow(loc.complaintTitle, complaint.title),
+                        _buildDetailRow(loc.priority, complaint.priorityDisplay),
+                        _buildDetailRow(loc.status, complaint.statusDisplay),
+                        _buildDetailRow(loc.created, _formatDate(complaint.createdAt)),
+                        if (complaint.resolvedAt != null)
+                          _buildDetailRow(
+                              loc.statusResolved, _formatDate(complaint.resolvedAt!)),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        HeadingSmall(text: loc.description),
+                        const SizedBox(height: AppSpacing.paddingXS),
+                        BodyText(text: complaint.description),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        HeadingSmall(text: loc.messages),
+                        const SizedBox(height: AppSpacing.paddingXS),
+                        _buildMessagesList(complaint.messages),
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.paddingM),
-                Text(loc.messages,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: AppSpacing.paddingXS),
-                _buildMessagesList(complaint.messages),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      text: loc.close,
+                    ),
+                    if (!complaint.isResolved) ...[
+                      const SizedBox(width: AppSpacing.paddingS),
+                      PrimaryButton(
+                        label: loc.reply,
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                          _showReplyDialog(context, guestVM, complaint);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.paddingS),
+                      PrimaryButton(
+                        label: loc.resolve,
+                        onPressed: () => _resolveComplaint(context, guestVM, complaint),
+                      ),
+                    ],
+                  ],
+                ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(loc.close),
-            ),
-            if (!complaint.isResolved) ...[
-              PrimaryButton(
-                label: loc.reply,
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  _showReplyDialog(context, guestVM, complaint);
-                },
-              ),
-              PrimaryButton(
-                label: loc.resolve,
-                onPressed: () => _resolveComplaint(context, guestVM, complaint),
-              ),
-            ],
-          ],
         );
       },
     );
@@ -860,19 +881,32 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
       builder: (dialogContext) {
         final loc = AppLocalizations.of(dialogContext)!;
 
-        return AlertDialog(
-          title: Text(loc.replyToComplaint),
-          content: TextInput(
-            controller: replyController,
-            label: loc.replyLabel,
-            hint: loc.typeYourReply,
-            maxLines: 4,
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(loc.cancel),
-            ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeadingMedium(text: loc.replyToComplaint),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: replyController,
+                  label: loc.replyLabel,
+                  hint: loc.typeYourReply,
+                  maxLines: 4,
+                ),
+                const SizedBox(height: AppSpacing.paddingL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      text: loc.cancel,
+                    ),
             PrimaryButton(
               label: loc.sendReply,
               onPressed: () async {
@@ -894,8 +928,13 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                   );
                 }
               },
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -911,19 +950,32 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
       builder: (dialogContext) {
         final loc = AppLocalizations.of(dialogContext)!;
 
-        return AlertDialog(
-          title: Text(loc.resolveComplaint),
-          content: TextInput(
-            controller: notesController,
-            label: loc.resolutionNotes,
-            hint: loc.resolutionNotesOptional,
-            maxLines: 3,
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(loc.cancel),
-            ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeadingMedium(text: loc.resolveComplaint),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: notesController,
+                  label: loc.resolutionNotes,
+                  hint: loc.resolutionNotesOptional,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: AppSpacing.paddingL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      text: loc.cancel,
+                    ),
             PrimaryButton(
               label: loc.markAsResolved,
               onPressed: () async {
@@ -946,8 +998,13 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                       content: Text(locOuter.complaintResolvedSuccessfully)),
                 );
               },
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -1028,45 +1085,67 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
       builder: (dialogContext) {
         final loc = AppLocalizations.of(dialogContext)!;
 
-        return AlertDialog(
-          title: HeadingMedium(text: loc.advancedSearch),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextInput(
-                label: loc.complaintTitle,
-                hint: loc.complaintTitle,
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                label: loc.guestName,
-                hint: loc.guestName,
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                label: loc.room,
-                hint: loc.roomNumber,
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                label: loc.priorityLevel,
-                hint: loc.priorityLevel,
-              ),
-            ],
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(AppLocalizations.of(context)!.cancel),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeadingMedium(text: loc.advancedSearch),
+                const SizedBox(height: AppSpacing.paddingM),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextInput(
+                          label: loc.complaintTitle,
+                          hint: loc.complaintTitle,
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          label: loc.guestName,
+                          hint: loc.guestName,
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          label: loc.room,
+                          hint: loc.roomNumber,
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          label: loc.priorityLevel,
+                          hint: loc.priorityLevel,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.paddingL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      text: AppLocalizations.of(context)!.cancel,
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                    PrimaryButton(
+                      label: AppLocalizations.of(context)!.search,
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                        // TODO: Implement advanced search
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-            PrimaryButton(
-              label: AppLocalizations.of(context)!.search,
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                // TODO: Implement advanced search
-              },
-            ),
-          ],
+          ),
         );
       },
     );

@@ -621,7 +621,7 @@ class _GuestProfileScreenState extends State<GuestProfileScreen> {
               right: 0,
               child: IconButton(
                 icon: _uploadingImage
-                    ? const CircularProgressIndicator()
+                    ? const AdaptiveLoader()
                     : const Icon(Icons.camera_alt),
                 onPressed: _uploadingImage ? null : onTap,
               ),

@@ -6,16 +6,20 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/loaders/shimmer_loader.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
+import '../../../../../common/widgets/responsive/responsive_container.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../feature/owner_dashboard/foods/data/models/owner_food_menu.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/guest_pg_selector_dropdown.dart';
 import '../../../shared/widgets/user_location_display.dart';
 import '../../viewmodel/guest_food_viewmodel.dart';
 
@@ -40,6 +44,7 @@ class GuestFoodListScreen extends StatefulWidget {
 class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _selectedDayIndex = 0; // Track selected day for placeholder menu
 
   List<String> _getDays(BuildContext context) {
     final loc = AppLocalizations.of(context);
@@ -104,13 +109,16 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   @override
   Widget build(BuildContext context) {
     final foodViewModel = Provider.of<GuestFoodViewmodel>(context);
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AdaptiveAppBar(
         titleWidget: const GuestPgAppBarDisplay(),
         centerTitle: true,
         showDrawer: true,
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
+        leadingActions: [
+          const GuestPgSelectorDropdown(compact: true),
+        ],
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -125,7 +133,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
       // Centralized Guest Drawer
       drawer: const GuestDrawer(),
 
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: () async => foodViewModel.loadGuestMenu(),
         child: _buildBody(context, foodViewModel),
@@ -153,8 +161,6 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   /// 📅 Weekly menu view with day tabs
   Widget _buildWeeklyMenuView(
       BuildContext context, GuestFoodViewmodel foodViewModel) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final today = DateFormat('EEEE').format(DateTime.now());
     final loc = AppLocalizations.of(context);
     final days = _getDays(context);
@@ -183,14 +189,13 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           ),
           // Day tabs
           Container(
-            color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+            color: ThemeColors.getCardBackground(context),
             child: TabBar(
               controller: _tabController,
               isScrollable: true,
-              indicatorColor: theme.primaryColor,
-              labelColor: theme.primaryColor,
-              unselectedLabelColor:
-                  isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+              indicatorColor: context.primaryColor,
+              labelColor: context.primaryColor,
+              unselectedLabelColor: ThemeColors.getTextTertiary(context),
               tabs: days.asMap().entries.map((entry) {
                 final index = entry.key;
                 final day = entry.value;
@@ -204,7 +209,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     ),
                     decoration: isToday
                         ? BoxDecoration(
-                            color: theme.primaryColor.withValues(alpha: 0.1),
+                            color: context.primaryColor.withValues(alpha: 0.1),
                             borderRadius:
                                 BorderRadius.circular(AppSpacing.borderRadiusS),
                           )
@@ -217,11 +222,18 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                             height: 8,
                             margin: const EdgeInsets.only(right: 4),
                             decoration: BoxDecoration(
-                              color: theme.primaryColor,
+                              color: context.primaryColor,
                               shape: BoxShape.circle,
                             ),
                           ),
-                        Text(day),
+                        Text(
+                          day,
+                          style: TextStyle(
+                            color: isToday
+                                ? context.primaryColor
+                                : ThemeColors.getTextTertiary(context),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -237,7 +249,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               controller: _tabController,
               children: englishDays.map((day) {
                 final menu = foodViewModel.getMenuForDay(day);
-                return _buildDayMenu(context, day, menu, isDarkMode);
+                return _buildDayMenu(context, day, menu);
               }).toList(),
             ),
           ),
@@ -274,10 +286,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   }
 
   /// 🍴 Builds menu for a specific day
-  Widget _buildDayMenu(
-      BuildContext context, String day, OwnerFoodMenu? menu, bool isDarkMode) {
+  Widget _buildDayMenu(BuildContext context, String day, OwnerFoodMenu? menu) {
     if (menu == null) {
-      return _buildNoDayMenu(context, day, isDarkMode);
+      return _buildNoDayMenu(context, day);
     }
 
     return SingleChildScrollView(
@@ -287,7 +298,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         children: [
           // Menu info card
           if (menu.description != null && menu.description!.isNotEmpty)
-            _buildMenuInfoCard(context, menu, isDarkMode),
+            _buildMenuInfoCard(context, menu),
 
           const SizedBox(height: AppSpacing.paddingM),
 
@@ -299,7 +310,6 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               Icons.free_breakfast,
               menu.breakfast,
               AppColors.breakfast,
-              isDarkMode,
             ),
 
           const SizedBox(height: AppSpacing.paddingM),
@@ -312,7 +322,6 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               Icons.lunch_dining,
               menu.lunch,
               AppColors.lunch,
-              isDarkMode,
             ),
 
           const SizedBox(height: AppSpacing.paddingM),
@@ -325,32 +334,29 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               Icons.dinner_dining,
               menu.dinner,
               AppColors.dinner,
-              isDarkMode,
             ),
 
           const SizedBox(height: AppSpacing.paddingM),
 
           // Photos section
           if (menu.photoUrls.isNotEmpty)
-            _buildPhotosSection(context, menu.photoUrls, isDarkMode),
+            _buildPhotosSection(context, menu.photoUrls),
         ],
       ),
     );
   }
 
   /// 📋 Menu info card
-  Widget _buildMenuInfoCard(
-      BuildContext context, OwnerFoodMenu menu, bool isDarkMode) {
-    final theme = Theme.of(context);
+  Widget _buildMenuInfoCard(BuildContext context, OwnerFoodMenu menu) {
     final loc = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surfaceVariant,
+        color: ThemeColors.getCardBackground(context),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+          color: ThemeColors.getDivider(context),
         ),
       ),
       child: Row(
@@ -370,19 +376,15 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               children: [
                 Text(
                   loc?.menuNote ?? 'Menu Note',
-                  style: theme.textTheme.titleSmall?.copyWith(
+                  style: context.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.textTheme.bodyLarge?.color,
+                    color: context.textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.paddingXS),
                 Text(
                   menu.description!,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isDarkMode
-                        ? AppColors.textSecondary
-                        : AppColors.textPrimary,
-                  ),
+                  style: context.textTheme.bodyMedium,
                 ),
               ],
             ),
@@ -399,24 +401,22 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     IconData icon,
     List<String> items,
     Color color,
-    bool isDarkMode,
   ) {
-    final theme = Theme.of(context);
     final loc = AppLocalizations.of(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color: color.withValues(alpha: 0.3),
+          color: ThemeColors.getDivider(context),
+          width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context)
-                .colorScheme
-                .shadow
-                .withValues(alpha: isDarkMode ? 0.3 : 0.05),
+            color: context.colors.shadow.withValues(
+              alpha: context.isDarkMode ? 0.3 : 0.05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -429,12 +429,13 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
           Container(
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             decoration: BoxDecoration(
+              color: context.theme.cardColor,
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  color.withValues(alpha: 0.2),
-                  color.withValues(alpha: 0.1),
+                  color.withValues(alpha: context.isDarkMode ? 0.3 : 0.15),
+                  color.withValues(alpha: context.isDarkMode ? 0.2 : 0.1),
                 ],
               ),
               borderRadius: const BorderRadius.only(
@@ -447,7 +448,8 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.paddingS),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.2),
+                    color:
+                        color.withValues(alpha: context.isDarkMode ? 0.3 : 0.2),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
@@ -465,13 +467,14 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     vertical: AppSpacing.paddingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.2),
+                    color:
+                        color.withValues(alpha: context.isDarkMode ? 0.3 : 0.2),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: Text(
                     '${items.length} ${loc?.items ?? 'items'}',
-                    style: theme.textTheme.bodySmall?.copyWith(
+                    style: context.textTheme.bodySmall?.copyWith(
                       color: color,
                       fontWeight: FontWeight.w600,
                     ),
@@ -494,13 +497,13 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                     vertical: AppSpacing.paddingS,
                   ),
                   decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? AppColors.darkInputFill
-                        : AppColors.surfaceVariant,
+                    color: context.theme.inputDecorationTheme.fillColor,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusM),
                     border: Border.all(
-                      color: color.withValues(alpha: 0.2),
+                      color: color.withValues(
+                          alpha: context.isDarkMode ? 0.4 : 0.3),
+                      width: 1,
                     ),
                   ),
                   child: Row(
@@ -514,9 +517,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                       const SizedBox(width: AppSpacing.paddingS),
                       Text(
                         item,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.textTheme.bodyMedium?.color,
-                        ),
+                        style: context.textTheme.bodyMedium,
                       ),
                     ],
                   ),
@@ -530,14 +531,13 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   }
 
   /// 📸 Photos section
-  Widget _buildPhotosSection(
-      BuildContext context, List<String> photos, bool isDarkMode) {
+  Widget _buildPhotosSection(BuildContext context, List<String> photos) {
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        color: ThemeColors.getCardBackground(context),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+          color: ThemeColors.getDivider(context),
         ),
       ),
       child: Column(
@@ -547,13 +547,12 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             child: Row(
               children: [
-                Icon(Icons.photo_library,
-                    color: Theme.of(context).primaryColor),
+                Icon(Icons.photo_library, color: context.primaryColor),
                 const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
                   text: AppLocalizations.of(context)?.foodGallery ??
                       'Food Gallery',
-                  color: Theme.of(context).textTheme.headlineSmall?.color,
+                  color: context.textTheme.headlineSmall?.color,
                 ),
               ],
             ),
@@ -581,15 +580,11 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                       height: 150,
                       fit: BoxFit.cover,
                       placeholder: Container(
-                        color: isDarkMode
-                            ? AppColors.darkInputFill
-                            : AppColors.surfaceVariant,
+                        color: context.theme.inputDecorationTheme.fillColor,
                         child: Center(
                           child: Icon(Icons.image,
                               size: 32,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
+                              color: context.colors.onSurface
                                   .withValues(alpha: 0.5)),
                         ),
                       ),
@@ -605,7 +600,7 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   }
 
   /// ❌ No menu for day
-  Widget _buildNoDayMenu(BuildContext context, String day, bool isDarkMode) {
+  Widget _buildNoDayMenu(BuildContext context, String day) {
     final loc = AppLocalizations.of(context);
     // Map English day to localized day
     final dayMap = {
@@ -671,49 +666,48 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   /// 🍽️ Structured empty state with zero-state stats and placeholder rows
   Widget _buildEmptyState(
       BuildContext context, GuestFoodViewmodel foodViewModel) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Zero-state stats section
-          _buildZeroStateStats(context, isDarkMode),
+          // Placeholder menu structure (moved to top)
+          _buildPlaceholderMenuStructure(context),
 
-          // Placeholder menu structure
-          _buildPlaceholderMenuStructure(context, isDarkMode),
+          // Small gap between menu preview and stats
+          SizedBox(height: context.responsivePadding.top * 0.5),
 
-          // Call to action
-          _buildEmptyStateAction(context, foodViewModel),
+          // Zero-state stats section (moved down)
+          _buildZeroStateStats(context),
         ],
       ),
     );
   }
 
   /// 📊 Zero-state stats section
-  Widget _buildZeroStateStats(BuildContext context, bool isDarkMode) {
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+  Widget _buildZeroStateStats(BuildContext context) {
+    return ResponsiveContainer(
+      margin: EdgeInsets.only(
+        top: 0, // Remove top margin since it's now below menu preview
+        left: context.responsiveMargin.left,
+        right: context.responsiveMargin.right,
+        bottom: context.responsiveMargin.bottom,
+      ),
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        color: ThemeColors.getCardBackground(context),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDarkMode
-              ? AppColors.darkDivider
-              : Theme.of(context).dividerColor,
+          color: ThemeColors.getDivider(context),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingMedium(
+          HeadingSmall(
             text: AppLocalizations.of(context)?.foodMenuStatistics ??
                 'Food Menu Statistics',
-            color: Theme.of(context).textTheme.bodyLarge?.color ??
-                Theme.of(context).colorScheme.onSurface,
+            color:
+                context.textTheme.bodyLarge?.color ?? context.colors.onSurface,
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
 
           // Stats grid
           Row(
@@ -725,10 +719,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   '0',
                   Icons.calendar_view_week,
                   AppColors.info,
-                  isDarkMode,
                 ),
               ),
-              const SizedBox(width: AppSpacing.paddingM),
+              SizedBox(width: context.responsivePadding.left),
               Expanded(
                 child: _buildStatCard(
                   context,
@@ -736,12 +729,11 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   '0',
                   Icons.restaurant_menu,
                   AppColors.success,
-                  isDarkMode,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
           Row(
             children: [
               Expanded(
@@ -751,10 +743,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   '0',
                   Icons.free_breakfast,
                   AppColors.breakfast,
-                  isDarkMode,
                 ),
               ),
-              const SizedBox(width: AppSpacing.paddingM),
+              SizedBox(width: context.responsivePadding.left),
               Expanded(
                 child: _buildStatCard(
                   context,
@@ -762,12 +753,11 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   '0',
                   Icons.lunch_dining,
                   AppColors.lunch,
-                  isDarkMode,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
           Row(
             children: [
               Expanded(
@@ -777,10 +767,9 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   '0',
                   Icons.dinner_dining,
                   AppColors.dinner,
-                  isDarkMode,
                 ),
               ),
-              const SizedBox(width: AppSpacing.paddingM),
+              SizedBox(width: context.responsivePadding.left),
               Expanded(
                 child: _buildStatCard(
                   context,
@@ -788,7 +777,6 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   '0',
                   Icons.cookie,
                   AppColors.statusGrey, // Using statusGrey for brown color
-                  isDarkMode,
                 ),
               ),
             ],
@@ -805,10 +793,11 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     String value,
     IconData icon,
     Color color,
-    bool isDarkMode,
   ) {
+    final padding = context.responsivePadding;
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding:
+          EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
@@ -818,37 +807,48 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 24,
+          // Row 1: Icon and number side by side
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: context.isMobile ? 18 : 24,
+              ),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: context.isMobile ? 16 : 20,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.paddingS),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.paddingXS),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS
+                  : AppSpacing.paddingS),
+          // Row 2: Text below
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
-              color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.7) ??
-                  Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7),
+              fontSize: context.isMobile ? 10 : 12,
+              color: (context.textTheme.bodySmall?.color ??
+                      context.colors.onSurface)
+                  .withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -856,35 +856,34 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
   }
 
   /// 🍽️ Placeholder menu structure
-  Widget _buildPlaceholderMenuStructure(BuildContext context, bool isDarkMode) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
+  Widget _buildPlaceholderMenuStructure(BuildContext context) {
+    return ResponsiveContainer(
+      margin: EdgeInsets.only(
+        top:
+            context.responsiveMargin.top, // Add top margin since it's now first
+        left: context.responsiveMargin.left, // Match Food Menu Statistics
+        right: context.responsiveMargin.right, // Match Food Menu Statistics
+        bottom: 0, // Remove bottom margin to reduce gap
+      ),
+      padding:
+          EdgeInsets.zero, // Remove default padding from ResponsiveContainer
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingMedium(
+          HeadingSmall(
             text: 'Weekly Menu Preview',
-            color: Theme.of(context).textTheme.bodyLarge?.color ??
-                Theme.of(context).colorScheme.onSurface,
+            color:
+                context.textTheme.bodyLarge?.color ?? context.colors.onSurface,
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
 
-          // Placeholder day tabs
-          Container(
-            height: 50,
-            decoration: BoxDecoration(
-              color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-              border: Border.all(
-                color: isDarkMode
-                    ? AppColors.darkDivider
-                    : Theme.of(context).dividerColor,
-              ),
-            ),
+          // Placeholder day tabs - scrollable directly without card
+          SizedBox(
+            height: context.isMobile ? 40 : 50,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
+              padding: EdgeInsets.symmetric(
+                  horizontal: context.responsivePadding.left * 0.5),
               itemCount: 7,
               itemBuilder: (context, index) {
                 final days = [
@@ -896,29 +895,49 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
                   'Saturday',
                   'Sunday'
                 ];
-                return Container(
-                  margin: const EdgeInsets.all(AppSpacing.paddingS),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.paddingM),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).dividerColor,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.borderRadiusS),
-                  ),
-                  child: Center(
-                    child: Text(
-                      days[index],
-                      style: TextStyle(
-                        color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7) ??
-                            Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
-                        fontSize: 12,
+                final padding = context.responsivePadding;
+                final isSelected = index == _selectedDayIndex;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedDayIndex = index;
+                    });
+                  },
+                  child: Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: context.isMobile
+                          ? padding.left * 0.25
+                          : padding.left * 0.5,
+                      vertical: context.isMobile ? 4 : 6,
+                    ),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: context.isMobile
+                            ? padding.left * 0.5
+                            : padding.left),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? context.primaryColor.withValues(alpha: 0.1)
+                          : context.theme.inputDecorationTheme.fillColor,
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.borderRadiusS),
+                      border: Border.all(
+                        color: isSelected
+                            ? context.primaryColor
+                            : ThemeColors.getDivider(context),
+                        width: isSelected ? 2 : 1,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        days[index],
+                        style: context.textTheme.bodySmall?.copyWith(
+                          fontSize: context.isMobile ? 10 : 12,
+                          color: isSelected
+                              ? context.primaryColor
+                              : context.textTheme.bodySmall?.color,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                        ),
                       ),
                     ),
                   ),
@@ -927,31 +946,28 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             ),
           ),
 
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
 
-          // Placeholder meal sections
+          // Placeholder meal sections - show based on selected day
           _buildPlaceholderMealSection(
             context,
             'Breakfast',
             Icons.free_breakfast,
             AppColors.breakfast,
-            isDarkMode,
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
           _buildPlaceholderMealSection(
             context,
             'Lunch',
             Icons.lunch_dining,
             AppColors.lunch,
-            isDarkMode,
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
           _buildPlaceholderMealSection(
             context,
             'Dinner',
             Icons.dinner_dining,
             AppColors.dinner,
-            isDarkMode,
           ),
         ],
       ),
@@ -964,15 +980,16 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
     String mealName,
     IconData icon,
     Color color,
-    bool isDarkMode,
   ) {
+    final padding = context.responsivePadding;
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding:
+          EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top),
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        color: ThemeColors.getCardBackground(context),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: Theme.of(context).dividerColor,
+          color: ThemeColors.getDivider(context),
         ),
       ),
       child: Column(
@@ -983,82 +1000,81 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
               Icon(
                 icon,
                 color: color,
-                size: 20,
+                size: context.isMobile ? 16 : 20,
               ),
-              const SizedBox(width: AppSpacing.paddingS),
+              SizedBox(width: context.responsivePadding.left * 0.25),
               Text(
                 mealName,
-                style: TextStyle(
-                  fontSize: 16,
+                style: context.textTheme.bodyLarge?.copyWith(
+                  fontSize: context.isMobile ? 14 : 16,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.bodyLarge?.color ??
-                      Theme.of(context).colorScheme.onSurface,
+                  color: context.textTheme.bodyLarge?.color ??
+                      context.colors.onSurface,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
 
           // Placeholder food items
-          ...List.generate(
-              3, (index) => _buildPlaceholderFoodItem(context, isDarkMode)),
+          ...List.generate(3, (index) => _buildPlaceholderFoodItem(context)),
         ],
       ),
     );
   }
 
   /// 🍽️ Placeholder food item
-  Widget _buildPlaceholderFoodItem(BuildContext context, bool isDarkMode) {
+  Widget _buildPlaceholderFoodItem(BuildContext context) {
+    final padding = context.responsivePadding;
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      margin: EdgeInsets.only(
+          bottom: context.isMobile ? padding.top * 0.25 : padding.top * 0.5),
+      padding:
+          EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        color: context.theme.inputDecorationTheme.fillColor,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
         border: Border.all(
-          color: Theme.of(context).dividerColor,
+          color: ThemeColors.getDivider(context),
         ),
       ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: context.isMobile ? 32 : 40,
+            height: context.isMobile ? 32 : 40,
             decoration: BoxDecoration(
-              color: Theme.of(context).dividerColor,
+              color: ThemeColors.getDivider(context),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: Icon(
               Icons.restaurant,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.5),
-              size: 20,
+              color: ThemeColors.getTextTertiary(context),
+              size: context.isMobile ? 16 : 20,
             ),
           ),
-          const SizedBox(width: AppSpacing.paddingM),
+          SizedBox(
+              width:
+                  context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: 12,
+                  height: context.isMobile ? 10 : 12,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
+                    color: ThemeColors.getTextTertiary(context)
                         .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.paddingXS),
+                SizedBox(height: context.isMobile ? 4 : AppSpacing.paddingXS),
                 Container(
-                  height: 8,
-                  width: 120,
+                  height: context.isMobile ? 6 : 8,
+                  width: context.isMobile ? 80 : 120,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).dividerColor,
+                    color: ThemeColors.getDivider(context),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -1066,99 +1082,20 @@ class _GuestFoodListScreenState extends State<GuestFoodListScreen>
             ),
           ),
           Container(
-            width: 60,
-            height: 24,
+            width: context.isMobile ? 48 : 60,
+            height: context.isMobile ? 20 : 24,
             decoration: BoxDecoration(
-              color: Theme.of(context).dividerColor,
+              color: ThemeColors.getDivider(context),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
             child: Center(
               child: Container(
-                height: 8,
-                width: 40,
+                height: context.isMobile ? 6 : 8,
+                width: context.isMobile ? 32 : 40,
                 decoration: BoxDecoration(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
+                  color: ThemeColors.getTextTertiary(context)
                       .withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 🔄 Empty state action section
-  Widget _buildEmptyStateAction(
-      BuildContext context, GuestFoodViewmodel foodViewModel) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingL),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(
-          color: isDarkMode
-              ? AppColors.darkDivider
-              : Theme.of(context).dividerColor,
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.restaurant_menu,
-            size: 48,
-            color: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.color
-                    ?.withValues(alpha: 0.5) ??
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          HeadingMedium(
-            text: 'No Menu Available',
-            color: Theme.of(context).textTheme.bodyLarge?.color ??
-                Theme.of(context).colorScheme.onSurface,
-          ),
-          const SizedBox(height: AppSpacing.paddingS),
-          Text(
-            'Your PG owner hasn\'t set up a weekly menu yet. The menu will appear here once it\'s configured.',
-            style: TextStyle(
-              color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.7) ??
-                  Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7),
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => foodViewModel.loadGuestMenu(),
-              icon: const Icon(Icons.refresh),
-              label: Text(
-                  AppLocalizations.of(context)?.refreshMenu ?? 'Refresh Menu'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primaryColor,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                padding:
-                    const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
               ),
             ),

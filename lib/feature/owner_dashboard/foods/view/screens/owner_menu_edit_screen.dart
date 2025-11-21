@@ -14,6 +14,8 @@ import 'package:provider/provider.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
@@ -25,6 +27,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/dialogs/confirmation_dialog.dart';
+import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../data/models/owner_food_menu.dart';
@@ -215,13 +218,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   /// - Modern stat chips with icons
   /// ============================================================================
   Widget _buildHeaderCard(AppLocalizations loc) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    // final textPrimary =
-    //     theme.textTheme.bodyLarge?.color ?? AppColors.textPrimary;
-    final textSecondary =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
-    final primaryColor = theme.colorScheme.primary;
+    final textSecondary = ThemeColors.getTextSecondary(context);
+    final primaryColor = context.primaryColor;
 
     final totalItems =
         _breakfastItems.length + _lunchItems.length + _dinnerItems.length;
@@ -236,8 +234,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            primaryColor.withValues(alpha: isDarkMode ? 0.15 : 0.1),
-            primaryColor.withValues(alpha: isDarkMode ? 0.08 : 0.05),
+            primaryColor.withValues(alpha: context.isDarkMode ? 0.15 : 0.1),
+            primaryColor.withValues(alpha: context.isDarkMode ? 0.08 : 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
@@ -331,7 +329,6 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 value: '$totalItems',
                 icon: Icons.list_alt,
                 color: AppColors.info,
-                isDarkMode: isDarkMode,
               ),
 
               // Breakfast Count
@@ -341,7 +338,6 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 value: '${_breakfastItems.length}',
                 icon: Icons.breakfast_dining_rounded,
                 color: AppColors.breakfast,
-                isDarkMode: isDarkMode,
               ),
 
               // Lunch Count
@@ -351,7 +347,6 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 value: '${_lunchItems.length}',
                 icon: Icons.lunch_dining_rounded,
                 color: AppColors.lunch,
-                isDarkMode: isDarkMode,
               ),
 
               // Dinner Count
@@ -361,7 +356,6 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 value: '${_dinnerItems.length}',
                 icon: Icons.dinner_dining_rounded,
                 color: AppColors.dinner,
-                isDarkMode: isDarkMode,
               ),
 
               // Photos Count
@@ -371,7 +365,6 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 value: '$totalPhotos',
                 icon: Icons.photo_library_rounded,
                 color: AppColors.warning,
-                isDarkMode: isDarkMode,
               ),
             ],
           ),
@@ -387,14 +380,10 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 vertical: AppSpacing.paddingS,
               ),
               decoration: BoxDecoration(
-                color: isDarkMode
-                    ? AppColors.darkCard.withValues(alpha: 0.5)
-                    : AppColors.textOnPrimary.withValues(alpha: 0.5),
+                color: ThemeColors.getCardBackground(context).withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 border: Border.all(
-                  color: isDarkMode
-                      ? AppColors.darkDivider
-                      : AppColors.outline.withValues(alpha: 0.3),
+                  color: ThemeColors.getDivider(context).withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -431,7 +420,6 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
     required String value,
     required IconData icon,
     required Color color,
-    required bool isDarkMode,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -439,7 +427,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: isDarkMode ? 0.15 : 0.1),
+        color: color.withValues(alpha: context.isDarkMode ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: color.withValues(alpha: 0.3),
@@ -516,13 +504,11 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                     final index = entry.key;
                     final url = entry.value;
                     return _buildPhotoItem(
-                      child: Image.network(
-                        url,
+                      child: AdaptiveImage(
+                        imageUrl: url,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.error,
-                              color: Theme.of(context).colorScheme.error);
-                        },
+                        errorWidget: Icon(Icons.error,
+                            color: Theme.of(context).colorScheme.error),
                       ),
                       onDelete: () => _deletePhoto(index, isNewPhoto: false),
                     );
@@ -545,7 +531,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
 
           if (_isUploadingPhoto) ...[
             const SizedBox(height: AppSpacing.paddingS),
-            const LinearProgressIndicator(),
+            const AdaptiveLoader(),
             const SizedBox(height: AppSpacing.paddingXS),
             BodyText(
                 text: loc.ownerMenuEditUploadingPhoto,
@@ -633,23 +619,16 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
 
   /// Builds empty state when no photos are added (theme-aware)
   Widget _buildEmptyPhotoState(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    final textSecondary =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
+    final textSecondary = ThemeColors.getTextSecondary(context);
     final loc = AppLocalizations.of(context)!;
 
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: isDarkMode
-            ? AppColors.darkCard // Dark background in dark mode
-            : AppColors.surfaceVariant, // Light background in light mode
+        color: ThemeColors.getCardBackground(context),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDarkMode
-              ? AppColors.darkDivider // Subtle border in dark mode
-              : AppColors.outline, // Medium border in light mode
+          color: ThemeColors.getDivider(context),
           style: BorderStyle.solid,
         ),
       ),
@@ -660,9 +639,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
             Icon(
               Icons.photo_camera,
               size: 40,
-              color: isDarkMode
-                  ? AppColors.textTertiary // Light icon in dark mode
-                  : AppColors.textSecondary, // Medium icon in light mode
+              color: ThemeColors.getTextSecondary(context),
             ),
             const SizedBox(height: AppSpacing.paddingS),
             BodyText(
@@ -684,13 +661,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
     required VoidCallback onAdd,
     required Function(int) onRemove,
   }) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    // final textPrimary =
-    //     theme.textTheme.bodyLarge?.color ?? AppColors.textPrimary;
-    final textSecondary =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
-    final primaryColor = theme.colorScheme.primary;
+    final textSecondary = ThemeColors.getTextSecondary(context);
+    final primaryColor = context.primaryColor;
 
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -752,14 +724,10 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
                 padding: const EdgeInsets.all(AppSpacing.paddingS),
                 decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? AppColors.darkInputFill // Dark background for item
-                      : AppColors.surfaceVariant, // Light background for item
+                  color: context.theme.inputDecorationTheme.fillColor,
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                   border: Border.all(
-                    color: isDarkMode
-                        ? AppColors.darkDivider // Subtle border in dark mode
-                        : AppColors.outline, // Medium border in light mode
+                    color: ThemeColors.getDivider(context),
                   ),
                 ),
                 child: Row(
@@ -845,75 +813,55 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
   Future<void> _addMealItem(
       AppLocalizations loc, String mealType, List<String> items) async {
     final controller = TextEditingController();
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
     final result = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDarkMode
-            ? AppColors.darkCard // Dark background for dark mode
-            : AppColors.surface, // White background for light mode
+      builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        title: HeadingMedium(text: loc.ownerMenuEditAddMealItemTitle(mealType)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: controller,
-              autofocus: true,
-              style: TextStyle(
-                color: theme.textTheme.bodyMedium?.color ??
-                    AppColors.textPrimary, // Theme-aware text color
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                labelText: loc.ownerMenuEditItemNameLabel,
-                hintText: loc.ownerMenuEditItemNameHint,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: loc.ownerMenuEditAddMealItemTitle(mealType)),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: controller,
+                autoFocus: true,
+                label: loc.ownerMenuEditItemNameLabel,
+                hint: loc.ownerMenuEditItemNameHint,
                 prefixIcon: Icon(
                   Icons.restaurant_rounded,
-                  color: theme.colorScheme.primary,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-                ),
-                filled: true,
-                fillColor: isDarkMode
-                    ? AppColors.darkInputFill // Dark input background
-                    : AppColors.surfaceVariant, // Light input background
-                // Ensure label and hint are visible
-                labelStyle: TextStyle(
-                  color: theme.textTheme.bodyMedium?.color ??
-                      AppColors.textSecondary,
-                ),
-                hintStyle: TextStyle(
-                  color: (theme.textTheme.bodyMedium?.color ??
-                          AppColors.textSecondary)
-                      .withValues(alpha: 0.6),
+                  color: context.primaryColor,
                 ),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          SecondaryButton(
-            onPressed: () => Navigator.of(context).pop(),
-            label: loc.cancel,
-          ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SecondaryButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    label: loc.cancel,
+                  ),
           const SizedBox(width: AppSpacing.paddingS),
-          PrimaryButton(
-            onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                Navigator.of(context).pop(controller.text.trim());
-              }
-            },
-            label: loc.add,
-            icon: Icons.add,
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    onPressed: () {
+                      if (controller.text.trim().isNotEmpty) {
+                        Navigator.of(context).pop(controller.text.trim());
+                      }
+                    },
+                    label: loc.add,
+                    icon: Icons.add,
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
 
@@ -972,7 +920,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
           return Container(
             color: AppColors.surfaceVariant,
             child: const Center(
-              child: CircularProgressIndicator(),
+              child: AdaptiveLoader(),
             ),
           );
         },

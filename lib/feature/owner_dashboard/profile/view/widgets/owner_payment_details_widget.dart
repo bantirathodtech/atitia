@@ -9,10 +9,15 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/images/adaptive_image.dart';
+import '../../../../../common/widgets/loaders/adaptive_loader.dart';
+import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
@@ -200,12 +205,10 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<OwnerPaymentDetailsViewModel>();
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     if (viewModel.loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: AdaptiveLoader());
     }
 
     return SingleChildScrollView(
@@ -219,14 +222,14 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  theme.primaryColor,
-                  theme.primaryColor.withValues(alpha: 0.7),
+                  context.primaryColor,
+                  context.primaryColor.withValues(alpha: 0.7),
                 ],
               ),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
               boxShadow: [
                 BoxShadow(
-                  color: theme.primaryColor.withValues(alpha: 0.3),
+                  color: context.primaryColor.withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -237,13 +240,13 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.paddingM),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onPrimary.withValues(alpha: 0.2),
+                    color: context.colors.onPrimary.withValues(alpha: 0.2),
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusM),
                   ),
                   child: Icon(
                     Icons.account_balance_wallet_rounded,
-                    color: theme.colorScheme.onPrimary,
+                    color: context.colors.onPrimary,
                     size: 32,
                   ),
                 ),
@@ -255,7 +258,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                       HeadingMedium(
                         text: loc?.paymentDetails ??
                             _text('paymentDetails', 'Payment Details'),
-                        color: theme.colorScheme.onPrimary,
+                        color: context.colors.onPrimary,
                       ),
                       const SizedBox(height: AppSpacing.paddingXS),
                       BodyText(
@@ -278,13 +281,11 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
           // Tab Bar
           Container(
             decoration: BoxDecoration(
-              color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+              color: ThemeColors.getCardBackground(context),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
               boxShadow: [
                 BoxShadow(
-                  color: isDarkMode
-                      ? theme.colorScheme.shadow.withValues(alpha: 0.3)
-                      : theme.colorScheme.shadow.withValues(alpha: 0.05),
+                  color: ThemeColors.getSubtleBackground(context),
                   blurRadius: 10,
                   offset: const Offset(0, 2),
                 ),
@@ -293,13 +294,12 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             child: TabBar(
               controller: _tabController,
               labelColor: AppColors.textOnPrimary,
-              unselectedLabelColor:
-                  isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+              unselectedLabelColor: ThemeColors.getTextSecondary(context),
               indicator: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    theme.primaryColor,
-                    theme.primaryColor.withValues(alpha: 0.7)
+                    context.primaryColor,
+                    context.primaryColor.withValues(alpha: 0.7)
                   ],
                 ),
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
@@ -325,9 +325,9 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildBankDetailsTab(isDarkMode, loc),
-                _buildUpiDetailsTab(isDarkMode, loc),
-                _buildQrCodeTab(isDarkMode, loc),
+                _buildBankDetailsTab(context, loc),
+                _buildUpiDetailsTab(context, loc),
+                _buildQrCodeTab(context, loc),
               ],
             ),
           ),
@@ -346,7 +346,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
     );
   }
 
-  Widget _buildBankDetailsTab(bool isDarkMode, AppLocalizations? loc) {
+  Widget _buildBankDetailsTab(BuildContext context, AppLocalizations? loc) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: Column(
@@ -369,7 +369,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             hint: loc?.exampleBankName ??
                 _text('exampleBankName', 'e.g., State Bank of India'),
             icon: Icons.account_balance,
-            isDarkMode: isDarkMode,
+            context: context,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildTextField(
@@ -379,7 +379,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             hint: loc?.nameAsPerBankRecords ??
                 _text('nameAsPerBankRecords', 'Name as per bank records'),
             icon: Icons.person,
-            isDarkMode: isDarkMode,
+            context: context,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildTextField(
@@ -390,7 +390,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                 _text('enterAccountNumber', 'Enter account number'),
             icon: Icons.numbers,
             keyboardType: TextInputType.number,
-            isDarkMode: isDarkMode,
+            context: context,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildTextField(
@@ -398,14 +398,14 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             label: loc?.ifscCode ?? _text('ifscCode', 'IFSC Code'),
             hint: loc?.exampleIfsc ?? _text('exampleIfsc', 'e.g., SBIN0001234'),
             icon: Icons.code,
-            isDarkMode: isDarkMode,
+            context: context,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildUpiDetailsTab(bool isDarkMode, AppLocalizations? loc) {
+  Widget _buildUpiDetailsTab(BuildContext context, AppLocalizations? loc) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: Column(
@@ -426,7 +426,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
             label: loc?.upiID ?? _text('upiID', 'UPI ID'),
             hint: loc?.exampleUpiId ?? _text('exampleUpiId', 'yourname@paytm'),
             icon: Icons.account_circle,
-            isDarkMode: isDarkMode,
+            context: context,
           ),
           const SizedBox(height: AppSpacing.paddingM),
           _buildTextField(
@@ -439,14 +439,14 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                     'Any special instructions for guests'),
             icon: Icons.note,
             maxLines: 3,
-            isDarkMode: isDarkMode,
+            context: context,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildQrCodeTab(bool isDarkMode, AppLocalizations? loc) {
+  Widget _buildQrCodeTab(BuildContext context, AppLocalizations? loc) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.paddingL),
       child: Column(
@@ -470,7 +470,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                 decoration: BoxDecoration(
                   border: Border.all(
                     color:
-                        isDarkMode ? AppColors.darkDivider : AppColors.outline,
+                        ThemeColors.getDivider(context),
                     width: 2,
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
@@ -544,7 +544,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                 fit: BoxFit.contain,
               );
             }
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: AdaptiveLoader());
           },
         );
       } else {
@@ -556,50 +556,34 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
       }
     } else if (_qrCodeUrl != null) {
       // Display existing URL from Firebase
-      return Image.network(
-        _qrCodeUrl!,
+      return AdaptiveImage(
+        imageUrl: _qrCodeUrl!,
         fit: BoxFit.contain,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return const Center(child: CircularProgressIndicator());
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return const Center(
-            child: Icon(Icons.error, size: 48, color: AppColors.error),
-          );
-        },
+        placeholder: const Center(child: AdaptiveLoader()),
+        errorWidget: const Center(
+          child: Icon(Icons.error, size: 48, color: AppColors.error),
+        ),
       );
     }
     return const SizedBox.shrink();
   }
 
   Widget _buildTextField({
+    required BuildContext context,
     required TextEditingController controller,
     required String label,
     required String hint,
     required IconData icon,
-    required bool isDarkMode,
     TextInputType? keyboardType,
     int maxLines = 1,
   }) {
-    return TextFormField(
+    return TextInput(
       controller: controller,
-      keyboardType: keyboardType,
+      label: label,
+      hint: hint,
+      prefixIcon: Icon(icon),
+      keyboardType: keyboardType ?? TextInputType.text,
       maxLines: maxLines,
-      style: TextStyle(
-        color: isDarkMode ? AppColors.textOnPrimary : AppColors.textPrimary,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Icon(icon),
-        filled: true,
-        fillColor:
-            isDarkMode ? AppColors.darkInputFill : AppColors.surfaceVariant,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        ),
-      ),
     );
   }
 }

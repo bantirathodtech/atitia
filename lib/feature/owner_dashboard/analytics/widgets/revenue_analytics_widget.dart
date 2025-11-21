@@ -37,25 +37,23 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeader(context, isDark, loc),
+        _buildHeader(context, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildMetricsCards(context, isDark, loc),
+        _buildMetricsCards(context, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildChartSection(context, isDark, loc),
+        _buildChartSection(context, loc),
         const SizedBox(height: AppSpacing.paddingL),
-        _buildForecastingSection(context, isDark, loc),
+        _buildForecastingSection(context, loc),
       ],
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, AppLocalizations loc) {
+  Widget _buildHeader(BuildContext context, AppLocalizations loc) {
     return Row(
       children: [
         Container(
@@ -104,7 +102,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
   }
 
   Widget _buildMetricsCards(
-      BuildContext context, bool isDark, AppLocalizations loc) {
+      BuildContext context, AppLocalizations loc) {
     final metrics = _calculateMetrics();
     final currencyFormatter = _currencyFormatter(loc);
     final percentFormatter = NumberFormat('###0.0', loc.localeName);
@@ -118,33 +116,33 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
       children: [
         Expanded(
           child: _buildMetricCard(
+            context,
             loc.revenueMetricTotalRevenue,
             totalRevenueValue,
             Icons.account_balance_wallet,
             AppColors.success,
-            isDark,
           ),
         ),
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: _buildMetricCard(
+            context,
             loc.revenueMetricMonthlyGrowth,
             '${percentFormatter.format(monthlyGrowthValue)}%',
             Icons.trending_up,
             metrics['monthlyGrowth'] >= 0
                 ? AppColors.success
                 : context.decorativeRed,
-            isDark,
           ),
         ),
         const SizedBox(width: AppSpacing.paddingM),
         Expanded(
           child: _buildMetricCard(
+            context,
             loc.revenueMetricAvgPerGuest,
             avgPerGuestValue,
             Icons.person,
             AppColors.info,
-            isDark,
           ),
         ),
       ],
@@ -152,11 +150,11 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
   }
 
   Widget _buildMetricCard(
+    BuildContext context,
     String title,
     String value,
     IconData icon,
     Color color,
-    bool isDark,
   ) {
     return AdaptiveCard(
       child: Padding(
@@ -196,7 +194,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
   }
 
   Widget _buildChartSection(
-      BuildContext context, bool isDark, AppLocalizations loc) {
+      BuildContext context, AppLocalizations loc) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -207,15 +205,15 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
               children: [
                 HeadingSmall(text: loc.revenueTrendsLabel),
                 const Spacer(),
-                _buildPeriodSelector(isDark, loc),
+                _buildPeriodSelector(context, loc),
                 const SizedBox(width: AppSpacing.paddingM),
-                _buildMetricSelector(isDark, loc),
+                _buildMetricSelector(context, loc),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingL),
             SizedBox(
               height: 300,
-              child: _buildSimpleChart(isDark, loc),
+              child: _buildSimpleChart(context, loc),
             ),
           ],
         ),
@@ -223,7 +221,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildPeriodSelector(bool isDark, AppLocalizations loc) {
+  Widget _buildPeriodSelector(BuildContext context, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -261,7 +259,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildMetricSelector(bool isDark, AppLocalizations loc) {
+  Widget _buildMetricSelector(BuildContext context, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingS),
       decoration: BoxDecoration(
@@ -299,7 +297,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildSimpleChart(bool isDark, AppLocalizations loc) {
+  Widget _buildSimpleChart(BuildContext context, AppLocalizations loc) {
     final chartData = _getChartData();
     final months = chartData['months'] as List<int>;
     final values = chartData['data'] as List<int>;
@@ -375,7 +373,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
   }
 
   Widget _buildForecastingSection(
-      BuildContext context, bool isDark, AppLocalizations loc) {
+      BuildContext context, AppLocalizations loc) {
     final forecast = _calculateForecast(loc);
     final currencyFormatter = _currencyFormatter(loc);
 
@@ -396,7 +394,6 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                     currencyFormatter.format(forecast['nextMonth']),
                     forecast['nextMonthGrowth'],
                     AppColors.info,
-                    isDark,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.paddingM),
@@ -407,13 +404,12 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
                     currencyFormatter.format(forecast['nextQuarter']),
                     forecast['nextQuarterGrowth'],
                     AppColors.success,
-                    isDark,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            _buildForecastInsights(forecast, isDark, loc),
+            _buildForecastInsights(context, forecast, loc),
           ],
         ),
       ),
@@ -426,7 +422,6 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     String value,
     double growth,
     Color color,
-    bool isDark,
   ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -473,7 +468,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
   }
 
   Widget _buildForecastInsights(
-      Map<String, dynamic> forecast, bool isDark, AppLocalizations loc) {
+      BuildContext context, Map<String, dynamic> forecast, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(

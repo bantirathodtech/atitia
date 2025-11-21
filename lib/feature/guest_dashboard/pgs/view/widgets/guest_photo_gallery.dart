@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/text/body_text.dart';
+import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../l10n/app_localizations.dart';
 
@@ -100,74 +101,48 @@ class GuestPhotoGallery extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).dividerColor),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                url,
+            child: AdaptiveImage(
+              imageUrl: url,
+              height: height,
+              width: width,
+              fit: BoxFit.cover,
+              borderRadius: 12,
+              errorWidget: Container(
                 height: height,
                 width: width,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  height: height,
-                  width: width,
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.broken_image,
-                        size: 40,
-                        color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.5) ??
-                            Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.5),
-                      ),
-                      const SizedBox(height: AppSpacing.paddingS / 2),
-                      BodyText(
-                        text: loc?.failedToLoadImage ??
-                            _text('failedToLoadImage', 'Failed to load image'),
-                        color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7) ??
-                            Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
-                      ),
-                    ],
-                  ),
-                ),
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return Container(
-                    height: height,
-                    width: width,
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).primaryColor,
-                        ),
-                        value: progress.expectedTotalBytes != null
-                            ? progress.cumulativeBytesLoaded /
-                                progress.expectedTotalBytes!
-                            : null,
-                      ),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.broken_image,
+                      size: 40,
+                      color: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.color
+                              ?.withValues(alpha: 0.5) ??
+                          Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
                     ),
-                  );
-                },
+                    const SizedBox(height: AppSpacing.paddingS / 2),
+                    BodyText(
+                      text: loc?.failedToLoadImage ??
+                          _text('failedToLoadImage', 'Failed to load image'),
+                      color: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.color
+                              ?.withValues(alpha: 0.7) ??
+                          Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

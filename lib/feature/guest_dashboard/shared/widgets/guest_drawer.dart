@@ -8,12 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/widgets/drawers/adaptive_drawer.dart';
+import '../../../../common/widgets/dialogs/confirmation_dialog.dart';
 import '../../../../core/app/localization/locale_provider.dart';
 import '../../../../core/app/theme/theme_provider.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../core/navigation/navigation_service.dart';
 import '../../../auth/logic/auth_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'guest_tab_navigation_provider.dart';
 
 class GuestDrawer extends StatelessWidget {
   /// Navigation callback when drawer items are tapped
@@ -46,60 +48,97 @@ class GuestDrawer extends StatelessWidget {
   }
 
   void _handleDrawerNavigation(BuildContext context, String item) {
-    switch (item) {
-      case 'home':
-        // Navigate to guest dashboard home (PGs tab)
-        if (onNavigationTap != null) {
-          onNavigationTap!(0); // PG List tab
-        }
-        break;
-      case 'pgs':
-        // Navigate to PGs tab
-        if (onNavigationTap != null) {
+    // Close drawer first
+    Navigator.of(context).pop();
+    
+    // Try to get tab navigation callback from provider (preferred method)
+    final tabNavigation = GuestTabNavigationProvider.getTabNavigationCallback(context);
+    if (tabNavigation != null) {
+      debugPrint('✅ GuestDrawer: Using provider callback for: $item');
+      switch (item) {
+        case 'pgs':
+          tabNavigation(0); // Callback handles both tab switch and route navigation
+          return;
+        case 'foods':
+          tabNavigation(1);
+          return;
+        case 'payments':
+          tabNavigation(2);
+          return;
+        case 'requests':
+          tabNavigation(3);
+          return;
+        case 'complaints':
+          tabNavigation(4);
+          return;
+      }
+    } else {
+      debugPrint('⚠️ GuestDrawer: Provider not found for: $item, using fallback');
+    }
+    
+    // Fallback: Use callback if provided (for backward compatibility)
+    if (onNavigationTap != null) {
+      switch (item) {
+        case 'pgs':
           onNavigationTap!(0); // PGs tab
-        }
+          return;
+        case 'foods':
+          onNavigationTap!(1); // Foods tab
+          return;
+        case 'payments':
+          onNavigationTap!(2); // Payments tab
+          return;
+        case 'requests':
+          onNavigationTap!(3); // Requests tab
+          return;
+        case 'complaints':
+          onNavigationTap!(4); // Complaints tab
+          return;
+      }
+    }
+    
+    // Final fallback: Route navigation (should not be needed if provider is set up)
+    // This should not happen if provider is working correctly
+    debugPrint('⚠️ GuestDrawer: Provider not found, using route navigation for: $item');
+    final navService = getIt<NavigationService>();
+    switch (item) {
+      case 'pgs':
+        navService.goToGuestPGs();
         break;
       case 'foods':
-        // Navigate to Foods tab
-        if (onNavigationTap != null) {
-          onNavigationTap!(1); // Foods tab
-        }
+        navService.goToGuestFoods();
         break;
       case 'payments':
-        // Navigate to Payments tab
-        if (onNavigationTap != null) {
-          onNavigationTap!(2); // Payments tab
-        }
+        navService.goToGuestPayments();
         break;
       case 'requests':
-        // Navigate to Requests tab
-        if (onNavigationTap != null) {
-          onNavigationTap!(3); // Requests tab
-        }
+        navService.goToRoute('/guest/requests');
         break;
       case 'complaints':
-        // Navigate to Complaints tab
-        if (onNavigationTap != null) {
-          onNavigationTap!(4); // Complaints tab
-        }
+        navService.goToGuestComplaints();
         break;
       case 'profile':
         // Navigate to guest profile screen
+        Navigator.of(context).pop(); // Close drawer
         _handleProfileTap(context);
         break;
       case 'notifications':
         // Navigate to notifications
+        Navigator.of(context).pop(); // Close drawer
         _handleNotificationsTap(context);
         break;
       case 'settings':
         // Navigate to settings
+        Navigator.of(context).pop(); // Close drawer
         _handleSettingsTap(context);
         break;
       case 'help':
         // Navigate to help & support
-        getIt<NavigationService>().goToGuestHelp();
+        Navigator.of(context).pop(); // Close drawer
+        navService.goToGuestHelp();
         break;
       case 'logout':
+        Navigator.of(context).pop(); // Close drawer
         _handleLogout(context);
         break;
     }
@@ -144,24 +183,21 @@ class GuestDrawer extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(loc.logout),
-        content: Text(loc.areYouSureYouWantToLogout),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc.cancel),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              final authProvider =
-                  Provider.of<AuthProvider>(context, listen: false);
-              authProvider.signOut();
-            },
-            child: Text(loc.logout),
-          ),
-        ],
+      builder: (context) => ConfirmationDialog(
+        title: loc.logout,
+        message: loc.areYouSureYouWantToLogout,
+        confirmText: loc.logout,
+        cancelText: loc.cancel,
+        isDestructive: true,
+        onConfirm: () {
+          Navigator.pop(context); // Close dialog
+          final authProvider =
+              Provider.of<AuthProvider>(context, listen: false);
+          authProvider.signOut();
+        },
+        onCancel: () {
+          Navigator.pop(context); // Close dialog
+        },
       ),
     );
   }

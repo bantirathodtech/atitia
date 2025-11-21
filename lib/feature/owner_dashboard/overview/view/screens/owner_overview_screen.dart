@@ -17,6 +17,8 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/utils/responsive/responsive_system.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/styles/theme_colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 // Using centralized OwnerDrawer instead of direct AdaptiveDrawer
 import '../../../shared/widgets/owner_drawer.dart';
@@ -83,10 +85,9 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final viewModel = context.watch<OwnerOverviewViewModel>();
-    final authProvider = context.watch<AuthProvider>();
-    final selectedPgProvider = context.watch<SelectedPgProvider>();
-    final ownerId = authProvider.user?.userId ?? '';
-    final currentPgId = selectedPgProvider.selectedPgId;
+    // Use select to only rebuild when userId or pgId changes
+    final ownerId = context.select<AuthProvider, String>((a) => a.user?.userId ?? '');
+    final currentPgId = context.select<SelectedPgProvider, String?>((p) => p.selectedPgId);
 
     // Auto-reload data when selected PG changes
     if (_lastLoadedPgId != currentPgId && ownerId.isNotEmpty) {
@@ -102,18 +103,12 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
         // Center: PG Selector dropdown
         titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
+        
+        // Theme-aware background color
+        backgroundColor: context.colors.surface,
 
         // Left: Drawer button
         showDrawer: true,
-
-        // Right: Refresh button
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => viewModel.refreshOverviewData(ownerId),
-            tooltip: loc.refreshDashboard,
-          ),
-        ],
 
         showBackButton: false,
         showThemeToggle: false,
@@ -122,13 +117,13 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
       // Centralized Owner Drawer
       drawer: const OwnerDrawer(),
 
-      body: _buildBody(context, viewModel, ownerId, authProvider, loc),
+      body: _buildBody(context, viewModel, ownerId, loc),
     );
   }
 
   /// Builds appropriate body content based on current state
   Widget _buildBody(BuildContext context, OwnerOverviewViewModel viewModel,
-      String ownerId, AuthProvider authProvider, AppLocalizations loc) {
+      String ownerId, AppLocalizations loc) {
     if (viewModel.loading && viewModel.overviewData == null) {
       return Center(
         child: Column(
@@ -197,16 +192,16 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Welcome Header - Full Width
-                    _buildWelcomeHeader(context, authProvider, responsive, loc),
-                    const SizedBox(height: AppSpacing.paddingL),
+                    _buildWelcomeHeader(context, responsive, loc),
+                    SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
                     // Summary Cards
                     OwnerSummaryWidget(overview: viewModel.overviewData!),
-                    const SizedBox(height: AppSpacing.paddingL),
+                    SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
                     // Performance Indicator
                     _buildPerformanceCard(context, viewModel, loc),
-                    const SizedBox(height: AppSpacing.paddingL),
+                    SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
                     // Revenue Chart
                     if (viewModel.monthlyBreakdown != null)
@@ -215,13 +210,13 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                         data: viewModel.monthlyBreakdown!,
                       ),
                     if (viewModel.monthlyBreakdown != null)
-                      const SizedBox(height: AppSpacing.paddingL),
+                      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
                     // Property Breakdown
                     if (viewModel.propertyBreakdown != null)
                       _buildPropertyBreakdown(context, viewModel, loc),
                     if (viewModel.propertyBreakdown != null)
-                      const SizedBox(height: AppSpacing.paddingL),
+                      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
                     // Quick Actions
                     _buildQuickActions(context, loc),
@@ -236,17 +231,17 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   }
 
   /// Builds welcome header - Full width responsive design
-  Widget _buildWelcomeHeader(BuildContext context, AuthProvider authProvider,
+  Widget _buildWelcomeHeader(BuildContext context,
       ResponsiveConfig responsive, AppLocalizations loc) {
+    final authProvider = context.read<AuthProvider>();
     final userName =
         authProvider.user?.fullName ?? loc.ownerOverviewOwnerFallback;
-    final theme = Theme.of(context);
     final padding = context.responsivePadding;
 
     return AdaptiveCard(
       padding: EdgeInsets.symmetric(
         horizontal: padding.horizontal,
-        vertical: padding.vertical * 1.5,
+        vertical: context.isMobile ? padding.vertical : padding.vertical * 1.5,
       ),
       child: Row(
         children: [
@@ -257,31 +252,24 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
               children: [
                 HeadingLarge(
                   text: '${loc.welcome}, $userName!',
-                  color: theme.primaryColor,
+                  color: context.primaryColor,
                 ),
-                const SizedBox(height: AppSpacing.paddingS),
+                SizedBox(height: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
                 BodyText(
                   text: loc.heresYourBusinessOverview,
-                  color: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.color
-                          ?.withValues(alpha: 0.7) ??
-                      Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
+                  color: ThemeColors.getTextTertiary(context),
+                  small: context.isMobile,
                 ),
               ],
             ),
           ),
           // Optional: Add icon or badge on larger screens
-          if (responsive.isDesktop) const SizedBox(width: AppSpacing.paddingM),
+          if (responsive.isDesktop) SizedBox(width: AppSpacing.paddingM),
           if (responsive.isDesktop)
             Icon(
               Icons.dashboard_outlined,
               size: 48,
-              color: theme.primaryColor.withValues(alpha: 0.3),
+              color: context.primaryColor.withValues(alpha: 0.3),
             ),
         ],
       ),
@@ -294,44 +282,52 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
     final indicator = viewModel.performanceIndicator;
     final occupancy = viewModel.formattedOccupancyRate;
     final indicatorLabel = _localizedPerformanceIndicator(loc, indicator);
+    final padding = context.responsivePadding;
 
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
             text: loc.performance,
-            color: Theme.of(context).primaryColor,
+            color: context.primaryColor,
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BodyText(text: loc.ownerOverviewOccupancyRate),
-                  const SizedBox(height: AppSpacing.paddingXS),
-                  HeadingMedium(
-                    text: occupancy,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BodyText(
+                      text: loc.ownerOverviewOccupancyRate,
+                      small: context.isMobile,
+                    ),
+                    SizedBox(height: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+                    HeadingMedium(
+                      text: occupancy,
+                      color: context.primaryColor,
+                    ),
+                  ],
+                ),
               ),
+              SizedBox(width: AppSpacing.paddingS),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.paddingM,
-                  vertical: AppSpacing.paddingS,
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM,
+                  vertical: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
                 ),
                 decoration: BoxDecoration(
-                  color: _getPerformanceColor(indicator).withValues(alpha: 0.2),
+                  color: _getPerformanceColor(context, indicator).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 ),
                 child: BodyText(
                   text: indicatorLabel,
-                  color: _getPerformanceColor(indicator),
+                  color: _getPerformanceColor(context, indicator),
                   medium: true,
+                  small: context.isMobile,
                 ),
               ),
             ],
@@ -341,8 +337,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
     );
   }
 
-  Color _getPerformanceColor(String indicator) {
-    final theme = Theme.of(context);
+  Color _getPerformanceColor(BuildContext context, String indicator) {
     switch (indicator.toLowerCase()) {
       case 'excellent':
         return AppColors.success;
@@ -351,9 +346,9 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
       case 'fair':
         return AppColors.warning;
       case 'needs attention':
-        return theme.colorScheme.error;
+        return context.colors.error;
       default:
-        return theme.colorScheme.error;
+        return context.colors.error;
     }
   }
 
@@ -380,16 +375,23 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
             final index = mapEntry.key + 1; // Start from 1, not 0
             final entry = mapEntry.value;
             return Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
+              padding: EdgeInsets.symmetric(
+                vertical: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  BodyText(text: loc.ownerOverviewPgLabel(index, entry.key)),
+                  Expanded(
+                    child: BodyText(
+                      text: loc.ownerOverviewPgLabel(index, entry.key),
+                      small: context.isMobile,
+                    ),
+                  ),
                   BodyText(
                     text: _formatCurrency(entry.value, loc),
                     medium: true,
-                    color: Theme.of(context).primaryColor,
+                    color: context.primaryColor,
+                    small: context.isMobile,
                   ),
                 ],
               ),
@@ -404,14 +406,18 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  BodyText(
-                    text: loc.totalRevenueWithPgs(totalPGs),
-                    medium: true,
+                  Expanded(
+                    child: BodyText(
+                      text: loc.totalRevenueWithPgs(totalPGs),
+                      medium: true,
+                      small: context.isMobile,
+                    ),
                   ),
                   BodyText(
                     text: _formatCurrency(totalRevenue, loc),
                     medium: true,
-                    color: Theme.of(context).primaryColor,
+                    color: context.primaryColor,
+                    small: context.isMobile,
                   ),
                 ],
               ),
@@ -424,18 +430,19 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
 
   /// Builds quick actions section
   Widget _buildQuickActions(BuildContext context, AppLocalizations loc) {
+    final padding = context.responsivePadding;
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
             text: loc.quickActions,
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           Wrap(
-            spacing: AppSpacing.paddingS,
-            runSpacing: AppSpacing.paddingS,
+            spacing: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
+            runSpacing: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
             children: [
               _buildActionChip(context, loc.addProperty, Icons.add_home, () {}),
               _buildActionChip(context, loc.addTenant, Icons.person_add, () {}),
@@ -455,25 +462,30 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.paddingM,
-          vertical: AppSpacing.paddingS,
+        padding: EdgeInsets.symmetric(
+          horizontal: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM,
+          vertical: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
         ),
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+          color: context.primaryColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           border: Border.all(
-            color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
+            color: context.primaryColor.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 18, color: Theme.of(context).primaryColor),
-            const SizedBox(width: AppSpacing.paddingS),
+            Icon(
+              icon,
+              size: context.isMobile ? 16 : 18,
+              color: context.primaryColor,
+            ),
+            SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
             BodyText(
               text: label,
-              color: Theme.of(context).primaryColor,
+              color: context.primaryColor,
+              small: context.isMobile,
             ),
           ],
         ),

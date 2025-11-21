@@ -12,6 +12,7 @@ import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
@@ -1312,12 +1313,28 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
       OwnerServiceModel service) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(service.title),
-        content: SingleChildScrollView(
-          child: _buildServiceDetailsContent(context, service),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: _buildServiceDetailsActions(context, guestVM, service),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: service.title),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: _buildServiceDetailsContent(context, service),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              _buildServiceDetailsActions(context, guestVM, service),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1345,41 +1362,45 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                 service.completedAt!,
               )),
         const SizedBox(height: AppSpacing.paddingM),
-        Text(loc.description,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        HeadingSmall(text: loc.description),
         const SizedBox(height: AppSpacing.paddingXS),
         Text(service.description),
         const SizedBox(height: AppSpacing.paddingM),
-        Text(loc.messages, style: const TextStyle(fontWeight: FontWeight.bold)),
+        HeadingSmall(text: loc.messages),
         const SizedBox(height: AppSpacing.paddingXS),
         _buildMessagesList(service.messages),
       ],
     );
   }
 
-  List<Widget> _buildServiceDetailsActions(BuildContext context,
+  Widget _buildServiceDetailsActions(BuildContext context,
       OwnerGuestViewModel guestVM, OwnerServiceModel service) {
     final loc = AppLocalizations.of(context)!;
 
-    return [
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: Text(loc.close),
-      ),
-      if (!service.isCompleted) ...[
-        PrimaryButton(
-          label: loc.reply,
-          onPressed: () {
-            Navigator.of(context).pop();
-            _showReplyDialog(context, guestVM, service);
-          },
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        TextButtonWidget(
+          onPressed: () => Navigator.of(context).pop(),
+          text: loc.close,
         ),
-        PrimaryButton(
-          label: loc.complete,
-          onPressed: () => _completeService(context, guestVM, service),
-        ),
+        if (!service.isCompleted) ...[
+          const SizedBox(width: AppSpacing.paddingS),
+          PrimaryButton(
+            label: loc.reply,
+            onPressed: () {
+              Navigator.of(context).pop();
+              _showReplyDialog(context, guestVM, service);
+            },
+          ),
+          const SizedBox(width: AppSpacing.paddingS),
+          PrimaryButton(
+            label: loc.complete,
+            onPressed: () => _completeService(context, guestVM, service),
+          ),
+        ],
       ],
-    ];
+    );
   }
 
   /// Builds detail row for dialog
@@ -1467,20 +1488,34 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.replyToServiceRequest),
-        content: TextInput(
-          controller: replyController,
-          label: AppLocalizations.of(context)!.replyLabel,
-          hint: AppLocalizations.of(context)!.typeYourReply,
-          maxLines: 4,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
-          PrimaryButton(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: AppLocalizations.of(context)!.replyToServiceRequest),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: replyController,
+                label: AppLocalizations.of(context)!.replyLabel,
+                hint: AppLocalizations.of(context)!.typeYourReply,
+                maxLines: 4,
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: AppLocalizations.of(context)!.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
             label: AppLocalizations.of(context)!.sendReply,
             onPressed: () async {
               if (replyController.text.isNotEmpty) {
@@ -1505,9 +1540,13 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                   SnackBar(content: Text(loc.replySentSuccessfully)),
                 );
               }
-            },
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -1570,20 +1609,34 @@ void _completeService(BuildContext context, OwnerGuestViewModel guestVM,
 
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text(AppLocalizations.of(context)!.completeService),
-      content: TextInput(
-        controller: notesController,
-        label: AppLocalizations.of(context)!.completionNotes,
-        hint: AppLocalizations.of(context)!.completionNotesOptional,
-        maxLines: 3,
+    builder: (context) => Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(AppLocalizations.of(context)!.cancel),
-        ),
-        PrimaryButton(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.paddingL),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            HeadingMedium(text: AppLocalizations.of(context)!.completeService),
+            const SizedBox(height: AppSpacing.paddingM),
+            TextInput(
+              controller: notesController,
+              label: AppLocalizations.of(context)!.completionNotes,
+              hint: AppLocalizations.of(context)!.completionNotesOptional,
+              maxLines: 3,
+            ),
+            const SizedBox(height: AppSpacing.paddingL),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButtonWidget(
+                  onPressed: () => Navigator.of(context).pop(),
+                  text: AppLocalizations.of(context)!.cancel,
+                ),
+                const SizedBox(width: AppSpacing.paddingS),
+                PrimaryButton(
           label: AppLocalizations.of(context)!.markAsCompleted,
           onPressed: () async {
             final navigator = Navigator.of(context);
@@ -1610,9 +1663,13 @@ void _completeService(BuildContext context, OwnerGuestViewModel guestVM,
             scaffoldMessenger.showSnackBar(
               SnackBar(content: Text(loc.serviceCompletedSuccessfully)),
             );
-          },
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     ),
   );
 }
@@ -1626,45 +1683,67 @@ String _formatDate(DateTime date) {
 void _showAdvancedSearch(BuildContext context, OwnerGuestViewModel guestVM) {
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: HeadingMedium(text: AppLocalizations.of(context)!.advancedSearch),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextInput(
-            label: AppLocalizations.of(context)!.serviceTitle,
-            hint: AppLocalizations.of(context)!.serviceTitle,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          TextInput(
-            label: AppLocalizations.of(context)!.guestName,
-            hint: AppLocalizations.of(context)!.guestName,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          TextInput(
-            label: AppLocalizations.of(context)!.room,
-            hint: AppLocalizations.of(context)!.roomNumber,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          TextInput(
-            label: AppLocalizations.of(context)!.serviceType,
-            hint: AppLocalizations.of(context)!.serviceType,
-          ),
-        ],
+    builder: (context) => Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(AppLocalizations.of(context)!.cancel),
-        ),
-        PrimaryButton(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.paddingL),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            HeadingMedium(text: AppLocalizations.of(context)!.advancedSearch),
+            const SizedBox(height: AppSpacing.paddingM),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextInput(
+                      label: AppLocalizations.of(context)!.serviceTitle,
+                      hint: AppLocalizations.of(context)!.serviceTitle,
+                    ),
+                    const SizedBox(height: AppSpacing.paddingM),
+                    TextInput(
+                      label: AppLocalizations.of(context)!.guestName,
+                      hint: AppLocalizations.of(context)!.guestName,
+                    ),
+                    const SizedBox(height: AppSpacing.paddingM),
+                    TextInput(
+                      label: AppLocalizations.of(context)!.room,
+                      hint: AppLocalizations.of(context)!.roomNumber,
+                    ),
+                    const SizedBox(height: AppSpacing.paddingM),
+                    TextInput(
+                      label: AppLocalizations.of(context)!.serviceType,
+                      hint: AppLocalizations.of(context)!.serviceType,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.paddingL),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButtonWidget(
+                  onPressed: () => Navigator.pop(context),
+                  text: AppLocalizations.of(context)!.cancel,
+                ),
+                const SizedBox(width: AppSpacing.paddingS),
+                PrimaryButton(
           label: AppLocalizations.of(context)!.search,
           onPressed: () {
             Navigator.pop(context);
             // TODO: Implement advanced search
-          },
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     ),
   );
 }

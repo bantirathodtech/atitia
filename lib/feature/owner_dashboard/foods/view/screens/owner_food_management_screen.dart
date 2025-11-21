@@ -10,6 +10,8 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/styles/theme_colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
@@ -130,6 +132,9 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
         // Center: PG Selector dropdown
         titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
+        
+        // Theme-aware background color
+        backgroundColor: context.colors.surface,
 
         // Left: Drawer button
         showDrawer: true,
@@ -146,11 +151,6 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
             icon: const Icon(Icons.calendar_month),
             onPressed: () => _showSpecialMenuOptions(context, foodVM, ownerId),
             tooltip: loc.specialMenus,
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => foodVM.refreshMenus(ownerId, pgId: currentPgId),
-            tooltip: loc.refreshMenu,
           ),
         ],
 
@@ -211,6 +211,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
       return _buildEmptyState(context, foodVM, ownerId, currentPgId);
     }
 
+    // TabBarView - Scaffold automatically positions body below app bar (including bottom widget)
     return TabBarView(
       controller: _tabController,
       children: [
@@ -235,15 +236,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
         children: [
           Icon(Icons.restaurant_menu,
               size: 64,
-              color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.5) ??
-                  Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.5)),
+              color: ThemeColors.getTextTertiary(context).withValues(alpha: 0.5)),
           const SizedBox(height: AppSpacing.paddingM),
           HeadingMedium(text: loc.noPgMenusFound),
           const SizedBox(height: AppSpacing.paddingS),
@@ -267,24 +260,40 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
     final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(loc.createPgWeeklyMenus),
-        content: Text(
-          loc.thisWillCreateDefaultMenuTemplates,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          SecondaryButton(
-            label: loc.cancel,
-            onPressed: () => Navigator.of(context).pop(),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: loc.createPgWeeklyMenus),
+              const SizedBox(height: AppSpacing.paddingM),
+              BodyText(text: loc.thisWillCreateDefaultMenuTemplates),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SecondaryButton(
+                    label: loc.cancel,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    label: loc.initialize,
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      await _initializeDefaultMenus(foodVM, ownerId, currentPgId);
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-          PrimaryButton(
-            label: loc.initialize,
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await _initializeDefaultMenus(foodVM, ownerId, currentPgId);
-            },
-          ),
-        ],
+        ),
       ),
     );
   }

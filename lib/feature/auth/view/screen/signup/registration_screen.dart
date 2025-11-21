@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../common/animations/fade_in.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/animations/slide_in.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
@@ -449,6 +450,7 @@ class _RegistrationScreenState extends State<RegistrationScreen>
       // =======================================================================
       appBar: AdaptiveAppBar(
         title: loc?.completeYourProfile ?? 'Complete Your Profile',
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
         centerTitle: true,
         elevation: 0,
         showThemeToggle: true, // Theme toggle enabled for user comfort

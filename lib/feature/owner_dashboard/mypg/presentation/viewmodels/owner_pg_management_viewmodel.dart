@@ -49,6 +49,13 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   OwnerOccupancyReport? _occupancyReport;
   Map<String, dynamic>? _pgDetails; // Full PG document from Firebase
 
+  // Cached filtered lists to avoid expensive recalculations
+  List<OwnerBooking>? _cachedPendingBookings;
+  List<OwnerBooking>? _cachedApprovedBookings;
+  List<OwnerBooking>? _cachedActiveBookings;
+  List<OwnerBooking>? _cachedRejectedBookings;
+  bool _bookingsChanged = false;
+
   StreamSubscription? _bedsSubscription;
   StreamSubscription? _roomsSubscription;
   StreamSubscription? _floorsSubscription;
@@ -168,11 +175,21 @@ class OwnerPgManagementViewModel extends BaseProviderState {
       _bookingsSubscription = _repository.streamBookings(pgId).listen(
         (bookings) {
           _bookings = bookings;
+          _cachedPendingBookings = null;
+          _cachedApprovedBookings = null;
+          _cachedActiveBookings = null;
+          _cachedRejectedBookings = null;
+          _bookingsChanged = true;
           notifyListeners();
         },
         onError: (error) {
           // Don't fail if bookings stream has permission issues
           _bookings = [];
+          _cachedPendingBookings = null;
+          _cachedApprovedBookings = null;
+          _cachedActiveBookings = null;
+          _cachedRejectedBookings = null;
+          _bookingsChanged = true;
         },
       );
     } catch (e) {
@@ -446,19 +463,40 @@ class OwnerPgManagementViewModel extends BaseProviderState {
     }
   }
 
-  /// Get pending booking requests
+  /// Get pending booking requests (cached)
   List<OwnerBooking> get pendingBookings {
-    return _bookings.where((b) => b.isPending).toList();
+    if (_cachedPendingBookings == null || _bookingsChanged) {
+      _cachedPendingBookings = _bookings.where((b) => b.isPending).toList();
+      _bookingsChanged = false;
+    }
+    return _cachedPendingBookings!;
   }
 
-  /// Get approved bookings
+  /// Get approved bookings (cached)
   List<OwnerBooking> get approvedBookings {
-    return _bookings.where((b) => b.isApproved).toList();
+    if (_cachedApprovedBookings == null || _bookingsChanged) {
+      _cachedApprovedBookings = _bookings.where((b) => b.isApproved).toList();
+      _bookingsChanged = false;
+    }
+    return _cachedApprovedBookings!;
   }
 
-  /// Get active bookings
+  /// Get active bookings (cached)
   List<OwnerBooking> get activeBookings {
-    return _bookings.where((b) => b.isActive).toList();
+    if (_cachedActiveBookings == null || _bookingsChanged) {
+      _cachedActiveBookings = _bookings.where((b) => b.isActive).toList();
+      _bookingsChanged = false;
+    }
+    return _cachedActiveBookings!;
+  }
+
+  /// Get rejected bookings (cached)
+  List<OwnerBooking> get rejectedBookings {
+    if (_cachedRejectedBookings == null || _bookingsChanged) {
+      _cachedRejectedBookings = _bookings.where((b) => b.isRejected).toList();
+      _bookingsChanged = false;
+    }
+    return _cachedRejectedBookings!;
   }
 
   /// Get upcoming vacating bookings (within 7 days)

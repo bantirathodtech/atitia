@@ -8,22 +8,24 @@ import 'package:intl/intl.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
-import '../../../../../common/widgets/cards/info_card.dart';
+import '../../../../../common/widgets/containers/section_container.dart';
+import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
-import '../../../../../common/widgets/loaders/shimmer_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
-import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../feature/owner_dashboard/myguest/data/models/owner_booking_request_model.dart';
 import '../../../../../feature/owner_dashboard/myguest/data/repository/owner_booking_request_repository.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/guest_drawer.dart';
+import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/guest_pg_selector_dropdown.dart';
 import '../../../shared/widgets/user_location_display.dart';
 
 /// Screen for guests to view their booking request status
@@ -186,8 +188,13 @@ class _GuestBookingRequestsScreenState
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AdaptiveAppBar(
-        title: loc?.myBookingRequests ??
-            _text('myBookingRequests', 'My Booking Requests'),
+        titleWidget: const GuestPgAppBarDisplay(),
+        centerTitle: true,
+        showDrawer: true,
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
+        leadingActions: [
+          const GuestPgSelectorDropdown(compact: true),
+        ],
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -195,8 +202,8 @@ class _GuestBookingRequestsScreenState
             tooltip: loc?.refresh ?? _text('refresh', 'Refresh'),
           ),
         ],
-        showBackButton: true,
-        showThemeToggle: true,
+        showBackButton: false,
+        showThemeToggle: false,
       ),
       drawer: const GuestDrawer(),
       body: _buildBody(),
@@ -224,64 +231,48 @@ class _GuestBookingRequestsScreenState
     }
 
     if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline,
-                size: 64, color: Theme.of(context).colorScheme.error),
-            const SizedBox(height: AppSpacing.paddingL),
-            HeadingMedium(
-              text: loc?.bookingRequestsErrorTitle ??
-                  _text('bookingRequestsErrorTitle', 'Error Loading Requests'),
-              align: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.paddingS),
-            BodyText(
-              text: _error!,
-              align: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.paddingL),
-            PrimaryButton(
-              onPressed: _loadBookingRequests,
-              label: loc?.tryAgain ?? _text('tryAgain', 'Try Again'),
-            ),
-          ],
-        ),
+      return EmptyState(
+        title: loc?.bookingRequestsErrorTitle ??
+            _text('bookingRequestsErrorTitle', 'Error Loading Requests'),
+        message: _error!,
+        icon: Icons.error_outline,
+        actionLabel: loc?.tryAgain ?? _text('tryAgain', 'Try Again'),
+        onAction: _loadBookingRequests,
       );
     }
 
     // Always show structured UI - stats and placeholder rows even when empty
-    return Column(
-      children: [
-        // User Location Display
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.paddingM,
-            AppSpacing.paddingM,
-            AppSpacing.paddingM,
-            AppSpacing.paddingS,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // User Location Display
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              context.responsivePadding.left,
+              context.responsivePadding.top,
+              context.responsivePadding.right,
+              context.responsivePadding.top * 0.5,
+            ),
+            child: const UserLocationDisplay(),
           ),
-          child: const UserLocationDisplay(),
-        ),
-        _buildStatsCard(),
-        Expanded(
-          child: _bookingRequests.isEmpty
+          _buildStatsCard(),
+          SizedBox(height: context.responsivePadding.top * 0.5),
+          _bookingRequests.isEmpty
               ? _buildZeroStateContent()
-              : ListView.builder(
-                  padding: const EdgeInsets.all(AppSpacing.paddingM),
-                  itemCount: _bookingRequests.length,
-                  itemBuilder: (context, index) {
-                    final request = _bookingRequests[index];
-                    return Padding(
-                      padding:
-                          const EdgeInsets.only(bottom: AppSpacing.paddingS),
-                      child: _buildRequestCard(request),
-                    );
-                  },
+              : Padding(
+                  padding: EdgeInsets.all(context.responsivePadding.top),
+                  child: Column(
+                    children: [
+                      ..._bookingRequests.map((request) => Padding(
+                            padding: EdgeInsets.only(
+                                bottom: context.responsivePadding.top),
+                            child: _buildRequestCard(request),
+                          )),
+                    ],
+                  ),
                 ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -293,216 +284,239 @@ class _GuestBookingRequestsScreenState
         _bookingRequests.where((r) => r.status == 'approved').length;
     final rejectedCount =
         _bookingRequests.where((r) => r.status == 'rejected').length;
+    final totalCount = _bookingRequests.length;
     final loc = AppLocalizations.of(context);
 
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingL),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
-        ),
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          HeadingMedium(
-            text: loc?.bookingRequestSummary ??
-                _text('bookingRequestSummary', 'Booking Request Summary'),
-            color: AppColors.textOnPrimary,
-            align: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildStatItem(
-                loc?.bookingRequestPending ??
-                    _text('bookingRequestPending', 'Pending'),
-                pendingCount,
-                AppColors.statusOrange,
-              ),
-              _buildStatItem(
-                loc?.bookingRequestApproved ??
-                    _text('bookingRequestApproved', 'Approved'),
-                approvedCount,
-                AppColors.success,
-              ),
-              _buildStatItem(
-                loc?.bookingRequestRejected ??
-                    _text('bookingRequestRejected', 'Rejected'),
-                rejectedCount,
-                AppColors.statusRed,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Builds individual stat item
-  Widget _buildStatItem(String label, int count, Color color) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.paddingM),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-          ),
-          child: Text(
-            count.toString(),
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textOnPrimary,
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.paddingS),
-        CaptionText(
-          text: label,
-          color: AppColors.textOnPrimary.withValues(alpha: 0.9),
-        ),
-      ],
-    );
-  }
-
-  /// Builds structured zero-state content with hints and placeholder rows
-  Widget _buildZeroStateContent() {
-    final padding = context.responsivePadding;
-    final loc = AppLocalizations.of(context);
-
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(padding.horizontal),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Info hint card
-          InfoCard(
-            title: loc?.bookingRequestsIntroTitle ??
-                _text('bookingRequestsIntroTitle',
-                    'Get Started with Booking Requests'),
-            description: loc?.bookingRequestsIntroDescription ??
-                _text(
-                  'bookingRequestsIntroDescription',
-                  'Browse PGs and send booking requests. Owners will review and respond to your requests here.',
-                ),
-            icon: Icons.info_outline,
-            iconColor: AppColors.primary,
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-
-          // Placeholder request cards showing structure
-          ...List.generate(3, (index) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
-              child: _buildPlaceholderRequestCard(index),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  /// Builds placeholder request card
-  Widget _buildPlaceholderRequestCard(int index) {
-    return AdaptiveCard(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.paddingM),
+    return Padding(
+      padding: context.responsiveMargin,
+      child: SectionContainer(
+        title: loc?.bookingRequestSummary ??
+            _text('bookingRequestSummary', 'Booking Request Summary'),
+        icon: Icons.book_online,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with placeholder
+            // Stats grid
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Row(
-                    children: [
-                      ShimmerLoader(
-                        width: 120,
-                        height: 16,
-                        borderRadius: 4,
-                      ),
-                    ],
+                  child: _buildStatItem(
+                    loc?.total ?? _text('total', 'Total'),
+                    totalCount,
+                    AppColors.info,
+                    Icons.book_online,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.paddingS,
-                    vertical: AppSpacing.paddingXS,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.borderRadiusS),
-                  ),
-                  child: ShimmerLoader(
-                    width: 60,
-                    height: 12,
-                    borderRadius: 4,
+                SizedBox(width: context.responsivePadding.left),
+                Expanded(
+                  child: _buildStatItem(
+                    loc?.bookingRequestPending ??
+                        _text('bookingRequestPending', 'Pending'),
+                    pendingCount,
+                    AppColors.statusOrange,
+                    Icons.pending,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.paddingS),
-            // Location placeholder
+            SizedBox(height: context.responsivePadding.top),
             Row(
               children: [
-                Icon(Icons.location_on,
-                    size: 14,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.5) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.5)),
-                const SizedBox(width: AppSpacing.paddingXS),
-                ShimmerLoader(
-                  width: 150,
-                  height: 12,
-                  borderRadius: 4,
+                Expanded(
+                  child: _buildStatItem(
+                    loc?.bookingRequestApproved ??
+                        _text('bookingRequestApproved', 'Approved'),
+                    approvedCount,
+                    AppColors.success,
+                    Icons.check_circle,
+                  ),
                 ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.paddingXS),
-            // Date placeholder
-            Row(
-              children: [
-                Icon(Icons.calendar_today,
-                    size: 14,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.5) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.5)),
-                const SizedBox(width: AppSpacing.paddingXS),
-                ShimmerLoader(
-                  width: 120,
-                  height: 12,
-                  borderRadius: 4,
+                SizedBox(width: context.responsivePadding.left),
+                Expanded(
+                  child: _buildStatItem(
+                    loc?.bookingRequestRejected ??
+                        _text('bookingRequestRejected', 'Rejected'),
+                    rejectedCount,
+                    AppColors.statusRed,
+                    Icons.cancel,
+                  ),
                 ),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Builds individual stat item
+  Widget _buildStatItem(String label, int count, Color color, IconData icon) {
+    return AdaptiveCard(
+      padding: EdgeInsets.all(context.isMobile
+          ? context.responsivePadding.top * 0.5
+          : context.responsivePadding.top),
+      backgroundColor: color.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+      hasShadow: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Row 1: Icon and number side by side
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: context.isMobile ? 18 : 24,
+              ),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
+              Text(
+                count.toString(),
+                style: TextStyle(
+                  fontSize: context.isMobile ? 16 : 20,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS
+                  : AppSpacing.paddingS),
+          // Row 2: Text below
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: context.isMobile ? 10 : 12,
+              color: (context.textTheme.bodySmall?.color ??
+                      context.colors.onSurface)
+                  .withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds structured zero-state content with hints and placeholder rows
+  Widget _buildZeroStateContent() {
+    final loc = AppLocalizations.of(context);
+
+    return _buildPlaceholderRequestStructure(context, loc);
+  }
+
+  /// Builds placeholder request structure
+  Widget _buildPlaceholderRequestStructure(
+      BuildContext context, AppLocalizations? loc) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: 0,
+        left: context.responsiveMargin.left,
+        right: context.responsiveMargin.right,
+        bottom: context.responsiveMargin.bottom,
+      ),
+      child: SectionContainer(
+        title: _text(
+            'recentBookingRequestsPreview', 'Recent Booking Requests Preview'),
+        icon: Icons.book_online,
+        child: Column(
+          children: [
+            // Placeholder request cards
+            ...List.generate(
+                3, (index) => _buildPlaceholderRequestCard(context)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds placeholder request card
+  Widget _buildPlaceholderRequestCard(BuildContext context) {
+    return AdaptiveCard(
+      margin: EdgeInsets.only(bottom: context.responsivePadding.top),
+      padding: EdgeInsets.all(context.isMobile
+          ? context.responsivePadding.top * 0.5
+          : context.responsivePadding.top),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with placeholder
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Container(
+                  height: context.isMobile ? 12 : 16,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: ThemeColors.getTextTertiary(context)
+                        .withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+              ),
+              SizedBox(width: context.responsivePadding.left),
+              Container(
+                width: context.isMobile ? 60 : 80,
+                height: context.isMobile ? 20 : 24,
+                decoration: BoxDecoration(
+                  color: ThemeColors.getDivider(context),
+                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.responsivePadding.top * 0.5),
+          // Location placeholder
+          Row(
+            children: [
+              Icon(Icons.location_on,
+                  size: context.isMobile ? 12 : 14,
+                  color: ThemeColors.getTextTertiary(context)),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
+              Container(
+                height: context.isMobile ? 10 : 12,
+                width: context.isMobile ? 120 : 150,
+                decoration: BoxDecoration(
+                  color: ThemeColors.getDivider(context),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.isMobile ? 4 : AppSpacing.paddingXS),
+          // Date placeholder
+          Row(
+            children: [
+              Icon(Icons.calendar_today,
+                  size: context.isMobile ? 12 : 14,
+                  color: ThemeColors.getTextTertiary(context)),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
+              Container(
+                height: context.isMobile ? 10 : 12,
+                width: context.isMobile ? 100 : 120,
+                decoration: BoxDecoration(
+                  color: ThemeColors.getDivider(context),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -519,7 +533,7 @@ class _GuestBookingRequestsScreenState
     return AdaptiveCard(
       onTap: () => _showRequestDetails(request),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.paddingM),
+        padding: EdgeInsets.all(context.responsivePadding.top),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -552,29 +566,12 @@ class _GuestBookingRequestsScreenState
             Row(
               children: [
                 Icon(Icons.location_on,
-                    size: 14,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7)),
-                const SizedBox(width: AppSpacing.paddingXS),
+                    size: 14, color: ThemeColors.getTextTertiary(context)),
+                SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: BodyText(
                     text: request.pgName,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7),
+                    color: ThemeColors.getTextTertiary(context),
                   ),
                 ),
               ],
@@ -584,32 +581,15 @@ class _GuestBookingRequestsScreenState
             Row(
               children: [
                 Icon(Icons.calendar_today,
-                    size: 14,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7)),
-                const SizedBox(width: AppSpacing.paddingXS),
+                    size: 14, color: ThemeColors.getTextTertiary(context)),
+                SizedBox(width: AppSpacing.paddingXS),
                 BodyText(
                   text: loc?.bookingRequestRequestedOn(
                         _formatDate(requestDate),
                       ) ??
                       _text('bookingRequestRequestedOn', 'Requested: {date}',
                           parameters: {'date': _formatDate(requestDate)}),
-                  color: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.color
-                          ?.withValues(alpha: 0.7) ??
-                      Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
+                  color: ThemeColors.getTextTertiary(context),
                 ),
               ],
             ),
@@ -619,32 +599,15 @@ class _GuestBookingRequestsScreenState
               Row(
                 children: [
                   Icon(Icons.check_circle,
-                      size: 14,
-                      color: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.color
-                              ?.withValues(alpha: 0.7) ??
-                          Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.7)),
-                  const SizedBox(width: AppSpacing.paddingXS),
+                      size: 14, color: ThemeColors.getTextTertiary(context)),
+                  SizedBox(width: AppSpacing.paddingXS),
                   BodyText(
                     text: loc?.bookingRequestRespondedOn(
                           _formatDate(respondedAt),
                         ) ??
                         _text('bookingRequestRespondedOn', 'Responded: {date}',
                             parameters: {'date': _formatDate(respondedAt)}),
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7),
+                    color: ThemeColors.getTextTertiary(context),
                   ),
                 ],
               ),
@@ -658,31 +621,24 @@ class _GuestBookingRequestsScreenState
                 text: loc?.bookingRequestFrom(request.guestName) ??
                     _text('bookingRequestFrom', 'Request from: {name}',
                         parameters: {'name': request.guestName}),
-                color: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.color
-                        ?.withValues(alpha: 0.8) ??
-                    Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.8),
+                color: ThemeColors.getTextTertiary(context),
               ),
             ],
             // Response message preview
             if (request.responseMessage != null &&
                 request.responseMessage!.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.paddingS),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.paddingS),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-                ),
+              AdaptiveCard(
+                padding: EdgeInsets.all(context.isMobile
+                    ? context.responsivePadding.top * 0.5
+                    : AppSpacing.paddingS),
+                backgroundColor: statusColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                hasShadow: false,
                 child: Row(
                   children: [
                     Icon(Icons.message, size: 16, color: statusColor),
-                    const SizedBox(width: AppSpacing.paddingS),
+                    SizedBox(width: AppSpacing.paddingS),
                     Expanded(
                       child: BodyText(
                         text: request.responseMessage!,

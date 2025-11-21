@@ -14,8 +14,10 @@ import '../../../../../common/widgets/chips/filter_chip.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
-import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
+import '../../../../../common/styles/theme_colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/owner_drawer.dart';
 import '../../../../auth/logic/auth_provider.dart';
@@ -75,8 +77,8 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<OwnerPgManagementViewModel>();
-    final selectedPgProvider = context.watch<SelectedPgProvider>();
-    final currentPgId = selectedPgProvider.selectedPgId;
+    // Use select to only rebuild when pgId changes
+    final currentPgId = context.select<SelectedPgProvider, String?>((p) => p.selectedPgId);
 
     if (_lastLoadedPgId != currentPgId &&
         currentPgId != null &&
@@ -94,40 +96,49 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
         titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
 
+        // Theme-aware background color
+        backgroundColor: context.colors.surface,
+
         // Left: Drawer button
         showDrawer: true,
 
-        // Right: Add PG + Refresh
+        // Right: Add PG
         actions: [
           const AddPgActionButton(),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: viewModel.refreshData,
-            tooltip: AppLocalizations.of(context)?.refreshPgData ??
-                'Refresh PG Data',
-          ),
         ],
 
-        // Bottom: PGs tab bar
+        // Bottom: PGs tab bar with extra height similar to food tab
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: TabBar(
-            controller: _tabController,
-            indicatorColor: Theme.of(context).colorScheme.onPrimary,
-            labelColor: Theme.of(context).colorScheme.onPrimary,
-            unselectedLabelColor:
-                Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.7),
-            tabs: [
-              Tab(
-                  text: AppLocalizations.of(context)?.dashboard ?? 'Dashboard',
-                  icon: const Icon(Icons.dashboard, size: 16)),
-              Tab(
-                  text: AppLocalizations.of(context)?.bedMap ?? 'Bed Map',
-                  icon: const Icon(Icons.bed, size: 16)),
-              Tab(
-                  text: AppLocalizations.of(context)?.booking ?? 'Bookings',
-                  icon: const Icon(Icons.book_online, size: 16)),
-            ],
+          preferredSize: const Size.fromHeight(80),
+          child: Container(
+            decoration: BoxDecoration(
+              color: context.colors.surface,
+              border: Border(
+                top: BorderSide(
+                  color: ThemeColors.getDivider(context),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicatorColor: context.colors.onSurface,
+              labelColor: context.colors.onSurface,
+              unselectedLabelColor:
+                  context.colors.onSurface.withValues(alpha: 0.7),
+              tabs: [
+                Tab(
+                    text:
+                        AppLocalizations.of(context)?.dashboard ?? 'Dashboard',
+                    icon: const Icon(Icons.dashboard, size: 16)),
+                Tab(
+                    text: AppLocalizations.of(context)?.bedMap ?? 'Bed Map',
+                    icon: const Icon(Icons.bed, size: 16)),
+                Tab(
+                    text: AppLocalizations.of(context)?.booking ?? 'Bookings',
+                    icon: const Icon(Icons.book_online, size: 16)),
+              ],
+            ),
           ),
         ),
 
@@ -138,12 +149,12 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
       // Centralized Owner Drawer
       drawer: const OwnerDrawer(),
 
-      body: _buildBody(context, viewModel, selectedPgProvider),
+      body: _buildBody(context, viewModel),
     );
   }
 
-  Widget _buildBody(BuildContext context, OwnerPgManagementViewModel viewModel,
-      SelectedPgProvider selectedPgProvider) {
+  Widget _buildBody(BuildContext context, OwnerPgManagementViewModel viewModel) {
+    final selectedPgProvider = context.read<SelectedPgProvider>();
     if (!selectedPgProvider.hasPgs) {
       return Center(
         child: Column(
@@ -234,22 +245,24 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
 
   Widget _buildDashboardTab(
       BuildContext context, OwnerPgManagementViewModel viewModel) {
+    final padding = context.responsivePadding;
+    final cardGap = context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OwnerPgInfoCard(pgDetails: viewModel.pgDetails),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: cardGap),
           if (viewModel.occupancyReport != null)
             OwnerOccupancyReportWidget(report: viewModel.occupancyReport!),
-          const SizedBox(height: AppSpacing.paddingM),
+          if (viewModel.occupancyReport != null) SizedBox(height: cardGap),
           if (viewModel.revenueReport != null)
             OwnerRevenueReportWidget(report: viewModel.revenueReport!),
-          const SizedBox(height: AppSpacing.paddingM),
+          if (viewModel.revenueReport != null) SizedBox(height: cardGap),
           if (viewModel.pendingBookings.isNotEmpty)
             OwnerBookingRequestListWidget(bookings: viewModel.pendingBookings),
-          const SizedBox(height: AppSpacing.paddingM),
+          if (viewModel.pendingBookings.isNotEmpty) SizedBox(height: cardGap),
           if (viewModel.upcomingVacating.isNotEmpty)
             OwnerUpcomingVacatingWidget(bookings: viewModel.upcomingVacating),
         ],
@@ -276,89 +289,101 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
   Widget _buildBookingsTab(
       BuildContext context, OwnerPgManagementViewModel viewModel) {
     final total = viewModel.bookings.length;
-    final approved = viewModel.bookings.where((b) => b.isApproved).length;
-    final pending = viewModel.bookings.where((b) => b.isPending).length;
-    final rejected = viewModel.bookings.where((b) => b.isRejected).length;
+    final approved = viewModel.approvedBookings.length;
+    final pending = viewModel.pendingBookings.length;
+    final rejected = viewModel.rejectedBookings.length;
+    final padding = context.responsivePadding;
 
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       children: [
         // Overview stats card (shows zero values when empty)
         AdaptiveCard(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.paddingM),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.book_online_rounded,
-                        color: Theme.of(context).primaryColor, size: 20),
-                    const SizedBox(width: AppSpacing.paddingS),
-                    HeadingMedium(
+          padding: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : AppSpacing.paddingM),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.book_online_rounded,
+                      color: context.primaryColor, size: context.isMobile ? 18 : 20),
+                  SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+                  Expanded(
+                    child: HeadingMedium(
                       text: AppLocalizations.of(context)?.bookingsOverview ??
                           'Bookings Overview',
-                      color: Theme.of(context).primaryColor,
+                      color: context.primaryColor,
                     ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.paddingM),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatItem(
-                        context,
-                        '$total',
-                        AppLocalizations.of(context)?.total ?? 'Total',
-                        Icons.receipt_long,
-                        Theme.of(context).primaryColor,
-                      ),
+                  ),
+                ],
+              ),
+              SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatItem(
+                      context,
+                      '$total',
+                      AppLocalizations.of(context)?.total ?? 'Total',
+                      Icons.receipt_long,
+                      context.primaryColor,
                     ),
-                    Expanded(
-                      child: _buildStatItem(
-                        context,
-                        '$approved',
-                        AppLocalizations.of(context)?.approved ?? 'Approved',
-                        Icons.check_circle,
-                        AppColors.success,
-                      ),
+                  ),
+                  Expanded(
+                    child: _buildStatItem(
+                      context,
+                      '$approved',
+                      AppLocalizations.of(context)?.approved ?? 'Approved',
+                      Icons.check_circle,
+                      AppColors.success,
                     ),
-                    Expanded(
-                      child: _buildStatItem(
-                        context,
-                        '$pending',
-                        AppLocalizations.of(context)?.pending ?? 'Pending',
-                        Icons.schedule,
-                        AppColors.warning,
-                      ),
+                  ),
+                  Expanded(
+                    child: _buildStatItem(
+                      context,
+                      '$pending',
+                      AppLocalizations.of(context)?.pending ?? 'Pending',
+                      Icons.schedule,
+                      AppColors.warning,
                     ),
-                    Expanded(
-                      child: _buildStatItem(
-                        context,
-                        '$rejected',
-                        AppLocalizations.of(context)?.rejected ?? 'Rejected',
-                        Icons.cancel,
-                        AppColors.error,
-                      ),
+                  ),
+                  Expanded(
+                    child: _buildStatItem(
+                      context,
+                      '$rejected',
+                      AppLocalizations.of(context)?.rejected ?? 'Rejected',
+                      Icons.cancel,
+                      AppColors.error,
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
 
-        const SizedBox(height: AppSpacing.paddingM),
+        SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
 
         // List (real items or placeholders)
         if (total > 0)
-          ...List.generate(viewModel.bookings.length, (index) {
-            final booking = viewModel.bookings[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
-              child: _buildBookingCard(context, booking, viewModel),
-            );
-          })
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: viewModel.bookings.length,
+            cacheExtent: 512,
+            addAutomaticKeepAlives: false,
+            addRepaintBoundaries: true,
+            itemBuilder: (context, index) {
+              final booking = viewModel.bookings[index];
+              return RepaintBoundary(
+                key: ValueKey('booking_${booking.id}_$index'),
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+                  child: _buildBookingCard(context, booking, viewModel),
+                ),
+              );
+            },
+          )
         else
           ..._buildBookingPlaceholders(context),
       ],
@@ -368,6 +393,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
   Widget _buildFilterChips(
       BuildContext context, OwnerPgManagementViewModel viewModel) {
     final loc = AppLocalizations.of(context);
+    final padding = context.responsivePadding;
     final filters = [
       loc?.all ?? 'All',
       loc?.occupied ?? 'Occupied',
@@ -378,8 +404,8 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
     final filterKeys = ['All', 'Occupied', 'Vacant', 'Pending', 'Maintenance'];
 
     return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
-      height: 50,
+      margin: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
+      height: context.isMobile ? 44 : 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: filterKeys.length,
@@ -389,7 +415,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           final isSelected = viewModel.selectedFilter == filterKey;
 
           return Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.paddingS),
+            padding: EdgeInsets.only(right: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
             child: CustomFilterChip(
               label: filterLabel,
               selected: isSelected,
@@ -437,15 +463,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             BodyText(
               text:
                   '${booking.formattedStartDate} - ${booking.formattedEndDate}',
-              color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.7) ??
-                  Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7),
+              color: ThemeColors.getTextTertiary(context),
             ),
             if (booking.isPending) ...[
               const SizedBox(height: AppSpacing.paddingS),
@@ -491,23 +509,43 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
 
   Widget _buildStatItem(BuildContext context, String value, String label,
       IconData icon, Color color) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
+    final padding = context.responsivePadding;
     return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingXS),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      margin: EdgeInsets.all(context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: isDarkMode ? 0.15 : 0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: AppSpacing.paddingS),
-          BodyText(text: value, medium: true, color: color),
-          CaptionText(text: label, color: color.withValues(alpha: 0.9)),
+          // Row 1: Icon and number side by side
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: context.isMobile ? 16 : 20),
+              SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: context.isMobile ? 14 : 16,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+          // Row 2: Text below
+          BodyText(
+            text: label,
+            small: true,
+            color: color.withValues(alpha: 0.9),
+            align: TextAlign.center,
+          ),
         ],
       ),
     );

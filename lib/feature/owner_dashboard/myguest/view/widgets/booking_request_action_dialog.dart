@@ -12,6 +12,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_booking_request_model.dart';
@@ -63,8 +64,6 @@ class _BookingRequestActionDialogState
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     return Dialog(
@@ -78,11 +77,11 @@ class _BookingRequestActionDialogState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(context, isDark, loc),
+            _buildHeader(context, loc),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildRequestInfo(context, isDark, loc),
+            _buildRequestInfo(context, loc),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildForm(context, isDark, loc),
+            _buildForm(context, loc),
             const SizedBox(height: AppSpacing.paddingL),
             _buildActions(context, loc),
           ],
@@ -93,7 +92,7 @@ class _BookingRequestActionDialogState
 
   /// Builds the dialog header
   Widget _buildHeader(
-      BuildContext context, bool isDark, AppLocalizations? loc) {
+      BuildContext context, AppLocalizations? loc) {
     return Row(
       children: [
         Container(
@@ -150,7 +149,7 @@ class _BookingRequestActionDialogState
 
   /// Builds request information section
   Widget _buildRequestInfo(
-      BuildContext context, bool isDark, AppLocalizations? loc) {
+      BuildContext context, AppLocalizations? loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
@@ -275,7 +274,7 @@ class _BookingRequestActionDialogState
   }
 
   /// Builds the form for response and additional details
-  Widget _buildForm(BuildContext context, bool isDark, AppLocalizations? loc) {
+  Widget _buildForm(BuildContext context, AppLocalizations? loc) {
     final dateFormat = DateFormat.yMMMd(loc?.localeName);
 
     return Form(
@@ -293,45 +292,36 @@ class _BookingRequestActionDialogState
           const SizedBox(height: AppSpacing.paddingM),
 
           // Response message
-          TextFormField(
+          TextInput(
             controller: _responseController,
-            decoration: InputDecoration(
-              labelText: widget.isApproval
-                  ? (loc?.welcomeMessageOptional ??
-                      'Welcome Message (Optional)')
-                  : (loc?.rejectionReasonOptional ??
-                      'Reason for Rejection (Optional)'),
-              hintText: widget.isApproval
-                  ? (loc?.welcomeMessageHint ??
-                      'Add a welcome message for the guest...')
-                  : (loc?.rejectionReasonHintDetailed ??
-                      'Explain why the request is being rejected...'),
-              border: const OutlineInputBorder(),
-            ),
+            label: widget.isApproval
+                ? (loc?.welcomeMessageOptional ??
+                    'Welcome Message (Optional)')
+                : (loc?.rejectionReasonOptional ??
+                    'Reason for Rejection (Optional)'),
+            hint: widget.isApproval
+                ? (loc?.welcomeMessageHint ??
+                    'Add a welcome message for the guest...')
+                : (loc?.rejectionReasonHintDetailed ??
+                    'Explain why the request is being rejected...'),
             maxLines: 3,
           ),
 
           // Additional fields for approval
           if (widget.isApproval) ...[
             const SizedBox(height: AppSpacing.paddingM),
-            TextFormField(
+            TextInput(
               controller: _roomNumberController,
-              decoration: InputDecoration(
-                labelText: loc?.roomNumberLabel ?? 'Room Number *',
-                hintText: loc?.enterRoomNumberHint ?? 'Enter room number...',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.door_front_door),
-              ),
+              label: loc?.roomNumberLabel ?? 'Room Number *',
+              hint: loc?.enterRoomNumberHint ?? 'Enter room number...',
+              prefixIcon: const Icon(Icons.door_front_door),
             ),
             const SizedBox(height: AppSpacing.paddingM),
-            TextFormField(
+            TextInput(
               controller: _bedNumberController,
-              decoration: InputDecoration(
-                labelText: loc?.bedNumberLabel ?? 'Bed Number *',
-                hintText: loc?.enterBedNumberHint ?? 'Enter bed number...',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.bed),
-              ),
+              label: loc?.bedNumberLabel ?? 'Bed Number *',
+              hint: loc?.enterBedNumberHint ?? 'Enter bed number...',
+              prefixIcon: const Icon(Icons.bed),
             ),
             const SizedBox(height: AppSpacing.paddingM),
 

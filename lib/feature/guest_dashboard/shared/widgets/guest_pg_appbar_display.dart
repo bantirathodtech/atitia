@@ -42,17 +42,24 @@ class GuestPgAppBarDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GuestPgSelectionProvider>(
-      builder: (context, guestPgProvider, child) {
-        final selectedPg = guestPgProvider.selectedPg;
+    // Use Consumer with listen: true to rebuild when provider changes
+    try {
+      return Consumer<GuestPgSelectionProvider>(
+        builder: (context, guestPgProvider, child) {
+          final selectedPg = guestPgProvider.selectedPg;
 
-        if (selectedPg == null) {
-          return _buildNoPgSelected(context);
-        }
+          // Always show something - either selected PG or "No PG Selected"
+          if (selectedPg == null) {
+            return _buildNoPgSelected(context);
+          }
 
-        return _buildPgSelected(context, selectedPg);
-      },
-    );
+          return _buildPgSelected(context, selectedPg);
+        },
+      );
+    } catch (e) {
+      // Fallback if provider is not available
+      return _buildNoPgSelected(context);
+    }
   }
 
   /// Builds the display when no PG is selected

@@ -9,6 +9,7 @@ import '../../../../../common/styles/colors.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
@@ -710,59 +711,81 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
       builder: (dialogContext) {
         final loc = AppLocalizations.of(dialogContext)!;
 
-        return AlertDialog(
-          title: Text(bike.fullBikeName),
-          content: SingleChildScrollView(
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildDetailRow(loc.guest, bike.guestInfo),
-                _buildDetailRow(loc.bikeNumber, bike.bikeNumber),
-                _buildDetailRow(loc.bikeName, bike.bikeName),
-                _buildDetailRow(loc.bikeType, bike.bikeTypeDisplay),
-                _buildDetailRow(loc.color, bike.color),
-                _buildDetailRow(loc.parkingSpot, bike.parkingSpot),
-                _buildDetailRow(loc.status, bike.statusDisplay),
-                _buildDetailRow(
-                    loc.registeredOn, _formatDate(bike.registrationDate)),
-                if (bike.lastParkedDate != null)
-                  _buildDetailRow(
-                      loc.lastParked, _formatDate(bike.lastParkedDate!)),
-                if (bike.removalDate != null)
-                  _buildDetailRow(loc.removed, _formatDate(bike.removalDate!)),
-                if (bike.violationReason != null)
-                  _buildDetailRow(loc.violationLabel, bike.violationReason!),
-                if (bike.notes != null) _buildDetailRow(loc.notes, bike.notes!),
+                HeadingMedium(text: bike.fullBikeName),
+                const SizedBox(height: AppSpacing.paddingM),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildDetailRow(loc.guest, bike.guestInfo),
+                        _buildDetailRow(loc.bikeNumber, bike.bikeNumber),
+                        _buildDetailRow(loc.bikeName, bike.bikeName),
+                        _buildDetailRow(loc.bikeType, bike.bikeTypeDisplay),
+                        _buildDetailRow(loc.color, bike.color),
+                        _buildDetailRow(loc.parkingSpot, bike.parkingSpot),
+                        _buildDetailRow(loc.status, bike.statusDisplay),
+                        _buildDetailRow(
+                            loc.registeredOn, _formatDate(bike.registrationDate)),
+                        if (bike.lastParkedDate != null)
+                          _buildDetailRow(
+                              loc.lastParked, _formatDate(bike.lastParkedDate!)),
+                        if (bike.removalDate != null)
+                          _buildDetailRow(loc.removed, _formatDate(bike.removalDate!)),
+                        if (bike.violationReason != null)
+                          _buildDetailRow(loc.violationLabel, bike.violationReason!),
+                        if (bike.notes != null) _buildDetailRow(loc.notes, bike.notes!),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      text: loc.close,
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                    PrimaryButton(
+                      label: loc.editBike,
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                        _editBike(context, guestVM, bike);
+                      },
+                    ),
+                    if (bike.isActive) ...[
+                      const SizedBox(width: AppSpacing.paddingS),
+                      PrimaryButton(
+                        label: loc.moveBike,
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                          _moveBike(context, guestVM, bike);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.paddingS),
+                      PrimaryButton(
+                        label: loc.removeBike,
+                        onPressed: () => _removeBike(context, guestVM, bike),
+                      ),
+                    ],
+                  ],
+                ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(loc.close),
-            ),
-            PrimaryButton(
-              label: loc.editBike,
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                _editBike(context, guestVM, bike);
-              },
-            ),
-            if (bike.isActive) ...[
-              PrimaryButton(
-                label: loc.moveBike,
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  _moveBike(context, guestVM, bike);
-                },
-              ),
-              PrimaryButton(
-                label: loc.removeBike,
-                onPressed: () => _removeBike(context, guestVM, bike),
-              ),
-            ],
-          ],
         );
       },
     );
@@ -801,12 +824,18 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
       builder: (dialogContext) {
         final loc = AppLocalizations.of(dialogContext)!;
 
-        return AlertDialog(
-          title: Text(loc.editBike),
-          content: SingleChildScrollView(
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                HeadingMedium(text: loc.editBike),
+                const SizedBox(height: AppSpacing.paddingM),
                 TextInput(
                   controller: parkingController,
                   label: loc.parkingSpot,
@@ -817,17 +846,18 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   label: loc.notes,
                   maxLines: 3,
                 ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(loc.cancel),
-            ),
-            PrimaryButton(
-              label: loc.saveChanges,
-              onPressed: () async {
+                const SizedBox(height: AppSpacing.paddingL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      text: loc.cancel,
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                    PrimaryButton(
+                      label: loc.saveChanges,
+                      onPressed: () async {
                 final messenger = ScaffoldMessenger.of(context);
                 final locOuter = AppLocalizations.of(context);
                 final updatedBike = bike.copyWith(
@@ -858,9 +888,13 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                     ),
                   ),
                 );
-              },
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -877,13 +911,19 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
       builder: (dialogContext) {
         final loc = AppLocalizations.of(dialogContext)!;
 
-        return AlertDialog(
-          title: Text(loc.moveBike),
-          content: SingleChildScrollView(
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(loc.currentSpot(bike.parkingSpot)),
+                HeadingMedium(text: loc.moveBike),
+                const SizedBox(height: AppSpacing.paddingM),
+                BodyText(text: loc.currentSpot(bike.parkingSpot)),
                 const SizedBox(height: AppSpacing.paddingM),
                 TextInput(
                   controller: newSpotController,
@@ -895,15 +935,16 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   label: loc.reasonForMove,
                   maxLines: 2,
                 ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(loc.cancel),
-            ),
-            PrimaryButton(
+                const SizedBox(height: AppSpacing.paddingL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      text: loc.cancel,
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                    PrimaryButton(
               label: loc.moveBike,
               onPressed: () async {
                 if (newSpotController.text.isNotEmpty) {
@@ -946,8 +987,12 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                   );
                 }
               },
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -963,30 +1008,37 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
       builder: (dialogContext) {
         final loc = AppLocalizations.of(dialogContext)!;
 
-        return AlertDialog(
-          title: Text(loc.removeBike),
-          content: SingleChildScrollView(
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(loc.areYouSureYouWantToRemoveBike(bike.fullBikeName)),
+                HeadingMedium(text: loc.removeBike),
+                const SizedBox(height: AppSpacing.paddingM),
+                BodyText(text: loc.areYouSureYouWantToRemoveBike(bike.fullBikeName)),
                 const SizedBox(height: AppSpacing.paddingM),
                 TextInput(
                   controller: reasonController,
                   label: loc.reasonForRemoval,
                   maxLines: 2,
                 ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(loc.cancel),
-            ),
-            PrimaryButton(
-              label: loc.removeBike,
-              onPressed: () async {
+                const SizedBox(height: AppSpacing.paddingL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      text: loc.cancel,
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                    PrimaryButton(
+                      label: loc.removeBike,
+                      onPressed: () async {
                 final navigator = Navigator.of(dialogContext);
                 final messenger = ScaffoldMessenger.of(context);
                 final locOuter = AppLocalizations.of(context);
@@ -1023,9 +1075,13 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                     ),
                   ),
                 );
-              },
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -1043,45 +1099,67 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
       builder: (dialogContext) {
         final loc = AppLocalizations.of(dialogContext)!;
 
-        return AlertDialog(
-          title: HeadingMedium(text: loc.advancedSearch),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextInput(
-                label: loc.bikeNumber,
-                hint: loc.bikeNumber,
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                label: loc.guestName,
-                hint: loc.guestName,
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                label: loc.bikeModel,
-                hint: loc.bikeModel,
-              ),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                label: loc.bikeColor,
-                hint: loc.bikeColor,
-              ),
-            ],
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(loc.cancel),
-            ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeadingMedium(text: loc.advancedSearch),
+                const SizedBox(height: AppSpacing.paddingM),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextInput(
+                          label: loc.bikeNumber,
+                          hint: loc.bikeNumber,
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          label: loc.guestName,
+                          hint: loc.guestName,
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          label: loc.bikeModel,
+                          hint: loc.bikeModel,
+                        ),
+                        const SizedBox(height: AppSpacing.paddingM),
+                        TextInput(
+                          label: loc.bikeColor,
+                          hint: loc.bikeColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.paddingL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      text: loc.cancel,
+                    ),
             PrimaryButton(
               label: loc.search,
               onPressed: () {
                 Navigator.pop(dialogContext);
                 // TODO: Implement advanced search
               },
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../lifecycle/stateful/adaptive_stateful_widget.dart';
-import '../../styles/colors.dart';
 import '../../styles/spacing.dart';
-import '../../styles/typography.dart';
+import '../../styles/theme_colors.dart';
+import '../../utils/extensions/context_extensions.dart';
 
 class SearchInput extends AdaptiveStatefulWidget {
   final TextEditingController? controller;
@@ -53,22 +53,26 @@ class SearchInputState extends AdaptiveStatefulWidgetState<SearchInput> {
 
   @override
   Widget buildAdaptive(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return TextField(
       controller: _controller,
       focusNode: _focusNode,
       onChanged: widget.onChanged,
-      style: AppTypography.input,
+      style: context.textTheme.bodyLarge,
       decoration: InputDecoration(
         hintText: widget.hint ??
             AppLocalizations.of(context)?.searchHint ??
             'Search...',
-        prefixIcon: const Icon(Icons.search),
+        hintStyle: TextStyle(color: ThemeColors.getTextTertiary(context)),
+        prefixIcon: Icon(
+          Icons.search,
+          color: ThemeColors.getTextTertiary(context),
+        ),
         suffixIcon: _controller.text.isNotEmpty
             ? IconButton(
-                icon: const Icon(Icons.clear),
+                icon: Icon(
+                  Icons.clear,
+                  color: ThemeColors.getTextTertiary(context),
+                ),
                 onPressed: clear,
               )
             : null,
@@ -76,8 +80,10 @@ class SearchInputState extends AdaptiveStatefulWidgetState<SearchInput> {
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
           borderSide: BorderSide.none,
         ),
+        enabledBorder: context.theme.inputDecorationTheme.enabledBorder,
+        focusedBorder: context.theme.inputDecorationTheme.focusedBorder,
         filled: true,
-        fillColor: isDark ? AppColors.darkInputFill : AppColors.lightInputFill,
+        fillColor: context.theme.inputDecorationTheme.fillColor,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.paddingM,
         ),

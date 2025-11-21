@@ -296,7 +296,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
   // Section Builders
   // ==========================================================================
 
-  /// Build Header Section with User Profile & Quick Actions
+  /// Build Header Section with User Profile
   Widget _buildHeader(BuildContext context) {
     if (customHeader != null) return customHeader!;
 
@@ -307,10 +307,10 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
         return Container(
           width: double.infinity,
           padding: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top + AppSpacing.paddingL,
-            left: AppSpacing.paddingL,
-            right: AppSpacing.paddingL,
-            bottom: AppSpacing.paddingL,
+            top: MediaQuery.of(context).padding.top + AppSpacing.paddingM,
+            left: AppSpacing.paddingM,
+            right: AppSpacing.paddingM,
+            bottom: AppSpacing.paddingM,
           ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -418,60 +418,6 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
               ),
 
               const SizedBox(height: AppSpacing.paddingL),
-
-              // Quick Actions Row
-              Row(
-                children: [
-                  // Profile Button
-                  Expanded(
-                    child: Builder(
-                      builder: (context) {
-                        final loc = AppLocalizations.of(context);
-                        return _buildQuickActionButton(
-                          context,
-                          icon: Icons.person_outline,
-                          label: loc?.profile ?? 'Profile',
-                          onTap: onProfileTap,
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.paddingS),
-
-                  // Notifications Button
-                  Expanded(
-                    child: Builder(
-                      builder: (context) {
-                        final loc = AppLocalizations.of(context);
-                        return _buildQuickActionButton(
-                          context,
-                          icon: Icons.notifications_outlined,
-                          label: loc?.notifications ?? 'Notifications',
-                          onTap: onNotificationsTap,
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.paddingS),
-
-                  // Settings Button
-                  Expanded(
-                    child: Builder(
-                      builder: (context) {
-                        final loc = AppLocalizations.of(context);
-                        return _buildQuickActionButton(
-                          context,
-                          icon: Icons.settings_outlined,
-                          label: loc?.settings ?? 'Settings',
-                          onTap: onSettingsTap,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.paddingM),
 
               // Role Switcher (if enabled)
               if (showRoleSwitcher) _buildRoleSwitcher(context),
@@ -845,54 +791,6 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
   // Helper Widget Builders
   // ==========================================================================
 
-  /// Build Quick Action Button
-  Widget _buildQuickActionButton(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    VoidCallback? onTap,
-  }) {
-    return Semantics(
-      button: true,
-      label: label,
-      hint: 'Tap to open $label',
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              vertical: AppSpacing.paddingS,
-              horizontal: AppSpacing.paddingS,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.textOnPrimary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  icon,
-                  size: 20,
-                  color: AppColors.textOnPrimary,
-                ),
-                const SizedBox(height: AppSpacing.paddingXS),
-                Text(
-                  label,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textOnPrimary,
-                    fontSize: 10,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   /// Build Toggle Button
   Widget _buildToggleButton(
     BuildContext context, {
@@ -1181,10 +1079,17 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
         label: item.label,
         selected: isSelected,
         hint: item.badge != null ? 'Has ${item.badge} notifications' : null,
-        child: Material(
+          child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => onItemSelected?.call(item.id),
+            onTap: () {
+              // If this is the logout item, call onLogout directly
+              if (item.id == 'logout') {
+                onLogout?.call();
+              } else {
+                onItemSelected?.call(item.id);
+              }
+            },
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
             child: Container(
               padding: EdgeInsets.symmetric(
@@ -1279,14 +1184,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
     final loc = AppLocalizations.of(context);
 
     // Base items for all roles
-    final commonItems = [
-      DrawerMenuItem(
-        id: 'home',
-        label: loc?.home ?? 'Home',
-        icon: Icons.home_outlined,
-        section: 'user',
-      ),
-    ];
+    final commonItems = <DrawerMenuItem>[];
 
     // Owner-specific items (dashboard tabs)
     final ownerItems = role.toLowerCase() == 'owner'
@@ -1345,6 +1243,24 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
           ];
 
     final systemItems = [
+      DrawerMenuItem(
+        id: 'profile',
+        label: loc?.profile ?? 'Profile',
+        icon: Icons.person_outline,
+        section: 'system',
+      ),
+      DrawerMenuItem(
+        id: 'notifications',
+        label: loc?.notifications ?? 'Notifications',
+        icon: Icons.notifications_outlined,
+        section: 'system',
+      ),
+      DrawerMenuItem(
+        id: 'settings',
+        label: loc?.settings ?? 'Settings',
+        icon: Icons.settings_outlined,
+        section: 'system',
+      ),
       DrawerMenuItem(
         id: 'help',
         label: loc?.helpSupport ?? 'Help & Support',

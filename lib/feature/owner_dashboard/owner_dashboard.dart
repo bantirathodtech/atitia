@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
-import '../../common/styles/colors.dart';
+import '../../common/styles/theme_colors.dart';
+import '../../common/utils/extensions/context_extensions.dart';
 import '../../common/utils/logging/logging_helper.dart';
 import '../../common/utils/responsive/responsive_system.dart';
 import '../../l10n/app_localizations.dart';
@@ -110,8 +111,6 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
 
   /// Builds the responsive bottom navigation bar with premium theme-aware styling
   Widget _buildResponsiveBottomNavigationBar() {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     return Semantics(
@@ -122,13 +121,8 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
         onTap: _onTabTapped,
         type: BottomNavigationBarType.fixed,
         showUnselectedLabels: true,
-        selectedItemColor: theme.primaryColor,
-        unselectedItemColor: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.color
-                ?.withValues(alpha: 0.7) ??
-            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+        selectedItemColor: context.primaryColor,
+        unselectedItemColor: ThemeColors.getTextTertiary(context),
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: 12,
@@ -138,8 +132,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
           fontSize: 11,
         ),
         elevation: 8,
-        backgroundColor:
-            isDarkMode ? AppColors.darkCard : theme.scaffoldBackgroundColor,
+        backgroundColor: ThemeColors.getCardBackground(context),
         items: [
           BottomNavigationBarItem(
             icon: const Icon(Icons.dashboard_outlined),
@@ -211,8 +204,6 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
 
   /// Builds navigation rail for tablet landscape mode
   Widget? _buildNavigationRail() {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     return Semantics(
@@ -221,33 +212,22 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
       child: NavigationRail(
         selectedIndex: _currentIndex,
         onDestinationSelected: _onTabTapped,
-        backgroundColor:
-            isDarkMode ? AppColors.darkCard : theme.scaffoldBackgroundColor,
+        backgroundColor: ThemeColors.getCardBackground(context),
         selectedIconTheme: IconThemeData(
-          color: theme.primaryColor,
+          color: context.primaryColor,
           size: 28,
         ),
         unselectedIconTheme: IconThemeData(
-          color: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.color
-                  ?.withValues(alpha: 0.7) ??
-              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          color: ThemeColors.getTextTertiary(context),
           size: 24,
         ),
         selectedLabelTextStyle: TextStyle(
-          color: theme.primaryColor,
+          color: context.primaryColor,
           fontWeight: FontWeight.w600,
           fontSize: 14,
         ),
         unselectedLabelTextStyle: TextStyle(
-          color: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.color
-                  ?.withValues(alpha: 0.7) ??
-              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          color: ThemeColors.getTextTertiary(context),
           fontWeight: FontWeight.w400,
           fontSize: 12,
         ),

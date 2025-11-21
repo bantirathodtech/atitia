@@ -13,6 +13,7 @@ import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/utils/data/indian_states_cities.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
@@ -461,8 +462,6 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   @override
   Widget build(BuildContext context) {
     final responsive = context.responsive;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AdaptiveAppBar(
@@ -502,7 +501,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
           return Column(
             children: [
               // Responsive Tab Bar
-              _buildResponsiveTabBar(context, responsive, isDark),
+              _buildResponsiveTabBar(context, responsive),
 
               // Tab Content with responsive padding
               Expanded(
@@ -532,7 +531,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
               ),
 
               // Bottom Action Bar (responsive)
-              _buildBottomActionBar(vm, responsive, isDark),
+              _buildBottomActionBar(vm, responsive),
             ],
           );
         },
@@ -595,7 +594,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   }
 
   Widget _buildResponsiveTabBar(
-      BuildContext context, ResponsiveConfig responsive, bool isDark) {
+      BuildContext context, ResponsiveConfig responsive) {
     final tabs = [
       Tab(
         text: responsive.isMobile
@@ -1216,7 +1215,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
   }
 
   Widget _buildBottomActionBar(
-      OwnerPgManagementViewModel vm, ResponsiveConfig responsive, bool isDark) {
+      OwnerPgManagementViewModel vm, ResponsiveConfig responsive) {
     return Container(
       padding: responsivePadding,
       decoration: BoxDecoration(
@@ -1244,11 +1243,13 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             ),
           if (responsive.isMobile) const SizedBox(width: AppSpacing.paddingM),
           // Save Draft
-          TextButton(
-            onPressed: vm.loading ? null : _saveDraft,
-            child:
-                Text(AppLocalizations.of(context)?.saveDraft ?? 'Save Draft'),
-          ),
+          if (!vm.loading)
+            TextButtonWidget(
+              onPressed: () {
+                _saveDraft();
+              },
+              text: AppLocalizations.of(context)?.saveDraft ?? 'Save Draft',
+            ),
           const SizedBox(width: AppSpacing.paddingM),
           // Publish button visible when minimally valid
           PrimaryButton(
@@ -1275,9 +1276,9 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
             ),
           ),
           const SizedBox(width: AppSpacing.paddingM),
-          TextButton(
+          TextButtonWidget(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            text: AppLocalizations.of(context)?.cancel ?? 'Cancel',
           ),
         ],
       ),

@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/utils/performance/memory_manager.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
@@ -21,6 +23,7 @@ import '../../../../../core/services/localization/internationalization_service.d
 import '../../../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/guest_pg_selector_dropdown.dart';
 import '../../../shared/widgets/user_location_display.dart';
 import '../../viewmodel/guest_pg_viewmodel.dart';
 import '../widgets/guest_pg_card.dart';
@@ -47,6 +50,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _showFilterPanel = false;
+  bool _showSearchBar = false;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
 
@@ -91,6 +95,19 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
     });
   }
 
+  /// Toggle search bar visibility
+  void _toggleSearchBar() {
+    setState(() {
+      _showSearchBar = !_showSearchBar;
+      // Clear search when hiding search bar
+      if (!_showSearchBar) {
+        _searchController.clear();
+        final pgVM = Provider.of<GuestPgViewModel>(context, listen: false);
+        pgVM.setSearchQuery('');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final pgVM = Provider.of<GuestPgViewModel>(context);
@@ -101,12 +118,28 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
         titleWidget: const GuestPgAppBarDisplay(),
         centerTitle: true,
         showDrawer: true,
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
+        leadingActions: [
+          const GuestPgSelectorDropdown(compact: true),
+        ],
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: Icon(
+              _showSearchBar ? Icons.search_off : Icons.search,
+            ),
+            onPressed: () => _toggleSearchBar(),
+            tooltip: _showSearchBar
+                ? _text('hideSearch', 'Hide Search')
+                : _text('showSearch', 'Show Search'),
+          ),
+          IconButton(
+            icon: Icon(
+              _showFilterPanel ? Icons.filter_list_off : Icons.filter_list,
+            ),
             onPressed: () => _toggleFilterPanel(),
-            tooltip: loc?.searchAndFilters ??
-                _text('searchAndFilters', 'Search & Filters'),
+            tooltip: _showFilterPanel
+                ? (loc?.hideFilters ?? _text('hideFilters', 'Hide Filters'))
+                : (loc?.showFilters ?? _text('showFilters', 'Show Filters')),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -318,15 +351,15 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
         children: [
           // User Location Display
           Padding(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               AppSpacing.paddingM,
               AppSpacing.paddingM,
               AppSpacing.paddingM,
-              AppSpacing.paddingS,
+              _showSearchBar ? AppSpacing.paddingS : 0,
             ),
             child: const UserLocationDisplay(),
           ),
-          _buildSearchBar(context, pgVM),
+          if (_showSearchBar) _buildSearchBar(context, pgVM),
           if (_showFilterPanel) _buildAdvancedFilters(context, pgVM),
           if (pgVM.searchQuery.isNotEmpty ||
               pgVM.selectedCity != null ||
@@ -340,25 +373,36 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
 
   /// 🔍 Premium search bar
   Widget _buildSearchBar(BuildContext context, GuestPgViewModel pgVM) {
-    // final theme = Theme.of(context);
-    // final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
+      margin: const EdgeInsets.fromLTRB(
+        AppSpacing.paddingM,
+        0,
+        AppSpacing.paddingM,
+        AppSpacing.paddingS,
+      ),
       child: TextField(
         controller: _searchController,
         onChanged: (value) => pgVM.setSearchQuery(value),
+        style: context.textTheme.bodyLarge,
         decoration: InputDecoration(
           hintText: loc?.searchByNameCityArea ??
               _text(
                 'searchByNameCityArea',
                 'Search by name, city, area...',
               ),
-          prefixIcon: const Icon(Icons.search),
+          hintStyle: TextStyle(color: ThemeColors.getTextTertiary(context)),
+          prefixIcon: Icon(
+            Icons.search,
+            color: ThemeColors.getTextTertiary(context),
+          ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear),
+                  icon: Icon(
+                    Icons.clear,
+                    color: ThemeColors.getTextTertiary(context),
+                  ),
                   onPressed: () {
                     _searchController.clear();
                     pgVM.setSearchQuery('');
@@ -366,24 +410,13 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
                 )
               : null,
           filled: true,
-          fillColor: AppColors.darkInputFill,
+          fillColor: context.theme.inputDecorationTheme.fillColor,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
             borderSide: BorderSide.none,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-            borderSide: BorderSide(
-              color: AppColors.darkDivider,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-            borderSide: BorderSide(
-              color: AppColors.primary,
-              width: 2,
-            ),
-          ),
+          enabledBorder: context.theme.inputDecorationTheme.enabledBorder,
+          focusedBorder: context.theme.inputDecorationTheme.focusedBorder,
         ),
       ),
     );
@@ -620,7 +653,12 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
       items: pgs,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.paddingM,
+        AppSpacing.paddingS,
+        AppSpacing.paddingM,
+        AppSpacing.paddingM,
+      ),
       itemBuilder: (context, pg, index) {
         return GuestPgCard(
           pg: pg,

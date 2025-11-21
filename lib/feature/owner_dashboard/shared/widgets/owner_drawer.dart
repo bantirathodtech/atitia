@@ -9,6 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../common/widgets/drawers/adaptive_drawer.dart';
+import '../../../../common/widgets/buttons/text_button.dart';
+import '../../../../common/widgets/text/heading_medium.dart';
+import '../../../../common/widgets/text/body_text.dart';
+import '../../../../common/styles/spacing.dart';
+import '../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../core/navigation/navigation_service.dart';
 import '../../../../core/app/theme/theme_provider.dart';
@@ -152,26 +157,51 @@ class OwnerDrawer extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     if (loc == null) return;
 
+    final isDarkMode = context.isDarkMode;
+    final backgroundColor = isDarkMode ? Colors.black : Colors.white;
+    
+    // Capture the auth provider from the original context
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(loc.logout),
-        content: Text(loc.areYouSureYouWantToLogout),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc.cancel),
+      builder: (dialogContext) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        ),
+        backgroundColor: backgroundColor,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: loc.logout),
+              const SizedBox(height: AppSpacing.paddingM),
+              BodyText(text: loc.areYouSureYouWantToLogout),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    text: loc.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  TextButtonWidget(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop();
+                      authProvider.signOut();
+                    },
+                    text: loc.logout,
+                    color: isDarkMode ? Colors.redAccent : Colors.red,
+                    bold: true,
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              final authProvider =
-                  Provider.of<AuthProvider>(context, listen: false);
-              authProvider.signOut();
-            },
-            child: Text(loc.logout),
-          ),
-        ],
+        ),
       ),
     );
   }

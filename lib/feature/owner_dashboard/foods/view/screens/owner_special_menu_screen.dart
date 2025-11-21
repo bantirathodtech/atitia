@@ -12,6 +12,8 @@ import 'package:intl/intl.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
@@ -179,8 +181,6 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
   }
 
   Widget _buildDateSection(AppLocalizations loc) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final formattedDate =
         DateFormat.yMMMMd(loc.localeName).format(_selectedDate);
 
@@ -191,7 +191,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.calendar_today, color: theme.primaryColor, size: 20),
+              Icon(Icons.calendar_today, color: context.primaryColor, size: 20),
               const SizedBox(width: AppSpacing.paddingS),
               HeadingSmall(text: loc.date),
             ],
@@ -202,12 +202,10 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.paddingM),
               decoration: BoxDecoration(
-                color: isDarkMode
-                    ? AppColors.darkInputFill
-                    : AppColors.surfaceVariant,
+                color: context.theme.inputDecorationTheme.fillColor,
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 border: Border.all(
-                  color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+                  color: ThemeColors.getDivider(context),
                 ),
               ),
               child: Row(
@@ -217,7 +215,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                     text: formattedDate,
                     medium: true,
                   ),
-                  Icon(Icons.edit_calendar, color: theme.primaryColor),
+                  Icon(Icons.edit_calendar, color: context.primaryColor),
                 ],
               ),
             ),
@@ -278,19 +276,16 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
   }
 
   Widget _buildFallbackInfo(AppLocalizations loc) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
-      backgroundColor: isDarkMode
+      backgroundColor: context.isDarkMode
           ? AppColors.info.withValues(alpha: 0.15)
           : AppColors.infoContainer,
       child: Row(
         children: [
           Icon(
             Icons.info_outline,
-            color: isDarkMode
+            color: context.isDarkMode
                 ? AppColors.info
                 : AppColors.info.withValues(alpha: 0.8),
           ),
@@ -298,8 +293,8 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
           Expanded(
             child: BodyText(
               text: loc.ownerSpecialMenuFallbackInfo,
-              color: isDarkMode
-                  ? theme.textTheme.bodyMedium?.color
+              color: context.isDarkMode
+                  ? context.textTheme.bodyMedium?.color
                   : AppColors.info.withValues(alpha: 0.9),
             ),
           ),
@@ -317,10 +312,6 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
   ) {
     final isEnabled = items != null;
     final mealItems = items ?? [];
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    // final textSecondary =
-    //     theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
 
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -332,7 +323,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
             children: [
               Row(
                 children: [
-                  Icon(icon, color: theme.primaryColor, size: 20),
+                  Icon(icon, color: context.primaryColor, size: 20),
                   const SizedBox(width: AppSpacing.paddingS),
                   HeadingSmall(
                       text: loc.ownerSpecialMenuOptionalSection(title)),
@@ -347,7 +338,7 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                     onUpdate(null);
                   }
                 },
-                activeThumbColor: theme.primaryColor,
+                activeThumbColor: context.primaryColor,
               ),
             ],
           ),
@@ -359,9 +350,9 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                   children: [
                     BodyText(
                       text: loc.ownerSpecialMenuNoItems,
-                      color: isDarkMode
-                          ? AppColors.textTertiary
-                          : AppColors.textSecondary,
+                      color: context.isDarkMode
+                          ? ThemeColors.getTextTertiary(context)
+                          : ThemeColors.getTextSecondary(context),
                     ),
                     const SizedBox(height: AppSpacing.paddingS),
                     SecondaryButton(
@@ -381,15 +372,11 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                   margin: const EdgeInsets.only(bottom: AppSpacing.paddingS),
                   padding: const EdgeInsets.all(AppSpacing.paddingS),
                   decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? AppColors.darkInputFill
-                        : AppColors.surfaceVariant,
+                    color: context.theme.inputDecorationTheme.fillColor,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusS),
                     border: Border.all(
-                      color: isDarkMode
-                          ? AppColors.darkDivider
-                          : AppColors.outline,
+                      color: ThemeColors.getDivider(context),
                     ),
                   ),
                   child: Row(
@@ -398,14 +385,14 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: theme.primaryColor.withValues(alpha: 0.1),
+                          color: context.primaryColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
                           child: Text(
                             '${index + 1}',
                             style: TextStyle(
-                              color: theme.primaryColor,
+                              color: context.primaryColor,
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             ),
@@ -468,36 +455,50 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
     Function(List<String>?) onUpdate,
   ) async {
     final controller = TextEditingController();
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
     final result = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDarkMode ? AppColors.darkCard : AppColors.surface,
-        title:
-            HeadingMedium(text: loc.ownerSpecialMenuAddMealItemTitle(mealType)),
-        content: TextInput(
-          controller: controller,
-          label: loc.ownerSpecialMenuItemNameLabel,
-          hint: loc.ownerSpecialMenuItemNameHint,
-          autoFocus: true,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          SecondaryButton(
-            onPressed: () => Navigator.of(context).pop(),
-            label: loc.cancel,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: loc.ownerSpecialMenuAddMealItemTitle(mealType)),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: controller,
+                label: loc.ownerSpecialMenuItemNameLabel,
+                hint: loc.ownerSpecialMenuItemNameHint,
+                autoFocus: true,
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SecondaryButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    label: loc.cancel,
+                  ),
+                  const SizedBox(width: AppSpacing.paddingS),
+                  PrimaryButton(
+                    onPressed: () {
+                      if (controller.text.trim().isNotEmpty) {
+                        Navigator.of(context).pop(controller.text.trim());
+                      }
+                    },
+                    label: loc.add,
+                    icon: Icons.add,
+                  ),
+                ],
+              ),
+            ],
           ),
-          PrimaryButton(
-            onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                Navigator.of(context).pop(controller.text.trim());
-              }
-            },
-            label: loc.add,
-            icon: Icons.add,
-          ),
-        ],
+        ),
       ),
     );
 

@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 
@@ -35,12 +36,6 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    // final surfaceColor = theme.colorScheme.surface;
-    // final textSecondary = theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
-    // final dividerColor = theme.dividerColor;
-
     // ========================================================================
     // Empty State - No Photos Added
     // ========================================================================
@@ -48,14 +43,10 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
       return Container(
         height: 180,
         decoration: BoxDecoration(
-          color: isDarkMode
-              ? AppColors.darkCard // Dark background in dark mode
-              : AppColors.surfaceVariant, // Light background in light mode
+          color: ThemeColors.getCardBackground(context),
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
           border: Border.all(
-            color: isDarkMode
-                ? AppColors.darkDivider // Subtle border in dark mode
-                : AppColors.outline, // Medium border in light mode
+            color: ThemeColors.getDivider(context),
           ),
         ),
         child: Center(
@@ -65,9 +56,7 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
               Icon(
                 Icons.photo_library,
                 size: 48,
-                color: isDarkMode
-                    ? AppColors.textTertiary // Light icon in dark mode
-                    : AppColors.textSecondary, // Medium icon in light mode
+                color: ThemeColors.getTextTertiary(context),
               ),
               const SizedBox(height: AppSpacing.paddingS),
               CaptionText(
@@ -95,16 +84,12 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
             fit: BoxFit.cover,
             placeholder: Container(
               height: 180,
-              color: isDarkMode
-                  ? AppColors.darkCard // Dark placeholder in dark mode
-                  : AppColors.surfaceVariant, // Light placeholder in light mode
+              color: ThemeColors.getCardBackground(context),
               child: Center(
                 child: Icon(
                   Icons.image,
                   size: 48,
-                  color: isDarkMode
-                      ? AppColors.textTertiary // Light icon in dark mode
-                      : AppColors.textSecondary, // Medium icon in light mode
+                  color: ThemeColors.getTextSecondary(context),
                 ),
               ),
             ),
@@ -132,16 +117,12 @@ class OwnerMenuPhotoWidget extends StatelessWidget {
             placeholder: Container(
               height: 180,
               width: 180,
-              color: isDarkMode
-                  ? AppColors.darkCard // Dark placeholder in dark mode
-                  : AppColors.surfaceVariant, // Light placeholder in light mode
+              color: ThemeColors.getCardBackground(context),
               child: Center(
                 child: Icon(
                   Icons.image,
                   size: 48,
-                  color: isDarkMode
-                      ? AppColors.textTertiary // Light icon in dark mode
-                      : AppColors.textSecondary, // Medium icon in light mode
+                  color: ThemeColors.getTextSecondary(context),
                 ),
               ),
             ),

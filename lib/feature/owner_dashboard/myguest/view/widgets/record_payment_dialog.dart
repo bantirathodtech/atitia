@@ -12,6 +12,7 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../feature/auth/logic/auth_provider.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_guest_model.dart';
@@ -71,8 +72,6 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     return Dialog(
@@ -89,11 +88,11 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(context, isDark),
+                _buildHeader(context),
                 const SizedBox(height: AppSpacing.paddingL),
-                _buildGuestBookingSelection(context, isDark, loc),
+                _buildGuestBookingSelection(context, loc),
                 const SizedBox(height: AppSpacing.paddingL),
-                _buildPaymentDetailsForm(context, isDark, loc),
+                _buildPaymentDetailsForm(context, loc),
                 const SizedBox(height: AppSpacing.paddingL),
                 _buildActions(context, loc),
               ],
@@ -105,7 +104,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
   }
 
   /// Builds the dialog header
-  Widget _buildHeader(BuildContext context, bool isDark) {
+  Widget _buildHeader(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Row(
       children: [
@@ -149,7 +148,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
 
   /// Builds guest and booking selection
   Widget _buildGuestBookingSelection(
-      BuildContext context, bool isDark, AppLocalizations? loc) {
+      BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -215,32 +214,21 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
 
   /// Builds payment details form
   Widget _buildPaymentDetailsForm(
-      BuildContext context, bool isDark, AppLocalizations? loc) {
+      BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         HeadingSmall(text: loc?.paymentDetails ?? 'Payment Details'),
         const SizedBox(height: AppSpacing.paddingM),
         // Amount
-        TextFormField(
+        TextInput(
           controller: _amountController,
-          decoration: InputDecoration(
-            labelText: loc?.paymentAmountLabel ?? 'Payment Amount *',
-            hintText: loc?.enterAmountHint ?? 'Enter amount in rupees',
-            border: const OutlineInputBorder(),
-            prefixIcon: const Icon(Icons.currency_rupee),
-          ),
+          label: loc?.paymentAmountLabel ?? 'Payment Amount *',
+          hint: loc?.enterAmountHint ?? 'Enter amount in rupees',
+          prefixIcon: const Icon(Icons.currency_rupee),
           keyboardType: TextInputType.numberWithOptions(decimal: true),
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return loc?.pleaseEnterAmount ?? 'Please enter amount';
-            }
-            final amount = double.tryParse(value);
-            if (amount == null || amount <= 0) {
-              return loc?.pleaseEnterValidAmount ??
-                  'Please enter a valid amount';
-            }
-            return null;
+          onChanged: (value) {
+            setState(() {}); // Trigger rebuild to show validation error
           },
         ),
         const SizedBox(height: AppSpacing.paddingM),
@@ -307,28 +295,20 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
         ),
         const SizedBox(height: AppSpacing.paddingM),
         // Transaction ID
-        TextFormField(
+        TextInput(
           controller: _transactionIdController,
-          decoration: InputDecoration(
-            labelText:
-                loc?.transactionIdOptional ?? 'Transaction ID (Optional)',
-            hintText: loc?.enterTransactionIdHint ??
-                'Enter transaction ID or reference number',
-            border: const OutlineInputBorder(),
-            prefixIcon: const Icon(Icons.receipt),
-          ),
+          label: loc?.transactionIdOptional ?? 'Transaction ID (Optional)',
+          hint: loc?.enterTransactionIdHint ??
+              'Enter transaction ID or reference number',
+          prefixIcon: const Icon(Icons.receipt),
         ),
         const SizedBox(height: AppSpacing.paddingM),
         // Notes
-        TextFormField(
+        TextInput(
           controller: _notesController,
-          decoration: InputDecoration(
-            labelText: loc?.notesOptional ?? 'Notes (Optional)',
-            hintText:
-                loc?.notesHint ?? 'Any additional notes about this payment',
-            border: const OutlineInputBorder(),
-            prefixIcon: const Icon(Icons.note),
-          ),
+          label: loc?.notesOptional ?? 'Notes (Optional)',
+          hint: loc?.notesHint ?? 'Any additional notes about this payment',
+          prefixIcon: const Icon(Icons.note),
           maxLines: 3,
         ),
       ],

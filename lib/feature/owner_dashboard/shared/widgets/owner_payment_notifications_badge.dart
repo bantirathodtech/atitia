@@ -6,11 +6,17 @@ import 'package:provider/provider.dart';
 
 import '../../../../common/styles/colors.dart';
 import '../../../../common/styles/spacing.dart';
+import '../../../../common/styles/theme_colors.dart';
+import '../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../common/widgets/text/body_text.dart';
 import '../../../../common/widgets/text/caption_text.dart';
 import '../../../../common/widgets/text/heading_small.dart';
+import '../../../../common/widgets/text/heading_medium.dart';
+import '../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../common/widgets/buttons/secondary_button.dart';
+import '../../../../common/widgets/buttons/text_button.dart';
+import '../../../../common/widgets/inputs/text_input.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../auth/logic/auth_provider.dart';
 import '../../../../core/viewmodels/payment_notification_viewmodel.dart';
@@ -171,14 +177,13 @@ class _PaymentNotificationsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: BoxDecoration(
         color:
-            isDark ? AppColors.darkCard : Theme.of(context).colorScheme.surface,
+            ThemeColors.getCardBackground(context),
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.borderRadiusL),
         ),
@@ -273,7 +278,6 @@ class _PaymentNotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final authProvider = context.read<AuthProvider>();
     final viewModel = context.read<PaymentNotificationViewModel>();
     final loc = AppLocalizations.of(context);
@@ -281,10 +285,10 @@ class _PaymentNotificationCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkInputFill : AppColors.surfaceVariant,
+        color: context.theme.inputDecorationTheme.fillColor,
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
         border: Border.all(
-          color: isDark ? AppColors.darkDivider : AppColors.outline,
+          color: ThemeColors.getDivider(context),
         ),
       ),
       child: Column(
@@ -356,22 +360,18 @@ class _PaymentNotificationCard extends StatelessWidget {
           ],
           // Screenshot preview
           if (notification.paymentScreenshotUrl != null) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-              child: Image.network(
-                notification.paymentScreenshotUrl!,
+            AdaptiveImage(
+              imageUrl: notification.paymentScreenshotUrl!,
+              height: 150,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              borderRadius: AppSpacing.borderRadiusS,
+              errorWidget: Container(
                 height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 150,
-                    color: isDark ? AppColors.darkCard : AppColors.outline,
-                    child: Center(
-                      child: Icon(Icons.error, color: AppColors.error),
-                    ),
-                  );
-                },
+                color: ThemeColors.getCardBackground(context),
+                child: Center(
+                  child: Icon(Icons.error, color: AppColors.error),
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.paddingM),
@@ -453,27 +453,45 @@ class _PaymentNotificationCard extends StatelessWidget {
     return showDialog<String>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(loc?.rejectPayment ?? 'Reject Payment'),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: loc?.rejectionReason ?? 'Reason for rejection',
-              hintText: loc?.rejectionReasonHint ??
-                  'e.g., Incorrect amount, wrong transaction',
-            ),
-            maxLines: 2,
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(loc?.cancel ?? 'Cancel'),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingL),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeadingMedium(
+                  text: loc?.rejectPayment ?? 'Reject Payment',
+                ),
+                const SizedBox(height: AppSpacing.paddingM),
+                TextInput(
+                  controller: controller,
+                  label: loc?.rejectionReason ?? 'Reason for rejection',
+                  hint: loc?.rejectionReasonHint ??
+                      'e.g., Incorrect amount, wrong transaction',
+                  maxLines: 2,
+                ),
+                const SizedBox(height: AppSpacing.paddingL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButtonWidget(
+                      onPressed: () => Navigator.pop(context),
+                      text: loc?.cancel ?? 'Cancel',
+                    ),
+                    const SizedBox(width: AppSpacing.paddingS),
+                    SecondaryButton(
+                      onPressed: () => Navigator.pop(context, controller.text),
+                      label: loc?.reject ?? 'Reject',
+                    ),
+                  ],
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, controller.text),
-              child: Text(loc?.reject ?? 'Reject'),
-            ),
-          ],
+          ),
         );
       },
     );

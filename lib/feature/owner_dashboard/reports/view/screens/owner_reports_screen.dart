@@ -13,6 +13,7 @@ import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
@@ -20,6 +21,8 @@ import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/cards/info_card.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../../shared/widgets/pg_selector_dropdown.dart';
@@ -130,11 +133,6 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
             onPressed: _selectDateRange,
             tooltip: loc.ownerReportsSelectDateRange,
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshReports,
-            tooltip: loc.ownerReportsRefresh,
-          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
@@ -171,8 +169,9 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
   }
 
   Widget _buildBody(BuildContext context, AppLocalizations loc) {
-    final overviewVM = context.watch<OwnerOverviewViewModel>();
-    final guestVM = context.watch<OwnerGuestViewModel>();
+    // Use read to avoid unnecessary rebuilds - only access data when needed
+    final overviewVM = context.read<OwnerOverviewViewModel>();
+    final guestVM = context.read<OwnerGuestViewModel>();
 
     if (overviewVM.loading && overviewVM.overviewData == null) {
       return Center(
@@ -180,7 +179,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const AdaptiveLoader(),
-            const SizedBox(height: AppSpacing.paddingM),
+            SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
             BodyText(text: loc.ownerReportsLoading),
           ],
         ),
@@ -194,7 +193,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
           children: [
             Icon(Icons.error_outline,
                 size: 64, color: Theme.of(context).colorScheme.error),
-            const SizedBox(height: AppSpacing.paddingL),
+            SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
             HeadingMedium(
               text: loc.ownerReportsErrorTitle,
               align: TextAlign.center,
@@ -204,7 +203,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               text: overviewVM.errorMessage ?? loc.unknownErrorOccurred,
               align: TextAlign.center,
             ),
-            const SizedBox(height: AppSpacing.paddingL),
+            SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
             PrimaryButton(
               onPressed: _refreshReports,
               label: loc.tryAgain,
@@ -250,13 +249,13 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
             : 0.0;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Date Range Display
           _buildDateRangeCard(context, loc),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Summary Cards
           Row(
@@ -269,7 +268,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
                   iconColor: AppColors.success,
                 ),
               ),
-              const SizedBox(width: AppSpacing.paddingM),
+              SizedBox(width: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
               Expanded(
                 child: InfoCard(
                   title: loc.ownerReportsAveragePerMonth,
@@ -280,7 +279,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Monthly Revenue Chart
           if (monthlyBreakdown != null && monthlyBreakdown.isNotEmpty)
@@ -289,7 +288,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               data: monthlyBreakdown,
             ),
           if (monthlyBreakdown != null && monthlyBreakdown.isNotEmpty)
-            const SizedBox(height: AppSpacing.paddingL),
+            SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Property Breakdown
           if (propertyBreakdown != null && propertyBreakdown.isNotEmpty)
@@ -324,12 +323,12 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
     }).toList();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildDateRangeCard(context, loc),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Summary Cards
           Wrap(
@@ -374,7 +373,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Booking Trends
           _buildBookingTrendsCard(context, filteredBookings, loc),
@@ -393,12 +392,12 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
     final inactiveGuests = guests.where((g) => g.status == 'Inactive').length;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildDateRangeCard(context, loc),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Summary Cards
           Row(
@@ -411,7 +410,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
                   iconColor: AppColors.info,
                 ),
               ),
-              const SizedBox(width: AppSpacing.paddingM),
+              SizedBox(width: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
               Expanded(
                 child: InfoCard(
                   title: loc.active,
@@ -420,7 +419,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
                   iconColor: AppColors.success,
                 ),
               ),
-              const SizedBox(width: AppSpacing.paddingM),
+              SizedBox(width: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
               Expanded(
                 child: InfoCard(
                   title: loc.inactive,
@@ -431,7 +430,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Guest Statistics
           if (guestStats.isNotEmpty)
@@ -465,12 +464,12 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
         filteredPayments.where((p) => p.status == 'pending').length;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildDateRangeCard(context, loc),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Summary Cards
           Wrap(
@@ -503,7 +502,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Payment Trends
           _buildPaymentTrendsCard(context, filteredPayments, loc),
@@ -533,12 +532,12 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
         filteredComplaints.where((c) => c.status == 'in_progress').length;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildDateRangeCard(context, loc),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Summary Cards
           Wrap(
@@ -571,7 +570,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingL),
+          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Complaint Trends
           _buildComplaintTrendsCard(context, filteredComplaints, loc),
@@ -583,7 +582,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
   Widget _buildDateRangeCard(BuildContext context, AppLocalizations loc) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Row(
         children: [
           const Icon(Icons.calendar_today, size: 20),
@@ -595,9 +594,9 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
               medium: true,
             ),
           ),
-          TextButton(
+          TextButtonWidget(
             onPressed: _selectDateRange,
-            child: Text(loc.ownerReportsChangeDateRange),
+            text: loc.ownerReportsChangeDateRange,
           ),
         ],
       ),
@@ -610,7 +609,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
         propertyBreakdown.values.fold(0.0, (sum, v) => sum + v);
 
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -691,7 +690,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
     }
 
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -731,7 +730,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
   Widget _buildGuestStatsCard(BuildContext context,
       Map<String, dynamic> guestStats, AppLocalizations loc) {
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -774,7 +773,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
     }
 
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -822,7 +821,7 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
     }
 
     return AdaptiveCard(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.isMobile ? context.responsivePadding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

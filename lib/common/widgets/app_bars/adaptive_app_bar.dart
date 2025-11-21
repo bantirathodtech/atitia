@@ -53,6 +53,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 
 import '../../lifecycle/stateless/adaptive_stateless_widget.dart';
 import '../../styles/spacing.dart';
@@ -110,6 +111,9 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
   /// Custom background color (if null, uses theme's app bar color)
   final Color? backgroundColor;
 
+  /// Custom foreground color (icons, text) - if null, uses theme's foreground or calculates from background
+  final Color? foregroundColor;
+
   /// Gradient background (overrides backgroundColor if provided)
   final Gradient? backgroundGradient;
 
@@ -160,6 +164,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
     this.centerTitle = false,
     this.elevation,
     this.backgroundColor,
+    this.foregroundColor,
     this.backgroundGradient,
     this.showBackButton = true,
     this.showThemeToggle = true,
@@ -243,8 +248,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
           Text(
             title!,
             style: AppTypography.appBarTitle.copyWith(
-              color: Theme.of(context).textTheme.titleLarge?.color ??
-                  Theme.of(context).colorScheme.onSurface,
+              color: _getAppBarForegroundColor(context),
             ),
           ),
 
@@ -276,7 +280,6 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
 
   /// Build Android-style Material AppBar
   Widget _buildAndroidAppBar(BuildContext context) {
-    final theme = Theme.of(context);
     final appBarBg = _getAppBarBackgroundColor(context);
     final platformElevation = _getPlatformElevation(context);
 
@@ -288,9 +291,15 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
       );
     }
 
-    return AppBar(
+    // Wrap in Theme to override AppBarTheme if backgroundColor is explicitly set
+    Widget appBar = AppBar(
       // Title: Use titleWidget if provided, otherwise Text
-      title: titleWidget ?? Text(title!, style: AppTypography.appBarTitle),
+      title: titleWidget ?? Text(
+        title!,
+        style: AppTypography.appBarTitle.copyWith(
+          color: _getAppBarForegroundColor(context),
+        ),
+      ),
 
       // Leading: Custom leading, or leadingActions row, or back button
       leading: _buildLeading(context),
@@ -301,12 +310,12 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
           : null,
 
       // Actions: Right-side buttons with auto theme toggle
-      actions: _buildActions(),
+      actions: _buildActions(context),
 
       centerTitle: centerTitle,
       elevation: platformElevation,
       backgroundColor: appBarBg,
-      foregroundColor: theme.appBarTheme.foregroundColor,
+      foregroundColor: _getAppBarForegroundColor(context),
       automaticallyImplyLeading: showBackButton &&
           leading == null &&
           (leadingActions == null || leadingActions!.isEmpty),
@@ -317,8 +326,38 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
 
       // Android-specific styling
       shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.26),
-      surfaceTintColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent, // Critical: Prevents Material 3 tinting
+      systemOverlayStyle: backgroundColor != null
+          ? (ThemeData.estimateBrightnessForColor(backgroundColor!) == Brightness.dark
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark)
+          : null,
+      // Force override theme's AppBarTheme
+      forceMaterialTransparency: backgroundColor != null,
     );
+
+    // If backgroundColor is explicitly set, wrap in Theme to override AppBarTheme
+    if (backgroundColor != null) {
+      return Theme(
+        data: Theme.of(context).copyWith(
+          appBarTheme: AppBarTheme(
+            backgroundColor: appBarBg, // Explicitly set, not copied from theme
+            foregroundColor: _getAppBarForegroundColor(context),
+            elevation: platformElevation,
+            shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.26),
+            surfaceTintColor: Colors.transparent, // Prevent Material 3 tinting
+            systemOverlayStyle: ThemeData.estimateBrightnessForColor(backgroundColor!) == Brightness.dark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
+            iconTheme: IconThemeData(color: _getAppBarForegroundColor(context)),
+            actionsIconTheme: IconThemeData(color: _getAppBarForegroundColor(context)),
+          ),
+        ),
+        child: appBar,
+      );
+    }
+
+    return appBar;
   }
 
   /// Build macOS-style AppBar
@@ -368,11 +407,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                 Text(
                                   title!,
                                   style: AppTypography.appBarTitle.copyWith(
-                                    color: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.color ??
-                                        Theme.of(context).colorScheme.onSurface,
+                                    color: _getAppBarForegroundColor(context),
                                   ),
                                 ),
                           )
@@ -383,18 +418,14 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                 Text(
                                   title!,
                                   style: AppTypography.appBarTitle.copyWith(
-                                    color: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.color ??
-                                        Theme.of(context).colorScheme.onSurface,
+                                    color: _getAppBarForegroundColor(context),
                                   ),
                                 ),
                           ),
                   ),
 
                   // Actions section
-                  ...(_buildActions() ?? []),
+                  ...(_buildActions(context) ?? []),
                 ],
               ),
             ),
@@ -409,8 +440,6 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
 
   /// Build Web-optimized AppBar
   Widget _buildWebAppBar(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final platformElevation = _getPlatformElevation(context);
 
     // For web, use Stack to truly center title when centerTitle is true
@@ -470,13 +499,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                         title!,
                                         style:
                                             AppTypography.appBarTitle.copyWith(
-                                          color: isDark
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
+                                          color: _getAppBarForegroundColor(context),
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
@@ -513,11 +536,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
                                 Text(
                                   title!,
                                   style: AppTypography.appBarTitle.copyWith(
-                                    color: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge
-                                            ?.color ??
-                                        Theme.of(context).colorScheme.onSurface,
+                                    color: _getAppBarForegroundColor(context),
                                   ),
                                 ),
                           ),
@@ -539,7 +558,6 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
 
   /// Build fallback Material AppBar
   Widget _buildMaterialAppBar(BuildContext context) {
-    final theme = Theme.of(context);
     final appBarBg = _getAppBarBackgroundColor(context);
     final platformElevation = _getPlatformElevation(context);
 
@@ -552,16 +570,21 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
     }
 
     return AppBar(
-      title: titleWidget ?? Text(title!, style: AppTypography.appBarTitle),
+      title: titleWidget ?? Text(
+        title!,
+        style: AppTypography.appBarTitle.copyWith(
+          color: _getAppBarForegroundColor(context),
+        ),
+      ),
       leading: _buildLeading(context),
       leadingWidth: leadingActions != null && leadingActions!.isNotEmpty
           ? (leadingActions!.length * 48.0) + 8
           : null,
-      actions: _buildActions(),
+      actions: _buildActions(context),
       centerTitle: centerTitle,
       elevation: platformElevation,
       backgroundColor: appBarBg,
-      foregroundColor: theme.appBarTheme.foregroundColor,
+      foregroundColor: _getAppBarForegroundColor(context),
       automaticallyImplyLeading: showBackButton &&
           leading == null &&
           (leadingActions == null || leadingActions!.isEmpty),
@@ -591,6 +614,25 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
     }
 
     return theme.appBarTheme.backgroundColor ?? theme.primaryColor;
+  }
+
+  /// Get app bar foreground color (icons, text) with proper contrast
+  Color _getAppBarForegroundColor(BuildContext context) {
+    // If custom foreground color provided, use it
+    if (foregroundColor != null) return foregroundColor!;
+
+    // If custom background color provided, calculate contrasting foreground
+    if (backgroundColor != null) {
+      // Calculate brightness of background color
+      final brightness = ThemeData.estimateBrightnessForColor(backgroundColor!);
+      // Return contrasting color: black for light backgrounds, white for dark backgrounds
+      return brightness == Brightness.light ? Colors.black : Colors.white;
+    }
+
+    // Otherwise use theme's foreground color
+    final theme = Theme.of(context);
+    return theme.appBarTheme.foregroundColor ?? 
+           (theme.brightness == Brightness.dark ? Colors.white : Colors.black);
   }
 
   // ==========================================================================
@@ -676,16 +718,14 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
           children: [
             Icon(
               CupertinoIcons.back,
-              color: Theme.of(context).textTheme.titleLarge?.color ??
-                  Theme.of(context).colorScheme.onSurface,
+              color: _getAppBarForegroundColor(context),
               size: 20,
             ),
             const SizedBox(width: AppSpacing.paddingXS),
             Text(
               backLabel,
               style: TextStyle(
-                color: Theme.of(context).textTheme.titleLarge?.color ??
-                    Theme.of(context).colorScheme.onSurface,
+                color: _getAppBarForegroundColor(context),
                 fontSize: 17,
               ),
             ),
@@ -697,8 +737,7 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
       return IconButton(
         icon: Icon(
           Icons.arrow_back,
-          color: Theme.of(context).textTheme.titleLarge?.color ??
-              Theme.of(context).colorScheme.onSurface,
+          color: _getAppBarForegroundColor(context),
         ),
         onPressed: () => Navigator.of(context).pop(),
         tooltip: backLabel,
@@ -708,14 +747,13 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
 
   /// Build drawer button (hamburger menu)
   Widget _buildDrawerButton(BuildContext context) {
-    final theme = Theme.of(context);
     final loc = AppLocalizations.of(context);
     final menuLabel = loc?.menu ?? 'Menu';
 
     return IconButton(
       icon: Icon(
         Icons.menu,
-        color: theme.appBarTheme.foregroundColor,
+        color: _getAppBarForegroundColor(context),
         size: 24,
       ),
       onPressed: onDrawerTap ??
@@ -736,16 +774,29 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
   //
   // RESULT: [...custom actions, ThemeToggleButton]
   // ==========================================================================
-  List<Widget>? _buildActions() {
+  List<Widget>? _buildActions(BuildContext context) {
     // If no actions and no theme toggle, return null
     if (actions == null && !showThemeToggle) {
       return null;
     }
 
-    // Build combined actions list
+    // Get foreground color for actions
+    final fgColor = _getAppBarForegroundColor(context);
+
+    // Build combined actions list with theme-aware colors
     final combinedActions = <Widget>[
-      // Add custom actions first (if provided)
-      if (actions != null) ...actions!,
+      // Add custom actions first (if provided) - wrap with IconTheme for color
+      if (actions != null) 
+        ...actions!.map((action) {
+          // If action is IconButton, wrap with IconTheme to apply foreground color
+          if (action is IconButton) {
+            return IconTheme(
+              data: IconThemeData(color: fgColor),
+              child: action,
+            );
+          }
+          return action;
+        }),
 
       // Add theme toggle button at the end (if enabled)
       if (showThemeToggle) const ThemeToggleButton(),
@@ -761,10 +812,23 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
       return null;
     }
 
+    // Get foreground color for actions
+    final fgColor = _getAppBarForegroundColor(context);
+
     // Build combined actions list with iOS styling
     final combinedActions = <Widget>[
-      // Add custom actions first (if provided)
-      if (actions != null) ...actions!,
+      // Add custom actions first (if provided) - wrap with IconTheme for color
+      if (actions != null) 
+        ...actions!.map((action) {
+          // If action is IconButton and no explicit color, wrap with IconTheme
+          if (action is IconButton) {
+            return IconTheme(
+              data: IconThemeData(color: fgColor),
+              child: action,
+            );
+          }
+          return action;
+        }),
 
       // Add theme toggle button at the end (if enabled)
       if (showThemeToggle) const ThemeToggleButton(),
@@ -780,10 +844,23 @@ class AdaptiveAppBar extends AdaptiveStatelessWidget
       return [];
     }
 
+    // Get foreground color for actions
+    final fgColor = _getAppBarForegroundColor(context);
+
     // Build combined actions list with web-specific hover effects
     final combinedActions = <Widget>[
-      // Add custom actions first (if provided)
-      if (actions != null) ...actions!,
+      // Add custom actions first (if provided) - wrap with IconTheme for color
+      if (actions != null) 
+        ...actions!.map((action) {
+          // If action is IconButton and no explicit color, wrap with IconTheme
+          if (action is IconButton) {
+            return IconTheme(
+              data: IconThemeData(color: fgColor),
+              child: action,
+            );
+          }
+          return action;
+        }),
 
       // Add theme toggle button at the end (if enabled)
       if (showThemeToggle) const ThemeToggleButton(),

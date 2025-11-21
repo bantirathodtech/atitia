@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/styles/colors.dart';
+import '../../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../../common/utils/extensions/context_extensions.dart';
 import '../../data/models/guest_food_model.dart';
 
@@ -108,21 +109,13 @@ class GuestFoodCard extends StatelessWidget {
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
       ),
       child: food.photos.isNotEmpty
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                food.photos.first,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildImagePlaceholder(context);
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(child: CircularProgressIndicator());
-                },
-              ),
+          ? AdaptiveImage(
+              imageUrl: food.photos.first,
+              width: 80,
+              height: 80,
+              fit: BoxFit.cover,
+              borderRadius: 8,
+              errorWidget: _buildImagePlaceholder(context),
             )
           : _buildImagePlaceholder(context),
     );

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
+import '../../../../../common/styles/typography.dart';
 import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
@@ -260,7 +261,10 @@ class OwnerMenuDayTab extends StatelessWidget {
     bool isSpecialMenu = false,
   }) {
     return AdaptiveCard(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingM,
+        vertical: AppSpacing.paddingS, // Reduced vertical margin from paddingM to paddingS
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -268,7 +272,13 @@ class OwnerMenuDayTab extends StatelessWidget {
             children: [
               Icon(icon, color: color, size: 24),
               const SizedBox(width: AppSpacing.paddingS),
-              HeadingMedium(text: title),
+              Text(
+                title,
+                style: AppTypography.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
               if (isSpecialMenu) ...[
                 const SizedBox(width: AppSpacing.paddingS),
                 Container(
@@ -337,7 +347,12 @@ class OwnerMenuDayTab extends StatelessWidget {
                                   .onSurface
                                   .withValues(alpha: 0.5)),
                       const SizedBox(width: AppSpacing.paddingS),
-                      Expanded(child: BodyText(text: item)),
+                      Expanded(
+                        child: BodyText(
+                          text: item,
+                          medium: true, // Use bodyMedium (14px) instead of bodyLarge (16px) - reduced by 1 size
+                        ),
+                      ),
                     ],
                   ),
                 )),

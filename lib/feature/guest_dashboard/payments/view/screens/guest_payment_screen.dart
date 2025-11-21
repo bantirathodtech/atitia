@@ -8,14 +8,19 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/utils/helpers/image_picker_helper.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../common/widgets/containers/section_container.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/images/adaptive_image.dart';
 import '../../../../../common/widgets/loaders/shimmer_loader.dart';
+import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
-import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/models/owner_payment_details_model.dart';
@@ -30,6 +35,7 @@ import '../../../../../core/services/localization/internationalization_service.d
 import '../../../shared/viewmodel/guest_pg_selection_provider.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/guest_pg_selector_dropdown.dart';
 import '../../../shared/widgets/user_location_display.dart';
 
 /// 💰 **GUEST PAYMENT SCREEN - PRODUCTION READY**
@@ -144,13 +150,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AdaptiveAppBar(
         titleWidget: const GuestPgAppBarDisplay(),
         centerTitle: true,
         showDrawer: true,
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
+        leadingActions: [
+          const GuestPgSelectorDropdown(compact: true),
+        ],
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -166,11 +174,11 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
       // Centralized Guest Drawer
       drawer: const GuestDrawer(),
 
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       body: Column(
         children: [
           // Tab Bar
-          _buildTabBar(context, theme.brightness == Brightness.dark),
+          _buildTabBar(context, context.isDarkMode),
           // Tab Content
           Expanded(
             child: TabBarView(
@@ -188,17 +196,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// 📊 Tab Bar
   Widget _buildTabBar(BuildContext context, bool isDarkMode) {
-    final theme = Theme.of(context);
     final loc = AppLocalizations.of(context);
 
     return Container(
-      color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+      color: ThemeColors.getCardBackground(context),
       child: TabBar(
         controller: _tabController,
-        indicatorColor: theme.primaryColor,
-        labelColor: theme.primaryColor,
-        unselectedLabelColor:
-            isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+        indicatorColor: context.primaryColor,
+        labelColor: context.primaryColor,
+        unselectedLabelColor: ThemeColors.getTextTertiary(context),
         tabs: [
           Tab(
             icon: const Icon(Icons.history),
@@ -216,8 +222,6 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   /// 📜 Payment History Tab
   Widget _buildPaymentHistoryTab(BuildContext context) {
     final paymentVM = Provider.of<PaymentNotificationViewModel>(context);
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     if (paymentVM.loading && paymentVM.notifications.isEmpty) {
@@ -229,23 +233,22 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     }
 
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.responsivePadding.top),
       children: [
         // User Location Display
-        const Padding(
-          padding: EdgeInsets.only(bottom: AppSpacing.paddingM),
-          child: UserLocationDisplay(),
+        Padding(
+          padding: EdgeInsets.only(bottom: context.responsivePadding.top),
+          child: const UserLocationDisplay(),
         ),
-        ...paymentVM.notifications.map((notification) =>
-            _buildPaymentCard(context, notification, isDarkMode, loc)),
+        ...paymentVM.notifications.map(
+            (notification) => _buildPaymentCard(context, notification, loc)),
       ],
     );
   }
 
   /// 💳 Payment Card
-  Widget _buildPaymentCard(BuildContext context, dynamic notification,
-      bool isDarkMode, AppLocalizations? loc) {
-    final theme = Theme.of(context);
+  Widget _buildPaymentCard(
+      BuildContext context, dynamic notification, AppLocalizations? loc) {
     final statusColor = _getStatusColor(notification.status);
     final statusIcon = _getStatusIcon(notification.status);
     final statusLabel = _notificationStatusLabel(notification.status, loc);
@@ -260,19 +263,18 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     final formattedAmount = currencyFormatter.format(notification.amount);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
+      margin: EdgeInsets.only(bottom: context.responsivePadding.top),
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        color: ThemeColors.getCardBackground(context),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
           color: statusColor.withValues(alpha: 0.3),
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context)
-                .colorScheme
-                .shadow
-                .withValues(alpha: isDarkMode ? 0.3 : 0.05),
+            color: context.colors.shadow.withValues(
+              alpha: context.isDarkMode ? 0.3 : 0.05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -314,17 +316,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                     children: [
                       Text(
                         formattedAmount,
-                        style: theme.textTheme.titleLarge?.copyWith(
+                        style: context.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: statusColor,
                         ),
                       ),
                       Text(
                         formattedDate,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: isDarkMode
-                              ? AppColors.textTertiary
-                              : AppColors.textSecondary,
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: ThemeColors.getTextTertiary(context),
                         ),
                       ),
                     ],
@@ -342,7 +342,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   ),
                   child: Text(
                     statusLabel,
-                    style: theme.textTheme.bodySmall?.copyWith(
+                    style: context.textTheme.bodySmall?.copyWith(
                       color: statusColor,
                       fontWeight: FontWeight.w600,
                     ),
@@ -365,7 +365,6 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         _text('paymentMethod', 'Payment Method'),
                     paymentMethodLabel ?? notification.paymentMethod!,
                     Icons.payment,
-                    isDarkMode,
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
@@ -376,7 +375,6 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         _text('transactionId', 'Transaction ID'),
                     notification.transactionId!,
                     Icons.tag,
-                    isDarkMode,
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
@@ -386,7 +384,6 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                     loc?.message ?? _text('message', 'Message'),
                     notification.message!,
                     Icons.message,
-                    isDarkMode,
                   ),
                   const SizedBox(height: AppSpacing.paddingS),
                 ],
@@ -411,9 +408,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.paddingM),
                     decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? AppColors.darkInputFill
-                          : AppColors.surfaceVariant,
+                      color: context.theme.inputDecorationTheme.fillColor,
                       borderRadius:
                           BorderRadius.circular(AppSpacing.borderRadiusM),
                     ),
@@ -423,12 +418,12 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         Row(
                           children: [
                             Icon(Icons.message,
-                                size: 16, color: theme.primaryColor),
+                                size: 16, color: context.primaryColor),
                             const SizedBox(width: AppSpacing.paddingS),
                             Text(
                               loc?.ownerResponse ??
                                   _text('ownerResponse', 'Owner Response'),
-                              style: theme.textTheme.titleSmall?.copyWith(
+                              style: context.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -437,7 +432,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                         const SizedBox(height: AppSpacing.paddingS),
                         Text(
                           notification.ownerResponse!,
-                          style: theme.textTheme.bodyMedium,
+                          style: context.textTheme.bodyMedium,
                         ),
                       ],
                     ),
@@ -473,8 +468,6 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// 🏦 Owner Payment Details
   Widget _buildOwnerPaymentDetails(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     if (_loadingOwnerDetails) {
@@ -486,15 +479,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     }
 
     if (_ownerPaymentDetails == null) {
-      return _buildOwnerPaymentDetailsEmptyState(context, loc, isDarkMode);
+      return _buildOwnerPaymentDetailsEmptyState(context, loc);
     }
 
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        color: ThemeColors.getCardBackground(context),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+          color: ThemeColors.getDivider(context),
         ),
       ),
       child: Column(
@@ -504,12 +497,12 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             child: Row(
               children: [
-                Icon(Icons.account_balance, color: theme.primaryColor),
+                Icon(Icons.account_balance, color: context.primaryColor),
                 const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
                   text: loc?.ownerPaymentDetails ??
                       _text('ownerPaymentDetails', 'Owner Payment Details'),
-                  color: theme.textTheme.headlineSmall?.color,
+                  color: context.textTheme.headlineSmall?.color,
                 ),
               ],
             ),
@@ -523,11 +516,11 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 children: [
                   BodyText(
                       text: loc?.upiId ?? _text('upiId', 'UPI ID'),
-                      color: AppColors.textSecondary),
+                      color: ThemeColors.getTextTertiary(context)),
                   const SizedBox(height: AppSpacing.paddingXS),
                   Text(
                     _ownerPaymentDetails!.upiId!,
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style: context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -543,7 +536,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 children: [
                   BodyText(
                       text: loc?.upiQrCode ?? _text('upiQrCode', 'UPI QR Code'),
-                      color: AppColors.textSecondary),
+                      color: ThemeColors.getTextTertiary(context)),
                   const SizedBox(height: AppSpacing.paddingS),
                   ClipRRect(
                     borderRadius:
@@ -566,33 +559,31 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// 📝 Send Payment Form
   Widget _buildSendPaymentForm(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        color: ThemeColors.getCardBackground(context),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+          color: ThemeColors.getDivider(context),
         ),
       ),
-      padding: const EdgeInsets.all(AppSpacing.paddingL),
+      padding: EdgeInsets.all(context.responsivePadding.top * 1.5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingSmall(
             text: loc?.sendPaymentNotification ??
                 _text('sendPaymentNotification', 'Send Payment Notification'),
-            color: theme.textTheme.headlineSmall?.color,
+            color: context.textTheme.headlineSmall?.color,
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
           BodyText(
             text: loc?.afterMakingPaymentUploadScreenshot ??
                 _text('afterMakingPaymentUploadScreenshot',
                     'After making payment, upload screenshot and notify owner'),
-            color: AppColors.textSecondary,
+            color: ThemeColors.getTextTertiary(context),
           ),
           const SizedBox(height: AppSpacing.paddingL),
           PrimaryButton(
@@ -607,15 +598,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   }
 
   /// Helper: Detail row
-  Widget _buildDetailRow(BuildContext context, String label, String value,
-      IconData icon, bool isDarkMode) {
+  Widget _buildDetailRow(
+      BuildContext context, String label, String value, IconData icon) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           icon,
           size: 16,
-          color: isDarkMode ? AppColors.textTertiary : AppColors.textSecondary,
+          color: ThemeColors.getTextTertiary(context),
         ),
         const SizedBox(width: AppSpacing.paddingS),
         Expanded(
@@ -624,9 +615,7 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
             children: [
               CaptionText(
                 text: label,
-                color: isDarkMode
-                    ? AppColors.textTertiary
-                    : AppColors.textSecondary,
+                color: ThemeColors.getTextTertiary(context),
               ),
               const SizedBox(height: 2),
               BodyText(text: value),
@@ -702,11 +691,11 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   /// ⏳ Loading state
   Widget _buildLoadingState(BuildContext context, AppLocalizations? loc) {
     return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.responsivePadding.top),
       itemCount: 3,
       itemBuilder: (context, index) {
         return Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
+          margin: EdgeInsets.only(bottom: context.responsivePadding.top),
           child: ShimmerLoader(
             width: double.infinity,
             height: 150,
@@ -719,20 +708,17 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// 💳 Structured empty state with zero-state stats and placeholder data structure
   Widget _buildEmptyState(BuildContext context, AppLocalizations? loc) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
     return SingleChildScrollView(
       child: Column(
         children: [
           // Zero-state stats section
-          _buildPaymentZeroStateStats(context, loc, isDarkMode),
+          _buildPaymentZeroStateStats(context, loc, false),
+
+          // Small gap between stats and placeholder
+          SizedBox(height: context.responsivePadding.top * 0.5),
 
           // Placeholder payment structure
-          _buildPlaceholderPaymentStructure(context, loc, isDarkMode),
-
-          // Call to action
-          _buildPaymentEmptyStateAction(context, loc),
+          _buildPlaceholderPaymentStructure(context, loc, false),
         ],
       ),
     );
@@ -741,106 +727,89 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   /// 📊 Payment zero-state stats section
   Widget _buildPaymentZeroStateStats(
       BuildContext context, AppLocalizations? loc, bool isDarkMode) {
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+    return Padding(
+      padding: context.responsiveMargin,
+      child: SectionContainer(
+        title: loc?.paymentStatistics ??
+            _text('paymentStatistics', 'Payment Statistics'),
+        icon: Icons.payment,
+        child: Column(
+          children: [
+            // Stats grid
+            Row(
+              children: [
+                Expanded(
+                  child: _buildPaymentStatCard(
+                    context,
+                    loc?.totalPayments ??
+                        _text('totalPayments', 'Total Payments'),
+                    '0',
+                    Icons.payment,
+                    AppColors.info,
+                  ),
+                ),
+                SizedBox(width: context.responsivePadding.left),
+                Expanded(
+                  child: _buildPaymentStatCard(
+                    context,
+                    loc?.pending ?? _text('pending', 'Pending'),
+                    '0',
+                    Icons.pending,
+                    AppColors.warning,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: context.responsivePadding.top),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildPaymentStatCard(
+                    context,
+                    loc?.completed ?? _text('completed', 'Completed'),
+                    '0',
+                    Icons.check_circle,
+                    AppColors.success,
+                  ),
+                ),
+                SizedBox(width: context.responsivePadding.left),
+                Expanded(
+                  child: _buildPaymentStatCard(
+                    context,
+                    loc?.failed ?? _text('failed', 'Failed'),
+                    '0',
+                    Icons.error,
+                    AppColors.error,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: context.responsivePadding.top),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildPaymentStatCard(
+                    context,
+                    loc?.totalAmount ?? _text('totalAmount', 'Total Amount'),
+                    '₹0',
+                    Icons.currency_rupee,
+                    AppColors.purple,
+                  ),
+                ),
+                SizedBox(width: context.responsivePadding.left),
+                Expanded(
+                  child: _buildPaymentStatCard(
+                    context,
+                    loc?.thisMonth ?? _text('thisMonth', 'This Month'),
+                    '₹0',
+                    Icons.calendar_month,
+                    AppColors.accent,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HeadingMedium(
-            text: loc?.paymentStatistics ??
-                _text('paymentStatistics', 'Payment Statistics'),
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-
-          // Stats grid
-          Row(
-            children: [
-              Expanded(
-                child: _buildPaymentStatCard(
-                  context,
-                  loc?.totalPayments ??
-                      _text('totalPayments', 'Total Payments'),
-                  '0',
-                  Icons.payment,
-                  AppColors.info,
-                  isDarkMode,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.paddingM),
-              Expanded(
-                child: _buildPaymentStatCard(
-                  context,
-                  loc?.pending ?? _text('pending', 'Pending'),
-                  '0',
-                  Icons.pending,
-                  AppColors.warning,
-                  isDarkMode,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          Row(
-            children: [
-              Expanded(
-                child: _buildPaymentStatCard(
-                  context,
-                  loc?.completed ?? _text('completed', 'Completed'),
-                  '0',
-                  Icons.check_circle,
-                  AppColors.success,
-                  isDarkMode,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.paddingM),
-              Expanded(
-                child: _buildPaymentStatCard(
-                  context,
-                  loc?.failed ?? _text('failed', 'Failed'),
-                  '0',
-                  Icons.error,
-                  AppColors.error,
-                  isDarkMode,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          Row(
-            children: [
-              Expanded(
-                child: _buildPaymentStatCard(
-                  context,
-                  loc?.totalAmount ?? _text('totalAmount', 'Total Amount'),
-                  '₹0',
-                  Icons.currency_rupee,
-                  AppColors.purple,
-                  isDarkMode,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.paddingM),
-              Expanded(
-                child: _buildPaymentStatCard(
-                  context,
-                  loc?.thisMonth ?? _text('thisMonth', 'This Month'),
-                  '₹0',
-                  Icons.calendar_month,
-                  AppColors.accent,
-                  isDarkMode,
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -852,50 +821,57 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     String value,
     IconData icon,
     Color color,
-    bool isDarkMode,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
+    return AdaptiveCard(
+      padding: EdgeInsets.all(context.isMobile
+          ? context.responsivePadding.top * 0.5
+          : context.responsivePadding.top),
+      backgroundColor: color.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+      hasShadow: false,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 24,
+          // Row 1: Icon and number side by side
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: context.isMobile ? 18 : 24,
+              ),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: context.isMobile ? 16 : 20,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.paddingS),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.paddingXS),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS
+                  : AppSpacing.paddingS),
+          // Row 2: Text below
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
-              color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.7) ??
-                  Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7),
+              fontSize: context.isMobile ? 10 : 12,
+              color: (context.textTheme.bodySmall?.color ??
+                      context.colors.onSurface)
+                  .withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -905,27 +881,29 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   /// 💳 Placeholder payment structure
   Widget _buildPlaceholderPaymentStructure(
       BuildContext context, AppLocalizations? loc, bool isDarkMode) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HeadingMedium(
-            text: loc?.recentPaymentsPreview ??
-                _text('recentPaymentsPreview', 'Recent Payments Preview'),
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-
-          // Placeholder payment cards
-          ...List.generate(
-              3,
-              (index) => _buildPlaceholderPaymentCard(
-                    context,
-                    loc,
-                    isDarkMode,
-                  )),
-        ],
+    return Padding(
+      padding: EdgeInsets.only(
+        top: 0,
+        left: context.responsiveMargin.left,
+        right: context.responsiveMargin.right,
+        bottom: context.responsiveMargin.bottom,
+      ),
+      child: SectionContainer(
+        title: loc?.recentPaymentsPreview ??
+            _text('recentPaymentsPreview', 'Recent Payments Preview'),
+        icon: Icons.payment,
+        child: Column(
+          children: [
+            // Placeholder payment cards
+            ...List.generate(
+                3,
+                (index) => _buildPlaceholderPaymentCard(
+                      context,
+                      loc,
+                      false, // isDarkMode not needed
+                    )),
+          ],
+        ),
       ),
     );
   }
@@ -933,16 +911,11 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
   /// 💳 Placeholder payment card
   Widget _buildPlaceholderPaymentCard(
       BuildContext context, AppLocalizations? loc, bool isDarkMode) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
-        ),
-      ),
+    return AdaptiveCard(
+      margin: EdgeInsets.only(bottom: context.responsivePadding.top),
+      padding: EdgeInsets.all(context.isMobile
+          ? context.responsivePadding.top * 0.5
+          : context.responsivePadding.top),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -970,23 +943,21 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      height: 12,
+                      height: context.isMobile ? 10 : 12,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest,
+                        color: ThemeColors.getTextTertiary(context)
+                            .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.paddingXS),
+                    SizedBox(
+                        height: context.isMobile ? 4 : AppSpacing.paddingXS),
                     Container(
-                      height: 8,
-                      width: 100,
+                      height: context.isMobile ? 6 : 8,
+                      width: context.isMobile ? 80 : 100,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest,
+                        color: ThemeColors.getDivider(context),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -994,26 +965,19 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                 ),
               ),
               Container(
-                width: 80,
-                height: 24,
+                width: context.isMobile ? 60 : 80,
+                height: context.isMobile ? 20 : 24,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  color: ThemeColors.getDivider(context),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: Center(
                   child: Container(
-                    height: 8,
-                    width: 60,
+                    height: context.isMobile ? 6 : 8,
+                    width: context.isMobile ? 40 : 60,
                     decoration: BoxDecoration(
-                      color: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.color
-                              ?.withValues(alpha: 0.4) ??
-                          Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.4),
+                      color: ThemeColors.getTextTertiary(context)
+                          .withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -1031,26 +995,17 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                     Text(
                       loc?.amount ?? _text('amount', 'Amount'),
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7) ??
-                            Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                        fontSize: context.isMobile ? 10 : 12,
+                        color: ThemeColors.getTextTertiary(context),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.paddingXS),
+                    SizedBox(
+                        height: context.isMobile ? 4 : AppSpacing.paddingXS),
                     Container(
-                      height: 16,
-                      width: 80,
+                      height: context.isMobile ? 12 : 16,
+                      width: context.isMobile ? 60 : 80,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        color: ThemeColors.getTextTertiary(context)
                             .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -1065,26 +1020,17 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                     Text(
                       loc?.status ?? _text('status', 'Status'),
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7) ??
-                            Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                        fontSize: context.isMobile ? 10 : 12,
+                        color: ThemeColors.getTextTertiary(context),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.paddingXS),
+                    SizedBox(
+                        height: context.isMobile ? 4 : AppSpacing.paddingXS),
                     Container(
-                      height: 16,
-                      width: 60,
+                      height: context.isMobile ? 12 : 16,
+                      width: context.isMobile ? 50 : 60,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        color: ThemeColors.getTextTertiary(context)
                             .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -1099,26 +1045,17 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                     Text(
                       loc?.date ?? _text('date', 'Date'),
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7) ??
-                            Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                        fontSize: context.isMobile ? 10 : 12,
+                        color: ThemeColors.getTextTertiary(context),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.paddingXS),
+                    SizedBox(
+                        height: context.isMobile ? 4 : AppSpacing.paddingXS),
                     Container(
-                      height: 16,
-                      width: 70,
+                      height: context.isMobile ? 12 : 16,
+                      width: context.isMobile ? 60 : 70,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        color: ThemeColors.getTextTertiary(context)
                             .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -1133,95 +1070,15 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
     );
   }
 
-  /// 🔄 Payment empty state action section
-  Widget _buildPaymentEmptyStateAction(
-      BuildContext context, AppLocalizations? loc) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingL),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.payment,
-            size: 48,
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          HeadingMedium(
-            text: loc?.noPaymentHistory ??
-                _text('noPaymentHistory', 'No Payment History'),
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          const SizedBox(height: AppSpacing.paddingS),
-          Text(
-            loc?.noPaymentHistoryDescription ??
-                _text(
-                  'noPaymentHistoryDescription',
-                  'Your payment notifications and history will appear here once you make payments.',
-                ),
-            style: TextStyle(
-              color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.7) ??
-                  Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7),
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                // Switch to send payment tab
-                _tabController.animateTo(1);
-              },
-              icon: const Icon(Icons.send),
-              label: Text(
-                  loc?.sendPayment ?? _text('sendPayment', 'Send Payment')),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primaryColor,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                padding:
-                    const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// 🏦 Owner payment details empty state
   Widget _buildOwnerPaymentDetailsEmptyState(
-      BuildContext context, AppLocalizations? loc, bool isDarkMode) {
-    final theme = Theme.of(context);
-
+      BuildContext context, AppLocalizations? loc) {
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
+        color: ThemeColors.getCardBackground(context),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+          color: ThemeColors.getDivider(context),
         ),
       ),
       child: Column(
@@ -1230,12 +1087,12 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
             padding: const EdgeInsets.all(AppSpacing.paddingM),
             child: Row(
               children: [
-                Icon(Icons.account_balance, color: theme.primaryColor),
+                Icon(Icons.account_balance, color: context.primaryColor),
                 const SizedBox(width: AppSpacing.paddingS),
                 HeadingSmall(
                   text: loc?.ownerPaymentDetails ??
                       _text('ownerPaymentDetails', 'Owner Payment Details'),
-                  color: theme.textTheme.headlineSmall?.color,
+                  color: context.textTheme.headlineSmall?.color,
                 ),
               ],
             ),
@@ -1247,48 +1104,46 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
               children: [
                 Icon(
                   Icons.account_balance_wallet_outlined,
-                  size: 64,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.5),
+                  size: context.isMobile ? 48 : 64,
+                  color: ThemeColors.getTextTertiary(context),
                 ),
-                const SizedBox(height: AppSpacing.paddingM),
-                HeadingMedium(
+                SizedBox(height: context.responsivePadding.top),
+                HeadingSmall(
                   text: loc?.paymentDetailsNotAvailable ??
                       _text('paymentDetailsNotAvailable',
                           'Payment Details Not Available'),
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: context.textTheme.bodyLarge?.color ??
+                      context.colors.onSurface,
                 ),
-                const SizedBox(height: AppSpacing.paddingS),
-                Text(
-                  loc?.ownerPaymentDetailsNotConfigured ??
-                      _text(
-                        'ownerPaymentDetailsNotConfigured',
-                        'Owner payment details are not configured yet. Please contact your PG owner to set up payment information.',
-                      ),
-                  style: TextStyle(
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7),
-                    fontSize: 14,
+                SizedBox(
+                    height: context.isMobile
+                        ? AppSpacing.paddingS
+                        : context.responsivePadding.top * 0.5),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: context.responsivePadding.left),
+                  child: Text(
+                    loc?.ownerPaymentDetailsNotConfigured ??
+                        _text(
+                          'ownerPaymentDetailsNotConfigured',
+                          'Owner payment details are not configured yet. Please contact your PG owner to set up payment information.',
+                        ),
+                    style: TextStyle(
+                      color: ThemeColors.getTextTertiary(context),
+                      fontSize: context.isMobile ? 12 : 14,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: AppSpacing.paddingL),
+                SizedBox(height: context.responsivePadding.top * 1.5),
 
                 // Placeholder payment methods
                 Container(
-                  padding: const EdgeInsets.all(AppSpacing.paddingM),
+                  padding: EdgeInsets.all(context.isMobile
+                      ? context.responsivePadding.top * 0.5
+                      : context.responsivePadding.top),
                   decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color: context.theme.inputDecorationTheme.fillColor,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.borderRadiusM),
                   ),
@@ -1301,32 +1156,36 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
                                 'Payment Methods Preview:'),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: context.textTheme.bodyLarge?.color ??
+                              context.colors.onSurface,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.paddingM),
+                      SizedBox(height: context.responsivePadding.top),
                       _buildPlaceholderPaymentMethod(
                           context,
                           loc?.upiId ?? _text('upiId', 'UPI ID'),
                           loc?.notAvailable ??
-                              _text('notAvailable', 'Not Available'),
-                          isDarkMode),
-                      const SizedBox(height: AppSpacing.paddingS),
+                              _text('notAvailable', 'Not Available')),
+                      SizedBox(
+                          height: context.isMobile
+                              ? AppSpacing.paddingS
+                              : context.responsivePadding.top * 0.5),
                       _buildPlaceholderPaymentMethod(
                           context,
                           loc?.bankAccount ??
                               _text('bankAccount', 'Bank Account'),
                           loc?.notAvailable ??
-                              _text('notAvailable', 'Not Available'),
-                          isDarkMode),
-                      const SizedBox(height: AppSpacing.paddingS),
+                              _text('notAvailable', 'Not Available')),
+                      SizedBox(
+                          height: context.isMobile
+                              ? AppSpacing.paddingS
+                              : context.responsivePadding.top * 0.5),
                       _buildPlaceholderPaymentMethod(
                           context,
                           loc?.phoneNumber ??
                               _text('phoneNumber', 'Phone Number'),
                           loc?.notAvailable ??
-                              _text('notAvailable', 'Not Available'),
-                          isDarkMode),
+                              _text('notAvailable', 'Not Available')),
                     ],
                   ),
                 ),
@@ -1340,37 +1199,33 @@ class _GuestPaymentScreenState extends State<GuestPaymentScreen>
 
   /// 💳 Placeholder payment method
   Widget _buildPlaceholderPaymentMethod(
-      BuildContext context, String label, String value, bool isDarkMode) {
+      BuildContext context, String label, String value) {
     return Row(
       children: [
         Container(
-          width: 8,
-          height: 8,
+          width: context.isMobile ? 6 : 8,
+          height: context.isMobile ? 6 : 8,
           decoration: BoxDecoration(
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+            color: ThemeColors.getTextTertiary(context).withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: AppSpacing.paddingS),
+        SizedBox(
+            width:
+                context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
-            color: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.color
-                    ?.withValues(alpha: 0.7) ??
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+            fontSize: context.isMobile ? 10 : 12,
+            color: ThemeColors.getTextTertiary(context),
           ),
         ),
         const Spacer(),
         Container(
-          height: 12,
-          width: 80,
+          height: context.isMobile ? 10 : 12,
+          width: context.isMobile ? 60 : 80,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            color: ThemeColors.getDivider(context),
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -1705,7 +1560,7 @@ class _SendPaymentDialogState extends State<SendPaymentDialog> {
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
               border: Border.all(color: theme.primaryColor),
             ),
-            child: const Center(child: CircularProgressIndicator()),
+            child: const Center(child: AdaptiveLoader()),
           );
         },
       );

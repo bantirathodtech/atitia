@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/styles/colors.dart';
+import '../../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../../common/widgets/grids/responsive_grid.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
@@ -63,16 +64,33 @@ class OwnerBedMapWidget extends StatelessWidget {
     return translated;
   }
 
+  // Helper methods to compute stats efficiently
+  static int _getOccupiedCount(List<OwnerBed> beds) {
+    return beds.where((b) => b.isOccupied).length;
+  }
+
+  static int _getVacantCount(List<OwnerBed> beds) {
+    return beds.where((b) => b.isVacant).length;
+  }
+
+  static int _getPendingCount(List<OwnerBed> beds) {
+    return beds.where((b) => b.isPending).length;
+  }
+
+  static int _getMaintenanceCount(List<OwnerBed> beds) {
+    return beds.where((b) => b.isUnderMaintenance).length;
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final hasData = beds.isNotEmpty;
     final totalBeds = hasData ? beds.length : 0;
-    final occupied = hasData ? beds.where((b) => b.isOccupied).length : 0;
-    final vacant = hasData ? beds.where((b) => b.isVacant).length : 0;
-    final pending = hasData ? beds.where((b) => b.isPending).length : 0;
-    final maintenance =
-        hasData ? beds.where((b) => b.isUnderMaintenance).length : 0;
+    // Compute stats once per build
+    final occupied = hasData ? _getOccupiedCount(beds) : 0;
+    final vacant = hasData ? _getVacantCount(beds) : 0;
+    final pending = hasData ? _getPendingCount(beds) : 0;
+    final maintenance = hasData ? _getMaintenanceCount(beds) : 0;
 
     if (!hasData) {
       return ListView(
@@ -92,32 +110,43 @@ class OwnerBedMapWidget extends StatelessWidget {
 
     // Group beds by room
     final roomBeds = _groupBedsByRoom(beds);
+    final roomIds = roomBeds.keys.toList();
 
-    return ListView(
+    return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
-      children: [
-        _buildOverviewCard(context, loc,
-            totalBeds: totalBeds,
-            occupied: occupied,
-            vacant: vacant,
-            pending: pending,
-            maintenance: maintenance),
-        const SizedBox(height: AppSpacing.paddingM),
-        ...roomBeds.keys.map((roomId) {
-          final roomBedsList = roomBeds[roomId]!;
-          final room = rooms.firstWhere((r) => r.id == roomId,
-              orElse: () => OwnerRoom(
-                  id: roomId,
-                  floorId: '',
-                  roomNumber: loc?.ownerBedMapRoomUnknown ??
-                      _text('ownerBedMapRoomUnknown', 'Unknown')));
+      cacheExtent: 512,
+      addAutomaticKeepAlives: false,
+      addRepaintBoundaries: true,
+      itemCount: roomIds.length + 2, // +2 for overview card and spacing
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return _buildOverviewCard(context, loc,
+              totalBeds: totalBeds,
+              occupied: occupied,
+              vacant: vacant,
+              pending: pending,
+              maintenance: maintenance);
+        }
+        if (index == 1) {
+          return const SizedBox(height: AppSpacing.paddingM);
+        }
+        final roomId = roomIds[index - 2];
+        final roomBedsList = roomBeds[roomId]!;
+        final room = rooms.firstWhere((r) => r.id == roomId,
+            orElse: () => OwnerRoom(
+                id: roomId,
+                floorId: '',
+                roomNumber: loc?.ownerBedMapRoomUnknown ??
+                    _text('ownerBedMapRoomUnknown', 'Unknown')));
 
-          return Padding(
+        return RepaintBoundary(
+          key: ValueKey('room_$roomId'),
+          child: Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
             child: _buildRoomCard(context, room, roomBedsList, loc),
-          );
-        }),
-      ],
+          ),
+        );
+      },
     );
   }
 
@@ -135,6 +164,7 @@ class OwnerBedMapWidget extends StatelessWidget {
   Widget _buildRoomCard(BuildContext context, OwnerRoom room,
       List<OwnerBed> roomBeds, AppLocalizations? loc) {
     final theme = Theme.of(context);
+    // Cache room bed counts to avoid recalculating
     final occupiedCount = roomBeds.where((b) => b.isOccupied).length;
     final vacantCount = roomBeds.where((b) => b.isVacant).length;
     final pendingCount = roomBeds.where((b) => b.isPending).length;
@@ -462,10 +492,9 @@ class OwnerBedMapWidget extends StatelessWidget {
 
   Widget _buildBedItem(
       BuildContext context, OwnerBed bed, AppLocalizations? loc) {
-    final theme = Theme.of(context);
     final statusColor = bed.statusColor;
     final bg = statusColor.withValues(
-        alpha: theme.brightness == Brightness.dark ? 0.12 : 0.08);
+        alpha: context.isDarkMode ? 0.12 : 0.08);
     final border = statusColor;
     final icon = bed.isOccupied
         ? Icons.person

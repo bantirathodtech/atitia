@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/body_text.dart';
@@ -25,12 +27,8 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
     final currentDay = MenuInitializationHelper.weekdayString(DateTime.now());
 
     // Theme-aware colors
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    final textSecondary =
-        theme.textTheme.bodyMedium?.color ?? AppColors.textSecondary;
-    final textTertiary =
-        isDarkMode ? AppColors.textTertiary : AppColors.textSecondary;
+    final textSecondary = ThemeColors.getTextSecondary(context);
+    final textTertiary = ThemeColors.getTextTertiary(context);
 
     return AdaptiveCard(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -158,15 +156,12 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
     int itemCount,
     IconData icon,
   ) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
     return Row(
       children: [
         Icon(
           icon,
           size: 18,
-          color: theme.primaryColor.withValues(alpha: 0.7),
+          color: context.primaryColor.withValues(alpha: 0.7),
         ),
         const SizedBox(width: AppSpacing.paddingS),
         BodyText(text: mealType, medium: true),
@@ -179,9 +174,9 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: itemCount > 0
                 ? AppColors.success
-                    .withValues(alpha: isDarkMode ? 0.15 : 0.1) // Theme-aware
+                    .withValues(alpha: context.isDarkMode ? 0.15 : 0.1) // Theme-aware
                 : AppColors.warning
-                    .withValues(alpha: isDarkMode ? 0.15 : 0.1), // Theme-aware
+                    .withValues(alpha: context.isDarkMode ? 0.15 : 0.1), // Theme-aware
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
           ),
           child: BodyText(

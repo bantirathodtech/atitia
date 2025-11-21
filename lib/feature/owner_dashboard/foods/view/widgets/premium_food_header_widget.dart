@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../../viewmodel/owner_food_viewmodel.dart';
@@ -42,12 +44,10 @@ class PremiumFoodHeaderWidget extends StatelessWidget
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(230);
+  Size get preferredSize => const Size.fromHeight(120);
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final foodVM = context.watch<OwnerFoodViewModel>();
     final loc = AppLocalizations.of(context);
 
@@ -62,145 +62,75 @@ class PremiumFoodHeaderWidget extends StatelessWidget
       AppColors.getDayColor(6), // Sunday - Sky Blue
     ];
 
-    final surfaceColor = isDarkMode ? AppColors.darkSurface : AppColors.surface;
-    final textPrimary =
-        isDarkMode ? AppColors.textOnPrimary : AppColors.textPrimary;
-    final textSecondary =
-        isDarkMode ? AppColors.textSecondary : AppColors.textSecondary;
+    final surfaceColor = ThemeColors.getCardBackground(context);
+    final isDarkMode = context.isDarkMode;
 
-    return Column(
-      children: [
-        // Premium Header section with gradient background
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppSpacing.paddingL),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                dayColors[currentTabIndex]
-                    .withValues(alpha: isDarkMode ? 0.15 : 0.1),
-                surfaceColor,
-              ],
-            ),
-            border: Border(
-              top: BorderSide(
-                color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
-                width: 1,
-              ),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: isDarkMode
-                    ? Theme.of(context)
-                        .colorScheme
-                        .shadow
-                        .withValues(alpha: 0.2)
-                    : dayColors[currentTabIndex].withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  // Premium gradient icon container
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.paddingS),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          dayColors[currentTabIndex],
-                          dayColors[currentTabIndex].withValues(alpha: 0.7),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color:
-                              dayColors[currentTabIndex].withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.restaurant_menu_rounded,
-                      color: AppColors.textOnPrimary,
-                      size: 28,
-                    ),
+    // Constrain the widget to preferredSize to prevent overflow
+    return SizedBox(
+      height: preferredSize.height,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Premium Header section with gradient background
+          Flexible(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    dayColors[currentTabIndex]
+                        .withValues(alpha: isDarkMode ? 0.15 : 0.1),
+                    surfaceColor,
+                  ],
+                ),
+                border: Border(
+                  top: BorderSide(
+                    color: ThemeColors.getDivider(context),
+                    width: 1,
                   ),
-                  const SizedBox(width: AppSpacing.paddingM),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Premium title with gradient shimmer effect
-                        ShaderMask(
-                          shaderCallback: (bounds) => LinearGradient(
-                            colors: [
-                              textPrimary,
-                              dayColors[currentTabIndex].withValues(alpha: 0.8),
-                            ],
-                          ).createShader(bounds),
-                          child: Text(
-                            loc?.weeklyMenuManagement ??
-                                _text('weeklyMenuManagement',
-                                    'Weekly Menu Management'),
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w800,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimary, // Required for ShaderMask
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.paddingXS),
-                        Text(
-                          loc?.manageBreakfastLunchDinnerForAllDays ??
-                              _text(
-                                'manageBreakfastLunchDinnerForAllDays',
-                                'Manage breakfast, lunch & dinner for all days',
-                              ),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
+                ),
+                    boxShadow: [
+                  BoxShadow(
+                    color: context.isDarkMode
+                        ? context.colors.shadow.withValues(alpha: 0.2)
+                        : dayColors[currentTabIndex].withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.paddingS),
-              _buildStatsRow(context, foodVM, dayColors[currentTabIndex], loc),
-            ],
-          ),
-        ),
-        // Premium Day tabs with gradient backgrounds
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                surfaceColor,
-                isDarkMode
-                    ? AppColors.darkCard.withValues(alpha: 0.5)
-                    : AppColors.surfaceVariant.withValues(alpha: 0.3),
-              ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildStatsRow(
+                      context, foodVM, dayColors[currentTabIndex], loc),
+                ],
+              ),
             ),
           ),
-          child: _buildPremiumTabBar(
-              isDarkMode, surfaceColor, dayColors[currentTabIndex], loc),
-        ),
-      ],
+          // Premium Day tabs with gradient backgrounds
+          Container(
+            height: 48, // Fixed height for tab bar
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  surfaceColor,
+                  isDarkMode
+                      ? AppColors.darkCard.withValues(alpha: 0.5)
+                      : AppColors.surfaceVariant.withValues(alpha: 0.3),
+                ],
+              ),
+            ),
+            child: _buildPremiumTabBar(
+                context, surfaceColor, dayColors[currentTabIndex], loc),
+          ),
+        ],
+      ),
     );
   }
 
@@ -215,24 +145,27 @@ class PremiumFoodHeaderWidget extends StatelessWidget
       children: [
         Expanded(
           child: _buildStatChip(
+            context,
             '${stats['totalWeeklyMenus'] ?? 0}',
             loc?.days ?? _text('days', 'Days'),
             Icons.calendar_today_rounded,
             dayColor,
           ),
         ),
-        const SizedBox(width: AppSpacing.paddingS),
+        SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
         Expanded(
           child: _buildStatChip(
+            context,
             '$totalItems',
             loc?.items ?? _text('items', 'Items'),
             Icons.restaurant_rounded,
             dayColor,
           ),
         ),
-        const SizedBox(width: AppSpacing.paddingS),
+        SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
         Expanded(
           child: _buildStatChip(
+            context,
             '${stats['totalPhotos'] ?? 0}',
             loc?.photos ?? _text('photos', 'Photos'),
             Icons.photo_library_rounded,
@@ -240,10 +173,13 @@ class PremiumFoodHeaderWidget extends StatelessWidget
           ),
         ),
         if ((stats['upcomingFestivals'] ?? 0) > 0) ...[
-          const SizedBox(width: AppSpacing.paddingS),
+          SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.isMobile ? 6 : 8,
+                vertical: context.isMobile ? 4 : 6,
+              ),
               decoration: BoxDecoration(
                 color: dayColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
@@ -258,17 +194,17 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                   Icon(
                     Icons.celebration_rounded,
                     color: dayColor,
-                    size: 14,
+                    size: context.isMobile ? 12 : 14,
                   ),
-                  const SizedBox(width: 2),
+                  SizedBox(width: context.isMobile ? 1 : 2),
                   Flexible(
                     child: Text(
                       '${stats['upcomingFestivals']} ${loc?.festival ?? _text('festival', 'Festival')}',
-                      style: TextStyle(
-                        color: dayColor,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    style: TextStyle(
+                      color: dayColor,
+                      fontSize: context.isMobile ? 9 : 10,
+                      fontWeight: FontWeight.w600,
+                    ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -282,9 +218,12 @@ class PremiumFoodHeaderWidget extends StatelessWidget
   }
 
   Widget _buildStatChip(
-      String value, String label, IconData icon, Color color) {
+      BuildContext context, String value, String label, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.isMobile ? 6 : 8,
+        vertical: context.isMobile ? 4 : 6,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
@@ -295,13 +234,14 @@ class PremiumFoodHeaderWidget extends StatelessWidget
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             icon,
             color: color,
-            size: 14,
+            size: context.isMobile ? 12 : 14,
           ),
-          const SizedBox(width: AppSpacing.paddingXS),
+          SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,7 +251,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                   value,
                   style: TextStyle(
                     color: color,
-                    fontSize: 12,
+                    fontSize: context.isMobile ? 10 : 12,
                     fontWeight: FontWeight.w700,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -320,7 +260,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                   label,
                   style: TextStyle(
                     color: color.withValues(alpha: 0.7),
-                    fontSize: 9,
+                    fontSize: context.isMobile ? 8 : 9,
                     fontWeight: FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -333,8 +273,9 @@ class PremiumFoodHeaderWidget extends StatelessWidget
     );
   }
 
-  Widget _buildPremiumTabBar(bool isDarkMode, Color surfaceColor,
+  Widget _buildPremiumTabBar(BuildContext context, Color surfaceColor,
       Color dayColor, AppLocalizations? loc) {
+    final isDarkMode = context.isDarkMode;
     final dayNames = [
       loc?.dayShortMon ?? _text('dayShortMon', 'Mon'),
       loc?.dayShortTue ?? _text('dayShortTue', 'Tue'),
@@ -369,7 +310,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
         color: surfaceColor,
         border: Border(
           bottom: BorderSide(
-            color: isDarkMode ? AppColors.darkDivider : AppColors.outline,
+            color: ThemeColors.getDivider(context),
             width: 1,
           ),
         ),
@@ -416,9 +357,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                             width: 1.5,
                           )
                         : Border.all(
-                            color: isDarkMode
-                                ? AppColors.darkDivider
-                                : AppColors.outline,
+                            color: ThemeColors.getDivider(context),
                           ),
                     // Premium shadow for selected tab
                     boxShadow: isSelected

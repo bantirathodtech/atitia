@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
+import '../../../../../common/widgets/buttons/text_button.dart';
+import '../../../../../common/widgets/inputs/text_input.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 import '../../../../../common/widgets/text/body_text.dart';
@@ -190,52 +192,73 @@ class GuestListWidget extends StatelessWidget {
     final loc = AppLocalizations.of(context)!;
     return showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingSmall(text: loc.guestDetailsTitle),
-        content: SingleChildScrollView(
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailRow(
-                  context, loc.ownerGuestDetailVehicleNumber, guest.vehicleNo!),
-              if (guest.vehicleName != null && guest.vehicleName!.isNotEmpty)
-                _buildDetailRow(
-                    context, loc.ownerGuestDetailVehicle, guest.vehicleName!),
-              if (guest.roomNumber != null)
-                _buildDetailRow(
-                  context,
-                  loc.ownerGuestDetailRoomBed,
-                  guest.roomBedDisplay,
+              HeadingSmall(text: loc.guestDetailsTitle),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailRow(
+                          context, loc.ownerGuestDetailVehicleNumber, guest.vehicleNo!),
+                      if (guest.vehicleName != null && guest.vehicleName!.isNotEmpty)
+                        _buildDetailRow(
+                            context, loc.ownerGuestDetailVehicle, guest.vehicleName!),
+                      if (guest.roomNumber != null)
+                        _buildDetailRow(
+                          context,
+                          loc.ownerGuestDetailRoomBed,
+                          guest.roomBedDisplay,
+                        ),
+                      if (guest.rent != null)
+                        _buildDetailRow(
+                            context, loc.ownerGuestDetailRent, guest.formattedRent),
+                      if (guest.deposit != null)
+                        _buildDetailRow(context, loc.ownerGuestDetailDeposit,
+                            guest.formattedDeposit),
+                      if (guest.joiningDate != null)
+                        _buildDetailRow(context, loc.ownerGuestDetailJoined,
+                            guest.formattedJoiningDate),
+                      _buildDetailRow(
+                          context, loc.ownerGuestDetailStatus, guest.statusDisplay),
+                    ],
+                  ),
                 ),
-              if (guest.rent != null)
-                _buildDetailRow(
-                    context, loc.ownerGuestDetailRent, guest.formattedRent),
-              if (guest.deposit != null)
-                _buildDetailRow(context, loc.ownerGuestDetailDeposit,
-                    guest.formattedDeposit),
-              if (guest.joiningDate != null)
-                _buildDetailRow(context, loc.ownerGuestDetailJoined,
-                    guest.formattedJoiningDate),
-              _buildDetailRow(
-                  context, loc.ownerGuestDetailStatus, guest.statusDisplay),
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc.close,
+                  ),
+                  if (guest.roomNumber != null || guest.bedNumber != null) ...[
+                    const SizedBox(width: AppSpacing.paddingS),
+                    PrimaryButton(
+                      label: loc.ownerGuestUpdateRoomBed,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showUpdateRoomBedDialog(context, guest);
+                      },
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc.close),
-          ),
-          if (guest.roomNumber != null || guest.bedNumber != null)
-            PrimaryButton(
-              label: loc.ownerGuestUpdateRoomBed,
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showUpdateRoomBedDialog(context, guest);
-              },
-            ),
-        ],
       ),
     );
   }
@@ -267,37 +290,37 @@ class GuestListWidget extends StatelessWidget {
 
     return showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: HeadingSmall(text: loc.ownerGuestUpdateRoomBedTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: roomController,
-              decoration: InputDecoration(
-                labelText: loc.ownerGuestRoomNumberLabel,
-                hintText: loc.ownerGuestRoomNumberHint,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.door_front_door),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.paddingM),
-            TextField(
-              controller: bedController,
-              decoration: InputDecoration(
-                labelText: loc.ownerGuestBedNumberLabel,
-                hintText: loc.ownerGuestBedNumberHint,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.bed),
-              ),
-            ),
-          ],
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(loc.cancel),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingSmall(text: loc.ownerGuestUpdateRoomBedTitle),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: roomController,
+                label: loc.ownerGuestRoomNumberLabel,
+                hint: loc.ownerGuestRoomNumberHint,
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              TextInput(
+                controller: bedController,
+                label: loc.ownerGuestBedNumberLabel,
+                hint: loc.ownerGuestBedNumberHint,
+              ),
+              const SizedBox(height: AppSpacing.paddingL),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc.cancel,
+                  ),
           PrimaryButton(
             label: loc.ownerGuestUpdateAction,
             onPressed: () async {
@@ -328,7 +351,11 @@ class GuestListWidget extends StatelessWidget {
               }
             },
           ),
-        ],
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

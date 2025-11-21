@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../colors.dart';
 import '../spacing.dart';
+import '../theme_colors.dart';
 import '../typography.dart';
-import 'border_decorations.dart';
+import '../../utils/extensions/context_extensions.dart';
 
 /// Consistent input field decorations for forms and text fields
 class InputDecorations {
@@ -21,6 +22,8 @@ class InputDecorations {
     bool enabled = true,
     bool isRequired = false,
   }) {
+    final inputTheme = context.theme.inputDecorationTheme;
+
     return InputDecoration(
       labelText: isRequired ? '$labelText *' : labelText,
       hintText: hintText,
@@ -30,63 +33,54 @@ class InputDecorations {
       enabled: enabled,
       floatingLabelBehavior: FloatingLabelBehavior.auto,
       contentPadding: const EdgeInsets.all(AppSpacing.paddingM),
-      // In the textField method, update the border sections:
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        borderSide: BorderDecorations.standard(context),
+      border: inputTheme.border,
+      enabledBorder: inputTheme.enabledBorder,
+      focusedBorder: inputTheme.focusedBorder,
+      errorBorder: inputTheme.errorBorder,
+      focusedErrorBorder: inputTheme.focusedErrorBorder,
+      disabledBorder: inputTheme.disabledBorder ??
+          OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+            borderSide: BorderSide(
+              color: ThemeColors.getDivider(context),
+              width: 1.0,
+            ),
+          ),
+      labelStyle: inputTheme.labelStyle?.copyWith(
+        color: enabled ? null : ThemeColors.getTextTertiary(context),
       ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        borderSide: BorderDecorations.standard(context),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        borderSide: BorderSide(
-          color: AppColors.lightPrimary,
-          width: 2.0,
-        ),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        borderSide: BorderDecorations.error, // Now using BorderSide
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        borderSide: BorderDecorations.error
-            .copyWith(width: 2.0), // Now using BorderSide
-      ),
-      disabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        borderSide: BorderSide(
-          color: AppColors.outline,
-          width: 1.0,
-        ),
-      ),
-      labelStyle: AppTypography.inputLabel.copyWith(
-        color: enabled ? null : AppColors.textTertiary,
-      ),
-      hintStyle: AppTypography.input.copyWith(
-        color: AppColors.textTertiary,
-      ),
-      errorStyle: AppTypography.bodySmall.copyWith(
-        color: AppColors.error,
-      ),
+      hintStyle: inputTheme.hintStyle,
+      errorStyle: inputTheme.errorStyle,
       filled: true,
-      fillColor: enabled ? AppColors.lightInputFill : AppColors.surfaceVariant,
+      fillColor: enabled
+          ? inputTheme.fillColor
+          : AppColors.surfaceVariant,
     );
   }
 
-  /// Search field decoration
-  static InputDecoration search({
+  /// Search field decoration - theme-aware via BuildContext
+  static InputDecoration search(
+    BuildContext context, {
     String hintText = 'Search...',
     VoidCallback? onClear,
   }) {
+    final inputTheme = context.theme.inputDecorationTheme;
+
     return InputDecoration(
       hintText: hintText,
-      prefixIcon: const Icon(Icons.search, size: 20),
+      hintStyle: TextStyle(color: ThemeColors.getTextTertiary(context)),
+      prefixIcon: Icon(
+        Icons.search,
+        size: 20,
+        color: ThemeColors.getTextTertiary(context),
+      ),
       suffixIcon: onClear != null
           ? IconButton(
-              icon: const Icon(Icons.clear, size: 18),
+              icon: Icon(
+                Icons.clear,
+                size: 18,
+                color: ThemeColors.getTextTertiary(context),
+              ),
               onPressed: onClear,
             )
           : null,
@@ -98,19 +92,29 @@ class InputDecorations {
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
         borderSide: BorderSide.none,
       ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-        borderSide: BorderSide(
-          color: AppColors.lightPrimary,
-          width: 1.5,
-        ),
-      ),
+      enabledBorder: inputTheme.enabledBorder is OutlineInputBorder
+          ? (inputTheme.enabledBorder as OutlineInputBorder).copyWith(
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+            )
+          : OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+              borderSide: BorderSide(
+                color: ThemeColors.getDivider(context),
+              ),
+            ),
+      focusedBorder: inputTheme.focusedBorder is OutlineInputBorder
+          ? (inputTheme.focusedBorder as OutlineInputBorder).copyWith(
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+            )
+          : OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+              borderSide: BorderSide(
+                color: AppColors.primary,
+                width: 1.5,
+              ),
+            ),
       filled: true,
-      fillColor: AppColors.lightInputFill,
+      fillColor: inputTheme.fillColor,
       isDense: true,
     );
   }

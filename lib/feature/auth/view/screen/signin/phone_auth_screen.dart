@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/utils/constants/validation.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
@@ -341,8 +342,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AdaptiveAppBar(
         title: role != null ? loc.loginAs(role) : loc.login,
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back,
+            color: context.isDarkMode ? Colors.white : Colors.black,
+          ),
           onPressed: () => getIt<NavigationService>().goToRoleSelection(),
         ),
         showThemeToggle: false, // Disable automatic theme toggle

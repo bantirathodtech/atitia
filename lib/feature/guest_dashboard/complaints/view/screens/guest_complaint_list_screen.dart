@@ -5,8 +5,14 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/colors.dart';
 import '../../../../../common/styles/spacing.dart';
+import '../../../../../common/styles/theme_colors.dart';
 import '../../../../../common/utils/constants/routes.dart';
+import '../../../../../common/utils/extensions/context_extensions.dart';
+import '../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
+import '../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../common/widgets/chips/filter_chip.dart';
+import '../../../../../common/widgets/containers/section_container.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/widgets/loaders/shimmer_loader.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
@@ -16,6 +22,7 @@ import '../../../../../core/navigation/navigation_service.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
+import '../../../shared/widgets/guest_pg_selector_dropdown.dart';
 import '../../../shared/widgets/user_location_display.dart';
 import '../../viewmodel/guest_complaint_viewmodel.dart';
 import '../widgets/guest_complaint_card.dart';
@@ -58,13 +65,16 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
   @override
   Widget build(BuildContext context) {
     final complaintVM = Provider.of<GuestComplaintViewModel>(context);
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AdaptiveAppBar(
         titleWidget: const GuestPgAppBarDisplay(),
         centerTitle: true,
         showDrawer: true,
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
+        leadingActions: [
+          const GuestPgSelectorDropdown(compact: true),
+        ],
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -95,7 +105,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
       // Centralized Guest Drawer
       drawer: const GuestDrawer(),
 
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: () async {
           final authProvider =
@@ -125,16 +135,16 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      padding: EdgeInsets.all(context.responsivePadding.top),
       child: Column(
         children: [
           // User Location Display
-          const Padding(
-            padding: EdgeInsets.only(bottom: AppSpacing.paddingM),
-            child: UserLocationDisplay(),
+          Padding(
+            padding: EdgeInsets.only(bottom: context.responsivePadding.top),
+            child: const UserLocationDisplay(),
           ),
           _buildFilterChips(context, complaintVM),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
           _buildComplaintsList(context, complaintVM),
         ],
       ),
@@ -153,7 +163,7 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
       itemBuilder: (context, index) {
         final complaint = filteredComplaints[index];
         return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
+          padding: EdgeInsets.only(bottom: context.responsivePadding.top),
           child: GuestComplaintCard(complaint: complaint),
         );
       },
@@ -382,8 +392,6 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
   /// 🎛️ Filter Chips
   Widget _buildFilterChips(
       BuildContext context, GuestComplaintViewModel complaintVM) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
     // Map English filter values to localized display strings
@@ -396,26 +404,21 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
 
     final filterKeys = ['All', 'Pending', 'In Progress', 'Resolved'];
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
+    return Padding(
+      padding: EdgeInsets.all(context.responsivePadding.top),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: filterKeys.map((filter) {
             final isSelected = _selectedFilter == filter;
-            return Container(
-              margin: const EdgeInsets.only(right: AppSpacing.paddingS),
-              child: FilterChip(
-                label: Text(filterMap[filter] ?? filter),
+            return Padding(
+              padding: EdgeInsets.only(right: context.responsivePadding.left),
+              child: CustomFilterChip(
+                label: filterMap[filter] ?? filter,
                 selected: isSelected,
                 onSelected: (selected) {
                   setState(() => _selectedFilter = filter);
                 },
-                backgroundColor: isDarkMode
-                    ? AppColors.darkInputFill
-                    : AppColors.surfaceVariant,
-                selectedColor: theme.primaryColor.withValues(alpha: 0.2),
-                checkmarkColor: theme.primaryColor,
               ),
             );
           }).toList(),
@@ -528,11 +531,11 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
     return SizedBox(
       height: 400, // Fixed height to prevent unbounded constraints
       child: ListView.builder(
-        padding: const EdgeInsets.all(AppSpacing.paddingM),
+        padding: EdgeInsets.all(context.responsivePadding.top),
         itemCount: 5,
         itemBuilder: (context, index) {
           return Container(
-            margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
+            margin: EdgeInsets.only(bottom: context.responsivePadding.top),
             child: ShimmerLoader(
               width: double.infinity,
               height: 120,
@@ -570,20 +573,17 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
 
   /// 📝 Structured empty state with zero-state stats and placeholder complaint data structure
   Widget _buildEmptyState(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-
     return SingleChildScrollView(
       child: Column(
         children: [
           // Zero-state stats section
-          _buildComplaintZeroStateStats(context, isDarkMode),
+          _buildComplaintZeroStateStats(context, false),
+
+          // Small gap between stats and placeholder
+          SizedBox(height: context.responsivePadding.top * 0.5),
 
           // Placeholder complaint structure
-          _buildPlaceholderComplaintStructure(context, isDarkMode),
-
-          // Call to action
-          _buildComplaintEmptyStateAction(context),
+          _buildPlaceholderComplaintStructure(context, false),
         ],
       ),
     );
@@ -593,104 +593,87 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
   Widget _buildComplaintZeroStateStats(BuildContext context, bool isDarkMode) {
     final loc = AppLocalizations.of(context);
 
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
+    return Padding(
+      padding: context.responsiveMargin,
+      child: SectionContainer(
+        title: loc?.complaintStatistics ?? 'Complaint Statistics',
+        icon: Icons.report_problem,
+        child: Column(
+          children: [
+            // Stats grid
+            Row(
+              children: [
+                Expanded(
+                  child: _buildComplaintStatCard(
+                    context,
+                    loc?.totalComplaints ?? 'Total Complaints',
+                    '0',
+                    Icons.report_problem,
+                    AppColors.info,
+                  ),
+                ),
+                SizedBox(width: context.responsivePadding.left),
+                Expanded(
+                  child: _buildComplaintStatCard(
+                    context,
+                    loc?.pending ?? 'Pending',
+                    '0',
+                    Icons.pending,
+                    AppColors.warning,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: context.responsivePadding.top),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildComplaintStatCard(
+                    context,
+                    loc?.inProgress ?? 'In Progress',
+                    '0',
+                    Icons.hourglass_empty,
+                    AppColors.warning,
+                  ),
+                ),
+                SizedBox(width: context.responsivePadding.left),
+                Expanded(
+                  child: _buildComplaintStatCard(
+                    context,
+                    loc?.resolved ?? 'Resolved',
+                    '0',
+                    Icons.check_circle,
+                    AppColors.success,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: context.responsivePadding.top),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildComplaintStatCard(
+                    context,
+                    loc?.highPriority ?? 'High Priority',
+                    '0',
+                    Icons.priority_high,
+                    AppColors.error,
+                  ),
+                ),
+                SizedBox(width: context.responsivePadding.left),
+                Expanded(
+                  child: _buildComplaintStatCard(
+                    context,
+                    loc?.thisMonth ?? 'This Month',
+                    '0',
+                    Icons.calendar_month,
+                    AppColors.purple,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HeadingMedium(
-            text: loc?.complaintStatistics ?? 'Complaint Statistics',
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-
-          // Stats grid
-          Row(
-            children: [
-              Expanded(
-                child: _buildComplaintStatCard(
-                  context,
-                  loc?.totalComplaints ?? 'Total Complaints',
-                  '0',
-                  Icons.report_problem,
-                  AppColors.info,
-                  isDarkMode,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.paddingM),
-              Expanded(
-                child: _buildComplaintStatCard(
-                  context,
-                  loc?.pending ?? 'Pending',
-                  '0',
-                  Icons.pending,
-                  AppColors.warning,
-                  isDarkMode,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          Row(
-            children: [
-              Expanded(
-                child: _buildComplaintStatCard(
-                  context,
-                  loc?.inProgress ?? 'In Progress',
-                  '0',
-                  Icons.hourglass_empty,
-                  AppColors.warning,
-                  isDarkMode,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.paddingM),
-              Expanded(
-                child: _buildComplaintStatCard(
-                  context,
-                  loc?.resolved ?? 'Resolved',
-                  '0',
-                  Icons.check_circle,
-                  AppColors.success,
-                  isDarkMode,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          Row(
-            children: [
-              Expanded(
-                child: _buildComplaintStatCard(
-                  context,
-                  loc?.highPriority ?? 'High Priority',
-                  '0',
-                  Icons.priority_high,
-                  AppColors.error,
-                  isDarkMode,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.paddingM),
-              Expanded(
-                child: _buildComplaintStatCard(
-                  context,
-                  loc?.thisMonth ?? 'This Month',
-                  '0',
-                  Icons.calendar_month,
-                  AppColors.purple,
-                  isDarkMode,
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -702,50 +685,57 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
     String value,
     IconData icon,
     Color color,
-    bool isDarkMode,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
+    return AdaptiveCard(
+      padding: EdgeInsets.all(context.isMobile
+          ? context.responsivePadding.top * 0.5
+          : context.responsivePadding.top),
+      backgroundColor: color.withValues(alpha: 0.1),
+      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+      hasShadow: false,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 24,
+          // Row 1: Icon and number side by side
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: color,
+                size: context.isMobile ? 18 : 24,
+              ),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: context.isMobile ? 16 : 20,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: AppSpacing.paddingS),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.paddingXS),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS
+                  : AppSpacing.paddingS),
+          // Row 2: Text below
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
-              color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.7) ??
-                  Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7),
+              fontSize: context.isMobile ? 10 : 12,
+              color: (context.textTheme.bodySmall?.color ??
+                      context.colors.onSurface)
+                  .withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -757,37 +747,34 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
       BuildContext context, bool isDarkMode) {
     final loc = AppLocalizations.of(context);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HeadingMedium(
-            text: loc?.recentComplaintsPreview ?? 'Recent Complaints Preview',
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-
-          // Placeholder complaint cards
-          ...List.generate(3,
-              (index) => _buildPlaceholderComplaintCard(context, isDarkMode)),
-        ],
+    return Padding(
+      padding: EdgeInsets.only(
+        top: 0,
+        left: context.responsiveMargin.left,
+        right: context.responsiveMargin.right,
+        bottom: context.responsiveMargin.bottom,
+      ),
+      child: SectionContainer(
+        title: loc?.recentComplaintsPreview ?? 'Recent Complaints Preview',
+        icon: Icons.report_problem,
+        child: Column(
+          children: [
+            // Placeholder complaint cards
+            ...List.generate(
+                3, (index) => _buildPlaceholderComplaintCard(context, false)),
+          ],
+        ),
       ),
     );
   }
 
   /// 📝 Placeholder complaint card
   Widget _buildPlaceholderComplaintCard(BuildContext context, bool isDarkMode) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
-        ),
-      ),
+    return AdaptiveCard(
+      margin: EdgeInsets.only(bottom: context.responsivePadding.top),
+      padding: EdgeInsets.all(context.isMobile
+          ? context.responsivePadding.top * 0.5
+          : context.responsivePadding.top),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -815,24 +802,21 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      height: 12,
+                      height: context.isMobile ? 10 : 12,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        color: ThemeColors.getTextTertiary(context)
                             .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.paddingXS),
+                    SizedBox(
+                        height: context.isMobile ? 4 : AppSpacing.paddingXS),
                     Container(
-                      height: 8,
-                      width: 120,
+                      height: context.isMobile ? 6 : 8,
+                      width: context.isMobile ? 100 : 120,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest,
+                        color: ThemeColors.getDivider(context),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -840,20 +824,18 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                 ),
               ),
               Container(
-                width: 80,
-                height: 24,
+                width: context.isMobile ? 60 : 80,
+                height: context.isMobile ? 20 : 24,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  color: ThemeColors.getDivider(context),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 ),
                 child: Center(
                   child: Container(
-                    height: 8,
-                    width: 60,
+                    height: context.isMobile ? 6 : 8,
+                    width: context.isMobile ? 40 : 60,
                     decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
+                      color: ThemeColors.getTextTertiary(context)
                           .withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -862,19 +844,19 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
 
           // Complaint description placeholder
           Container(
-            height: 40,
+            height: context.isMobile ? 30 : 40,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: ThemeColors.getDivider(context),
               borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
             ),
           ),
 
-          const SizedBox(height: AppSpacing.paddingM),
+          SizedBox(height: context.responsivePadding.top),
 
           Row(
             children: [
@@ -885,26 +867,17 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                     Text(
                       'Category',
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7) ??
-                            Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                        fontSize: context.isMobile ? 10 : 12,
+                        color: ThemeColors.getTextTertiary(context),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.paddingXS),
+                    SizedBox(
+                        height: context.isMobile ? 4 : AppSpacing.paddingXS),
                     Container(
-                      height: 16,
-                      width: 80,
+                      height: context.isMobile ? 12 : 16,
+                      width: context.isMobile ? 60 : 80,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        color: ThemeColors.getTextTertiary(context)
                             .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -919,26 +892,17 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                     Text(
                       'Priority',
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7) ??
-                            Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                        fontSize: context.isMobile ? 10 : 12,
+                        color: ThemeColors.getTextTertiary(context),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.paddingXS),
+                    SizedBox(
+                        height: context.isMobile ? 4 : AppSpacing.paddingXS),
                     Container(
-                      height: 16,
-                      width: 60,
+                      height: context.isMobile ? 12 : 16,
+                      width: context.isMobile ? 50 : 60,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        color: ThemeColors.getTextTertiary(context)
                             .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -953,26 +917,17 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
                     Text(
                       'Date',
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7) ??
-                            Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
+                        fontSize: context.isMobile ? 10 : 12,
+                        color: ThemeColors.getTextTertiary(context),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.paddingXS),
+                    SizedBox(
+                        height: context.isMobile ? 4 : AppSpacing.paddingXS),
                     Container(
-                      height: 16,
-                      width: 70,
+                      height: context.isMobile ? 12 : 16,
+                      width: context.isMobile ? 60 : 70,
                       decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
+                        color: ThemeColors.getTextTertiary(context)
                             .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -984,148 +939,6 @@ class _GuestComplaintsListScreenState extends State<GuestComplaintsListScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  /// 🔄 Complaint empty state action section
-  Widget _buildComplaintEmptyStateAction(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    final loc = AppLocalizations.of(context);
-
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingL),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkCard : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.report_problem_outlined,
-            size: 48,
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: AppSpacing.paddingM),
-          HeadingMedium(
-            text: AppLocalizations.of(context)?.noComplaintsYet ??
-                'No Complaints Yet',
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          const SizedBox(height: AppSpacing.paddingS),
-          Text(
-            AppLocalizations.of(context)?.noComplaintsYetDescription ??
-                'You haven\'t submitted any complaints yet. Tap the + button to add your first complaint.',
-            style: TextStyle(
-              color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.7) ??
-                  Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.7),
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-
-          // Complaint categories preview
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.paddingM),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  loc?.commonComplaintCategories ??
-                      'Common Complaint Categories:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.paddingM),
-                _buildPlaceholderComplaintCategory(context,
-                    loc?.maintenanceIssues ?? 'Maintenance Issues', isDarkMode),
-                const SizedBox(height: AppSpacing.paddingS),
-                _buildPlaceholderComplaintCategory(
-                    context, loc?.cleanliness ?? 'Cleanliness', isDarkMode),
-                const SizedBox(height: AppSpacing.paddingS),
-                _buildPlaceholderComplaintCategory(
-                    context, loc?.foodQuality ?? 'Food Quality', isDarkMode),
-                const SizedBox(height: AppSpacing.paddingS),
-                _buildPlaceholderComplaintCategory(context,
-                    loc?.noiseComplaints ?? 'Noise Complaints', isDarkMode),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.paddingL),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                getIt<NavigationService>()
-                    .goToRoute(AppRoutes.guestComplaintAdd());
-              },
-              icon: const Icon(Icons.add),
-              label: Text(AppLocalizations.of(context)?.submitFirstComplaint ??
-                  'Submit First Complaint'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primaryColor,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                padding:
-                    const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 📝 Placeholder complaint category
-  Widget _buildPlaceholderComplaintCategory(
-      BuildContext context, String category, bool isDarkMode) {
-    return Row(
-      children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.paddingS),
-        Text(
-          category,
-          style: TextStyle(
-            fontSize: 12,
-            color: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.color
-                    ?.withValues(alpha: 0.7) ??
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-          ),
-        ),
-      ],
     );
   }
 }

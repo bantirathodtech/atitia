@@ -60,6 +60,17 @@ class OwnerGuestViewModel extends BaseProviderState {
   String _searchQuery = '';
   String _statusFilter = 'all';
   String _typeFilter = 'all';
+  
+  // Cached filtered lists to avoid recalculating on every access
+  List<OwnerGuestModel>? _cachedFilteredGuests;
+  String? _cachedSearchQuery;
+  String? _cachedStatusFilter;
+  
+  // Flags to track when lists change for cache invalidation
+  bool _guestsChanged = false;
+  bool _complaintsChanged = false;
+  bool _bikesChanged = false;
+  bool _servicesChanged = false;
 
   // Stream subscriptions
   StreamSubscription<List<OwnerGuestModel>>? _guestsSubscription;
@@ -94,16 +105,23 @@ class OwnerGuestViewModel extends BaseProviderState {
 
   String get selectedTab => _selectedTab;
 
-  // Filtered lists
+  // Filtered lists - cached to avoid expensive recalculations
   List<OwnerGuestModel> get filteredGuests {
+    // Return cached result if filters haven't changed
+    if (_cachedFilteredGuests != null &&
+        _cachedSearchQuery == _searchQuery &&
+        _cachedStatusFilter == _statusFilter) {
+      return _cachedFilteredGuests!;
+    }
+
+    // Calculate filtered list
     var filtered = _guests;
 
     if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
       filtered = filtered
           .where((guest) =>
-              guest.guestName
-                  .toLowerCase()
-                  .contains(_searchQuery.toLowerCase()) ||
+              guest.guestName.toLowerCase().contains(query) ||
               guest.phoneNumber.contains(_searchQuery) ||
               guest.roomNumber.contains(_searchQuery))
           .toList();
@@ -113,6 +131,11 @@ class OwnerGuestViewModel extends BaseProviderState {
       filtered =
           filtered.where((guest) => guest.status == _statusFilter).toList();
     }
+
+    // Cache the result
+    _cachedFilteredGuests = filtered;
+    _cachedSearchQuery = _searchQuery;
+    _cachedStatusFilter = _statusFilter;
 
     return filtered;
   }
@@ -225,14 +248,52 @@ class OwnerGuestViewModel extends BaseProviderState {
   }
 
   // Statistics getters
+  // Cached stats to avoid expensive recalculations
+  int? _cachedActiveGuests;
+  int? _cachedNewGuests;
+  int? _cachedNewComplaints;
+  int? _cachedActiveBikes;
+  int? _cachedNewServices;
+  
   int get totalGuests => _guests.length;
-  int get activeGuests => _guests.where((g) => g.isCurrentlyActive).length;
+  int get activeGuests {
+    if (_cachedActiveGuests == null || _guestsChanged) {
+      _cachedActiveGuests = _guests.where((g) => g.isCurrentlyActive).length;
+      _guestsChanged = false;
+    }
+    return _cachedActiveGuests!;
+  }
+  int get newGuests {
+    if (_cachedNewGuests == null || _guestsChanged) {
+      _cachedNewGuests = _guests.where((g) => g.status == 'new').length;
+      _guestsChanged = false;
+    }
+    return _cachedNewGuests!;
+  }
   int get totalComplaints => _complaints.length;
-  int get newComplaints => _complaints.where((c) => c.isNew).length;
+  int get newComplaints {
+    if (_cachedNewComplaints == null || _complaintsChanged) {
+      _cachedNewComplaints = _complaints.where((c) => c.isNew).length;
+      _complaintsChanged = false;
+    }
+    return _cachedNewComplaints!;
+  }
   int get totalBikes => _bikes.length;
-  int get activeBikes => _bikes.where((b) => b.isCurrentlyActive).length;
+  int get activeBikes {
+    if (_cachedActiveBikes == null || _bikesChanged) {
+      _cachedActiveBikes = _bikes.where((b) => b.isCurrentlyActive).length;
+      _bikesChanged = false;
+    }
+    return _cachedActiveBikes!;
+  }
   int get totalServices => _services.length;
-  int get newServices => _services.where((s) => s.isNew).length;
+  int get newServices {
+    if (_cachedNewServices == null || _servicesChanged) {
+      _cachedNewServices = _services.where((s) => s.isNew).length;
+      _servicesChanged = false;
+    }
+    return _cachedNewServices!;
+  }
 
   /// Initialize ViewModel with data streams
   Future<void> initialize(String ownerId, {String? pgId}) async {
@@ -276,6 +337,10 @@ class OwnerGuestViewModel extends BaseProviderState {
         _repository.getGuestsStream(ownerId, pgId: pgId).listen(
       (guests) {
         _guests = guests;
+        _cachedFilteredGuests = null; // Invalidate cache when guests change
+        _cachedActiveGuests = null; // Invalidate stats cache
+        _cachedNewGuests = null;
+        _guestsChanged = true;
         notifyListeners();
       },
       onError: (error) {},
@@ -286,6 +351,8 @@ class OwnerGuestViewModel extends BaseProviderState {
         _repository.getComplaintsStream(ownerId, pgId: pgId).listen(
       (complaints) {
         _complaints = complaints;
+        _cachedNewComplaints = null;
+        _complaintsChanged = true;
         notifyListeners();
       },
       onError: (error) {},
@@ -295,6 +362,8 @@ class OwnerGuestViewModel extends BaseProviderState {
     _bikesSubscription = _repository.getBikesStream(ownerId, pgId: pgId).listen(
       (bikes) {
         _bikes = bikes;
+        _cachedActiveBikes = null;
+        _bikesChanged = true;
         notifyListeners();
       },
       onError: (error) {},
@@ -305,6 +374,8 @@ class OwnerGuestViewModel extends BaseProviderState {
         _repository.getServicesStream(ownerId, pgId: pgId).listen(
       (services) {
         _services = services;
+        _cachedNewServices = null;
+        _servicesChanged = true;
         notifyListeners();
       },
       onError: (error) {},
@@ -373,6 +444,7 @@ class OwnerGuestViewModel extends BaseProviderState {
   void setSearchQuery(String query) {
     if (_searchQuery != query) {
       _searchQuery = query;
+      _cachedFilteredGuests = null; // Invalidate cache
       notifyListeners();
     }
   }
@@ -381,6 +453,7 @@ class OwnerGuestViewModel extends BaseProviderState {
   void setStatusFilter(String status) {
     if (_statusFilter != status) {
       _statusFilter = status;
+      _cachedFilteredGuests = null; // Invalidate cache
       notifyListeners();
     }
   }
@@ -398,6 +471,7 @@ class OwnerGuestViewModel extends BaseProviderState {
     _searchQuery = '';
     _statusFilter = 'all';
     _typeFilter = 'all';
+    _cachedFilteredGuests = null; // Invalidate cache
     notifyListeners();
   }
 
