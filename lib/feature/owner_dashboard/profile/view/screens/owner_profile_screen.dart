@@ -696,7 +696,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
                 ),
               ),
               if (imageUrl != null)
-                Container(
+                SizedBox(
                   width: 60,
                   height: 60,
                   child: ClipRRect(

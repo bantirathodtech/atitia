@@ -71,7 +71,10 @@ class _BookingRequestActionDialogState
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
       ),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 500),
+        constraints: BoxConstraints(
+          maxWidth: 500,
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
         padding: const EdgeInsets.all(AppSpacing.paddingL),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -79,9 +82,19 @@ class _BookingRequestActionDialogState
           children: [
             _buildHeader(context, loc),
             const SizedBox(height: AppSpacing.paddingL),
-            _buildRequestInfo(context, loc),
-            const SizedBox(height: AppSpacing.paddingL),
-            _buildForm(context, loc),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildRequestInfo(context, loc),
+                    const SizedBox(height: AppSpacing.paddingL),
+                    _buildForm(context, loc),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: AppSpacing.paddingL),
             _buildActions(context, loc),
           ],
@@ -91,8 +104,7 @@ class _BookingRequestActionDialogState
   }
 
   /// Builds the dialog header
-  Widget _buildHeader(
-      BuildContext context, AppLocalizations? loc) {
+  Widget _buildHeader(BuildContext context, AppLocalizations? loc) {
     return Row(
       children: [
         Container(
@@ -148,8 +160,7 @@ class _BookingRequestActionDialogState
   }
 
   /// Builds request information section
-  Widget _buildRequestInfo(
-      BuildContext context, AppLocalizations? loc) {
+  Widget _buildRequestInfo(BuildContext context, AppLocalizations? loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(
@@ -295,8 +306,7 @@ class _BookingRequestActionDialogState
           TextInput(
             controller: _responseController,
             label: widget.isApproval
-                ? (loc?.welcomeMessageOptional ??
-                    'Welcome Message (Optional)')
+                ? (loc?.welcomeMessageOptional ?? 'Welcome Message (Optional)')
                 : (loc?.rejectionReasonOptional ??
                     'Reason for Rejection (Optional)'),
             hint: widget.isApproval
@@ -479,7 +489,9 @@ class _BookingRequestActionDialogState
   /// Submits the approval or rejection
   Future<void> _submitAction() async {
     final loc = AppLocalizations.of(context);
-    if (!_formKey.currentState!.validate()) {
+
+    // Validate form (will pass if no validators are set)
+    if (_formKey.currentState != null && !_formKey.currentState!.validate()) {
       return;
     }
 
