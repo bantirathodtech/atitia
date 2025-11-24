@@ -7,19 +7,23 @@ import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
+import '../../../../../../common/widgets/cards/guest_info_card.dart';
 import '../../../../../../common/widgets/grids/responsive_grid.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
+import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../../common/widgets/chips/status_chip.dart';
 import '../../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../../l10n/app_localizations.dart';
 import '../../../data/models/owner_pg_management_model.dart';
+import '../../../../../../feature/owner_dashboard/myguest/data/models/owner_guest_model.dart';
 
 /// Interactive bed map widget showing room and bed occupancy
 class OwnerBedMapWidget extends StatelessWidget {
   final List<OwnerBed> beds;
   final List<OwnerRoom> rooms;
   final List<OwnerFloor> floors;
+  final Map<String, OwnerGuestModel>? guests; // Optional guest details map
 
   static final InternationalizationService _i18n =
       InternationalizationService.instance;
@@ -28,6 +32,7 @@ class OwnerBedMapWidget extends StatelessWidget {
     required this.beds,
     required this.rooms,
     required this.floors,
+    this.guests,
     super.key,
   });
 
@@ -308,6 +313,11 @@ class OwnerBedMapWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.paddingM),
+            // Show room guest summary if occupied beds exist
+            if (occupiedCount > 0) ...[
+              _buildRoomGuestSummary(context, room, roomBeds, loc),
+              const SizedBox(height: AppSpacing.paddingM),
+            ],
             ResponsiveGrid(
               targetTileWidth: 120,
               horizontalGap: AppSpacing.paddingS,
@@ -318,6 +328,86 @@ class OwnerBedMapWidget extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Builds room guest summary showing all guests in the room
+  Widget _buildRoomGuestSummary(
+    BuildContext context,
+    OwnerRoom room,
+    List<OwnerBed> roomBeds,
+    AppLocalizations? loc,
+  ) {
+    final theme = Theme.of(context);
+    final occupiedBeds = roomBeds.where((b) => b.isOccupied).toList();
+
+    if (occupiedBeds.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.paddingM),
+      decoration: BoxDecoration(
+        color: theme.primaryColor.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+        border: Border.all(
+          color: theme.primaryColor.withValues(alpha: 0.15),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.people_outline,
+                size: 18,
+                color: theme.primaryColor,
+              ),
+              const SizedBox(width: AppSpacing.paddingS),
+              BodyText(
+                text: _text('ownerBedMapRoomGuestsLabel',
+                    'Guests in Room {roomNumber}',
+                    parameters: {'roomNumber': room.roomNumber}),
+                medium: true,
+                color: theme.primaryColor,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.paddingS),
+          Wrap(
+            spacing: AppSpacing.paddingS,
+            runSpacing: AppSpacing.paddingS,
+            children: occupiedBeds.map((bed) {
+              final guest = bed.guestUid != null && guests != null
+                  ? guests![bed.guestUid!]
+                  : null;
+
+              // Get booking info for payment status
+              String? paymentStatus;
+              if (guest != null && guest.status == 'payment_pending') {
+                paymentStatus = 'pending';
+              } else if (guest != null && guest.status == 'active') {
+                paymentStatus = 'collected';
+              }
+
+              return GuestInfoCard(
+                guestName: guest?.fullName ?? bed.guestName ?? 'Unknown Guest',
+                guestPhotoUrl: guest?.profilePhotoUrl,
+                phoneNumber: guest?.phoneNumber,
+                email: guest?.email,
+                status: guest?.status ?? (bed.isPending ? 'pending' : 'active'),
+                paymentStatus: paymentStatus,
+                compact: true,
+                onTap: () {
+                  // TODO: Navigate to guest details
+                },
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
@@ -550,22 +640,51 @@ class OwnerBedMapWidget extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
+              // Status indicator badge
               Positioned(
                 top: -2,
                 right: -2,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  width: 12,
+                  height: 12,
                   decoration: BoxDecoration(
                     color: statusColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Text(
-                    '',
-                    style: TextStyle(fontSize: 0),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
+              // Payment status indicator (if occupied)
+              if (bed.isOccupied && _hasPaymentPending(context, bed))
+                Positioned(
+                  bottom: -2,
+                  right: -2,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Text(
+                      '₹',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -574,6 +693,11 @@ class OwnerBedMapWidget extends StatelessWidget {
                   Icon(icon, color: statusColor, size: 22),
                   const SizedBox(height: AppSpacing.paddingS),
                   HeadingSmall(text: bed.bedNumber, color: statusColor),
+                  // Show guest name if occupied
+                  if (bed.isOccupied || bed.isPending) ...[
+                    const SizedBox(height: 4),
+                    _buildGuestNameLabel(context, bed, statusColor),
+                  ],
                 ],
               ),
             ],
@@ -581,5 +705,60 @@ class OwnerBedMapWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Builds guest name label for bed item
+  Widget _buildGuestNameLabel(
+    BuildContext context,
+    OwnerBed bed,
+    Color statusColor,
+  ) {
+    final guest = bed.guestUid != null && guests != null
+        ? guests![bed.guestUid!]
+        : null;
+
+    final guestName = guest?.fullName ?? bed.guestName ?? 'Guest';
+    
+    // Truncate long names
+    final displayName = guestName.length > 12
+        ? '${guestName.substring(0, 10)}...'
+        : guestName;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 6,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: statusColor.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        displayName,
+        style: TextStyle(
+          color: statusColor,
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  /// Checks if bed has payment pending
+  bool _hasPaymentPending(BuildContext context, OwnerBed bed) {
+    if (bed.guestUid == null || guests == null) {
+      return false;
+    }
+
+    final guest = guests![bed.guestUid!];
+    if (guest == null) {
+      return false;
+    }
+
+    // Show payment pending indicator if guest status is payment_pending
+    return guest.status == 'payment_pending';
   }
 }

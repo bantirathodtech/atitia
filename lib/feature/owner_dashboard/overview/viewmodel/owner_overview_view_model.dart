@@ -41,6 +41,8 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
   OwnerOverviewModel? _overviewData;
   Map<String, double>? _monthlyBreakdown;
   Map<String, double>? _propertyBreakdown;
+  Map<String, dynamic>? _paymentStatusBreakdown;
+  List<dynamic>? _recentlyUpdatedGuests; // List of guest data maps
   int _selectedYear = DateTime.now().year;
 
   /// Read-only overview data for UI consumption
@@ -51,6 +53,12 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
 
   /// Property-wise revenue breakdown
   Map<String, double>? get propertyBreakdown => _propertyBreakdown;
+
+  /// Payment status breakdown (paid, pending, partial counts and amounts)
+  Map<String, dynamic>? get paymentStatusBreakdown => _paymentStatusBreakdown;
+
+  /// Recently updated guests data
+  List<dynamic>? get recentlyUpdatedGuests => _recentlyUpdatedGuests;
 
   /// Selected year for reports
   int get selectedYear => _selectedYear;
@@ -224,12 +232,64 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
     );
   }
 
+  /// Loads payment status breakdown
+  Future<void> loadPaymentStatusBreakdown(String ownerId, {String? pgId}) async {
+    try {
+      _paymentStatusBreakdown =
+          await _repository.getPaymentStatusBreakdown(ownerId, pgId: pgId);
+
+      _analyticsService.logEvent(
+        name: 'owner_payment_status_breakdown_loaded',
+        parameters: {
+          'owner_id': ownerId,
+          'pg_id': pgId ?? 'all',
+        },
+      );
+
+      notifyListeners();
+    } catch (e) {
+      logError(
+        'Failed to load payment status breakdown',
+        feature: 'owner_overview',
+        error: e,
+      );
+    }
+  }
+
+  /// Loads recently updated guests
+  Future<void> loadRecentlyUpdatedGuests(String ownerId, {String? pgId, int days = 7}) async {
+    try {
+      _recentlyUpdatedGuests =
+          await _repository.getRecentlyUpdatedGuests(ownerId, pgId: pgId, days: days);
+
+      _analyticsService.logEvent(
+        name: 'owner_recently_updated_guests_loaded',
+        parameters: {
+          'owner_id': ownerId,
+          'pg_id': pgId ?? 'all',
+          'days': days,
+          'count': _recentlyUpdatedGuests?.length ?? 0,
+        },
+      );
+
+      notifyListeners();
+    } catch (e) {
+      logError(
+        'Failed to load recently updated guests',
+        feature: 'owner_overview',
+        error: e,
+      );
+    }
+  }
+
   /// Refreshes all overview data
   /// If pgId is provided, refreshes data for that specific PG only
   Future<void> refreshOverviewData(String ownerId, {String? pgId}) async {
     await loadOverviewData(ownerId, pgId: pgId);
     await loadMonthlyBreakdown(ownerId, _selectedYear);
     await loadPropertyBreakdown(ownerId);
+    await loadPaymentStatusBreakdown(ownerId, pgId: pgId);
+    await loadRecentlyUpdatedGuests(ownerId, pgId: pgId);
 
     _analyticsService.logEvent(
       name: 'owner_overview_refreshed',

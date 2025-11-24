@@ -7,6 +7,7 @@ import '../../../../../core/interfaces/analytics/analytics_service_interface.dar
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/repositories/notification_repository.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../core/services/booking/booking_lifecycle_service.dart';
 import '../models/guest_payment_model.dart';
 
 /// Repository layer for guest payments data operations
@@ -16,6 +17,7 @@ class GuestPaymentRepository {
   final IDatabaseService _databaseService;
   final IAnalyticsService _analyticsService;
   final NotificationRepository _notificationRepository;
+  final BookingLifecycleService _bookingLifecycleService;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
 
@@ -25,12 +27,15 @@ class GuestPaymentRepository {
     IDatabaseService? databaseService,
     IAnalyticsService? analyticsService,
     NotificationRepository? notificationRepository,
+    BookingLifecycleService? bookingLifecycleService,
   })  : _databaseService =
             databaseService ?? UnifiedServiceLocator.serviceFactory.database,
         _analyticsService =
             analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics,
         _notificationRepository =
-            notificationRepository ?? NotificationRepository();
+            notificationRepository ?? NotificationRepository(),
+        _bookingLifecycleService =
+            bookingLifecycleService ?? BookingLifecycleService();
 
   /// Streams payments for a specific guest with real-time updates
   /// Uses Firestore query to filter payments by guestId, ordered by payment date
@@ -113,8 +118,52 @@ class GuestPaymentRepository {
         },
       );
 
-      // Notify owner about payment received
+      // Activate guest and notify owner when payment is received
       if (payment.ownerId.isNotEmpty && payment.status == 'Paid') {
+        // Activate guest from payment (if booking exists)
+        if (payment.bookingId.isNotEmpty) {
+          try {
+            // Get booking details to get room/bed info
+            final bookingDoc = await _databaseService.getDocument(
+              FirestoreConstants.bookings,
+              payment.bookingId,
+            );
+
+            if (bookingDoc.exists) {
+              final bookingData = bookingDoc.data() as Map<String, dynamic>?;
+              final roomNumber = bookingData?['roomNumber'] as String? ?? '';
+              final bedNumber = bookingData?['bedNumber'] as String? ?? '';
+              final rentAmount = bookingData?['rentAmount']?.toDouble();
+              final depositAmount = bookingData?['depositAmount']?.toDouble();
+
+              if (roomNumber.isNotEmpty && bedNumber.isNotEmpty) {
+                // Activate guest record
+                await _bookingLifecycleService.activateGuestFromPayment(
+                  guestId: payment.guestId,
+                  ownerId: payment.ownerId,
+                  pgId: payment.pgId,
+                  bookingId: payment.bookingId,
+                  roomNumber: roomNumber,
+                  bedNumber: bedNumber,
+                  rentAmount: rentAmount,
+                  depositAmount: depositAmount,
+                );
+              }
+            }
+          } catch (e) {
+            // Log error but don't fail payment creation
+            await _analyticsService.logEvent(
+              name: 'guest_activation_from_payment_failed',
+              parameters: {
+                'payment_id': payment.paymentId,
+                'booking_id': payment.bookingId,
+                'error': e.toString(),
+              },
+            );
+          }
+        }
+
+        // Notify owner about payment received
         final locale = _i18n.currentLocale;
         final symbol = NumberFormat.simpleCurrency(locale: locale.toString())
             .currencySymbol;
@@ -174,6 +223,64 @@ class GuestPaymentRepository {
         payment.paymentId,
         paymentData,
       );
+
+      // Activate guest when payment status changes to 'Paid'
+      if (payment.status == 'Paid' && payment.bookingId.isNotEmpty) {
+        try {
+          // Get old payment status before update to check if status changed
+          final oldPaymentDoc = await _databaseService.getDocument(
+            FirestoreConstants.payments,
+            payment.paymentId,
+          );
+
+          String? oldStatus;
+          if (oldPaymentDoc.exists) {
+            final oldData = oldPaymentDoc.data() as Map<String, dynamic>?;
+            oldStatus = oldData?['status'] as String?;
+          }
+
+          // Only activate if status changed to 'Paid'
+          if (oldStatus != 'Paid') {
+            // Get booking details
+            final bookingDoc = await _databaseService.getDocument(
+              FirestoreConstants.bookings,
+              payment.bookingId,
+            );
+
+            if (bookingDoc.exists) {
+              final bookingData = bookingDoc.data() as Map<String, dynamic>?;
+              final roomNumber = bookingData?['roomNumber'] as String? ?? '';
+              final bedNumber = bookingData?['bedNumber'] as String? ?? '';
+              final rentAmount = bookingData?['rentAmount']?.toDouble();
+              final depositAmount = bookingData?['depositAmount']?.toDouble();
+
+              if (roomNumber.isNotEmpty && bedNumber.isNotEmpty) {
+                // Activate guest record
+                await _bookingLifecycleService.activateGuestFromPayment(
+                  guestId: payment.guestId,
+                  ownerId: payment.ownerId,
+                  pgId: payment.pgId,
+                  bookingId: payment.bookingId,
+                  roomNumber: roomNumber,
+                  bedNumber: bedNumber,
+                  rentAmount: rentAmount,
+                  depositAmount: depositAmount,
+                );
+              }
+            }
+          }
+        } catch (e) {
+          // Log error but don't fail payment update
+          await _analyticsService.logEvent(
+            name: 'guest_activation_from_payment_update_failed',
+            parameters: {
+              'payment_id': payment.paymentId,
+              'booking_id': payment.bookingId,
+              'error': e.toString(),
+            },
+          );
+        }
+      }
 
       // Track payment update analytics
       await _analyticsService.logEvent(

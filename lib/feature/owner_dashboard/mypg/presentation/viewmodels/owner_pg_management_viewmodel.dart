@@ -7,8 +7,10 @@ import 'package:flutter/foundation.dart';
 import '../../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../core/services/booking/guest_info_service.dart';
 import '../../data/models/owner_pg_management_model.dart';
 import '../../data/repositories/owner_pg_management_repository.dart';
+import '../../../../../../feature/owner_dashboard/myguest/data/models/owner_guest_model.dart';
 
 /// ViewModel for PG management with real-time Firestore streams
 /// Extends BaseProviderState for automatic service access and state management
@@ -18,6 +20,7 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   final _analyticsService = getIt.analytics;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
+  final GuestInfoService _guestInfoService = GuestInfoService();
 
   String _text(
     String key,
@@ -48,6 +51,7 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   OwnerRevenueReport? _revenueReport;
   OwnerOccupancyReport? _occupancyReport;
   Map<String, dynamic>? _pgDetails; // Full PG document from Firebase
+  Map<String, OwnerGuestModel> _guestsMap = {}; // Guest UID -> Guest Model map for bed map widget
 
   // Cached filtered lists to avoid expensive recalculations
   List<OwnerBooking>? _cachedPendingBookings;
@@ -73,6 +77,7 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   OwnerRevenueReport? get revenueReport => _revenueReport;
   OwnerOccupancyReport? get occupancyReport => _occupancyReport;
   Map<String, dynamic>? get pgDetails => _pgDetails; // Expose PG details to UI
+  Map<String, OwnerGuestModel> get guestsMap => _guestsMap; // Guest map for bed map widget
   String get selectedFilter => _selectedFilter;
 
   /// Helper getters for PG details
@@ -268,6 +273,9 @@ class OwnerPgManagementViewModel extends BaseProviderState {
 
       // Update occupancy report based on parsed beds
       _updateOccupancyReport();
+
+      // Load guest details for occupied beds (async, won't block)
+      _loadGuestDetailsForBeds();
     } catch (e) {
       // If parsing fails, keep empty lists
       _beds = [];
@@ -517,6 +525,34 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   /// Get rooms by floor
   List<OwnerRoom> getRoomsForFloor(String floorId) {
     return _rooms.where((r) => r.floorId == floorId).toList();
+  }
+
+  /// Load guest details for all beds that have guestUid
+  Future<void> _loadGuestDetailsForBeds() async {
+    try {
+      // Extract unique guest UIDs from beds
+      final guestUids = _beds
+          .where((bed) => bed.guestUid != null && bed.guestUid!.isNotEmpty)
+          .map((bed) => bed.guestUid!)
+          .toSet()
+          .toList();
+
+      if (guestUids.isEmpty) {
+        _guestsMap = {};
+        notifyListeners();
+        return;
+      }
+
+      // Fetch guest details using GuestInfoService
+      _guestsMap = await _guestInfoService.getGuestsByUids(guestUids);
+      notifyListeners();
+
+      debugPrint('Loaded ${_guestsMap.length} guest details for bed map');
+    } catch (e) {
+      debugPrint('Error loading guest details: $e');
+      // Don't throw error, just log it - bed map can work without guest details
+      _guestsMap = {};
+    }
   }
 
   /// Refresh all data

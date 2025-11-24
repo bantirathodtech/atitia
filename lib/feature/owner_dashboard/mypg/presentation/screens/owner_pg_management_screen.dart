@@ -280,6 +280,7 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             beds: viewModel.filteredBeds,
             rooms: viewModel.rooms,
             floors: viewModel.floors,
+            guests: viewModel.guestsMap,
           ),
         ),
       ],

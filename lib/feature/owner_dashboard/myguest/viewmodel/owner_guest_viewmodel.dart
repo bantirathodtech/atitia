@@ -470,6 +470,21 @@ class OwnerGuestViewModel extends BaseProviderState
       case 'vehicles':
         filtered = _guests.where((g) => g.hasVehicleInfo).toList();
         break;
+      case 'payment_pending':
+        filtered = _guests
+            .where((g) =>
+                g.status == 'payment_pending' ||
+                _getGuestPaymentStatus(g) == 'pending')
+            .toList();
+        break;
+      case 'paid':
+        filtered = _guests
+            .where((g) =>
+                g.status == 'active' &&
+                (_getGuestPaymentStatus(g) == 'collected' ||
+                    _getGuestPaymentStatus(g) == null))
+            .toList();
+        break;
       default:
         filtered = _guests;
     }
@@ -490,6 +505,60 @@ class OwnerGuestViewModel extends BaseProviderState
     }
 
     return filtered;
+  }
+
+  /// Gets payment status map for all guests
+  Map<String, String> get guestPaymentStatus {
+    final Map<String, String> statusMap = {};
+
+    for (var guest in _guests) {
+      final paymentStatus = _getGuestPaymentStatus(guest);
+      if (paymentStatus != null) {
+        statusMap[guest.uid] = paymentStatus;
+      }
+    }
+
+    return statusMap;
+  }
+
+  /// Gets payment status for a specific guest
+  String? _getGuestPaymentStatus(OwnerGuestModel guest) {
+    // Check guest status first
+    if (guest.status == 'payment_pending') {
+      return 'pending';
+    }
+
+    // Check bookings for payment status
+    final guestBookings = _bookings.where((b) => b.guestUid == guest.uid);
+    if (guestBookings.isNotEmpty) {
+      // Get the most recent active booking
+      final activeBooking = guestBookings
+          .where((b) => b.status == 'active' || b.status == 'approved')
+          .toList()
+        ..sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+
+      if (activeBooking.isNotEmpty) {
+        return activeBooking.first.paymentStatus;
+      }
+    }
+
+    // Check payments
+    final guestPayments = _payments.where((p) => p.guestUid == guest.uid);
+    if (guestPayments.isNotEmpty) {
+      final collectedPayments =
+          guestPayments.where((p) => p.isCollected).toList();
+      if (collectedPayments.isNotEmpty) {
+        return 'collected';
+      }
+      return 'pending';
+    }
+
+    // Default based on guest status
+    if (guest.status == 'active') {
+      return 'collected';
+    }
+
+    return null;
   }
 
   /// Sets search query with debouncing to avoid excessive filtering

@@ -30,6 +30,8 @@ import '../../../shared/widgets/pg_selector_dropdown.dart';
 import '../../viewmodel/owner_overview_view_model.dart';
 import '../widgets/owner_summary_widget.dart';
 import '../widgets/owner_chart_widget.dart';
+import '../../../../../common/widgets/dashboard/recently_updated_guests_widget.dart';
+import '../../../../../common/widgets/dashboard/payment_status_breakdown_widget.dart';
 
 /// Owner Overview Screen - Dashboard home with comprehensive analytics
 /// Displays key metrics, revenue charts, and quick actions
@@ -69,6 +71,8 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
       await viewModel.loadOverviewData(ownerId, pgId: pgId);
       await viewModel.loadMonthlyBreakdown(ownerId, DateTime.now().year);
       await viewModel.loadPropertyBreakdown(ownerId);
+      await viewModel.loadPaymentStatusBreakdown(ownerId, pgId: pgId);
+      await viewModel.loadRecentlyUpdatedGuests(ownerId, pgId: pgId);
     }
   }
 
@@ -198,6 +202,18 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                     // Summary Cards
                     OwnerSummaryWidget(overview: viewModel.overviewData!),
                     SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+
+                    // Payment Status Breakdown
+                    if (viewModel.paymentStatusBreakdown != null)
+                      _buildPaymentStatusBreakdown(context, viewModel),
+                    if (viewModel.paymentStatusBreakdown != null)
+                      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+
+                    // Recently Updated Guests
+                    if (viewModel.recentlyUpdatedGuests != null && viewModel.recentlyUpdatedGuests!.isNotEmpty)
+                      _buildRecentlyUpdatedGuests(context, viewModel, loc),
+                    if (viewModel.recentlyUpdatedGuests != null && viewModel.recentlyUpdatedGuests!.isNotEmpty)
+                      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
                     // Performance Indicator
                     _buildPerformanceCard(context, viewModel, loc),
@@ -490,6 +506,47 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  /// Builds payment status breakdown widget
+  Widget _buildPaymentStatusBreakdown(
+      BuildContext context, OwnerOverviewViewModel viewModel) {
+    final breakdown = viewModel.paymentStatusBreakdown!;
+    
+    return PaymentStatusBreakdownWidget(
+      paidCount: breakdown['paidCount'] as int? ?? 0,
+      pendingCount: breakdown['pendingCount'] as int? ?? 0,
+      partialCount: breakdown['partialCount'] as int? ?? 0,
+      paidAmount: breakdown['paidAmount']?.toDouble(),
+      pendingAmount: breakdown['pendingAmount']?.toDouble(),
+      partialAmount: breakdown['partialAmount']?.toDouble(),
+      onViewDetails: () {
+        // TODO: Navigate to payments/guests tab
+      },
+    );
+  }
+
+  /// Builds recently updated guests widget
+  Widget _buildRecentlyUpdatedGuests(
+    BuildContext context,
+    OwnerOverviewViewModel viewModel,
+    AppLocalizations loc,
+  ) {
+    final guestsData = viewModel.recentlyUpdatedGuests!;
+
+    // Convert List<dynamic> to List<Map<String, dynamic>>
+    final guestsList = guestsData
+        .map((item) => item as Map<String, dynamic>)
+        .toList();
+
+    return RecentlyUpdatedGuestsWidget(
+      guests: guestsList,
+      onViewAll: () {
+        // TODO: Navigate to guests tab
+      },
+      maxDisplayCount: 5,
+      daysToLookBack: 7,
     );
   }
 

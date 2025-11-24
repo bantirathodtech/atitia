@@ -5,6 +5,7 @@ import '../../../../../core/interfaces/analytics/analytics_service_interface.dar
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/repositories/notification_repository.dart';
 import '../../../../../core/services/firebase/database/firestore_transaction_service.dart';
+import '../../../../../core/services/booking/booking_lifecycle_service.dart';
 import '../../../../../core/telemetry/cross_role_telemetry_service.dart';
 import '../models/owner_booking_request_model.dart';
 
@@ -16,6 +17,7 @@ class OwnerBookingRequestRepository {
   final IAnalyticsService _analyticsService;
   final NotificationRepository _notificationRepository;
   final FirestoreTransactionService _transactionService;
+  final BookingLifecycleService _bookingLifecycleService;
   final _telemetry = CrossRoleTelemetryService();
 
   /// Constructor with dependency injection
@@ -25,6 +27,7 @@ class OwnerBookingRequestRepository {
     IAnalyticsService? analyticsService,
     NotificationRepository? notificationRepository,
     FirestoreTransactionService? transactionService,
+    BookingLifecycleService? bookingLifecycleService,
   })  : _databaseService =
             databaseService ?? UnifiedServiceLocator.serviceFactory.database,
         _analyticsService =
@@ -32,7 +35,9 @@ class OwnerBookingRequestRepository {
         _notificationRepository =
             notificationRepository ?? NotificationRepository(),
         _transactionService =
-            transactionService ?? FirestoreTransactionService();
+            transactionService ?? FirestoreTransactionService(),
+        _bookingLifecycleService =
+            bookingLifecycleService ?? BookingLifecycleService();
 
   /// Streams all booking requests for a specific owner
   /// Filters by ownerId to show only requests for owner's PGs
@@ -171,7 +176,7 @@ class OwnerBookingRequestRepository {
 
     final requestData = requestDoc.data() as Map<String, dynamic>;
     final guestId = requestData['guestId'] as String?;
-    final ownerId = requestData['ownerId'] as String?;
+    final requestOwnerId = requestData['ownerId'] as String?;
     final currentStatus = requestData['status'] as String?;
 
     // Check if already processed (race condition prevention)
@@ -221,17 +226,71 @@ class OwnerBookingRequestRepository {
         );
 
         // Update guest's room/bed assignment if provided
+        // Status will be 'payment_pending' until payment is received
         if (guestId != null && roomNumber != null && bedNumber != null) {
           transaction.update(
             firestore.collection('users').doc(guestId),
             {
               'roomNumber': roomNumber,
               'bedNumber': bedNumber,
+              'pgId': requestData['pgId'],
+              'status': 'payment_pending', // Payment pending until guest pays
               'updatedAt': now,
             },
           );
         }
       });
+
+      // Create booking record after transaction succeeds
+      final bookingOwnerId = requestOwnerId ?? '';
+      if (guestId != null &&
+          roomNumber != null &&
+          bedNumber != null &&
+          startDate != null &&
+          bookingOwnerId.isNotEmpty) {
+        try {
+          final bookingId = await _bookingLifecycleService
+              .createBookingFromRequest(
+            requestId: requestId,
+            guestId: guestId,
+            ownerId: bookingOwnerId,
+            pgId: requestData['pgId'] ?? '',
+            pgName: requestData['pgName'] ?? '',
+            roomNumber: roomNumber,
+            bedNumber: bedNumber,
+            startDate: startDate,
+            endDate: endDate,
+            rentAmount: null, // Will be fetched from PG config
+            depositAmount: null, // Will be fetched from PG config
+          );
+
+          // Update bed assignment in PG floor structure
+          await _bookingLifecycleService.updateBedAssignment(
+            pgId: requestData['pgId'] ?? '',
+            roomNumber: roomNumber,
+            bedNumber: bedNumber,
+            guestId: guestId,
+            isOccupied: true,
+          );
+
+          await _analyticsService.logEvent(
+            name: 'booking_created_during_approval',
+            parameters: {
+              'booking_id': bookingId,
+              'request_id': requestId,
+            },
+          );
+        } catch (e) {
+          // Log error but don't fail approval - booking can be created manually
+          await _analyticsService.logEvent(
+            name: 'booking_creation_during_approval_failed',
+            parameters: {
+              'request_id': requestId,
+              'error': e.toString(),
+            },
+          );
+        }
+      }
 
       // Notify guest about approval (after transaction succeeds)
       if (guestId != null) {
@@ -298,13 +357,13 @@ class OwnerBookingRequestRepository {
       );
       // Track failed action
       try {
-        if (ownerId != null && guestId != null) {
+        if (requestOwnerId != null && guestId != null) {
           await _telemetry.trackBookingRequestAction(
             action: 'approved',
             actorRole: 'owner',
             requestId: requestId,
             guestId: guestId,
-            ownerId: ownerId,
+            ownerId: requestOwnerId,
             success: false,
             metadata: {'error': e.toString()},
           );

@@ -570,6 +570,7 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
             children: [
               GuestListWidget(
                 guests: viewModel.filteredGuests,
+                guestPaymentStatus: viewModel.guestPaymentStatus,
                 selectionMode: viewModel.selectionMode,
                 selectedGuestIds: viewModel.selectedGuestIds,
                 onGuestTap: (guest) {
@@ -927,7 +928,15 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
   Widget _buildFilterChips(
       BuildContext context, OwnerGuestViewModel viewModel) {
     final AppLocalizations loc = AppLocalizations.of(context)!;
-    final filters = ['All', 'Active', 'Pending', 'Inactive', 'Vehicles'];
+    final filters = [
+      'All',
+      'Active',
+      'Pending',
+      'Payment Pending',
+      'Paid',
+      'Inactive',
+      'Vehicles'
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1004,6 +1013,11 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
         return loc.ownerGuestFilterActive;
       case 'Pending':
         return loc.ownerGuestFilterPending;
+      case 'Payment Pending':
+        return loc.ownerGuestFilterPaymentPending ??
+            'Payment Pending';
+      case 'Paid':
+        return loc.ownerGuestFilterPaid ?? 'Paid';
       case 'Inactive':
         return loc.ownerGuestFilterInactive;
       case 'Vehicles':

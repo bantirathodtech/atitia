@@ -14,6 +14,7 @@ import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
+import '../../../../../common/utils/booking/guest_status_utils.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../data/models/owner_guest_model.dart';
 
@@ -22,12 +23,14 @@ import '../../data/models/owner_guest_model.dart';
 /// Supports selection mode for bulk actions
 class GuestListWidget extends StatelessWidget {
   final List<OwnerGuestModel> guests;
+  final Map<String, String>? guestPaymentStatus; // guestUid -> payment status
   final bool selectionMode;
   final Set<String> selectedGuestIds;
   final Function(OwnerGuestModel)? onGuestTap;
 
   const GuestListWidget({
     required this.guests,
+    this.guestPaymentStatus,
     this.selectionMode = false,
     this.selectedGuestIds = const {},
     this.onGuestTap,
@@ -154,6 +157,15 @@ class GuestListWidget extends StatelessWidget {
                           ),
                       ],
                     ),
+                    // Payment status indicator
+                    if (_getPaymentStatus(guest) != null) ...[
+                      const SizedBox(height: AppSpacing.paddingXS),
+                      _buildPaymentStatusIndicator(
+                        context,
+                        guest,
+                        _getPaymentStatus(guest)!,
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -356,6 +368,87 @@ class GuestListWidget extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// Gets payment status for a guest
+  String? _getPaymentStatus(OwnerGuestModel guest) {
+    // Check guest status first
+    if (guest.status == 'payment_pending') {
+      return GuestStatusUtils.paymentStatusPending;
+    }
+
+    // Check payment status map if provided
+    if (guestPaymentStatus != null) {
+      return guestPaymentStatus![guest.uid];
+    }
+
+    // Default based on guest status
+    if (guest.status == 'active') {
+      return GuestStatusUtils.paymentStatusCollected;
+    }
+
+    return null;
+  }
+
+  /// Builds payment status indicator
+  Widget _buildPaymentStatusIndicator(
+    BuildContext context,
+    OwnerGuestModel guest,
+    String paymentStatus,
+  ) {
+    Color statusColor;
+    String statusText;
+    IconData statusIcon;
+
+    switch (paymentStatus.toLowerCase()) {
+      case GuestStatusUtils.paymentStatusCollected:
+        statusColor = AppColors.success;
+        statusText = 'Paid';
+        statusIcon = Icons.check_circle;
+        break;
+      case GuestStatusUtils.paymentStatusPending:
+        statusColor = AppColors.warning;
+        statusText = 'Payment Pending';
+        statusIcon = Icons.pending;
+        break;
+      case GuestStatusUtils.paymentStatusPartial:
+        statusColor = AppColors.info;
+        statusText = 'Partial Payment';
+        statusIcon = Icons.payments;
+        break;
+      default:
+        return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingS,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: statusColor.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+        border: Border.all(
+          color: statusColor.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            statusIcon,
+            size: 14,
+            color: statusColor,
+          ),
+          const SizedBox(width: 4),
+          CaptionText(
+            text: statusText,
+            color: statusColor,
+          ),
+        ],
       ),
     );
   }

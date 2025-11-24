@@ -406,4 +406,236 @@ class OwnerOverviewRepository {
       );
     }
   }
+
+  /// Fetches payment status breakdown (paid, pending, partial counts and amounts)
+  /// If pgId is provided, filters by that specific PG only
+  Future<Map<String, dynamic>> getPaymentStatusBreakdown(
+      String ownerId, {String? pgId}) async {
+    try {
+      // Get bookings to determine guest payment status
+      final bookingsSnapshot = await _databaseService
+          .getCollectionStream(FirestoreConstants.bookings)
+          .first;
+
+      int paidCount = 0;
+      int pendingCount = 0;
+      int partialCount = 0;
+      double paidAmount = 0.0;
+      double pendingAmount = 0.0;
+      double partialAmount = 0.0;
+
+      // Get unique guest IDs from bookings for this owner/PG
+      final guestIds = <String>{};
+      for (var doc in bookingsSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final bookingPgId = data['pgId'] as String?;
+        final ownerIdFromBooking = data['ownerId'] as String?;
+        
+        // Filter by owner and optionally by PG
+        if (ownerIdFromBooking == ownerId &&
+            (pgId == null || bookingPgId == pgId)) {
+          final guestUid = data['guestUid'] as String?;
+          if (guestUid != null) {
+            guestIds.add(guestUid);
+          }
+        }
+      }
+
+      // Count payment status from bookings
+      for (var doc in bookingsSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final bookingPgId = data['pgId'] as String?;
+        final ownerIdFromBooking = data['ownerId'] as String?;
+        
+        if (ownerIdFromBooking == ownerId &&
+            (pgId == null || bookingPgId == pgId)) {
+          final paymentStatus = (data['paymentStatus'] as String? ?? 'pending').toLowerCase();
+          final bookingRentAmount = (data['rentAmount'] ?? 0).toDouble();
+          final bookingDepositAmount = (data['depositAmount'] ?? 0).toDouble();
+          final bookingPaidAmount = (data['paidAmount'] ?? 0).toDouble();
+          final totalAmount = bookingRentAmount + bookingDepositAmount;
+
+          if (paymentStatus == 'collected' || bookingPaidAmount >= totalAmount) {
+            paidCount++;
+            paidAmount += totalAmount;
+          } else if (paymentStatus == 'partial' || (bookingPaidAmount > 0 && bookingPaidAmount < totalAmount)) {
+            partialCount++;
+            partialAmount += bookingPaidAmount;
+          } else {
+            pendingCount++;
+            pendingAmount += totalAmount;
+          }
+        }
+      }
+
+      // Also check guests with payment_pending status
+      final guestsSnapshot = await _databaseService
+          .getCollectionStreamWithFilter(
+              FirestoreConstants.users, 'role', 'guest')
+          .first;
+
+      for (var doc in guestsSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>?;
+        if (data == null) continue;
+
+        final guestId = doc.id;
+        final guestPgId = data['pgId'] as String?;
+        final guestStatus = data['status'] as String? ?? 'active';
+
+        // Only count if guest is linked to this owner's PG(s)
+        if (pgId != null && guestPgId != pgId) continue;
+        if (!guestIds.contains(guestId) && guestStatus != 'payment_pending') continue;
+
+        if (guestStatus == 'payment_pending') {
+          pendingCount++;
+          // Try to get amount from booking
+          final guestBookings = bookingsSnapshot.docs.where((b) {
+            final bData = b.data() as Map<String, dynamic>;
+            return bData['guestUid'] == guestId;
+          });
+          
+          if (guestBookings.isNotEmpty) {
+            final bookingData = guestBookings.first.data() as Map<String, dynamic>;
+            final rent = (bookingData['rentAmount'] ?? 0).toDouble();
+            final deposit = (bookingData['depositAmount'] ?? 0).toDouble();
+            pendingAmount += rent + deposit;
+          }
+        }
+      }
+
+      final breakdown = {
+        'paidCount': paidCount,
+        'pendingCount': pendingCount,
+        'partialCount': partialCount,
+        'paidAmount': paidAmount,
+        'pendingAmount': pendingAmount,
+        'partialAmount': partialAmount,
+        'totalCount': paidCount + pendingCount + partialCount,
+      };
+
+      await _analyticsService.logEvent(
+        name: 'owner_payment_status_breakdown_fetched',
+        parameters: {
+          'owner_id': ownerId,
+          'pg_id': pgId ?? 'all',
+          ...breakdown,
+        },
+      );
+
+      return breakdown;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'owner_payment_status_breakdown_error',
+        parameters: {
+          'owner_id': ownerId,
+          'error': e.toString(),
+        },
+      );
+      throw AppException(
+        message: _text(
+          'ownerPaymentStatusBreakdownFailed',
+          'Failed to fetch payment status breakdown',
+        ),
+        details: e.toString(),
+      );
+    }
+  }
+
+  /// Fetches recently updated guests (within last N days)
+  /// If pgId is provided, filters by that specific PG only
+  Future<List<Map<String, dynamic>>> getRecentlyUpdatedGuests(
+      String ownerId, {String? pgId, int days = 7}) async {
+    try {
+      final cutoffDate = DateTime.now().subtract(Duration(days: days));
+
+      // Get bookings to find guests linked to owner's PGs
+      final bookingsSnapshot = await _databaseService
+          .getCollectionStream(FirestoreConstants.bookings)
+          .first;
+
+      final guestIds = <String>{};
+      for (var doc in bookingsSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final bookingPgId = data['pgId'] as String?;
+        final ownerIdFromBooking = data['ownerId'] as String?;
+        
+        if (ownerIdFromBooking == ownerId &&
+            (pgId == null || bookingPgId == pgId)) {
+          final guestUid = data['guestUid'] as String?;
+          if (guestUid != null) {
+            guestIds.add(guestUid);
+          }
+        }
+      }
+
+      // Get guests
+      final guestsSnapshot = await _databaseService
+          .getCollectionStreamWithFilter(
+              FirestoreConstants.users, 'role', 'guest')
+          .first;
+
+      final recentGuests = <Map<String, dynamic>>[];
+
+      for (var doc in guestsSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>?;
+        if (data == null) continue;
+
+        final guestId = doc.id;
+        final guestPgId = data['pgId'] as String?;
+        final updatedAt = data['updatedAt']?.toDate();
+        final createdAt = data['createdAt']?.toDate();
+
+        // Filter by PG if specified
+        if (pgId != null && guestPgId != pgId) continue;
+
+        // Check if guest is linked to owner's PG(s) or has matching PG
+        if (!guestIds.contains(guestId) && guestPgId == null) continue;
+
+        final lastUpdate = updatedAt ?? createdAt;
+        if (lastUpdate != null && lastUpdate.isAfter(cutoffDate)) {
+          recentGuests.add({
+            'uid': guestId,
+            'fullName': data['fullName'] ?? data['name'] ?? 'Unknown',
+            'phoneNumber': data['phoneNumber'] ?? '',
+            'email': data['email'],
+            'profilePhotoUrl': data['profilePhotoUrl'],
+            'roomNumber': data['roomNumber'],
+            'bedNumber': data['bedNumber'],
+            'status': data['status'] ?? 'active',
+            'updatedAt': lastUpdate.millisecondsSinceEpoch,
+            'createdAt': (createdAt ?? lastUpdate).millisecondsSinceEpoch,
+          });
+        }
+      }
+
+      // Sort by most recently updated first
+      recentGuests.sort((a, b) {
+        final aUpdated = a['updatedAt'] as int? ?? 0;
+        final bUpdated = b['updatedAt'] as int? ?? 0;
+        return bUpdated.compareTo(aUpdated);
+      });
+
+      await _analyticsService.logEvent(
+        name: 'owner_recently_updated_guests_fetched',
+        parameters: {
+          'owner_id': ownerId,
+          'pg_id': pgId ?? 'all',
+          'days': days,
+          'count': recentGuests.length,
+        },
+      );
+
+      return recentGuests;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'owner_recently_updated_guests_error',
+        parameters: {
+          'owner_id': ownerId,
+          'error': e.toString(),
+        },
+      );
+      // Return empty list on error rather than throwing
+      return [];
+    }
+  }
 }
