@@ -42,6 +42,8 @@ import '../../../services/firebase/messaging/cloud_messaging_service.dart';
 import '../../../services/firebase/performance/performance_monitoring_service.dart';
 import '../../../services/firebase/remote_config/remote_config_service.dart';
 import '../../../services/firebase/security/app_integrity_service.dart';
+import '../../../../core/services/memory/advanced_memory_manager.dart';
+import '../../../../core/services/sync/background_sync_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../services/supabase/supabase_config.dart';
@@ -236,6 +238,33 @@ class FirebaseServiceInitializer {
     }
 
     // Initialize Supabase storage lazily on first access; nothing to do here.
+
+    // ==========================================================================
+    // Initialize Performance Optimization Services
+    // ==========================================================================
+    try {
+      // Initialize Advanced Memory Manager (lightweight, should be early)
+      final memoryManager = AdvancedMemoryManager();
+      await memoryManager.initialize();
+      debugPrint('✅ Advanced Memory Manager initialized');
+    } catch (e) {
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Memory Manager initialization failed: $e');
+    }
+
+    try {
+      // Initialize Background Sync Service (monitors connectivity)
+      final backgroundSync = BackgroundSyncService();
+      await backgroundSync.initialize();
+      debugPrint('✅ Background Sync Service initialized');
+    } catch (e) {
+      debugPrint(
+          '⚠️ Firebase Service Initializer: Background Sync initialization failed: $e');
+    }
+
+    // PaginatedFirestoreService and ComputeService are stateless singletons
+    // They don't need explicit initialization - just use them when needed
+    debugPrint('✅ Performance optimization services ready');
   }
 
   // ==========================================================================
