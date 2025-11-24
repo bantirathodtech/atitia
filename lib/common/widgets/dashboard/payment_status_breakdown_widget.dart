@@ -265,7 +265,7 @@ class PaymentStatusBreakdownWidget extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             CaptionText(
-              text: 'Collection Rate: ${collectionRate}%',
+              text: 'Collection Rate: $collectionRate%',
               color: AppColors.success,
             ),
           ],
@@ -274,4 +274,3 @@ class PaymentStatusBreakdownWidget extends StatelessWidget {
     );
   }
 }
-

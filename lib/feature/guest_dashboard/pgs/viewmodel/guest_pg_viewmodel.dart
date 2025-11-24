@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../common/utils/logging/logging_mixin.dart';
+import '../../../../common/utils/pg/pg_price_utils.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 
 import '../../../../core/services/localization/internationalization_service.dart';
@@ -55,6 +56,8 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
   String? _selectedMealType;
   bool? _wifiFilter;
   bool? _parkingFilter;
+  double? _minPriceFilter;
+  double? _maxPriceFilter;
 
   /// Read-only list of available PGs for UI consumption
   List<GuestPgModel> get pgList => _pgList;
@@ -98,6 +101,12 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
 
   /// Parking filter status
   bool? get parkingFilter => _parkingFilter;
+
+  /// Minimum price filter
+  double? get minPriceFilter => _minPriceFilter;
+
+  /// Maximum price filter
+  double? get maxPriceFilter => _maxPriceFilter;
 
   /// Loads all available PGs with real-time streaming
   /// Sets up continuous listener for PG listing updates
@@ -318,6 +327,21 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     );
   }
 
+  /// Sets price range filter
+  void setPriceRangeFilter(double? minPrice, double? maxPrice) {
+    _minPriceFilter = minPrice;
+    _maxPriceFilter = maxPrice;
+    _updateFilteredPGs();
+    notifyListeners();
+    _analyticsService.logEvent(
+      name: _i18n.translate('pgPriceRangeFilterChangedEvent'),
+      parameters: {
+        'min_price': minPrice?.toString() ?? 'none',
+        'max_price': maxPrice?.toString() ?? 'none',
+      },
+    );
+  }
+
   /// Clears all filters
   void clearAllFilters() {
     _selectedFilter = 'All';
@@ -328,6 +352,8 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _selectedMealType = null;
     _wifiFilter = null;
     _parkingFilter = null;
+    _minPriceFilter = null;
+    _maxPriceFilter = null;
     _updateFilteredPGs();
     notifyListeners();
     _analyticsService.logEvent(
@@ -425,6 +451,25 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
       }).toList();
     }
 
+    // Apply price range filter
+    if (_minPriceFilter != null || _maxPriceFilter != null) {
+      filtered = filtered.where((pg) {
+        // Get price from rentConfig using utility
+        final minRent = PgPriceUtils.getMinRent(pg.rentConfig);
+        final maxRent = PgPriceUtils.getMaxRent(pg.rentConfig);
+        
+        if (minRent == null || maxRent == null) return false;
+
+        // Check if PG price range overlaps with filter range
+        final filterMin = _minPriceFilter ?? 0.0;
+        final filterMax = _maxPriceFilter ?? double.infinity;
+
+        return (minRent >= filterMin && minRent <= filterMax) ||
+            (maxRent >= filterMin && maxRent <= filterMax) ||
+            (minRent <= filterMin && maxRent >= filterMax);
+      }).toList();
+    }
+
     // Apply filter based on selected filter type
     switch (_selectedFilter.toLowerCase()) {
       case 'by city':
@@ -450,6 +495,13 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
         .map((pg) => pg.pgType!)
         .toSet();
 
+    // Calculate price range
+    final allRentConfigs = _pgList
+        .map((pg) => pg.rentConfig)
+        .where((config) => config != null && config.isNotEmpty)
+        .toList();
+    final priceRange = PgPriceUtils.getOverallPriceRange(allRentConfigs);
+
     _pgStats = {
       'totalPGs': _pgList.length,
       'totalCities': cities.length,
@@ -458,6 +510,8 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
       'cities': cities.toList()..sort(),
       'amenities': totalAmenities.toList()..sort(),
       'pgTypes': pgTypes.toList()..sort(),
+      'minPrice': priceRange['min'],
+      'maxPrice': priceRange['max'],
       'avgRoomsPerPG': _pgList.isNotEmpty
           ? _pgList.map((pg) => pg.totalRooms).reduce((a, b) => a + b) /
               _pgList.length

@@ -6,6 +6,7 @@ import '../../../feature/guest_dashboard/complaints/viewmodel/guest_complaint_vi
 import '../../../feature/guest_dashboard/foods/viewmodel/guest_food_viewmodel.dart';
 import '../../../feature/guest_dashboard/payments/viewmodel/guest_payment_viewmodel.dart';
 import '../../../feature/guest_dashboard/pgs/viewmodel/guest_pg_viewmodel.dart';
+import '../../../feature/guest_dashboard/pgs/viewmodel/guest_favorite_pg_viewmodel.dart';
 import '../../../feature/guest_dashboard/profile/viewmodel/guest_profile_viewmodel.dart';
 import '../../../feature/owner_dashboard/foods/viewmodel/owner_food_viewmodel.dart';
 import '../../../feature/owner_dashboard/guests/viewmodel/owner_guest_viewmodel.dart';
@@ -71,6 +72,11 @@ class FirebaseAppProviders {
         // Guest PGs - PG browsing and booking
         ChangeNotifierProvider<GuestPgViewModel>(
           create: (_) => FirebaseDependencyContainer.createGuestPgViewModel(),
+        ),
+
+        // Guest Favorite PGs - Favorite PG management
+        ChangeNotifierProvider<GuestFavoritePgViewModel>(
+          create: (_) => GuestFavoritePgViewModel(),
         ),
 
         // Guest PG Selection - Selected PG state management for guests

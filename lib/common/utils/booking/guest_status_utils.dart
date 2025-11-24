@@ -10,6 +10,7 @@
 /// - 'payment_pending': Approved by owner, awaiting payment
 /// - 'active': Payment received, guest is active
 /// - 'inactive': Guest checked out or booking cancelled
+library;
 
 class GuestStatusUtils {
   /// Guest status constants

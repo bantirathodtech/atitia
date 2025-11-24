@@ -1,7 +1,9 @@
 // lib/features/guest_dashboard/pgs/view/widgets/guest_pg_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
@@ -13,8 +15,11 @@ import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../common/widgets/sharing_summary.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../../feature/auth/logic/auth_provider.dart';
 import '../../data/models/guest_pg_model.dart';
+import '../../viewmodel/guest_favorite_pg_viewmodel.dart';
 import 'booking_request_dialog.dart';
 
 /// 🏠 **UPDATED PG PREVIEW CARD**
@@ -165,20 +170,33 @@ class GuestPgCard extends StatelessWidget {
             children: [
               // Status Indicator Badge
               _buildStatusBadge(loc),
-              // Photo count badge
-              if (pg.hasPhotos)
-                _buildBadge(
-                  loc?.photosBadge(pg.photos.length) ??
-                      _text(
-                        'photosBadge',
-                        '{count} Photo(s)',
-                        parameters: {
-                          'count': pg.photos.length.toString(),
-                        },
-                      ),
-                  Theme.of(context).colorScheme.shadow.withValues(alpha: 0.7),
-                  Icons.photo_library,
-                ),
+              // Action buttons (Favorite, Share)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildFavoriteButton(context),
+                  const SizedBox(width: AppSpacing.paddingXS),
+                  _buildShareButton(context, loc),
+                  if (pg.hasPhotos) ...[
+                    const SizedBox(width: AppSpacing.paddingXS),
+                    _buildBadge(
+                      loc?.photosBadge(pg.photos.length) ??
+                          _text(
+                            'photosBadge',
+                            '{count} Photo(s)',
+                            parameters: {
+                              'count': pg.photos.length.toString(),
+                            },
+                          ),
+                      Theme.of(context)
+                          .colorScheme
+                          .shadow
+                          .withValues(alpha: 0.7),
+                      Icons.photo_library,
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
         ),
@@ -634,6 +652,124 @@ class GuestPgCard extends StatelessWidget {
       return Icons.people;
     }
     return Icons.home;
+  }
+
+  /// ⭐ Favorite button
+  Widget _buildFavoriteButton(BuildContext context) {
+    return Consumer<GuestFavoritePgViewModel>(
+      builder: (context, favoriteVM, _) {
+        final isFavorite = favoriteVM.isFavorite(pg.pgId);
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final guestId = authProvider.user?.userId;
+
+        if (guestId == null) return const SizedBox.shrink();
+
+        return IconButton(
+          icon: Icon(
+            isFavorite ? Icons.favorite : Icons.favorite_border,
+            color: isFavorite ? AppColors.error : AppColors.textOnPrimary,
+          ),
+          onPressed: () async {
+            try {
+              await favoriteVM.toggleFavorite(guestId, pg.pgId);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      isFavorite
+                          ? _text('pgRemovedFromFavorites',
+                              'Removed from favorites')
+                          : _text('pgAddedToFavorites',
+                              'Added to favorites'),
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      _text('failedToToggleFavorite',
+                          'Failed to update favorite'),
+                    ),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              }
+            }
+          },
+          tooltip: isFavorite
+              ? _text('removeFromFavorites', 'Remove from favorites')
+              : _text('addToFavorites', 'Add to favorites'),
+        );
+      },
+    );
+  }
+
+  /// 📤 Share button
+  Widget _buildShareButton(BuildContext context, AppLocalizations? loc) {
+    return IconButton(
+      icon: const Icon(Icons.share, color: AppColors.textOnPrimary),
+      onPressed: () => _sharePG(context, loc),
+      tooltip: _text('share', 'Share'),
+    );
+  }
+
+  /// 📤 Share PG details
+  Future<void> _sharePG(BuildContext context, AppLocalizations? loc) async {
+    try {
+      final shareText = StringBuffer();
+      shareText.writeln('🏠 ${pg.pgName}');
+      shareText.writeln();
+      shareText.writeln('📍 ${pg.fullAddress}');
+      shareText.writeln();
+
+      // Add pricing if available
+      final rentConfig = pg.rentConfig;
+      if (rentConfig != null && rentConfig.isNotEmpty) {
+        shareText.writeln('💰 Pricing:');
+        if (rentConfig['oneShare'] != null) {
+          shareText.writeln('1 Share: ₹${rentConfig['oneShare']}');
+        }
+        if (rentConfig['twoShare'] != null) {
+          shareText.writeln('2 Share: ₹${rentConfig['twoShare']}');
+        }
+        if (rentConfig['threeShare'] != null) {
+          shareText.writeln('3 Share: ₹${rentConfig['threeShare']}');
+        }
+      }
+
+      shareText.writeln();
+      shareText.writeln('Check out this PG on Atitia!');
+
+      await Share.share(
+        shareText.toString(),
+        subject: '${pg.pgName} - Atitia',
+      );
+
+      // Log analytics
+      getIt.analytics.logEvent(
+        name: 'pg_shared_from_card',
+        parameters: {
+          'pg_id': pg.pgId,
+          'pg_name': pg.pgName,
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _text('failedToShare', 'Failed to share: {error}',
+                  parameters: {'error': e.toString()}),
+            ),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   /// 🍽️ Get icon for meal type

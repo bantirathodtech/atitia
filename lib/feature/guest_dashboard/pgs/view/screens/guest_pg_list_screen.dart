@@ -17,10 +17,14 @@ import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/widgets/filters/price_range_filter.dart';
+import '../../../../../common/widgets/filters/amenities_filter_chip_group.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../feature/auth/logic/auth_provider.dart';
 import '../../../../../l10n/app_localizations.dart';
+import '../../viewmodel/guest_favorite_pg_viewmodel.dart';
 import '../../../shared/widgets/guest_drawer.dart';
 import '../../../shared/widgets/guest_pg_appbar_display.dart';
 import '../../../shared/widgets/guest_pg_selector_dropdown.dart';
@@ -82,6 +86,15 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
       final pgVM = Provider.of<GuestPgViewModel>(context, listen: false);
       if (!pgVM.loading && pgVM.pgList.isEmpty) {
         pgVM.loadPGs(context);
+      }
+
+      // Initialize favorites
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final guestId = authProvider.user?.userId;
+      if (guestId != null) {
+        final favoriteVM =
+            Provider.of<GuestFavoritePgViewModel>(context, listen: false);
+        favoriteVM.initializeFavorites(guestId);
       }
     });
   }
@@ -363,7 +376,9 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           if (_showFilterPanel) _buildAdvancedFilters(context, pgVM),
           if (pgVM.searchQuery.isNotEmpty ||
               pgVM.selectedCity != null ||
-              pgVM.selectedAmenities.isNotEmpty)
+              pgVM.selectedAmenities.isNotEmpty ||
+              pgVM.minPriceFilter != null ||
+              pgVM.maxPriceFilter != null)
             _buildActiveFiltersChips(context, pgVM),
           _buildPGsList(context, pgVM),
         ],
@@ -492,37 +507,33 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
             const SizedBox(height: AppSpacing.paddingM),
           ],
 
-          // Amenities filter
-          if (pgVM.getAvailableAmenities().isNotEmpty) ...[
-            BodyText(
-                text: loc?.amenities ?? _text('amenities', 'Amenities'),
-                color: AppColors.textSecondary),
-            const SizedBox(height: AppSpacing.paddingS),
-            Wrap(
-              spacing: AppSpacing.paddingS,
-              runSpacing: AppSpacing.paddingS,
-              children: pgVM.getAvailableAmenities().map((amenity) {
-                final isSelected = pgVM.selectedAmenities.contains(amenity);
-                return FilterChip(
-                  label: Text(amenity),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    final newAmenities =
-                        List<String>.from(pgVM.selectedAmenities);
-                    if (selected) {
-                      newAmenities.add(amenity);
-                    } else {
-                      newAmenities.remove(amenity);
-                    }
-                    pgVM.setSelectedAmenities(newAmenities);
-                  },
-                  backgroundColor: AppColors.darkInputFill,
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
-                  checkmarkColor: AppColors.primary,
-                );
-              }).toList(),
+          // Price Range filter
+          if (pgVM.pgStats['minPrice'] != null &&
+              pgVM.pgStats['maxPrice'] != null) ...[
+            PriceRangeFilter(
+              minPrice: (pgVM.pgStats['minPrice'] as num?)?.toDouble() ?? 0.0,
+              maxPrice:
+                  (pgVM.pgStats['maxPrice'] as num?)?.toDouble() ?? 100000.0,
+              currentMinPrice: pgVM.minPriceFilter ??
+                  ((pgVM.pgStats['minPrice'] as num?)?.toDouble() ?? 0.0),
+              currentMaxPrice: pgVM.maxPriceFilter ??
+                  ((pgVM.pgStats['maxPrice'] as num?)?.toDouble() ?? 100000.0),
+              onRangeChanged: (RangeValues values) {
+                pgVM.setPriceRangeFilter(values.start, values.end);
+              },
             ),
+            const SizedBox(height: AppSpacing.paddingM),
           ],
+
+          // Amenities filter
+          AmenitiesFilterChipGroup(
+            availableAmenities: pgVM.getAvailableAmenities(),
+            selectedAmenities: pgVM.selectedAmenities,
+            onSelectionChanged: (amenities) {
+              pgVM.setSelectedAmenities(amenities);
+            },
+            title: loc?.amenities ?? _text('amenities', 'Amenities'),
+          ),
         ],
       ),
     );
@@ -582,6 +593,16 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
                                 },
                                 true,
                               )),
+                      if (pgVM.minPriceFilter != null ||
+                          pgVM.maxPriceFilter != null)
+                        _buildActiveFilterChip(
+                          context,
+                          'Price: ₹${pgVM.minPriceFilter?.toStringAsFixed(0) ?? '0'} - ₹${pgVM.maxPriceFilter?.toStringAsFixed(0) ?? '∞'}',
+                          () {
+                            pgVM.setPriceRangeFilter(null, null);
+                          },
+                          true,
+                        ),
                     ],
                   ),
                 ),
