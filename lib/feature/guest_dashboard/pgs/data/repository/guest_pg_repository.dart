@@ -104,19 +104,23 @@ class GuestPgRepository {
   /// Streams all available PGs with real-time updates
   /// Returns continuous stream for reactive UI updates
   /// Filters out inactive PGs and drafts for guest consumption
+  /// OPTIMIZED: Filter at DB level using compound filters
   Stream<List<GuestPgModel>> getAllPGsStream() {
+    // OPTIMIZED: Use compound filter to exclude drafts and inactive PGs at DB level
     return _databaseService
-        .getCollectionStream(FirestoreConstants.pgs)
+        .getCollectionStreamWithCompoundFilter(
+          FirestoreConstants.pgs,
+          [
+            {'field': 'isDraft', 'value': false},
+            {'field': 'isActive', 'value': true},
+          ],
+        )
         .map((snapshot) {
       final pgs = snapshot.docs
           .map((doc) {
             final data = doc.data() as Map<String, dynamic>;
-            // Exclude drafts - only show published PGs to guests
-            if (data['isDraft'] == true) return null;
             return GuestPgModel.fromMap(data);
           })
-          .whereType<GuestPgModel>() // Filter out nulls and cast
-          .where((pg) => pg.isActive) // Only show active, published PGs
           .toList();
 
       // Log analytics for PG list loaded

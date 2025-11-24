@@ -81,32 +81,49 @@ class FirebaseDatabaseAdapter implements IDatabaseService {
 
   @override
   Future<void> batchWrite(List<Map<String, dynamic>> operations) async {
-    // Use FirestoreServiceWrapper's batch capabilities if available
-    // For now, delegate to individual operations
+    // OPTIMIZED: Use proper Firestore batch writes
+    if (operations.isEmpty) return;
+
+    final firestore = FirebaseFirestore.instance;
+    int batchCount = 0;
+    WriteBatch? batch;
+
     for (final op in operations) {
+      // Firestore batch limit is 500 operations
+      if (batchCount % 500 == 0) {
+        if (batch != null) {
+          await batch.commit();
+        }
+        batch = firestore.batch();
+      }
+
       final collection = op['collection'] as String;
       final docId = op['docId'] as String;
       final operation = op['operation'] as String;
+      final docRef = firestore.collection(collection).doc(docId);
 
       switch (operation) {
         case 'set':
-          await _firestoreService.setDocument(
-            collection,
-            docId,
+          batch!.set(
+            docRef,
             op['data'] as Map<String, dynamic>,
+            SetOptions(merge: op['merge'] == true),
           );
           break;
         case 'update':
-          await _firestoreService.updateDocument(
-            collection,
-            docId,
-            op['data'] as Map<String, dynamic>,
-          );
+          batch!.update(docRef, op['data'] as Map<String, dynamic>);
           break;
         case 'delete':
-          await _firestoreService.deleteDocument(collection, docId);
+          batch!.delete(docRef);
           break;
       }
+
+      batchCount++;
+    }
+
+    // Commit remaining operations
+    if (batch != null && batchCount % 500 != 0) {
+      await batch.commit();
     }
   }
 
@@ -131,8 +148,27 @@ class FirebaseDatabaseAdapter implements IDatabaseService {
     bool descending = false,
     int? limit,
   }) {
-    // Use compound filter stream and get first snapshot
-    // This is a simplified implementation
-    return getCollectionStreamWithCompoundFilter(collection, conditions).first;
+    // OPTIMIZED: Use queryDocumentsWithFilters and apply orderBy/limit
+    Query query = FirebaseFirestore.instance.collection(collection);
+    
+    // Apply filters
+    for (var condition in conditions) {
+      query = query.where(
+        condition['field'] as String,
+        isEqualTo: condition['value'],
+      );
+    }
+    
+    // Apply orderBy if specified
+    if (orderBy != null) {
+      query = query.orderBy(orderBy, descending: descending);
+    }
+    
+    // Apply limit if specified
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+    
+    return query.get();
   }
 }

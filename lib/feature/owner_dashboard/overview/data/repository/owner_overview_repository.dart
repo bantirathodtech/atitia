@@ -1,5 +1,6 @@
 // lib/features/owner_dashboard/overview/data/repository/owner_overview_repository.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../../core/di/common/unified_service_locator.dart';
 import '../../../../../common/utils/constants/firestore.dart';
 import '../../../../../common/utils/exceptions/exceptions.dart';
@@ -148,83 +149,80 @@ class OwnerOverviewRepository {
         }
       }
 
-      // Fetch payments data (filter by pgId if provided)
-      final paymentsSnapshot = await _databaseService
-          .getCollectionStream(FirestoreConstants.payments)
-          .first;
+      // Fetch payments data - OPTIMIZED: Filter at DB level
+      // Get owner ID from bookings or use ownerId parameter
+      final now = DateTime.now();
+
+      // Use optimized queries - fetch collected and pending separately for better performance
+      final collectedPayments = await _queryPaymentsOptimized(
+        ownerId: ownerId,
+        pgId: pgId,
+        status: 'collected',
+      );
+      final pendingPayments = await _queryPaymentsOptimized(
+        ownerId: ownerId,
+        pgId: pgId,
+        status: 'pending',
+      );
 
       double totalRevenue = 0.0;
       double pendingRevenue = 0.0;
       double monthlyRevenue = 0.0;
 
-      final now = DateTime.now();
-      final currentMonth = now.month;
-      final currentYear = now.year;
-
-      for (var doc in paymentsSnapshot.docs) {
+      for (var doc in collectedPayments.docs) {
         final data = doc.data() as Map<String, dynamic>;
-
-        // Filter by pgId if specified
-        if (pgId != null && data['pgId'] != pgId) continue;
-
         final amount = (data['amount'] ?? 0).toDouble();
-        final status = data['status'] as String? ?? 'pending';
         final date = data['date']?.toDate();
 
-        if (status.toLowerCase() == 'collected') {
-          totalRevenue += amount;
+        totalRevenue += amount;
 
-          // Calculate monthly revenue
-          if (date != null &&
-              date.month == currentMonth &&
-              date.year == currentYear) {
-            monthlyRevenue += amount;
-          }
-        } else {
-          pendingRevenue += amount;
+        // Calculate monthly revenue - filter at query level in future
+        if (date != null &&
+            date.month == now.month &&
+            date.year == now.year) {
+          monthlyRevenue += amount;
         }
       }
 
-      // Fetch bookings data (filter by pgId if provided)
-      final bookingsSnapshot = await _databaseService
-          .getCollectionStream(FirestoreConstants.bookings)
-          .first;
+      for (var doc in pendingPayments.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final amount = (data['amount'] ?? 0).toDouble();
+        pendingRevenue += amount;
+      }
+
+      // Fetch bookings data - OPTIMIZED: Filter at DB level
+      final bookingsSnapshot = await _queryBookingsOptimized(
+        ownerId: ownerId,
+        pgId: pgId,
+      );
 
       int pendingBookings = 0;
       int approvedBookings = 0;
-      int activeTenants =
-          0; // Count from bookings where status = approved/active
+      int activeTenants = 0;
 
       for (var doc in bookingsSnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-
-        // Filter by pgId if specified
-        if (pgId != null && data['pgId'] != pgId) continue;
-
         final status = data['status'] as String? ?? 'pending';
 
         if (status == 'pending') {
           pendingBookings++;
         } else if (status == 'approved' || status == 'active') {
           approvedBookings++;
-          activeTenants++; // Count active tenants
+          activeTenants++;
         }
       }
 
-      // Fetch complaints data (filter by pgId if provided)
-      final complaintsSnapshot = await _databaseService
-          .getCollectionStream(FirestoreConstants.complaints)
-          .first;
+      // Fetch complaints data - OPTIMIZED: Filter at DB level
+      final complaintsSnapshot = await _queryComplaintsOptimized(
+        ownerId: ownerId,
+        pgId: pgId,
+      );
 
       int pendingComplaints = 0;
       int resolvedComplaints = 0;
 
       for (var doc in complaintsSnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-
-        // Filter by pgId if specified
-        if (pgId != null && data['pgId'] != pgId) continue;
-
         final status = data['status'] as String? ?? 'pending';
 
         if (status == 'pending') {
@@ -276,13 +274,15 @@ class OwnerOverviewRepository {
     }).asyncMap((future) => future);
   }
 
-  /// Fetches monthly revenue breakdown
+  /// Fetches monthly revenue breakdown - OPTIMIZED with DB-level filtering
   Future<Map<String, double>> getMonthlyRevenueBreakdown(
       String ownerId, int year) async {
     try {
-      final paymentsSnapshot = await _databaseService
-          .getCollectionStream(FirestoreConstants.payments)
-          .first;
+      // OPTIMIZED: Filter at DB level - query only collected payments for this owner
+      final paymentsSnapshot = await _queryPaymentsOptimized(
+        ownerId: ownerId,
+        status: 'collected',
+      );
 
       final Map<String, double> breakdown = {};
 
@@ -290,15 +290,16 @@ class OwnerOverviewRepository {
         breakdown['month_$month'] = 0.0;
       }
 
+      // Filter by year in code (can be optimized further with date range queries)
+      final yearStart = DateTime(year, 1, 1);
+      final yearEnd = DateTime(year, 12, 31, 23, 59, 59);
+
       for (var doc in paymentsSnapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        final amount = (data['amount'] ?? 0).toDouble();
-        final status = data['status'] as String? ?? 'pending';
         final date = data['date']?.toDate();
 
-        if (status.toLowerCase() == 'collected' &&
-            date != null &&
-            date.year == year) {
+        if (date != null && date.isAfter(yearStart.subtract(const Duration(days: 1))) && date.isBefore(yearEnd.add(const Duration(days: 1)))) {
+          final amount = (data['amount'] ?? 0).toDouble();
           final monthKey = 'month_${date.month}';
           breakdown[monthKey] = (breakdown[monthKey] ?? 0) + amount;
         }
@@ -360,21 +361,18 @@ class OwnerOverviewRepository {
               parameters: {'pgId': pgId},
             );
 
-        // Fetch payments for this property
-        final paymentsSnapshot = await _databaseService
-            .getCollectionStreamWithFilter(
-                FirestoreConstants.payments, 'pgId', pgId)
-            .first;
+        // OPTIMIZED: Fetch payments for this property with DB-level filtering
+        final paymentsSnapshot = await _queryPaymentsOptimized(
+          pgId: pgId,
+          status: 'collected', // Only get collected payments for revenue
+        );
 
         double propertyRevenue = 0.0;
+        // Already filtered by status='collected' at DB level, so just sum amounts
         for (var paymentDoc in paymentsSnapshot.docs) {
           final paymentData = paymentDoc.data() as Map<String, dynamic>;
           final amount = (paymentData['amount'] ?? 0).toDouble();
-          final status = paymentData['status'] as String? ?? 'pending';
-
-          if (status.toLowerCase() == 'collected') {
-            propertyRevenue += amount;
-          }
+          propertyRevenue += amount;
         }
 
         breakdown[pgName] = propertyRevenue;
@@ -412,10 +410,11 @@ class OwnerOverviewRepository {
   Future<Map<String, dynamic>> getPaymentStatusBreakdown(
       String ownerId, {String? pgId}) async {
     try {
-      // Get bookings to determine guest payment status
-      final bookingsSnapshot = await _databaseService
-          .getCollectionStream(FirestoreConstants.bookings)
-          .first;
+      // OPTIMIZED: Get bookings filtered at DB level
+      final bookingsSnapshot = await _queryBookingsOptimized(
+        ownerId: ownerId,
+        pgId: pgId,
+      );
 
       int paidCount = 0;
       int pendingCount = 0;
@@ -548,10 +547,11 @@ class OwnerOverviewRepository {
     try {
       final cutoffDate = DateTime.now().subtract(Duration(days: days));
 
-      // Get bookings to find guests linked to owner's PGs
-      final bookingsSnapshot = await _databaseService
-          .getCollectionStream(FirestoreConstants.bookings)
-          .first;
+      // OPTIMIZED: Get bookings filtered at DB level
+      final bookingsSnapshot = await _queryBookingsOptimized(
+        ownerId: ownerId,
+        pgId: pgId,
+      );
 
       final guestIds = <String>{};
       for (var doc in bookingsSnapshot.docs) {
@@ -636,6 +636,89 @@ class OwnerOverviewRepository {
       );
       // Return empty list on error rather than throwing
       return [];
+    }
+  }
+
+  /// Helper: Query payments optimized with DB-level filtering
+  Future<QuerySnapshot> _queryPaymentsOptimized({
+    String? ownerId,
+    String? pgId,
+    String? status,
+  }) async {
+    final filters = <Map<String, dynamic>>[];
+    if (ownerId != null) {
+      filters.add({'field': 'ownerId', 'value': ownerId});
+    }
+    if (pgId != null) {
+      filters.add({'field': 'pgId', 'value': pgId});
+    }
+    if (status != null) {
+      filters.add({'field': 'status', 'value': status});
+    }
+
+    if (filters.isEmpty) {
+      // Use queryCollection interface method
+      return await _databaseService.queryCollection(
+        FirestoreConstants.payments,
+        [],
+      );
+    } else {
+      return await _databaseService.queryCollection(
+        FirestoreConstants.payments,
+        filters,
+      );
+    }
+  }
+
+  /// Helper: Query bookings optimized with DB-level filtering
+  Future<QuerySnapshot> _queryBookingsOptimized({
+    String? ownerId,
+    String? pgId,
+  }) async {
+    final filters = <Map<String, dynamic>>[];
+    if (ownerId != null) {
+      filters.add({'field': 'ownerId', 'value': ownerId});
+    }
+    if (pgId != null) {
+      filters.add({'field': 'pgId', 'value': pgId});
+    }
+
+    if (filters.isEmpty) {
+      return await _databaseService.queryCollection(
+        FirestoreConstants.bookings,
+        [],
+      );
+    } else {
+      return await _databaseService.queryCollection(
+        FirestoreConstants.bookings,
+        filters,
+      );
+    }
+  }
+
+  /// Helper: Query complaints optimized with DB-level filtering
+  Future<QuerySnapshot> _queryComplaintsOptimized({
+    String? ownerId,
+    String? pgId,
+  }) async {
+    final filters = <Map<String, dynamic>>[];
+    if (ownerId != null) {
+      filters.add({'field': 'ownerId', 'value': ownerId});
+    }
+    if (pgId != null) {
+      filters.add({'field': 'pgId', 'value': pgId});
+    }
+
+    if (filters.isEmpty) {
+      return await _databaseService.queryCollection(
+        FirestoreConstants.complaints,
+        [],
+      );
+    } else {
+      return await _databaseService.queryCollection(
+        FirestoreConstants.complaints,
+        filters,
+      );
     }
   }
 }
