@@ -1,8 +1,6 @@
 // lib/common/widgets/animations/smooth_page_transition.dart
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import '../../styles/spacing.dart';
 
 /// 🎨 **SMOOTH PAGE TRANSITIONS - ENHANCED ANIMATIONS**
 ///
@@ -94,20 +92,52 @@ class SmoothPageTransition {
 }
 
 /// Custom transition page for GoRouter
-class CustomTransitionPage extends CustomTransitionPage<void> {
-  CustomTransitionPage({
-    required super.child,
-    required super.transitionsBuilder,
-    super.transitionDuration,
-    super.reverseTransitionDuration,
-    super.opaque,
-    super.barrierDismissible,
-    super.barrierColor,
-    super.barrierLabel,
-    super.maintainState,
-    super.fullscreenDialog,
+class CustomTransitionPage extends Page<void> {
+  final Widget child;
+  final RouteTransitionsBuilder transitionsBuilder;
+  final Duration? transitionDuration;
+  final Duration? reverseTransitionDuration;
+  final bool opaque;
+  final bool barrierDismissible;
+  final Color? barrierColor;
+  final String? barrierLabel;
+  final bool maintainState;
+  final bool fullscreenDialog;
+
+  const CustomTransitionPage({
+    required this.child,
+    required this.transitionsBuilder,
+    this.transitionDuration,
+    this.reverseTransitionDuration,
+    this.opaque = true,
+    this.barrierDismissible = false,
+    this.barrierColor,
+    this.barrierLabel,
+    this.maintainState = true,
+    this.fullscreenDialog = false,
     super.key,
+    super.name,
+    super.arguments,
+    super.restorationId,
   });
+
+  @override
+  Route<void> createRoute(BuildContext context) {
+    return PageRouteBuilder<void>(
+      settings: this,
+      pageBuilder: (context, animation, secondaryAnimation) => child,
+      transitionsBuilder: transitionsBuilder,
+      transitionDuration: transitionDuration ?? const Duration(milliseconds: 300),
+      reverseTransitionDuration:
+          reverseTransitionDuration ?? const Duration(milliseconds: 300),
+      opaque: opaque,
+      barrierDismissible: barrierDismissible,
+      barrierColor: barrierColor,
+      barrierLabel: barrierLabel,
+      maintainState: maintainState,
+      fullscreenDialog: fullscreenDialog,
+    );
+  }
 }
 
 /// Animated list item wrapper
