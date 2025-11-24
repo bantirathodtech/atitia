@@ -94,10 +94,9 @@ class OwnerFoodViewModel extends BaseProviderState {
       setLoading(true);
       clearError();
 
+      // Phase 1: Load critical menu data first (needed for UI display)
       _weeklyMenus = await _repository.fetchWeeklyMenus(ownerId, pgId: pgId);
       _overrides = await _repository.fetchMenuOverrides(ownerId, pgId: pgId);
-      await _loadMenuStats(ownerId, pgId: pgId);
-      _startFeedbackStream(pgId: pgId);
 
       // Update tracking variables
       _lastLoadedOwnerId = ownerId;
@@ -116,8 +115,16 @@ class OwnerFoodViewModel extends BaseProviderState {
         },
       );
 
-      // Notify listeners to update UI
+      // Notify listeners to update UI with menus (don't wait for stats)
       notifyListeners();
+      setLoading(false);
+
+      // Phase 2: Load secondary data in parallel (non-blocking)
+      // These update the UI as they complete
+      Future.microtask(() async {
+        await _loadMenuStats(ownerId, pgId: pgId);
+        _startFeedbackStream(pgId: pgId);
+      });
     } catch (e) {
       setError(
         true,
@@ -130,7 +137,6 @@ class OwnerFoodViewModel extends BaseProviderState {
       _weeklyMenus = [];
       _overrides = [];
       notifyListeners();
-    } finally {
       setLoading(false);
     }
   }

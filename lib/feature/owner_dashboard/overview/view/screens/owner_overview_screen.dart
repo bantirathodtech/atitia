@@ -4,6 +4,8 @@
 // Main dashboard with analytics, charts, and quick stats with theme toggle.
 // ============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -56,6 +58,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   }
 
   /// Loads overview data when screen initializes
+  /// Optimized: Loads critical data first, then secondary data in parallel
   Future<void> _loadOverviewData() async {
     if (!mounted) return;
 
@@ -67,13 +70,29 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
 
     if (ownerId.isNotEmpty) {
       _lastLoadedPgId = pgId;
-      // Load data for selected PG only
+      
+      // Phase 1: Load critical overview data first (shows main stats quickly)
       await viewModel.loadOverviewData(ownerId, pgId: pgId);
-      await viewModel.loadMonthlyBreakdown(ownerId, DateTime.now().year);
-      await viewModel.loadPropertyBreakdown(ownerId);
-      await viewModel.loadPaymentStatusBreakdown(ownerId, pgId: pgId);
-      await viewModel.loadRecentlyUpdatedGuests(ownerId, pgId: pgId);
+      
+      // Phase 2: Load secondary data in parallel (non-blocking for UI)
+      // These will update the UI as they complete
+      Future.microtask(() => _loadSecondaryData(viewModel, ownerId, pgId));
     }
+  }
+
+  /// Loads secondary/optional data in parallel without blocking UI
+  Future<void> _loadSecondaryData(
+    OwnerOverviewViewModel viewModel,
+    String ownerId,
+    String? pgId,
+  ) async {
+    // Load all secondary data in parallel - don't block UI
+    await Future.wait([
+      viewModel.loadMonthlyBreakdown(ownerId, DateTime.now().year),
+      viewModel.loadPropertyBreakdown(ownerId),
+      viewModel.loadPaymentStatusBreakdown(ownerId, pgId: pgId),
+      viewModel.loadRecentlyUpdatedGuests(ownerId, pgId: pgId),
+    ], eagerError: false); // Don't fail all if one fails
   }
 
   String _formatCurrency(double value, AppLocalizations loc) {

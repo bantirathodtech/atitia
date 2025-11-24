@@ -160,10 +160,9 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
   }
 
   /// Loads monthly revenue breakdown
+  /// Secondary data - doesn't affect main loading state
   Future<void> loadMonthlyBreakdown(String ownerId, int year) async {
     try {
-      setLoading(true);
-      clearError();
       _monthlyBreakdown =
           await _repository.getMonthlyRevenueBreakdown(ownerId, year);
 
@@ -177,24 +176,19 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
 
       notifyListeners();
     } catch (e) {
-      setError(
-        true,
-        _text(
-          'ownerMonthlyBreakdownLoadFailed',
-          'Failed to load monthly breakdown: {error}',
-          parameters: {'error': e.toString()},
-        ),
+      // Don't set error state for secondary data - just log it
+      logError(
+        'Failed to load monthly breakdown',
+        feature: 'owner_overview',
+        error: e,
       );
-    } finally {
-      setLoading(false);
     }
   }
 
   /// Loads property-wise revenue breakdown
+  /// Secondary data - doesn't affect main loading state
   Future<void> loadPropertyBreakdown(String ownerId) async {
     try {
-      setLoading(true);
-      clearError();
       _propertyBreakdown =
           await _repository.getPropertyRevenueBreakdown(ownerId);
 
@@ -257,6 +251,7 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
   }
 
   /// Loads recently updated guests
+  /// Secondary data - doesn't affect main loading state
   Future<void> loadRecentlyUpdatedGuests(String ownerId, {String? pgId, int days = 7}) async {
     try {
       _recentlyUpdatedGuests =
@@ -284,20 +279,28 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
 
   /// Refreshes all overview data
   /// If pgId is provided, refreshes data for that specific PG only
+  /// Optimized: Loads critical data first, then secondary data in parallel
   Future<void> refreshOverviewData(String ownerId, {String? pgId}) async {
+    // Load critical data first
     await loadOverviewData(ownerId, pgId: pgId);
-    await loadMonthlyBreakdown(ownerId, _selectedYear);
-    await loadPropertyBreakdown(ownerId);
-    await loadPaymentStatusBreakdown(ownerId, pgId: pgId);
-    await loadRecentlyUpdatedGuests(ownerId, pgId: pgId);
-
-    _analyticsService.logEvent(
-      name: 'owner_overview_refreshed',
-      parameters: {
-        'owner_id': ownerId,
-        'pg_id': pgId ?? 'all',
-      },
-    );
+    
+    // Load secondary data in parallel (non-blocking)
+    Future.microtask(() async {
+      await Future.wait([
+        loadMonthlyBreakdown(ownerId, _selectedYear),
+        loadPropertyBreakdown(ownerId),
+        loadPaymentStatusBreakdown(ownerId, pgId: pgId),
+        loadRecentlyUpdatedGuests(ownerId, pgId: pgId),
+      ], eagerError: false);
+      
+      _analyticsService.logEvent(
+        name: 'owner_overview_refreshed',
+        parameters: {
+          'owner_id': ownerId,
+          'pg_id': pgId ?? 'all',
+        },
+      );
+    });
   }
 
   /// Calculates occupancy rate based on active tenants and total capacity
