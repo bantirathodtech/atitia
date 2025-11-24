@@ -1014,10 +1014,9 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
       case 'Pending':
         return loc.ownerGuestFilterPending;
       case 'Payment Pending':
-        return loc.ownerGuestFilterPaymentPending ??
-            'Payment Pending';
+        return loc.ownerGuestPaymentPendingLabel;
       case 'Paid':
-        return loc.ownerGuestFilterPaid ?? 'Paid';
+        return loc.ownerGuestPaymentCollectedLabel;
       case 'Inactive':
         return loc.ownerGuestFilterInactive;
       case 'Vehicles':

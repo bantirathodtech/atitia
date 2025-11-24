@@ -5,13 +5,13 @@ import 'package:provider/provider.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
-import '../../../../../common/widgets/loaders/adaptive_loader.dart';
+import '../../../../../common/widgets/loaders/enhanced_loading_state.dart';
+import '../../../../../common/widgets/indicators/enhanced_empty_state.dart';
 import '../../../../../common/widgets/text/body_text.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../common/utils/extensions/context_extensions.dart';
-import '../../../../../common/styles/theme_colors.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
@@ -176,39 +176,30 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
       String ownerId, String? currentPgId) {
     final loc = AppLocalizations.of(context)!;
     if (foodVM.loading && foodVM.weeklyMenus.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const AdaptiveLoader(),
-            const SizedBox(height: AppSpacing.paddingM),
-            BodyText(text: loc.loadingMenus),
-          ],
-        ),
+      return EnhancedLoadingState(
+        message: loc.loadingMenus,
+        type: LoadingType.skeleton,
+        showShimmer: true,
+        shimmerItemCount: 7,
       );
     }
 
     if (foodVM.error) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline,
-                size: 64, color: Theme.of(context).colorScheme.error),
-            const SizedBox(height: AppSpacing.paddingM),
-            BodyText(text: loc.failedToLoadMenus),
-            const SizedBox(height: AppSpacing.paddingM),
-            PrimaryButton(
-              label: loc.retry,
-              onPressed: () => foodVM.refreshMenus(ownerId, pgId: currentPgId),
-            ),
-          ],
-        ),
+      return EmptyStates.error(
+        context: context,
+        message: loc.failedToLoadMenus,
+        onRetry: () => foodVM.refreshMenus(ownerId, pgId: currentPgId),
       );
     }
 
     if (foodVM.weeklyMenus.isEmpty) {
-      return _buildEmptyState(context, foodVM, ownerId, currentPgId);
+      return EnhancedEmptyState(
+        title: 'No Menus Available',
+        message: 'Create menus for your PG to get started',
+        icon: Icons.restaurant_menu_outlined,
+        primaryActionLabel: loc.createPgMenus,
+        onPrimaryAction: () => _showInitializeMenusDialog(context, foodVM, ownerId, currentPgId),
+      );
     }
 
     // TabBarView - Scaffold automatically positions body below app bar (including bottom widget)
@@ -226,33 +217,6 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
     );
   }
 
-  /// Builds empty state when no menus exist
-  Widget _buildEmptyState(BuildContext context, OwnerFoodViewModel foodVM,
-      String ownerId, String? currentPgId) {
-    final loc = AppLocalizations.of(context)!;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.restaurant_menu,
-              size: 64,
-              color: ThemeColors.getTextTertiary(context).withValues(alpha: 0.5)),
-          const SizedBox(height: AppSpacing.paddingM),
-          HeadingMedium(text: loc.noPgMenusFound),
-          const SizedBox(height: AppSpacing.paddingS),
-          BodyText(
-            text: loc.createWeeklyMenusForThisPg,
-            align: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.paddingL),
-          BodyText(
-            text: loc.useCreatePgMenusButton,
-            align: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
 
   /// Shows dialog to initialize default menus
   void _showInitializeMenusDialog(BuildContext context,

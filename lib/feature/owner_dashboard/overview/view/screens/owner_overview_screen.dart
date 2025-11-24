@@ -10,9 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../../common/widgets/loaders/adaptive_loader.dart';
-import '../../../../../common/widgets/indicators/empty_state.dart';
-import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_large.dart';
 import '../../../../../common/widgets/text/body_text.dart';
@@ -34,6 +31,9 @@ import '../widgets/owner_summary_widget.dart';
 import '../widgets/owner_chart_widget.dart';
 import '../../../../../common/widgets/dashboard/recently_updated_guests_widget.dart';
 import '../../../../../common/widgets/dashboard/payment_status_breakdown_widget.dart';
+import '../../../../../common/widgets/loaders/enhanced_loading_state.dart';
+import '../../../../../common/widgets/indicators/enhanced_empty_state.dart';
+import '../../../../../common/widgets/animations/smooth_page_transition.dart';
 
 /// Owner Overview Screen - Dashboard home with comprehensive analytics
 /// Displays key metrics, revenue charts, and quick actions
@@ -148,48 +148,22 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   Widget _buildBody(BuildContext context, OwnerOverviewViewModel viewModel,
       String ownerId, AppLocalizations loc) {
     if (viewModel.loading && viewModel.overviewData == null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AdaptiveLoader(),
-            const SizedBox(height: AppSpacing.paddingM),
-            BodyText(text: loc.loadingDashboard),
-          ],
-        ),
+      return EnhancedLoadingState(
+        message: loc.loadingDashboard,
+        type: LoadingType.fullscreen,
       );
     }
 
     if (viewModel.error) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline,
-                size: 64, color: Theme.of(context).colorScheme.error),
-            const SizedBox(height: AppSpacing.paddingL),
-            HeadingMedium(
-              text: loc.errorLoadingDashboard,
-              align: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.paddingS),
-            BodyText(
-              text: viewModel.errorMessage ?? loc.somethingWentWrong,
-              align: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.paddingL),
-            PrimaryButton(
-              onPressed: () => viewModel.refreshOverviewData(ownerId),
-              label: loc.tryAgain,
-              icon: Icons.refresh,
-            ),
-          ],
-        ),
+      return EmptyStates.error(
+        context: context,
+        message: viewModel.errorMessage ?? loc.somethingWentWrong,
+        onRetry: () => viewModel.refreshOverviewData(ownerId, pgId: null),
       );
     }
 
     if (viewModel.overviewData == null) {
-      return EmptyState(
+      return EnhancedEmptyState(
         title: loc.noData,
         message: loc.dashboardDataWillAppearHere,
         icon: Icons.dashboard_outlined,
@@ -215,11 +189,17 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Welcome Header - Full Width
-                    _buildWelcomeHeader(context, responsive, loc),
+                    FadeInAnimation(
+                      delay: const Duration(milliseconds: 100),
+                      child: _buildWelcomeHeader(context, responsive, loc),
+                    ),
                     SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
                     // Summary Cards
-                    OwnerSummaryWidget(overview: viewModel.overviewData!),
+                    FadeInAnimation(
+                      delay: const Duration(milliseconds: 200),
+                      child: OwnerSummaryWidget(overview: viewModel.overviewData!),
+                    ),
                     SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
                     // Payment Status Breakdown
