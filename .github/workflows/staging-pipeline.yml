@@ -442,6 +442,67 @@ jobs:
         continue-on-error: true
         timeout-minutes: 20
 
+      - name: 📤 Upload Debug APK Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk-debug-staging
+          path: |
+            build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: 🧹 Clean Up Disk Space Before Release Build
+        run: |
+          echo "🧹 Cleaning up disk space before release build..."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Check current disk space
+          echo "📊 Disk space before cleanup:"
+          df -h
+          echo ""
+          
+          # Remove debug build artifacts (already uploaded as artifact)
+          echo "🗑️  Removing debug build artifacts..."
+          rm -rf build/app/outputs/flutter-apk/app-debug.apk || true
+          rm -rf build/app/intermediates || true
+          rm -rf build/app/tmp || true
+          
+          # Clean Gradle build cache (keep user home cache for speed)
+          echo "🗑️  Cleaning Gradle build cache..."
+          cd android
+          ./gradlew clean --no-daemon 2>&1 | head -20 || true
+          cd ..
+          
+          # Remove intermediate build directories
+          echo "🗑️  Removing intermediate build directories..."
+          rm -rf android/app/build/intermediates || true
+          rm -rf android/app/build/tmp || true
+          rm -rf android/app/build/generated || true
+          rm -rf android/build/tmp || true
+          rm -rf android/.gradle/daemon || true
+          
+          # Clean Flutter build cache (keep .dart_tool for dependencies)
+          echo "🗑️  Cleaning Flutter build cache..."
+          rm -rf build/app/intermediates || true
+          rm -rf build/app/tmp || true
+          
+          # Clean system temp files if space is still low
+          AVAILABLE_SPACE=$(df -BG . | awk 'NR==2 {print $4}' | sed 's/G//')
+          if [ "$AVAILABLE_SPACE" -lt 5 ]; then
+            echo "⚠️  Low disk space detected ($AVAILABLE_SPACE GB), performing aggressive cleanup..."
+            rm -rf /tmp/* || true
+            rm -rf ~/.pub-cache/hosted/pub.dev/.tmp/* || true
+            flutter clean || true
+          fi
+          
+          # Show disk space after cleanup
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 Disk space after cleanup:"
+          df -h
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
       - name: 🤖 Build Android APK (Release)
         run: |
           echo "🔨 Building Android APK (release)..."
@@ -453,7 +514,7 @@ jobs:
         continue-on-error: true
         timeout-minutes: 20
 
-      - name: 📤 Upload APK Artifacts
+      - name: 📤 Upload Release APK Artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
