@@ -319,7 +319,7 @@ class _GuestBookingHistoryScreenState
             Container(
               padding: const EdgeInsets.all(AppSpacing.paddingS),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
               ),
               child: Row(

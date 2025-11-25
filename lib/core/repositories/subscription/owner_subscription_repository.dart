@@ -1,5 +1,7 @@
 // lib/core/repositories/subscription/owner_subscription_repository.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../di/common/unified_service_locator.dart';
 import '../../../common/utils/constants/firestore.dart';
 import '../../interfaces/analytics/analytics_service_interface.dart';
@@ -83,8 +85,7 @@ class OwnerSubscriptionRepository {
         return null;
       }
 
-      return OwnerSubscriptionModel.fromMap(
-          doc.data() as Map<String, dynamic>);
+      return OwnerSubscriptionModel.fromMap(doc.data() as Map<String, dynamic>);
     } catch (e) {
       throw Exception('Failed to get subscription: $e');
     }
@@ -105,8 +106,8 @@ class OwnerSubscriptionRepository {
 
       // Find active subscription
       for (final doc in subscriptions.docs) {
-        final subscription = OwnerSubscriptionModel.fromMap(
-            doc.data() as Map<String, dynamic>);
+        final subscription =
+            OwnerSubscriptionModel.fromMap(doc.data() as Map<String, dynamic>);
         if (subscription.isActive) {
           return subscription;
         }
@@ -122,10 +123,10 @@ class OwnerSubscriptionRepository {
   Stream<OwnerSubscriptionModel?> streamSubscription(String ownerId) {
     return _databaseService
         .getCollectionStreamWithFilter(
-          FirestoreConstants.ownerSubscriptions,
-          'ownerId',
-          ownerId,
-        )
+      FirestoreConstants.ownerSubscriptions,
+      'ownerId',
+      ownerId,
+    )
         .map((snapshot) {
       if (snapshot.docs.isEmpty) {
         return null;
@@ -153,15 +154,21 @@ class OwnerSubscriptionRepository {
   }
 
   /// Stream all subscriptions for an owner
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Stream<List<OwnerSubscriptionModel>> streamAllSubscriptions(String ownerId) {
+    // Note: Streams don't support limit directly via interface
+    // For full pagination, use PaginationController with FirestorePaginationHelper
+    // This method is kept for backwards compatibility but should be replaced with pagination
     return _databaseService
         .getCollectionStreamWithFilter(
-          FirestoreConstants.ownerSubscriptions,
-          'ownerId',
-          ownerId,
-        )
+      FirestoreConstants.ownerSubscriptions,
+      'ownerId',
+      ownerId,
+    )
         .map((snapshot) {
-      return snapshot.docs
+      // COST OPTIMIZATION: Limit to 20 most recent items
+      final limitedDocs = snapshot.docs.take(20).toList();
+      return limitedDocs
           .map((doc) => OwnerSubscriptionModel.fromMap(
               doc.data() as Map<String, dynamic>))
           .toList()
@@ -174,23 +181,24 @@ class OwnerSubscriptionRepository {
   }
 
   /// Get all subscriptions for an owner
-  Future<List<OwnerSubscriptionModel>> getAllSubscriptions(String ownerId) async {
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
+  Future<List<OwnerSubscriptionModel>> getAllSubscriptions(
+      String ownerId) async {
     try {
-      final subscriptions = await _databaseService.queryDocuments(
+      final subscriptions = await _databaseService.queryCollection(
         FirestoreConstants.ownerSubscriptions,
-        field: 'ownerId',
-        isEqualTo: ownerId,
+        [
+          {'field': 'ownerId', 'value': ownerId}
+        ],
+        orderBy: 'createdAt',
+        descending: true,
+        limit: 20, // COST OPTIMIZATION: Limit to 20 items per page
       );
 
       return subscriptions.docs
           .map((doc) => OwnerSubscriptionModel.fromMap(
               doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) {
-          final aDate = a.createdAt ?? DateTime(1970);
-          final bDate = b.createdAt ?? DateTime(1970);
-          return bDate.compareTo(aDate);
-        });
+          .toList();
     } catch (e) {
       throw Exception('Failed to get subscriptions: $e');
     }
@@ -289,22 +297,20 @@ class OwnerSubscriptionRepository {
 
   /// Get all subscriptions (admin-level access)
   /// Returns all subscriptions across all owners for admin dashboard
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Future<List<OwnerSubscriptionModel>> getAllSubscriptionsAdmin() async {
     try {
-      // Use stream first to get all, then convert to list
-      final snapshot = await _databaseService
-          .getCollectionStream(FirestoreConstants.ownerSubscriptions)
-          .first;
+      // COST OPTIMIZATION: Use direct Firestore query with limit
+      // For full pagination, use PaginationController with FirestorePaginationHelper
+      final snapshot = await FirebaseFirestore.instance
+          .collection(FirestoreConstants.ownerSubscriptions)
+          .orderBy('createdAt', descending: true)
+          .limit(20) // COST OPTIMIZATION: Limit to 20 items per page
+          .get();
 
       return snapshot.docs
-          .map((doc) => OwnerSubscriptionModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) {
-          final aDate = a.createdAt ?? DateTime(1970);
-          final bDate = b.createdAt ?? DateTime(1970);
-          return bDate.compareTo(aDate);
-        });
+          .map((doc) => OwnerSubscriptionModel.fromMap(doc.data()))
+          .toList();
     } catch (e) {
       throw Exception('Failed to get all subscriptions: $e');
     }
@@ -312,19 +318,19 @@ class OwnerSubscriptionRepository {
 
   /// Stream all subscriptions (admin-level access)
   /// Returns real-time stream of all subscriptions across all owners
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Stream<List<OwnerSubscriptionModel>> streamAllSubscriptionsAdmin() {
-    return _databaseService
-        .getCollectionStream(FirestoreConstants.ownerSubscriptions)
+    // COST OPTIMIZATION: Use direct Firestore query with limit
+    // For full pagination, use PaginationController with FirestorePaginationHelper
+    return FirebaseFirestore.instance
+        .collection(FirestoreConstants.ownerSubscriptions)
+        .orderBy('createdAt', descending: true)
+        .limit(20) // COST OPTIMIZATION: Limit to 20 items per page
+        .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => OwnerSubscriptionModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) {
-          final aDate = a.createdAt ?? DateTime(1970);
-          final bDate = b.createdAt ?? DateTime(1970);
-          return bDate.compareTo(aDate);
-        });
+          .map((doc) => OwnerSubscriptionModel.fromMap(doc.data()))
+          .toList();
     });
   }
 
@@ -350,4 +356,3 @@ class OwnerSubscriptionRepository {
     }
   }
 }
-

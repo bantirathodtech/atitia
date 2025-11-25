@@ -58,9 +58,10 @@ class BedChangeRequestRepository {
   }
 
   Stream<List<BedChangeRequestModel>> streamOwnerRequests(String ownerId) {
+    // COST OPTIMIZATION: Limit to 20 requests per stream
     return _databaseService
         .getCollectionStreamWithFilter(
-            FirestoreConstants.bedChangeRequests, 'ownerId', ownerId)
+            FirestoreConstants.bedChangeRequests, 'ownerId', ownerId, limit: 20)
         .map((snap) => snap.docs
             .map((d) =>
                 BedChangeRequestModel.fromMap(d.data() as Map<String, dynamic>))
@@ -68,9 +69,10 @@ class BedChangeRequestRepository {
   }
 
   Stream<List<BedChangeRequestModel>> streamGuestRequests(String guestId) {
+    // COST OPTIMIZATION: Limit to 20 requests per stream
     return _databaseService
         .getCollectionStreamWithFilter(
-            FirestoreConstants.bedChangeRequests, 'guestId', guestId)
+            FirestoreConstants.bedChangeRequests, 'guestId', guestId, limit: 20)
         .map((snap) => snap.docs
             .map((d) =>
                 BedChangeRequestModel.fromMap(d.data() as Map<String, dynamic>))

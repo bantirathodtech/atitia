@@ -1,5 +1,7 @@
 // lib/core/repositories/refund/refund_request_repository.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../di/common/unified_service_locator.dart';
 import '../../../common/utils/constants/firestore.dart';
 import '../../interfaces/analytics/analytics_service_interface.dart';
@@ -89,88 +91,106 @@ class RefundRequestRepository {
   }
 
   /// Get refund requests for an owner
-  Future<List<RefundRequestModel>> getOwnerRefundRequests(String ownerId) async {
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
+  Future<List<RefundRequestModel>> getOwnerRefundRequests(
+      String ownerId) async {
     try {
-      final requests = await _databaseService.queryDocuments(
+      final requests = await _databaseService.queryCollection(
         FirestoreConstants.refundRequests,
-        field: 'ownerId',
-        isEqualTo: ownerId,
+        [
+          {'field': 'ownerId', 'value': ownerId}
+        ],
+        orderBy: 'requestedAt',
+        descending: true,
+        limit: 20, // COST OPTIMIZATION: Limit to 20 items per page
       );
 
       return requests.docs
-          .map((doc) => RefundRequestModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+          .map((doc) =>
+              RefundRequestModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw Exception('Failed to get owner refund requests: $e');
     }
   }
 
   /// Stream refund requests for an owner (real-time updates)
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Stream<List<RefundRequestModel>> streamOwnerRefundRequests(String ownerId) {
-    return _databaseService
-        .getCollectionStreamWithFilter(
-          FirestoreConstants.refundRequests,
-          'ownerId',
-          ownerId,
-        )
+    // COST OPTIMIZATION: Use direct Firestore query with limit
+    // For full pagination, use PaginationController with FirestorePaginationHelper
+    return FirebaseFirestore.instance
+        .collection(FirestoreConstants.refundRequests)
+        .where('ownerId', isEqualTo: ownerId)
+        .orderBy('requestedAt', descending: true)
+        .limit(20) // COST OPTIMIZATION: Limit to 20 items per page
+        .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => RefundRequestModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+          .map((doc) => RefundRequestModel.fromMap(doc.data()))
+          .toList();
     });
   }
 
   /// Get pending refund requests (admin-level)
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Future<List<RefundRequestModel>> getPendingRefundRequests() async {
     try {
-      final requests = await _databaseService.queryDocuments(
+      final requests = await _databaseService.queryCollection(
         FirestoreConstants.refundRequests,
-        field: 'status',
-        isEqualTo: RefundStatus.pending.firestoreValue,
+        [
+          {'field': 'status', 'value': RefundStatus.pending.firestoreValue}
+        ],
+        orderBy: 'requestedAt',
+        descending: true,
+        limit: 20, // COST OPTIMIZATION: Limit to 20 items per page
       );
 
       return requests.docs
-          .map((doc) => RefundRequestModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+          .map((doc) =>
+              RefundRequestModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw Exception('Failed to get pending refund requests: $e');
     }
   }
 
   /// Stream all refund requests (admin-level)
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Stream<List<RefundRequestModel>> streamAllRefundRequests() {
-    return _databaseService
-        .getCollectionStream(FirestoreConstants.refundRequests)
+    // COST OPTIMIZATION: Use direct Firestore query with limit
+    // For full pagination, use PaginationController with FirestorePaginationHelper
+    return FirebaseFirestore.instance
+        .collection(FirestoreConstants.refundRequests)
+        .orderBy('requestedAt', descending: true)
+        .limit(20) // COST OPTIMIZATION: Limit to 20 items per page
+        .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => RefundRequestModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+          .map((doc) => RefundRequestModel.fromMap(doc.data()))
+          .toList();
     });
   }
 
   /// Get refund requests by status (admin-level)
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Future<List<RefundRequestModel>> getRefundRequestsByStatus(
       RefundStatus status) async {
     try {
-      final requests = await _databaseService.queryDocuments(
+      final requests = await _databaseService.queryCollection(
         FirestoreConstants.refundRequests,
-        field: 'status',
-        isEqualTo: status.firestoreValue,
+        [
+          {'field': 'status', 'value': status.firestoreValue}
+        ],
+        orderBy: 'requestedAt',
+        descending: true,
+        limit: 20, // COST OPTIMIZATION: Limit to 20 items per page
       );
 
       return requests.docs
-          .map((doc) => RefundRequestModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
+          .map((doc) =>
+              RefundRequestModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw Exception('Failed to get refund requests by status: $e');
     }
@@ -192,8 +212,8 @@ class RefundRequestRepository {
 
       // Return most recent refund request for this revenue record
       final refundRequests = requests.docs
-          .map((doc) => RefundRequestModel.fromMap(
-              doc.data() as Map<String, dynamic>))
+          .map((doc) =>
+              RefundRequestModel.fromMap(doc.data() as Map<String, dynamic>))
           .toList()
         ..sort((a, b) => b.requestedAt.compareTo(a.requestedAt));
 
@@ -203,4 +223,3 @@ class RefundRequestRepository {
     }
   }
 }
-

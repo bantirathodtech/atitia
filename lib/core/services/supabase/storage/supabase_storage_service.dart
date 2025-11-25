@@ -29,6 +29,7 @@ import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../services/optimization/image_compression_service.dart';
 import '../supabase_config.dart';
 
 /// Supabase Storage service providing file operations
@@ -172,21 +173,47 @@ class SupabaseStorageServiceWrapper {
           : '$folderPath/$fileName';
 
       // =======================================================================
-      // Read bytes based on file type (File vs XFile)
+      // Compress and read bytes based on file type (File vs XFile)
+      // COST OPTIMIZATION: Compress images before upload to reduce storage costs
       // =======================================================================
       Uint8List bytes;
 
-      if (file is XFile) {
-        // Web: XFile from image_picker (readAsBytes works on web)
-        bytes = Uint8List.fromList(await file.readAsBytes());
-      } else if (file is File) {
-        // Mobile/Desktop: dart:io File (readAsBytes works on mobile)
-        bytes = await file.readAsBytes();
+      // Check if file is an image (by extension or MIME type)
+      final isImage = _isImageFile(fileName);
+      
+      if (isImage) {
+        // Compress image before upload
+        final compressedBytes = await ImageCompressionService.instance.compressImage(file);
+        
+        if (compressedBytes != null && compressedBytes.isNotEmpty) {
+          bytes = compressedBytes;
+        } else {
+          // Compression failed, fallback to original
+          if (file is XFile) {
+            bytes = Uint8List.fromList(await file.readAsBytes());
+          } else if (file is File) {
+            bytes = await file.readAsBytes();
+          } else {
+            throw Exception(
+              'Unsupported file type: ${file.runtimeType}. '
+              'Expected File or XFile.',
+            );
+          }
+        }
       } else {
-        throw Exception(
-          'Unsupported file type: ${file.runtimeType}. '
-          'Expected File or XFile.',
-        );
+        // Not an image, read bytes as-is
+        if (file is XFile) {
+          // Web: XFile from image_picker (readAsBytes works on web)
+          bytes = Uint8List.fromList(await file.readAsBytes());
+        } else if (file is File) {
+          // Mobile/Desktop: dart:io File (readAsBytes works on mobile)
+          bytes = await file.readAsBytes();
+        } else {
+          throw Exception(
+            'Unsupported file type: ${file.runtimeType}. '
+            'Expected File or XFile.',
+          );
+        }
       }
 
       // =======================================================================
@@ -257,6 +284,12 @@ class SupabaseStorageServiceWrapper {
     } catch (e) {
       throw Exception('Failed to get download URL: $e');
     }
+  }
+
+  /// Check if file is an image based on extension
+  bool _isImageFile(String fileName) {
+    final extension = fileName.toLowerCase().split('.').last;
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'].contains(extension);
   }
 
   /// Deletes file from Supabase Storage

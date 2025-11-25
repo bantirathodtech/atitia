@@ -120,12 +120,14 @@ class EnhancedDatabaseService {
     String? pgId,
     String? status,
     String? paymentStatus,
+    int? limit,
   }) {
     return _firestoreService.streamBookings(
       ownerId: ownerId,
       pgId: pgId,
       status: status,
       paymentStatus: paymentStatus,
+      limit: limit,
     );
   }
 
@@ -215,10 +217,12 @@ class EnhancedDatabaseService {
   Stream<QuerySnapshot> streamPublishedPGs({
     String? ownerId,
     bool? isActive,
+    int? limit,
   }) {
     return _firestoreService.streamPublishedPGs(
       ownerId: ownerId,
       isActive: isActive,
+      limit: limit,
     );
   }
 
@@ -251,14 +255,17 @@ class EnhancedDatabaseService {
     String? status,
     DateTime? startDate,
     DateTime? endDate,
+    int? limit,
     bool useCache = true,
   }) async {
+    // COST OPTIMIZATION: Limit aggregation to first 200 payments for stats
     final snapshot = await queryPayments(
       ownerId: ownerId,
       pgId: pgId,
       status: status,
       startDate: startDate,
       endDate: endDate,
+      limit: limit ?? 200,
       useCache: useCache,
     );
 

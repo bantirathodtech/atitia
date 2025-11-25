@@ -33,11 +33,13 @@ class GuestComplaintRepository {
   /// Streams complaints for a specific guest with real-time updates
   /// Uses Firestore query to filter complaints by guestId
   Stream<List<GuestComplaintModel>> getComplaintsForGuest(String guestId) {
+    // COST OPTIMIZATION: Limit to 20 complaints per stream
     return _databaseService
         .getCollectionStreamWithFilter(
           FirestoreConstants.complaints, // Collection name from constants
           'guestId',
           guestId,
+          limit: 20,
         )
         .map((snapshot) => snapshot.docs
             .map((doc) => GuestComplaintModel.fromMap(

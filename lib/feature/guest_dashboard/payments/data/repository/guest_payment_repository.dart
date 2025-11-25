@@ -40,11 +40,13 @@ class GuestPaymentRepository {
   /// Streams payments for a specific guest with real-time updates
   /// Uses Firestore query to filter payments by guestId, ordered by payment date
   Stream<List<GuestPaymentModel>> getPaymentsForGuest(String guestId) {
+    // COST OPTIMIZATION: Limit to 30 payments per stream
     return _databaseService
         .getCollectionStreamWithFilter(
       FirestoreConstants.payments, // Collection name from constants
       'guestId',
       guestId,
+      limit: 30,
     )
         .map((snapshot) {
       final payments = snapshot.docs
@@ -61,12 +63,14 @@ class GuestPaymentRepository {
 
   /// Streams pending payments for a specific guest
   Stream<List<GuestPaymentModel>> getPendingPaymentsForGuest(String guestId) {
+    // COST OPTIMIZATION: Limit to 20 pending payments per stream
     return _databaseService.getCollectionStreamWithCompoundFilter(
       FirestoreConstants.payments,
       [
         {'field': 'guestId', 'value': guestId},
         {'field': 'status', 'value': 'Pending'},
       ],
+      limit: 20,
     ).map((snapshot) => snapshot.docs
         .map((doc) => GuestPaymentModel.fromMap(
               doc.data()! as Map<String, dynamic>,
@@ -76,13 +80,14 @@ class GuestPaymentRepository {
 
   /// Streams overdue payments for a specific guest
   Stream<List<GuestPaymentModel>> getOverduePaymentsForGuest(String guestId) {
-    // final now = DateTime.now();
+    // COST OPTIMIZATION: Limit to 20 overdue payments per stream
     return _databaseService.getCollectionStreamWithCompoundFilter(
       FirestoreConstants.payments,
       [
         {'field': 'guestId', 'value': guestId},
         {'field': 'status', 'value': 'Pending'},
       ],
+      limit: 20,
     ).map((snapshot) => snapshot.docs
         .map((doc) => GuestPaymentModel.fromMap(
               doc.data()! as Map<String, dynamic>,

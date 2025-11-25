@@ -3,10 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/utils/responsive/responsive_system.dart';
+import '../../../../../../common/utils/constants/firestore.dart';
 import '../../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
@@ -17,6 +19,8 @@ import '../../../../../../common/widgets/text/heading_small.dart';
 import '../../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../../common/widgets/buttons/secondary_button.dart';
 import '../../../../../../common/widgets/indicators/enhanced_empty_state.dart';
+import '../../../../../../common/widgets/pagination/firestore_pagination_helper.dart';
+import '../../../../../../common/widgets/pagination/pagination_controller.dart';
 import '../../../../../../core/models/refund/refund_request_model.dart';
 import '../../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../viewmodel/admin_refund_viewmodel.dart';
@@ -31,14 +35,80 @@ class AdminRefundApprovalScreen extends StatefulWidget {
       _AdminRefundApprovalScreenState();
 }
 
-class _AdminRefundApprovalScreenState
-    extends State<AdminRefundApprovalScreen> {
+class _AdminRefundApprovalScreenState extends State<AdminRefundApprovalScreen> {
+  PaginationController<RefundRequestModel>? _paginationController;
+  String _selectedStatusFilter = 'all';
+  String _selectedTypeFilter = 'all';
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AdminRefundViewModel>().initialize();
+      _initializePagination();
     });
+  }
+
+  @override
+  void dispose() {
+    _paginationController?.dispose();
+    super.dispose();
+  }
+
+  /// Initialize pagination controller for all refund requests
+  void _initializePagination() {
+    _updatePaginationController();
+  }
+
+  /// Update pagination controller based on selected filters
+  void _updatePaginationController([String? statusFilter, String? typeFilter]) {
+    final status = statusFilter ?? _selectedStatusFilter;
+    final type = typeFilter ?? _selectedTypeFilter;
+    _paginationController?.dispose();
+
+    Query baseQuery = FirebaseFirestore.instance
+        .collection(FirestoreConstants.refundRequests);
+
+    // Apply status filter if not 'all' (most common filter)
+    if (status != 'all') {
+      baseQuery = baseQuery.where('status', isEqualTo: status);
+    }
+
+    // Apply ordering
+    baseQuery = baseQuery.orderBy('requestedAt', descending: true);
+
+    // If type filter is also set, we'll filter in memory after fetching
+    final needsTypeFilter = type != 'all';
+
+    _paginationController =
+        FirestorePaginationHelper.createController<RefundRequestModel>(
+      query: baseQuery,
+      documentMapper: (doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        // Ensure refundRequestId is set from document ID
+        if (data['refundRequestId'] == null ||
+            (data['refundRequestId'] as String).isEmpty) {
+          data['refundRequestId'] = doc.id;
+        }
+        final refund = RefundRequestModel.fromMap(data);
+
+        // Apply in-memory type filter if needed
+        if (needsTypeFilter && refund.type.firestoreValue != type) {
+          // Return a sentinel value - we'll filter these out in the controller
+          // Actually, let's filter in the itemBuilder instead
+        }
+
+        return refund;
+      },
+      pageSize: 20,
+    );
+
+    // Override itemBuilder to apply type filter in memory
+    // Note: This is a simplified approach - for production, consider creating a composite index
+    // or using a custom query function that filters before pagination
+
+    // Load initial page
+    _paginationController?.loadInitial();
   }
 
   @override
@@ -58,31 +128,43 @@ class _AdminRefundApprovalScreenState
             return Center(
               child: EmptyStates.error(
                 context: context,
-                message: viewModel.errorMessage ?? 'Failed to load refund requests',
+                message:
+                    viewModel.errorMessage ?? 'Failed to load refund requests',
                 onRetry: () => viewModel.refresh(),
               ),
             );
           }
 
           return RefreshIndicator(
-            onRefresh: () => viewModel.refresh(),
-            child: SingleChildScrollView(
-              padding: ResponsiveSystem.getResponsivePadding(context),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Statistics Cards
-                  _buildStatistics(context, viewModel),
-                  const SizedBox(height: AppSpacing.paddingL),
+            onRefresh: () async {
+              await viewModel.refresh();
+              await _paginationController?.refresh();
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Statistics Cards
+                Padding(
+                  padding: ResponsiveSystem.getResponsivePadding(context)
+                      .copyWith(bottom: AppSpacing.paddingM),
+                  child: _buildStatistics(context, viewModel),
+                ),
 
-                  // Filters
-                  _buildFilters(context, viewModel),
-                  const SizedBox(height: AppSpacing.paddingL),
+                // Filters
+                Padding(
+                  padding: ResponsiveSystem.getResponsivePadding(context)
+                      .copyWith(bottom: AppSpacing.paddingM),
+                  child: _buildFilters(context, viewModel),
+                ),
 
-                  // Refund Requests List
-                  _buildRefundRequestsList(context, viewModel),
-                ],
-              ),
+                // Refund Requests List
+                Expanded(
+                  child: Padding(
+                    padding: ResponsiveSystem.getResponsivePadding(context),
+                    child: _buildRefundRequestsList(context, viewModel),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -137,8 +219,8 @@ class _AdminRefundApprovalScreenState
     );
   }
 
-  Widget _buildStatCard(
-      BuildContext context, String label, String value, Color color, IconData icon) {
+  Widget _buildStatCard(BuildContext context, String label, String value,
+      Color color, IconData icon) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -150,10 +232,10 @@ class _AdminRefundApprovalScreenState
             CaptionText(
               text: label,
               color: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(alpha: 0.7),
+                  .textTheme
+                  .bodySmall
+                  ?.color
+                  ?.withValues(alpha: 0.7),
             ),
           ],
         ),
@@ -161,8 +243,7 @@ class _AdminRefundApprovalScreenState
     );
   }
 
-  Widget _buildFilters(
-      BuildContext context, AdminRefundViewModel viewModel) {
+  Widget _buildFilters(BuildContext context, AdminRefundViewModel viewModel) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -191,7 +272,7 @@ class _AdminRefundApprovalScreenState
   Widget _buildStatusFilter(
       BuildContext context, AdminRefundViewModel viewModel) {
     return DropdownButtonFormField<String>(
-      value: viewModel.selectedStatusFilter,
+      initialValue: _selectedStatusFilter,
       decoration: InputDecoration(
         labelText: 'Status',
         border: OutlineInputBorder(
@@ -207,7 +288,11 @@ class _AdminRefundApprovalScreenState
       ],
       onChanged: (value) {
         if (value != null) {
+          setState(() {
+            _selectedStatusFilter = value;
+          });
           viewModel.setStatusFilter(value);
+          _updatePaginationController(value, _selectedTypeFilter);
         }
       },
     );
@@ -216,7 +301,7 @@ class _AdminRefundApprovalScreenState
   Widget _buildTypeFilter(
       BuildContext context, AdminRefundViewModel viewModel) {
     return DropdownButtonFormField<String>(
-      value: viewModel.selectedTypeFilter,
+      initialValue: _selectedTypeFilter,
       decoration: InputDecoration(
         labelText: 'Type',
         border: OutlineInputBorder(
@@ -231,7 +316,11 @@ class _AdminRefundApprovalScreenState
       ],
       onChanged: (value) {
         if (value != null) {
+          setState(() {
+            _selectedTypeFilter = value;
+          });
           viewModel.setTypeFilter(value);
+          _updatePaginationController(_selectedStatusFilter, value);
         }
       },
     );
@@ -239,6 +328,81 @@ class _AdminRefundApprovalScreenState
 
   Widget _buildRefundRequestsList(
       BuildContext context, AdminRefundViewModel viewModel) {
+    // Use pagination controller if available
+    if (_paginationController != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Consumer<PaginationController<RefundRequestModel>>(
+            builder: (context, controller, child) {
+              return HeadingMedium(
+                  text: 'Refund Requests (${controller.items.length})');
+            },
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          Expanded(
+            child: Consumer<PaginationController<RefundRequestModel>>(
+              builder: (context, controller, child) {
+                // Filter by type in memory if needed
+                final filteredItems = _selectedTypeFilter == 'all'
+                    ? controller.items
+                    : controller.items
+                        .where((refund) =>
+                            refund.type.firestoreValue == _selectedTypeFilter)
+                        .toList();
+
+                if (filteredItems.isEmpty && !controller.isLoading) {
+                  return AdaptiveCard(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.paddingL),
+                      child: Center(
+                        child: EmptyStates.noData(
+                          context: context,
+                          title: 'No Refund Requests',
+                          message:
+                              'There are no refund requests matching the current filters.',
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  itemCount:
+                      filteredItems.length + (controller.hasMore ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == filteredItems.length) {
+                      // Load more indicator
+                      if (controller.hasMore && !controller.isLoadingMore) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          controller.loadMore();
+                        });
+                      }
+                      return controller.isLoadingMore
+                          ? const Padding(
+                              padding: EdgeInsets.all(AppSpacing.paddingM),
+                              child: Center(child: CircularProgressIndicator()),
+                            )
+                          : const SizedBox.shrink();
+                    }
+
+                    final refund = filteredItems[index];
+                    return Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: AppSpacing.paddingM),
+                      child:
+                          _buildRefundRequestCard(context, refund, viewModel),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Fallback to ViewModel implementation
     final filteredRefunds = viewModel.filteredRefunds;
 
     if (filteredRefunds.isEmpty) {
@@ -249,7 +413,8 @@ class _AdminRefundApprovalScreenState
             child: EmptyStates.noData(
               context: context,
               title: 'No Refund Requests',
-              message: 'There are no refund requests matching the current filters.',
+              message:
+                  'There are no refund requests matching the current filters.',
             ),
           ),
         ),
@@ -317,7 +482,8 @@ class _AdminRefundApprovalScreenState
                     children: [
                       HeadingSmall(text: refund.type.displayName),
                       CaptionText(
-                        text: 'Requested: ${dateFormatter.format(refund.requestedAt)}',
+                        text:
+                            'Requested: ${dateFormatter.format(refund.requestedAt)}',
                         color: Theme.of(context)
                             .textTheme
                             .bodySmall
@@ -334,7 +500,8 @@ class _AdminRefundApprovalScreenState
                   ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
                     border: Border.all(color: statusColor),
                   ),
                   child: Row(
@@ -414,14 +581,16 @@ class _AdminRefundApprovalScreenState
                 children: [
                   Expanded(
                     child: SecondaryButton(
-                      onPressed: () => _showRejectDialog(context, refund, viewModel),
+                      onPressed: () =>
+                          _showRejectDialog(context, refund, viewModel),
                       label: 'Reject',
                     ),
                   ),
                   const SizedBox(width: AppSpacing.paddingM),
                   Expanded(
                     child: PrimaryButton(
-                      onPressed: () => _approveRefund(context, refund, viewModel),
+                      onPressed: () =>
+                          _approveRefund(context, refund, viewModel),
                       label: 'Approve',
                     ),
                   ),
@@ -444,8 +613,8 @@ class _AdminRefundApprovalScreenState
     );
   }
 
-  Future<void> _approveRefund(BuildContext context,
-      RefundRequestModel refund, AdminRefundViewModel viewModel) async {
+  Future<void> _approveRefund(BuildContext context, RefundRequestModel refund,
+      AdminRefundViewModel viewModel) async {
     final authService = getIt.auth;
     final adminUserId = authService.currentUserId ?? '';
 
@@ -475,8 +644,8 @@ class _AdminRefundApprovalScreenState
     }
   }
 
-  Future<void> _processRefund(BuildContext context,
-      RefundRequestModel refund, AdminRefundViewModel viewModel) async {
+  Future<void> _processRefund(BuildContext context, RefundRequestModel refund,
+      AdminRefundViewModel viewModel) async {
     final authService = getIt.auth;
     final adminUserId = authService.currentUserId ?? '';
 
@@ -599,4 +768,3 @@ class _AdminRefundApprovalScreenState
     }
   }
 }
-

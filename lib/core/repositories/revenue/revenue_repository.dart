@@ -1,5 +1,7 @@
 // lib/core/repositories/revenue/revenue_repository.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../di/common/unified_service_locator.dart';
 import '../../../common/utils/constants/firestore.dart';
 import '../../interfaces/analytics/analytics_service_interface.dart';
@@ -89,36 +91,41 @@ class RevenueRepository {
   }
 
   /// Stream revenue records for an owner
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Stream<List<RevenueRecordModel>> streamOwnerRevenue(String ownerId) {
-    return _databaseService
-        .getCollectionStreamWithFilter(
-          FirestoreConstants.revenueRecords,
-          'ownerId',
-          ownerId,
-        )
+    // COST OPTIMIZATION: Use direct Firestore query with limit
+    // For full pagination, use PaginationController with FirestorePaginationHelper
+    return FirebaseFirestore.instance
+        .collection(FirestoreConstants.revenueRecords)
+        .where('ownerId', isEqualTo: ownerId)
+        .orderBy('paymentDate', descending: true)
+        .limit(20) // COST OPTIMIZATION: Limit to 20 items per page
+        .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => RevenueRecordModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
+          .map((doc) => RevenueRecordModel.fromMap(doc.data()))
+          .toList();
     });
   }
 
   /// Get revenue records for an owner
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Future<List<RevenueRecordModel>> getOwnerRevenue(String ownerId) async {
     try {
-      final revenues = await _databaseService.queryDocuments(
+      final revenues = await _databaseService.queryCollection(
         FirestoreConstants.revenueRecords,
-        field: 'ownerId',
-        isEqualTo: ownerId,
+        [
+          {'field': 'ownerId', 'value': ownerId}
+        ],
+        orderBy: 'paymentDate',
+        descending: true,
+        limit: 20, // COST OPTIMIZATION: Limit to 20 items per page
       );
 
       return revenues.docs
-          .map((doc) => RevenueRecordModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
+          .map((doc) =>
+              RevenueRecordModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw Exception('Failed to get owner revenue: $e');
     }
@@ -146,8 +153,8 @@ class RevenueRepository {
       );
 
       return revenues.docs
-          .map((doc) => RevenueRecordModel.fromMap(
-              doc.data() as Map<String, dynamic>))
+          .map((doc) =>
+              RevenueRecordModel.fromMap(doc.data() as Map<String, dynamic>))
           .where((revenue) => revenue.status == PaymentStatus.completed)
           .toList()
         ..sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
@@ -167,8 +174,8 @@ class RevenueRepository {
 
       double total = 0.0;
       for (final doc in revenues.docs) {
-        final revenue = RevenueRecordModel.fromMap(
-            doc.data() as Map<String, dynamic>);
+        final revenue =
+            RevenueRecordModel.fromMap(doc.data() as Map<String, dynamic>);
         total += revenue.amount;
       }
       return total;
@@ -188,8 +195,8 @@ class RevenueRepository {
 
       double total = 0.0;
       for (final doc in revenues.docs) {
-        final revenue = RevenueRecordModel.fromMap(
-            doc.data() as Map<String, dynamic>);
+        final revenue =
+            RevenueRecordModel.fromMap(doc.data() as Map<String, dynamic>);
         if (revenue.paymentDate.year == year &&
             revenue.paymentDate.month == month) {
           total += revenue.amount;
@@ -212,8 +219,8 @@ class RevenueRepository {
 
       double total = 0.0;
       for (final doc in revenues.docs) {
-        final revenue = RevenueRecordModel.fromMap(
-            doc.data() as Map<String, dynamic>);
+        final revenue =
+            RevenueRecordModel.fromMap(doc.data() as Map<String, dynamic>);
         if (revenue.paymentDate.year == year) {
           total += revenue.amount;
         }
@@ -240,8 +247,8 @@ class RevenueRepository {
       };
 
       for (final doc in revenues.docs) {
-        final revenue = RevenueRecordModel.fromMap(
-            doc.data() as Map<String, dynamic>);
+        final revenue =
+            RevenueRecordModel.fromMap(doc.data() as Map<String, dynamic>);
         breakdown[revenue.type] =
             (breakdown[revenue.type] ?? 0.0) + revenue.amount;
       }
@@ -264,8 +271,8 @@ class RevenueRepository {
       final breakdown = <String, double>{};
 
       for (final doc in revenues.docs) {
-        final revenue = RevenueRecordModel.fromMap(
-            doc.data() as Map<String, dynamic>);
+        final revenue =
+            RevenueRecordModel.fromMap(doc.data() as Map<String, dynamic>);
         final monthYear = revenue.monthYear; // Format: "2025-01"
         breakdown[monthYear] = (breakdown[monthYear] ?? 0.0) + revenue.amount;
       }
@@ -277,35 +284,42 @@ class RevenueRepository {
   }
 
   /// Stream all revenue records (for admin dashboard)
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Stream<List<RevenueRecordModel>> streamAllRevenue() {
-    return _databaseService
-        .getCollectionStream(FirestoreConstants.revenueRecords)
+    // COST OPTIMIZATION: Use direct Firestore query with limit
+    // For full pagination, use PaginationController with FirestorePaginationHelper
+    return FirebaseFirestore.instance
+        .collection(FirestoreConstants.revenueRecords)
+        .orderBy('paymentDate', descending: true)
+        .limit(20) // COST OPTIMIZATION: Limit to 20 items per page
+        .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => RevenueRecordModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
+          .map((doc) => RevenueRecordModel.fromMap(doc.data()))
+          .toList();
     });
   }
 
   /// Get pending revenue records (payments not yet completed)
+  /// OPTIMIZED: Limited to 20 items per page for cost optimization
   Future<List<RevenueRecordModel>> getPendingRevenue() async {
     try {
-      final revenues = await _databaseService.queryDocuments(
+      final revenues = await _databaseService.queryCollection(
         FirestoreConstants.revenueRecords,
-        field: 'status',
-        isEqualTo: PaymentStatus.pending.firestoreValue,
+        [
+          {'field': 'status', 'value': PaymentStatus.pending.firestoreValue}
+        ],
+        orderBy: 'paymentDate',
+        descending: true,
+        limit: 20, // COST OPTIMIZATION: Limit to 20 items per page
       );
 
       return revenues.docs
-          .map((doc) => RevenueRecordModel.fromMap(
-              doc.data() as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
+          .map((doc) =>
+              RevenueRecordModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw Exception('Failed to get pending revenue: $e');
     }
   }
 }
-

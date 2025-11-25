@@ -23,11 +23,13 @@ class PaymentReminderService with LoggingMixin {
       logInfo('Checking for payments that need reminders', feature: 'payment_reminders');
 
       // Get all pending payments
+      // COST OPTIMIZATION: Limit to 200 pending payments for reminder check
       final pendingPaymentsSnapshot = await _databaseService.queryCollection(
         FirestoreConstants.payments,
         [
           {'field': 'status', 'value': 'Pending'},
         ],
+        limit: 200,
       );
 
       final now = DateTime.now();

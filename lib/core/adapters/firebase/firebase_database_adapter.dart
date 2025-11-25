@@ -47,28 +47,31 @@ class FirebaseDatabaseAdapter implements IDatabaseService {
   }
 
   @override
-  Stream<QuerySnapshot> getCollectionStream(String collection) {
-    return _firestoreService.getCollectionStream(collection);
+  Stream<QuerySnapshot> getCollectionStream(String collection, {int? limit}) {
+    return _firestoreService.getCollectionStream(collection, limit: limit);
   }
 
   @override
   Stream<QuerySnapshot> getCollectionStreamWithFilter(
     String collection,
     String field,
-    dynamic value,
-  ) {
+    dynamic value, {
+    int? limit,
+  }) {
     return _firestoreService.getCollectionStreamWithFilter(
-        collection, field, value);
+        collection, field, value, limit: limit);
   }
 
   @override
   Stream<QuerySnapshot> getCollectionStreamWithCompoundFilter(
     String collection,
-    List<Map<String, dynamic>> filters,
-  ) {
+    List<Map<String, dynamic>> filters, {
+    int? limit,
+  }) {
     return _firestoreService.getCollectionStreamWithCompoundFilter(
       collection,
       filters,
+      limit: limit,
     );
   }
 
@@ -132,11 +135,13 @@ class FirebaseDatabaseAdapter implements IDatabaseService {
     String collection, {
     required String field,
     required dynamic isEqualTo,
+    int? limit,
   }) {
     return _firestoreService.queryDocuments(
       collection,
       field: field,
       isEqualTo: isEqualTo,
+      limit: limit,
     );
   }
 

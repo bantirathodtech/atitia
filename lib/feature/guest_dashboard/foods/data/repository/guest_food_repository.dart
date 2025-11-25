@@ -20,8 +20,9 @@ class GuestFoodRepository {
   /// Streams all available food items with real-time updates
   /// Returns a stream of food lists for reactive UI updates
   Stream<List<GuestFoodModel>> getAllFoodsStream() {
+    // COST OPTIMIZATION: Limit to 50 food items per stream
     return _databaseService
-        .getCollectionStream(FirestoreConstants.foods)
+        .getCollectionStream(FirestoreConstants.foods, limit: 50)
         .map((snapshot) => snapshot.docs
             .map((doc) => GuestFoodModel.fromMap(
                   doc.data()! as Map<String, dynamic>,

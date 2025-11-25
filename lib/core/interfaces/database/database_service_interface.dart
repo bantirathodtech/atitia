@@ -31,20 +31,22 @@ abstract class IDatabaseService {
   Future<void> deleteDocument(String collection, String documentId);
 
   /// Streams a collection with optional filter
-  Stream<QuerySnapshot> getCollectionStream(String collection);
+  Stream<QuerySnapshot> getCollectionStream(String collection, {int? limit});
 
   /// Streams a collection filtered by a single field
   Stream<QuerySnapshot> getCollectionStreamWithFilter(
     String collection,
     String field,
-    dynamic value,
-  );
+    dynamic value, {
+    int? limit,
+  });
 
   /// Streams a collection with compound filters
   Stream<QuerySnapshot> getCollectionStreamWithCompoundFilter(
     String collection,
-    List<Map<String, dynamic>> filters,
-  );
+    List<Map<String, dynamic>> filters, {
+    int? limit,
+  });
 
   /// Generates a new document ID
   String generateDocumentId();
@@ -66,5 +68,6 @@ abstract class IDatabaseService {
     String collection, {
     required String field,
     required dynamic isEqualTo,
+    int? limit,
   });
 }

@@ -94,6 +94,7 @@ class OptimizedFirestoreService {
     String? pgId,
     String? status,
     String? paymentStatus,
+    int? limit,
   }) {
     Query query = _firestore.collection(FirestoreConstants.bookings);
 
@@ -108,6 +109,13 @@ class OptimizedFirestoreService {
     }
     if (paymentStatus != null) {
       query = query.where('paymentStatus', isEqualTo: paymentStatus);
+    }
+    
+    // COST OPTIMIZATION: Apply limit if specified (defaults to 30 for bookings)
+    if (limit != null && limit > 0) {
+      query = query.limit(limit);
+    } else {
+      query = query.limit(30); // Default limit for safety
     }
 
     return query.snapshots();
@@ -173,6 +181,7 @@ class OptimizedFirestoreService {
   Stream<QuerySnapshot> streamPublishedPGs({
     String? ownerId,
     bool? isActive,
+    int? limit,
   }) {
     Query query = _firestore.collection(FirestoreConstants.pgs);
 
@@ -183,6 +192,13 @@ class OptimizedFirestoreService {
     query = query.where('isDraft', isEqualTo: false);
     if (isActive != null) {
       query = query.where('isActive', isEqualTo: isActive);
+    }
+    
+    // COST OPTIMIZATION: Apply limit if specified (defaults to 50 for PGs)
+    if (limit != null && limit > 0) {
+      query = query.limit(limit);
+    } else {
+      query = query.limit(50); // Default limit for safety
     }
 
     return query.snapshots();
@@ -274,13 +290,16 @@ class OptimizedFirestoreService {
     String? status,
     DateTime? startDate,
     DateTime? endDate,
+    int? limit,
   }) async {
+    // COST OPTIMIZATION: Limit aggregation to first 200 payments for stats
     final snapshot = await queryPayments(
       ownerId: ownerId,
       pgId: pgId,
       status: status,
       startDate: startDate,
       endDate: endDate,
+      limit: limit ?? 200,
     );
 
     double totalAmount = 0.0;

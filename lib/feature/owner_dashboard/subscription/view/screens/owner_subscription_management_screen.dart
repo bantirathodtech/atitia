@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
@@ -17,11 +18,16 @@ import '../../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../../common/utils/responsive/responsive_system.dart';
+import '../../../../../../common/utils/constants/firestore.dart';
 import '../../../../../../l10n/app_localizations.dart';
 import '../../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../../core/models/subscription/subscription_plan_model.dart';
 import '../../../../../../core/models/subscription/owner_subscription_model.dart';
 import '../../../../../../common/utils/constants/routes.dart';
+import '../../../../../../common/widgets/pagination/paginated_list_view.dart';
+import '../../../../../../common/widgets/pagination/firestore_pagination_helper.dart';
+import '../../../../../../common/widgets/pagination/pagination_controller.dart';
+import '../../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../shared/widgets/owner_drawer.dart';
 import '../../viewmodel/owner_subscription_viewmodel.dart';
 
@@ -38,6 +44,7 @@ class _OwnerSubscriptionManagementScreenState
     extends State<OwnerSubscriptionManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  PaginationController<OwnerSubscriptionModel>? _historyPaginationController;
   static final InternationalizationService _i18n =
       InternationalizationService.instance;
 
@@ -61,15 +68,44 @@ class _OwnerSubscriptionManagementScreenState
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    
+    // Initialize pagination controller for subscription history
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<OwnerSubscriptionViewModel>().initialize();
+      _initializeHistoryPagination();
     });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _historyPaginationController?.dispose();
     super.dispose();
+  }
+
+  /// Initialize pagination controller for subscription history
+  void _initializeHistoryPagination() {
+    final ownerId = getIt.auth.currentUserId;
+    if (ownerId == null || ownerId.isEmpty) return;
+
+    _historyPaginationController = FirestorePaginationHelper.createController<OwnerSubscriptionModel>(
+      query: FirebaseFirestore.instance
+          .collection(FirestoreConstants.ownerSubscriptions)
+          .where('ownerId', isEqualTo: ownerId)
+          .orderBy('createdAt', descending: true),
+      documentMapper: (doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        // Ensure subscriptionId is set from document ID
+        if (data['subscriptionId'] == null || (data['subscriptionId'] as String).isEmpty) {
+          data['subscriptionId'] = doc.id;
+        }
+        return OwnerSubscriptionModel.fromMap(data);
+      },
+      pageSize: 20,
+    );
+
+    // Load initial page
+    _historyPaginationController?.loadInitial();
   }
 
   @override
@@ -461,9 +497,37 @@ class _OwnerSubscriptionManagementScreenState
     OwnerSubscriptionViewModel viewModel,
     AppLocalizations loc,
   ) {
-    final history = viewModel.subscriptionHistory;
     final responsivePadding = ResponsiveSystem.getResponsivePadding(context);
 
+    // Use pagination controller if available, otherwise fallback to ViewModel
+    if (_historyPaginationController != null) {
+      return RefreshIndicator(
+        onRefresh: () => _historyPaginationController!.refresh(),
+        child: PaginatedListView<OwnerSubscriptionModel>(
+          controller: _historyPaginationController!,
+          padding: responsivePadding,
+          itemBuilder: (context, subscription, index) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: AppSpacing.paddingM,
+              ),
+              child: _buildHistoryCard(context, subscription, loc),
+            );
+          },
+          emptyWidget: EnhancedEmptyState(
+            title: _text('noHistory', 'No Subscription History'),
+            message: _text(
+              'subscriptionHistoryWillAppearHere',
+              'Your subscription history will appear here',
+            ),
+            icon: Icons.history_outlined,
+          ),
+        ),
+      );
+    }
+
+    // Fallback to old implementation if pagination not initialized
+    final history = viewModel.subscriptionHistory;
     if (viewModel.loading && history.isEmpty) {
       return const EnhancedLoadingState(type: LoadingType.centered);
     }

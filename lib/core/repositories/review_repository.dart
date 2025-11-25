@@ -71,8 +71,9 @@ class ReviewRepository {
 
   /// Get guest's reviews
   Stream<List<ReviewModel>> streamGuestReviews(String guestId) {
+    // COST OPTIMIZATION: Limit to 20 reviews per stream
     return _databaseService
-        .getCollectionStreamWithFilter(_reviewsCollection, 'guestId', guestId)
+        .getCollectionStreamWithFilter(_reviewsCollection, 'guestId', guestId, limit: 20)
         .map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -84,8 +85,9 @@ class ReviewRepository {
 
   /// Get owner's reviews (for all their PGs)
   Stream<List<ReviewModel>> streamOwnerReviews(String ownerId) {
+    // COST OPTIMIZATION: Limit to 30 reviews per stream
     return _databaseService
-        .getCollectionStreamWithFilter(_reviewsCollection, 'ownerId', ownerId)
+        .getCollectionStreamWithFilter(_reviewsCollection, 'ownerId', ownerId, limit: 30)
         .map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -98,10 +100,12 @@ class ReviewRepository {
   /// Get review statistics for a PG
   Future<Map<String, dynamic>> getPGReviewStats(String pgId) async {
     try {
+      // COST OPTIMIZATION: Limit to 100 reviews for stats calculation
       final reviews = await _databaseService.queryDocuments(
         _reviewsCollection,
         field: 'pgId',
         isEqualTo: pgId,
+        limit: 100,
       );
 
       if (reviews.docs.isEmpty) {
@@ -272,8 +276,9 @@ class ReviewRepository {
 
   /// Get pending reviews for moderation
   Stream<List<ReviewModel>> streamPendingReviews() {
+    // COST OPTIMIZATION: Limit to 50 pending reviews per stream
     return _databaseService
-        .getCollectionStream(_reviewsCollection)
+        .getCollectionStream(_reviewsCollection, limit: 50)
         .map((snapshot) {
       return snapshot.docs
           .map((doc) {
@@ -297,8 +302,10 @@ class ReviewRepository {
 
   /// Get recent reviews across all PGs
   Stream<List<ReviewModel>> streamRecentReviews({int limit = 10}) {
+    // COST OPTIMIZATION: Limit query to requested limit (max 20)
+    final queryLimit = limit > 20 ? 20 : limit;
     return _databaseService
-        .getCollectionStream(_reviewsCollection)
+        .getCollectionStream(_reviewsCollection, limit: queryLimit)
         .map((snapshot) {
       return snapshot.docs
           .map((doc) {

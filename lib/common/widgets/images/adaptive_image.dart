@@ -27,6 +27,13 @@ class AdaptiveImage extends AdaptiveStatelessWidget {
   @override
   Widget buildAdaptive(BuildContext context) {
     final finalUrl = _normalizeUrl(imageUrl);
+    
+    // COST OPTIMIZATION: Use smaller cache sizes for list thumbnails
+    // If width/height are small (< 200), treat as thumbnail and use aggressive caching
+    final isThumbnail = (width != null && width! < 200) || (height != null && height! < 200);
+    final cacheWidth = isThumbnail ? (width?.toInt() ?? 150) : (width?.isFinite == true ? width!.toInt() : null);
+    final cacheHeight = isThumbnail ? (height?.toInt() ?? 150) : (height?.isFinite == true ? height!.toInt() : null);
+    
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: CachedNetworkImage(
@@ -43,12 +50,15 @@ class AdaptiveImage extends AdaptiveStatelessWidget {
           return errorWidget ?? _buildDefaultErrorWidget(context);
         },
         // Performance optimizations
-        memCacheWidth: width?.isFinite == true ? width!.toInt() : null,
-        memCacheHeight: height?.isFinite == true ? height!.toInt() : null,
-        maxWidthDiskCache: 800,
-        maxHeightDiskCache: 600,
+        memCacheWidth: cacheWidth,
+        memCacheHeight: cacheHeight,
+        maxWidthDiskCache: isThumbnail ? 300 : 800,
+        maxHeightDiskCache: isThumbnail ? 300 : 600,
         // Cache settings for better performance
         cacheManager: null, // Use default cache manager
+        // Lazy loading optimization
+        fadeInDuration: const Duration(milliseconds: 200),
+        fadeOutDuration: const Duration(milliseconds: 100),
       ),
     );
   }

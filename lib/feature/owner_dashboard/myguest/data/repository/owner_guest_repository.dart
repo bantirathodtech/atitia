@@ -27,9 +27,10 @@ class OwnerGuestRepository {
   /// Streams all users with role 'Guest' from Firestore
   /// Returns real-time updates of guest list
   Stream<List<OwnerGuestModel>> streamGuests() {
+    // COST OPTIMIZATION: Limit to 50 guests per stream
     return _databaseService
         .getCollectionStreamWithFilter(
-            FirestoreConstants.users, 'role', 'guest')
+            FirestoreConstants.users, 'role', 'guest', limit: 50)
         .map((snapshot) {
       final guests = snapshot.docs
           .map((doc) => OwnerGuestModel.fromFirestore(doc))
@@ -49,8 +50,9 @@ class OwnerGuestRepository {
       List<String> pgIds) {
     if (pgIds.isEmpty) return Stream.value([]);
 
+    // COST OPTIMIZATION: Limit to 50 complaints per stream to prevent loading entire collection
     return _databaseService
-        .getCollectionStream(FirestoreConstants.complaints)
+        .getCollectionStream(FirestoreConstants.complaints, limit: 50)
         .map((snapshot) {
       final complaints = snapshot.docs
           .map((doc) {
@@ -270,9 +272,10 @@ class OwnerGuestRepository {
   /// Streams all bookings filtered by specific PG ID
   /// Provides real-time booking updates for owner's PG properties
   Stream<List<OwnerBookingModel>> streamBookings(String pgId) {
+    // COST OPTIMIZATION: Limit to 30 bookings per PG
     return _databaseService
         .getCollectionStreamWithFilter(
-            FirestoreConstants.bookings, 'pgId', pgId)
+            FirestoreConstants.bookings, 'pgId', pgId, limit: 30)
         .map((snapshot) {
       final bookings = snapshot.docs
           .map((doc) => OwnerBookingModel.fromFirestore(doc))
@@ -399,9 +402,10 @@ class OwnerGuestRepository {
   /// Streams all payments filtered by specific PG ID
   /// Monitors payment status and collections in real-time
   Stream<List<OwnerPaymentModel>> streamPayments(String pgId) {
+    // COST OPTIMIZATION: Limit to 30 payments per PG
     return _databaseService
         .getCollectionStreamWithFilter(
-            FirestoreConstants.payments, 'pgId', pgId)
+            FirestoreConstants.payments, 'pgId', pgId, limit: 30)
         .map((snapshot) {
       final payments = snapshot.docs
           .map((doc) => OwnerPaymentModel.fromFirestore(doc))
@@ -486,8 +490,9 @@ class OwnerGuestRepository {
       return Stream.value([]);
     }
 
+    // COST OPTIMIZATION: Limit to 50 bookings per stream to prevent loading entire collection
     return _databaseService
-        .getCollectionStream(FirestoreConstants.bookings)
+        .getCollectionStream(FirestoreConstants.bookings, limit: 50)
         .map((snapshot) {
       final bookings = snapshot.docs
           .map((doc) => OwnerBookingModel.fromFirestore(doc))
@@ -514,8 +519,9 @@ class OwnerGuestRepository {
       return Stream.value([]);
     }
 
+    // COST OPTIMIZATION: Limit to 50 payments per stream to prevent loading entire collection
     return _databaseService
-        .getCollectionStream(FirestoreConstants.payments)
+        .getCollectionStream(FirestoreConstants.payments, limit: 50)
         .map((snapshot) {
       final payments = snapshot.docs
           .map((doc) => OwnerPaymentModel.fromFirestore(doc))

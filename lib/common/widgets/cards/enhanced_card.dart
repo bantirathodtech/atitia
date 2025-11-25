@@ -184,7 +184,6 @@ class GradientCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EnhancedCard(
-      child: child,
       gradient: LinearGradient(
         colors: colors,
         begin: begin,
@@ -195,6 +194,7 @@ class GradientCard extends StatelessWidget {
       borderRadius: borderRadius,
       onTap: onTap,
       elevation: 4,
+      child: child,
     );
   }
 }
@@ -226,7 +226,6 @@ class ElevatedCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return EnhancedCard(
-      child: child,
       padding: padding,
       margin: margin,
       backgroundColor: backgroundColor,
@@ -247,6 +246,7 @@ class ElevatedCard extends StatelessWidget {
           spreadRadius: 0,
         ),
       ],
+      child: child,
     );
   }
 }

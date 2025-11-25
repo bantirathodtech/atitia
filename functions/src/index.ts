@@ -8,7 +8,8 @@
  * - Auto-downgrade after grace period (7 days)
  */
 
-import * as functions from "firebase-functions";
+import * as functions from "firebase-functions/v2";
+import {onSchedule} from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 
 admin.initializeApp();
@@ -25,10 +26,12 @@ const REMINDER_DAYS = [7, 3, 1];
  * Scheduled function that runs daily at 9:00 AM UTC
  * Checks for expiring subscriptions and processes renewals
  */
-export const checkSubscriptionRenewals = functions.pubsub
-  .schedule("0 9 * * *") // Every day at 9:00 AM UTC
-  .timeZone("UTC")
-  .onRun(async (_context) => {
+export const checkSubscriptionRenewals = onSchedule(
+  {
+    schedule: "0 9 * * *", // Every day at 9:00 AM UTC
+    timeZone: "UTC",
+  },
+  async () => {
     functions.logger.info("Starting subscription renewal check...");
 
     try {
@@ -74,18 +77,16 @@ export const checkSubscriptionRenewals = functions.pubsub
         }
       }
 
-      functions.logger.info("Subscription renewal check completed", results);
-
-      return {
-        success: true,
+      functions.logger.info("Subscription renewal check completed", {
         ...results,
         timestamp: admin.firestore.Timestamp.now().toDate().toISOString(),
-      };
+      });
     } catch (error) {
       functions.logger.error("Error in subscription renewal check:", error);
       throw error;
     }
-  });
+  }
+);
 
 /**
  * Get subscriptions expiring within specified days

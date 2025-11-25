@@ -8,6 +8,7 @@ import '../../../../common/utils/pg/pg_price_utils.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 
 import '../../../../core/services/localization/internationalization_service.dart';
+import '../../../../core/services/cache/static_data_cache_service.dart';
 import '../../../../core/repositories/featured/featured_listing_repository.dart';
 import '../data/models/guest_pg_model.dart';
 import '../data/repository/guest_pg_repository.dart';
@@ -137,7 +138,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
       (pgs) {
         _pgList = pgs;
         _updateFilteredPGs();
-        _updatePGStats();
+        _updatePGStats(); // Fire-and-forget async operation
         setLoading(false);
 
         logInfo(
@@ -525,7 +526,9 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
   }
 
   /// Updates PG statistics for dashboard display
+  /// Caches cities/amenities lists to reduce future computation
   void _updatePGStats() {
+    // Compute cities and amenities from current PG list
     final cities = _pgList.map((pg) => pg.city).toSet();
     final totalAmenities = _pgList.expand((pg) => pg.amenities).toSet();
     final pgTypes = _pgList
@@ -559,6 +562,14 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
               _pgList.length
           : 0.0,
     };
+
+    // Cache cities and amenities asynchronously (fire-and-forget)
+    // This doesn't block the stats update but improves future performance
+    StaticDataCacheService.instance
+        .cacheStaticData(cities.toList(), totalAmenities.toList())
+        .catchError((e) {
+      // Silently fail cache update, stats are already computed
+    });
   }
 
   /// Adds or updates PG in Firestore

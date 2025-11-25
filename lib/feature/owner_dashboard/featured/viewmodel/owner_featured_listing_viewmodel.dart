@@ -35,7 +35,7 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
             paymentService ?? AppSubscriptionPaymentService();
 
   List<FeaturedListingModel> _featuredListings = [];
-  Map<String, FeaturedListingModel?> _pgFeaturedListings = {}; // pgId -> active featured listing
+  final Map<String, FeaturedListingModel?> _pgFeaturedListings = {}; // pgId -> active featured listing
   StreamSubscription<List<FeaturedListingModel>>? _featuredListingsStream;
   bool _isProcessingPayment = false;
   bool _isCancelling = false;

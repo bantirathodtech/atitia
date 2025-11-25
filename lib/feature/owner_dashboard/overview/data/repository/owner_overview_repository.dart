@@ -93,9 +93,10 @@ class OwnerOverviewRepository {
       {String? pgId}) async {
     try {
       // Fetch properties count and calculate total beds
+      // COST OPTIMIZATION: Limit to 50 properties per owner (reasonable limit)
       final propertiesSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.pgs, 'ownerUid', ownerId)
+              FirestoreConstants.pgs, 'ownerUid', ownerId, limit: 50)
           .first;
 
       // Filter out drafts - only count published/active properties
@@ -337,9 +338,10 @@ class OwnerOverviewRepository {
   Future<Map<String, double>> getPropertyRevenueBreakdown(
       String ownerId) async {
     try {
+      // COST OPTIMIZATION: Limit to 50 properties per owner
       final propertiesSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.pgs, 'ownerUid', ownerId)
+              FirestoreConstants.pgs, 'ownerUid', ownerId, limit: 50)
           .first;
 
       // Filter out drafts - only include published properties
@@ -468,9 +470,10 @@ class OwnerOverviewRepository {
       }
 
       // Also check guests with payment_pending status
+      // COST OPTIMIZATION: Limit to 200 guests for stats calculation
       final guestsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.users, 'role', 'guest')
+              FirestoreConstants.users, 'role', 'guest', limit: 200)
           .first;
 
       for (var doc in guestsSnapshot.docs) {
@@ -569,9 +572,10 @@ class OwnerOverviewRepository {
       }
 
       // Get guests
+      // COST OPTIMIZATION: Limit to 200 guests for recent updates check
       final guestsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.users, 'role', 'guest')
+              FirestoreConstants.users, 'role', 'guest', limit: 200)
           .first;
 
       final recentGuests = <Map<String, dynamic>>[];
@@ -658,14 +662,18 @@ class OwnerOverviewRepository {
 
     if (filters.isEmpty) {
       // Use queryCollection interface method
+      // COST OPTIMIZATION: Limit to 100 payments for stats calculation
       return await _databaseService.queryCollection(
         FirestoreConstants.payments,
         [],
+        limit: 100,
       );
     } else {
+      // COST OPTIMIZATION: Limit to 100 payments for stats calculation
       return await _databaseService.queryCollection(
         FirestoreConstants.payments,
         filters,
+        limit: 100,
       );
     }
   }
@@ -684,14 +692,18 @@ class OwnerOverviewRepository {
     }
 
     if (filters.isEmpty) {
+      // COST OPTIMIZATION: Limit to 100 bookings for stats calculation
       return await _databaseService.queryCollection(
         FirestoreConstants.bookings,
         [],
+        limit: 100,
       );
     } else {
+      // COST OPTIMIZATION: Limit to 100 bookings for stats calculation
       return await _databaseService.queryCollection(
         FirestoreConstants.bookings,
         filters,
+        limit: 100,
       );
     }
   }
@@ -710,14 +722,18 @@ class OwnerOverviewRepository {
     }
 
     if (filters.isEmpty) {
+      // COST OPTIMIZATION: Limit to 100 complaints for stats calculation
       return await _databaseService.queryCollection(
         FirestoreConstants.complaints,
         [],
+        limit: 100,
       );
     } else {
+      // COST OPTIMIZATION: Limit to 100 complaints for stats calculation
       return await _databaseService.queryCollection(
         FirestoreConstants.complaints,
         filters,
+        limit: 100,
       );
     }
   }

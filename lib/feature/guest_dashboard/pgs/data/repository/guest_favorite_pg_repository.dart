@@ -67,11 +67,13 @@ class GuestFavoritePgRepository {
 
   /// Stream favorite PG IDs for a guest
   Stream<List<String>> streamFavoritePgIds(String guestId) {
+    // COST OPTIMIZATION: Limit to 50 favorite PGs per guest
     return _databaseService
         .getCollectionStreamWithFilter(
           _favoritesCollection,
           'guestId',
           guestId,
+          limit: 50,
         )
         .map((snapshot) {
       return snapshot.docs
@@ -83,10 +85,12 @@ class GuestFavoritePgRepository {
   /// Get all favorite PG IDs for a guest (one-time read)
   Future<List<String>> getFavoritePgIds(String guestId) async {
     try {
+      // COST OPTIMIZATION: Limit to 50 favorite PGs per guest
       final snapshot = await _databaseService.queryDocuments(
         _favoritesCollection,
         field: 'guestId',
         isEqualTo: guestId,
+        limit: 50,
       );
 
       return snapshot.docs

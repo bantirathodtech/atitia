@@ -42,9 +42,10 @@ class OwnerBookingRequestRepository {
   /// Streams all booking requests for a specific owner
   /// Filters by ownerId to show only requests for owner's PGs
   Stream<List<OwnerBookingRequestModel>> streamBookingRequests(String ownerId) {
+    // COST OPTIMIZATION: Limit to 30 requests per stream
     return _databaseService
         .getCollectionStreamWithFilter(
-            'owner_booking_requests', 'ownerId', ownerId)
+            'owner_booking_requests', 'ownerId', ownerId, limit: 30)
         .map((snapshot) {
       final requests = snapshot.docs
           .map((doc) => OwnerBookingRequestModel.fromFirestore(doc))
@@ -67,9 +68,10 @@ class OwnerBookingRequestRepository {
   /// Filters by guestId to show all booking requests sent by the guest
   Stream<List<OwnerBookingRequestModel>> streamGuestBookingRequests(
       String guestId) {
+    // COST OPTIMIZATION: Limit to 20 requests per stream
     return _databaseService
         .getCollectionStreamWithFilter(
-            'owner_booking_requests', 'guestId', guestId)
+            'owner_booking_requests', 'guestId', guestId, limit: 20)
         .map((snapshot) {
       final requests = snapshot.docs
           .map((doc) => OwnerBookingRequestModel.fromFirestore(doc))
@@ -96,8 +98,9 @@ class OwnerBookingRequestRepository {
       return Stream.value([]);
     }
 
+    // COST OPTIMIZATION: Limit to 50 requests per stream (prevents loading entire collection)
     return _databaseService
-        .getCollectionStream('owner_booking_requests')
+        .getCollectionStream('owner_booking_requests', limit: 50)
         .map((snapshot) {
       final requests = snapshot.docs
           .map((doc) => OwnerBookingRequestModel.fromFirestore(doc))

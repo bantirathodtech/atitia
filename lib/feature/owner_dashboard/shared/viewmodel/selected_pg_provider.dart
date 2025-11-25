@@ -72,14 +72,15 @@ class SelectedPgProvider extends ChangeNotifier {
 
       // Fetch PGs from Firestore using ownerUid filter
       // Try ownerUid first (standard field), fallback to ownerId if needed
+      // COST OPTIMIZATION: Limit to 50 PGs per owner
       Stream<QuerySnapshot> stream;
       try {
         stream = _databaseService.getCollectionStreamWithFilter(
-            FirestoreConstants.pgs, 'ownerUid', _ownerId!);
+            FirestoreConstants.pgs, 'ownerUid', _ownerId!, limit: 50);
       } catch (e) {
         // Fallback: try ownerId field name
         stream = _databaseService.getCollectionStreamWithFilter(
-            FirestoreConstants.pgs, 'ownerId', _ownerId!);
+            FirestoreConstants.pgs, 'ownerId', _ownerId!, limit: 50);
       }
 
       final snapshot = await stream.first;

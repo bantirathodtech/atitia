@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../../common/widgets/cards/adaptive_card.dart';
@@ -17,6 +18,11 @@ import '../../../../../../common/styles/spacing.dart';
 import '../../../../../../common/styles/colors.dart';
 import '../../../../../../common/utils/responsive/responsive_system.dart';
 import '../../../../../../common/utils/constants/routes.dart';
+import '../../../../../../common/utils/constants/firestore.dart';
+import '../../../../../../common/widgets/pagination/paginated_list_view.dart';
+import '../../../../../../common/widgets/pagination/firestore_pagination_helper.dart';
+import '../../../../../../common/widgets/pagination/pagination_controller.dart';
+import '../../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../../core/models/refund/refund_request_model.dart';
 import '../../viewmodel/owner_refund_viewmodel.dart';
 import '../../../shared/widgets/owner_drawer.dart';
@@ -33,12 +39,62 @@ class OwnerRefundHistoryScreen extends StatefulWidget {
 
 class _OwnerRefundHistoryScreenState
     extends State<OwnerRefundHistoryScreen> {
+  PaginationController<RefundRequestModel>? _paginationController;
+  String _selectedStatusFilter = 'all';
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<OwnerRefundViewModel>().initialize();
+      _initializePagination();
     });
+  }
+
+  @override
+  void dispose() {
+    _paginationController?.dispose();
+    super.dispose();
+  }
+
+  /// Initialize pagination controller for refund requests
+  void _initializePagination() {
+    final ownerId = getIt.auth.currentUserId;
+    if (ownerId == null || ownerId.isEmpty) return;
+
+    _updatePaginationController(ownerId);
+  }
+
+  /// Update pagination controller based on selected filter
+  void _updatePaginationController(String ownerId, [String? statusFilter]) {
+    final filter = statusFilter ?? _selectedStatusFilter;
+    _paginationController?.dispose();
+
+    Query baseQuery = FirebaseFirestore.instance
+        .collection(FirestoreConstants.refundRequests)
+        .where('ownerId', isEqualTo: ownerId)
+        .orderBy('requestedAt', descending: true);
+
+    // Apply status filter if not 'all'
+    if (filter != 'all') {
+      baseQuery = baseQuery.where('status', isEqualTo: filter);
+    }
+
+    _paginationController = FirestorePaginationHelper.createController<RefundRequestModel>(
+      query: baseQuery,
+      documentMapper: (doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        // Ensure refundRequestId is set from document ID
+        if (data['refundRequestId'] == null || (data['refundRequestId'] as String).isEmpty) {
+          data['refundRequestId'] = doc.id;
+        }
+        return RefundRequestModel.fromMap(data);
+      },
+      pageSize: 20,
+    );
+
+    // Load initial page
+    _paginationController?.loadInitial();
   }
 
   @override
@@ -76,29 +132,38 @@ class _OwnerRefundHistoryScreenState
           }
 
           return RefreshIndicator(
-            onRefresh: () => viewModel.refresh(),
-            child: SingleChildScrollView(
-              padding: ResponsiveSystem.getResponsivePadding(context),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Request new refund button
-                  PrimaryButton(
+            onRefresh: () async {
+              await viewModel.refresh();
+              await _paginationController?.refresh();
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Request new refund button
+                Padding(
+                  padding: ResponsiveSystem.getResponsivePadding(context).copyWith(bottom: AppSpacing.paddingM),
+                  child: PrimaryButton(
                     onPressed: () {
                       context.go(AppRoutes.ownerRefundRequest);
                     },
                     label: 'Request New Refund',
                   ),
-                  const SizedBox(height: AppSpacing.paddingL),
+                ),
 
-                  // Filters
-                  _buildFilters(context, viewModel),
-                  const SizedBox(height: AppSpacing.paddingL),
+                // Filters
+                Padding(
+                  padding: ResponsiveSystem.getResponsivePadding(context).copyWith(bottom: AppSpacing.paddingM),
+                  child: _buildFilters(context, viewModel),
+                ),
 
-                  // Refund requests list
-                  _buildRefundRequestsList(context, viewModel),
-                ],
-              ),
+                // Refund requests list
+                Expanded(
+                  child: Padding(
+                    padding: ResponsiveSystem.getResponsivePadding(context),
+                    child: _buildRefundRequestsList(context, viewModel),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -119,11 +184,11 @@ class _OwnerRefundHistoryScreenState
             Wrap(
               spacing: AppSpacing.paddingS,
               children: [
-                _buildFilterChip(context, 'all', 'All', viewModel),
-                _buildFilterChip(context, 'pending', 'Pending', viewModel),
-                _buildFilterChip(context, 'approved', 'Approved', viewModel),
-                _buildFilterChip(context, 'rejected', 'Rejected', viewModel),
-                _buildFilterChip(context, 'completed', 'Completed', viewModel),
+                _buildFilterChip(context, 'all', 'All'),
+                _buildFilterChip(context, 'pending', 'Pending'),
+                _buildFilterChip(context, 'approved', 'Approved'),
+                _buildFilterChip(context, 'rejected', 'Rejected'),
+                _buildFilterChip(context, 'completed', 'Completed'),
               ],
             ),
           ],
@@ -132,15 +197,20 @@ class _OwnerRefundHistoryScreenState
     );
   }
 
-  Widget _buildFilterChip(BuildContext context, String value, String label,
-      OwnerRefundViewModel viewModel) {
-    final isSelected = viewModel.selectedStatusFilter == value;
+  Widget _buildFilterChip(BuildContext context, String value, String label) {
+    final isSelected = _selectedStatusFilter == value;
 
     return FilterChip(
       label: Text(label),
       selected: isSelected,
       onSelected: (selected) {
-        viewModel.setStatusFilter(value);
+        setState(() {
+          _selectedStatusFilter = value;
+        });
+        final ownerId = getIt.auth.currentUserId;
+        if (ownerId != null && ownerId.isNotEmpty) {
+          _updatePaginationController(ownerId, value);
+        }
       },
       selectedColor: AppColors.primary.withValues(alpha: 0.2),
       checkmarkColor: AppColors.primary,
@@ -149,6 +219,50 @@ class _OwnerRefundHistoryScreenState
 
   Widget _buildRefundRequestsList(
       BuildContext context, OwnerRefundViewModel viewModel) {
+    // Use pagination controller if available
+    if (_paginationController != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Consumer<PaginationController<RefundRequestModel>>(
+            builder: (context, controller, child) {
+              return HeadingMedium(text: 'Refund Requests (${controller.items.length})');
+            },
+          ),
+          const SizedBox(height: AppSpacing.paddingM),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => _paginationController!.refresh(),
+              child: PaginatedListView<RefundRequestModel>(
+                controller: _paginationController!,
+                itemBuilder: (context, refund, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.paddingM),
+                    child: _buildRefundRequestCard(context, refund),
+                  );
+                },
+                emptyWidget: AdaptiveCard(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.paddingL),
+                    child: Center(
+                      child: EmptyStates.noData(
+                        context: context,
+                        title: 'No Refund Requests',
+                        message: _selectedStatusFilter == 'all'
+                            ? 'You haven\'t requested any refunds yet.'
+                            : 'No refund requests match the selected filter.',
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Fallback to ViewModel implementation
     final filteredRefunds = viewModel.filteredRefunds;
 
     if (filteredRefunds.isEmpty) {

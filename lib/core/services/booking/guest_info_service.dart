@@ -66,9 +66,10 @@ class GuestInfoService {
       String guestUid, String pgId) async {
     try {
       // Get bookings stream and find active booking
+      // COST OPTIMIZATION: Limit to 20 bookings (active ones are usually recent)
       final bookingsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.bookings, 'guestUid', guestUid)
+              FirestoreConstants.bookings, 'guestUid', guestUid, limit: 20)
           .first;
 
       if (bookingsSnapshot.docs.isEmpty) {
@@ -101,9 +102,10 @@ class GuestInfoService {
       String pgId, String roomNumber) async {
     try {
       // Get all guests streamed from users collection
+      // COST OPTIMIZATION: Limit to 100 guests for room filtering
       final guestsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.users, 'role', 'guest')
+              FirestoreConstants.users, 'role', 'guest', limit: 100)
           .first;
 
       final guests = <OwnerGuestModel>[];

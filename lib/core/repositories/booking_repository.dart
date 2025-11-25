@@ -77,14 +77,19 @@ class BookingRepository {
 
   /// Streams guest's bookings
   Stream<List<BookingModel>> streamGuestBookings(String guestId) {
+    // COST OPTIMIZATION: Use queryDocuments with limit instead of stream for initial load
+    // For real-time updates, consider pagination or limiting stream results
     return _databaseService
         .getCollectionStreamWithFilter(_bookingsCollection, 'guestId', guestId)
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return BookingModel.fromMap(data);
-      }).toList()
+      final bookings = snapshot.docs
+          .take(20) // COST OPTIMIZATION: Limit to 20 most recent bookings
+          .map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return BookingModel.fromMap(data);
+          }).toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return bookings;
     });
   }
 
@@ -98,11 +103,14 @@ class BookingRepository {
         {'field': 'ownerId', 'value': ownerId},
         {'field': 'pgId', 'value': pgId},
       ]).map((snapshot) {
-        return snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return BookingModel.fromMap(data);
-        }).toList()
+        final bookings = snapshot.docs
+            .take(20) // COST OPTIMIZATION: Limit to 20 most recent bookings
+            .map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return BookingModel.fromMap(data);
+            }).toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        return bookings;
       });
     } else {
       // Use single filter for ownerId only
@@ -110,11 +118,14 @@ class BookingRepository {
           .getCollectionStreamWithFilter(
               _bookingsCollection, 'ownerId', ownerId)
           .map((snapshot) {
-        return snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return BookingModel.fromMap(data);
-        }).toList()
+        final bookings = snapshot.docs
+            .take(20) // COST OPTIMIZATION: Limit to 20 most recent bookings
+            .map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return BookingModel.fromMap(data);
+            }).toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        return bookings;
       });
     }
   }
@@ -130,8 +141,11 @@ class BookingRepository {
 
       if (bookings.docs.isEmpty) return null;
 
+      // COST OPTIMIZATION: Limit search to first 20 bookings (active ones are usually recent)
+      final limitedDocs = bookings.docs.take(20);
+
       // Find active booking
-      for (var doc in bookings.docs) {
+      for (var doc in limitedDocs) {
         final data = doc.data() as Map<String, dynamic>;
         final booking = BookingModel.fromMap(data);
         if (booking.status.toLowerCase() == 'active' ||

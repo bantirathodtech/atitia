@@ -72,14 +72,16 @@ class NotificationRepository {
       userId,
     )
         .map((snapshot) {
-      final notifications = snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return {
-          ...data,
-          'id': data['id'] ?? doc.id,
-          'timestamp': _parseTimestamp(data['createdAt']),
-        };
-      }).toList();
+      final notifications = snapshot.docs
+          .take(50) // COST OPTIMIZATION: Limit to 50 most recent notifications
+          .map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return {
+              ...data,
+              'id': data['id'] ?? doc.id,
+              'timestamp': _parseTimestamp(data['createdAt']),
+            };
+          }).toList();
 
       // Sort by timestamp (newest first)
       notifications.sort((a, b) {
@@ -106,7 +108,7 @@ class NotificationRepository {
 
   /// Mark all notifications as read for a user
   Future<void> markAllNotificationsAsRead(String userId) async {
-    // Get all notifications for the user
+    // COST OPTIMIZATION: Limit to first 100 unread notifications
     final snapshot = await _databaseService.queryDocuments(
       FirestoreConstants.notifications,
       field: 'userId',
@@ -114,7 +116,8 @@ class NotificationRepository {
     );
 
     final batch = <String>[];
-    for (final doc in snapshot.docs) {
+    // COST OPTIMIZATION: Process only first 100 notifications
+    for (final doc in snapshot.docs.take(100)) {
       final data = doc.data() as Map<String, dynamic>;
       if (data['read'] != true) {
         batch.add(doc.id);

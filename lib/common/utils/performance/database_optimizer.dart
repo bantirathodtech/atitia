@@ -3,6 +3,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
+import '../../../core/services/optimization/stream_debounce_service.dart';
+
 /// Database optimization utility for Firestore queries
 /// Provides query optimization, pagination, and caching strategies
 class DatabaseOptimizer {
@@ -131,12 +133,14 @@ class DatabaseOptimizer {
   }
 
   /// Optimized real-time listener with debouncing
+  /// Uses custom debounce service to reduce rapid-fire updates
   static Stream<QuerySnapshot> listenToCollection({
     required Query query,
     int pageSize = _defaultPageSize,
-    Duration debounceDuration = const Duration(milliseconds: 300),
+    Duration debounceDuration = const Duration(milliseconds: 50),
   }) {
-    return query.limit(pageSize).snapshots().debounceTime(debounceDuration);
+    final stream = query.limit(pageSize).snapshots();
+    return StreamDebounceService.instance.debounce(stream, duration: debounceDuration);
   }
 
   /// Clear expired cache entries
@@ -211,6 +215,60 @@ class DatabaseOptimizer {
         ));
 
     await Future.wait(futures);
+  }
+
+  /// Create optimized paginated query with automatic limit
+  /// Always applies limit to prevent loading all documents
+  static Query createPaginatedQuery({
+    required Query baseQuery,
+    int pageSize = _defaultPageSize,
+    DocumentSnapshot? startAfter,
+  }) {
+    Query query = baseQuery.limit(pageSize > _maxPageSize ? _maxPageSize : pageSize);
+    
+    if (startAfter != null) {
+      query = query.startAfterDocument(startAfter);
+    }
+    
+    return query;
+  }
+
+  /// Ensure query has limit applied (cost optimization)
+  /// Prevents accidentally loading all documents
+  static Query ensureLimited(Query query, {int defaultLimit = _defaultPageSize}) {
+    // Check if query already has limit
+    // Note: This is a simple check - in production, you might want to parse the query
+    // For now, we'll always apply a limit as a safety measure
+    return query.limit(defaultLimit);
+  }
+
+  /// Create query with multiple optimizations
+  /// - Applies limit
+  /// - Adds ordering for consistent pagination
+  /// - Prepares for pagination
+  static Query createOptimizedQuery({
+    required Query baseQuery,
+    int pageSize = _defaultPageSize,
+    String? orderByField,
+    bool descending = true,
+    DocumentSnapshot? startAfter,
+  }) {
+    Query query = baseQuery;
+    
+    // Add ordering if specified (important for consistent pagination)
+    if (orderByField != null) {
+      query = query.orderBy(orderByField, descending: descending);
+    }
+    
+    // Apply limit
+    query = query.limit(pageSize > _maxPageSize ? _maxPageSize : pageSize);
+    
+    // Add pagination cursor
+    if (startAfter != null) {
+      query = query.startAfterDocument(startAfter);
+    }
+    
+    return query;
   }
 }
 

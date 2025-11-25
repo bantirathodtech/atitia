@@ -51,11 +51,13 @@ class PaymentNotificationRepository {
   /// Get payment notifications for an owner (pending confirmations)
   Stream<List<PaymentNotificationModel>> streamOwnerPendingNotifications(
       String ownerId) {
+    // COST OPTIMIZATION: Limit to 30 notifications per stream
     return _databaseService
         .getCollectionStreamWithFilter(
           FirestoreConstants.paymentNotifications,
           'ownerId',
           ownerId,
+          limit: 30,
         )
         .map((snapshot) => snapshot.docs
             .map((doc) => PaymentNotificationModel.fromMap(
@@ -67,11 +69,13 @@ class PaymentNotificationRepository {
   /// Get payment notifications for a guest
   Stream<List<PaymentNotificationModel>> streamGuestNotifications(
       String guestId) {
+    // COST OPTIMIZATION: Limit to 30 notifications per stream
     return _databaseService
         .getCollectionStreamWithFilter(
           FirestoreConstants.paymentNotifications,
           'guestId',
           guestId,
+          limit: 30,
         )
         .map((snapshot) => snapshot.docs
             .map((doc) => PaymentNotificationModel.fromMap(
