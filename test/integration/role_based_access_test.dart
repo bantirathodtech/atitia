@@ -39,21 +39,24 @@ void main() {
         // 4. Router should redirect guest to their dashboard
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.ownerHome, 'guest', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.ownerHome, 'guest',
+              skipAuthCheck: true),
           AppRoutes.guestHome,
           reason:
               'Guest should be redirected to guest dashboard when accessing owner route',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.ownerOverview, 'guest', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.ownerOverview, 'guest',
+              skipAuthCheck: true),
           AppRoutes.guestHome,
           reason:
               'Guest should be redirected to guest dashboard when accessing owner overview',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.ownerFoods, 'guest', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.ownerFoods, 'guest',
+              skipAuthCheck: true),
           AppRoutes.guestHome,
           reason:
               'Guest should be redirected to guest dashboard when accessing owner foods',
@@ -73,21 +76,24 @@ void main() {
         // 4. Router should redirect owner to their dashboard
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.guestHome, 'owner', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.guestHome, 'owner',
+              skipAuthCheck: true),
           AppRoutes.ownerHome,
           reason:
               'Owner should be redirected to owner dashboard when accessing guest route',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.guestPGs, 'owner', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.guestPGs, 'owner',
+              skipAuthCheck: true),
           AppRoutes.ownerHome,
           reason:
               'Owner should be redirected to owner dashboard when accessing guest PGs',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.guestPayments, 'owner', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.guestPayments, 'owner',
+              skipAuthCheck: true),
           AppRoutes.ownerHome,
           reason:
               'Owner should be redirected to owner dashboard when accessing guest payments',
@@ -150,26 +156,30 @@ void main() {
         // 4. Router should allow navigation to guest routes
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.guestHome, 'guest', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.guestHome, 'guest',
+              skipAuthCheck: true),
           isNull,
           reason:
               'Authenticated guest should be able to access guest dashboard',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.guestPGs, 'guest', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.guestPGs, 'guest',
+              skipAuthCheck: true),
           isNull,
           reason: 'Authenticated guest should be able to access guest PGs',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.guestPayments, 'guest', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.guestPayments, 'guest',
+              skipAuthCheck: true),
           isNull,
           reason: 'Authenticated guest should be able to access guest payments',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.guestComplaints, 'guest', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.guestComplaints, 'guest',
+              skipAuthCheck: true),
           isNull,
           reason:
               'Authenticated guest should be able to access guest complaints',
@@ -189,26 +199,30 @@ void main() {
         // 4. Router should allow navigation to owner routes
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.ownerHome, 'owner', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.ownerHome, 'owner',
+              skipAuthCheck: true),
           isNull,
           reason:
               'Authenticated owner should be able to access owner dashboard',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.ownerOverview, 'owner', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.ownerOverview, 'owner',
+              skipAuthCheck: true),
           isNull,
           reason: 'Authenticated owner should be able to access owner overview',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.ownerFoods, 'owner', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.ownerFoods, 'owner',
+              skipAuthCheck: true),
           isNull,
           reason: 'Authenticated owner should be able to access owner foods',
         );
 
         expect(
-          RouteGuard.getRedirectPath(AppRoutes.ownerGuests, 'owner', skipAuthCheck: true),
+          RouteGuard.getRedirectPath(AppRoutes.ownerGuests, 'owner',
+              skipAuthCheck: true),
           isNull,
           reason: 'Authenticated owner should be able to access owner guests',
         );

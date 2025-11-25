@@ -125,7 +125,7 @@ class RouteGuard {
   }
 
   /// Gets redirect path based on authentication and role
-  /// 
+  ///
   /// [skipAuthCheck] - When true, skips authentication check (useful for testing)
   /// This allows testing role-based access logic without setting up Firebase Auth
   static String? getRedirectPath(
