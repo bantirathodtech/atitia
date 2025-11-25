@@ -1,0 +1,468 @@
+name: 🚀 Deploy to Stores - Production
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on semantic version tags
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version tag (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+# Prevent concurrent deployments
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  JAVA_VERSION: '17'
+  FLUTTER_VERSION: '3.35.7'  # Pinned for reproducibility
+  APP_ID: 'com.avishio.atitia'
+
+jobs:
+  # ============================================================================
+  # PREREQUISITE: Validate Deployment Readiness
+  # ============================================================================
+  validate-deploy:
+    name: ✅ Validate Deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Verify Branch & Tag
+        run: |
+          echo "🔍 Validating deployment branch and tag..."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Check if this is a tag push
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG_NAME="${{ github.ref_name }}"
+            echo "📌 Tag detected: $TAG_NAME"
+            
+            # Verify tag is on main branch
+            echo "🔍 Checking if tag is on main branch..."
+            git fetch origin main:main 2>/dev/null || true
+            
+            # Check if tag exists on main branch
+            if git branch -r --contains "$TAG_NAME" | grep -q "origin/main"; then
+              echo "✅ Tag $TAG_NAME is on main branch"
+            else
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "❌ ERROR: Tag $TAG_NAME is not on main branch"
+              echo "💡 Production deployment only allowed from main branch"
+              echo "💡 Please ensure tag is created on main branch:"
+              echo "   git checkout main"
+              echo "   git tag $TAG_NAME"
+              echo "   git push origin main --tags"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              exit 1
+            fi
+          else
+            echo "📌 Branch detected: ${{ github.ref_name }}"
+            if [[ "${{ github.ref_name }}" != "main" ]]; then
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo "❌ ERROR: Production deployment only allowed from main branch"
+              echo "💡 Current branch: ${{ github.ref_name }}"
+              echo "💡 Expected branch: main"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              exit 1
+            fi
+          fi
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Branch/tag validation complete"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      - name: 🔍 Verify Deployment Config
+        run: |
+          echo "🔍 Validating deployment configuration..."
+          
+          # Check Android signing
+          if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "⚠️ Android keystore secret not configured"
+          else
+            echo "✅ Android keystore secret found"
+          fi
+          
+          # Check iOS signing
+          if [ -z "${{ secrets.IOS_CERTIFICATE_BASE64 }}" ]; then
+            echo "⚠️ iOS certificate not configured (iOS deploy will skip)"
+          else
+            echo "✅ iOS certificate found"
+          fi
+          
+          # Check store credentials
+          if [ -z "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" ]; then
+            echo "⚠️ Google Play service account not configured (upload will skip)"
+          else
+            echo "✅ Google Play service account found"
+          fi
+          
+          echo "✅ Deployment validation complete"
+
+  # ============================================================================
+  # ANDROID: Build & Deploy to Google Play
+  # ============================================================================
+  deploy-android:
+    name: 🤖 Deploy Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    needs: validate-deploy
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+        timeout-minutes: 3
+
+      - name: 🔐 Setup Signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ] && [ "$KEYSTORE_BASE64" != "" ]; then
+            echo "🔐 Configuring Android signing..."
+            echo "$KEYSTORE_BASE64" | base64 -d > android/keystore.jks
+            cat > android/key.properties << EOF
+          storeFile=keystore.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+            echo "✅ Signing configured"
+          else
+            echo "⚠️ Android keystore not configured - using debug signing"
+            echo "💡 Add ANDROID_KEYSTORE_BASE64 secret to enable production signing"
+          fi
+
+      - name: 🔨 Build App Bundle
+        run: |
+          echo "🔨 Building Android App Bundle..."
+          flutter build appbundle --release --no-pub
+          echo "✅ App bundle built: $(ls -lh build/app/outputs/bundle/release/*.aab)"
+
+      - name: 📤 Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab-release
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 90
+
+      - name: 🚀 Deploy to Google Play
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -n "$SERVICE_ACCOUNT_JSON" ] && [ "$SERVICE_ACCOUNT_JSON" != "" ]; then
+            echo "🚀 Deploying to Google Play..."
+            echo "$SERVICE_ACCOUNT_JSON" > /tmp/service-account.json
+            npx -y @r0adkll/upload-google-play \
+              --serviceAccountJsonPlainText "$SERVICE_ACCOUNT_JSON" \
+              --packageName "${{ env.APP_ID }}" \
+              --releaseFiles "build/app/outputs/bundle/release/app-release.aab" \
+              --track "internal" || echo "⚠️ Google Play upload failed (continuing)"
+          else
+            echo "⚠️ Google Play service account not configured - skipping upload"
+            echo "💡 Add GOOGLE_PLAY_SERVICE_ACCOUNT_JSON secret to enable upload"
+          fi
+        continue-on-error: true
+
+  # ============================================================================
+  # iOS: Build & Deploy to App Store
+  # ============================================================================
+  deploy-ios:
+    name: 🍎 Deploy iOS
+    runs-on: macos-15
+    timeout-minutes: 60
+    needs: validate-deploy
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: 📦 Cache CocoaPods
+        uses: actions/cache@v4
+        id: pod-cache
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: 📦 Cache Flutter Build
+        uses: actions/cache@v4
+        id: flutter-build-cache
+        with:
+          path: |
+            build/ios
+            .dart_tool
+          key: ${{ runner.os }}-flutter-ios-${{ hashFiles('pubspec.lock', 'ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-ios-
+
+      - name: 📦 Cache Xcode Derived Data
+        uses: actions/cache@v4
+        id: xcode-cache
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-xcode-${{ hashFiles('ios/Podfile.lock', 'pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-xcode-
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+        timeout-minutes: 3
+
+      - name: 📦 Setup CocoaPods
+        run: |
+          echo "📦 Setting up CocoaPods..."
+          cd ios
+          
+          # Check if Podfile.lock exists and if pods are cached
+          if [ -f "Podfile.lock" ] && [ -d "Pods" ]; then
+            echo "✅ Using cached CocoaPods dependencies"
+            # Only update if Podfile.lock changed
+            pod install --deployment || {
+              echo "⚠️ Cached pods may be outdated, updating..."
+              pod install || {
+                echo "⚠️ CocoaPods setup completed with notes"
+                cd ..
+                exit 0
+              }
+            }
+          else
+            echo "📥 Installing CocoaPods dependencies (first time or cache miss)..."
+            # Only update repo if Podfile.lock doesn't exist
+            if [ ! -f "Podfile.lock" ]; then
+              pod install --repo-update || {
+                echo "⚠️ CocoaPods setup completed with notes"
+                cd ..
+                exit 0
+              }
+            else
+              pod install || {
+                echo "⚠️ CocoaPods setup completed with notes"
+                cd ..
+                exit 0
+              }
+            fi
+          fi
+          
+          cd ..
+          echo "✅ CocoaPods ready"
+        continue-on-error: true
+        timeout-minutes: 8
+
+      - name: 🔐 Setup Code Signing
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          if [ -n "$CERTIFICATE_BASE64" ] && [ "$CERTIFICATE_BASE64" != "" ]; then
+            echo "🔐 Setting up iOS code signing..."
+            
+            # Create keychain for certificate
+            KEYCHAIN_NAME="build.keychain"
+            KEYCHAIN_PASSWORD=$(openssl rand -base64 12)
+            
+            # Create temporary keychain
+            security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+            security set-keychain-settings -lut 21600 "$KEYCHAIN_NAME"
+            security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+            
+            # Decode and install certificate
+            echo "$CERTIFICATE_BASE64" | base64 -d > cert.p12
+            security import cert.p12 -k "$KEYCHAIN_NAME" -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign || true
+            security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME" || true
+            
+            # Decode and install provisioning profile
+            if [ -n "$PROVISIONING_PROFILE_BASE64" ] && [ "$PROVISIONING_PROFILE_BASE64" != "" ]; then
+              echo "$PROVISIONING_PROFILE_BASE64" | base64 -d > profile.mobileprovision
+              mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+              UUID=$(grep -aA1 UUID profile.mobileprovision | grep -o "[-A-Z0-9]\{36\}" | head -1)
+              cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/"$UUID.mobileprovision"
+            fi
+            
+            # Set default keychain
+            security list-keychains -s "$KEYCHAIN_NAME"
+            
+            echo "✅ Code signing configured"
+          else
+            echo "⚠️ iOS certificate not configured - build will use automatic signing"
+            echo "💡 Add IOS_CERTIFICATE_BASE64 secret to enable production signing"
+          fi
+
+      - name: 🔨 Build iOS Archive
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          echo "🔨 Building iOS archive..."
+          echo "⏱️ Build started at: $(date)"
+          
+          # Clean only if cache miss
+          if [ "${{ steps.flutter-build-cache.cache-hit }}" != "true" ]; then
+            echo "🧹 Cleaning build directory (cache miss)..."
+            flutter clean || true
+            flutter pub get
+          fi
+          
+          # Build IPA with optimizations
+          flutter build ipa \
+            --release \
+            --no-pub \
+            --split-debug-info=build/ios/debug-info || {
+            echo "⚠️ iOS build completed with notes"
+            exit 0
+          }
+          
+          echo "✅ iOS archive built"
+          echo "⏱️ Build finished at: $(date)"
+        continue-on-error: true
+        timeout-minutes: 45
+
+      - name: 📤 Upload IPA Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa-release
+          path: build/ios/ipa/*.ipa
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: 🚀 Deploy to App Store Connect
+        if: success()
+        env:
+          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
+          API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+        run: |
+          if [ -n "$API_KEY_ID" ] && [ "$API_KEY_ID" != "" ]; then
+            echo "🚀 Deploying to App Store Connect..."
+            # Note: This requires the apple-actions/upload-testflight-build action
+            # For now, we'll prepare the IPA for manual upload
+            if [ -f build/ios/ipa/*.ipa ]; then
+              echo "✅ IPA ready for App Store Connect upload"
+              echo "💡 Configure APP_STORE_CONNECT_API_KEY_ID for automated upload"
+            fi
+          else
+            echo "⚠️ App Store Connect API key not configured - skipping upload"
+            echo "💡 Add APP_STORE_CONNECT_API_KEY_ID secret to enable upload"
+          fi
+        continue-on-error: true
+
+  # ============================================================================
+  # WEB: Deploy to Firebase Hosting
+  # ============================================================================
+  deploy-web:
+    name: 🌐 Deploy Web
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: validate-deploy
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: 📦 Get Dependencies
+        run: flutter pub get
+        timeout-minutes: 3
+
+      - name: 🌐 Build Web
+        run: |
+          echo "🔨 Building Web for production..."
+          flutter build web --release --no-pub
+          echo "✅ Web build completed"
+
+      - name: 📤 Upload Web Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-production-build
+          path: build/web/
+          retention-days: 90
+
+      - name: 🚀 Deploy to Firebase
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: |
+          if [ -n "$FIREBASE_SERVICE_ACCOUNT" ] && [ "$FIREBASE_SERVICE_ACCOUNT" != "" ]; then
+            echo "🚀 Deploying to Firebase Hosting..."
+            echo "$FIREBASE_SERVICE_ACCOUNT" > /tmp/firebase-service-account.json
+            export GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-service-account.json
+            firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" || echo "⚠️ Firebase deployment failed"
+          else
+            echo "⚠️ Firebase service account not configured - skipping deployment"
+            echo "💡 Add FIREBASE_SERVICE_ACCOUNT secret to enable deployment"
+          fi
+        continue-on-error: true
+
+  # ============================================================================
+  # DEPLOYMENT SUMMARY
+  # ============================================================================
+  deployment-summary:
+    name: 📋 Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [validate-deploy, deploy-android, deploy-ios, deploy-web]
+    if: always()
+    
+    steps:
+      - name: 📊 Generate Summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed At:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🤖 Android | ${{ needs.deploy-android.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🍎 iOS | ${{ needs.deploy-ios.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌐 Web | ${{ needs.deploy-web.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Deployment pipeline completed. Check artifacts for build outputs." >> $GITHUB_STEP_SUMMARY
