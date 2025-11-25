@@ -404,6 +404,72 @@ service cloud.firestore {
     match /notification_preferences/{userId} {
       allow read, write: if isAuthenticated() && request.auth.uid == userId;
     }
+
+    // Owner Subscriptions - Owner subscription management
+    match /owner_subscriptions/{subscriptionId} {
+      allow read: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow list: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.ownerId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+
+    // Featured Listings - Featured PG listings
+    match /featured_listings/{featuredListingId} {
+      allow read: if isAuthenticated(); // All authenticated users can read (for guest app)
+      allow list: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+                       request.resource.data.ownerId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // Revenue Records - App revenue tracking (admin only)
+    match /revenue_records/{revenueId} {
+      allow read: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow list: if isAuthenticated() && isAdmin(); // Only admins can list all
+      allow create: if isAuthenticated(); // Created by payment service (server-side)
+      allow update: if isAuthenticated() && isAdmin(); // Only admins can update
+      allow delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // Refund Requests - Owners create, Admins approve/reject/process
+    match /refund_requests/{refundRequestId} {
+      // Owners can create their own refund requests
+      allow create: if isAuthenticated() && 
+                       request.resource.data.ownerId == request.auth.uid;
+      
+      // Owners can read their own refund requests, admins can read all
+      allow read: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      );
+      
+      // Allow listing: Owners see their own, admins see all
+      allow list: if isAuthenticated();
+      
+      // Only admins can update refund requests (approve/reject/process)
+      allow update: if isAuthenticated() && isAdmin();
+      
+      // No deletions - refund requests are permanent records for audit
+      allow delete: if false;
+    }
     
     // Owner Guests - Owner can manage guests in their properties
     match /owner_guests/{guestId} {

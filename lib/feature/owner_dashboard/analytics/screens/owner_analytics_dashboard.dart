@@ -21,6 +21,9 @@ import '../../../../../core/services/localization/internationalization_service.d
 import '../../shared/viewmodel/selected_pg_provider.dart';
 import '../../shared/widgets/pg_selector_dropdown.dart';
 import '../../shared/widgets/owner_drawer.dart';
+import '../../subscription/viewmodel/owner_subscription_viewmodel.dart';
+import '../../../../../core/models/subscription/subscription_plan_model.dart';
+import '../../../../../common/widgets/dialogs/premium_upgrade_dialog.dart';
 import '../widgets/revenue_analytics_widget.dart';
 import '../widgets/occupancy_analytics_widget.dart';
 
@@ -149,12 +152,50 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget build(BuildContext context) {
     final selectedPgProvider = context.watch<SelectedPgProvider>();
     final currentPgId = selectedPgProvider.selectedPgId;
+    final subscriptionViewModel = context.watch<OwnerSubscriptionViewModel>();
     final loc = AppLocalizations.of(context)!;
     final tabLabels = [
       loc.analyticsTabRevenue,
       loc.analyticsTabOccupancy,
       loc.analyticsTabPerformance,
     ];
+
+    // Check if user has premium subscription
+    final hasPremiumAccess = subscriptionViewModel.currentTier != SubscriptionTier.free;
+
+    // If free tier, show upgrade prompt instead of analytics
+    if (!hasPremiumAccess) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          PremiumUpgradeDialog.show(
+            context,
+            featureName: 'Analytics Dashboard',
+            description:
+                'Get comprehensive insights into your PG business with advanced analytics. Track revenue trends, occupancy rates, and performance metrics.',
+            featureBenefits: [
+              'Revenue analytics and trends',
+              'Occupancy rate tracking',
+              'Performance metrics and KPIs',
+              'Historical data comparisons',
+              'Export reports for analysis',
+            ],
+          ).then((_) {
+            // Navigate back after dialog is dismissed
+            if (mounted && Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          });
+        }
+      });
+      // Return empty scaffold while dialog is being shown
+      return Scaffold(
+        appBar: AdaptiveAppBar(
+          title: 'Analytics',
+          showBackButton: true,
+        ),
+        body: Container(), // Empty body while checking subscription
+      );
+    }
 
     return Scaffold(
       appBar: AdaptiveAppBar(

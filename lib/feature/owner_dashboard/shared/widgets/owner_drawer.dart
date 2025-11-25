@@ -99,6 +99,18 @@ class OwnerDrawer extends StatelessWidget {
       case 'reports':
         getIt<NavigationService>().goToOwnerReports();
         break;
+      case 'subscription':
+        getIt<NavigationService>().goToOwnerSubscriptionPlans();
+        break;
+      case 'featured':
+        getIt<NavigationService>().goToOwnerFeaturedListingManagement();
+        break;
+      case 'refundRequest':
+        getIt<NavigationService>().goToOwnerRefundRequest();
+        break;
+      case 'refundHistory':
+        getIt<NavigationService>().goToOwnerRefundHistory();
+        break;
       case 'logout':
         _handleLogout(context);
         break;

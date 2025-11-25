@@ -54,6 +54,9 @@ class OwnerProfile {
   final String? gender;
   final bool isActive;
   final bool isVerified;
+  final String? subscriptionTier; // 'free', 'premium', 'enterprise'
+  final String? subscriptionStatus; // 'active', 'expired', 'cancelled', etc.
+  final DateTime? subscriptionEndDate; // When subscription expires
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final Map<String, dynamic>? metadata;
@@ -84,6 +87,9 @@ class OwnerProfile {
     this.gender,
     this.isActive = true,
     this.isVerified = false,
+    this.subscriptionTier,
+    this.subscriptionStatus,
+    this.subscriptionEndDate,
     DateTime? createdAt,
     DateTime? updatedAt,
     this.metadata,
@@ -137,6 +143,9 @@ class OwnerProfile {
       gender: data['gender'],
       isActive: data['isActive'] ?? true,
       isVerified: data['isVerified'] ?? false,
+      subscriptionTier: data['subscriptionTier'],
+      subscriptionStatus: data['subscriptionStatus'],
+      subscriptionEndDate: data['subscriptionEndDate']?.toDate(),
       createdAt: data['createdAt']?.toDate(),
       updatedAt: data['updatedAt']?.toDate(),
       metadata: data['metadata'] != null
@@ -177,6 +186,10 @@ class OwnerProfile {
       'gender': gender,
       'isActive': isActive,
       'isVerified': isVerified,
+      'subscriptionTier': subscriptionTier,
+      'subscriptionStatus': subscriptionStatus,
+      'subscriptionEndDate':
+          subscriptionEndDate != null ? Timestamp.fromDate(subscriptionEndDate!) : null,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'metadata': metadata,
@@ -210,6 +223,9 @@ class OwnerProfile {
     String? gender,
     bool? isActive,
     bool? isVerified,
+    String? subscriptionTier,
+    String? subscriptionStatus,
+    DateTime? subscriptionEndDate,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? metadata,
@@ -240,6 +256,9 @@ class OwnerProfile {
       gender: gender ?? this.gender,
       isActive: isActive ?? this.isActive,
       isVerified: isVerified ?? this.isVerified,
+      subscriptionTier: subscriptionTier ?? this.subscriptionTier,
+      subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
+      subscriptionEndDate: subscriptionEndDate ?? this.subscriptionEndDate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
       metadata: metadata ?? this.metadata,
@@ -340,6 +359,28 @@ class OwnerProfile {
     if (panNumber != null && panNumber!.isNotEmpty) completed++;
 
     return ((completed / total) * 100).round();
+  }
+
+  /// Check if owner has active subscription
+  bool get hasActiveSubscription {
+    if (subscriptionStatus != 'active') return false;
+    if (subscriptionEndDate == null) return false;
+    return subscriptionEndDate!.isAfter(DateTime.now());
+  }
+
+  /// Check if owner has premium or enterprise subscription
+  bool get hasPremiumSubscription {
+    if (!hasActiveSubscription) return false;
+    return subscriptionTier == 'premium' || subscriptionTier == 'enterprise';
+  }
+
+  /// Check if owner can add more PGs based on subscription
+  bool canAddPG(int currentPGCount) {
+    if (subscriptionTier == null || subscriptionTier == 'free') {
+      return currentPGCount < 1; // Free tier allows 1 PG
+    }
+    // Premium and Enterprise allow unlimited PGs
+    return true;
   }
 
   @override

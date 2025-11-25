@@ -8,6 +8,7 @@ import '../../../../common/utils/pg/pg_price_utils.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 
 import '../../../../core/services/localization/internationalization_service.dart';
+import '../../../../core/repositories/featured/featured_listing_repository.dart';
 import '../data/models/guest_pg_model.dart';
 import '../data/repository/guest_pg_repository.dart';
 
@@ -16,6 +17,7 @@ import '../data/repository/guest_pg_repository.dart';
 /// Coordinates between UI layer and Repository layer
 class GuestPgViewModel extends BaseProviderState with LoggingMixin {
   final GuestPgRepository _repository;
+  final FeaturedListingRepository _featuredRepo;
   final _analyticsService = getIt.analytics;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
@@ -40,13 +42,16 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
   /// If repository is not provided, creates it with default services
   GuestPgViewModel({
     GuestPgRepository? repository,
-  }) : _repository = repository ?? GuestPgRepository();
+    FeaturedListingRepository? featuredRepo,
+  })  : _repository = repository ?? GuestPgRepository(),
+        _featuredRepo = featuredRepo ?? FeaturedListingRepository();
 
   List<GuestPgModel> _pgList = [];
   List<GuestPgModel> _filteredPGs = [];
   List<GuestPgModel> _cityPGs = [];
   List<GuestPgModel> _amenityPGs = [];
   GuestPgModel? _selectedPG;
+  Set<String> _featuredPGIds = {}; // Set of featured PG IDs for quick lookup
   String _selectedFilter = 'All'; // All, By City, By Amenities
   String _searchQuery = '';
   Map<String, dynamic> _pgStats = {};
@@ -108,6 +113,9 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
   /// Maximum price filter
   double? get maxPriceFilter => _maxPriceFilter;
 
+  /// Check if a PG is featured
+  bool isPGFeatured(String pgId) => _featuredPGIds.contains(pgId);
+
   /// Loads all available PGs with real-time streaming
   /// Sets up continuous listener for PG listing updates
   /// Automatically manages loading state through BaseProviderState
@@ -120,6 +128,9 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
       _text('guestPgStartingLoad', 'Starting to load PGs'),
       feature: 'guest_pgs',
     );
+
+    // Load featured PG IDs first
+    _loadFeaturedPGIds();
 
     // Listen to real-time PG updates
     _repository.getAllPGsStream().listen(
@@ -483,7 +494,34 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
         break;
     }
 
+    // Sort featured PGs first
+    filtered.sort((a, b) {
+      final aIsFeatured = _featuredPGIds.contains(a.pgId);
+      final bIsFeatured = _featuredPGIds.contains(b.pgId);
+      
+      if (aIsFeatured && !bIsFeatured) return -1;
+      if (!aIsFeatured && bIsFeatured) return 1;
+      return 0; // Maintain original order for non-featured PGs
+    });
+
     _filteredPGs = filtered;
+  }
+
+  /// Load featured PG IDs from repository
+  Future<void> _loadFeaturedPGIds() async {
+    try {
+      final featuredIds = await _featuredRepo.getActiveFeaturedPGIds();
+      _featuredPGIds = featuredIds.toSet();
+      notifyListeners();
+    } catch (e) {
+      logError(
+        'Failed to load featured PG IDs',
+        feature: 'guest_pgs',
+        error: e,
+      );
+      // Continue without featured sorting if loading fails
+      _featuredPGIds = {};
+    }
   }
 
   /// Updates PG statistics for dashboard display

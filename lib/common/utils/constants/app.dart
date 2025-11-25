@@ -1,4 +1,5 @@
 import '../../../core/services/localization/internationalization_service.dart';
+import 'web_urls.dart';
 
 /// Application-specific business rules and constants.
 ///
@@ -24,8 +25,10 @@ class AppConstants {
   static const String supportEmail = 'bantirathodtech@gmail.com';
 
   /// Public privacy policy URL hosted for regulatory compliance
-  static const String privacyPolicyUrl =
-      'https://sites.google.com/view/atitiaprivacy/home';
+  /// @deprecated Use WebUrls.privacyPolicy instead
+  /// This will be removed in a future version
+  @Deprecated('Use WebUrls.privacyPolicy instead')
+  static const String privacyPolicyUrl = WebUrls.privacyPolicy;
 
   // MARK: - Business Rules
   // ==========================================

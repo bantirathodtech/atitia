@@ -27,7 +27,10 @@ import '../../../../auth/logic/auth_provider.dart';
 import '../../../shared/viewmodel/selected_pg_provider.dart';
 import '../../../shared/widgets/pg_selector_dropdown.dart';
 import '../../../shared/widgets/owner_drawer.dart';
+import '../../../subscription/viewmodel/owner_subscription_viewmodel.dart';
 import '../../../overview/viewmodel/owner_overview_view_model.dart';
+import '../../../../../core/models/subscription/subscription_plan_model.dart';
+import '../../../../../common/widgets/dialogs/premium_upgrade_dialog.dart';
 import '../../../myguest/viewmodel/owner_guest_viewmodel.dart';
 import '../../../overview/view/widgets/owner_chart_widget.dart';
 
@@ -112,7 +115,45 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final selectedPgProvider = context.watch<SelectedPgProvider>();
+    final subscriptionViewModel = context.watch<OwnerSubscriptionViewModel>();
     final currentPgId = selectedPgProvider.selectedPgId;
+
+    // Check if user has premium subscription
+    final hasPremiumAccess = subscriptionViewModel.currentTier != SubscriptionTier.free;
+
+    // If free tier, show upgrade prompt instead of reports
+    if (!hasPremiumAccess) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          PremiumUpgradeDialog.show(
+            context,
+            featureName: 'Reports Dashboard',
+            description:
+                'Generate comprehensive reports for your PG business. Export detailed analytics on revenue, bookings, guests, payments, and complaints.',
+            featureBenefits: [
+              'Detailed revenue reports',
+              'Booking and guest analytics',
+              'Payment history and trends',
+              'Complaint tracking reports',
+              'Export data to CSV/Excel',
+            ],
+          ).then((_) {
+            // Navigate back after dialog is dismissed
+            if (mounted && Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          });
+        }
+      });
+      // Return empty scaffold while dialog is being shown
+      return Scaffold(
+        appBar: AdaptiveAppBar(
+          title: 'Reports',
+          showBackButton: true,
+        ),
+        body: Container(), // Empty body while checking subscription
+      );
+    }
 
     // Auto-reload when PG changes
     if (_lastLoadedPgId != currentPgId) {

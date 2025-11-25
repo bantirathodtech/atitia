@@ -30,6 +30,9 @@ class AppRoutes {
   /// User role selection screen: '/role-selection'
   static const String roleSelection = '/role-selection';
 
+  /// Admin access screen: '/admin-access'
+  static const String adminAccess = '/admin-access';
+
   /// User registration completion: '/registration'
   static const String registration = '/registration';
 
@@ -108,6 +111,36 @@ class AppRoutes {
   /// Owner reports: '/owner/reports'
   static const String ownerReports = '$ownerHome/reports';
 
+  /// Owner subscription plans: '/owner/subscription/plans'
+  static const String ownerSubscriptionPlans = '$ownerHome/subscription/plans';
+
+  /// Owner subscription management: '/owner/subscription/management'
+  static const String ownerSubscriptionManagement = '$ownerHome/subscription/management';
+
+  /// Owner featured listing purchase: '/owner/featured/purchase'
+  static const String ownerFeaturedListingPurchase = '$ownerHome/featured/purchase';
+
+  /// Owner featured listing management: '/owner/featured/management'
+  static const String ownerFeaturedListingManagement = '$ownerHome/featured/management';
+
+  /// Owner refund request: '/owner/refunds/request'
+  static const String ownerRefundRequest = '$ownerHome/refunds/request';
+
+  /// Owner refund history: '/owner/refunds/history'
+  static const String ownerRefundHistory = '$ownerHome/refunds/history';
+
+  // MARK: - Admin Feature Routes
+  // ==========================================
+
+  /// Admin dashboard home: '/admin'
+  static const String adminHome = '/admin';
+
+  /// Admin revenue dashboard: '/admin/revenue'
+  static const String adminRevenueDashboard = '$adminHome/revenue';
+
+  /// Admin refund approval: '/admin/refunds'
+  static const String adminRefundApproval = '$adminHome/refunds';
+
   // MARK: - Route Builder Methods
   // ==========================================
 
@@ -166,5 +199,10 @@ class AppRoutes {
   /// Check if current route is an owner flow
   static bool isOwnerRoute(String route) {
     return route.startsWith(ownerHome);
+  }
+
+  /// Check if current route is an admin flow
+  static bool isAdminRoute(String route) {
+    return route.startsWith(adminHome);
   }
 }

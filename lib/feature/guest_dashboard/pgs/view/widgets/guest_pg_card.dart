@@ -39,6 +39,7 @@ class GuestPgCard extends StatelessWidget {
   final VoidCallback? onTap;
   final double? userLatitude; // User's current location latitude
   final double? userLongitude; // User's current location longitude
+  final bool isFeatured; // Whether this PG is featured
   static final InternationalizationService _i18n =
       InternationalizationService.instance;
 
@@ -47,6 +48,7 @@ class GuestPgCard extends StatelessWidget {
     this.onTap,
     this.userLatitude,
     this.userLongitude,
+    this.isFeatured = false,
     super.key,
   });
 
@@ -168,8 +170,17 @@ class GuestPgCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Status Indicator Badge
-              _buildStatusBadge(loc),
+              // Status Indicator Badge and Featured Badge
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isFeatured) ...[
+                    _buildFeaturedBadge(context, loc),
+                    const SizedBox(width: AppSpacing.paddingXS),
+                  ],
+                  _buildStatusBadge(loc),
+                ],
+              ),
               // Action buttons (Favorite, Share)
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -339,6 +350,51 @@ class GuestPgCard extends StatelessWidget {
             label: loc?.bookNow ?? _text('bookNow', 'Book Now'),
             icon: Icons.home_work,
             onPressed: () => _showBookingRequestDialog(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ⭐ Featured badge
+  Widget _buildFeaturedBadge(BuildContext context, AppLocalizations? loc) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingS,
+        vertical: AppSpacing.paddingXS,
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.amber.shade600,
+            Colors.orange.shade600,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.amber.withValues(alpha: 0.3),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.star_rounded,
+            size: 14,
+            color: AppColors.textOnPrimary,
+          ),
+          const SizedBox(width: AppSpacing.paddingXS),
+          Text(
+            _text('featured', 'Featured'),
+            style: const TextStyle(
+              color: AppColors.textOnPrimary,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),

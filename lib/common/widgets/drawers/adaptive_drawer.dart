@@ -1079,7 +1079,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
         label: item.label,
         selected: isSelected,
         hint: item.badge != null ? 'Has ${item.badge} notifications' : null,
-          child: Material(
+        child: Material(
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
@@ -1132,7 +1132,7 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                     ),
                   ),
 
-                  // Badge (if any)
+                  // Badge (if any) - Premium badge or other badges
                   if (item.badge != null) ...[
                     const SizedBox(width: AppSpacing.paddingS),
                     Container(
@@ -1141,17 +1141,41 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary,
+                        color: item.badge!.toLowerCase() == 'premium'
+                            ? AppColors.primary
+                            : AppColors.secondary,
                         borderRadius:
                             BorderRadius.circular(AppSpacing.borderRadiusS),
+                        boxShadow: item.badge!.toLowerCase() == 'premium'
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.primary.withValues(alpha: 0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
                       ),
-                      child: Text(
-                        item.badge!,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textOnPrimary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (item.badge!.toLowerCase() == 'premium') ...[
+                            Icon(
+                              Icons.star,
+                              size: 10,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 2),
+                          ],
+                          Text(
+                            item.badge!,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -1205,6 +1229,44 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
               id: 'guest',
               label: loc?.guests ?? 'Guest',
               icon: Icons.people,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'subscription',
+              label: 'Subscription',
+              icon: Icons.card_membership,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'featured',
+              label: 'Featured Listings',
+              icon: Icons.star,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'analytics',
+              label: 'Analytics',
+              icon: Icons.analytics,
+              section: 'user',
+              badge: 'Premium',
+            ),
+            DrawerMenuItem(
+              id: 'reports',
+              label: 'Reports',
+              icon: Icons.report,
+              section: 'user',
+              badge: 'Premium',
+            ),
+            DrawerMenuItem(
+              id: 'refundRequest',
+              label: 'Refund Request',
+              icon: Icons.money_off,
+              section: 'user',
+            ),
+            DrawerMenuItem(
+              id: 'refundHistory',
+              label: 'Refund History',
+              icon: Icons.history,
               section: 'user',
             ),
           ]

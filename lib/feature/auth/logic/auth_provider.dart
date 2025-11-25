@@ -531,7 +531,37 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
 
         // CRITICAL SECURITY FIX: Validate role selection
 
-        // If no role was selected, this is a security issue
+        // Handle admin role separately - admin doesn't need role selection
+        if (existingUser.role == 'admin') {
+          // User is admin - allow access without role selection
+          _user = existingUser;
+          _selectedRole = null;
+          
+          // Update phone number from Firebase user to ensure it's current
+          if (firebaseUser.phoneNumber != null &&
+              firebaseUser.phoneNumber!.isNotEmpty) {
+            _user = _user!.copyWith(phoneNumber: firebaseUser.phoneNumber!);
+          }
+
+          // Update last login and phone number if changed
+          await _firestoreService.updateDocument(
+            FirestoreConstants.users,
+            firebaseUser.uid,
+            {
+              'lastLoginAt': DateTime.now(),
+              'phoneNumber': _user!.phoneNumber,
+            },
+          );
+
+          // Save to local storage
+          await _saveUserToPrefs(_user!);
+
+          // Navigate to admin dashboard
+          await _navigateAfterAuthentication();
+          return;
+        }
+
+        // For non-admin users, require role selection
         if (_selectedRole == null) {
           // Clear and force sign-out to prevent partial sessions
           _user = null;
@@ -672,7 +702,7 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       return;
     }
 
-    // STRICT: Only navigate if role is exactly 'guest' or 'owner'
+    // Navigate based on role: 'guest', 'owner', or 'admin'
     if (userRole == 'owner') {
       debugPrint(
           '✅ _navigateAfterAuthentication: Role is owner - navigating to owner dashboard');
@@ -681,6 +711,10 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       debugPrint(
           '✅ _navigateAfterAuthentication: Role is guest - navigating to guest dashboard');
       _navigation.goToGuestHome();
+    } else if (userRole == 'admin') {
+      debugPrint(
+          '✅ _navigateAfterAuthentication: Role is admin - navigating to admin dashboard');
+      _navigation.goToAdminRevenueDashboard();
     } else {
       // Invalid role value - redirect to role selection
       debugPrint(
@@ -838,7 +872,7 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
         return;
       }
 
-      // STRICT: Only navigate if role is exactly 'guest' or 'owner'
+      // Navigate based on role: 'guest', 'owner', or 'admin'
       if (role == 'guest') {
         debugPrint(
             '✅ navigateAfterSplash: Role is guest - navigating to guest dashboard');
@@ -847,6 +881,10 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
         debugPrint(
             '✅ navigateAfterSplash: Role is owner - navigating to owner dashboard');
         _navigation.goToOwnerHome();
+      } else if (role == 'admin') {
+        debugPrint(
+            '✅ navigateAfterSplash: Role is admin - navigating to admin dashboard');
+        _navigation.goToAdminRevenueDashboard();
       } else {
         // Invalid role - redirect to role selection
         debugPrint(
@@ -1185,10 +1223,11 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
 
         final userRole = _selectedRole!.toLowerCase().trim();
 
-        // STRICT VALIDATION: Only allow 'guest' or 'owner'
+        // VALIDATION: Only allow 'guest' or 'owner' for new user registration
+        // Admin role cannot be created through app - must be manually set in Firestore
         if (userRole != 'guest' && userRole != 'owner') {
           setError(true,
-              'CRITICAL: Invalid role "$userRole". Role must be "guest" or "owner".');
+              'Invalid role "$userRole". Role must be "guest" or "owner". Admin access must be configured separately.');
           await _analyticsService.logEvent(
             name: 'auth_verify_otp_invalid_role_critical',
             parameters: {'user_id': userId, 'invalid_role': userRole},

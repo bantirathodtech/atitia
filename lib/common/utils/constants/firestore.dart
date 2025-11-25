@@ -106,4 +106,19 @@ class FirestoreConstants {
 
   /// Bed change requests collection: 'bed_change_requests'
   static const String bedChangeRequests = 'bed_change_requests';
+
+  // MARK: - Monetization Collections
+  // ==========================================
+
+  /// Owner subscriptions collection: 'owner_subscriptions'
+  static const String ownerSubscriptions = 'owner_subscriptions';
+
+  /// Featured listings collection: 'featured_listings'
+  static const String featuredListings = 'featured_listings';
+
+  /// Revenue records collection: 'revenue_records'
+  static const String revenueRecords = 'revenue_records';
+
+  /// Refund requests collection: 'refund_requests'
+  static const String refundRequests = 'refund_requests';
 }

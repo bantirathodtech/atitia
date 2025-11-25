@@ -21,6 +21,9 @@ class NavigationService {
   /// Navigate to Role Selection Screen
   void goToRoleSelection() => _router.go(AppRoutes.roleSelection);
 
+  /// Navigate to Admin Access Screen
+  void goToAdminAccess() => _router.go(AppRoutes.adminAccess);
+
   void goToPhoneAuth() => _router.go(AppRoutes.phoneAuth);
   void goToRegistration() => _router.go(AppRoutes.registration);
 
@@ -76,6 +79,17 @@ class NavigationService {
   void goToOwnerHelp() => _router.go(AppRoutes.ownerHelp);
   void goToOwnerAnalytics() => _router.go(AppRoutes.ownerAnalytics);
   void goToOwnerReports() => _router.go(AppRoutes.ownerReports);
+  void goToOwnerSubscriptionPlans() => _router.go(AppRoutes.ownerSubscriptionPlans);
+  void goToOwnerSubscriptionManagement() => _router.go(AppRoutes.ownerSubscriptionManagement);
+  void goToOwnerFeaturedListingPurchase() => _router.go(AppRoutes.ownerFeaturedListingPurchase);
+  void goToOwnerFeaturedListingManagement() => _router.go(AppRoutes.ownerFeaturedListingManagement);
+  void goToOwnerRefundRequest() => _router.go(AppRoutes.ownerRefundRequest);
+  void goToOwnerRefundHistory() => _router.go(AppRoutes.ownerRefundHistory);
+
+  // Admin navigation methods
+  void goToAdminHome() => _router.go(AppRoutes.adminHome);
+  void goToAdminRevenueDashboard() => _router.go(AppRoutes.adminRevenueDashboard);
+  void goToAdminRefundApproval() => _router.go(AppRoutes.adminRefundApproval);
 
   // Utility navigation methods
   void goBack() => _router.pop();
@@ -111,17 +125,17 @@ class NavigationService {
   bool get isOnOwnerFlow =>
       getCurrentLocation().startsWith(AppRoutes.ownerHome);
 
-  /// STRICT: Navigate to home dashboard based on user role
-  /// This method should be used instead of directly calling goToGuestHome/goToOwnerHome
-  /// to ensure role-based navigation is always enforced
+  /// Navigate to home dashboard based on user role
+  /// Supports 'guest', 'owner', and 'admin' roles
   void goToHomeByRole(String? role) {
     final userRole = role?.toLowerCase().trim();
 
-    // STRICT: Only navigate if role is explicitly 'guest' or 'owner'
     if (userRole == 'guest') {
       goToGuestHome();
     } else if (userRole == 'owner') {
       goToOwnerHome();
+    } else if (userRole == 'admin') {
+      goToAdminRevenueDashboard();
     } else {
       // Invalid or missing role - redirect to role selection
       goToRoleSelection();

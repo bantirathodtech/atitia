@@ -685,6 +685,7 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
           pg: pg,
           userLatitude: null, // TODO: Get from location service if needed
           userLongitude: null, // TODO: Get from location service if needed
+          isFeatured: pgVM.isPGFeatured(pg.pgId),
           onTap: () {
             pgVM.setSelectedPG(pg);
             getIt<NavigationService>().goToGuestPGDetails(pg.pgId);

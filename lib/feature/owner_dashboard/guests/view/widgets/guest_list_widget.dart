@@ -513,52 +513,6 @@ class _GuestListWidgetState extends State<GuestListWidget> {
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.paddingM),
-          // Placeholder rows
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding:
-                const EdgeInsets.symmetric(horizontal: AppSpacing.paddingM),
-            itemCount: 3, // Show 3 placeholder rows
-            itemBuilder: (context, index) =>
-                _buildPlaceholderGuestCard(context),
-          ),
-          // Empty state message
-          Container(
-            margin: const EdgeInsets.all(AppSpacing.paddingM),
-            padding: const EdgeInsets.all(AppSpacing.paddingL),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-              border: Border.all(color: Theme.of(context).dividerColor),
-            ),
-            child: Column(
-              children: [
-                Icon(Icons.people_outline,
-                    size: 48,
-                    color: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.5) ??
-                        Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.5)),
-                const SizedBox(height: AppSpacing.paddingM),
-                HeadingMedium(
-                  text: loc?.noGuestsYet ?? 'No Guests Yet',
-                ),
-                const SizedBox(height: AppSpacing.paddingS),
-                BodyText(
-                  text: loc?.guestsAppearAfterBooking ??
-                      'Guests will appear here once they book your PG',
-                  align: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

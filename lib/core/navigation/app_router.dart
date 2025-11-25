@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../feature/auth/view/screen/role_selection/role_selection_screen.dart';
+import '../../../feature/auth/view/screen/admin/admin_access_screen.dart';
 import '../../../feature/auth/view/screen/signin/phone_auth_screen.dart';
 import '../../../feature/auth/view/screen/signup/registration_screen.dart';
 import '../../../feature/auth/view/screen/splash/splash_screen.dart';
@@ -28,6 +29,14 @@ import '../../../feature/owner_dashboard/notifications/view/screens/owner_notifi
 import '../../../feature/owner_dashboard/help/view/screens/owner_help_screen.dart';
 import '../../../feature/owner_dashboard/analytics/screens/owner_analytics_dashboard.dart';
 import '../../../feature/owner_dashboard/reports/view/screens/owner_reports_screen.dart';
+import '../../../feature/owner_dashboard/subscription/view/screens/owner_subscription_plans_screen.dart';
+import '../../../feature/owner_dashboard/subscription/view/screens/owner_subscription_management_screen.dart';
+import '../../../feature/owner_dashboard/featured/view/screens/owner_featured_listing_purchase_screen.dart';
+import '../../../feature/owner_dashboard/featured/view/screens/owner_featured_listing_management_screen.dart';
+import '../../../feature/owner_dashboard/refunds/view/screens/owner_refund_request_screen.dart';
+import '../../../feature/owner_dashboard/refunds/view/screens/owner_refund_history_screen.dart';
+import '../../../feature/admin_dashboard/revenue/view/screens/admin_revenue_dashboard_screen.dart';
+import '../../../feature/admin_dashboard/refunds/view/screens/admin_refund_approval_screen.dart';
 import '../../common/screens/privacy_policy_screen.dart';
 import '../../common/screens/terms_of_service_screen.dart';
 import '../../common/utils/constants/routes.dart';
@@ -63,6 +72,11 @@ class AppRouter {
         path: AppRoutes.roleSelection,
         name: AppRoutes.roleSelection,
         builder: (context, state) => const RoleSelectionScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminAccess,
+        name: AppRoutes.adminAccess,
+        builder: (context, state) => const AdminAccessScreen(),
       ),
       GoRoute(
         path: AppRoutes.phoneAuth,
@@ -274,6 +288,70 @@ class AppRouter {
             name: AppRoutes.ownerReports,
             builder: (context, state) => const OwnerReportsScreen(),
           ),
+          // Subscription routes
+          GoRoute(
+            path: 'subscription/plans',
+            name: AppRoutes.ownerSubscriptionPlans,
+            builder: (context, state) => const OwnerSubscriptionPlansScreen(),
+          ),
+          GoRoute(
+            path: 'subscription/management',
+            name: AppRoutes.ownerSubscriptionManagement,
+            builder: (context, state) => const OwnerSubscriptionManagementScreen(),
+          ),
+          // Featured listing routes
+          GoRoute(
+            path: 'featured/purchase',
+            name: AppRoutes.ownerFeaturedListingPurchase,
+            builder: (context, state) => const OwnerFeaturedListingPurchaseScreen(),
+          ),
+          GoRoute(
+            path: 'featured/management',
+            name: AppRoutes.ownerFeaturedListingManagement,
+            builder: (context, state) => const OwnerFeaturedListingManagementScreen(),
+          ),
+          // Refund routes
+          GoRoute(
+            path: 'refunds/request',
+            name: AppRoutes.ownerRefundRequest,
+            builder: (context, state) => const OwnerRefundRequestScreen(),
+          ),
+          GoRoute(
+            path: 'refunds/history',
+            name: AppRoutes.ownerRefundHistory,
+            builder: (context, state) => const OwnerRefundHistoryScreen(),
+          ),
+        ],
+      ),
+
+      // Admin routes (admin-only access)
+      GoRoute(
+        path: AppRoutes.adminHome,
+        name: AppRoutes.adminHome,
+        redirect: (context, state) {
+          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          final userRole = authProvider.user?.role;
+          // Redirect to revenue dashboard by default
+          if (state.matchedLocation == AppRoutes.adminHome) {
+            return AppRoutes.adminRevenueDashboard;
+          }
+          // Check admin role for admin routes
+          if (userRole != 'admin') {
+            return AppRoutes.splash; // Redirect non-admins
+          }
+          return null;
+        },
+        routes: [
+          GoRoute(
+            path: 'revenue',
+            name: AppRoutes.adminRevenueDashboard,
+            builder: (context, state) => const AdminRevenueDashboardScreen(),
+          ),
+          GoRoute(
+            path: 'refunds',
+            name: AppRoutes.adminRefundApproval,
+            builder: (context, state) => const AdminRefundApprovalScreen(),
+          ),
         ],
       ),
 
@@ -324,6 +402,17 @@ class AppRouter {
             RouteGuard.requiresAuth(currentRoute)) {
           // Not authenticated and route requires auth - redirect to splash
           return AppRoutes.splash;
+        }
+
+        // Check admin routes (must be admin)
+        if (AppRoutes.isAdminRoute(currentRoute) && userRole != 'admin') {
+          // Redirect non-admins away from admin routes
+          if (userRole == 'guest') {
+            return AppRoutes.guestHome;
+          } else if (userRole == 'owner') {
+            return AppRoutes.ownerHome;
+          }
+          return AppRoutes.roleSelection;
         }
 
         // Check role-based access

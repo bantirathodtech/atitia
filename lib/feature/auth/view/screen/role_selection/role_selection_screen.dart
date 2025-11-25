@@ -26,8 +26,10 @@ import '../../../../../common/widgets/buttons/theme_toggle_button.dart';
 import '../../../../../common/widgets/cards/adaptive_card.dart';
 import '../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../common/utils/constants/routes.dart';
 import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/navigation/navigation_service.dart';
+import 'package:go_router/go_router.dart';
 import '../../../logic/auth_provider.dart';
 
 /// Role selection screen where users choose between Guest and Owner roles
@@ -148,45 +150,85 @@ class RoleSelectionScreen extends StatelessWidget {
           ),
 
           // =================================================================
-          // Floating Theme Toggle Button (Top-Right Corner)
+          // Top Bar with Admin Access and Theme Toggle
           // =================================================================
-          // Positioned absolutely in top-right for easy access
-          // User can change theme before selecting role
-          // Fully theme-aware colors for day/night modes
+          // Admin access (3-dot menu) on top-left
+          // Theme toggle on top-right
           // =================================================================
-          Positioned(
-            top: AppSpacing.paddingM,
-            right: AppSpacing.paddingM,
-            child: SafeArea(
-              child: Builder(
-                builder: (context) {
-                  final isDark = Theme.of(context).brightness == Brightness.dark;
-                  final colorScheme = Theme.of(context).colorScheme;
-                  
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isDark
-                            ? colorScheme.outline.withValues(alpha: 0.3)
-                            : colorScheme.outline.withValues(alpha: 0.2),
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDark
-                              ? Colors.black.withValues(alpha: 0.4)
-                              : Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                          spreadRadius: 0,
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.paddingM),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Admin Access Button (3-dot menu) - Top Left
+                  Builder(
+                    builder: (context) {
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      final colorScheme = Theme.of(context).colorScheme;
+                      
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: colorScheme.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark
+                                ? colorScheme.outline.withValues(alpha: 0.3)
+                                : colorScheme.outline.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDark
+                                  ? Colors.black.withValues(alpha: 0.4)
+                                  : Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                              spreadRadius: 0,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: const ThemeToggleButton(),
-                  );
-                },
+                        child: IconButton(
+                          icon: const Icon(Icons.more_vert),
+                          tooltip: 'Admin Access',
+                          onPressed: () => _handleAdminAccess(context),
+                        ),
+                      );
+                    },
+                  ),
+
+                  // Theme Toggle Button - Top Right
+                  Builder(
+                    builder: (context) {
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      final colorScheme = Theme.of(context).colorScheme;
+                      
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: colorScheme.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark
+                                ? colorScheme.outline.withValues(alpha: 0.3)
+                                : colorScheme.outline.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDark
+                                  ? Colors.black.withValues(alpha: 0.4)
+                                  : Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: const ThemeToggleButton(),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ),
@@ -389,5 +431,10 @@ class RoleSelectionScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Handle admin access - navigate to admin access screen
+  void _handleAdminAccess(BuildContext context) {
+    context.go(AppRoutes.adminAccess);
   }
 }

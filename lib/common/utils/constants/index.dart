@@ -7,3 +7,4 @@ export '../constants/platform.dart';
 export '../constants/routes.dart';
 export '../constants/storage.dart';
 export '../constants/validation.dart';
+export '../constants/web_urls.dart';

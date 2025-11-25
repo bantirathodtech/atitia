@@ -14,6 +14,11 @@ import '../../../feature/owner_dashboard/mypg/presentation/viewmodels/owner_pg_m
 import '../../../feature/owner_dashboard/overview/viewmodel/owner_overview_view_model.dart';
 import '../../../feature/owner_dashboard/profile/viewmodel/owner_payment_details_viewmodel.dart';
 import '../../../feature/owner_dashboard/profile/viewmodel/owner_profile_viewmodel.dart';
+import '../../../feature/owner_dashboard/subscription/viewmodel/owner_subscription_viewmodel.dart';
+import '../../../feature/owner_dashboard/featured/viewmodel/owner_featured_listing_viewmodel.dart';
+import '../../../feature/owner_dashboard/refunds/viewmodel/owner_refund_viewmodel.dart';
+import '../../../feature/admin_dashboard/revenue/viewmodel/admin_revenue_viewmodel.dart';
+import '../../../feature/admin_dashboard/refunds/viewmodel/admin_refund_viewmodel.dart';
 import '../../../feature/owner_dashboard/shared/viewmodel/selected_pg_provider.dart';
 import '../../../feature/guest_dashboard/shared/viewmodel/guest_pg_selection_provider.dart';
 import '../../app/localization/locale_provider.dart';
@@ -132,6 +137,32 @@ class FirebaseAppProviders {
         ChangeNotifierProvider<OwnerOverviewViewModel>(
           create: (_) =>
               FirebaseDependencyContainer.createOwnerOverviewViewModel(),
+        ),
+
+        // Owner Subscription - Subscription management and purchase
+        ChangeNotifierProvider<OwnerSubscriptionViewModel>(
+          create: (_) => OwnerSubscriptionViewModel(),
+        ),
+
+        // Owner Featured Listing - Featured listing management and purchase
+        ChangeNotifierProvider<OwnerFeaturedListingViewModel>(
+          create: (_) => OwnerFeaturedListingViewModel(),
+        ),
+
+        // Owner Refunds - Refund request management
+        ChangeNotifierProvider<OwnerRefundViewModel>(
+          create: (_) => OwnerRefundViewModel(),
+        ),
+
+        // ==================== ADMIN PROVIDERS ====================
+        // Admin Revenue Dashboard - App-level revenue analytics
+        ChangeNotifierProvider<AdminRevenueViewModel>(
+          create: (_) => AdminRevenueViewModel(),
+        ),
+
+        // Admin Refunds - Refund request approval and processing
+        ChangeNotifierProvider<AdminRefundViewModel>(
+          create: (_) => AdminRefundViewModel(),
         ),
       ];
 

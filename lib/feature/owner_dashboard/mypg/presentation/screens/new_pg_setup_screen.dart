@@ -24,6 +24,11 @@ import '../../../../../common/widgets/containers/section_container.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../auth/logic/auth_provider.dart';
 import '../../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../../core/models/subscription/subscription_plan_model.dart';
+import '../../../subscription/viewmodel/owner_subscription_viewmodel.dart';
+import '../../../shared/viewmodel/selected_pg_provider.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../../../common/utils/constants/routes.dart';
 import '../../data/models/owner_pg_management_model.dart';
 import '../../domain/entities/owner_pg_entity.dart';
 import '../viewmodels/owner_pg_management_viewmodel.dart';
@@ -1373,6 +1378,64 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     }
 
     final vm = context.read<OwnerPgManagementViewModel>();
+
+    // Check subscription tier limits for PG creation (only for new PGs, not edits or drafts)
+    if (!isEditMode) {
+      final subscriptionVM = context.read<OwnerSubscriptionViewModel>();
+      final pgProvider = context.read<SelectedPgProvider>();
+      
+      // Initialize subscription VM if not already initialized
+      if (!subscriptionVM.hasActiveSubscription) {
+        await subscriptionVM.initialize();
+      }
+
+      final currentTier = subscriptionVM.currentSubscription?.tier ?? SubscriptionTier.free;
+      final plan = SubscriptionPlanModel.getPlanByTier(currentTier);
+      final currentPgCount = pgProvider.pgs.length;
+      final maxPGs = plan?.maxPGs ?? 1; // Default to 1 if plan not found
+
+      // Check if owner has reached their PG limit (only check for completely new PGs)
+      String? existingDraftId;
+      if (_pgEntity != null && _pgEntity!.id.isNotEmpty) {
+        existingDraftId = _pgEntity!.id;
+      }
+
+      if (existingDraftId == null && maxPGs != -1 && currentPgCount >= maxPGs) {
+        // Show error dialog with upgrade option
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: Text(_text('pgLimitReached', 'PG Limit Reached')),
+            content: Text(
+              _text(
+                'pgLimitReachedMessage',
+                'You have reached the maximum number of PGs allowed for your {tier} plan ({current}/{max}).\n\nUpgrade to Premium or Enterprise plan for unlimited PGs.',
+                parameters: {
+                  'tier': currentTier.displayName,
+                  'current': currentPgCount.toString(),
+                  'max': maxPGs.toString(),
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text(_text('cancel', 'Cancel')),
+              ),
+              PrimaryButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  context.go(AppRoutes.ownerSubscriptionPlans);
+                },
+                label: _text('upgradePlan', 'Upgrade Plan'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    }
 
     // Convert to floor structure format
     final floorStructure = _floors.map((floor) {

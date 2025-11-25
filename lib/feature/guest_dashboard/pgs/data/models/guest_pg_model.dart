@@ -52,6 +52,8 @@ class GuestPgModel {
   final String? paymentInstructions; // Payment instructions
   final String? ownerName;
   final String? googleMapLink; // Google Maps link
+  final bool isFeatured; // Whether this PG is currently featured
+  final DateTime? featuredUntil; // Date until which PG is featured
   final Map<String, dynamic>? metadata;
 
   GuestPgModel({
@@ -96,6 +98,8 @@ class GuestPgModel {
     this.paymentInstructions,
     this.ownerName,
     this.googleMapLink,
+    this.isFeatured = false,
+    this.featuredUntil,
     this.metadata,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
@@ -183,6 +187,10 @@ class GuestPgModel {
       ownerName: map['ownerName'],
       googleMapLink:
           map['googleMapLink'] ?? map['mapLink'], // Support both field names
+      isFeatured: map['isFeatured'] as bool? ?? false,
+      featuredUntil: map['featuredUntil'] != null
+          ? _parseDate(map['featuredUntil'])
+          : null,
       metadata: map['metadata'] != null
           ? Map<String, dynamic>.from(map['metadata'])
           : null,
@@ -234,6 +242,8 @@ class GuestPgModel {
       'paymentInstructions': paymentInstructions,
       'ownerName': ownerName,
       'googleMapLink': googleMapLink,
+      'isFeatured': isFeatured,
+      'featuredUntil': featuredUntil,
       'metadata': metadata,
     };
   }
@@ -273,6 +283,8 @@ class GuestPgModel {
     bool? securityAvailable,
     String? ownerName,
     String? googleMapLink,
+    bool? isFeatured,
+    DateTime? featuredUntil,
     Map<String, dynamic>? metadata,
   }) {
     return GuestPgModel(
@@ -317,6 +329,8 @@ class GuestPgModel {
       paymentInstructions: paymentInstructions ?? paymentInstructions,
       ownerName: ownerName ?? this.ownerName,
       googleMapLink: googleMapLink ?? this.googleMapLink,
+      isFeatured: isFeatured ?? this.isFeatured,
+      featuredUntil: featuredUntil ?? this.featuredUntil,
       metadata: metadata ?? this.metadata,
     );
   }
@@ -420,6 +434,13 @@ class GuestPgModel {
   int get statusColor {
     if (!isActive) return 0xFFE57373; // Red
     return 0xFF81C784; // Green
+  }
+
+  /// Check if PG is currently featured
+  bool get isCurrentlyFeatured {
+    if (!isFeatured) return false;
+    if (featuredUntil == null) return false;
+    return featuredUntil!.isAfter(DateTime.now());
   }
 
   /// Returns distance from a given point (if location is available)

@@ -82,8 +82,8 @@ class RouteGuard {
         return null;
       }
 
-      // Validate role is either 'guest' or 'owner'
-      if (role != 'guest' && role != 'owner') {
+      // Validate role is either 'guest', 'owner', or 'admin'
+      if (role != 'guest' && role != 'owner' && role != 'admin') {
         debugPrint(
             '🔒 RouteGuard: Invalid role value "$role" for userId: $userId');
         return null;
@@ -159,6 +159,18 @@ class RouteGuard {
     if (AppRoutes.isGuestRoute(currentRoute) && userRole != 'guest') {
       // If user is owner trying to access guest route, force redirect to owner dashboard
       if (userRole == 'owner') {
+        return AppRoutes.ownerHome;
+      }
+      // If role is invalid/null, redirect to role selection
+      return AppRoutes.roleSelection;
+    }
+
+    // STRICT: Prevent non-admin from accessing admin routes
+    if (AppRoutes.isAdminRoute(currentRoute) && userRole != 'admin') {
+      // Redirect to appropriate dashboard based on role
+      if (userRole == 'guest') {
+        return AppRoutes.guestHome;
+      } else if (userRole == 'owner') {
         return AppRoutes.ownerHome;
       }
       // If role is invalid/null, redirect to role selection
