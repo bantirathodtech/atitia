@@ -93,3 +93,71 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+// ============================================================================
+// FIX: Remove integration_test plugin from release builds
+// ============================================================================
+// GeneratedPluginRegistrant.java includes integration_test (dev_dependency)
+// which causes release builds to fail because the plugin class doesn't exist.
+// Solution: Remove integration_test registration lines before compilation.
+// ============================================================================
+
+tasks.register("removeIntegrationTestFromRelease") {
+    description = "Removes integration_test plugin from GeneratedPluginRegistrant.java for release builds"
+    group = "flutter"
+    
+    doLast {
+        val generatedFile = file("src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java")
+        if (generatedFile.exists()) {
+            var content = generatedFile.readText()
+            val originalContent = content
+            
+            // Remove the integration_test try-catch block
+            // Pattern: try { ... IntegrationTestPlugin() ... } catch ...
+            val lines = content.lines().toMutableList()
+            val filteredLines = mutableListOf<String>()
+            
+            var i = 0
+            while (i < lines.size) {
+                val line = lines[i]
+                val trimmed = line.trim()
+                
+                // Check if this line starts the integration_test try block
+                if (trimmed == "try {" && i + 1 < lines.size && 
+                    lines[i + 1].contains("integration_test")) {
+                    // Skip this try block - find and skip until end of catch block
+                    var j = i
+                    var braceCount = 0
+                    while (j < lines.size) {
+                        val currentLine = lines[j]
+                        braceCount += currentLine.count { it == '{' } - currentLine.count { it == '}' }
+                        if (currentLine.trim().startsWith("}") && braceCount == 0 && j > i) {
+                            // End of catch block
+                            i = j + 1
+                            break
+                        }
+                        j++
+                    }
+                    if (j >= lines.size) break
+                    continue
+                }
+                
+                // Keep all other lines
+                filteredLines.add(line)
+                i++
+            }
+            
+            content = filteredLines.joinToString("\n")
+            
+            if (content != originalContent) {
+                generatedFile.writeText(content)
+                println("✅ Removed integration_test plugin registration from GeneratedPluginRegistrant.java")
+            }
+        }
+    }
+}
+
+// Execute removal task before compiling release Java code
+afterEvaluate {
+    tasks.findByName("compileReleaseJavaWithJavac")?.dependsOn("removeIntegrationTestFromRelease")
+}
