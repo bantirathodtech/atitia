@@ -736,16 +736,19 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                         _buildDetailRow(loc.color, bike.color),
                         _buildDetailRow(loc.parkingSpot, bike.parkingSpot),
                         _buildDetailRow(loc.status, bike.statusDisplay),
-                        _buildDetailRow(
-                            loc.registeredOn, _formatDate(bike.registrationDate)),
+                        _buildDetailRow(loc.registeredOn,
+                            _formatDate(bike.registrationDate)),
                         if (bike.lastParkedDate != null)
-                          _buildDetailRow(
-                              loc.lastParked, _formatDate(bike.lastParkedDate!)),
+                          _buildDetailRow(loc.lastParked,
+                              _formatDate(bike.lastParkedDate!)),
                         if (bike.removalDate != null)
-                          _buildDetailRow(loc.removed, _formatDate(bike.removalDate!)),
+                          _buildDetailRow(
+                              loc.removed, _formatDate(bike.removalDate!)),
                         if (bike.violationReason != null)
-                          _buildDetailRow(loc.violationLabel, bike.violationReason!),
-                        if (bike.notes != null) _buildDetailRow(loc.notes, bike.notes!),
+                          _buildDetailRow(
+                              loc.violationLabel, bike.violationReason!),
+                        if (bike.notes != null)
+                          _buildDetailRow(loc.notes, bike.notes!),
                       ],
                     ),
                   ),
@@ -858,36 +861,36 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                     PrimaryButton(
                       label: loc.saveChanges,
                       onPressed: () async {
-                final messenger = ScaffoldMessenger.of(context);
-                final locOuter = AppLocalizations.of(context);
-                final updatedBike = bike.copyWith(
-                  parkingSpot: parkingController.text,
-                  notes: notesController.text.isNotEmpty
-                      ? notesController.text
-                      : null,
-                  updatedAt: DateTime.now(),
-                );
+                        final messenger = ScaffoldMessenger.of(context);
+                        final locOuter = AppLocalizations.of(context);
+                        final updatedBike = bike.copyWith(
+                          parkingSpot: parkingController.text,
+                          notes: notesController.text.isNotEmpty
+                              ? notesController.text
+                              : null,
+                          updatedAt: DateTime.now(),
+                        );
 
-                final success = await guestVM.updateBike(updatedBike);
-                // FIXED: BuildContext async gap warning
-                // Flutter recommends: Check mounted immediately before using context after async operations
-                // Changed from: Using context with mounted check in compound condition after async gap
-                // Changed to: Check mounted immediately before each context usage
-                // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-                if (!success || !mounted) return;
-                // ignore: use_build_context_synchronously
-                Navigator.of(dialogContext).pop();
-                if (!mounted) return;
-                // ignore: use_build_context_synchronously
-                messenger.showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      locOuter?.bikeUpdatedSuccessfully ??
-                          _text('bikeUpdatedSuccessfully',
-                              'Bike updated successfully'),
-                    ),
-                  ),
-                );
+                        final success = await guestVM.updateBike(updatedBike);
+                        // FIXED: BuildContext async gap warning
+                        // Flutter recommends: Check mounted immediately before using context after async operations
+                        // Changed from: Using context with mounted check in compound condition after async gap
+                        // Changed to: Check mounted immediately before each context usage
+                        // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
+                        if (!success || !mounted) return;
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(dialogContext).pop();
+                        if (!mounted) return;
+                        // ignore: use_build_context_synchronously
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              locOuter?.bikeUpdatedSuccessfully ??
+                                  _text('bikeUpdatedSuccessfully',
+                                      'Bike updated successfully'),
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ],
@@ -945,48 +948,50 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                     ),
                     const SizedBox(width: AppSpacing.paddingS),
                     PrimaryButton(
-              label: loc.moveBike,
-              onPressed: () async {
-                if (newSpotController.text.isNotEmpty) {
-                  final navigator = Navigator.of(dialogContext);
-                  final messenger = ScaffoldMessenger.of(context);
-                  final locOuter = AppLocalizations.of(context);
-                  final request = BikeMovementRequest(
-                    requestId: DateTime.now().millisecondsSinceEpoch.toString(),
-                    bikeId: bike.bikeId,
-                    guestId: bike.guestId,
-                    guestName: bike.guestName,
-                    pgId: bike.pgId,
-                    ownerId: bike.ownerId,
-                    requestType: 'move',
-                    currentSpot: bike.parkingSpot,
-                    newSpot: newSpotController.text,
-                    reason: reasonController.text.isNotEmpty
-                        ? reasonController.text
-                        : loc.ownerRequestedMove,
-                    status: 'pending',
-                    requestedAt: DateTime.now(),
-                    isActive: true,
-                  );
+                      label: loc.moveBike,
+                      onPressed: () async {
+                        if (newSpotController.text.isNotEmpty) {
+                          final navigator = Navigator.of(dialogContext);
+                          final messenger = ScaffoldMessenger.of(context);
+                          final locOuter = AppLocalizations.of(context);
+                          final request = BikeMovementRequest(
+                            requestId: DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString(),
+                            bikeId: bike.bikeId,
+                            guestId: bike.guestId,
+                            guestName: bike.guestName,
+                            pgId: bike.pgId,
+                            ownerId: bike.ownerId,
+                            requestType: 'move',
+                            currentSpot: bike.parkingSpot,
+                            newSpot: newSpotController.text,
+                            reason: reasonController.text.isNotEmpty
+                                ? reasonController.text
+                                : loc.ownerRequestedMove,
+                            status: 'pending',
+                            requestedAt: DateTime.now(),
+                            isActive: true,
+                          );
 
-                  final success =
-                      await guestVM.createBikeMovementRequest(request);
-                  // FIXED: BuildContext async gap warning
-                  if (!success || !mounted) return;
-                  navigator.pop();
-                  if (!mounted) return;
-                  // ignore: use_build_context_synchronously
-                  messenger.showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        locOuter?.bikeMovementRequestCreated ??
-                            _text('bikeMovementRequestCreated',
-                                'Bike movement request created'),
-                      ),
-                    ),
-                  );
-                }
-              },
+                          final success =
+                              await guestVM.createBikeMovementRequest(request);
+                          // FIXED: BuildContext async gap warning
+                          if (!success || !mounted) return;
+                          navigator.pop();
+                          if (!mounted) return;
+                          // ignore: use_build_context_synchronously
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                locOuter?.bikeMovementRequestCreated ??
+                                    _text('bikeMovementRequestCreated',
+                                        'Bike movement request created'),
+                              ),
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -1020,7 +1025,8 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
               children: [
                 HeadingMedium(text: loc.removeBike),
                 const SizedBox(height: AppSpacing.paddingM),
-                BodyText(text: loc.areYouSureYouWantToRemoveBike(bike.fullBikeName)),
+                BodyText(
+                    text: loc.areYouSureYouWantToRemoveBike(bike.fullBikeName)),
                 const SizedBox(height: AppSpacing.paddingM),
                 TextInput(
                   controller: reasonController,
@@ -1039,42 +1045,43 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                     PrimaryButton(
                       label: loc.removeBike,
                       onPressed: () async {
-                final navigator = Navigator.of(dialogContext);
-                final messenger = ScaffoldMessenger.of(context);
-                final locOuter = AppLocalizations.of(context);
-                final request = BikeMovementRequest(
-                  requestId: DateTime.now().millisecondsSinceEpoch.toString(),
-                  bikeId: bike.bikeId,
-                  guestId: bike.guestId,
-                  guestName: bike.guestName,
-                  pgId: bike.pgId,
-                  ownerId: bike.ownerId,
-                  requestType: 'remove',
-                  currentSpot: bike.parkingSpot,
-                  reason: reasonController.text.isNotEmpty
-                      ? reasonController.text
-                      : loc.ownerRequestedRemoval,
-                  status: 'pending',
-                  requestedAt: DateTime.now(),
-                  isActive: true,
-                );
+                        final navigator = Navigator.of(dialogContext);
+                        final messenger = ScaffoldMessenger.of(context);
+                        final locOuter = AppLocalizations.of(context);
+                        final request = BikeMovementRequest(
+                          requestId:
+                              DateTime.now().millisecondsSinceEpoch.toString(),
+                          bikeId: bike.bikeId,
+                          guestId: bike.guestId,
+                          guestName: bike.guestName,
+                          pgId: bike.pgId,
+                          ownerId: bike.ownerId,
+                          requestType: 'remove',
+                          currentSpot: bike.parkingSpot,
+                          reason: reasonController.text.isNotEmpty
+                              ? reasonController.text
+                              : loc.ownerRequestedRemoval,
+                          status: 'pending',
+                          requestedAt: DateTime.now(),
+                          isActive: true,
+                        );
 
-                final success =
-                    await guestVM.createBikeMovementRequest(request);
-                // FIXED: BuildContext async gap warning
-                if (!success || !mounted) return;
-                navigator.pop();
-                if (!mounted) return;
-                // ignore: use_build_context_synchronously
-                messenger.showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      locOuter?.bikeRemovalRequestCreated ??
-                          _text('bikeRemovalRequestCreated',
-                              'Bike removal request created'),
-                    ),
-                  ),
-                );
+                        final success =
+                            await guestVM.createBikeMovementRequest(request);
+                        // FIXED: BuildContext async gap warning
+                        if (!success || !mounted) return;
+                        navigator.pop();
+                        if (!mounted) return;
+                        // ignore: use_build_context_synchronously
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              locOuter?.bikeRemovalRequestCreated ??
+                                  _text('bikeRemovalRequestCreated',
+                                      'Bike removal request created'),
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ],
@@ -1147,12 +1154,12 @@ class _BikeManagementWidgetState extends State<BikeManagementWidget> {
                       onPressed: () => Navigator.pop(dialogContext),
                       text: loc.cancel,
                     ),
-            PrimaryButton(
-              label: loc.search,
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                // TODO: Implement advanced search
-              },
+                    PrimaryButton(
+                      label: loc.search,
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                        // TODO: Implement advanced search
+                      },
                     ),
                     const SizedBox(width: AppSpacing.paddingS),
                   ],

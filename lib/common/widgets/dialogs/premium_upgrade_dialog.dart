@@ -66,7 +66,8 @@ class PremiumUpgradeDialog extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.paddingS),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
                   ),
                   child: Icon(
                     Icons.star,
@@ -82,7 +83,8 @@ class PremiumUpgradeDialog extends StatelessWidget {
                       HeadingMedium(text: 'Premium Feature'),
                       CaptionText(
                         text: featureName,
-                        color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                        color: theme.textTheme.bodySmall?.color
+                            ?.withValues(alpha: 0.7),
                       ),
                     ],
                   ),
@@ -157,4 +159,3 @@ class PremiumUpgradeDialog extends StatelessWidget {
     );
   }
 }
-

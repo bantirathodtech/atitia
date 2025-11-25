@@ -14,7 +14,8 @@ class GuestTabNavigationProvider extends InheritedWidget {
   });
 
   static GuestTabNavigationProvider? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<GuestTabNavigationProvider>();
+    return context
+        .dependOnInheritedWidgetOfExactType<GuestTabNavigationProvider>();
   }
 
   static Function(int)? getTabNavigationCallback(BuildContext context) {
@@ -27,4 +28,3 @@ class GuestTabNavigationProvider extends InheritedWidget {
     return onTabSelected != oldWidget.onTabSelected;
   }
 }
-

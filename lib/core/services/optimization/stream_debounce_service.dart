@@ -5,7 +5,8 @@ import 'dart:async';
 /// Service for debouncing streams to reduce rapid-fire updates
 /// Expected savings: 30-50% reduction in Firestore reads for real-time streams
 class StreamDebounceService {
-  static final StreamDebounceService _instance = StreamDebounceService._internal();
+  static final StreamDebounceService _instance =
+      StreamDebounceService._internal();
   factory StreamDebounceService() => _instance;
   StreamDebounceService._internal();
 
@@ -15,7 +16,7 @@ class StreamDebounceService {
   static const Duration defaultDebounceDuration = Duration(milliseconds: 50);
 
   /// Debounce a stream by delaying emissions until there's a pause in the stream
-  /// 
+  ///
   /// Usage:
   /// ```dart
   /// final debouncedStream = StreamDebounceService.instance.debounce(
@@ -25,7 +26,7 @@ class StreamDebounceService {
   /// ```
   Stream<T> debounce<T>(Stream<T> source, {Duration? duration}) {
     final debounceDuration = duration ?? defaultDebounceDuration;
-    
+
     return _DebounceStream<T>(source, debounceDuration).stream;
   }
 
@@ -34,7 +35,7 @@ class StreamDebounceService {
   Stream<T> debounceImmediateFirst<T>(Stream<T> source, {Duration? duration}) {
     final debounceDuration = duration ?? defaultDebounceDuration;
     bool isFirst = true;
-    
+
     return _DebounceStream<T>(
       source,
       debounceDuration,
@@ -102,4 +103,3 @@ class _DebounceStream<T> {
 
   Stream<T> get stream => _controller.stream;
 }
-

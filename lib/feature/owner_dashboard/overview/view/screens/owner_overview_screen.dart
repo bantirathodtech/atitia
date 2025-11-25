@@ -70,10 +70,10 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
 
     if (ownerId.isNotEmpty) {
       _lastLoadedPgId = pgId;
-      
+
       // Phase 1: Load critical overview data first (shows main stats quickly)
       await viewModel.loadOverviewData(ownerId, pgId: pgId);
-      
+
       // Phase 2: Load secondary data in parallel (non-blocking for UI)
       // These will update the UI as they complete
       Future.microtask(() => _loadSecondaryData(viewModel, ownerId, pgId));
@@ -109,8 +109,10 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
     final loc = AppLocalizations.of(context)!;
     final viewModel = context.watch<OwnerOverviewViewModel>();
     // Use select to only rebuild when userId or pgId changes
-    final ownerId = context.select<AuthProvider, String>((a) => a.user?.userId ?? '');
-    final currentPgId = context.select<SelectedPgProvider, String?>((p) => p.selectedPgId);
+    final ownerId =
+        context.select<AuthProvider, String>((a) => a.user?.userId ?? '');
+    final currentPgId =
+        context.select<SelectedPgProvider, String?>((p) => p.selectedPgId);
 
     // Auto-reload data when selected PG changes
     if (_lastLoadedPgId != currentPgId && ownerId.isNotEmpty) {
@@ -126,7 +128,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
         // Center: PG Selector dropdown
         titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
-        
+
         // Theme-aware background color
         backgroundColor: context.colors.surface,
 
@@ -193,30 +195,48 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                       delay: const Duration(milliseconds: 100),
                       child: _buildWelcomeHeader(context, responsive, loc),
                     ),
-                    SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+                    SizedBox(
+                        height: context.isMobile
+                            ? AppSpacing.paddingM
+                            : AppSpacing.paddingL),
 
                     // Summary Cards
                     FadeInAnimation(
                       delay: const Duration(milliseconds: 200),
-                      child: OwnerSummaryWidget(overview: viewModel.overviewData!),
+                      child:
+                          OwnerSummaryWidget(overview: viewModel.overviewData!),
                     ),
-                    SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+                    SizedBox(
+                        height: context.isMobile
+                            ? AppSpacing.paddingM
+                            : AppSpacing.paddingL),
 
                     // Payment Status Breakdown
                     if (viewModel.paymentStatusBreakdown != null)
                       _buildPaymentStatusBreakdown(context, viewModel),
                     if (viewModel.paymentStatusBreakdown != null)
-                      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+                      SizedBox(
+                          height: context.isMobile
+                              ? AppSpacing.paddingM
+                              : AppSpacing.paddingL),
 
                     // Recently Updated Guests
-                    if (viewModel.recentlyUpdatedGuests != null && viewModel.recentlyUpdatedGuests!.isNotEmpty)
+                    if (viewModel.recentlyUpdatedGuests != null &&
+                        viewModel.recentlyUpdatedGuests!.isNotEmpty)
                       _buildRecentlyUpdatedGuests(context, viewModel, loc),
-                    if (viewModel.recentlyUpdatedGuests != null && viewModel.recentlyUpdatedGuests!.isNotEmpty)
-                      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+                    if (viewModel.recentlyUpdatedGuests != null &&
+                        viewModel.recentlyUpdatedGuests!.isNotEmpty)
+                      SizedBox(
+                          height: context.isMobile
+                              ? AppSpacing.paddingM
+                              : AppSpacing.paddingL),
 
                     // Performance Indicator
                     _buildPerformanceCard(context, viewModel, loc),
-                    SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+                    SizedBox(
+                        height: context.isMobile
+                            ? AppSpacing.paddingM
+                            : AppSpacing.paddingL),
 
                     // Revenue Chart
                     if (viewModel.monthlyBreakdown != null)
@@ -225,13 +245,19 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                         data: viewModel.monthlyBreakdown!,
                       ),
                     if (viewModel.monthlyBreakdown != null)
-                      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+                      SizedBox(
+                          height: context.isMobile
+                              ? AppSpacing.paddingM
+                              : AppSpacing.paddingL),
 
                     // Property Breakdown
                     if (viewModel.propertyBreakdown != null)
                       _buildPropertyBreakdown(context, viewModel, loc),
                     if (viewModel.propertyBreakdown != null)
-                      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+                      SizedBox(
+                          height: context.isMobile
+                              ? AppSpacing.paddingM
+                              : AppSpacing.paddingL),
 
                     // Quick Actions
                     _buildQuickActions(context, loc),
@@ -246,8 +272,8 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   }
 
   /// Builds welcome header - Full width responsive design
-  Widget _buildWelcomeHeader(BuildContext context,
-      ResponsiveConfig responsive, AppLocalizations loc) {
+  Widget _buildWelcomeHeader(
+      BuildContext context, ResponsiveConfig responsive, AppLocalizations loc) {
     final authProvider = context.read<AuthProvider>();
     final userName =
         authProvider.user?.fullName ?? loc.ownerOverviewOwnerFallback;
@@ -269,7 +295,10 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                   text: '${loc.welcome}, $userName!',
                   color: context.primaryColor,
                 ),
-                SizedBox(height: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+                SizedBox(
+                    height: context.isMobile
+                        ? AppSpacing.paddingXS
+                        : AppSpacing.paddingS),
                 BodyText(
                   text: loc.heresYourBusinessOverview,
                   color: ThemeColors.getTextTertiary(context),
@@ -300,7 +329,8 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
     final padding = context.responsivePadding;
 
     return AdaptiveCard(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : AppSpacing.paddingM),
+      padding: EdgeInsets.all(
+          context.isMobile ? padding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -308,7 +338,9 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
             text: loc.performance,
             color: context.primaryColor,
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -320,7 +352,10 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
                       text: loc.ownerOverviewOccupancyRate,
                       small: context.isMobile,
                     ),
-                    SizedBox(height: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+                    SizedBox(
+                        height: context.isMobile
+                            ? AppSpacing.paddingXS * 0.5
+                            : AppSpacing.paddingXS),
                     HeadingMedium(
                       text: occupancy,
                       color: context.primaryColor,
@@ -331,11 +366,16 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
               SizedBox(width: AppSpacing.paddingS),
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM,
-                  vertical: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
+                  horizontal: context.isMobile
+                      ? AppSpacing.paddingS
+                      : AppSpacing.paddingM,
+                  vertical: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS,
                 ),
                 decoration: BoxDecoration(
-                  color: _getPerformanceColor(context, indicator).withValues(alpha: 0.2),
+                  color: _getPerformanceColor(context, indicator)
+                      .withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 ),
                 child: BodyText(
@@ -391,7 +431,9 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
             final entry = mapEntry.value;
             return Padding(
               padding: EdgeInsets.symmetric(
-                vertical: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS,
+                vertical: context.isMobile
+                    ? AppSpacing.paddingXS * 0.5
+                    : AppSpacing.paddingXS,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -447,17 +489,22 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   Widget _buildQuickActions(BuildContext context, AppLocalizations loc) {
     final padding = context.responsivePadding;
     return AdaptiveCard(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : AppSpacing.paddingM),
+      padding: EdgeInsets.all(
+          context.isMobile ? padding.top * 0.75 : AppSpacing.paddingM),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(
             text: loc.quickActions,
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           Wrap(
-            spacing: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
-            runSpacing: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
+            spacing:
+                context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
+            runSpacing:
+                context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
             children: [
               _buildActionChip(context, loc.addProperty, Icons.add_home, () {}),
               _buildActionChip(context, loc.addTenant, Icons.person_add, () {}),
@@ -478,8 +525,10 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
       borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM,
-          vertical: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
+          horizontal:
+              context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM,
+          vertical:
+              context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
         ),
         decoration: BoxDecoration(
           color: context.primaryColor.withValues(alpha: 0.1),
@@ -496,7 +545,10 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
               size: context.isMobile ? 16 : 18,
               color: context.primaryColor,
             ),
-            SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+            SizedBox(
+                width: context.isMobile
+                    ? AppSpacing.paddingXS
+                    : AppSpacing.paddingS),
             BodyText(
               text: label,
               color: context.primaryColor,
@@ -512,7 +564,7 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
   Widget _buildPaymentStatusBreakdown(
       BuildContext context, OwnerOverviewViewModel viewModel) {
     final breakdown = viewModel.paymentStatusBreakdown!;
-    
+
     return PaymentStatusBreakdownWidget(
       paidCount: breakdown['paidCount'] as int? ?? 0,
       pendingCount: breakdown['pendingCount'] as int? ?? 0,
@@ -535,9 +587,8 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
     final guestsData = viewModel.recentlyUpdatedGuests!;
 
     // Convert List<dynamic> to List<Map<String, dynamic>>
-    final guestsList = guestsData
-        .map((item) => item as Map<String, dynamic>)
-        .toList();
+    final guestsList =
+        guestsData.map((item) => item as Map<String, dynamic>).toList();
 
     return RecentlyUpdatedGuestsWidget(
       guests: guestsList,

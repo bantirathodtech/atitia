@@ -127,7 +127,8 @@ class CustomTransitionPage extends Page<void> {
       settings: this,
       pageBuilder: (context, animation, secondaryAnimation) => child,
       transitionsBuilder: transitionsBuilder,
-      transitionDuration: transitionDuration ?? const Duration(milliseconds: 300),
+      transitionDuration:
+          transitionDuration ?? const Duration(milliseconds: 300),
       reverseTransitionDuration:
           reverseTransitionDuration ?? const Duration(milliseconds: 300),
       opaque: opaque,
@@ -360,4 +361,3 @@ class _ScaleInAnimationState extends State<ScaleInAnimation>
     );
   }
 }
-

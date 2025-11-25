@@ -15,7 +15,7 @@ class AdvancedMemoryManager {
 
   static const int _maxImageCacheSize = 100 * 1024 * 1024; // 100MB
   static const int _maxImageCacheObjects = 100;
-  
+
   bool _isInitialized = false;
 
   /// Initialize advanced memory management
@@ -25,8 +25,7 @@ class AdvancedMemoryManager {
     try {
       // Configure image cache limits
       PaintingBinding.instance.imageCache.maximumSize = _maxImageCacheObjects;
-      PaintingBinding.instance.imageCache.maximumSizeBytes =
-          _maxImageCacheSize;
+      PaintingBinding.instance.imageCache.maximumSizeBytes = _maxImageCacheSize;
 
       // Listen to memory pressure warnings
       if (kDebugMode) {
@@ -50,7 +49,7 @@ class AdvancedMemoryManager {
       if (currentSize > thresholdBytes) {
         PaintingBinding.instance.imageCache.clear();
         PaintingBinding.instance.imageCache.clearLiveImages();
-        
+
         if (kDebugMode) {
           debugPrint(
               '🧹 Cleared image cache (was ${(currentSize / 1024 / 1024).toStringAsFixed(2)}MB)');
@@ -81,14 +80,17 @@ class AdvancedMemoryManager {
   /// Get current memory usage statistics
   Map<String, dynamic> getMemoryStats() {
     final imageCache = PaintingBinding.instance.imageCache;
-    
+
     return {
       'imageCacheSize': imageCache.currentSizeBytes,
-      'imageCacheSizeMB': (imageCache.currentSizeBytes / 1024 / 1024).toStringAsFixed(2),
+      'imageCacheSizeMB':
+          (imageCache.currentSizeBytes / 1024 / 1024).toStringAsFixed(2),
       'imageCacheObjects': imageCache.currentSize,
       'maxImageCacheSize': imageCache.maximumSizeBytes,
       'maxImageCacheObjects': imageCache.maximumSize,
-      'cacheUtilization': (imageCache.currentSizeBytes / imageCache.maximumSizeBytes * 100).toStringAsFixed(2),
+      'cacheUtilization':
+          (imageCache.currentSizeBytes / imageCache.maximumSizeBytes * 100)
+              .toStringAsFixed(2),
     };
   }
 
@@ -103,4 +105,3 @@ class AdvancedMemoryManager {
     }
   }
 }
-

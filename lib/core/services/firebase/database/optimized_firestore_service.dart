@@ -110,7 +110,7 @@ class OptimizedFirestoreService {
     if (paymentStatus != null) {
       query = query.where('paymentStatus', isEqualTo: paymentStatus);
     }
-    
+
     // COST OPTIMIZATION: Apply limit if specified (defaults to 30 for bookings)
     if (limit != null && limit > 0) {
       query = query.limit(limit);
@@ -193,7 +193,7 @@ class OptimizedFirestoreService {
     if (isActive != null) {
       query = query.where('isActive', isEqualTo: isActive);
     }
-    
+
     // COST OPTIMIZATION: Apply limit if specified (defaults to 50 for PGs)
     if (limit != null && limit > 0) {
       query = query.limit(limit);
@@ -319,4 +319,3 @@ class OptimizedFirestoreService {
     };
   }
 }
-

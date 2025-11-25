@@ -164,7 +164,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
@@ -186,7 +186,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 ],
               ),
             ),
-            
+
             // Page view
             Expanded(
               child: PageView.builder(
@@ -202,10 +202,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 },
               ),
             ),
-            
+
             // Page indicator
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
+              padding:
+                  const EdgeInsets.symmetric(vertical: AppSpacing.paddingM),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
@@ -214,7 +215,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 ),
               ),
             ),
-            
+
             // Navigation buttons
             Padding(
               padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -232,7 +233,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                   Expanded(
                     child: PrimaryButton(
                       onPressed: _nextPage,
-                      label: _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
+                      label: _currentPage == _pages.length - 1
+                          ? 'Get Started'
+                          : 'Next',
                       icon: _currentPage == _pages.length - 1
                           ? Icons.check
                           : Icons.arrow_forward,
@@ -267,17 +270,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               color: theme.primaryColor,
             ),
           ),
-          
+
           const SizedBox(height: AppSpacing.paddingXL * 2),
-          
+
           // Title
           HeadingLarge(
             text: page.title,
             align: TextAlign.center,
           ),
-          
+
           const SizedBox(height: AppSpacing.paddingL),
-          
+
           // Description
           BodyText(
             text: page.description,
@@ -322,4 +325,3 @@ enum OnboardingType {
   guest,
   owner,
 }
-

@@ -313,7 +313,8 @@ class BookingListWidget extends StatelessWidget {
                           booking.formattedEndDate),
                       _buildDetailRow(
                         context,
-                        loc?.durationLabel ?? _text('durationLabel', 'Duration'),
+                        loc?.durationLabel ??
+                            _text('durationLabel', 'Duration'),
                         loc?.durationDays(booking.durationInDays) ??
                             _text('durationDays', '{count} days',
                                 parameters: {'count': booking.durationInDays}),
@@ -332,7 +333,8 @@ class BookingListWidget extends StatelessWidget {
                           booking.formattedPaid),
                       _buildDetailRow(
                           context,
-                          loc?.remainingLabel ?? _text('remainingLabel', 'Remaining'),
+                          loc?.remainingLabel ??
+                              _text('remainingLabel', 'Remaining'),
                           booking.formattedRemaining),
                       _buildDetailRow(
                           context,

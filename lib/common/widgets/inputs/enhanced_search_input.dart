@@ -73,7 +73,8 @@ class _EnhancedSearchInputState extends State<EnhancedSearchInput> {
     if (query.isEmpty) {
       setState(() {
         _filteredSuggestions = widget.suggestions ?? [];
-        _showSuggestions = widget.suggestions != null && widget.suggestions!.isNotEmpty;
+        _showSuggestions =
+            widget.suggestions != null && widget.suggestions!.isNotEmpty;
       });
     } else {
       final filtered = (widget.suggestions ?? [])
@@ -122,7 +123,7 @@ class _EnhancedSearchInputState extends State<EnhancedSearchInput> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,7 +179,8 @@ class _EnhancedSearchInputState extends State<EnhancedSearchInput> {
                     constraints: const BoxConstraints(maxHeight: 200),
                     decoration: BoxDecoration(
                       color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.borderRadiusL),
                     ),
                     child: ListView.builder(
                       shrinkWrap: true,
@@ -223,7 +225,9 @@ class _EnhancedSearchInputState extends State<EnhancedSearchInput> {
                 small: true,
                 color: ThemeColors.getTextTertiary(context),
               ),
-              ...widget.popularSearches!.take(5).map((search) => _buildChip(context, search)),
+              ...widget.popularSearches!
+                  .take(5)
+                  .map((search) => _buildChip(context, search)),
             ],
           ),
         ],
@@ -245,4 +249,3 @@ class _EnhancedSearchInputState extends State<EnhancedSearchInput> {
     );
   }
 }
-

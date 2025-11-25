@@ -297,18 +297,21 @@ class AppRouter {
           GoRoute(
             path: 'subscription/management',
             name: AppRoutes.ownerSubscriptionManagement,
-            builder: (context, state) => const OwnerSubscriptionManagementScreen(),
+            builder: (context, state) =>
+                const OwnerSubscriptionManagementScreen(),
           ),
           // Featured listing routes
           GoRoute(
             path: 'featured/purchase',
             name: AppRoutes.ownerFeaturedListingPurchase,
-            builder: (context, state) => const OwnerFeaturedListingPurchaseScreen(),
+            builder: (context, state) =>
+                const OwnerFeaturedListingPurchaseScreen(),
           ),
           GoRoute(
             path: 'featured/management',
             name: AppRoutes.ownerFeaturedListingManagement,
-            builder: (context, state) => const OwnerFeaturedListingManagementScreen(),
+            builder: (context, state) =>
+                const OwnerFeaturedListingManagementScreen(),
           ),
           // Refund routes
           GoRoute(
@@ -329,7 +332,8 @@ class AppRouter {
         path: AppRoutes.adminHome,
         name: AppRoutes.adminHome,
         redirect: (context, state) {
-          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          final authProvider =
+              Provider.of<AuthProvider>(context, listen: false);
           final userRole = authProvider.user?.role;
           // Redirect to revenue dashboard by default
           if (state.matchedLocation == AppRoutes.adminHome) {

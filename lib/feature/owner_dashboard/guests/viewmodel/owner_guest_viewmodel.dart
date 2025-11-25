@@ -60,12 +60,12 @@ class OwnerGuestViewModel extends BaseProviderState {
   String _searchQuery = '';
   String _statusFilter = 'all';
   String _typeFilter = 'all';
-  
+
   // Cached filtered lists to avoid recalculating on every access
   List<OwnerGuestModel>? _cachedFilteredGuests;
   String? _cachedSearchQuery;
   String? _cachedStatusFilter;
-  
+
   // Flags to track when lists change for cache invalidation
   bool _guestsChanged = false;
   bool _complaintsChanged = false;
@@ -254,7 +254,7 @@ class OwnerGuestViewModel extends BaseProviderState {
   int? _cachedNewComplaints;
   int? _cachedActiveBikes;
   int? _cachedNewServices;
-  
+
   int get totalGuests => _guests.length;
   int get activeGuests {
     if (_cachedActiveGuests == null || _guestsChanged) {
@@ -263,6 +263,7 @@ class OwnerGuestViewModel extends BaseProviderState {
     }
     return _cachedActiveGuests!;
   }
+
   int get newGuests {
     if (_cachedNewGuests == null || _guestsChanged) {
       _cachedNewGuests = _guests.where((g) => g.status == 'new').length;
@@ -270,6 +271,7 @@ class OwnerGuestViewModel extends BaseProviderState {
     }
     return _cachedNewGuests!;
   }
+
   int get totalComplaints => _complaints.length;
   int get newComplaints {
     if (_cachedNewComplaints == null || _complaintsChanged) {
@@ -278,6 +280,7 @@ class OwnerGuestViewModel extends BaseProviderState {
     }
     return _cachedNewComplaints!;
   }
+
   int get totalBikes => _bikes.length;
   int get activeBikes {
     if (_cachedActiveBikes == null || _bikesChanged) {
@@ -286,6 +289,7 @@ class OwnerGuestViewModel extends BaseProviderState {
     }
     return _cachedActiveBikes!;
   }
+
   int get totalServices => _services.length;
   int get newServices {
     if (_cachedNewServices == null || _servicesChanged) {

@@ -41,8 +41,9 @@ class OwnerGuestRepository {
       {String? pgId}) async {
     try {
       // COST OPTIMIZATION: Limit to 100 guests for owner
-      final snapshot =
-          await _databaseService.getCollectionStream(guestsCollection, limit: 100).first;
+      final snapshot = await _databaseService
+          .getCollectionStream(guestsCollection, limit: 100)
+          .first;
 
       final guests = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -309,8 +310,9 @@ class OwnerGuestRepository {
       {String? pgId}) async {
     try {
       // COST OPTIMIZATION: Limit to 50 bikes per owner
-      final snapshot =
-          await _databaseService.getCollectionStream(bikesCollection, limit: 50).first;
+      final snapshot = await _databaseService
+          .getCollectionStream(bikesCollection, limit: 50)
+          .first;
 
       final bikes = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -433,8 +435,9 @@ class OwnerGuestRepository {
       {String? pgId}) async {
     try {
       // COST OPTIMIZATION: Limit to 50 service requests per owner
-      final snapshot =
-          await _databaseService.getCollectionStream(servicesCollection, limit: 50).first;
+      final snapshot = await _databaseService
+          .getCollectionStream(servicesCollection, limit: 50)
+          .first;
 
       final services = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;

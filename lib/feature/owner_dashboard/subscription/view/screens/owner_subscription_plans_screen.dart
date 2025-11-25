@@ -75,7 +75,8 @@ class _OwnerSubscriptionPlansScreenState
         showThemeToggle: false,
       ),
       drawer: const OwnerDrawer(),
-      body: _buildBody(context, loc ?? AppLocalizations.of(context)!, viewModel),
+      body:
+          _buildBody(context, loc ?? AppLocalizations.of(context)!, viewModel),
     );
   }
 
@@ -91,7 +92,8 @@ class _OwnerSubscriptionPlansScreenState
     if (viewModel.error) {
       return EmptyStates.error(
         context: context,
-        message: viewModel.errorMessage ?? _text('errorLoadingPlans', 'Failed to load subscription plans'),
+        message: viewModel.errorMessage ??
+            _text('errorLoadingPlans', 'Failed to load subscription plans'),
         onRetry: () => viewModel.initialize(),
       );
     }
@@ -107,11 +109,16 @@ class _OwnerSubscriptionPlansScreenState
           if (viewModel.hasActiveSubscription)
             _buildCurrentSubscriptionBanner(context, viewModel, loc),
           if (viewModel.hasActiveSubscription)
-            SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+            SizedBox(
+                height: context.isMobile
+                    ? AppSpacing.paddingM
+                    : AppSpacing.paddingL),
 
           // Billing Period Toggle
           _buildBillingPeriodToggle(context, loc),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Subscription Plans
           _buildPlansGrid(context, viewModel, loc),
@@ -152,7 +159,8 @@ class _OwnerSubscriptionPlansScreenState
                       'expiresOn',
                       'Expires on {date}',
                       parameters: {
-                        'date': DateFormat('MMM dd, yyyy').format(subscription.endDate),
+                        'date': DateFormat('MMM dd, yyyy')
+                            .format(subscription.endDate),
                       },
                     ),
                   ),
@@ -227,7 +235,7 @@ class _OwnerSubscriptionPlansScreenState
               padding: EdgeInsets.only(
                 right: plan != plans.last ? AppSpacing.paddingM : 0,
               ),
-              child:               _buildPlanCard(
+              child: _buildPlanCard(
                 context,
                 plan,
                 viewModel,
@@ -275,15 +283,14 @@ class _OwnerSubscriptionPlansScreenState
             : '₹${price.toStringAsFixed(0)}/yr';
 
     final isPopular = plan.tier == SubscriptionTier.premium;
-    final canUpgrade = !isCurrentPlan &&
-        viewModel.currentTier.index < plan.tier.index;
-    final isDowngrade = !isCurrentPlan &&
-        viewModel.currentTier.index > plan.tier.index;
+    final canUpgrade =
+        !isCurrentPlan && viewModel.currentTier.index < plan.tier.index;
+    final isDowngrade =
+        !isCurrentPlan && viewModel.currentTier.index > plan.tier.index;
 
     return AdaptiveCard(
-      backgroundColor: isPopular
-          ? context.primaryColor.withValues(alpha: 0.05)
-          : null,
+      backgroundColor:
+          isPopular ? context.primaryColor.withValues(alpha: 0.05) : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -308,7 +315,8 @@ class _OwnerSubscriptionPlansScreenState
                   ),
                   decoration: BoxDecoration(
                     color: context.primaryColor,
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
                   ),
                   child: CaptionText(
                     text: _text('popular', 'Popular'),
@@ -417,7 +425,8 @@ class _OwnerSubscriptionPlansScreenState
                 onSuccess: (subscriptionId) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(_text('subscriptionSuccess', 'Subscription purchased successfully!')),
+                      content: Text(_text('subscriptionSuccess',
+                          'Subscription purchased successfully!')),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -425,7 +434,9 @@ class _OwnerSubscriptionPlansScreenState
                 onFailure: (error) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(_text('subscriptionFailed', 'Failed to purchase subscription: {error}', parameters: {'error': error})),
+                      content: Text(_text('subscriptionFailed',
+                          'Failed to purchase subscription: {error}',
+                          parameters: {'error': error})),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -439,4 +450,3 @@ class _OwnerSubscriptionPlansScreenState
     );
   }
 }
-

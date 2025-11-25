@@ -88,4 +88,3 @@ class WebUrls {
     return url.startsWith(baseUrl);
   }
 }
-

@@ -31,8 +31,7 @@ class GuestBookingHistoryScreen extends StatefulWidget {
       _GuestBookingHistoryScreenState();
 }
 
-class _GuestBookingHistoryScreenState
-    extends State<GuestBookingHistoryScreen> {
+class _GuestBookingHistoryScreenState extends State<GuestBookingHistoryScreen> {
   final BookingRepository _repository = BookingRepository();
   List<BookingModel> _bookings = [];
   bool _loading = true;
@@ -272,8 +271,7 @@ class _GuestBookingHistoryScreenState
                 Icon(Icons.hotel, size: 16, color: theme.iconTheme.color),
                 const SizedBox(width: AppSpacing.paddingXS),
                 CaptionText(
-                  text: _text('roomBedInfo',
-                      'Room {room}, Bed {bed}',
+                  text: _text('roomBedInfo', 'Room {room}, Bed {bed}',
                       parameters: {
                         'room': booking.roomNumber,
                         'bed': booking.bedNumber,
@@ -283,8 +281,7 @@ class _GuestBookingHistoryScreenState
                 Icon(Icons.people, size: 16, color: theme.iconTheme.color),
                 const SizedBox(width: AppSpacing.paddingXS),
                 CaptionText(
-                  text: _text('sharingType',
-                      '{type} Sharing',
+                  text: _text('sharingType', '{type} Sharing',
                       parameters: {'type': booking.sharingType.toString()}),
                 ),
               ],
@@ -299,8 +296,7 @@ class _GuestBookingHistoryScreenState
                 const SizedBox(width: AppSpacing.paddingXS),
                 Expanded(
                   child: CaptionText(
-                    text: _text('bookingDates',
-                        'From {start} to {end}',
+                    text: _text('bookingDates', 'From {start} to {end}',
                         parameters: {
                           'start': DateFormat('MMM dd, yyyy')
                               .format(booking.startDate),
@@ -332,7 +328,8 @@ class _GuestBookingHistoryScreenState
                         text: _text('rentPerMonth', 'Rent/Month'),
                       ),
                       BodyText(
-                        text: '₹${NumberFormat('#,##0').format(booking.rentPerMonth)}',
+                        text:
+                            '₹${NumberFormat('#,##0').format(booking.rentPerMonth)}',
                         medium: true,
                       ),
                     ],
@@ -344,7 +341,8 @@ class _GuestBookingHistoryScreenState
                         text: _text('securityDeposit', 'Security Deposit'),
                       ),
                       BodyText(
-                        text: '₹${NumberFormat('#,##0').format(booking.securityDeposit)}',
+                        text:
+                            '₹${NumberFormat('#,##0').format(booking.securityDeposit)}',
                         medium: true,
                       ),
                     ],
@@ -372,8 +370,7 @@ class _GuestBookingHistoryScreenState
                     const SizedBox(width: AppSpacing.paddingXS),
                     Expanded(
                       child: BodyText(
-                        text: _text('pendingDues',
-                            'Pending Dues: ₹{amount}',
+                        text: _text('pendingDues', 'Pending Dues: ₹{amount}',
                             parameters: {
                               'amount': NumberFormat('#,##0')
                                   .format(booking.pendingDues),
@@ -410,8 +407,7 @@ class _GuestBookingHistoryScreenState
                     if (booking.cancellationDate != null) ...[
                       const SizedBox(height: AppSpacing.paddingXS),
                       CaptionText(
-                        text: _text('cancelledOn',
-                            'Cancelled on {date}',
+                        text: _text('cancelledOn', 'Cancelled on {date}',
                             parameters: {
                               'date': DateFormat('MMM dd, yyyy')
                                   .format(booking.cancellationDate!),
@@ -447,4 +443,3 @@ class _GuestBookingHistoryScreenState
     }
   }
 }
-

@@ -173,10 +173,10 @@ class OwnerCurrentDayQuickEditWidget extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: itemCount > 0
-                ? AppColors.success
-                    .withValues(alpha: context.isDarkMode ? 0.15 : 0.1) // Theme-aware
-                : AppColors.warning
-                    .withValues(alpha: context.isDarkMode ? 0.15 : 0.1), // Theme-aware
+                ? AppColors.success.withValues(
+                    alpha: context.isDarkMode ? 0.15 : 0.1) // Theme-aware
+                : AppColors.warning.withValues(
+                    alpha: context.isDarkMode ? 0.15 : 0.1), // Theme-aware
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
           ),
           child: BodyText(

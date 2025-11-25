@@ -96,7 +96,8 @@ class _OwnerFeaturedListingPurchaseScreenState
       return EmptyStates.error(
         context: context,
         message: viewModel.errorMessage ??
-            _text('errorLoadingFeaturedListings', 'Failed to load featured listings'),
+            _text('errorLoadingFeaturedListings',
+                'Failed to load featured listings'),
         onRetry: () => viewModel.initialize(),
       );
     }
@@ -110,23 +111,33 @@ class _OwnerFeaturedListingPurchaseScreenState
         children: [
           // Header
           _buildHeader(context, loc),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // PG Selection
           _buildPGSelection(context, pgProvider, loc),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Duration Selection
           _buildDurationSelection(context, loc),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
           // Pricing Summary
           if (_selectedPgId != null) _buildPricingSummary(context, loc),
           if (_selectedPgId != null)
-            SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+            SizedBox(
+                height: context.isMobile
+                    ? AppSpacing.paddingM
+                    : AppSpacing.paddingL),
 
           // Purchase Button
-          if (_selectedPgId != null) _buildPurchaseButton(context, viewModel, loc),
+          if (_selectedPgId != null)
+            _buildPurchaseButton(context, viewModel, loc),
         ],
       ),
     );
@@ -180,25 +191,26 @@ class _OwnerFeaturedListingPurchaseScreenState
       );
     }
 
-    final items = pgProvider.pgs.map((pg) {
-      final pgId = pg['pgId'] as String? ?? pg['id'] as String? ?? '';
-      final pgName = pg['pgName'] as String? ?? pg['name'] as String? ?? 'Unknown PG';
-      final isFeatured = context
-          .read<OwnerFeaturedListingViewModel>()
-          .isPGFeatured(pgId);
-      return DropdownMenuItem<String>(
-        value: isFeatured ? null : pgId,
-        enabled: !isFeatured,
-        child: Text(
-          isFeatured ? '$pgName (Already Featured)' : pgName,
-          style: TextStyle(
-            color: isFeatured
-                ? Theme.of(context).disabledColor
-                : null,
-          ),
-        ),
-      );
-    }).where((item) => item.value != null).toList();
+    final items = pgProvider.pgs
+        .map((pg) {
+          final pgId = pg['pgId'] as String? ?? pg['id'] as String? ?? '';
+          final pgName =
+              pg['pgName'] as String? ?? pg['name'] as String? ?? 'Unknown PG';
+          final isFeatured =
+              context.read<OwnerFeaturedListingViewModel>().isPGFeatured(pgId);
+          return DropdownMenuItem<String>(
+            value: isFeatured ? null : pgId,
+            enabled: !isFeatured,
+            child: Text(
+              isFeatured ? '$pgName (Already Featured)' : pgName,
+              style: TextStyle(
+                color: isFeatured ? Theme.of(context).disabledColor : null,
+              ),
+            ),
+          );
+        })
+        .where((item) => item.value != null)
+        .toList();
 
     return AdaptiveCard(
       child: Column(
@@ -277,14 +289,14 @@ class _OwnerFeaturedListingPurchaseScreenState
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-          color: isSelected
-              ? context.primaryColor.withValues(alpha: 0.1)
-              : null,
+          color:
+              isSelected ? context.primaryColor.withValues(alpha: 0.1) : null,
         ),
         child: Column(
           children: [
             BodyText(
-              text: '$months ${months == 1 ? _text('month', 'Month') : _text('months', "Months")}',
+              text:
+                  '$months ${months == 1 ? _text('month', 'Month') : _text('months', "Months")}',
               medium: true,
             ),
             SizedBox(height: AppSpacing.paddingXS),
@@ -304,7 +316,8 @@ class _OwnerFeaturedListingPurchaseScreenState
   }
 
   Widget _buildPricingSummary(BuildContext context, AppLocalizations loc) {
-    final price = FeaturedListingModel.getPriceForDuration(_selectedDurationMonths);
+    final price =
+        FeaturedListingModel.getPriceForDuration(_selectedDurationMonths);
     final pricePerMonth = price / _selectedDurationMonths;
 
     return AdaptiveCard(
@@ -319,7 +332,8 @@ class _OwnerFeaturedListingPurchaseScreenState
             children: [
               BodyText(text: _text('duration', 'Duration')),
               BodyText(
-                text: '$_selectedDurationMonths ${_selectedDurationMonths == 1 ? _text('month', 'Month') : _text('months', "Months")}',
+                text:
+                    '$_selectedDurationMonths ${_selectedDurationMonths == 1 ? _text('month', 'Month') : _text('months', "Months")}',
                 medium: true,
               ),
             ],
@@ -386,7 +400,9 @@ class _OwnerFeaturedListingPurchaseScreenState
             'You are about to purchase a featured listing for {duration} months at ₹{amount}. Continue?',
             parameters: {
               'duration': _selectedDurationMonths.toString(),
-              'amount': FeaturedListingModel.getPriceForDuration(_selectedDurationMonths).toStringAsFixed(0),
+              'amount': FeaturedListingModel.getPriceForDuration(
+                      _selectedDurationMonths)
+                  .toStringAsFixed(0),
             },
           ),
         ),
@@ -404,7 +420,8 @@ class _OwnerFeaturedListingPurchaseScreenState
                 onSuccess: (featuredListingId) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(_text('featuredListingPurchased', 'Featured listing purchased successfully!')),
+                      content: Text(_text('featuredListingPurchased',
+                          'Featured listing purchased successfully!')),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -413,7 +430,9 @@ class _OwnerFeaturedListingPurchaseScreenState
                 onFailure: (error) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(_text('featuredListingPurchaseFailed', 'Failed to purchase featured listing: {error}', parameters: {'error': error})),
+                      content: Text(_text('featuredListingPurchaseFailed',
+                          'Failed to purchase featured listing: {error}',
+                          parameters: {'error': error})),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -427,4 +446,3 @@ class _OwnerFeaturedListingPurchaseScreenState
     );
   }
 }
-

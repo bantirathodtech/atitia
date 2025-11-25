@@ -163,4 +163,3 @@ Future<Map<String, dynamic>> _aggregateDataInIsolate(
       return {'count': data.length};
   }
 }
-

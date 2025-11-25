@@ -45,7 +45,8 @@ class OwnerBookingRequestRepository {
     // COST OPTIMIZATION: Limit to 30 requests per stream
     return _databaseService
         .getCollectionStreamWithFilter(
-            'owner_booking_requests', 'ownerId', ownerId, limit: 30)
+            'owner_booking_requests', 'ownerId', ownerId,
+            limit: 30)
         .map((snapshot) {
       final requests = snapshot.docs
           .map((doc) => OwnerBookingRequestModel.fromFirestore(doc))
@@ -71,7 +72,8 @@ class OwnerBookingRequestRepository {
     // COST OPTIMIZATION: Limit to 20 requests per stream
     return _databaseService
         .getCollectionStreamWithFilter(
-            'owner_booking_requests', 'guestId', guestId, limit: 20)
+            'owner_booking_requests', 'guestId', guestId,
+            limit: 20)
         .map((snapshot) {
       final requests = snapshot.docs
           .map((doc) => OwnerBookingRequestModel.fromFirestore(doc))
@@ -252,8 +254,8 @@ class OwnerBookingRequestRepository {
           startDate != null &&
           bookingOwnerId.isNotEmpty) {
         try {
-          final bookingId = await _bookingLifecycleService
-              .createBookingFromRequest(
+          final bookingId =
+              await _bookingLifecycleService.createBookingFromRequest(
             requestId: requestId,
             guestId: guestId,
             ownerId: bookingOwnerId,

@@ -51,7 +51,8 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   OwnerRevenueReport? _revenueReport;
   OwnerOccupancyReport? _occupancyReport;
   Map<String, dynamic>? _pgDetails; // Full PG document from Firebase
-  Map<String, OwnerGuestModel> _guestsMap = {}; // Guest UID -> Guest Model map for bed map widget
+  Map<String, OwnerGuestModel> _guestsMap =
+      {}; // Guest UID -> Guest Model map for bed map widget
 
   // Cached filtered lists to avoid expensive recalculations
   List<OwnerBooking>? _cachedPendingBookings;
@@ -77,7 +78,8 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   OwnerRevenueReport? get revenueReport => _revenueReport;
   OwnerOccupancyReport? get occupancyReport => _occupancyReport;
   Map<String, dynamic>? get pgDetails => _pgDetails; // Expose PG details to UI
-  Map<String, OwnerGuestModel> get guestsMap => _guestsMap; // Guest map for bed map widget
+  Map<String, OwnerGuestModel> get guestsMap =>
+      _guestsMap; // Guest map for bed map widget
   String get selectedFilter => _selectedFilter;
 
   /// Helper getters for PG details

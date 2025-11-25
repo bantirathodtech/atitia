@@ -18,7 +18,8 @@ class StaticDataCacheService {
   static const String _citiesCacheKey = 'static_data_cities_cache';
   static const String _amenitiesCacheKey = 'static_data_amenities_cache';
   static const String _citiesTimestampKey = 'static_data_cities_timestamp';
-  static const String _amenitiesTimestampKey = 'static_data_amenities_timestamp';
+  static const String _amenitiesTimestampKey =
+      'static_data_amenities_timestamp';
   static const Duration _cacheExpiry = Duration(hours: 24); // 24 hours expiry
 
   /// Get cached cities list
@@ -26,10 +27,10 @@ class StaticDataCacheService {
   Future<List<String>?> getCachedCities() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final cachedData = prefs.getString(_citiesCacheKey);
       final timestampString = prefs.getString(_citiesTimestampKey);
-      
+
       if (cachedData == null || timestampString == null) {
         return null;
       }
@@ -37,7 +38,7 @@ class StaticDataCacheService {
       // Check if cache is expired
       final timestamp = DateTime.parse(timestampString);
       final now = DateTime.now();
-      
+
       if (now.difference(timestamp) > _cacheExpiry) {
         // Cache expired, remove it
         await invalidateCities();
@@ -57,13 +58,14 @@ class StaticDataCacheService {
   Future<void> cacheCities(List<String> cities) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Serialize cities to JSON
       final citiesJson = jsonEncode(cities);
-      
+
       // Save cache and timestamp
       await prefs.setString(_citiesCacheKey, citiesJson);
-      await prefs.setString(_citiesTimestampKey, DateTime.now().toIso8601String());
+      await prefs.setString(
+          _citiesTimestampKey, DateTime.now().toIso8601String());
     } catch (e) {
       // Cache error - silently fail
     }
@@ -74,10 +76,10 @@ class StaticDataCacheService {
   Future<List<String>?> getCachedAmenities() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final cachedData = prefs.getString(_amenitiesCacheKey);
       final timestampString = prefs.getString(_amenitiesTimestampKey);
-      
+
       if (cachedData == null || timestampString == null) {
         return null;
       }
@@ -85,7 +87,7 @@ class StaticDataCacheService {
       // Check if cache is expired
       final timestamp = DateTime.parse(timestampString);
       final now = DateTime.now();
-      
+
       if (now.difference(timestamp) > _cacheExpiry) {
         // Cache expired, remove it
         await invalidateAmenities();
@@ -105,20 +107,22 @@ class StaticDataCacheService {
   Future<void> cacheAmenities(List<String> amenities) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Serialize amenities to JSON
       final amenitiesJson = jsonEncode(amenities);
-      
+
       // Save cache and timestamp
       await prefs.setString(_amenitiesCacheKey, amenitiesJson);
-      await prefs.setString(_amenitiesTimestampKey, DateTime.now().toIso8601String());
+      await prefs.setString(
+          _amenitiesTimestampKey, DateTime.now().toIso8601String());
     } catch (e) {
       // Cache error - silently fail
     }
   }
 
   /// Cache both cities and amenities together
-  Future<void> cacheStaticData(List<String> cities, List<String> amenities) async {
+  Future<void> cacheStaticData(
+      List<String> cities, List<String> amenities) async {
     await Future.wait([
       cacheCities(cities),
       cacheAmenities(amenities),
@@ -155,4 +159,3 @@ class StaticDataCacheService {
     ]);
   }
 }
-

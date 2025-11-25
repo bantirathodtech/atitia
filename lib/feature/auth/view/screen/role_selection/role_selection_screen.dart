@@ -164,9 +164,10 @@ class RoleSelectionScreen extends StatelessWidget {
                   // Admin Access Button (3-dot menu) - Top Left
                   Builder(
                     builder: (context) {
-                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
                       final colorScheme = Theme.of(context).colorScheme;
-                      
+
                       return Container(
                         decoration: BoxDecoration(
                           color: colorScheme.surface,
@@ -200,9 +201,10 @@ class RoleSelectionScreen extends StatelessWidget {
                   // Theme Toggle Button - Top Right
                   Builder(
                     builder: (context) {
-                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      final isDark =
+                          Theme.of(context).brightness == Brightness.dark;
                       final colorScheme = Theme.of(context).colorScheme;
-                      
+
                       return Container(
                         decoration: BoxDecoration(
                           color: colorScheme.surface,
@@ -373,7 +375,6 @@ class RoleSelectionScreen extends StatelessWidget {
     }
   }
 
-
   /// Builds role selection card
   Widget _buildRoleCard({
     required BuildContext context,
@@ -395,10 +396,12 @@ class RoleSelectionScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(AppSpacing.paddingS), // Reduced padding
+                padding: const EdgeInsets.all(
+                    AppSpacing.paddingS), // Reduced padding
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10), // Slightly smaller radius
+                  borderRadius:
+                      BorderRadius.circular(10), // Slightly smaller radius
                 ),
                 child: Icon(
                   icon,
@@ -412,7 +415,8 @@ class RoleSelectionScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    HeadingSmall( // Reduced from HeadingMedium
+                    HeadingSmall(
+                      // Reduced from HeadingMedium
                       text: title,
                       color: color,
                     ),

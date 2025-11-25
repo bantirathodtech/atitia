@@ -469,7 +469,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
         // Get price from rentConfig using utility
         final minRent = PgPriceUtils.getMinRent(pg.rentConfig);
         final maxRent = PgPriceUtils.getMaxRent(pg.rentConfig);
-        
+
         if (minRent == null || maxRent == null) return false;
 
         // Check if PG price range overlaps with filter range
@@ -499,7 +499,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     filtered.sort((a, b) {
       final aIsFeatured = _featuredPGIds.contains(a.pgId);
       final bIsFeatured = _featuredPGIds.contains(b.pgId);
-      
+
       if (aIsFeatured && !bIsFeatured) return -1;
       if (!aIsFeatured && bIsFeatured) return 1;
       return 0; // Maintain original order for non-featured PGs

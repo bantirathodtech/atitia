@@ -31,11 +31,12 @@ enum SubscriptionStatus {
   }
 
   String get firestoreValue => name;
-  
+
   static SubscriptionStatus? fromFirestoreValue(String? value) {
     if (value == null) return null;
     try {
-      return SubscriptionStatus.values.firstWhere((status) => status.name == value);
+      return SubscriptionStatus.values
+          .firstWhere((status) => status.name == value);
     } catch (e) {
       return null;
     }
@@ -57,7 +58,7 @@ enum BillingPeriod {
   }
 
   String get firestoreValue => name;
-  
+
   static BillingPeriod? fromFirestoreValue(String? value) {
     if (value == null) return null;
     try {
@@ -114,9 +115,12 @@ class OwnerSubscriptionModel {
     return OwnerSubscriptionModel(
       subscriptionId: map['subscriptionId'] as String? ?? '',
       ownerId: map['ownerId'] as String? ?? '',
-      tier: SubscriptionTier.fromFirestoreValue(map['tier']) ?? SubscriptionTier.free,
-      status: SubscriptionStatus.fromFirestoreValue(map['status']) ?? SubscriptionStatus.active,
-      billingPeriod: BillingPeriod.fromFirestoreValue(map['billingPeriod']) ?? BillingPeriod.monthly,
+      tier: SubscriptionTier.fromFirestoreValue(map['tier']) ??
+          SubscriptionTier.free,
+      status: SubscriptionStatus.fromFirestoreValue(map['status']) ??
+          SubscriptionStatus.active,
+      billingPeriod: BillingPeriod.fromFirestoreValue(map['billingPeriod']) ??
+          BillingPeriod.monthly,
       startDate: map['startDate'] != null
           ? DateServiceConverter.fromService(map['startDate'] as String)
           : DateTime.now(),
@@ -215,11 +219,13 @@ class OwnerSubscriptionModel {
   }
 
   /// Check if subscription is currently active
-  bool get isActive => status == SubscriptionStatus.active && endDate.isAfter(DateTime.now());
+  bool get isActive =>
+      status == SubscriptionStatus.active && endDate.isAfter(DateTime.now());
 
   /// Check if subscription has expired
-  bool get isExpired => status == SubscriptionStatus.expired || 
-                       (status == SubscriptionStatus.active && endDate.isBefore(DateTime.now()));
+  bool get isExpired =>
+      status == SubscriptionStatus.expired ||
+      (status == SubscriptionStatus.active && endDate.isBefore(DateTime.now()));
 
   /// Check if subscription is in grace period (expired but within 7 days)
   bool get isInGracePeriod {
@@ -242,13 +248,15 @@ class OwnerSubscriptionModel {
   }
 
   /// Check if subscription can be renewed
-  bool get canRenew => status == SubscriptionStatus.active || 
-                       status == SubscriptionStatus.expired || 
-                       status == SubscriptionStatus.gracePeriod;
+  bool get canRenew =>
+      status == SubscriptionStatus.active ||
+      status == SubscriptionStatus.expired ||
+      status == SubscriptionStatus.gracePeriod;
 
   /// Check if subscription can be cancelled
-  bool get canCancel => status == SubscriptionStatus.active || 
-                        status == SubscriptionStatus.pendingPayment;
+  bool get canCancel =>
+      status == SubscriptionStatus.active ||
+      status == SubscriptionStatus.pendingPayment;
 
   @override
   String toString() {
@@ -258,10 +266,10 @@ class OwnerSubscriptionModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is OwnerSubscriptionModel && other.subscriptionId == subscriptionId;
+    return other is OwnerSubscriptionModel &&
+        other.subscriptionId == subscriptionId;
   }
 
   @override
   int get hashCode => subscriptionId.hashCode;
 }
-

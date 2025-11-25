@@ -57,7 +57,8 @@ class OwnerRevenueReportWidget extends StatelessWidget {
     final collectedCountText = numberFormatter.format(report.collectedPayments);
 
     return AdaptiveCard(
-      padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+      padding: EdgeInsets.all(
+          context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -65,7 +66,10 @@ class OwnerRevenueReportWidget extends StatelessWidget {
             children: [
               Icon(Icons.account_balance_wallet_rounded,
                   color: AppColors.success, size: context.isMobile ? 18 : 20),
-              SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
               Expanded(
                 child: HeadingMedium(
                   text: loc?.ownerRevenueReportTitle ??
@@ -75,7 +79,9 @@ class OwnerRevenueReportWidget extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           Row(
             children: [
               Expanded(
@@ -88,7 +94,10 @@ class OwnerRevenueReportWidget extends StatelessWidget {
                   AppColors.success,
                 ),
               ),
-              SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
               Expanded(
                 child: _buildStatItem(
                   context,
@@ -101,7 +110,9 @@ class OwnerRevenueReportWidget extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           Row(
             children: [
               Expanded(
@@ -115,7 +126,10 @@ class OwnerRevenueReportWidget extends StatelessWidget {
                   AppColors.info,
                 ),
               ),
-              SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
               Expanded(
                 child: _buildStatItem(
                   context,
@@ -134,10 +148,11 @@ class OwnerRevenueReportWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(
-      BuildContext context, String label, String value, IconData icon, Color color) {
+  Widget _buildStatItem(BuildContext context, String label, String value,
+      IconData icon, Color color) {
     return AdaptiveCard(
-      padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+      padding: EdgeInsets.all(
+          context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -147,7 +162,10 @@ class OwnerRevenueReportWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, color: color, size: context.isMobile ? 18 : 24),
-              SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS * 0.5
+                      : AppSpacing.paddingXS),
               Flexible(
                 child: BodyText(
                   text: value,
@@ -157,7 +175,10 @@ class OwnerRevenueReportWidget extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS * 0.5
+                  : AppSpacing.paddingXS),
           // Row 2: Label below
           CaptionText(text: label, color: color),
         ],

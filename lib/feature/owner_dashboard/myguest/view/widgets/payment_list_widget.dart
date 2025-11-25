@@ -307,8 +307,10 @@ class PaymentListWidget extends StatelessWidget {
                           loc?.guestName ?? _text('guestName', 'Guest Name'),
                           guest.fullName,
                           loc),
-                      _buildDetailRow(loc?.phoneNumber ?? _text('phoneNumber', 'Phone'),
-                          guest.phoneNumber, loc),
+                      _buildDetailRow(
+                          loc?.phoneNumber ?? _text('phoneNumber', 'Phone'),
+                          guest.phoneNumber,
+                          loc),
                       _buildDetailRow(loc?.amount ?? _text('amount', 'Amount'),
                           _formatCurrency(payment.amountPaid, loc), loc),
                       _buildDetailRow(
@@ -317,13 +319,16 @@ class PaymentListWidget extends StatelessWidget {
                           payment.paymentMethodDisplay,
                           loc),
                       _buildDetailRow(
-                          loc?.paymentDate ?? _text('paymentDate', 'Payment Date'),
+                          loc?.paymentDate ??
+                              _text('paymentDate', 'Payment Date'),
                           _formatDate(payment.date, loc),
                           loc),
                       _buildDetailRow(loc?.status ?? _text('status', 'Status'),
                           payment.statusDisplay, loc),
-                      _buildDetailRow(loc?.roomBed ?? _text('roomBed', 'Room/Bed'),
-                          booking.roomBedDisplay, loc),
+                      _buildDetailRow(
+                          loc?.roomBed ?? _text('roomBed', 'Room/Bed'),
+                          booking.roomBedDisplay,
+                          loc),
                       if (payment.transactionId != null &&
                           payment.transactionId!.isNotEmpty)
                         _buildDetailRow(
@@ -332,11 +337,12 @@ class PaymentListWidget extends StatelessWidget {
                             payment.transactionId!,
                             loc),
                       if (payment.notes != null && payment.notes!.isNotEmpty)
-                        _buildDetailRow(
-                            loc?.notes ?? _text('notes', 'Notes'), payment.notes!, loc),
+                        _buildDetailRow(loc?.notes ?? _text('notes', 'Notes'),
+                            payment.notes!, loc),
                       if (payment.collectedBy != null)
                         _buildDetailRow(
-                            loc?.collectedBy ?? _text('collectedBy', 'Collected By'),
+                            loc?.collectedBy ??
+                                _text('collectedBy', 'Collected By'),
                             payment.collectedBy!,
                             loc),
                     ],
@@ -368,7 +374,8 @@ class PaymentListWidget extends StatelessWidget {
                         _collectPayment(context, payment, loc);
                       },
                       label: loc?.markPaymentCollected ??
-                          _text('markPaymentCollected', 'Mark Payment as Collected'),
+                          _text('markPaymentCollected',
+                              'Mark Payment as Collected'),
                     ),
                   ],
                 ],
@@ -419,7 +426,8 @@ class PaymentListWidget extends StatelessWidget {
             children: [
               HeadingSmall(
                   text: loc?.markPaymentCollected ??
-                      _text('markPaymentCollected', 'Mark Payment as Collected')),
+                      _text(
+                          'markPaymentCollected', 'Mark Payment as Collected')),
               const SizedBox(height: AppSpacing.paddingM),
               BodyText(
                 text: loc?.confirmMarkPaymentCollected(
@@ -443,39 +451,40 @@ class PaymentListWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.paddingS),
                   PrimaryButton(
-            label: loc?.confirm ?? _text('confirm', 'Confirm'),
-            onPressed: () async {
-              Navigator.of(context).pop();
+                    label: loc?.confirm ?? _text('confirm', 'Confirm'),
+                    onPressed: () async {
+                      Navigator.of(context).pop();
 
-              final authProvider =
-                  Provider.of<AuthProvider>(context, listen: false);
-              final ownerName = authProvider.user?.fullName ??
-                  (loc?.owner ?? _text('owner', 'Owner'));
+                      final authProvider =
+                          Provider.of<AuthProvider>(context, listen: false);
+                      final ownerName = authProvider.user?.fullName ??
+                          (loc?.owner ?? _text('owner', 'Owner'));
 
-              final updatedPayment = payment.copyWith(
-                status: 'collected',
-                collectedBy: ownerName,
-                updatedAt: DateTime.now(),
-              );
+                      final updatedPayment = payment.copyWith(
+                        status: 'collected',
+                        collectedBy: ownerName,
+                        updatedAt: DateTime.now(),
+                      );
 
-              final success = await viewModel.updatePayment(updatedPayment);
+                      final success =
+                          await viewModel.updatePayment(updatedPayment);
 
-              if (context.mounted) {
-                final message = success
-                    ? (loc?.paymentMarkedCollected ??
-                        _text('paymentMarkedCollected',
-                            'Payment marked as collected'))
-                    : (loc?.ownerPaymentUpdateFailed ??
-                        _text('ownerPaymentUpdateFailed',
-                            'Failed to update payment'));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(message),
-                    backgroundColor:
-                        success ? AppColors.success : AppColors.error,
-                  ),
-                );
-              }
+                      if (context.mounted) {
+                        final message = success
+                            ? (loc?.paymentMarkedCollected ??
+                                _text('paymentMarkedCollected',
+                                    'Payment marked as collected'))
+                            : (loc?.ownerPaymentUpdateFailed ??
+                                _text('ownerPaymentUpdateFailed',
+                                    'Failed to update payment'));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(message),
+                            backgroundColor:
+                                success ? AppColors.success : AppColors.error,
+                          ),
+                        );
+                      }
                     },
                   ),
                 ],
@@ -538,8 +547,10 @@ class PaymentListWidget extends StatelessWidget {
                       final updatedPayment = payment.copyWith(
                         status: 'failed',
                         notes: reasonController.text.trim().isNotEmpty
-                            ? loc?.rejectedWithReason(reasonController.text.trim()) ??
-                                _text('rejectedWithReason', 'Rejected: {reason}',
+                            ? loc?.rejectedWithReason(
+                                    reasonController.text.trim()) ??
+                                _text(
+                                    'rejectedWithReason', 'Rejected: {reason}',
                                     parameters: {
                                       'reason': reasonController.text.trim()
                                     })
@@ -549,7 +560,8 @@ class PaymentListWidget extends StatelessWidget {
                         updatedAt: DateTime.now(),
                       );
 
-                      final success = await viewModel.updatePayment(updatedPayment);
+                      final success =
+                          await viewModel.updatePayment(updatedPayment);
 
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -557,7 +569,8 @@ class PaymentListWidget extends StatelessWidget {
                             content: Text(
                               success
                                   ? (loc?.paymentRejected ??
-                                      _text('paymentRejected', 'Payment rejected'))
+                                      _text('paymentRejected',
+                                          'Payment rejected'))
                                   : (loc?.failedToRejectPayment ??
                                       _text('failedToRejectPayment',
                                           'Failed to reject payment')),

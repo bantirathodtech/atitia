@@ -194,4 +194,3 @@ class GuestFavoritePgViewModel extends BaseProviderState with LoggingMixin {
     notifyListeners();
   }
 }
-

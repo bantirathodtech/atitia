@@ -8,7 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
-import '../config/screenshot_config.dart' show ScreenshotConfig, ScreenshotDefinition;
+import '../config/screenshot_config.dart'
+    show ScreenshotConfig, ScreenshotDefinition;
 
 /// Professional screenshot capture service
 class ScreenshotService {
@@ -49,18 +50,18 @@ class ScreenshotService {
         // Some platforms don't require this, continue anyway
         print('⚠️  convertFlutterSurfaceToImage not required: $e');
       }
-      
+
       // Capture screenshot using integration_test framework
       // The framework automatically saves screenshots with the provided name
       await _binding.takeScreenshot(definition.name);
-      
+
       // Also save to external storage for easy retrieval and visibility on device
       try {
         await _saveToExternalStorage(definition.name);
       } catch (e) {
         print('⚠️  Could not save to external storage: $e');
       }
-      
+
       // Store metadata with expected filename (for reporting)
       final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
       final filename = '${definition.name}_$timestamp.png';
@@ -105,7 +106,8 @@ class ScreenshotService {
   }
 
   /// Get all captured screenshots
-  Map<String, String> get capturedScreenshots => Map.unmodifiable(_capturedScreenshots);
+  Map<String, String> get capturedScreenshots =>
+      Map.unmodifiable(_capturedScreenshots);
 
   /// Generate screenshot report
   String generateReport() {
@@ -141,11 +143,12 @@ class ScreenshotService {
         // Get app's files directory where integration_test saves screenshots
         final appDir = await getApplicationDocumentsDirectory();
         final screenshotsDir = Directory('${appDir.path}/../files/screenshots');
-        
+
         // Look for the screenshot file
         File? foundFile;
-        final screenshotFile = File('${screenshotsDir.path}/$screenshotName.png');
-        
+        final screenshotFile =
+            File('${screenshotsDir.path}/$screenshotName.png');
+
         if (await screenshotFile.exists()) {
           foundFile = screenshotFile;
         } else {
@@ -160,11 +163,11 @@ class ScreenshotService {
             }
           }
         }
-        
+
         if (foundFile != null && await foundFile.exists()) {
           // Read the screenshot bytes
           final bytes = await foundFile.readAsBytes();
-          
+
           // Use image_gallery_saver_plus for proper gallery integration
           // This ensures screenshots appear in gallery on all Android versions (including 10+)
           try {
@@ -174,29 +177,32 @@ class ScreenshotService {
               quality: 100,
               isReturnImagePathOfIOS: true,
             );
-            
+
             if (result['isSuccess'] == true) {
               final savedPath = result['filePath'] ?? result['path'];
               print('   📁 Saved to gallery: $savedPath');
               print('   📱 Visible in device gallery');
             } else {
-              print('   ⚠️  Gallery save returned false, trying fallback method');
+              print(
+                  '   ⚠️  Gallery save returned false, trying fallback method');
               throw Exception('Gallery save failed');
             }
           } catch (galleryError) {
             // Fallback: Save to external storage directory (for file manager access)
             print('   ⚠️  Gallery save failed: $galleryError');
             print('   📝 Falling back to external storage directory');
-            
+
             try {
-              final externalDir = Directory('/sdcard/Pictures/AtitiaScreenshots');
+              final externalDir =
+                  Directory('/sdcard/Pictures/AtitiaScreenshots');
               if (!await externalDir.exists()) {
                 await externalDir.create(recursive: true);
               }
-              
-              final externalFile = File('${externalDir.path}/$screenshotName.png');
+
+              final externalFile =
+                  File('${externalDir.path}/$screenshotName.png');
               await externalFile.writeAsBytes(bytes);
-              
+
               print('   📁 Saved to external storage: ${externalFile.path}');
               print('   📱 Accessible via file manager');
             } catch (fallbackError) {
@@ -215,12 +221,13 @@ class ScreenshotService {
                   'cp "/data/data/com.avishio.atitia/files/screenshots/$screenshotName.png" "/sdcard/Pictures/AtitiaScreenshots/$screenshotName.png" 2>/dev/null || true'
                 ],
               );
-              
+
               if (result.exitCode == 0) {
                 print('   📁 Copied to external storage via shell');
                 // Try to save to gallery after copying
                 try {
-                  final copiedFile = File('/sdcard/Pictures/AtitiaScreenshots/$screenshotName.png');
+                  final copiedFile = File(
+                      '/sdcard/Pictures/AtitiaScreenshots/$screenshotName.png');
                   if (await copiedFile.exists()) {
                     final bytes = await copiedFile.readAsBytes();
                     final galleryResult = await ImageGallerySaverPlus.saveImage(
@@ -266,4 +273,3 @@ class ScreenshotService {
     }
   }
 }
-

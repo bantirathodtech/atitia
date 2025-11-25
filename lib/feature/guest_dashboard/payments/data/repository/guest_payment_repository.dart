@@ -64,36 +64,40 @@ class GuestPaymentRepository {
   /// Streams pending payments for a specific guest
   Stream<List<GuestPaymentModel>> getPendingPaymentsForGuest(String guestId) {
     // COST OPTIMIZATION: Limit to 20 pending payments per stream
-    return _databaseService.getCollectionStreamWithCompoundFilter(
-      FirestoreConstants.payments,
-      [
-        {'field': 'guestId', 'value': guestId},
-        {'field': 'status', 'value': 'Pending'},
-      ],
-      limit: 20,
-    ).map((snapshot) => snapshot.docs
-        .map((doc) => GuestPaymentModel.fromMap(
-              doc.data()! as Map<String, dynamic>,
-            ))
-        .toList());
+    return _databaseService
+        .getCollectionStreamWithCompoundFilter(
+          FirestoreConstants.payments,
+          [
+            {'field': 'guestId', 'value': guestId},
+            {'field': 'status', 'value': 'Pending'},
+          ],
+          limit: 20,
+        )
+        .map((snapshot) => snapshot.docs
+            .map((doc) => GuestPaymentModel.fromMap(
+                  doc.data()! as Map<String, dynamic>,
+                ))
+            .toList());
   }
 
   /// Streams overdue payments for a specific guest
   Stream<List<GuestPaymentModel>> getOverduePaymentsForGuest(String guestId) {
     // COST OPTIMIZATION: Limit to 20 overdue payments per stream
-    return _databaseService.getCollectionStreamWithCompoundFilter(
-      FirestoreConstants.payments,
-      [
-        {'field': 'guestId', 'value': guestId},
-        {'field': 'status', 'value': 'Pending'},
-      ],
-      limit: 20,
-    ).map((snapshot) => snapshot.docs
-        .map((doc) => GuestPaymentModel.fromMap(
-              doc.data()! as Map<String, dynamic>,
-            ))
-        .where((payment) => payment.isOverdue)
-        .toList());
+    return _databaseService
+        .getCollectionStreamWithCompoundFilter(
+          FirestoreConstants.payments,
+          [
+            {'field': 'guestId', 'value': guestId},
+            {'field': 'status', 'value': 'Pending'},
+          ],
+          limit: 20,
+        )
+        .map((snapshot) => snapshot.docs
+            .map((doc) => GuestPaymentModel.fromMap(
+                  doc.data()! as Map<String, dynamic>,
+                ))
+            .where((payment) => payment.isOverdue)
+            .toList());
   }
 
   /// Adds a new payment document to Firestore

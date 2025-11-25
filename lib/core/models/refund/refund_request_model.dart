@@ -115,13 +115,15 @@ class RefundRequestModel {
   factory RefundRequestModel.fromMap(Map<String, dynamic> map) {
     return RefundRequestModel(
       refundRequestId: map['refundRequestId'] as String? ?? '',
-      type: RefundType.fromFirestoreValue(map['type']) ?? RefundType.subscription,
+      type:
+          RefundType.fromFirestoreValue(map['type']) ?? RefundType.subscription,
       ownerId: map['ownerId'] as String? ?? '',
       subscriptionId: map['subscriptionId'] as String?,
       featuredListingId: map['featuredListingId'] as String?,
       revenueRecordId: map['revenueRecordId'] as String? ?? '',
       amount: (map['amount'] as num?)?.toDouble() ?? 0.0,
-      status: RefundStatus.fromFirestoreValue(map['status']) ?? RefundStatus.pending,
+      status: RefundStatus.fromFirestoreValue(map['status']) ??
+          RefundStatus.pending,
       reason: map['reason'] as String? ?? '',
       adminNotes: map['adminNotes'] as String?,
       razorpayRefundId: map['razorpayRefundId'] as String?,
@@ -231,10 +233,10 @@ class RefundRequestModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is RefundRequestModel && other.refundRequestId == refundRequestId;
+    return other is RefundRequestModel &&
+        other.refundRequestId == refundRequestId;
   }
 
   @override
   int get hashCode => refundRequestId.hashCode;
 }
-

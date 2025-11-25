@@ -175,7 +175,8 @@ class OwnerPgManagementRepository {
     // COST OPTIMIZATION: Limit to 30 bookings per PG
     return _databaseService
         .getCollectionStreamWithFilter(
-            FirestoreConstants.bookings, 'pgId', pgId, limit: 30)
+            FirestoreConstants.bookings, 'pgId', pgId,
+            limit: 30)
         .map((snapshot) {
       final bookings =
           snapshot.docs.map((doc) => OwnerBooking.fromFirestore(doc)).toList();
@@ -550,7 +551,8 @@ class OwnerPgManagementRepository {
 
       // Invalidate caches when PG is updated
       await PgDetailsCacheService.instance.invalidatePGDetails(pgId);
-      await StaticDataCacheService.instance.invalidateAll(); // Cities/amenities may have changed
+      await StaticDataCacheService.instance
+          .invalidateAll(); // Cities/amenities may have changed
 
       await _analyticsService.logEvent(
         name: 'owner_pg_updated',
@@ -626,7 +628,7 @@ class OwnerPgManagementRepository {
       // Check cache first
       final cacheService = PgDetailsCacheService.instance;
       final cachedData = await cacheService.getCachedPGDetails(pgId);
-      
+
       if (cachedData != null) {
         // Cache hit - return cached data
         await _analyticsService.logEvent(

@@ -1383,13 +1383,14 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     if (!isEditMode) {
       final subscriptionVM = context.read<OwnerSubscriptionViewModel>();
       final pgProvider = context.read<SelectedPgProvider>();
-      
+
       // Initialize subscription VM if not already initialized
       if (!subscriptionVM.hasActiveSubscription) {
         await subscriptionVM.initialize();
       }
 
-      final currentTier = subscriptionVM.currentSubscription?.tier ?? SubscriptionTier.free;
+      final currentTier =
+          subscriptionVM.currentSubscription?.tier ?? SubscriptionTier.free;
       final plan = SubscriptionPlanModel.getPlanByTier(currentTier);
       final currentPgCount = pgProvider.pgs.length;
       final maxPGs = plan?.maxPGs ?? 1; // Default to 1 if plan not found

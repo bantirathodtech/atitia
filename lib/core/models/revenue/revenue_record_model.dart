@@ -24,7 +24,7 @@ enum RevenueType {
   }
 
   String get firestoreValue => name;
-  
+
   static RevenueType? fromFirestoreValue(String? value) {
     if (value == null) return null;
     try {
@@ -56,7 +56,7 @@ enum PaymentStatus {
   }
 
   String get firestoreValue => name;
-  
+
   static PaymentStatus? fromFirestoreValue(String? value) {
     if (value == null) return null;
     try {
@@ -81,7 +81,8 @@ class RevenueRecordModel {
   final DateTime paymentDate;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final Map<String, dynamic>? metadata; // Additional metadata (tier, duration, etc.)
+  final Map<String, dynamic>?
+      metadata; // Additional metadata (tier, duration, etc.)
 
   RevenueRecordModel({
     required this.revenueId,
@@ -104,10 +105,12 @@ class RevenueRecordModel {
   factory RevenueRecordModel.fromMap(Map<String, dynamic> map) {
     return RevenueRecordModel(
       revenueId: map['revenueId'] as String? ?? '',
-      type: RevenueType.fromFirestoreValue(map['type']) ?? RevenueType.subscription,
+      type: RevenueType.fromFirestoreValue(map['type']) ??
+          RevenueType.subscription,
       ownerId: map['ownerId'] as String? ?? '',
       amount: (map['amount'] as num?)?.toDouble() ?? 0.0,
-      status: PaymentStatus.fromFirestoreValue(map['status']) ?? PaymentStatus.pending,
+      status: PaymentStatus.fromFirestoreValue(map['status']) ??
+          PaymentStatus.pending,
       paymentDate: map['paymentDate'] != null
           ? DateServiceConverter.fromService(map['paymentDate'] as String)
           : DateTime.now(),
@@ -215,4 +218,3 @@ class RevenueRecordModel {
   @override
   int get hashCode => revenueId.hashCode;
 }
-

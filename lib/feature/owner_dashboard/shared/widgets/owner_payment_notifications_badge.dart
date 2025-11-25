@@ -182,8 +182,7 @@ class _PaymentNotificationsSheet extends StatelessWidget {
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: BoxDecoration(
-        color:
-            ThemeColors.getCardBackground(context),
+        color: ThemeColors.getCardBackground(context),
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.borderRadiusL),
         ),

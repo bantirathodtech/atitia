@@ -66,4 +66,3 @@ class AmenitiesFilterChipGroup extends StatelessWidget {
     );
   }
 }
-

@@ -108,9 +108,7 @@ class _EnhancedCardState extends State<EnhancedCard>
       decoration: BoxDecoration(
         color: widget.gradient == null
             ? (widget.backgroundColor ??
-                (isDark
-                    ? AppColors.darkInputFill
-                    : theme.colorScheme.surface))
+                (isDark ? AppColors.darkInputFill : theme.colorScheme.surface))
             : null,
         gradient: widget.gradient,
         borderRadius: widget.borderRadius ??
@@ -132,7 +130,7 @@ class _EnhancedCardState extends State<EnhancedCard>
     );
 
     Widget finalCard = cardContent;
-    
+
     if (widget.animateOnMount) {
       finalCard = ScaleInAnimation(
         duration: widget.animationDuration,
@@ -250,4 +248,3 @@ class ElevatedCard extends StatelessWidget {
     );
   }
 }
-

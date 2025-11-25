@@ -70,11 +70,11 @@ class GuestFavoritePgRepository {
     // COST OPTIMIZATION: Limit to 50 favorite PGs per guest
     return _databaseService
         .getCollectionStreamWithFilter(
-          _favoritesCollection,
-          'guestId',
-          guestId,
-          limit: 50,
-        )
+      _favoritesCollection,
+      'guestId',
+      guestId,
+      limit: 50,
+    )
         .map((snapshot) {
       return snapshot.docs
           .map((doc) => (doc.data() as Map<String, dynamic>)['pgId'] as String)
@@ -103,4 +103,3 @@ class GuestFavoritePgRepository {
     }
   }
 }
-

@@ -37,8 +37,7 @@ class OwnerRefundHistoryScreen extends StatefulWidget {
       _OwnerRefundHistoryScreenState();
 }
 
-class _OwnerRefundHistoryScreenState
-    extends State<OwnerRefundHistoryScreen> {
+class _OwnerRefundHistoryScreenState extends State<OwnerRefundHistoryScreen> {
   PaginationController<RefundRequestModel>? _paginationController;
   String _selectedStatusFilter = 'all';
 
@@ -80,12 +79,14 @@ class _OwnerRefundHistoryScreenState
       baseQuery = baseQuery.where('status', isEqualTo: filter);
     }
 
-    _paginationController = FirestorePaginationHelper.createController<RefundRequestModel>(
+    _paginationController =
+        FirestorePaginationHelper.createController<RefundRequestModel>(
       query: baseQuery,
       documentMapper: (doc) {
         final data = doc.data() as Map<String, dynamic>;
         // Ensure refundRequestId is set from document ID
-        if (data['refundRequestId'] == null || (data['refundRequestId'] as String).isEmpty) {
+        if (data['refundRequestId'] == null ||
+            (data['refundRequestId'] as String).isEmpty) {
           data['refundRequestId'] = doc.id;
         }
         return RefundRequestModel.fromMap(data);
@@ -125,7 +126,8 @@ class _OwnerRefundHistoryScreenState
             return Center(
               child: EmptyStates.error(
                 context: context,
-                message: viewModel.errorMessage ?? 'Failed to load refund requests',
+                message:
+                    viewModel.errorMessage ?? 'Failed to load refund requests',
                 onRetry: () => viewModel.refresh(),
               ),
             );
@@ -141,7 +143,8 @@ class _OwnerRefundHistoryScreenState
               children: [
                 // Request new refund button
                 Padding(
-                  padding: ResponsiveSystem.getResponsivePadding(context).copyWith(bottom: AppSpacing.paddingM),
+                  padding: ResponsiveSystem.getResponsivePadding(context)
+                      .copyWith(bottom: AppSpacing.paddingM),
                   child: PrimaryButton(
                     onPressed: () {
                       context.go(AppRoutes.ownerRefundRequest);
@@ -152,7 +155,8 @@ class _OwnerRefundHistoryScreenState
 
                 // Filters
                 Padding(
-                  padding: ResponsiveSystem.getResponsivePadding(context).copyWith(bottom: AppSpacing.paddingM),
+                  padding: ResponsiveSystem.getResponsivePadding(context)
+                      .copyWith(bottom: AppSpacing.paddingM),
                   child: _buildFilters(context, viewModel),
                 ),
 
@@ -171,8 +175,7 @@ class _OwnerRefundHistoryScreenState
     );
   }
 
-  Widget _buildFilters(
-      BuildContext context, OwnerRefundViewModel viewModel) {
+  Widget _buildFilters(BuildContext context, OwnerRefundViewModel viewModel) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingM),
@@ -226,7 +229,8 @@ class _OwnerRefundHistoryScreenState
         children: [
           Consumer<PaginationController<RefundRequestModel>>(
             builder: (context, controller, child) {
-              return HeadingMedium(text: 'Refund Requests (${controller.items.length})');
+              return HeadingMedium(
+                  text: 'Refund Requests (${controller.items.length})');
             },
           ),
           const SizedBox(height: AppSpacing.paddingM),
@@ -343,7 +347,8 @@ class _OwnerRefundHistoryScreenState
                     children: [
                       HeadingMedium(text: refund.type.displayName),
                       CaptionText(
-                        text: 'Requested: ${dateFormatter.format(refund.requestedAt)}',
+                        text:
+                            'Requested: ${dateFormatter.format(refund.requestedAt)}',
                         color: Theme.of(context)
                             .textTheme
                             .bodySmall
@@ -360,7 +365,8 @@ class _OwnerRefundHistoryScreenState
                   ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusS),
                     border: Border.all(color: statusColor),
                   ),
                   child: Row(
@@ -459,4 +465,3 @@ class _OwnerRefundHistoryScreenState
     );
   }
 }
-

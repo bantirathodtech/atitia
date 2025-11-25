@@ -31,7 +31,8 @@ class NotificationsScreen extends StatelessWidget {
           : StreamBuilder(
               // COST OPTIMIZATION: Limit to 50 notifications per user
               stream: firestore.getCollectionStreamWithFilter(
-                  'notifications', 'userId', userId, limit: 50),
+                  'notifications', 'userId', userId,
+                  limit: 50),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: AdaptiveLoader());

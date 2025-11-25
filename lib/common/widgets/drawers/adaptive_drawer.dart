@@ -1149,7 +1149,8 @@ class AdaptiveDrawer extends AdaptiveStatelessWidget {
                         boxShadow: item.badge!.toLowerCase() == 'premium'
                             ? [
                                 BoxShadow(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.3),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 ),

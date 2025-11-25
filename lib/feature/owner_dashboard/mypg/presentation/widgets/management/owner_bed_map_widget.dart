@@ -368,8 +368,8 @@ class OwnerBedMapWidget extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.paddingS),
               BodyText(
-                text: _text('ownerBedMapRoomGuestsLabel',
-                    'Guests in Room {roomNumber}',
+                text: _text(
+                    'ownerBedMapRoomGuestsLabel', 'Guests in Room {roomNumber}',
                     parameters: {'roomNumber': room.roomNumber}),
                 medium: true,
                 color: theme.primaryColor,
@@ -583,8 +583,7 @@ class OwnerBedMapWidget extends StatelessWidget {
   Widget _buildBedItem(
       BuildContext context, OwnerBed bed, AppLocalizations? loc) {
     final statusColor = bed.statusColor;
-    final bg = statusColor.withValues(
-        alpha: context.isDarkMode ? 0.12 : 0.08);
+    final bg = statusColor.withValues(alpha: context.isDarkMode ? 0.12 : 0.08);
     final border = statusColor;
     final icon = bed.isOccupied
         ? Icons.person
@@ -713,16 +712,14 @@ class OwnerBedMapWidget extends StatelessWidget {
     OwnerBed bed,
     Color statusColor,
   ) {
-    final guest = bed.guestUid != null && guests != null
-        ? guests![bed.guestUid!]
-        : null;
+    final guest =
+        bed.guestUid != null && guests != null ? guests![bed.guestUid!] : null;
 
     final guestName = guest?.fullName ?? bed.guestName ?? 'Guest';
-    
+
     // Truncate long names
-    final displayName = guestName.length > 12
-        ? '${guestName.substring(0, 10)}...'
-        : guestName;
+    final displayName =
+        guestName.length > 12 ? '${guestName.substring(0, 10)}...' : guestName;
 
     return Container(
       padding: const EdgeInsets.symmetric(

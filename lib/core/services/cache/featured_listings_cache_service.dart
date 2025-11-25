@@ -24,10 +24,10 @@ class FeaturedListingsCacheService {
   Future<List<String>?> getCachedFeaturedPGIds() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final cachedData = prefs.getString(_cacheKey);
       final timestampString = prefs.getString(_timestampKey);
-      
+
       if (cachedData == null || timestampString == null) {
         return null;
       }
@@ -35,7 +35,7 @@ class FeaturedListingsCacheService {
       // Check if cache is expired
       final timestamp = DateTime.parse(timestampString);
       final now = DateTime.now();
-      
+
       if (now.difference(timestamp) > _cacheExpiry) {
         // Cache expired, remove it
         await invalidateCache();
@@ -55,10 +55,10 @@ class FeaturedListingsCacheService {
   Future<void> cacheFeaturedPGIds(List<String> pgIds) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Serialize PG IDs to JSON
       final pgIdsJson = jsonEncode(pgIds);
-      
+
       // Save cache and timestamp
       await prefs.setString(_cacheKey, pgIdsJson);
       await prefs.setString(_timestampKey, DateTime.now().toIso8601String());
@@ -85,4 +85,3 @@ class FeaturedListingsCacheService {
     return cached != null;
   }
 }
-

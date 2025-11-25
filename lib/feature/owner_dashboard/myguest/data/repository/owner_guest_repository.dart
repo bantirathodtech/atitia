@@ -30,7 +30,8 @@ class OwnerGuestRepository {
     // COST OPTIMIZATION: Limit to 50 guests per stream
     return _databaseService
         .getCollectionStreamWithFilter(
-            FirestoreConstants.users, 'role', 'guest', limit: 50)
+            FirestoreConstants.users, 'role', 'guest',
+            limit: 50)
         .map((snapshot) {
       final guests = snapshot.docs
           .map((doc) => OwnerGuestModel.fromFirestore(doc))
@@ -275,7 +276,8 @@ class OwnerGuestRepository {
     // COST OPTIMIZATION: Limit to 30 bookings per PG
     return _databaseService
         .getCollectionStreamWithFilter(
-            FirestoreConstants.bookings, 'pgId', pgId, limit: 30)
+            FirestoreConstants.bookings, 'pgId', pgId,
+            limit: 30)
         .map((snapshot) {
       final bookings = snapshot.docs
           .map((doc) => OwnerBookingModel.fromFirestore(doc))
@@ -405,7 +407,8 @@ class OwnerGuestRepository {
     // COST OPTIMIZATION: Limit to 30 payments per PG
     return _databaseService
         .getCollectionStreamWithFilter(
-            FirestoreConstants.payments, 'pgId', pgId, limit: 30)
+            FirestoreConstants.payments, 'pgId', pgId,
+            limit: 30)
         .map((snapshot) {
       final payments = snapshot.docs
           .map((doc) => OwnerPaymentModel.fromFirestore(doc))

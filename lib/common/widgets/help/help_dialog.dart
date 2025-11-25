@@ -49,7 +49,7 @@ class HelpDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
@@ -83,7 +83,8 @@ class HelpDialog extends StatelessWidget {
                         const SizedBox(height: AppSpacing.paddingS),
                         BodyText(
                           text: section.description,
-                          color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                          color: theme.textTheme.bodyMedium?.color
+                              ?.withValues(alpha: 0.7),
                         ),
                       ],
                     ),
@@ -119,4 +120,3 @@ class HelpSection {
     required this.description,
   });
 }
-

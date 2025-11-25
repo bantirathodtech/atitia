@@ -18,7 +18,8 @@ import '../../../../../core/interfaces/analytics/analytics_service_interface.dar
 
 /// ViewModel for Owner Refund Management
 /// Handles creating refund requests and viewing refund status
-class OwnerRefundViewModel extends BaseProviderState with StreamSubscriptionMixin {
+class OwnerRefundViewModel extends BaseProviderState
+    with StreamSubscriptionMixin {
   final RefundRequestRepository _refundRepo;
   final RevenueRepository _revenueRepo;
   final OwnerSubscriptionRepository _subscriptionRepo;
@@ -32,7 +33,8 @@ class OwnerRefundViewModel extends BaseProviderState with StreamSubscriptionMixi
   List<FeaturedListingModel> _refundableFeaturedListings = [];
 
   // Filters
-  String _selectedStatusFilter = 'all'; // all, pending, approved, rejected, completed
+  String _selectedStatusFilter =
+      'all'; // all, pending, approved, rejected, completed
 
   OwnerRefundViewModel({
     RefundRequestRepository? refundRepo,
@@ -50,9 +52,12 @@ class OwnerRefundViewModel extends BaseProviderState with StreamSubscriptionMixi
   // Getters
   List<RefundRequestModel> get refundRequests => _refundRequests;
   List<RefundRequestModel> get filteredRefunds => _getFilteredRefunds();
-  List<RevenueRecordModel> get refundableRevenueRecords => _refundableRevenueRecords;
-  List<OwnerSubscriptionModel> get refundableSubscriptions => _refundableSubscriptions;
-  List<FeaturedListingModel> get refundableFeaturedListings => _refundableFeaturedListings;
+  List<RevenueRecordModel> get refundableRevenueRecords =>
+      _refundableRevenueRecords;
+  List<OwnerSubscriptionModel> get refundableSubscriptions =>
+      _refundableSubscriptions;
+  List<FeaturedListingModel> get refundableFeaturedListings =>
+      _refundableFeaturedListings;
   String get selectedStatusFilter => _selectedStatusFilter;
 
   /// Get current owner ID
@@ -127,24 +132,29 @@ class OwnerRefundViewModel extends BaseProviderState with StreamSubscriptionMixi
       _refundableRevenueRecords = revenueRecords
           .where((r) =>
               r.status == PaymentStatus.completed &&
-              r.paymentDate.isAfter(DateTime.now().subtract(const Duration(days: 30))))
+              r.paymentDate
+                  .isAfter(DateTime.now().subtract(const Duration(days: 30))))
           .toList();
 
       // Get active subscriptions that can be refunded
-      final subscriptionsStream = _subscriptionRepo.streamAllSubscriptions(ownerId);
+      final subscriptionsStream =
+          _subscriptionRepo.streamAllSubscriptions(ownerId);
       final allSubscriptions = await subscriptionsStream.first;
       _refundableSubscriptions = allSubscriptions
           .where((s) =>
               s.status == SubscriptionStatus.active &&
-              s.startDate.isAfter(DateTime.now().subtract(const Duration(days: 30))))
+              s.startDate
+                  .isAfter(DateTime.now().subtract(const Duration(days: 30))))
           .toList();
 
       // Get active featured listings that can be refunded
-      final featuredListings = await _featuredRepo.streamOwnerFeaturedListings(ownerId).first;
+      final featuredListings =
+          await _featuredRepo.streamOwnerFeaturedListings(ownerId).first;
       _refundableFeaturedListings = featuredListings
           .where((f) =>
               f.status == FeaturedListingStatus.active &&
-              f.startDate.isAfter(DateTime.now().subtract(const Duration(days: 30))))
+              f.startDate
+                  .isAfter(DateTime.now().subtract(const Duration(days: 30))))
           .toList();
 
       notifyListeners();
@@ -267,4 +277,3 @@ class OwnerRefundViewModel extends BaseProviderState with StreamSubscriptionMixi
     super.dispose();
   }
 }
-

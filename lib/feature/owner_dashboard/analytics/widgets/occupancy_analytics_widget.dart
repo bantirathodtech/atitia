@@ -102,8 +102,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildOccupancyMetrics(
-      BuildContext context, AppLocalizations loc) {
+  Widget _buildOccupancyMetrics(BuildContext context, AppLocalizations loc) {
     final metrics = _calculateOccupancyMetrics();
     final percentFormatter = NumberFormat.decimalPattern(loc.localeName);
 
@@ -186,8 +185,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildOccupancyChart(
-      BuildContext context, AppLocalizations loc) {
+  Widget _buildOccupancyChart(BuildContext context, AppLocalizations loc) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -290,7 +288,8 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildSimpleOccupancyChart(BuildContext context, AppLocalizations loc) {
+  Widget _buildSimpleOccupancyChart(
+      BuildContext context, AppLocalizations loc) {
     final chartData = _getOccupancyChartData();
     final months = chartData['months'] as List<int>;
     final values = chartData['data'] as List<int>;
@@ -364,8 +363,7 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildCapacityAnalysis(
-      BuildContext context, AppLocalizations loc) {
+  Widget _buildCapacityAnalysis(BuildContext context, AppLocalizations loc) {
     final analysis = _calculateCapacityAnalysis(loc);
     final numberFormatter = NumberFormat.decimalPattern(loc.localeName);
 
@@ -473,8 +471,8 @@ class _OccupancyAnalyticsWidgetState extends State<OccupancyAnalyticsWidget> {
     );
   }
 
-  Widget _buildOccupancyInsights(
-      BuildContext context, Map<String, dynamic> analysis, AppLocalizations loc) {
+  Widget _buildOccupancyInsights(BuildContext context,
+      Map<String, dynamic> analysis, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(

@@ -52,9 +52,7 @@ class InputDecorations {
       hintStyle: inputTheme.hintStyle,
       errorStyle: inputTheme.errorStyle,
       filled: true,
-      fillColor: enabled
-          ? inputTheme.fillColor
-          : AppColors.surfaceVariant,
+      fillColor: enabled ? inputTheme.fillColor : AppColors.surfaceVariant,
     );
   }
 

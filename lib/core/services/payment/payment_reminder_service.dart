@@ -12,15 +12,15 @@ import '../../repositories/notification_repository.dart';
 /// Automatically sends payment reminders to guests for pending/overdue payments
 /// Checks for payments due within 3 days or overdue payments
 class PaymentReminderService with LoggingMixin {
-  final IDatabaseService _databaseService =
-      getIt.firestore as IDatabaseService;
+  final IDatabaseService _databaseService = getIt.firestore as IDatabaseService;
   final NotificationRepository _notificationRepository =
       NotificationRepository();
 
   /// Check and send reminders for all guests with pending/overdue payments
   Future<void> checkAndSendReminders() async {
     try {
-      logInfo('Checking for payments that need reminders', feature: 'payment_reminders');
+      logInfo('Checking for payments that need reminders',
+          feature: 'payment_reminders');
 
       // Get all pending payments
       // COST OPTIMIZATION: Limit to 200 pending payments for reminder check
@@ -65,7 +65,8 @@ class PaymentReminderService with LoggingMixin {
   Future<void> _sendPaymentReminder(GuestPaymentModel payment) async {
     try {
       // Check if reminder was already sent today
-      final lastReminderDateStr = payment.metadata?['lastReminderDate'] as String?;
+      final lastReminderDateStr =
+          payment.metadata?['lastReminderDate'] as String?;
       if (lastReminderDateStr != null) {
         try {
           final lastReminderDate = DateTime.parse(lastReminderDateStr);
@@ -173,4 +174,3 @@ class PaymentReminderService with LoggingMixin {
     }
   }
 }
-

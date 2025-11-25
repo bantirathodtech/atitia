@@ -227,7 +227,8 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
   }
 
   /// Loads payment status breakdown
-  Future<void> loadPaymentStatusBreakdown(String ownerId, {String? pgId}) async {
+  Future<void> loadPaymentStatusBreakdown(String ownerId,
+      {String? pgId}) async {
     try {
       _paymentStatusBreakdown =
           await _repository.getPaymentStatusBreakdown(ownerId, pgId: pgId);
@@ -252,10 +253,11 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
 
   /// Loads recently updated guests
   /// Secondary data - doesn't affect main loading state
-  Future<void> loadRecentlyUpdatedGuests(String ownerId, {String? pgId, int days = 7}) async {
+  Future<void> loadRecentlyUpdatedGuests(String ownerId,
+      {String? pgId, int days = 7}) async {
     try {
-      _recentlyUpdatedGuests =
-          await _repository.getRecentlyUpdatedGuests(ownerId, pgId: pgId, days: days);
+      _recentlyUpdatedGuests = await _repository
+          .getRecentlyUpdatedGuests(ownerId, pgId: pgId, days: days);
 
       _analyticsService.logEvent(
         name: 'owner_recently_updated_guests_loaded',
@@ -283,7 +285,7 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
   Future<void> refreshOverviewData(String ownerId, {String? pgId}) async {
     // Load critical data first
     await loadOverviewData(ownerId, pgId: pgId);
-    
+
     // Load secondary data in parallel (non-blocking)
     Future.microtask(() async {
       await Future.wait([
@@ -292,7 +294,7 @@ class OwnerOverviewViewModel extends BaseProviderState with LoggingMixin {
         loadPaymentStatusBreakdown(ownerId, pgId: pgId),
         loadRecentlyUpdatedGuests(ownerId, pgId: pgId),
       ], eagerError: false);
-      
+
       _analyticsService.logEvent(
         name: 'owner_overview_refreshed',
         parameters: {

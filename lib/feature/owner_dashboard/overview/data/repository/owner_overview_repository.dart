@@ -96,7 +96,8 @@ class OwnerOverviewRepository {
       // COST OPTIMIZATION: Limit to 50 properties per owner (reasonable limit)
       final propertiesSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.pgs, 'ownerUid', ownerId, limit: 50)
+              FirestoreConstants.pgs, 'ownerUid', ownerId,
+              limit: 50)
           .first;
 
       // Filter out drafts - only count published/active properties
@@ -178,9 +179,7 @@ class OwnerOverviewRepository {
         totalRevenue += amount;
 
         // Calculate monthly revenue - filter at query level in future
-        if (date != null &&
-            date.month == now.month &&
-            date.year == now.year) {
+        if (date != null && date.month == now.month && date.year == now.year) {
           monthlyRevenue += amount;
         }
       }
@@ -299,7 +298,9 @@ class OwnerOverviewRepository {
         final data = doc.data() as Map<String, dynamic>;
         final date = data['date']?.toDate();
 
-        if (date != null && date.isAfter(yearStart.subtract(const Duration(days: 1))) && date.isBefore(yearEnd.add(const Duration(days: 1)))) {
+        if (date != null &&
+            date.isAfter(yearStart.subtract(const Duration(days: 1))) &&
+            date.isBefore(yearEnd.add(const Duration(days: 1)))) {
           final amount = (data['amount'] ?? 0).toDouble();
           final monthKey = 'month_${date.month}';
           breakdown[monthKey] = (breakdown[monthKey] ?? 0) + amount;
@@ -341,7 +342,8 @@ class OwnerOverviewRepository {
       // COST OPTIMIZATION: Limit to 50 properties per owner
       final propertiesSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.pgs, 'ownerUid', ownerId, limit: 50)
+              FirestoreConstants.pgs, 'ownerUid', ownerId,
+              limit: 50)
           .first;
 
       // Filter out drafts - only include published properties
@@ -409,8 +411,8 @@ class OwnerOverviewRepository {
 
   /// Fetches payment status breakdown (paid, pending, partial counts and amounts)
   /// If pgId is provided, filters by that specific PG only
-  Future<Map<String, dynamic>> getPaymentStatusBreakdown(
-      String ownerId, {String? pgId}) async {
+  Future<Map<String, dynamic>> getPaymentStatusBreakdown(String ownerId,
+      {String? pgId}) async {
     try {
       // OPTIMIZED: Get bookings filtered at DB level
       final bookingsSnapshot = await _queryBookingsOptimized(
@@ -431,7 +433,7 @@ class OwnerOverviewRepository {
         final data = doc.data() as Map<String, dynamic>;
         final bookingPgId = data['pgId'] as String?;
         final ownerIdFromBooking = data['ownerId'] as String?;
-        
+
         // Filter by owner and optionally by PG
         if (ownerIdFromBooking == ownerId &&
             (pgId == null || bookingPgId == pgId)) {
@@ -447,19 +449,22 @@ class OwnerOverviewRepository {
         final data = doc.data() as Map<String, dynamic>;
         final bookingPgId = data['pgId'] as String?;
         final ownerIdFromBooking = data['ownerId'] as String?;
-        
+
         if (ownerIdFromBooking == ownerId &&
             (pgId == null || bookingPgId == pgId)) {
-          final paymentStatus = (data['paymentStatus'] as String? ?? 'pending').toLowerCase();
+          final paymentStatus =
+              (data['paymentStatus'] as String? ?? 'pending').toLowerCase();
           final bookingRentAmount = (data['rentAmount'] ?? 0).toDouble();
           final bookingDepositAmount = (data['depositAmount'] ?? 0).toDouble();
           final bookingPaidAmount = (data['paidAmount'] ?? 0).toDouble();
           final totalAmount = bookingRentAmount + bookingDepositAmount;
 
-          if (paymentStatus == 'collected' || bookingPaidAmount >= totalAmount) {
+          if (paymentStatus == 'collected' ||
+              bookingPaidAmount >= totalAmount) {
             paidCount++;
             paidAmount += totalAmount;
-          } else if (paymentStatus == 'partial' || (bookingPaidAmount > 0 && bookingPaidAmount < totalAmount)) {
+          } else if (paymentStatus == 'partial' ||
+              (bookingPaidAmount > 0 && bookingPaidAmount < totalAmount)) {
             partialCount++;
             partialAmount += bookingPaidAmount;
           } else {
@@ -473,7 +478,8 @@ class OwnerOverviewRepository {
       // COST OPTIMIZATION: Limit to 200 guests for stats calculation
       final guestsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.users, 'role', 'guest', limit: 200)
+              FirestoreConstants.users, 'role', 'guest',
+              limit: 200)
           .first;
 
       for (var doc in guestsSnapshot.docs) {
@@ -486,7 +492,8 @@ class OwnerOverviewRepository {
 
         // Only count if guest is linked to this owner's PG(s)
         if (pgId != null && guestPgId != pgId) continue;
-        if (!guestIds.contains(guestId) && guestStatus != 'payment_pending') continue;
+        if (!guestIds.contains(guestId) && guestStatus != 'payment_pending')
+          continue;
 
         if (guestStatus == 'payment_pending') {
           pendingCount++;
@@ -495,9 +502,10 @@ class OwnerOverviewRepository {
             final bData = b.data() as Map<String, dynamic>;
             return bData['guestUid'] == guestId;
           });
-          
+
           if (guestBookings.isNotEmpty) {
-            final bookingData = guestBookings.first.data() as Map<String, dynamic>;
+            final bookingData =
+                guestBookings.first.data() as Map<String, dynamic>;
             final rent = (bookingData['rentAmount'] ?? 0).toDouble();
             final deposit = (bookingData['depositAmount'] ?? 0).toDouble();
             pendingAmount += rent + deposit;
@@ -545,8 +553,8 @@ class OwnerOverviewRepository {
 
   /// Fetches recently updated guests (within last N days)
   /// If pgId is provided, filters by that specific PG only
-  Future<List<Map<String, dynamic>>> getRecentlyUpdatedGuests(
-      String ownerId, {String? pgId, int days = 7}) async {
+  Future<List<Map<String, dynamic>>> getRecentlyUpdatedGuests(String ownerId,
+      {String? pgId, int days = 7}) async {
     try {
       final cutoffDate = DateTime.now().subtract(Duration(days: days));
 
@@ -561,7 +569,7 @@ class OwnerOverviewRepository {
         final data = doc.data() as Map<String, dynamic>;
         final bookingPgId = data['pgId'] as String?;
         final ownerIdFromBooking = data['ownerId'] as String?;
-        
+
         if (ownerIdFromBooking == ownerId &&
             (pgId == null || bookingPgId == pgId)) {
           final guestUid = data['guestUid'] as String?;
@@ -575,7 +583,8 @@ class OwnerOverviewRepository {
       // COST OPTIMIZATION: Limit to 200 guests for recent updates check
       final guestsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.users, 'role', 'guest', limit: 200)
+              FirestoreConstants.users, 'role', 'guest',
+              limit: 200)
           .first;
 
       final recentGuests = <Map<String, dynamic>>[];

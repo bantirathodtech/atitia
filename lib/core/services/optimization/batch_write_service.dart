@@ -16,7 +16,7 @@ class BatchWriteService {
   static const int _maxBatchSize = 500; // Firestore limit
 
   /// Batch write operations for better performance and cost reduction
-  /// 
+  ///
   /// Usage:
   /// ```dart
   /// final operations = [
@@ -29,7 +29,7 @@ class BatchWriteService {
     if (operations.isEmpty) return;
 
     final firestore = FirebaseFirestore.instance;
-    
+
     // Split operations into batches (max 500 per batch)
     for (int i = 0; i < operations.length; i += _maxBatchSize) {
       final batch = firestore.batch();
@@ -49,27 +49,31 @@ class BatchWriteService {
             if (data != null) {
               batch.set(docRef, data, SetOptions(merge: merge));
             } else {
-              debugPrint('Warning: set operation without data for $collection/$docId');
+              debugPrint(
+                  'Warning: set operation without data for $collection/$docId');
             }
             break;
           case 'update':
             if (data != null) {
               batch.update(docRef, data);
             } else {
-              debugPrint('Warning: update operation without data for $collection/$docId');
+              debugPrint(
+                  'Warning: update operation without data for $collection/$docId');
             }
             break;
           case 'delete':
             batch.delete(docRef);
             break;
           default:
-            debugPrint('Warning: Unknown operation type "$operation" for $collection/$docId');
+            debugPrint(
+                'Warning: Unknown operation type "$operation" for $collection/$docId');
         }
       }
 
       try {
         await batch.commit();
-        debugPrint('Batch write committed: ${batchOperations.length} operations');
+        debugPrint(
+            'Batch write committed: ${batchOperations.length} operations');
       } catch (e) {
         debugPrint('Batch write failed: $e');
         rethrow;
@@ -120,4 +124,3 @@ class BatchWriteService {
     };
   }
 }
-

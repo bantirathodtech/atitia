@@ -25,14 +25,14 @@ class PgDetailsCacheService {
   Future<Map<String, dynamic>?> getCachedPGDetails(String pgId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Check if cache exists
       final cacheKey = '$_cachePrefix$pgId';
       final timestampKey = '$_timestampPrefix$pgId';
-      
+
       final cachedData = prefs.getString(cacheKey);
       final timestampString = prefs.getString(timestampKey);
-      
+
       if (cachedData == null || timestampString == null) {
         return null;
       }
@@ -40,7 +40,7 @@ class PgDetailsCacheService {
       // Check if cache is expired
       final timestamp = DateTime.parse(timestampString);
       final now = DateTime.now();
-      
+
       if (now.difference(timestamp) > _cacheExpiry) {
         // Cache expired, remove it
         await prefs.remove(cacheKey);
@@ -62,13 +62,13 @@ class PgDetailsCacheService {
   Future<void> cachePGDetails(String pgId, Map<String, dynamic> pgData) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final cacheKey = '$_cachePrefix$pgId';
       final timestampKey = '$_timestampPrefix$pgId';
-      
+
       // Serialize PG data to JSON
       final pgJson = jsonEncode(pgData);
-      
+
       // Save cache and timestamp
       await prefs.setString(cacheKey, pgJson);
       await prefs.setString(timestampKey, DateTime.now().toIso8601String());
@@ -82,10 +82,10 @@ class PgDetailsCacheService {
   Future<void> invalidatePGDetails(String pgId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final cacheKey = '$_cachePrefix$pgId';
       final timestampKey = '$_timestampPrefix$pgId';
-      
+
       await prefs.remove(cacheKey);
       await prefs.remove(timestampKey);
     } catch (e) {
@@ -99,11 +99,11 @@ class PgDetailsCacheService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final keys = prefs.getKeys();
-      
+
       // Remove all PG cache keys
       final keysToRemove = keys.where((key) =>
           key.startsWith(_cachePrefix) || key.startsWith(_timestampPrefix));
-      
+
       for (final key in keysToRemove) {
         await prefs.remove(key);
       }
@@ -118,23 +118,24 @@ class PgDetailsCacheService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final keys = prefs.getKeys();
-      
+
       final now = DateTime.now();
-      
+
       // Find all timestamp keys
-      final timestampKeys = keys.where((key) => key.startsWith(_timestampPrefix));
-      
+      final timestampKeys =
+          keys.where((key) => key.startsWith(_timestampPrefix));
+
       for (final timestampKey in timestampKeys) {
         final timestampString = prefs.getString(timestampKey);
         if (timestampString == null) continue;
-        
+
         try {
           final timestamp = DateTime.parse(timestampString);
           if (now.difference(timestamp) > _cacheExpiry) {
             // Extract pgId from timestamp key
             final pgId = timestampKey.replaceFirst(_timestampPrefix, '');
             final cacheKey = '$_cachePrefix$pgId';
-            
+
             // Remove expired cache
             await prefs.remove(cacheKey);
             await prefs.remove(timestampKey);
@@ -166,4 +167,3 @@ class PgDetailsCacheService {
     return cached != null;
   }
 }
-

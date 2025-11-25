@@ -40,7 +40,8 @@ class EnhancedEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final iconColor = this.iconColor ?? theme.primaryColor.withValues(alpha: 0.6);
+    final iconColor =
+        this.iconColor ?? theme.primaryColor.withValues(alpha: 0.6);
     final padding = MediaQuery.of(context).size.width < 600
         ? const EdgeInsets.all(AppSpacing.paddingM)
         : const EdgeInsets.all(AppSpacing.paddingL);
@@ -68,7 +69,8 @@ class EnhancedEmptyState extends StatelessWidget {
     );
   }
 
-  Widget _buildIllustration(BuildContext context, ThemeData theme, Color iconColor) {
+  Widget _buildIllustration(
+      BuildContext context, ThemeData theme, Color iconColor) {
     // Use illustration asset if provided, otherwise use icon
     if (illustrationAsset != null) {
       return Container(
@@ -86,7 +88,8 @@ class EnhancedEmptyState extends StatelessWidget {
         child: Image.asset(
           illustrationAsset!,
           fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) => _buildIcon(context, iconColor),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildIcon(context, iconColor),
         ),
       );
     }
@@ -234,4 +237,3 @@ class EmptyStates {
     );
   }
 }
-

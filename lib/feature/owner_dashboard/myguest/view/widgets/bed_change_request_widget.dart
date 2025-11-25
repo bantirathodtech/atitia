@@ -276,28 +276,28 @@ class BedChangeRequestWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.paddingS),
                   PrimaryButton(
-            label: loc.approve,
-            onPressed: () async {
-              final success = await viewModel.approveBedChangeRequest(
-                request.requestId,
-                decisionNotes: notesController.text.trim().isEmpty
-                    ? null
-                    : notesController.text.trim(),
-              );
-              if (context.mounted) {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      success
-                          ? loc.bedChangeApproveSuccess
-                          : loc.bedChangeApproveFailure,
-                    ),
-                    backgroundColor:
-                        success ? AppColors.success : AppColors.error,
-                  ),
-                );
-              }
+                    label: loc.approve,
+                    onPressed: () async {
+                      final success = await viewModel.approveBedChangeRequest(
+                        request.requestId,
+                        decisionNotes: notesController.text.trim().isEmpty
+                            ? null
+                            : notesController.text.trim(),
+                      );
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              success
+                                  ? loc.bedChangeApproveSuccess
+                                  : loc.bedChangeApproveFailure,
+                            ),
+                            backgroundColor:
+                                success ? AppColors.success : AppColors.error,
+                          ),
+                        );
+                      }
                     },
                   ),
                 ],

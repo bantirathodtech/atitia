@@ -101,8 +101,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildMetricsCards(
-      BuildContext context, AppLocalizations loc) {
+  Widget _buildMetricsCards(BuildContext context, AppLocalizations loc) {
     final metrics = _calculateMetrics();
     final currencyFormatter = _currencyFormatter(loc);
     final percentFormatter = NumberFormat('###0.0', loc.localeName);
@@ -193,8 +192,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildChartSection(
-      BuildContext context, AppLocalizations loc) {
+  Widget _buildChartSection(BuildContext context, AppLocalizations loc) {
     return AdaptiveCard(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.paddingL),
@@ -372,8 +370,7 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildForecastingSection(
-      BuildContext context, AppLocalizations loc) {
+  Widget _buildForecastingSection(BuildContext context, AppLocalizations loc) {
     final forecast = _calculateForecast(loc);
     final currencyFormatter = _currencyFormatter(loc);
 
@@ -467,8 +464,8 @@ class _RevenueAnalyticsWidgetState extends State<RevenueAnalyticsWidget> {
     );
   }
 
-  Widget _buildForecastInsights(
-      BuildContext context, Map<String, dynamic> forecast, AppLocalizations loc) {
+  Widget _buildForecastInsights(BuildContext context,
+      Map<String, dynamic> forecast, AppLocalizations loc) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.paddingM),
       decoration: BoxDecoration(

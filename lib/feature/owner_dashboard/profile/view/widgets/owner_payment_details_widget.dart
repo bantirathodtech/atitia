@@ -469,8 +469,7 @@ class _OwnerPaymentDetailsWidgetState extends State<OwnerPaymentDetailsWidget>
                 height: 250,
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color:
-                        ThemeColors.getDivider(context),
+                    color: ThemeColors.getDivider(context),
                     width: 2,
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),

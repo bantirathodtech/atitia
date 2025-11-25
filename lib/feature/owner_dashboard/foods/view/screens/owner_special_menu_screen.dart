@@ -468,7 +468,8 @@ class _OwnerSpecialMenuScreenState extends State<OwnerSpecialMenuScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HeadingMedium(text: loc.ownerSpecialMenuAddMealItemTitle(mealType)),
+              HeadingMedium(
+                  text: loc.ownerSpecialMenuAddMealItemTitle(mealType)),
               const SizedBox(height: AppSpacing.paddingM),
               TextInput(
                 controller: controller,

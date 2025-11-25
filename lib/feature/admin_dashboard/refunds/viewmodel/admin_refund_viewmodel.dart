@@ -12,7 +12,8 @@ import '../../../../../core/interfaces/analytics/analytics_service_interface.dar
 
 /// ViewModel for Admin Refund Management
 /// Handles refund request approval, rejection, and processing
-class AdminRefundViewModel extends BaseProviderState with StreamSubscriptionMixin {
+class AdminRefundViewModel extends BaseProviderState
+    with StreamSubscriptionMixin {
   final RefundRequestRepository _refundRepo;
   final RefundService _refundService;
   final IAnalyticsService _analyticsService;
@@ -25,7 +26,8 @@ class AdminRefundViewModel extends BaseProviderState with StreamSubscriptionMixi
   List<RefundRequestModel> _completedRefunds = [];
 
   // Filters
-  String _selectedStatusFilter = 'all'; // all, pending, approved, rejected, completed
+  String _selectedStatusFilter =
+      'all'; // all, pending, approved, rejected, completed
   String _selectedTypeFilter = 'all'; // all, subscription, featuredListing
 
   AdminRefundViewModel({
@@ -93,18 +95,14 @@ class AdminRefundViewModel extends BaseProviderState with StreamSubscriptionMixi
     _allRefundRequests = refunds;
 
     // Categorize by status
-    _pendingRefunds = refunds
-        .where((r) => r.status == RefundStatus.pending)
-        .toList();
-    _approvedRefunds = refunds
-        .where((r) => r.status == RefundStatus.approved)
-        .toList();
-    _rejectedRefunds = refunds
-        .where((r) => r.status == RefundStatus.rejected)
-        .toList();
-    _completedRefunds = refunds
-        .where((r) => r.status == RefundStatus.completed)
-        .toList();
+    _pendingRefunds =
+        refunds.where((r) => r.status == RefundStatus.pending).toList();
+    _approvedRefunds =
+        refunds.where((r) => r.status == RefundStatus.approved).toList();
+    _rejectedRefunds =
+        refunds.where((r) => r.status == RefundStatus.rejected).toList();
+    _completedRefunds =
+        refunds.where((r) => r.status == RefundStatus.completed).toList();
 
     notifyListeners();
   }
@@ -273,4 +271,3 @@ class AdminRefundViewModel extends BaseProviderState with StreamSubscriptionMixi
     super.dispose();
   }
 }
-

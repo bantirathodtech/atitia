@@ -115,13 +115,16 @@ class AppRoutes {
   static const String ownerSubscriptionPlans = '$ownerHome/subscription/plans';
 
   /// Owner subscription management: '/owner/subscription/management'
-  static const String ownerSubscriptionManagement = '$ownerHome/subscription/management';
+  static const String ownerSubscriptionManagement =
+      '$ownerHome/subscription/management';
 
   /// Owner featured listing purchase: '/owner/featured/purchase'
-  static const String ownerFeaturedListingPurchase = '$ownerHome/featured/purchase';
+  static const String ownerFeaturedListingPurchase =
+      '$ownerHome/featured/purchase';
 
   /// Owner featured listing management: '/owner/featured/management'
-  static const String ownerFeaturedListingManagement = '$ownerHome/featured/management';
+  static const String ownerFeaturedListingManagement =
+      '$ownerHome/featured/management';
 
   /// Owner refund request: '/owner/refunds/request'
   static const String ownerRefundRequest = '$ownerHome/refunds/request';

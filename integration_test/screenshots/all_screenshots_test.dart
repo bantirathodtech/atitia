@@ -24,7 +24,8 @@ void main() {
       screenshotService = ScreenshotService();
     });
 
-    testWidgets('Capture all screenshots for both flows', (WidgetTester tester) async {
+    testWidgets('Capture all screenshots for both flows',
+        (WidgetTester tester) async {
       authHelper = MockAuthHelper(tester);
       navigationHelper = NavigationHelper(tester);
 
@@ -48,7 +49,7 @@ void main() {
       print('\n📱 Authenticating as Guest...');
       await authHelper.loginAsGuest();
       await navigationHelper.waitForScreenLoad();
-      
+
       // Set system theme mode
       print('\n🎨 Setting System Theme Mode...');
       await authHelper.setSystemThemeMode();
@@ -87,11 +88,12 @@ void main() {
       // Logout guest and login as owner
       print('\n📱 Logging out and authenticating as Owner...');
       await authHelper.logout();
-      await Future.delayed(const Duration(seconds: 3)); // Wait longer for logout
+      await Future.delayed(
+          const Duration(seconds: 3)); // Wait longer for logout
       await tester.pumpAndSettle();
       await authHelper.loginAsOwner();
       await navigationHelper.waitForScreenLoad();
-      
+
       // Ensure system theme mode is still set
       await authHelper.setSystemThemeMode();
       await navigationHelper.waitForScreenLoad();
@@ -126,12 +128,14 @@ void main() {
       print('\n\n📄 PART 3: Generating Reports');
       print('-----------------------------------');
 
-      final reportPath = '${ScreenshotConfig.outputDirectory}/complete_report.md';
+      final reportPath =
+          '${ScreenshotConfig.outputDirectory}/complete_report.md';
       await screenshotService.saveReport(reportPath);
 
       print('\n✅ Complete Screenshot Capture Finished!');
       print('==========================================');
-      print('📊 Total Screenshots: ${screenshotService.capturedScreenshots.length}');
+      print(
+          '📊 Total Screenshots: ${screenshotService.capturedScreenshots.length}');
       print('📁 Output Directory: ${ScreenshotConfig.outputDirectory}');
       print('📄 Report: $reportPath');
       print('');
@@ -142,4 +146,3 @@ void main() {
     });
   });
 }
-

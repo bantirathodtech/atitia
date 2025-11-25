@@ -118,7 +118,8 @@ class _AdminAccessScreenState extends State<AdminAccessScreen> {
                   padding: const EdgeInsets.all(AppSpacing.paddingM),
                   decoration: BoxDecoration(
                     color: AppColors.error.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.borderRadiusM),
                     border: Border.all(color: AppColors.error),
                   ),
                   child: BodyText(
@@ -131,7 +132,8 @@ class _AdminAccessScreenState extends State<AdminAccessScreen> {
               // Access Button
               PrimaryButton(
                 onPressed: _isLoading ? null : _handleAdminAccess,
-                label: _isLoading ? 'Authenticating...' : 'Access Admin Dashboard',
+                label:
+                    _isLoading ? 'Authenticating...' : 'Access Admin Dashboard',
               ),
               const SizedBox(height: AppSpacing.paddingM),
 
@@ -183,4 +185,3 @@ class _AdminAccessScreenState extends State<AdminAccessScreen> {
     }
   }
 }
-

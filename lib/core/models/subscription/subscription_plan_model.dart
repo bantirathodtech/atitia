@@ -22,7 +22,7 @@ enum SubscriptionTier {
   }
 
   String get firestoreValue => name;
-  
+
   static SubscriptionTier? fromFirestoreValue(String? value) {
     if (value == null) return null;
     try {
@@ -62,7 +62,8 @@ class SubscriptionPlanModel {
   /// Factory constructor to create plan from Firestore document
   factory SubscriptionPlanModel.fromMap(Map<String, dynamic> map) {
     return SubscriptionPlanModel(
-      tier: SubscriptionTier.fromFirestoreValue(map['tier']) ?? SubscriptionTier.free,
+      tier: SubscriptionTier.fromFirestoreValue(map['tier']) ??
+          SubscriptionTier.free,
       planId: map['planId'] as String? ?? '',
       name: map['name'] as String? ?? '',
       description: map['description'] as String? ?? '',
@@ -219,4 +220,3 @@ class SubscriptionPlanModel {
   @override
   int get hashCode => planId.hashCode;
 }
-

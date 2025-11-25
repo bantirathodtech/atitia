@@ -11,7 +11,7 @@ import '../../interfaces/analytics/analytics_service_interface.dart';
 import '../../../feature/owner_dashboard/profile/data/repository/owner_profile_repository.dart';
 
 /// Service for managing subscription renewals, reminders, and auto-downgrades
-/// 
+///
 /// Features:
 /// - Check for expiring subscriptions
 /// - Send renewal reminders (7, 3, 1 days before expiry)
@@ -26,7 +26,7 @@ class SubscriptionRenewalService {
 
   // Grace period duration in days
   static const int gracePeriodDays = 7;
-  
+
   // Reminder intervals (days before expiry)
   static const List<int> reminderDays = [7, 3, 1];
 
@@ -35,14 +35,11 @@ class SubscriptionRenewalService {
     NotificationRepository? notificationRepo,
     OwnerProfileRepository? profileRepo,
     IAnalyticsService? analyticsService,
-  })  : _subscriptionRepo = subscriptionRepo ?? 
-          OwnerSubscriptionRepository(),
-        _notificationRepo = notificationRepo ?? 
-          NotificationRepository(),
-        _profileRepo = profileRepo ?? 
-          OwnerProfileRepository(),
-        _analyticsService = analyticsService ?? 
-          UnifiedServiceLocator.serviceFactory.analytics;
+  })  : _subscriptionRepo = subscriptionRepo ?? OwnerSubscriptionRepository(),
+        _notificationRepo = notificationRepo ?? NotificationRepository(),
+        _profileRepo = profileRepo ?? OwnerProfileRepository(),
+        _analyticsService =
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
 
   /// Check and process all expiring subscriptions
   /// This method should be called periodically (e.g., daily via Cloud Functions)
@@ -57,7 +54,8 @@ class SubscriptionRenewalService {
 
       // Check for subscriptions expiring in reminder days
       for (final daysBeforeExpiry in reminderDays) {
-        final expiringSubscriptions = await _subscriptionRepo.getExpiringSubscriptions(
+        final expiringSubscriptions =
+            await _subscriptionRepo.getExpiringSubscriptions(
           daysBeforeExpiry: daysBeforeExpiry,
         );
 
@@ -68,8 +66,9 @@ class SubscriptionRenewalService {
       }
 
       // Check for expired subscriptions that need grace period
-      final expiredSubscriptions = await _subscriptionRepo.getExpiredSubscriptions();
-      
+      final expiredSubscriptions =
+          await _subscriptionRepo.getExpiredSubscriptions();
+
       for (final subscription in expiredSubscriptions) {
         if (subscription.status == SubscriptionStatus.active) {
           // Move to grace period
@@ -77,7 +76,8 @@ class SubscriptionRenewalService {
           results.movedToGracePeriod++;
         } else if (subscription.isInGracePeriod) {
           // Check if grace period has ended
-          final daysSinceExpiry = DateTime.now().difference(subscription.endDate).inDays;
+          final daysSinceExpiry =
+              DateTime.now().difference(subscription.endDate).inDays;
           if (daysSinceExpiry > gracePeriodDays) {
             // Auto-downgrade
             await _autoDowngrade(subscription);
@@ -112,9 +112,11 @@ class SubscriptionRenewalService {
   ) async {
     try {
       // Get owner profile for notification details
-      final ownerProfile = await _profileRepo.getOwnerProfile(subscription.ownerId);
+      final ownerProfile =
+          await _profileRepo.getOwnerProfile(subscription.ownerId);
       if (ownerProfile == null) {
-        debugPrint('⚠️ Owner profile not found for subscription reminder: ${subscription.ownerId}');
+        debugPrint(
+            '⚠️ Owner profile not found for subscription reminder: ${subscription.ownerId}');
         return;
       }
 
@@ -124,13 +126,16 @@ class SubscriptionRenewalService {
 
       if (daysBeforeExpiry == 7) {
         title = 'Subscription Renewal Reminder';
-        body = 'Your ${subscription.tier.displayName} subscription expires in 7 days. Renew now to continue enjoying premium features.';
+        body =
+            'Your ${subscription.tier.displayName} subscription expires in 7 days. Renew now to continue enjoying premium features.';
       } else if (daysBeforeExpiry == 3) {
         title = 'Subscription Expiring Soon';
-        body = 'Your ${subscription.tier.displayName} subscription expires in 3 days. Don\'t miss out on premium features!';
+        body =
+            'Your ${subscription.tier.displayName} subscription expires in 3 days. Don\'t miss out on premium features!';
       } else {
         title = 'Last Day to Renew';
-        body = 'Your ${subscription.tier.displayName} subscription expires today. Renew now to avoid service interruption.';
+        body =
+            'Your ${subscription.tier.displayName} subscription expires today. Renew now to avoid service interruption.';
       }
 
       // Send notification
@@ -187,17 +192,21 @@ class SubscriptionRenewalService {
       );
 
       // Send grace period notification
-      final ownerProfile = await _profileRepo.getOwnerProfile(subscription.ownerId);
+      final ownerProfile =
+          await _profileRepo.getOwnerProfile(subscription.ownerId);
       if (ownerProfile != null) {
         await _notificationRepo.sendUserNotification(
           userId: subscription.ownerId,
           type: 'subscription_grace_period',
           title: 'Subscription in Grace Period',
-          body: 'Your ${subscription.tier.displayName} subscription has expired. You have 7 days to renew before downgrading to Free tier.',
+          body:
+              'Your ${subscription.tier.displayName} subscription has expired. You have 7 days to renew before downgrading to Free tier.',
           data: {
             'subscriptionId': subscription.subscriptionId,
             'tier': subscription.tier.firestoreValue,
-            'gracePeriodEnds': subscription.endDate.add(Duration(days: gracePeriodDays)).toIso8601String(),
+            'gracePeriodEnds': subscription.endDate
+                .add(Duration(days: gracePeriodDays))
+                .toIso8601String(),
             'action': 'renew_subscription',
           },
         );
@@ -238,13 +247,15 @@ class SubscriptionRenewalService {
       );
 
       // Send downgrade notification
-      final ownerProfile = await _profileRepo.getOwnerProfile(subscription.ownerId);
+      final ownerProfile =
+          await _profileRepo.getOwnerProfile(subscription.ownerId);
       if (ownerProfile != null) {
         await _notificationRepo.sendUserNotification(
           userId: subscription.ownerId,
           type: 'subscription_downgraded',
           title: 'Subscription Downgraded',
-          body: 'Your ${subscription.tier.displayName} subscription has been downgraded to Free tier. Upgrade anytime to regain premium features.',
+          body:
+              'Your ${subscription.tier.displayName} subscription has been downgraded to Free tier. Upgrade anytime to regain premium features.',
           data: {
             'subscriptionId': subscription.subscriptionId,
             'previousTier': subscription.tier.firestoreValue,
@@ -262,7 +273,8 @@ class SubscriptionRenewalService {
         },
       );
 
-      debugPrint('✅ Auto-downgraded subscription: ${subscription.subscriptionId}');
+      debugPrint(
+          '✅ Auto-downgraded subscription: ${subscription.subscriptionId}');
     } catch (e) {
       debugPrint('❌ Error auto-downgrading subscription: $e');
       rethrow;
@@ -279,7 +291,8 @@ class SubscriptionRenewalService {
     try {
       final profile = await _profileRepo.getOwnerProfile(ownerId);
       if (profile == null) {
-        debugPrint('⚠️ Owner profile not found for subscription update: $ownerId');
+        debugPrint(
+            '⚠️ Owner profile not found for subscription update: $ownerId');
         return;
       }
 
@@ -328,4 +341,3 @@ class RenewalCheckResult {
     return 'RenewalCheckResult(reminders: $remindersSent, gracePeriod: $movedToGracePeriod, downgraded: $downgraded)';
   }
 }
-

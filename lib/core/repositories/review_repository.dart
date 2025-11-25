@@ -73,7 +73,8 @@ class ReviewRepository {
   Stream<List<ReviewModel>> streamGuestReviews(String guestId) {
     // COST OPTIMIZATION: Limit to 20 reviews per stream
     return _databaseService
-        .getCollectionStreamWithFilter(_reviewsCollection, 'guestId', guestId, limit: 20)
+        .getCollectionStreamWithFilter(_reviewsCollection, 'guestId', guestId,
+            limit: 20)
         .map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -87,7 +88,8 @@ class ReviewRepository {
   Stream<List<ReviewModel>> streamOwnerReviews(String ownerId) {
     // COST OPTIMIZATION: Limit to 30 reviews per stream
     return _databaseService
-        .getCollectionStreamWithFilter(_reviewsCollection, 'ownerId', ownerId, limit: 30)
+        .getCollectionStreamWithFilter(_reviewsCollection, 'ownerId', ownerId,
+            limit: 30)
         .map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;

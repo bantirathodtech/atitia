@@ -263,7 +263,8 @@ class OwnerMenuDayTab extends StatelessWidget {
     return AdaptiveCard(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingM,
-        vertical: AppSpacing.paddingS, // Reduced vertical margin from paddingM to paddingS
+        vertical: AppSpacing
+            .paddingS, // Reduced vertical margin from paddingM to paddingS
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -350,7 +351,8 @@ class OwnerMenuDayTab extends StatelessWidget {
                       Expanded(
                         child: BodyText(
                           text: item,
-                          medium: true, // Use bodyMedium (14px) instead of bodyLarge (16px) - reduced by 1 size
+                          medium:
+                              true, // Use bodyMedium (14px) instead of bodyLarge (16px) - reduced by 1 size
                         ),
                       ),
                     ],

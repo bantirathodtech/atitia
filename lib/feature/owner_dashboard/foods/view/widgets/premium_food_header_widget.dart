@@ -75,7 +75,9 @@ class PremiumFoodHeaderWidget extends StatelessWidget
           Flexible(
             child: Container(
               width: double.infinity,
-              padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+              padding: EdgeInsets.all(context.isMobile
+                  ? AppSpacing.paddingXS
+                  : AppSpacing.paddingS),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -92,7 +94,7 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                     width: 1,
                   ),
                 ),
-                    boxShadow: [
+                boxShadow: [
                   BoxShadow(
                     color: context.isDarkMode
                         ? context.colors.shadow.withValues(alpha: 0.2)
@@ -152,7 +154,9 @@ class PremiumFoodHeaderWidget extends StatelessWidget
             dayColor,
           ),
         ),
-        SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+        SizedBox(
+            width:
+                context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
         Expanded(
           child: _buildStatChip(
             context,
@@ -162,7 +166,9 @@ class PremiumFoodHeaderWidget extends StatelessWidget
             dayColor,
           ),
         ),
-        SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+        SizedBox(
+            width:
+                context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
         Expanded(
           child: _buildStatChip(
             context,
@@ -173,7 +179,10 @@ class PremiumFoodHeaderWidget extends StatelessWidget
           ),
         ),
         if ((stats['upcomingFestivals'] ?? 0) > 0) ...[
-          SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+          SizedBox(
+              width: context.isMobile
+                  ? AppSpacing.paddingXS
+                  : AppSpacing.paddingS),
           Flexible(
             child: Container(
               padding: EdgeInsets.symmetric(
@@ -200,11 +209,11 @@ class PremiumFoodHeaderWidget extends StatelessWidget
                   Flexible(
                     child: Text(
                       '${stats['upcomingFestivals']} ${loc?.festival ?? _text('festival', 'Festival')}',
-                    style: TextStyle(
-                      color: dayColor,
-                      fontSize: context.isMobile ? 9 : 10,
-                      fontWeight: FontWeight.w600,
-                    ),
+                      style: TextStyle(
+                        color: dayColor,
+                        fontSize: context.isMobile ? 9 : 10,
+                        fontWeight: FontWeight.w600,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -217,8 +226,8 @@ class PremiumFoodHeaderWidget extends StatelessWidget
     );
   }
 
-  Widget _buildStatChip(
-      BuildContext context, String value, String label, IconData icon, Color color) {
+  Widget _buildStatChip(BuildContext context, String value, String label,
+      IconData icon, Color color) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.isMobile ? 6 : 8,
@@ -241,7 +250,10 @@ class PremiumFoodHeaderWidget extends StatelessWidget
             color: color,
             size: context.isMobile ? 12 : 14,
           ),
-          SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+          SizedBox(
+              width: context.isMobile
+                  ? AppSpacing.paddingXS * 0.5
+                  : AppSpacing.paddingXS),
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

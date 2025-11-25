@@ -56,8 +56,8 @@ class RefundService with LoggingMixin {
       }
 
       // Get revenue record
-      final revenueRecord = await _revenueRepo.getRevenueRecord(
-          refundRequest.revenueRecordId);
+      final revenueRecord =
+          await _revenueRepo.getRevenueRecord(refundRequest.revenueRecordId);
       if (revenueRecord == null) {
         throw Exception('Revenue record not found');
       }
@@ -161,7 +161,7 @@ class RefundService with LoggingMixin {
     // This should call a Cloud Function that processes the refund with the secret key
     // TODO: Implement Cloud Functions call for refund processing
     // For now, simulate success (will be replaced with actual Cloud Function call)
-    
+
     logInfo(
       'Processing refund via Cloud Functions (to be implemented)',
       feature: 'refund',
@@ -170,7 +170,7 @@ class RefundService with LoggingMixin {
         'amount': amount.toString(),
       },
     );
-    
+
     // Simulate refund ID (remove in production - replace with actual Cloud Function call)
     return 'refund_${DateTime.now().millisecondsSinceEpoch}';
   }
@@ -180,8 +180,8 @@ class RefundService with LoggingMixin {
     if (refundRequest.type == RefundType.subscription &&
         refundRequest.subscriptionId != null) {
       // Cancel the subscription
-      final subscription =
-          await _subscriptionRepo.getSubscription(refundRequest.subscriptionId!);
+      final subscription = await _subscriptionRepo
+          .getSubscription(refundRequest.subscriptionId!);
       if (subscription != null) {
         // Subscription cancellation should be handled by cancellation flow
         // For refund, we just mark it as cancelled
@@ -194,8 +194,8 @@ class RefundService with LoggingMixin {
     } else if (refundRequest.type == RefundType.featuredListing &&
         refundRequest.featuredListingId != null) {
       // Cancel the featured listing
-      final listing = await _featuredRepo.getFeaturedListing(
-          refundRequest.featuredListingId!);
+      final listing = await _featuredRepo
+          .getFeaturedListing(refundRequest.featuredListingId!);
       if (listing != null) {
         await _featuredRepo.cancelFeaturedListing(
           featuredListingId: refundRequest.featuredListingId!,
@@ -209,9 +209,7 @@ class RefundService with LoggingMixin {
   Future<void> _sendRefundNotification(
       RefundRequestModel refundRequest, bool success) async {
     try {
-      final title = success
-          ? 'Refund Processed'
-          : 'Refund Processing Failed';
+      final title = success ? 'Refund Processed' : 'Refund Processing Failed';
       final body = success
           ? 'Your refund request for ${refundRequest.formattedAmount} has been processed successfully. The amount will be credited to your account within 5-7 business days.'
           : 'Your refund request could not be processed. Please contact support for assistance.';
@@ -325,8 +323,7 @@ class RefundService with LoggingMixin {
         userId: refundRequest.ownerId,
         type: 'refund',
         title: 'Refund Request Rejected',
-        body:
-            'Your refund request has been rejected. Reason: $rejectionReason',
+        body: 'Your refund request has been rejected. Reason: $rejectionReason',
         data: {
           'refund_request_id': refundRequestId,
           'status': 'rejected',
@@ -353,4 +350,3 @@ class RefundService with LoggingMixin {
     }
   }
 }
-

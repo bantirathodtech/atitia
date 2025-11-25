@@ -24,7 +24,8 @@ void main() {
       screenshotService = ScreenshotService();
     });
 
-    testWidgets('Capture all owner flow screenshots', (WidgetTester tester) async {
+    testWidgets('Capture all owner flow screenshots',
+        (WidgetTester tester) async {
       authHelper = MockAuthHelper(tester);
       navigationHelper = NavigationHelper(tester);
 
@@ -57,7 +58,8 @@ void main() {
 
       // Step 2: Get owner screenshots to capture
       final screenshots = ScreenshotConfig.getScreenshotsByRole('owner');
-      print('\n📸 Step 2: Capturing ${screenshots.length} owner screenshots...');
+      print(
+          '\n📸 Step 2: Capturing ${screenshots.length} owner screenshots...');
 
       // Step 3: Capture each screenshot
       for (final screenshotDef in screenshots) {
@@ -112,17 +114,20 @@ void main() {
 
       // Step 4: Generate report
       print('\n📄 Step 3: Generating report...');
-      final reportPath = '${ScreenshotConfig.outputDirectory}/owner_flow_report.md';
+      final reportPath =
+          '${ScreenshotConfig.outputDirectory}/owner_flow_report.md';
       await screenshotService.saveReport(reportPath);
 
       print('\n✅ Owner Flow Screenshot Capture Complete!');
       print('==========================================');
-      print('📊 Total Screenshots: ${screenshotService.capturedScreenshots.length}');
+      print(
+          '📊 Total Screenshots: ${screenshotService.capturedScreenshots.length}');
       print('📁 Output Directory: ${ScreenshotConfig.outputDirectory}');
       print('📄 Report: $reportPath');
     });
 
-    testWidgets('Capture required owner screenshots only', (WidgetTester tester) async {
+    testWidgets('Capture required owner screenshots only',
+        (WidgetTester tester) async {
       authHelper = MockAuthHelper(tester);
       navigationHelper = NavigationHelper(tester);
 
@@ -138,8 +143,10 @@ void main() {
       await navigationHelper.waitForScreenLoad();
 
       // Get only required screenshots
-      final requiredScreenshots = ScreenshotConfig.getRequiredScreenshots('owner');
-      print('\n📸 Capturing ${requiredScreenshots.length} required screenshots...');
+      final requiredScreenshots =
+          ScreenshotConfig.getRequiredScreenshots('owner');
+      print(
+          '\n📸 Capturing ${requiredScreenshots.length} required screenshots...');
 
       for (final screenshotDef in requiredScreenshots) {
         print('\n📸 ${screenshotDef.name}');
@@ -163,4 +170,3 @@ void main() {
     });
   });
 }
-

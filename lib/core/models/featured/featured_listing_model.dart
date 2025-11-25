@@ -27,11 +27,12 @@ enum FeaturedListingStatus {
   }
 
   String get firestoreValue => name;
-  
+
   static FeaturedListingStatus? fromFirestoreValue(String? value) {
     if (value == null) return null;
     try {
-      return FeaturedListingStatus.values.firstWhere((status) => status.name == value);
+      return FeaturedListingStatus.values
+          .firstWhere((status) => status.name == value);
     } catch (e) {
       return null;
     }
@@ -77,7 +78,8 @@ class FeaturedListingModel {
       featuredListingId: map['featuredListingId'] as String? ?? '',
       pgId: map['pgId'] as String? ?? '',
       ownerId: map['ownerId'] as String? ?? '',
-      status: FeaturedListingStatus.fromFirestoreValue(map['status']) ?? FeaturedListingStatus.pending,
+      status: FeaturedListingStatus.fromFirestoreValue(map['status']) ??
+          FeaturedListingStatus.pending,
       startDate: map['startDate'] != null
           ? DateServiceConverter.fromService(map['startDate'] as String)
           : DateTime.now(),
@@ -153,12 +155,14 @@ class FeaturedListingModel {
   }
 
   /// Check if featured listing is currently active
-  bool get isActive => status == FeaturedListingStatus.active && 
-                      endDate.isAfter(DateTime.now());
+  bool get isActive =>
+      status == FeaturedListingStatus.active && endDate.isAfter(DateTime.now());
 
   /// Check if featured listing has expired
-  bool get isExpired => status == FeaturedListingStatus.expired || 
-                       (status == FeaturedListingStatus.active && endDate.isBefore(DateTime.now()));
+  bool get isExpired =>
+      status == FeaturedListingStatus.expired ||
+      (status == FeaturedListingStatus.active &&
+          endDate.isBefore(DateTime.now()));
 
   /// Get days remaining until expiration
   int get daysUntilExpiry {
@@ -202,10 +206,10 @@ class FeaturedListingModel {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is FeaturedListingModel && other.featuredListingId == featuredListingId;
+    return other is FeaturedListingModel &&
+        other.featuredListingId == featuredListingId;
   }
 
   @override
   int get hashCode => featuredListingId.hashCode;
 }
-

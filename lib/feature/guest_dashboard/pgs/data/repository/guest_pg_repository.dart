@@ -61,7 +61,7 @@ class GuestPgRepository {
       // Check cache first
       final cacheService = PgDetailsCacheService.instance;
       final cachedData = await cacheService.getCachedPGDetails(pgId);
-      
+
       if (cachedData != null) {
         // Cache hit - reconstruct from cached data
         try {
@@ -151,20 +151,18 @@ class GuestPgRepository {
     // COST OPTIMIZATION: Limit to 50 PGs per stream
     return _databaseService
         .getCollectionStreamWithCompoundFilter(
-          FirestoreConstants.pgs,
-          [
-            {'field': 'isDraft', 'value': false},
-            {'field': 'isActive', 'value': true},
-          ],
-          limit: 50,
-        )
+      FirestoreConstants.pgs,
+      [
+        {'field': 'isDraft', 'value': false},
+        {'field': 'isActive', 'value': true},
+      ],
+      limit: 50,
+    )
         .map((snapshot) {
-      final pgs = snapshot.docs
-          .map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return GuestPgModel.fromMap(data);
-          })
-          .toList();
+      final pgs = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return GuestPgModel.fromMap(data);
+      }).toList();
 
       // Log analytics for PG list loaded
       _analyticsService.logEvent(
@@ -241,7 +239,8 @@ class GuestPgRepository {
 
       // Invalidate caches when PG is deleted
       await PgDetailsCacheService.instance.invalidatePGDetails(pgId);
-      await StaticDataCacheService.instance.invalidateAll(); // Cities/amenities may have changed
+      await StaticDataCacheService.instance
+          .invalidateAll(); // Cities/amenities may have changed
 
       await _analyticsService.logEvent(
         name: _i18n.translate('pgDeletedEvent'),

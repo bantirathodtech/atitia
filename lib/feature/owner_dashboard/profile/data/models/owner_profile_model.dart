@@ -188,8 +188,9 @@ class OwnerProfile {
       'isVerified': isVerified,
       'subscriptionTier': subscriptionTier,
       'subscriptionStatus': subscriptionStatus,
-      'subscriptionEndDate':
-          subscriptionEndDate != null ? Timestamp.fromDate(subscriptionEndDate!) : null,
+      'subscriptionEndDate': subscriptionEndDate != null
+          ? Timestamp.fromDate(subscriptionEndDate!)
+          : null,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'metadata': metadata,

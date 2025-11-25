@@ -30,11 +30,9 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
     OwnerSubscriptionRepository? subscriptionRepo,
     OwnerProfileRepository? profileRepo,
     AppSubscriptionPaymentService? paymentService,
-  })  : _subscriptionRepo =
-            subscriptionRepo ?? OwnerSubscriptionRepository(),
+  })  : _subscriptionRepo = subscriptionRepo ?? OwnerSubscriptionRepository(),
         _profileRepo = profileRepo ?? OwnerProfileRepository(),
-        _paymentService =
-            paymentService ?? AppSubscriptionPaymentService();
+        _paymentService = paymentService ?? AppSubscriptionPaymentService();
 
   OwnerSubscriptionModel? _currentSubscription;
   List<OwnerSubscriptionModel> _subscriptionHistory = [];
@@ -133,7 +131,8 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
   /// Load current active subscription
   Future<void> _loadCurrentSubscription(String ownerId) async {
     try {
-      _currentSubscription = await _subscriptionRepo.getActiveSubscription(ownerId);
+      _currentSubscription =
+          await _subscriptionRepo.getActiveSubscription(ownerId);
       notifyListeners();
     } catch (e) {
       logError(
@@ -164,9 +163,7 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
   /// Start real-time subscription stream
   void _startSubscriptionStream(String ownerId) {
     _subscriptionStream?.cancel();
-    _subscriptionStream = _subscriptionRepo
-        .streamSubscription(ownerId)
-        .listen(
+    _subscriptionStream = _subscriptionRepo.streamSubscription(ownerId).listen(
       (subscription) {
         _currentSubscription = subscription;
         notifyListeners();
@@ -278,7 +275,8 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
       notifyListeners();
 
       final exception = AppException(
-        message: _text('subscriptionPurchaseFailed', 'Failed to purchase subscription'),
+        message: _text(
+            'subscriptionPurchaseFailed', 'Failed to purchase subscription'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -300,7 +298,8 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
     try {
       if (_isCancelling) {
         throw AppException(
-          message: _text('cancellationInProgress', 'Cancellation already in progress'),
+          message: _text(
+              'cancellationInProgress', 'Cancellation already in progress'),
           severity: ErrorSeverity.medium,
         );
       }
@@ -359,7 +358,8 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
       notifyListeners();
 
       final exception = AppException(
-        message: _text('subscriptionCancellationFailed', 'Failed to cancel subscription'),
+        message: _text(
+            'subscriptionCancellationFailed', 'Failed to cancel subscription'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -388,7 +388,8 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
       return currentPGCount < 1;
     }
 
-    final plan = SubscriptionPlanModel.getPlanByTier(_currentSubscription!.tier);
+    final plan =
+        SubscriptionPlanModel.getPlanByTier(_currentSubscription!.tier);
     if (plan == null) return false;
 
     return plan.canAddPG(currentPGCount);
@@ -400,6 +401,6 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
   }
 
   /// Get all available subscription plans
-  List<SubscriptionPlanModel> get availablePlans => SubscriptionPlanModel.allPlans;
+  List<SubscriptionPlanModel> get availablePlans =>
+      SubscriptionPlanModel.allPlans;
 }
-

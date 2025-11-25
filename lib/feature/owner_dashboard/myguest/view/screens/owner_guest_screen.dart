@@ -309,24 +309,25 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                   ),
                   const SizedBox(width: AppSpacing.paddingS),
                   PrimaryButton(
-            label: loc.send,
-            onPressed: () async {
-              final text = controller.text.trim();
-              if (text.isEmpty) return;
-              Navigator.of(context).pop();
-              final ok =
-                  await viewModel.addComplaintReply(complaintId, text, 'Owner');
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: BodyText(
-                      text: ok ? loc.replySent : loc.failedToSendReply,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    backgroundColor: ok ? AppColors.success : AppColors.error,
-                  ),
-                );
-              }
+                    label: loc.send,
+                    onPressed: () async {
+                      final text = controller.text.trim();
+                      if (text.isEmpty) return;
+                      Navigator.of(context).pop();
+                      final ok = await viewModel.addComplaintReply(
+                          complaintId, text, 'Owner');
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: BodyText(
+                              text: ok ? loc.replySent : loc.failedToSendReply,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            backgroundColor:
+                                ok ? AppColors.success : AppColors.error,
+                          ),
+                        );
+                      }
                     },
                   ),
                 ],
@@ -377,17 +378,21 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                       final ok = await viewModel.updateComplaintStatus(
                         complaintId,
                         'resolved',
-                        resolutionNotes:
-                            notes.text.trim().isEmpty ? null : notes.text.trim(),
+                        resolutionNotes: notes.text.trim().isEmpty
+                            ? null
+                            : notes.text.trim(),
                       );
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: BodyText(
-                              text: ok ? loc.complaintResolved : loc.failedToResolve,
+                              text: ok
+                                  ? loc.complaintResolved
+                                  : loc.failedToResolve,
                               color: Theme.of(context).colorScheme.onPrimary,
                             ),
-                            backgroundColor: ok ? AppColors.success : AppColors.error,
+                            backgroundColor:
+                                ok ? AppColors.success : AppColors.error,
                           ),
                         );
                       }
@@ -699,12 +704,14 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.check_circle, color: AppColors.success),
+                      leading: const Icon(Icons.check_circle,
+                          color: AppColors.success),
                       title: BodyText(text: loc.active),
                       onTap: () => Navigator.pop(context, 'active'),
                     ),
                     ListTile(
-                      leading: const Icon(Icons.pending, color: AppColors.statusOrange),
+                      leading: const Icon(Icons.pending,
+                          color: AppColors.statusOrange),
                       title: BodyText(text: loc.pending),
                       onTap: () => Navigator.pop(context, 'pending'),
                     ),
@@ -759,7 +766,8 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
               HeadingMedium(text: loc.confirmBulkDelete),
               const SizedBox(height: AppSpacing.paddingM),
               BodyText(
-                text: loc.areYouSureYouWantToDeleteGuests(viewModel.selectedCount),
+                text: loc
+                    .areYouSureYouWantToDeleteGuests(viewModel.selectedCount),
               ),
               const SizedBox(height: AppSpacing.paddingL),
               Row(
@@ -1311,22 +1319,26 @@ class _OwnerGuestScreenState extends State<OwnerGuestScreen>
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      _buildDetailRow(loc.bookingRequestGuestNameLabel,
+                          request.guestDisplayName),
                       _buildDetailRow(
-                          loc.bookingRequestGuestNameLabel, request.guestDisplayName),
-                      _buildDetailRow(loc.bookingRequestPhoneLabel, request.guestPhone),
-                      _buildDetailRow(loc.bookingRequestEmailLabel, request.guestEmail),
-                      _buildDetailRow(loc.bookingRequestPgNameLabel, request.pgName),
+                          loc.bookingRequestPhoneLabel, request.guestPhone),
                       _buildDetailRow(
-                          loc.bookingRequestDateLabel, request.formattedCreatedAt),
+                          loc.bookingRequestEmailLabel, request.guestEmail),
+                      _buildDetailRow(
+                          loc.bookingRequestPgNameLabel, request.pgName),
+                      _buildDetailRow(loc.bookingRequestDateLabel,
+                          request.formattedCreatedAt),
                       _buildDetailRow(
                           loc.bookingRequestStatusLabel, request.statusDisplay),
-                      if (request.message != null && request.message!.isNotEmpty)
+                      if (request.message != null &&
+                          request.message!.isNotEmpty)
                         _buildDetailRow(
                             loc.bookingRequestMessageLabel, request.message!),
                       if (request.responseMessage != null &&
                           request.responseMessage!.isNotEmpty)
-                        _buildDetailRow(
-                            loc.bookingRequestResponseLabel, request.responseMessage!),
+                        _buildDetailRow(loc.bookingRequestResponseLabel,
+                            request.responseMessage!),
                     ],
                   ),
                 ),

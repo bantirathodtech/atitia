@@ -735,8 +735,7 @@ class GuestPgCard extends StatelessWidget {
                       isFavorite
                           ? _text('pgRemovedFromFavorites',
                               'Removed from favorites')
-                          : _text('pgAddedToFavorites',
-                              'Added to favorites'),
+                          : _text('pgAddedToFavorites', 'Added to favorites'),
                     ),
                     duration: const Duration(seconds: 2),
                   ),

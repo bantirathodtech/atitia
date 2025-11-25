@@ -197,9 +197,8 @@ class SearchHints extends StatelessWidget {
                   (hint) => ActionChip(
                     label: BodyText(text: hint, small: true),
                     onPressed: () => onHintSelected?.call(hint),
-                    backgroundColor: Theme.of(context)
-                        .primaryColor
-                        .withValues(alpha: 0.1),
+                    backgroundColor:
+                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     labelStyle: TextStyle(
                       color: Theme.of(context).primaryColor,
                     ),
@@ -212,4 +211,3 @@ class SearchHints extends StatelessWidget {
     );
   }
 }
-

@@ -54,17 +54,18 @@ class DatabasePerformanceMonitor {
   /// Log cache statistics
   void logCacheStats() {
     final stats = _cacheService.getCacheStats();
-    
+
     _monitoring.log(
       'DatabaseCache',
       'Cache Statistics',
       LogLevel.info,
       metadata: stats,
     );
-    
+
     if (kDebugMode) {
       debugPrint('📊 Database Cache Stats:');
-      debugPrint('  Cache Size: ${stats['memoryCacheSize']}/${stats['maxCacheSize']}');
+      debugPrint(
+          '  Cache Size: ${stats['memoryCacheSize']}/${stats['maxCacheSize']}');
       debugPrint('  Hit Rate: ${stats['hitRate']}%');
       debugPrint('  Cache Hits: ${stats['cacheHits']}');
       debugPrint('  Cache Misses: ${stats['cacheMisses']}');
@@ -88,7 +89,8 @@ class DatabasePerformanceMonitor {
         'operation_count': operationCount,
         'duration_ms': duration.inMilliseconds,
         'duration_seconds': duration.inSeconds,
-        'operations_per_second': (operationCount / duration.inSeconds).toStringAsFixed(2),
+        'operations_per_second':
+            (operationCount / duration.inSeconds).toStringAsFixed(2),
         ...?metadata,
       },
     );
@@ -120,7 +122,7 @@ class DatabasePerformanceMonitor {
   /// Get comprehensive database performance metrics
   Map<String, dynamic> getPerformanceMetrics() {
     final cacheStats = _cacheService.getCacheStats();
-    
+
     return {
       'cache': cacheStats,
       'monitoring_enabled': true,
@@ -128,4 +130,3 @@ class DatabasePerformanceMonitor {
     };
   }
 }
-

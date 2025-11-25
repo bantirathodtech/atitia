@@ -24,7 +24,8 @@ class OwnerSummaryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final cardGap = context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS;
+    final cardGap =
+        context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS;
     return Column(
       children: [
         Row(
@@ -111,7 +112,8 @@ class OwnerSummaryWidget extends StatelessWidget {
       IconData icon, Color color) {
     final padding = context.responsivePadding;
     return AdaptiveCard(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top),
+      padding:
+          EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -143,9 +145,9 @@ class OwnerSummaryWidget extends StatelessWidget {
           BodyText(
             text: title,
             small: true,
-            color: (context.textTheme.bodySmall?.color ??
-                    context.colors.onSurface)
-                .withValues(alpha: 0.7),
+            color:
+                (context.textTheme.bodySmall?.color ?? context.colors.onSurface)
+                    .withValues(alpha: 0.7),
             align: TextAlign.center,
           ),
         ],

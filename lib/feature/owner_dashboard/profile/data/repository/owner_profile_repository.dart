@@ -68,7 +68,7 @@ class OwnerProfileRepository {
       // Check cache first
       final cacheService = UserProfileCacheService.instance;
       final cachedData = await cacheService.getCachedProfileData(ownerId);
-      
+
       if (cachedData != null) {
         // Cache hit - reconstruct from cached data
         try {
@@ -82,8 +82,10 @@ class OwnerProfileRepository {
             profilePhoto: cachedData['profilePhoto'],
             aadhaarNumber: cachedData['aadhaarNumber'],
             aadhaarPhoto: cachedData['aadhaarPhoto'],
-            bankAccountName: (cachedData['bankDetails'] as Map?)?['accountName'],
-            bankAccountNumber: (cachedData['bankDetails'] as Map?)?['accountNumber'],
+            bankAccountName:
+                (cachedData['bankDetails'] as Map?)?['accountName'],
+            bankAccountNumber:
+                (cachedData['bankDetails'] as Map?)?['accountNumber'],
             bankIFSC: (cachedData['bankDetails'] as Map?)?['ifsc'],
             upiId: (cachedData['upiDetails'] as Map?)?['upiId'],
             upiQrCodeUrl: (cachedData['upiDetails'] as Map?)?['qrCodeUrl'],
@@ -117,12 +119,12 @@ class OwnerProfileRepository {
                 ? Map<String, dynamic>.from(cachedData['metadata'])
                 : null,
           );
-          
+
           await _analyticsService.logEvent(
             name: 'owner_profile_cache_hit',
             parameters: {'owner_id': ownerId},
           );
-          
+
           return profile;
         } catch (e) {
           // Cache data corrupted, fall through to Firestore fetch
@@ -144,11 +146,11 @@ class OwnerProfileRepository {
       }
 
       final profile = OwnerProfile.fromFirestore(doc);
-      
+
       // Cache the profile data for future use
       final profileData = doc.data() as Map<String, dynamic>;
       await cacheService.cacheProfileData(ownerId, profileData);
-      
+
       await _analyticsService.logEvent(
         name: 'owner_profile_cache_miss',
         parameters: {'owner_id': ownerId},
@@ -300,7 +302,7 @@ class OwnerProfileRepository {
         ownerId,
         {'profilePhoto': photoUrl, 'updatedAt': DateTime.now()},
       );
-      
+
       // Invalidate cache on profile photo update
       await _invalidateCache(ownerId);
     } catch (e) {
@@ -327,7 +329,7 @@ class OwnerProfileRepository {
         ownerId,
         {'aadhaarPhoto': photoUrl, 'updatedAt': DateTime.now()},
       );
-      
+
       // Invalidate cache on Aadhaar photo update
       await _invalidateCache(ownerId);
     } catch (e) {
@@ -357,7 +359,7 @@ class OwnerProfileRepository {
           'updatedAt': DateTime.now(),
         },
       );
-      
+
       // Invalidate cache on UPI QR code update
       await _invalidateCache(ownerId);
     } catch (e) {
@@ -390,7 +392,7 @@ class OwnerProfileRepository {
           'updatedAt': DateTime.now(),
         },
       );
-      
+
       // Invalidate cache on bank details update
       await _invalidateCache(ownerId);
     } catch (e) {
@@ -422,7 +424,7 @@ class OwnerProfileRepository {
         ownerId,
         businessInfo,
       );
-      
+
       // Invalidate cache on business info update
       await _invalidateCache(ownerId);
     } catch (e) {

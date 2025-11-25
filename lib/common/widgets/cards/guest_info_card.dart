@@ -35,11 +35,11 @@ class GuestInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     if (compact) {
       return _buildCompactCard(context, theme);
     }
-    
+
     return _buildFullCard(context, theme);
   }
 
@@ -53,7 +53,8 @@ class GuestInfoCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.paddingS),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          color:
+              theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
           border: Border.all(
             color: statusColor.withValues(alpha: 0.3),
@@ -127,11 +128,11 @@ class GuestInfoCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  BodyText(
-                    text: guestName,
-                    medium: true,
-                    color: theme.textTheme.bodyLarge?.color,
-                  ),
+                      BodyText(
+                        text: guestName,
+                        medium: true,
+                        color: theme.textTheme.bodyLarge?.color,
+                      ),
                       if (phoneNumber != null) ...[
                         const SizedBox(height: 4),
                         CaptionText(
@@ -326,4 +327,3 @@ class GuestInfoCard extends StatelessWidget {
     }
   }
 }
-

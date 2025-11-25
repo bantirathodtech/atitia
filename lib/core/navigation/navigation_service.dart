@@ -79,16 +79,21 @@ class NavigationService {
   void goToOwnerHelp() => _router.go(AppRoutes.ownerHelp);
   void goToOwnerAnalytics() => _router.go(AppRoutes.ownerAnalytics);
   void goToOwnerReports() => _router.go(AppRoutes.ownerReports);
-  void goToOwnerSubscriptionPlans() => _router.go(AppRoutes.ownerSubscriptionPlans);
-  void goToOwnerSubscriptionManagement() => _router.go(AppRoutes.ownerSubscriptionManagement);
-  void goToOwnerFeaturedListingPurchase() => _router.go(AppRoutes.ownerFeaturedListingPurchase);
-  void goToOwnerFeaturedListingManagement() => _router.go(AppRoutes.ownerFeaturedListingManagement);
+  void goToOwnerSubscriptionPlans() =>
+      _router.go(AppRoutes.ownerSubscriptionPlans);
+  void goToOwnerSubscriptionManagement() =>
+      _router.go(AppRoutes.ownerSubscriptionManagement);
+  void goToOwnerFeaturedListingPurchase() =>
+      _router.go(AppRoutes.ownerFeaturedListingPurchase);
+  void goToOwnerFeaturedListingManagement() =>
+      _router.go(AppRoutes.ownerFeaturedListingManagement);
   void goToOwnerRefundRequest() => _router.go(AppRoutes.ownerRefundRequest);
   void goToOwnerRefundHistory() => _router.go(AppRoutes.ownerRefundHistory);
 
   // Admin navigation methods
   void goToAdminHome() => _router.go(AppRoutes.adminHome);
-  void goToAdminRevenueDashboard() => _router.go(AppRoutes.adminRevenueDashboard);
+  void goToAdminRevenueDashboard() =>
+      _router.go(AppRoutes.adminRevenueDashboard);
   void goToAdminRefundApproval() => _router.go(AppRoutes.adminRefundApproval);
 
   // Utility navigation methods

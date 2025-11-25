@@ -213,8 +213,7 @@ class _RecordPaymentDialogState extends State<RecordPaymentDialog> {
   }
 
   /// Builds payment details form
-  Widget _buildPaymentDetailsForm(
-      BuildContext context, AppLocalizations? loc) {
+  Widget _buildPaymentDetailsForm(BuildContext context, AppLocalizations? loc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

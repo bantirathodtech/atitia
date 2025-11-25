@@ -43,8 +43,7 @@ class PaginatedFirestoreService {
     DocumentSnapshot? startAfterDocument,
   }) async {
     // Limit page size to prevent memory issues
-    final limitedPageSize =
-        pageSize > _maxPageSize ? _maxPageSize : pageSize;
+    final limitedPageSize = pageSize > _maxPageSize ? _maxPageSize : pageSize;
 
     Query query = _firestore.collection(collection);
 
@@ -69,7 +68,8 @@ class PaginatedFirestoreService {
     }
 
     // Limit results
-    query = query.limit(limitedPageSize + 1); // Fetch one extra to check if more exists
+    query = query
+        .limit(limitedPageSize + 1); // Fetch one extra to check if more exists
 
     final snapshot = await query.get();
 
@@ -224,4 +224,3 @@ class PaginatedFirestoreService {
     );
   }
 }
-

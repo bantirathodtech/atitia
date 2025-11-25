@@ -68,7 +68,7 @@ class _OwnerSubscriptionManagementScreenState
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
+
     // Initialize pagination controller for subscription history
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<OwnerSubscriptionViewModel>().initialize();
@@ -88,7 +88,8 @@ class _OwnerSubscriptionManagementScreenState
     final ownerId = getIt.auth.currentUserId;
     if (ownerId == null || ownerId.isEmpty) return;
 
-    _historyPaginationController = FirestorePaginationHelper.createController<OwnerSubscriptionModel>(
+    _historyPaginationController =
+        FirestorePaginationHelper.createController<OwnerSubscriptionModel>(
       query: FirebaseFirestore.instance
           .collection(FirestoreConstants.ownerSubscriptions)
           .where('ownerId', isEqualTo: ownerId)
@@ -96,7 +97,8 @@ class _OwnerSubscriptionManagementScreenState
       documentMapper: (doc) {
         final data = doc.data() as Map<String, dynamic>;
         // Ensure subscriptionId is set from document ID
-        if (data['subscriptionId'] == null || (data['subscriptionId'] as String).isEmpty) {
+        if (data['subscriptionId'] == null ||
+            (data['subscriptionId'] as String).isEmpty) {
           data['subscriptionId'] = doc.id;
         }
         return OwnerSubscriptionModel.fromMap(data);
@@ -220,17 +222,21 @@ class _OwnerSubscriptionManagementScreenState
     return [
       // Status Banner
       _buildStatusBanner(context, subscription, loc),
-      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+      SizedBox(
+          height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
       // Subscription Details Card
       _buildSubscriptionDetailsCard(context, subscription, plan, loc),
-      SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+      SizedBox(
+          height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
       // Payment Details Card
       if (subscription.amountPaid > 0)
         _buildPaymentDetailsCard(context, subscription, loc),
       if (subscription.amountPaid > 0)
-        SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+        SizedBox(
+            height:
+                context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
 
       // Actions Card
       if (subscription.status == SubscriptionStatus.active)
@@ -249,7 +255,8 @@ class _OwnerSubscriptionManagementScreenState
 
     switch (subscription.status) {
       case SubscriptionStatus.active:
-        if (subscription.daysUntilExpiry <= 7 && subscription.daysUntilExpiry > 0) {
+        if (subscription.daysUntilExpiry <= 7 &&
+            subscription.daysUntilExpiry > 0) {
           bannerColor = Colors.orange;
           statusIcon = Icons.warning;
           statusText = _text(
@@ -322,7 +329,8 @@ class _OwnerSubscriptionManagementScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HeadingMedium(text: _text('subscriptionDetails', 'Subscription Details')),
+          HeadingMedium(
+              text: _text('subscriptionDetails', 'Subscription Details')),
           SizedBox(height: AppSpacing.paddingM),
           _buildDetailRow(
             context,
@@ -364,7 +372,9 @@ class _OwnerSubscriptionManagementScreenState
           _buildDetailRow(
             context,
             _text('autoRenew', 'Auto Renew'),
-            subscription.autoRenew ? _text('enabled', 'Enabled') : _text('disabled', 'Disabled'),
+            subscription.autoRenew
+                ? _text('enabled', 'Enabled')
+                : _text('disabled', 'Disabled'),
             subscription.autoRenew ? Icons.check_circle : Icons.cancel,
           ),
           if (subscription.cancelledAt != null) ...[
@@ -603,7 +613,8 @@ class _OwnerSubscriptionManagementScreenState
                     ),
                     SizedBox(height: AppSpacing.paddingXS),
                     CaptionText(
-                      text: '${subscription.billingPeriod.displayName} • ₹${subscription.amountPaid.toStringAsFixed(2)}',
+                      text:
+                          '${subscription.billingPeriod.displayName} • ₹${subscription.amountPaid.toStringAsFixed(2)}',
                     ),
                   ],
                 ),
@@ -631,7 +642,8 @@ class _OwnerSubscriptionManagementScreenState
               Icon(Icons.event, size: 16, color: context.primaryColor),
               SizedBox(width: AppSpacing.paddingXS),
               CaptionText(
-                text: '${DateFormat('MMM dd, yyyy').format(subscription.startDate)} - ${DateFormat('MMM dd, yyyy').format(subscription.endDate)}',
+                text:
+                    '${DateFormat('MMM dd, yyyy').format(subscription.startDate)} - ${DateFormat('MMM dd, yyyy').format(subscription.endDate)}',
               ),
             ],
           ),
@@ -666,7 +678,8 @@ class _OwnerSubscriptionManagementScreenState
               controller: reasonController,
               decoration: InputDecoration(
                 labelText: _text('reason', 'Reason (Optional)'),
-                hintText: _text('enterCancellationReason', 'Enter cancellation reason'),
+                hintText: _text(
+                    'enterCancellationReason', 'Enter cancellation reason'),
                 border: const OutlineInputBorder(),
               ),
               maxLines: 3,
@@ -688,7 +701,8 @@ class _OwnerSubscriptionManagementScreenState
                 onSuccess: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(_text('subscriptionCancelled', 'Subscription cancelled successfully')),
+                      content: Text(_text('subscriptionCancelled',
+                          'Subscription cancelled successfully')),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -697,7 +711,9 @@ class _OwnerSubscriptionManagementScreenState
                 onFailure: (error) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(_text('cancellationFailed', 'Failed to cancel subscription: {error}', parameters: {'error': error})),
+                      content: Text(_text('cancellationFailed',
+                          'Failed to cancel subscription: {error}',
+                          parameters: {'error': error})),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -782,4 +798,3 @@ class _OwnerSubscriptionManagementScreenState
     );
   }
 }
-

@@ -60,4 +60,3 @@ class GridCardAnimation extends StatelessWidget {
     );
   }
 }
-

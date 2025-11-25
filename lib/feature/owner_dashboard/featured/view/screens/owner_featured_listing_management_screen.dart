@@ -82,7 +82,8 @@ class _OwnerFeaturedListingManagementScreenState
     final ownerId = getIt.auth.currentUserId;
     if (ownerId == null || ownerId.isEmpty) return;
 
-    _paginationController = FirestorePaginationHelper.createController<FeaturedListingModel>(
+    _paginationController =
+        FirestorePaginationHelper.createController<FeaturedListingModel>(
       query: FirebaseFirestore.instance
           .collection(FirestoreConstants.featuredListings)
           .where('ownerId', isEqualTo: ownerId)
@@ -90,7 +91,8 @@ class _OwnerFeaturedListingManagementScreenState
       documentMapper: (doc) {
         final data = doc.data() as Map<String, dynamic>;
         // Ensure featuredListingId is set from document ID
-        if (data['featuredListingId'] == null || (data['featuredListingId'] as String).isEmpty) {
+        if (data['featuredListingId'] == null ||
+            (data['featuredListingId'] as String).isEmpty) {
           data['featuredListingId'] = doc.id;
         }
         return FeaturedListingModel.fromMap(data);
@@ -144,7 +146,8 @@ class _OwnerFeaturedListingManagementScreenState
       return EmptyStates.error(
         context: context,
         message: viewModel.errorMessage ??
-            _text('errorLoadingFeaturedListings', 'Failed to load featured listings'),
+            _text('errorLoadingFeaturedListings',
+                'Failed to load featured listings'),
         onRetry: () => viewModel.initialize(),
       );
     }
@@ -179,7 +182,8 @@ class _OwnerFeaturedListingManagementScreenState
               'Feature your PGs to increase visibility and get more bookings',
             ),
             icon: Icons.star_border,
-            primaryActionLabel: _text('featureFirstPG', 'Feature Your First PG'),
+            primaryActionLabel:
+                _text('featureFirstPG', 'Feature Your First PG'),
             onPrimaryAction: () {
               context.go(AppRoutes.ownerFeaturedListingPurchase);
             },
@@ -214,9 +218,8 @@ class _OwnerFeaturedListingManagementScreenState
           final listing = featuredListings[index];
           return Padding(
             padding: EdgeInsets.only(
-              bottom: index < featuredListings.length - 1
-                  ? AppSpacing.paddingM
-                  : 0,
+              bottom:
+                  index < featuredListings.length - 1 ? AppSpacing.paddingM : 0,
             ),
             child: _buildFeaturedListingCard(
               context,
@@ -275,7 +278,8 @@ class _OwnerFeaturedListingManagementScreenState
                     ),
                     SizedBox(height: AppSpacing.paddingXS),
                     CaptionText(
-                      text: '${listing.formattedDuration} • ₹${listing.amountPaid.toStringAsFixed(0)}',
+                      text:
+                          '${listing.formattedDuration} • ₹${listing.amountPaid.toStringAsFixed(0)}',
                     ),
                   ],
                 ),
@@ -304,7 +308,8 @@ class _OwnerFeaturedListingManagementScreenState
               SizedBox(width: AppSpacing.paddingXS),
               Expanded(
                 child: CaptionText(
-                  text: '${DateFormat('MMM dd, yyyy').format(listing.startDate)} - ${DateFormat('MMM dd, yyyy').format(listing.endDate)}',
+                  text:
+                      '${DateFormat('MMM dd, yyyy').format(listing.startDate)} - ${DateFormat('MMM dd, yyyy').format(listing.endDate)}',
                 ),
               ),
             ],
@@ -329,7 +334,8 @@ class _OwnerFeaturedListingManagementScreenState
           if (listing.status == FeaturedListingStatus.active) ...[
             SizedBox(height: AppSpacing.paddingM),
             SecondaryButton(
-              onPressed: () => _showCancelDialog(context, listing, viewModel, loc),
+              onPressed: () =>
+                  _showCancelDialog(context, listing, viewModel, loc),
               label: _text('cancelFeaturedListing', 'Cancel Featured Listing'),
               icon: Icons.cancel,
               width: double.infinity,
@@ -369,7 +375,8 @@ class _OwnerFeaturedListingManagementScreenState
                 onSuccess: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(_text('featuredListingCancelled', 'Featured listing cancelled successfully')),
+                      content: Text(_text('featuredListingCancelled',
+                          'Featured listing cancelled successfully')),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -377,7 +384,9 @@ class _OwnerFeaturedListingManagementScreenState
                 onFailure: (error) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(_text('featuredListingCancellationFailed', 'Failed to cancel featured listing: {error}', parameters: {'error': error})),
+                      content: Text(_text('featuredListingCancellationFailed',
+                          'Failed to cancel featured listing: {error}',
+                          parameters: {'error': error})),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -391,4 +400,3 @@ class _OwnerFeaturedListingManagementScreenState
     );
   }
 }
-

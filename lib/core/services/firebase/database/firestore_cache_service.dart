@@ -22,7 +22,7 @@ class FirestoreCacheService {
   static const String _cachePrefix = 'firestore_cache_';
   static const Duration _defaultTTL = Duration(minutes: 5);
   static const int _maxMemoryCacheSize = 100;
-  
+
   // Cache performance tracking
   int _cacheHits = 0;
   int _cacheMisses = 0;
@@ -36,7 +36,7 @@ class FirestoreCacheService {
       if (kDebugMode) debugPrint('✅ Cache hit (memory): $cacheKey');
       return memoryEntry.data;
     }
-    
+
     _cacheMisses++;
 
     // Check disk cache
@@ -107,8 +107,9 @@ class FirestoreCacheService {
     // Remove from disk cache
     try {
       final prefs = await SharedPreferences.getInstance();
-      final keys = prefs.getKeys().where((key) =>
-          key.startsWith('$_cachePrefix${collection}_'));
+      final keys = prefs
+          .getKeys()
+          .where((key) => key.startsWith('$_cachePrefix${collection}_'));
       for (final key in keys) {
         await prefs.remove(key);
       }
@@ -116,7 +117,8 @@ class FirestoreCacheService {
       if (kDebugMode) debugPrint('⚠️ Cache invalidation error: $e');
     }
 
-    if (kDebugMode) debugPrint('✅ Cache invalidated for collection: $collection');
+    if (kDebugMode)
+      debugPrint('✅ Cache invalidated for collection: $collection');
   }
 
   /// Clear all cache
@@ -124,9 +126,8 @@ class FirestoreCacheService {
     _memoryCache.clear();
     try {
       final prefs = await SharedPreferences.getInstance();
-      final keys = prefs.getKeys()
-          .where((key) => key.startsWith(_cachePrefix))
-          .toList();
+      final keys =
+          prefs.getKeys().where((key) => key.startsWith(_cachePrefix)).toList();
       for (final key in keys) {
         await prefs.remove(key);
       }
@@ -161,8 +162,8 @@ class FirestoreCacheService {
     // Remove oldest entries if cache is full
     if (_memoryCache.length >= _maxMemoryCacheSize) {
       final oldestKey = _memoryCache.entries
-          .reduce((a, b) =>
-              a.value.timestamp.isBefore(b.value.timestamp) ? a : b)
+          .reduce(
+              (a, b) => a.value.timestamp.isBefore(b.value.timestamp) ? a : b)
           .key;
       _memoryCache.remove(oldestKey);
     }
@@ -172,14 +173,14 @@ class FirestoreCacheService {
 
   /// Get cache statistics with performance metrics
   Map<String, dynamic> getCacheStats() {
-    final expiredEntries = _memoryCache.entries
-        .where((e) => e.value.isExpired)
-        .length;
+    final expiredEntries =
+        _memoryCache.entries.where((e) => e.value.isExpired).length;
     final activeEntries = _memoryCache.length - expiredEntries;
-    
+
     final totalRequests = _cacheHits + _cacheMisses;
-    final hitRate = totalRequests > 0 ? (_cacheHits / totalRequests * 100) : 0.0;
-    
+    final hitRate =
+        totalRequests > 0 ? (_cacheHits / totalRequests * 100) : 0.0;
+
     return {
       'memoryCacheSize': _memoryCache.length,
       'activeEntries': activeEntries,
@@ -219,4 +220,3 @@ class CacheEntry {
 
   bool get isExpired => DateTime.now().difference(timestamp) >= ttl;
 }
-

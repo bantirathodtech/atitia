@@ -87,4 +87,3 @@ class _AnimatedContentBuilderState extends State<AnimatedContentBuilder> {
     );
   }
 }
-

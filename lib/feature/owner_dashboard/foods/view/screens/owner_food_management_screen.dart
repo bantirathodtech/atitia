@@ -132,7 +132,7 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
         // Center: PG Selector dropdown
         titleWidget: const PgSelectorDropdown(compact: true),
         centerTitle: true,
-        
+
         // Theme-aware background color
         backgroundColor: context.colors.surface,
 
@@ -198,7 +198,8 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
         message: 'Create menus for your PG to get started',
         icon: Icons.restaurant_menu_outlined,
         primaryActionLabel: loc.createPgMenus,
-        onPrimaryAction: () => _showInitializeMenusDialog(context, foodVM, ownerId, currentPgId),
+        onPrimaryAction: () =>
+            _showInitializeMenusDialog(context, foodVM, ownerId, currentPgId),
       );
     }
 
@@ -216,7 +217,6 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
       ],
     );
   }
-
 
   /// Shows dialog to initialize default menus
   void _showInitializeMenusDialog(BuildContext context,
@@ -250,7 +250,8 @@ class _OwnerFoodManagementScreenState extends State<OwnerFoodManagementScreen>
                     label: loc.initialize,
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      await _initializeDefaultMenus(foodVM, ownerId, currentPgId);
+                      await _initializeDefaultMenus(
+                          foodVM, ownerId, currentPgId);
                     },
                   ),
                 ],

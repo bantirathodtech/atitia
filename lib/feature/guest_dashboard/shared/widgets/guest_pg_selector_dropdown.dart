@@ -92,14 +92,18 @@ class GuestPgSelectorDropdown extends StatelessWidget {
           Icon(
             Icons.home_outlined,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           const SizedBox(width: AppSpacing.paddingXS),
           Text(
             loc?.noPgsAvailable ?? _text('noPgsAvailable', 'No PGs'),
             style: TextStyle(
               fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -126,7 +130,7 @@ class _CompactGuestPgSelector extends StatelessWidget {
     final theme = Theme.of(context);
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobile = screenWidth < 600;
-    
+
     final labelText = selectedPgId != null && selectedPg != null
         ? selectedPg!.pgName
         : 'Select PG';
@@ -236,4 +240,3 @@ class _CompactGuestPgSelector extends StatelessWidget {
     );
   }
 }
-

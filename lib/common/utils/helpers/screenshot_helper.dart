@@ -17,7 +17,7 @@ import 'package:path_provider/path_provider.dart';
 /// Helper class for capturing screenshots programmatically
 class ScreenshotHelper {
   /// Captures a screenshot of the current screen
-  /// 
+  ///
   /// This is a placeholder implementation. For actual screenshot capture:
   /// - Use integration_test framework (recommended for automated tests)
   /// - Use screenshot package for manual captures
@@ -49,10 +49,11 @@ class ScreenshotHelper {
       // 1. integration_test framework (for automated tests)
       // 2. screenshot package (for manual captures)
       // 3. Platform-specific tools (ADB, xcrun)
-      
+
       // This is a placeholder - implement based on your needs
       debugPrint('Screenshot capture requested: $filePath');
-      debugPrint('Use integration_test or screenshot package for actual capture');
+      debugPrint(
+          'Use integration_test or screenshot package for actual capture');
 
       return filePath;
     } catch (e) {
@@ -100,14 +101,16 @@ class ScreenshotHelper {
     if (directory == null) return [];
 
     try {
-      final files = directory.listSync()
+      final files = directory
+          .listSync()
           .whereType<File>()
           .where((file) => file.path.endsWith('.png'))
           .toList();
-      
+
       // Sort by modification time (newest first)
-      files.sort((a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()));
-      
+      files
+          .sort((a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()));
+
       return files;
     } catch (e) {
       debugPrint('Error listing screenshots: $e');
@@ -144,4 +147,3 @@ class ScreenshotHelper {
     }
   }
 }
-

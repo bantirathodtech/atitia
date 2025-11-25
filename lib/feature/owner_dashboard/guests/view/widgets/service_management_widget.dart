@@ -1498,7 +1498,8 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HeadingMedium(text: AppLocalizations.of(context)!.replyToServiceRequest),
+              HeadingMedium(
+                  text: AppLocalizations.of(context)!.replyToServiceRequest),
               const SizedBox(height: AppSpacing.paddingM),
               TextInput(
                 controller: replyController,
@@ -1516,30 +1517,31 @@ class _ServiceManagementWidgetState extends State<ServiceManagementWidget> {
                   ),
                   const SizedBox(width: AppSpacing.paddingS),
                   PrimaryButton(
-            label: AppLocalizations.of(context)!.sendReply,
-            onPressed: () async {
-              if (replyController.text.isNotEmpty) {
-                final navigator = Navigator.of(context);
-                final scaffoldMessenger = ScaffoldMessenger.of(this.context);
-                final loc = AppLocalizations.of(context)!;
-                final success = await guestVM.addServiceReply(
-                  service.serviceId,
-                  replyController.text,
-                  loc.owner,
-                );
+                    label: AppLocalizations.of(context)!.sendReply,
+                    onPressed: () async {
+                      if (replyController.text.isNotEmpty) {
+                        final navigator = Navigator.of(context);
+                        final scaffoldMessenger =
+                            ScaffoldMessenger.of(this.context);
+                        final loc = AppLocalizations.of(context)!;
+                        final success = await guestVM.addServiceReply(
+                          service.serviceId,
+                          replyController.text,
+                          loc.owner,
+                        );
 
-                // FIXED: BuildContext async gap warning
-                // Flutter recommends: Check mounted immediately before using context after async operations
-                // Changed from: Using context with mounted check in compound condition after async gap
-                // Changed to: Check mounted immediately before each context usage
-                // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-                if (!success || !mounted) return;
-                navigator.pop();
-                if (!mounted) return;
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(content: Text(loc.replySentSuccessfully)),
-                );
-              }
+                        // FIXED: BuildContext async gap warning
+                        // Flutter recommends: Check mounted immediately before using context after async operations
+                        // Changed from: Using context with mounted check in compound condition after async gap
+                        // Changed to: Check mounted immediately before each context usage
+                        // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
+                        if (!success || !mounted) return;
+                        navigator.pop();
+                        if (!mounted) return;
+                        scaffoldMessenger.showSnackBar(
+                          SnackBar(content: Text(loc.replySentSuccessfully)),
+                        );
+                      }
                     },
                   ),
                 ],
@@ -1637,32 +1639,33 @@ void _completeService(BuildContext context, OwnerGuestViewModel guestVM,
                 ),
                 const SizedBox(width: AppSpacing.paddingS),
                 PrimaryButton(
-          label: AppLocalizations.of(context)!.markAsCompleted,
-          onPressed: () async {
-            final navigator = Navigator.of(context);
-            final scaffoldMessenger = ScaffoldMessenger.of(context);
-            final loc = AppLocalizations.of(context)!;
-            final success = await guestVM.updateServiceStatus(
-              service.serviceId,
-              'completed',
-              completionNotes:
-                  notesController.text.isNotEmpty ? notesController.text : null,
-            );
+                  label: AppLocalizations.of(context)!.markAsCompleted,
+                  onPressed: () async {
+                    final navigator = Navigator.of(context);
+                    final scaffoldMessenger = ScaffoldMessenger.of(context);
+                    final loc = AppLocalizations.of(context)!;
+                    final success = await guestVM.updateServiceStatus(
+                      service.serviceId,
+                      'completed',
+                      completionNotes: notesController.text.isNotEmpty
+                          ? notesController.text
+                          : null,
+                    );
 
-            // FIXED: BuildContext async gap warning
-            // Flutter recommends: Check mounted immediately before using context after async operations
-            // Changed from: Using context with mounted check in compound condition after async gap
-            // Changed to: Check mounted immediately before each context usage
-            // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
-            // Note: Dialog context is safe to use here - dialog manages its own lifecycle
-            if (!success) {
-              navigator.pop();
-              return;
-            }
-            navigator.pop();
-            scaffoldMessenger.showSnackBar(
-              SnackBar(content: Text(loc.serviceCompletedSuccessfully)),
-            );
+                    // FIXED: BuildContext async gap warning
+                    // Flutter recommends: Check mounted immediately before using context after async operations
+                    // Changed from: Using context with mounted check in compound condition after async gap
+                    // Changed to: Check mounted immediately before each context usage
+                    // Note: Navigator and ScaffoldMessenger are safe to use after async when mounted check is performed, analyzer flags as false positive
+                    // Note: Dialog context is safe to use here - dialog manages its own lifecycle
+                    if (!success) {
+                      navigator.pop();
+                      return;
+                    }
+                    navigator.pop();
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(content: Text(loc.serviceCompletedSuccessfully)),
+                    );
                   },
                 ),
               ],
@@ -1733,10 +1736,10 @@ void _showAdvancedSearch(BuildContext context, OwnerGuestViewModel guestVM) {
                 ),
                 const SizedBox(width: AppSpacing.paddingS),
                 PrimaryButton(
-          label: AppLocalizations.of(context)!.search,
-          onPressed: () {
-            Navigator.pop(context);
-            // TODO: Implement advanced search
+                  label: AppLocalizations.of(context)!.search,
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // TODO: Implement advanced search
                   },
                 ),
               ],

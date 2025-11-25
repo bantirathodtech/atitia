@@ -742,12 +742,14 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                         _buildDetailRow(loc.guest, complaint.guestName),
                         _buildDetailRow(loc.room, complaint.roomNumber),
                         _buildDetailRow(loc.complaintTitle, complaint.title),
-                        _buildDetailRow(loc.priority, complaint.priorityDisplay),
+                        _buildDetailRow(
+                            loc.priority, complaint.priorityDisplay),
                         _buildDetailRow(loc.status, complaint.statusDisplay),
-                        _buildDetailRow(loc.created, _formatDate(complaint.createdAt)),
+                        _buildDetailRow(
+                            loc.created, _formatDate(complaint.createdAt)),
                         if (complaint.resolvedAt != null)
-                          _buildDetailRow(
-                              loc.statusResolved, _formatDate(complaint.resolvedAt!)),
+                          _buildDetailRow(loc.statusResolved,
+                              _formatDate(complaint.resolvedAt!)),
                         const SizedBox(height: AppSpacing.paddingM),
                         HeadingSmall(text: loc.description),
                         const SizedBox(height: AppSpacing.paddingXS),
@@ -780,7 +782,8 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                       const SizedBox(width: AppSpacing.paddingS),
                       PrimaryButton(
                         label: loc.resolve,
-                        onPressed: () => _resolveComplaint(context, guestVM, complaint),
+                        onPressed: () =>
+                            _resolveComplaint(context, guestVM, complaint),
                       ),
                     ],
                   ],
@@ -907,27 +910,29 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                       onPressed: () => Navigator.of(dialogContext).pop(),
                       text: loc.cancel,
                     ),
-            PrimaryButton(
-              label: loc.sendReply,
-              onPressed: () async {
-                if (replyController.text.isNotEmpty) {
-                  final navigator = Navigator.of(dialogContext);
-                  final scaffoldMessenger = ScaffoldMessenger.of(context);
-                  final locOuter = AppLocalizations.of(context)!;
-                  final success = await guestVM.addComplaintReply(
-                    complaint.complaintId,
-                    replyController.text,
-                    locOuter.owner,
-                  );
+                    PrimaryButton(
+                      label: loc.sendReply,
+                      onPressed: () async {
+                        if (replyController.text.isNotEmpty) {
+                          final navigator = Navigator.of(dialogContext);
+                          final scaffoldMessenger =
+                              ScaffoldMessenger.of(context);
+                          final locOuter = AppLocalizations.of(context)!;
+                          final success = await guestVM.addComplaintReply(
+                            complaint.complaintId,
+                            replyController.text,
+                            locOuter.owner,
+                          );
 
-                  if (!success || !mounted) return;
-                  navigator.pop();
-                  if (!mounted) return;
-                  scaffoldMessenger.showSnackBar(
-                    SnackBar(content: Text(locOuter.replySentSuccessfully)),
-                  );
-                }
-              },
+                          if (!success || !mounted) return;
+                          navigator.pop();
+                          if (!mounted) return;
+                          scaffoldMessenger.showSnackBar(
+                            SnackBar(
+                                content: Text(locOuter.replySentSuccessfully)),
+                          );
+                        }
+                      },
                     ),
                     const SizedBox(width: AppSpacing.paddingS),
                   ],
@@ -976,28 +981,29 @@ class _ComplaintManagementWidgetState extends State<ComplaintManagementWidget> {
                       onPressed: () => Navigator.of(dialogContext).pop(),
                       text: loc.cancel,
                     ),
-            PrimaryButton(
-              label: loc.markAsResolved,
-              onPressed: () async {
-                final navigator = Navigator.of(dialogContext);
-                final scaffoldMessenger = ScaffoldMessenger.of(context);
-                final locOuter = AppLocalizations.of(context)!;
-                final success = await guestVM.updateComplaintStatus(
-                  complaint.complaintId,
-                  'resolved',
-                  resolutionNotes: notesController.text.isNotEmpty
-                      ? notesController.text
-                      : null,
-                );
+                    PrimaryButton(
+                      label: loc.markAsResolved,
+                      onPressed: () async {
+                        final navigator = Navigator.of(dialogContext);
+                        final scaffoldMessenger = ScaffoldMessenger.of(context);
+                        final locOuter = AppLocalizations.of(context)!;
+                        final success = await guestVM.updateComplaintStatus(
+                          complaint.complaintId,
+                          'resolved',
+                          resolutionNotes: notesController.text.isNotEmpty
+                              ? notesController.text
+                              : null,
+                        );
 
-                if (!success || !mounted) return;
-                navigator.pop();
-                if (!mounted) return;
-                scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                      content: Text(locOuter.complaintResolvedSuccessfully)),
-                );
-              },
+                        if (!success || !mounted) return;
+                        navigator.pop();
+                        if (!mounted) return;
+                        scaffoldMessenger.showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text(locOuter.complaintResolvedSuccessfully)),
+                        );
+                      },
                     ),
                     const SizedBox(width: AppSpacing.paddingS),
                   ],

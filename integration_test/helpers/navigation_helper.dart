@@ -20,7 +20,8 @@ class NavigationHelper {
       // Try to find and use GoRouter through BuildContext
       final context = tester.binding.rootElement;
       if (context == null) {
-        print('⚠️  Could not get context for navigation, trying alternative method');
+        print(
+            '⚠️  Could not get context for navigation, trying alternative method');
         // Alternative: The app should already be on the correct route after login
         // Just wait for the screen to load
         await tester.pumpAndSettle();
@@ -50,7 +51,8 @@ class NavigationHelper {
 
       return true;
     } catch (e) {
-      print('⚠️  Navigation to $route - continuing anyway (may already be on screen): $e');
+      print(
+          '⚠️  Navigation to $route - continuing anyway (may already be on screen): $e');
       // Continue anyway - app might already be on the correct screen
       await tester.pumpAndSettle();
       return true;
@@ -198,4 +200,3 @@ class NavigationHelper {
     );
   }
 }
-

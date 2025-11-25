@@ -136,13 +136,15 @@ class ImageCompressionService {
     try {
       if (kIsWeb) {
         // Web doesn't support File operations
-        debugPrint('compressAndSaveToFile not supported on web, use compressImage instead');
+        debugPrint(
+            'compressAndSaveToFile not supported on web, use compressImage instead');
         return null;
       }
 
       // Get temporary directory
       final tempDir = await getTemporaryDirectory();
-      final fileName = 'compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final fileName =
+          'compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final targetPath = path.join(tempDir.path, fileName);
 
       if (imageFile is File) {
@@ -218,4 +220,3 @@ class ImageCompressionService {
     return (1 - (compressedSize / originalSize)) * 100;
   }
 }
-

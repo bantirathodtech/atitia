@@ -43,7 +43,7 @@ class FirestorePaginationHelper {
   }) {
     // Ensure query has limit applied
     Query limitedQuery = query.limit(pageSize);
-    
+
     return PaginationController<T>(
       queryFunction: (q) => q.get(),
       documentMapper: documentMapper,
@@ -52,4 +52,3 @@ class FirestorePaginationHelper {
     );
   }
 }
-

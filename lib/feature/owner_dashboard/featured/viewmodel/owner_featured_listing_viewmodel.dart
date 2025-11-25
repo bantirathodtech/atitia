@@ -14,7 +14,8 @@ import '../../profile/data/repository/owner_profile_repository.dart';
 
 /// ViewModel for managing featured listings for owner's PGs
 /// Handles featured listing purchase, cancellation, and management
-class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin {
+class OwnerFeaturedListingViewModel extends BaseProviderState
+    with LoggingMixin {
   final FeaturedListingRepository _featuredRepo;
   final OwnerProfileRepository _profileRepo;
   final AppSubscriptionPaymentService _paymentService;
@@ -28,14 +29,13 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
     FeaturedListingRepository? featuredRepo,
     OwnerProfileRepository? profileRepo,
     AppSubscriptionPaymentService? paymentService,
-  })  : _featuredRepo =
-            featuredRepo ?? FeaturedListingRepository(),
+  })  : _featuredRepo = featuredRepo ?? FeaturedListingRepository(),
         _profileRepo = profileRepo ?? OwnerProfileRepository(),
-        _paymentService =
-            paymentService ?? AppSubscriptionPaymentService();
+        _paymentService = paymentService ?? AppSubscriptionPaymentService();
 
   List<FeaturedListingModel> _featuredListings = [];
-  final Map<String, FeaturedListingModel?> _pgFeaturedListings = {}; // pgId -> active featured listing
+  final Map<String, FeaturedListingModel?> _pgFeaturedListings =
+      {}; // pgId -> active featured listing
   StreamSubscription<List<FeaturedListingModel>>? _featuredListingsStream;
   bool _isProcessingPayment = false;
   bool _isCancelling = false;
@@ -108,7 +108,8 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
       );
     } catch (e) {
       final exception = AppException(
-        message: _text('featuredListingLoadFailed', 'Failed to load featured listings'),
+        message: _text(
+            'featuredListingLoadFailed', 'Failed to load featured listings'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -153,9 +154,8 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
   /// Start real-time featured listings stream
   void _startFeaturedListingsStream(String ownerId) {
     _featuredListingsStream?.cancel();
-    _featuredListingsStream = _featuredRepo
-        .streamOwnerFeaturedListings(ownerId)
-        .listen(
+    _featuredListingsStream =
+        _featuredRepo.streamOwnerFeaturedListings(ownerId).listen(
       (listings) {
         _featuredListings = listings;
         _updatePGFeaturedListings();
@@ -212,7 +212,8 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
           'owner_id': ownerId,
           'pg_id': pgId,
           'duration_months': durationMonths.toString(),
-          'amount': FeaturedListingModel.getPriceForDuration(durationMonths).toString(),
+          'amount': FeaturedListingModel.getPriceForDuration(durationMonths)
+              .toString(),
         },
       );
 
@@ -264,7 +265,8 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
       notifyListeners();
 
       final exception = AppException(
-        message: _text('featuredListingPurchaseFailed', 'Failed to purchase featured listing'),
+        message: _text('featuredListingPurchaseFailed',
+            'Failed to purchase featured listing'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -286,7 +288,8 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
     try {
       if (_isCancelling) {
         throw AppException(
-          message: _text('cancellationInProgress', 'Cancellation already in progress'),
+          message: _text(
+              'cancellationInProgress', 'Cancellation already in progress'),
           severity: ErrorSeverity.medium,
         );
       }
@@ -302,14 +305,16 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
       final listing = await _featuredRepo.getFeaturedListing(featuredListingId);
       if (listing == null) {
         throw AppException(
-          message: _text('featuredListingNotFound', 'Featured listing not found'),
+          message:
+              _text('featuredListingNotFound', 'Featured listing not found'),
           severity: ErrorSeverity.medium,
         );
       }
 
       if (listing.ownerId != ownerId) {
         throw AppException(
-          message: _text('unauthorized', 'Unauthorized: Featured listing does not belong to you'),
+          message: _text('unauthorized',
+              'Unauthorized: Featured listing does not belong to you'),
           severity: ErrorSeverity.high,
         );
       }
@@ -352,7 +357,8 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
       notifyListeners();
 
       final exception = AppException(
-        message: _text('featuredListingCancellationFailed', 'Failed to cancel featured listing'),
+        message: _text('featuredListingCancellationFailed',
+            'Failed to cancel featured listing'),
         details: e.toString(),
       );
       setError(true, exception.toString());
@@ -383,4 +389,3 @@ class OwnerFeaturedListingViewModel extends BaseProviderState with LoggingMixin 
       });
   }
 }
-

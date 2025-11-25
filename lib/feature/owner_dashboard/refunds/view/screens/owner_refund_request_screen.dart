@@ -42,8 +42,7 @@ class OwnerRefundRequestScreen extends StatefulWidget {
       _OwnerRefundRequestScreenState();
 }
 
-class _OwnerRefundRequestScreenState
-    extends State<OwnerRefundRequestScreen> {
+class _OwnerRefundRequestScreenState extends State<OwnerRefundRequestScreen> {
   final _formKey = GlobalKey<FormState>();
   final _reasonController = TextEditingController();
 
@@ -211,17 +210,14 @@ class _OwnerRefundRequestScreenState
       return const SizedBox.shrink();
     }
 
-    final refundableRecords = viewModel.refundableRevenueRecords
-        .where((r) {
-          if (_selectedRefundType == RefundType.subscription) {
-            return r.type == RevenueType.subscription &&
-                r.subscriptionId != null;
-          } else {
-            return r.type == RevenueType.featuredListing &&
-                r.featuredListingId != null;
-          }
-        })
-        .toList();
+    final refundableRecords = viewModel.refundableRevenueRecords.where((r) {
+      if (_selectedRefundType == RefundType.subscription) {
+        return r.type == RevenueType.subscription && r.subscriptionId != null;
+      } else {
+        return r.type == RevenueType.featuredListing &&
+            r.featuredListingId != null;
+      }
+    }).toList();
 
     if (refundableRecords.isEmpty) {
       return AdaptiveCard(
@@ -347,7 +343,8 @@ class _OwnerRefundRequestScreenState
               children: [
                 BodyText(text: 'Refund Amount:'),
                 HeadingMedium(
-                  text: currencyFormatter.format(_selectedRevenueRecord!.amount),
+                  text:
+                      currencyFormatter.format(_selectedRevenueRecord!.amount),
                   color: AppColors.primary,
                 ),
               ],
@@ -427,8 +424,8 @@ class _OwnerRefundRequestScreenState
     }
 
     // Check if refund request already exists
-    final hasExisting =
-        await viewModel.hasExistingRefundRequest(_selectedRevenueRecord!.revenueId);
+    final hasExisting = await viewModel
+        .hasExistingRefundRequest(_selectedRevenueRecord!.revenueId);
     if (hasExisting) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -471,4 +468,3 @@ class _OwnerRefundRequestScreenState
     }
   }
 }
-

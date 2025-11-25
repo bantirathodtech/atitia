@@ -161,7 +161,8 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
     ];
 
     // Check if user has premium subscription
-    final hasPremiumAccess = subscriptionViewModel.currentTier != SubscriptionTier.free;
+    final hasPremiumAccess =
+        subscriptionViewModel.currentTier != SubscriptionTier.free;
 
     // If free tier, show upgrade prompt instead of analytics
     if (!hasPremiumAccess) {
@@ -276,9 +277,13 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                     ?.withValues(alpha: 0.5) ??
                 Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
           HeadingMedium(text: loc.analyticsNoPgTitle),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           BodyText(
             text: loc.analyticsNoPgMessage,
           ),
@@ -295,7 +300,9 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const AdaptiveLoader(),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
           BodyText(text: loc.analyticsLoading),
         ],
       ),
@@ -322,16 +329,25 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
                 color: Theme.of(context).colorScheme.error,
               ),
             ),
-            SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+            SizedBox(
+                height: context.isMobile
+                    ? AppSpacing.paddingM
+                    : AppSpacing.paddingL),
             Semantics(
               header: true,
               child: HeadingMedium(text: loc.analyticsErrorTitle),
             ),
-            SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+            SizedBox(
+                height: context.isMobile
+                    ? AppSpacing.paddingS
+                    : AppSpacing.paddingM),
             BodyText(
               text: _error ?? loc.analyticsUnknownError,
             ),
-            SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+            SizedBox(
+                height: context.isMobile
+                    ? AppSpacing.paddingM
+                    : AppSpacing.paddingL),
             PrimaryButton(
               onPressed: _refreshData,
               label: loc.retry,
@@ -345,7 +361,8 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget _buildRevenueTab(BuildContext context) {
     final padding = context.responsivePadding;
     return SingleChildScrollView(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
+      padding:
+          EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       child: RevenueAnalyticsWidget(
         revenueData: _revenueData,
         selectedPgId: _lastLoadedPgId,
@@ -357,7 +374,8 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget _buildOccupancyTab(BuildContext context) {
     final padding = context.responsivePadding;
     return SingleChildScrollView(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
+      padding:
+          EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       child: OccupancyAnalyticsWidget(
         occupancyData: _occupancyData,
         selectedPgId: _lastLoadedPgId,
@@ -368,9 +386,11 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
 
   Widget _buildPerformanceTab(BuildContext context) {
     final padding = context.responsivePadding;
-    final cardGap = context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL;
+    final cardGap =
+        context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL;
     return SingleChildScrollView(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
+      padding:
+          EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -390,7 +410,8 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+          padding: EdgeInsets.all(
+              context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           decoration: BoxDecoration(
             color: context.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
@@ -401,7 +422,9 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
             size: context.isMobile ? 20 : 24,
           ),
         ),
-        SizedBox(width: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+        SizedBox(
+            width:
+                context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,14 +449,18 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
     final maintenanceScore = decimalFormatter.format(9.2);
 
     final padding = context.responsivePadding;
-    final cardGap = context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM;
+    final cardGap =
+        context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM;
     return AdaptiveCard(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : AppSpacing.paddingL),
+      padding: EdgeInsets.all(
+          context.isMobile ? padding.top * 0.75 : AppSpacing.paddingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           HeadingMedium(text: loc.performanceKpiTitle),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
           Row(
             children: [
               Expanded(
@@ -483,7 +510,8 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   ) {
     final padding = context.responsivePadding;
     return Container(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
+      padding: EdgeInsets.all(
+          context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
@@ -495,7 +523,10 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
           Row(
             children: [
               Icon(icon, color: color, size: context.isMobile ? 16 : 20),
-              SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
               Expanded(
                 child: Text(
                   title,
@@ -509,7 +540,10 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
               ),
             ],
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS
+                  : AppSpacing.paddingS),
           Text(
             value,
             style: TextStyle(

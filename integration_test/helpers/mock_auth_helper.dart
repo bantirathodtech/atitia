@@ -410,20 +410,20 @@ class MockAuthHelper {
 
       // Step 2: Enter phone number
       print('   Step 2: Entering phone number: $ownerPhoneNumber...');
-      
+
       // Wait for phone auth screen to appear after role selection
       await tester.pumpAndSettle();
       await Future.delayed(const Duration(seconds: 2));
-      
+
       // Try multiple ways to find the phone input field (enhanced for owner)
       Finder? phoneField;
       bool phoneFieldFound = false;
-      
+
       // Wait up to 5 seconds for phone field to appear
       for (int attempt = 0; attempt < 10; attempt++) {
         await tester.pumpAndSettle();
         await Future.delayed(const Duration(milliseconds: 500));
-        
+
         // Method 1: Try TextFormField
         final textFormFields = find.byType(TextFormField);
         if (textFormFields.evaluate().isNotEmpty) {
@@ -445,7 +445,8 @@ class MockAuthHelper {
         // Method 3: Try by hint text "Phone" or "10 digit"
         final phoneHint = find.textContaining('Phone', findRichText: true);
         final digitHint = find.textContaining('digit', findRichText: true);
-        if (phoneHint.evaluate().isNotEmpty || digitHint.evaluate().isNotEmpty) {
+        if (phoneHint.evaluate().isNotEmpty ||
+            digitHint.evaluate().isNotEmpty) {
           await tester.pumpAndSettle();
           final fields = find.byType(TextField);
           if (fields.evaluate().isEmpty) {
@@ -463,13 +464,15 @@ class MockAuthHelper {
             break;
           }
         }
-        
+
         if (attempt < 9) {
           print('   Waiting for phone field... (attempt ${attempt + 1}/10)');
         }
       }
 
-      if (phoneFieldFound && phoneField != null && phoneField.evaluate().isNotEmpty) {
+      if (phoneFieldFound &&
+          phoneField != null &&
+          phoneField.evaluate().isNotEmpty) {
         await tester.enterText(phoneField, ownerPhoneNumber);
         await tester.pumpAndSettle();
         await Future.delayed(const Duration(milliseconds: 500));
@@ -477,11 +480,11 @@ class MockAuthHelper {
       } else {
         print('   ⚠️  Could not find phone input field automatically');
         print('   Trying fallback: finding all text fields...');
-        
+
         // Fallback: try all text fields
         final allTextFormFields = find.byType(TextFormField);
         final allTextFields = find.byType(TextField);
-        
+
         if (allTextFormFields.evaluate().isNotEmpty) {
           print('   Using first TextFormField as phone field');
           await tester.enterText(allTextFormFields.first, ownerPhoneNumber);
@@ -513,20 +516,21 @@ class MockAuthHelper {
       }
 
       await tester.pumpAndSettle();
-      await Future.delayed(const Duration(seconds: 5)); // Wait longer for OTP to be sent and UI to update
+      await Future.delayed(const Duration(
+          seconds: 5)); // Wait longer for OTP to be sent and UI to update
 
       // Step 4: Enter OTP
       print('   Step 4: Entering OTP: $otpCode...');
-      
+
       // Wait for OTP field to appear (it only shows after _otpSent is true)
       bool otpFieldFound = false;
       Finder? otpField;
-      
+
       // Try multiple methods to find OTP field (enhanced for owner)
       for (int attempt = 0; attempt < 15; attempt++) {
         await tester.pumpAndSettle();
         await Future.delayed(const Duration(milliseconds: 500));
-        
+
         // Method 1: Count TextFormFields - if there are 2, second is OTP
         final allTextFormFields = find.byType(TextFormField);
         if (allTextFormFields.evaluate().length >= 2) {
@@ -535,13 +539,13 @@ class MockAuthHelper {
           print('   Found OTP field (second TextFormField)');
           break;
         }
-        
+
         // Method 2: Find by label text "Enter OTP" or "OTP"
         final otpLabel = find.textContaining('OTP', findRichText: true);
         if (otpLabel.evaluate().isNotEmpty) {
           final allTextFields = find.byType(TextField);
           final allTextFormFields2 = find.byType(TextFormField);
-          
+
           if (allTextFormFields2.evaluate().isNotEmpty) {
             if (allTextFormFields2.evaluate().length >= 2) {
               otpField = allTextFormFields2.at(1);
@@ -558,7 +562,7 @@ class MockAuthHelper {
             break;
           }
         }
-        
+
         // Method 3: Find by hint text "six digit" or "6 digit"
         final sixDigitHint = find.textContaining('digit', findRichText: true);
         if (sixDigitHint.evaluate().isNotEmpty) {
@@ -570,7 +574,7 @@ class MockAuthHelper {
             break;
           }
         }
-        
+
         // Method 4: If only one TextFormField exists and phone was already entered, this might be OTP
         if (allTextFormFields.evaluate().length == 1) {
           // Check if phone field is already filled
@@ -583,12 +587,13 @@ class MockAuthHelper {
             break;
           }
         }
-        
+
         if (attempt < 14 && attempt % 3 == 0) {
-          print('   Waiting for OTP field to appear... (attempt ${attempt + 1}/15)');
+          print(
+              '   Waiting for OTP field to appear... (attempt ${attempt + 1}/15)');
         }
       }
-      
+
       // Enter OTP
       if (otpFieldFound && otpField != null && otpField.evaluate().isNotEmpty) {
         print('   Found OTP field, entering code: $otpCode');
@@ -599,11 +604,11 @@ class MockAuthHelper {
       } else {
         print('   ⚠️  Could not find OTP field automatically');
         print('   Trying fallback: finding all text fields...');
-        
+
         // Fallback: try all text fields
         final allTextFormFields = find.byType(TextFormField);
         final allTextFields = find.byType(TextField);
-        
+
         if (allTextFormFields.evaluate().length >= 2) {
           print('   Using second TextFormField as OTP field');
           await tester.enterText(allTextFormFields.at(1), otpCode);
@@ -632,7 +637,7 @@ class MockAuthHelper {
             print('   ❌ All OTP entry methods failed');
           }
         }
-        
+
         await tester.pumpAndSettle();
         await Future.delayed(const Duration(milliseconds: 500));
       }

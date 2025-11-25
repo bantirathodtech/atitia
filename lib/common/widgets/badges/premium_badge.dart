@@ -65,4 +65,3 @@ class PremiumBadge extends StatelessWidget {
     );
   }
 }
-

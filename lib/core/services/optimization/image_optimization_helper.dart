@@ -4,7 +4,8 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
 /// Isolate helper for image optimization (must be top-level)
-Future<Uint8List> _processImageInIsolateHelper(Map<String, dynamic> params) async {
+Future<Uint8List> _processImageInIsolateHelper(
+    Map<String, dynamic> params) async {
   final imageBytes = params['imageBytes'] as Uint8List;
   final maxWidth = params['maxWidth'] as int;
   final maxHeight = params['maxHeight'] as int;
@@ -42,4 +43,3 @@ Future<Uint8List> _processImageInIsolateHelper(Map<String, dynamic> params) asyn
     return imageBytes; // Return original on error
   }
 }
-

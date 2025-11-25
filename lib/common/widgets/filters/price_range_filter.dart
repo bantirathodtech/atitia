@@ -101,9 +101,7 @@ class _PriceRangeFilterState extends State<PriceRangeFilter> {
                 vertical: AppSpacing.paddingXS,
               ),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkCard
-                    : AppColors.lightCard,
+                color: isDark ? AppColors.darkCard : AppColors.lightCard,
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 border: Border.all(
                   color: theme.dividerColor.withOpacity(0.3),
@@ -111,9 +109,7 @@ class _PriceRangeFilterState extends State<PriceRangeFilter> {
               ),
               child: CaptionText(
                 text: 'Min: ${_formatPrice(_currentRange.start)}',
-                color: isDark
-                    ? AppColors.lightText
-                    : AppColors.textPrimary,
+                color: isDark ? AppColors.lightText : AppColors.textPrimary,
               ),
             ),
             Container(
@@ -122,9 +118,7 @@ class _PriceRangeFilterState extends State<PriceRangeFilter> {
                 vertical: AppSpacing.paddingXS,
               ),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkCard
-                    : AppColors.lightCard,
+                color: isDark ? AppColors.darkCard : AppColors.lightCard,
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
                 border: Border.all(
                   color: theme.dividerColor.withOpacity(0.3),
@@ -132,9 +126,7 @@ class _PriceRangeFilterState extends State<PriceRangeFilter> {
               ),
               child: CaptionText(
                 text: 'Max: ${_formatPrice(_currentRange.end)}',
-                color: isDark
-                    ? AppColors.lightText
-                    : AppColors.textPrimary,
+                color: isDark ? AppColors.lightText : AppColors.textPrimary,
               ),
             ),
           ],
@@ -143,4 +135,3 @@ class _PriceRangeFilterState extends State<PriceRangeFilter> {
     );
   }
 }
-

@@ -59,7 +59,9 @@ class FoodFeedbackRepository {
     required String dateKey,
   }) {
     // COST OPTIMIZATION: Limit to 200 feedback entries per stream (covers multiple days)
-    return _databaseService.getCollectionStream(collection, limit: 200).map((snapshot) {
+    return _databaseService
+        .getCollectionStream(collection, limit: 200)
+        .map((snapshot) {
       final entries =
           snapshot.docs.map((d) => d.data() as Map<String, dynamic>).where(
                 (m) => m['pgId'] == pgId && m['dateKey'] == dateKey,

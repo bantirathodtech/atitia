@@ -42,7 +42,8 @@ class EnhancedLoadingState extends StatelessWidget {
     }
   }
 
-  Widget _buildCenteredLoader(BuildContext context, ThemeData theme, Color bgColor) {
+  Widget _buildCenteredLoader(
+      BuildContext context, ThemeData theme, Color bgColor) {
     return Container(
       color: bgColor,
       child: Center(
@@ -54,7 +55,8 @@ class EnhancedLoadingState extends StatelessWidget {
               const SizedBox(height: AppSpacing.paddingL),
               BodyText(
                 text: message!,
-                color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                color:
+                    theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                 align: TextAlign.center,
               ),
             ],
@@ -64,11 +66,12 @@ class EnhancedLoadingState extends StatelessWidget {
     );
   }
 
-  Widget _buildSkeletonLoader(BuildContext context, ThemeData theme, Color bgColor) {
+  Widget _buildSkeletonLoader(
+      BuildContext context, ThemeData theme, Color bgColor) {
     final padding = MediaQuery.of(context).size.width < 600
         ? const EdgeInsets.all(AppSpacing.paddingM)
         : const EdgeInsets.all(AppSpacing.paddingL);
-    
+
     return Container(
       color: bgColor,
       padding: padding,
@@ -93,7 +96,8 @@ class EnhancedLoadingState extends StatelessWidget {
                     const SizedBox(height: AppSpacing.paddingL),
                     BodyText(
                       text: message!,
-                      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                      color: theme.textTheme.bodyMedium?.color
+                          ?.withValues(alpha: 0.7),
                       align: TextAlign.center,
                     ),
                   ],
@@ -134,7 +138,8 @@ class EnhancedLoadingState extends StatelessWidget {
     );
   }
 
-  Widget _buildFullscreenLoader(BuildContext context, ThemeData theme, Color bgColor) {
+  Widget _buildFullscreenLoader(
+      BuildContext context, ThemeData theme, Color bgColor) {
     return Container(
       color: bgColor,
       child: Center(
@@ -145,11 +150,13 @@ class EnhancedLoadingState extends StatelessWidget {
             if (message != null) ...[
               const SizedBox(height: AppSpacing.paddingXL),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.paddingXL),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.paddingXL),
                 child: BodyText(
                   text: message!,
                   align: TextAlign.center,
-                  color: theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.8),
+                  color:
+                      theme.textTheme.bodyLarge?.color?.withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -159,7 +166,8 @@ class EnhancedLoadingState extends StatelessWidget {
     );
   }
 
-  Widget _buildAnimatedLoader(BuildContext context, ThemeData theme, {double size = 48}) {
+  Widget _buildAnimatedLoader(BuildContext context, ThemeData theme,
+      {double size = 48}) {
     return Container(
       width: size,
       height: size,
@@ -258,4 +266,3 @@ class LoadingOverlay extends StatelessWidget {
     );
   }
 }
-

@@ -18,7 +18,7 @@ class AddPgActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     // Use provided color or theme-aware color based on app bar background
     final iconColor = color ?? context.colors.onSurface;
-    
+
     return IconButton(
       icon: Icon(Icons.add_business, color: iconColor),
       tooltip: tooltip,

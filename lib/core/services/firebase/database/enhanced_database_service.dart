@@ -17,8 +17,7 @@ class EnhancedDatabaseService {
   EnhancedDatabaseService({
     OptimizedFirestoreService? firestoreService,
     FirestoreCacheService? cacheService,
-  })  : _firestoreService =
-            firestoreService ?? OptimizedFirestoreService(),
+  })  : _firestoreService = firestoreService ?? OptimizedFirestoreService(),
         _cacheService = cacheService ?? FirestoreCacheService();
 
   /// Query payments with caching and DB-level filtering
@@ -231,11 +230,10 @@ class EnhancedDatabaseService {
     required List<Map<String, dynamic>> operations,
   }) async {
     await _firestoreService.batchWrite(operations: operations);
-    
+
     // Invalidate relevant caches after batch write
-    final collections = operations
-        .map((op) => op['collection'] as String)
-        .toSet();
+    final collections =
+        operations.map((op) => op['collection'] as String).toSet();
     for (final collection in collections) {
       await _cacheService.invalidateCollection(collection);
     }
@@ -291,4 +289,3 @@ class EnhancedDatabaseService {
     await _cacheService.invalidateCollection(collection);
   }
 }
-

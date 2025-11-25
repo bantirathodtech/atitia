@@ -25,14 +25,14 @@ class UserProfileCacheService {
   Future<Map<String, dynamic>?> getCachedProfileData(String userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Check if cache exists
       final cacheKey = '$_cachePrefix$userId';
       final timestampKey = '$_timestampPrefix$userId';
-      
+
       final cachedData = prefs.getString(cacheKey);
       final timestampString = prefs.getString(timestampKey);
-      
+
       if (cachedData == null || timestampString == null) {
         return null;
       }
@@ -40,7 +40,7 @@ class UserProfileCacheService {
       // Check if cache is expired
       final timestamp = DateTime.parse(timestampString);
       final now = DateTime.now();
-      
+
       if (now.difference(timestamp) > _cacheExpiry) {
         // Cache expired, remove it
         await prefs.remove(cacheKey);
@@ -59,16 +59,17 @@ class UserProfileCacheService {
 
   /// Cache profile data (raw Firestore document data)
   /// Pass the raw Map<String, dynamic> from Firestore document
-  Future<void> cacheProfileData(String userId, Map<String, dynamic> profileData) async {
+  Future<void> cacheProfileData(
+      String userId, Map<String, dynamic> profileData) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final cacheKey = '$_cachePrefix$userId';
       final timestampKey = '$_timestampPrefix$userId';
-      
+
       // Serialize profile data to JSON
       final profileJson = jsonEncode(profileData);
-      
+
       // Save cache and timestamp
       await prefs.setString(cacheKey, profileJson);
       await prefs.setString(timestampKey, DateTime.now().toIso8601String());
@@ -82,10 +83,10 @@ class UserProfileCacheService {
   Future<void> invalidateProfile(String userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final cacheKey = '$_cachePrefix$userId';
       final timestampKey = '$_timestampPrefix$userId';
-      
+
       await prefs.remove(cacheKey);
       await prefs.remove(timestampKey);
     } catch (e) {
@@ -99,11 +100,11 @@ class UserProfileCacheService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final keys = prefs.getKeys();
-      
+
       // Remove all profile cache keys
       final keysToRemove = keys.where((key) =>
           key.startsWith(_cachePrefix) || key.startsWith(_timestampPrefix));
-      
+
       for (final key in keysToRemove) {
         await prefs.remove(key);
       }
@@ -118,23 +119,24 @@ class UserProfileCacheService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final keys = prefs.getKeys();
-      
+
       final now = DateTime.now();
-      
+
       // Find all timestamp keys
-      final timestampKeys = keys.where((key) => key.startsWith(_timestampPrefix));
-      
+      final timestampKeys =
+          keys.where((key) => key.startsWith(_timestampPrefix));
+
       for (final timestampKey in timestampKeys) {
         final timestampString = prefs.getString(timestampKey);
         if (timestampString == null) continue;
-        
+
         try {
           final timestamp = DateTime.parse(timestampString);
           if (now.difference(timestamp) > _cacheExpiry) {
             // Extract userId from timestamp key
             final userId = timestampKey.replaceFirst(_timestampPrefix, '');
             final cacheKey = '$_cachePrefix$userId';
-            
+
             // Remove expired cache
             await prefs.remove(cacheKey);
             await prefs.remove(timestampKey);

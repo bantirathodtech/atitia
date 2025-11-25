@@ -180,11 +180,12 @@ class SupabaseStorageServiceWrapper {
 
       // Check if file is an image (by extension or MIME type)
       final isImage = _isImageFile(fileName);
-      
+
       if (isImage) {
         // Compress image before upload
-        final compressedBytes = await ImageCompressionService.instance.compressImage(file);
-        
+        final compressedBytes =
+            await ImageCompressionService.instance.compressImage(file);
+
         if (compressedBytes != null && compressedBytes.isNotEmpty) {
           bytes = compressedBytes;
         } else {
@@ -289,7 +290,8 @@ class SupabaseStorageServiceWrapper {
   /// Check if file is an image based on extension
   bool _isImageFile(String fileName) {
     final extension = fileName.toLowerCase().split('.').last;
-    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'].contains(extension);
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif']
+        .contains(extension);
   }
 
   /// Deletes file from Supabase Storage

@@ -64,8 +64,9 @@ class BookingLifecycleService {
             // Try to get rent from floor structure
             if (rentAmount == null && rentConfig != null) {
               // Use default rent from config if available
-              finalRentAmount = (rentConfig['oneShare'] ?? rentConfig['twoShare'] ?? 0)
-                  .toDouble();
+              finalRentAmount =
+                  (rentConfig['oneShare'] ?? rentConfig['twoShare'] ?? 0)
+                      .toDouble();
             }
 
             if (depositAmount == null && deposit != null) {
@@ -331,4 +332,3 @@ class BookingLifecycleService {
     }
   }
 }
-

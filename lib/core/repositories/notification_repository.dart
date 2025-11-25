@@ -75,13 +75,13 @@ class NotificationRepository {
       final notifications = snapshot.docs
           .take(50) // COST OPTIMIZATION: Limit to 50 most recent notifications
           .map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return {
-              ...data,
-              'id': data['id'] ?? doc.id,
-              'timestamp': _parseTimestamp(data['createdAt']),
-            };
-          }).toList();
+        final data = doc.data() as Map<String, dynamic>;
+        return {
+          ...data,
+          'id': data['id'] ?? doc.id,
+          'timestamp': _parseTimestamp(data['createdAt']),
+        };
+      }).toList();
 
       // Sort by timestamp (newest first)
       notifications.sort((a, b) {

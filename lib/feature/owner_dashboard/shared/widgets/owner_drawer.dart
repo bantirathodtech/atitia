@@ -171,7 +171,7 @@ class OwnerDrawer extends StatelessWidget {
 
     final isDarkMode = context.isDarkMode;
     final backgroundColor = isDarkMode ? Colors.black : Colors.white;
-    
+
     // Capture the auth provider from the original context
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 

@@ -45,9 +45,7 @@ class ConfirmationDialog extends StatelessWidget {
     final finalCancelText = cancelText ?? loc?.cancel ?? 'Cancel';
 
     return AlertDialog(
-      backgroundColor: isDarkMode 
-          ? theme.colorScheme.surface 
-          : Colors.white,
+      backgroundColor: isDarkMode ? theme.colorScheme.surface : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),

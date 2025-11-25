@@ -43,11 +43,13 @@ class PaymentReminderBanner extends StatelessWidget {
 
     if (isOverdue && dueDate != null) {
       final daysOverdue = DateTime.now().difference(dueDate!).inDays;
-      message = 'Your payment of ₹${_formatAmount(amount)} is overdue by $daysOverdue day(s).';
+      message =
+          'Your payment of ₹${_formatAmount(amount)} is overdue by $daysOverdue day(s).';
       icon = Icons.warning_amber_rounded;
     } else if (dueDate != null) {
       final daysUntilDue = dueDate!.difference(DateTime.now()).inDays;
-      message = 'Your payment of ₹${_formatAmount(amount)} is due in $daysUntilDue day(s).';
+      message =
+          'Your payment of ₹${_formatAmount(amount)} is due in $daysUntilDue day(s).';
       icon = Icons.access_time;
     } else {
       message = 'You have a pending payment of ₹${_formatAmount(amount)}.';
@@ -78,7 +80,8 @@ class PaymentReminderBanner extends StatelessWidget {
                 if (dueDate != null) ...[
                   const SizedBox(height: AppSpacing.paddingXS),
                   CaptionText(
-                    text: 'Due Date: ${DateFormat('MMM dd, yyyy').format(dueDate!)}',
+                    text:
+                        'Due Date: ${DateFormat('MMM dd, yyyy').format(dueDate!)}',
                     color: iconColor.withOpacity(0.8),
                   ),
                 ],
@@ -117,4 +120,3 @@ class PaymentReminderBanner extends StatelessWidget {
     return NumberFormat('#,##0').format(amount);
   }
 }
-

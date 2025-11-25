@@ -140,7 +140,8 @@ class DatabaseOptimizer {
     Duration debounceDuration = const Duration(milliseconds: 50),
   }) {
     final stream = query.limit(pageSize).snapshots();
-    return StreamDebounceService.instance.debounce(stream, duration: debounceDuration);
+    return StreamDebounceService.instance
+        .debounce(stream, duration: debounceDuration);
   }
 
   /// Clear expired cache entries
@@ -224,18 +225,20 @@ class DatabaseOptimizer {
     int pageSize = _defaultPageSize,
     DocumentSnapshot? startAfter,
   }) {
-    Query query = baseQuery.limit(pageSize > _maxPageSize ? _maxPageSize : pageSize);
-    
+    Query query =
+        baseQuery.limit(pageSize > _maxPageSize ? _maxPageSize : pageSize);
+
     if (startAfter != null) {
       query = query.startAfterDocument(startAfter);
     }
-    
+
     return query;
   }
 
   /// Ensure query has limit applied (cost optimization)
   /// Prevents accidentally loading all documents
-  static Query ensureLimited(Query query, {int defaultLimit = _defaultPageSize}) {
+  static Query ensureLimited(Query query,
+      {int defaultLimit = _defaultPageSize}) {
     // Check if query already has limit
     // Note: This is a simple check - in production, you might want to parse the query
     // For now, we'll always apply a limit as a safety measure
@@ -254,20 +257,20 @@ class DatabaseOptimizer {
     DocumentSnapshot? startAfter,
   }) {
     Query query = baseQuery;
-    
+
     // Add ordering if specified (important for consistent pagination)
     if (orderByField != null) {
       query = query.orderBy(orderByField, descending: descending);
     }
-    
+
     // Apply limit
     query = query.limit(pageSize > _maxPageSize ? _maxPageSize : pageSize);
-    
+
     // Add pagination cursor
     if (startAfter != null) {
       query = query.startAfterDocument(startAfter);
     }
-    
+
     return query;
   }
 }

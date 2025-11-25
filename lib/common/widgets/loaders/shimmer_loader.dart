@@ -28,13 +28,13 @@ class ShimmerLoader extends AdaptiveStatelessWidget {
   Widget buildAdaptive(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
-    final base = baseColor ?? 
-        (isDark 
+
+    final base = baseColor ??
+        (isDark
             ? Colors.grey[800]!.withValues(alpha: 0.5)
             : Colors.grey[300]!.withValues(alpha: 0.5));
-    final highlight = highlightColor ?? 
-        (isDark 
+    final highlight = highlightColor ??
+        (isDark
             ? Colors.grey[700]!.withValues(alpha: 0.8)
             : Colors.grey[100]!.withValues(alpha: 0.8));
 

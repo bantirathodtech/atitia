@@ -78,7 +78,8 @@ class BookingRequestListWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HeadingMedium(text: loc?.bookingRequestDialogTitle ?? 'Booking Request'),
+              HeadingMedium(
+                  text: loc?.bookingRequestDialogTitle ?? 'Booking Request'),
               const SizedBox(height: AppSpacing.paddingM),
               Flexible(
                 child: SingleChildScrollView(
@@ -87,19 +88,23 @@ class BookingRequestListWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       BodyText(
-                        text: '${loc?.guestLabel ?? 'Guest'}: ${request['guestName'] ?? (loc?.unknownValue ?? 'Unknown')}',
+                        text:
+                            '${loc?.guestLabel ?? 'Guest'}: ${request['guestName'] ?? (loc?.unknownValue ?? 'Unknown')}',
                       ),
                       const SizedBox(height: AppSpacing.paddingS),
                       BodyText(
-                        text: '${loc?.pgLabel ?? 'PG'}: ${request['pgName'] ?? (loc?.unknownPg ?? 'Unknown PG')}',
+                        text:
+                            '${loc?.pgLabel ?? 'PG'}: ${request['pgName'] ?? (loc?.unknownPg ?? 'Unknown PG')}',
                       ),
                       const SizedBox(height: AppSpacing.paddingS),
                       BodyText(
-                        text: '${loc?.dateLabel ?? 'Date'}: ${request['requestDate'] ?? (loc?.unknownValue ?? 'Unknown')}',
+                        text:
+                            '${loc?.dateLabel ?? 'Date'}: ${request['requestDate'] ?? (loc?.unknownValue ?? 'Unknown')}',
                       ),
                       const SizedBox(height: AppSpacing.paddingS),
                       BodyText(
-                        text: '${loc?.statusLabel ?? 'Status'}: ${request['status'] ?? (loc?.unknownValue ?? 'Unknown')}',
+                        text:
+                            '${loc?.statusLabel ?? 'Status'}: ${request['status'] ?? (loc?.unknownValue ?? 'Unknown')}',
                       ),
                     ],
                   ),

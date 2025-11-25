@@ -214,7 +214,8 @@ class ErrorMessages {
       message: resource != null
           ? 'We need permission to access $resource to continue.'
           : 'We need permission to continue.',
-      suggestion: 'Please grant the required permission in your device settings.',
+      suggestion:
+          'Please grant the required permission in your device settings.',
       errorType: ErrorType.permission,
       primaryActionLabel: 'Grant Permission',
       onPrimaryAction: onGrantPermission,
@@ -235,7 +236,8 @@ class ErrorMessages {
       message: item != null
           ? 'We couldn\'t find "$item".'
           : 'We couldn\'t find what you\'re looking for.',
-      suggestion: 'Try searching with different keywords or check your spelling.',
+      suggestion:
+          'Try searching with different keywords or check your spelling.',
       errorType: ErrorType.notFound,
       primaryActionLabel: 'Search Again',
       onPrimaryAction: onSearch,
@@ -249,7 +251,8 @@ class ErrorMessages {
     return EnhancedErrorMessage(
       title: 'Request Timed Out',
       message: 'The request took too long to complete. Please try again.',
-      suggestion: 'This usually happens when the server is slow or your connection is weak.',
+      suggestion:
+          'This usually happens when the server is slow or your connection is weak.',
       errorType: ErrorType.timeout,
       primaryActionLabel: 'Retry',
       onPrimaryAction: onRetry,
@@ -282,7 +285,8 @@ class ErrorMessages {
     return EnhancedErrorMessage(
       title: 'Server Error',
       message: 'Something went wrong on our end. We\'re working to fix it.',
-      suggestion: 'Please try again in a few moments. If the problem persists, contact support.',
+      suggestion:
+          'Please try again in a few moments. If the problem persists, contact support.',
       errorType: ErrorType.server,
       primaryActionLabel: 'Retry',
       onPrimaryAction: onRetry,
@@ -304,7 +308,7 @@ class ErrorSnackBar {
     Duration duration = const Duration(seconds: 4),
   }) {
     final theme = Theme.of(context);
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -340,4 +344,3 @@ class ErrorSnackBar {
     );
   }
 }
-

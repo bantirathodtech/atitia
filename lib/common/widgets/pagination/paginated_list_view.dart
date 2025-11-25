@@ -51,12 +51,12 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
   @override
   void initState() {
     super.initState();
-    
+
     _scrollController = widget.scrollController ?? ScrollController();
     _isControllerOwned = widget.scrollController == null;
-    
+
     _scrollController.addListener(_onScroll);
-    
+
     // Load initial data
     if (widget.controller.itemCount == 0 && !widget.controller.isLoading) {
       widget.controller.loadInitial();
@@ -99,8 +99,7 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
         }
 
         // Show empty state
-        if (!widget.controller.isLoading &&
-            widget.controller.itemCount == 0) {
+        if (!widget.controller.isLoading && widget.controller.itemCount == 0) {
           return widget.emptyWidget ?? _buildDefaultEmptyWidget(context);
         }
 
@@ -115,7 +114,9 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
           addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
           itemCount: widget.controller.itemCount +
               (widget.controller.hasMore ? 1 : 0) +
-              (widget.controller.error != null && widget.controller.hasItems ? 1 : 0),
+              (widget.controller.error != null && widget.controller.hasItems
+                  ? 1
+                  : 0),
           itemBuilder: (context, index) {
             // Show error banner if error occurred after items loaded
             if (widget.controller.error != null &&
@@ -126,17 +127,18 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
 
             // Show loading more indicator
             if (index == widget.controller.itemCount) {
-              return widget.loadingMoreWidget ?? _buildDefaultLoadingMoreWidget();
+              return widget.loadingMoreWidget ??
+                  _buildDefaultLoadingMoreWidget();
             }
 
             // Show item
             final item = widget.controller.items[index];
             final itemWidget = widget.itemBuilder(context, item, index);
-            
+
             if (widget.addRepaintBoundaries) {
               return RepaintBoundary(child: itemWidget);
             }
-            
+
             return itemWidget;
           },
         );
@@ -184,7 +186,10 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
             Text(
               'No items found',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6),
                   ),
             ),
           ],
@@ -262,4 +267,3 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
     );
   }
 }
-

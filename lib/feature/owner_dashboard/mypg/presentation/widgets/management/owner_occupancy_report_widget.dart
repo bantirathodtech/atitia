@@ -58,14 +58,19 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
         '${percentageFormatter.format(report.occupancyPercentage)}%';
 
     return AdaptiveCard(
-      padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
+      padding: EdgeInsets.all(
+          context.isMobile ? AppSpacing.paddingM : AppSpacing.paddingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.analytics_rounded, color: AppColors.info, size: context.isMobile ? 18 : 20),
-              SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+              Icon(Icons.analytics_rounded,
+                  color: AppColors.info, size: context.isMobile ? 18 : 20),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS
+                      : AppSpacing.paddingS),
               Expanded(
                 child: HeadingMedium(
                   text: loc?.ownerOccupancyReportTitle ??
@@ -75,11 +80,15 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+          SizedBox(
+              height:
+                  context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
           ResponsiveGrid(
             targetTileWidth: context.isMobile ? 150 : 200,
-            horizontalGap: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
-            verticalGap: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
+            horizontalGap:
+                context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
+            verticalGap:
+                context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS,
             childAspectRatio: context.isMobile ? 1.5 : 1.8,
             children: [
               _buildStatItem(
@@ -140,10 +149,11 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(
-      BuildContext context, String label, String value, IconData icon, Color color) {
+  Widget _buildStatItem(BuildContext context, String label, String value,
+      IconData icon, Color color) {
     return AdaptiveCard(
-      padding: EdgeInsets.all(context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+      padding: EdgeInsets.all(
+          context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -153,7 +163,10 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, color: color, size: context.isMobile ? 18 : 24),
-              SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS * 0.5
+                      : AppSpacing.paddingXS),
               Flexible(
                 child: BodyText(
                   text: value,
@@ -163,7 +176,10 @@ class OwnerOccupancyReportWidget extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS * 0.5
+                  : AppSpacing.paddingXS),
           // Row 2: Label below
           CaptionText(text: label, color: color),
         ],

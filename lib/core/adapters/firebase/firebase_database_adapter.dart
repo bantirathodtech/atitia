@@ -58,8 +58,8 @@ class FirebaseDatabaseAdapter implements IDatabaseService {
     dynamic value, {
     int? limit,
   }) {
-    return _firestoreService.getCollectionStreamWithFilter(
-        collection, field, value, limit: limit);
+    return _firestoreService
+        .getCollectionStreamWithFilter(collection, field, value, limit: limit);
   }
 
   @override
@@ -155,7 +155,7 @@ class FirebaseDatabaseAdapter implements IDatabaseService {
   }) {
     // OPTIMIZED: Use queryDocumentsWithFilters and apply orderBy/limit
     Query query = FirebaseFirestore.instance.collection(collection);
-    
+
     // Apply filters
     for (var condition in conditions) {
       query = query.where(
@@ -163,17 +163,17 @@ class FirebaseDatabaseAdapter implements IDatabaseService {
         isEqualTo: condition['value'],
       );
     }
-    
+
     // Apply orderBy if specified
     if (orderBy != null) {
       query = query.orderBy(orderBy, descending: descending);
     }
-    
+
     // Apply limit if specified
     if (limit != null) {
       query = query.limit(limit);
     }
-    
+
     return query.get();
   }
 }

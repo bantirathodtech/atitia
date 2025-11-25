@@ -78,13 +78,11 @@ class RecentlyUpdatedGuestsWidget extends StatelessWidget {
             else
               Column(
                 children: [
-                  ...recentGuests
-                      .take(maxDisplayCount)
-                      .map((guest) => Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: AppSpacing.paddingS),
-                            child: _buildGuestListItem(context, guest),
-                          )),
+                  ...recentGuests.take(maxDisplayCount).map((guest) => Padding(
+                        padding:
+                            const EdgeInsets.only(bottom: AppSpacing.paddingS),
+                        child: _buildGuestListItem(context, guest),
+                      )),
                   if (onViewAll != null)
                     Padding(
                       padding: const EdgeInsets.only(top: AppSpacing.paddingS),
@@ -92,7 +90,8 @@ class RecentlyUpdatedGuestsWidget extends StatelessWidget {
                         child: TextButton(
                           onPressed: onViewAll,
                           child: BodyText(
-                            text: '+ ${recentGuests.length - maxDisplayCount} more',
+                            text:
+                                '+ ${recentGuests.length - maxDisplayCount} more',
                             color: context.primaryColor,
                             small: true,
                           ),
@@ -113,7 +112,7 @@ class RecentlyUpdatedGuestsWidget extends StatelessWidget {
     final recentGuests = guests.where((guest) {
       final updatedAt = guest['updatedAt'];
       final createdAt = guest['createdAt'];
-      
+
       DateTime? lastUpdate;
       if (updatedAt is int) {
         lastUpdate = DateTime.fromMillisecondsSinceEpoch(updatedAt);
@@ -124,7 +123,7 @@ class RecentlyUpdatedGuestsWidget extends StatelessWidget {
       } else if (createdAt is DateTime) {
         lastUpdate = createdAt;
       }
-      
+
       if (lastUpdate == null) return false;
 
       // Check if updated or created in the last N days
@@ -133,8 +132,10 @@ class RecentlyUpdatedGuestsWidget extends StatelessWidget {
 
     // Sort by most recently updated first
     recentGuests.sort((a, b) {
-      final aUpdated = _getDateTime(a['updatedAt'] ?? a['createdAt']) ?? DateTime(1970);
-      final bUpdated = _getDateTime(b['updatedAt'] ?? b['createdAt']) ?? DateTime(1970);
+      final aUpdated =
+          _getDateTime(a['updatedAt'] ?? a['createdAt']) ?? DateTime(1970);
+      final bUpdated =
+          _getDateTime(b['updatedAt'] ?? b['createdAt']) ?? DateTime(1970);
       return bUpdated.compareTo(aUpdated);
     });
 
@@ -242,7 +243,8 @@ class RecentlyUpdatedGuestsWidget extends StatelessWidget {
                   const SizedBox(height: 2),
                   CaptionText(
                     text: 'Updated $timeAgo',
-                    color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                    color: theme.textTheme.bodySmall?.color
+                        ?.withValues(alpha: 0.6),
                   ),
                 ],
               ],
@@ -324,4 +326,3 @@ class RecentlyUpdatedGuestsWidget extends StatelessWidget {
     }
   }
 }
-

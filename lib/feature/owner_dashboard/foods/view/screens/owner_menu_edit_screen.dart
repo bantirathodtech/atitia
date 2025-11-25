@@ -380,7 +380,8 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                 vertical: AppSpacing.paddingS,
               ),
               decoration: BoxDecoration(
-                color: ThemeColors.getCardBackground(context).withValues(alpha: 0.5),
+                color: ThemeColors.getCardBackground(context)
+                    .withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
                 border: Border.all(
                   color: ThemeColors.getDivider(context).withValues(alpha: 0.3),
@@ -846,7 +847,7 @@ class _OwnerMenuEditScreenState extends State<OwnerMenuEditScreen> {
                     onPressed: () => Navigator.of(context).pop(),
                     label: loc.cancel,
                   ),
-          const SizedBox(width: AppSpacing.paddingS),
+                  const SizedBox(width: AppSpacing.paddingS),
                   const SizedBox(width: AppSpacing.paddingS),
                   PrimaryButton(
                     onPressed: () {

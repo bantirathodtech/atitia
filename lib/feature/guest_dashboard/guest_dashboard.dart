@@ -37,7 +37,8 @@ class GuestDashboardScreen extends StatefulWidget {
 class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
   int _currentIndex = 0;
   final _analyticsService = getIt.analytics;
-  bool _isSwitchingTab = false; // Flag to prevent route listener from interfering during tab switch
+  bool _isSwitchingTab =
+      false; // Flag to prevent route listener from interfering during tab switch
 
   // Tab screens - No Provider wrapping needed since ViewModels are in AppProviders
   final List<Widget> _tabs = const [
@@ -68,18 +69,18 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
         listen: false,
       );
       pgSelectionProvider.initialize();
-      
+
       // Listen to route changes to update tab index
       _setupRouteListener();
     });
   }
-  
+
   /// Setup route listener to update tab index when routes change
   void _setupRouteListener() {
     final router = GoRouter.of(context);
     router.routerDelegate.addListener(_onRouteChanged);
   }
-  
+
   /// Called when route changes
   void _onRouteChanged() {
     if (mounted) {
@@ -90,7 +91,7 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
       });
     }
   }
-  
+
   @override
   void dispose() {
     // Remove route listener
@@ -136,7 +137,8 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
   /// Updates the current tab index based on the current route
   void _updateTabFromRoute() {
     if (!mounted || _isSwitchingTab) {
-      debugPrint('🔍 GuestDashboard: Skipping route update (switching tab or not mounted)');
+      debugPrint(
+          '🔍 GuestDashboard: Skipping route update (switching tab or not mounted)');
       return;
     }
 
@@ -170,9 +172,10 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
     if (location.endsWith('/') && location.length > 1) {
       location = location.substring(0, location.length - 1);
     }
-    
+
     // Debug: Print route for troubleshooting
-    debugPrint('🔍 GuestDashboard: Current route = $location, Current tab = $_currentIndex');
+    debugPrint(
+        '🔍 GuestDashboard: Current route = $location, Current tab = $_currentIndex');
 
     // Skip update if we're on a detail screen - these should not trigger tab updates
     if (_isOnDetailRoute(location)) {
@@ -183,9 +186,7 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
     // Map routes to tab indices - default to PGs tab (0)
     // Use exact route matching for better reliability
     int newIndex = 0;
-    if (location == '/guest/pgs' || 
-        location == '/guest' ||
-        location.isEmpty) {
+    if (location == '/guest/pgs' || location == '/guest' || location.isEmpty) {
       newIndex = 0; // PGs tab
     } else if (location == '/guest/foods') {
       newIndex = 1; // Foods tab
@@ -201,10 +202,12 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
 
     // Only update if different to avoid unnecessary rebuilds
     if (newIndex != _currentIndex && mounted) {
-      debugPrint('✅ GuestDashboard: Updating tab from $_currentIndex to $newIndex for route $location');
+      debugPrint(
+          '✅ GuestDashboard: Updating tab from $_currentIndex to $newIndex for route $location');
       _setTabIndex(newIndex, silent: true);
     } else {
-      debugPrint('🔍 GuestDashboard: Tab already at $newIndex for route $location');
+      debugPrint(
+          '🔍 GuestDashboard: Tab already at $newIndex for route $location');
     }
   }
 
@@ -266,7 +269,7 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
         _isSwitchingTab = false;
         return;
       }
-      
+
       final router = GoRouter.of(context);
       final tabRoutes = [
         '/guest/pgs',
@@ -279,20 +282,23 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
       if (index < tabRoutes.length) {
         final targetRoute = tabRoutes[index];
         // Navigate to ensure URL is correct, but only if route is different
-        final currentRoute = router.routerDelegate.currentConfiguration.uri.path;
+        final currentRoute =
+            router.routerDelegate.currentConfiguration.uri.path;
         if (currentRoute != targetRoute) {
           debugPrint('✅ GuestDashboard: Navigating to route $targetRoute');
           router.go(targetRoute);
         } else {
-          debugPrint('🔍 GuestDashboard: Already on route $targetRoute, skipping navigation');
+          debugPrint(
+              '🔍 GuestDashboard: Already on route $targetRoute, skipping navigation');
         }
       }
-      
+
       // Clear flag after navigation completes
       Future.delayed(const Duration(milliseconds: 200), () {
         if (mounted) {
           _isSwitchingTab = false;
-          debugPrint('🔍 GuestDashboard: Tab switch complete, route listener re-enabled');
+          debugPrint(
+              '🔍 GuestDashboard: Tab switch complete, route listener re-enabled');
         }
       });
     });
@@ -327,7 +333,7 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
 
     // Use GoRouter's route information to listen to route changes
     final router = GoRouter.of(context);
-    
+
     // Listen to route changes using router delegate
     return ListenableBuilder(
       listenable: router.routerDelegate,
@@ -343,27 +349,28 @@ class _GuestDashboardScreenState extends State<GuestDashboardScreen> {
         return GuestTabNavigationProvider(
           onTabSelected: _onTabSelected,
           child: Scaffold(
-      // Responsive body: Navigation rail + content for tablet landscape, content only for mobile/portrait
-      body: isTabletLandscape
-          ? Row(
-              children: [
-                _buildNavigationRail()!,
-                Expanded(
-                  child: IndexedStack(
+            // Responsive body: Navigation rail + content for tablet landscape, content only for mobile/portrait
+            body: isTabletLandscape
+                ? Row(
+                    children: [
+                      _buildNavigationRail()!,
+                      Expanded(
+                        child: IndexedStack(
+                          index: _currentIndex,
+                          children: _tabs,
+                        ),
+                      ),
+                    ],
+                  )
+                : IndexedStack(
                     index: _currentIndex,
                     children: _tabs,
                   ),
-                ),
-              ],
-            )
-          : IndexedStack(
-              index: _currentIndex,
-              children: _tabs,
-            ),
 
-      // Bottom navigation only for mobile/portrait
-      bottomNavigationBar:
-          isTabletLandscape ? null : _buildResponsiveBottomNavigationBar(),
+            // Bottom navigation only for mobile/portrait
+            bottomNavigationBar: isTabletLandscape
+                ? null
+                : _buildResponsiveBottomNavigationBar(),
           ),
         );
       },

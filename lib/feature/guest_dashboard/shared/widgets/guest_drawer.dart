@@ -50,14 +50,16 @@ class GuestDrawer extends StatelessWidget {
   void _handleDrawerNavigation(BuildContext context, String item) {
     // Close drawer first
     Navigator.of(context).pop();
-    
+
     // Try to get tab navigation callback from provider (preferred method)
-    final tabNavigation = GuestTabNavigationProvider.getTabNavigationCallback(context);
+    final tabNavigation =
+        GuestTabNavigationProvider.getTabNavigationCallback(context);
     if (tabNavigation != null) {
       debugPrint('✅ GuestDrawer: Using provider callback for: $item');
       switch (item) {
         case 'pgs':
-          tabNavigation(0); // Callback handles both tab switch and route navigation
+          tabNavigation(
+              0); // Callback handles both tab switch and route navigation
           return;
         case 'foods':
           tabNavigation(1);
@@ -73,9 +75,10 @@ class GuestDrawer extends StatelessWidget {
           return;
       }
     } else {
-      debugPrint('⚠️ GuestDrawer: Provider not found for: $item, using fallback');
+      debugPrint(
+          '⚠️ GuestDrawer: Provider not found for: $item, using fallback');
     }
-    
+
     // Fallback: Use callback if provided (for backward compatibility)
     if (onNavigationTap != null) {
       switch (item) {
@@ -96,10 +99,11 @@ class GuestDrawer extends StatelessWidget {
           return;
       }
     }
-    
+
     // Final fallback: Route navigation (should not be needed if provider is set up)
     // This should not happen if provider is working correctly
-    debugPrint('⚠️ GuestDrawer: Provider not found, using route navigation for: $item');
+    debugPrint(
+        '⚠️ GuestDrawer: Provider not found, using route navigation for: $item');
     final navService = getIt<NavigationService>();
     switch (item) {
       case 'pgs':

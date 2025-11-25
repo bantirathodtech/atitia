@@ -20,8 +20,8 @@ class GuestInfoService {
   /// Fetches guest information by UID
   Future<OwnerGuestModel?> getGuestByUid(String guestUid) async {
     try {
-      final guestDoc =
-          await _databaseService.getDocument(FirestoreConstants.users, guestUid);
+      final guestDoc = await _databaseService.getDocument(
+          FirestoreConstants.users, guestUid);
 
       if (!guestDoc.exists) {
         return null;
@@ -69,7 +69,8 @@ class GuestInfoService {
       // COST OPTIMIZATION: Limit to 20 bookings (active ones are usually recent)
       final bookingsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.bookings, 'guestUid', guestUid, limit: 20)
+              FirestoreConstants.bookings, 'guestUid', guestUid,
+              limit: 20)
           .first;
 
       if (bookingsSnapshot.docs.isEmpty) {
@@ -105,7 +106,8 @@ class GuestInfoService {
       // COST OPTIMIZATION: Limit to 100 guests for room filtering
       final guestsSnapshot = await _databaseService
           .getCollectionStreamWithFilter(
-              FirestoreConstants.users, 'role', 'guest', limit: 100)
+              FirestoreConstants.users, 'role', 'guest',
+              limit: 100)
           .first;
 
       final guests = <OwnerGuestModel>[];
@@ -114,8 +116,7 @@ class GuestInfoService {
         try {
           final guest = OwnerGuestModel.fromFirestore(doc);
           // Filter by PG and room
-          if (guest.roomNumber == roomNumber &&
-              guest.status == 'active' ||
+          if (guest.roomNumber == roomNumber && guest.status == 'active' ||
               guest.status == 'payment_pending') {
             guests.add(guest);
           }
@@ -131,4 +132,3 @@ class GuestInfoService {
     }
   }
 }
-

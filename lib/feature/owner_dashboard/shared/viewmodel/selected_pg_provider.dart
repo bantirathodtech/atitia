@@ -76,11 +76,13 @@ class SelectedPgProvider extends ChangeNotifier {
       Stream<QuerySnapshot> stream;
       try {
         stream = _databaseService.getCollectionStreamWithFilter(
-            FirestoreConstants.pgs, 'ownerUid', _ownerId!, limit: 50);
+            FirestoreConstants.pgs, 'ownerUid', _ownerId!,
+            limit: 50);
       } catch (e) {
         // Fallback: try ownerId field name
         stream = _databaseService.getCollectionStreamWithFilter(
-            FirestoreConstants.pgs, 'ownerId', _ownerId!, limit: 50);
+            FirestoreConstants.pgs, 'ownerId', _ownerId!,
+            limit: 50);
       }
 
       final snapshot = await stream.first;

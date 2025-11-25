@@ -85,9 +85,9 @@ class BookingRepository {
       final bookings = snapshot.docs
           .take(20) // COST OPTIMIZATION: Limit to 20 most recent bookings
           .map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return BookingModel.fromMap(data);
-          }).toList()
+        final data = doc.data() as Map<String, dynamic>;
+        return BookingModel.fromMap(data);
+      }).toList()
         ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return bookings;
     });
@@ -106,9 +106,9 @@ class BookingRepository {
         final bookings = snapshot.docs
             .take(20) // COST OPTIMIZATION: Limit to 20 most recent bookings
             .map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              return BookingModel.fromMap(data);
-            }).toList()
+          final data = doc.data() as Map<String, dynamic>;
+          return BookingModel.fromMap(data);
+        }).toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
         return bookings;
       });
@@ -121,9 +121,9 @@ class BookingRepository {
         final bookings = snapshot.docs
             .take(20) // COST OPTIMIZATION: Limit to 20 most recent bookings
             .map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              return BookingModel.fromMap(data);
-            }).toList()
+          final data = doc.data() as Map<String, dynamic>;
+          return BookingModel.fromMap(data);
+        }).toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
         return bookings;
       });

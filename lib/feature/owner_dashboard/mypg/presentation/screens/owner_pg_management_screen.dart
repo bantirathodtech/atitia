@@ -78,7 +78,8 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
   Widget build(BuildContext context) {
     final viewModel = context.watch<OwnerPgManagementViewModel>();
     // Use select to only rebuild when pgId changes
-    final currentPgId = context.select<SelectedPgProvider, String?>((p) => p.selectedPgId);
+    final currentPgId =
+        context.select<SelectedPgProvider, String?>((p) => p.selectedPgId);
 
     if (_lastLoadedPgId != currentPgId &&
         currentPgId != null &&
@@ -153,7 +154,8 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
     );
   }
 
-  Widget _buildBody(BuildContext context, OwnerPgManagementViewModel viewModel) {
+  Widget _buildBody(
+      BuildContext context, OwnerPgManagementViewModel viewModel) {
     final selectedPgProvider = context.read<SelectedPgProvider>();
     if (!selectedPgProvider.hasPgs) {
       return Center(
@@ -246,9 +248,11 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
   Widget _buildDashboardTab(
       BuildContext context, OwnerPgManagementViewModel viewModel) {
     final padding = context.responsivePadding;
-    final cardGap = context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM;
+    final cardGap =
+        context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM;
     return SingleChildScrollView(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
+      padding:
+          EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -296,19 +300,25 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
     final padding = context.responsivePadding;
 
     return ListView(
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
+      padding:
+          EdgeInsets.all(context.isMobile ? padding.top * 0.75 : padding.top),
       children: [
         // Overview stats card (shows zero values when empty)
         AdaptiveCard(
-          padding: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : AppSpacing.paddingM),
+          padding: EdgeInsets.all(
+              context.isMobile ? padding.top * 0.5 : AppSpacing.paddingM),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Icon(Icons.book_online_rounded,
-                      color: context.primaryColor, size: context.isMobile ? 18 : 20),
-                  SizedBox(width: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+                      color: context.primaryColor,
+                      size: context.isMobile ? 18 : 20),
+                  SizedBox(
+                      width: context.isMobile
+                          ? AppSpacing.paddingXS
+                          : AppSpacing.paddingS),
                   Expanded(
                     child: HeadingMedium(
                       text: AppLocalizations.of(context)?.bookingsOverview ??
@@ -318,7 +328,10 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
                   ),
                 ],
               ),
-              SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+              SizedBox(
+                  height: context.isMobile
+                      ? AppSpacing.paddingS
+                      : AppSpacing.paddingM),
               Row(
                 children: [
                   Expanded(
@@ -363,7 +376,9 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           ),
         ),
 
-        SizedBox(height: context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
+        SizedBox(
+            height:
+                context.isMobile ? AppSpacing.paddingS : AppSpacing.paddingM),
 
         // List (real items or placeholders)
         if (total > 0)
@@ -379,7 +394,10 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
               return RepaintBoundary(
                 key: ValueKey('booking_${booking.id}_$index'),
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+                  padding: EdgeInsets.only(
+                      bottom: context.isMobile
+                          ? AppSpacing.paddingXS
+                          : AppSpacing.paddingS),
                   child: _buildBookingCard(context, booking, viewModel),
                 ),
               );
@@ -405,7 +423,8 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
     final filterKeys = ['All', 'Occupied', 'Vacant', 'Pending', 'Maintenance'];
 
     return Container(
-      margin: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
+      margin: EdgeInsets.all(
+          context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
       height: context.isMobile ? 44 : 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -416,7 +435,10 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
           final isSelected = viewModel.selectedFilter == filterKey;
 
           return Padding(
-            padding: EdgeInsets.only(right: context.isMobile ? AppSpacing.paddingXS : AppSpacing.paddingS),
+            padding: EdgeInsets.only(
+                right: context.isMobile
+                    ? AppSpacing.paddingXS
+                    : AppSpacing.paddingS),
             child: CustomFilterChip(
               label: filterLabel,
               selected: isSelected,
@@ -512,8 +534,10 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
       IconData icon, Color color) {
     final padding = context.responsivePadding;
     return Container(
-      margin: EdgeInsets.all(context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
-      padding: EdgeInsets.all(context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
+      margin: EdgeInsets.all(
+          context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+      padding: EdgeInsets.all(
+          context.isMobile ? padding.top * 0.5 : padding.top * 0.75),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
@@ -528,7 +552,10 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(icon, color: color, size: context.isMobile ? 16 : 20),
-              SizedBox(width: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+              SizedBox(
+                  width: context.isMobile
+                      ? AppSpacing.paddingXS * 0.5
+                      : AppSpacing.paddingXS),
               Text(
                 value,
                 style: TextStyle(
@@ -539,7 +566,10 @@ class _OwnerPgManagementScreenState extends State<OwnerPgManagementScreen>
               ),
             ],
           ),
-          SizedBox(height: context.isMobile ? AppSpacing.paddingXS * 0.5 : AppSpacing.paddingXS),
+          SizedBox(
+              height: context.isMobile
+                  ? AppSpacing.paddingXS * 0.5
+                  : AppSpacing.paddingXS),
           // Row 2: Text below
           BodyText(
             text: label,

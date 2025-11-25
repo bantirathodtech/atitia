@@ -15,7 +15,8 @@ import '../../../../../common/lifecycle/mixin/stream_subscription_mixin.dart';
 
 /// ViewModel for Admin Revenue Dashboard
 /// Aggregates app-level revenue metrics, subscription stats, and featured listing stats
-class AdminRevenueViewModel extends BaseProviderState with StreamSubscriptionMixin {
+class AdminRevenueViewModel extends BaseProviderState
+    with StreamSubscriptionMixin {
   final RevenueRepository _revenueRepo;
   final OwnerSubscriptionRepository _subscriptionRepo;
   final FeaturedListingRepository _featuredListingRepo;
@@ -62,11 +63,14 @@ class AdminRevenueViewModel extends BaseProviderState with StreamSubscriptionMix
   double get totalRevenue => _totalRevenue;
   double get monthlyRevenue => _monthlyRevenue;
   double get yearlyRevenue => _yearlyRevenue;
-  Map<RevenueType, double> get revenueByType => Map.unmodifiable(_revenueByType);
-  Map<String, double> get monthlyBreakdown => Map.unmodifiable(_monthlyBreakdown);
+  Map<RevenueType, double> get revenueByType =>
+      Map.unmodifiable(_revenueByType);
+  Map<String, double> get monthlyBreakdown =>
+      Map.unmodifiable(_monthlyBreakdown);
   int get activeSubscriptionsCount => _activeSubscriptionsCount;
   int get totalSubscriptionsCount => _totalSubscriptionsCount;
-  Map<String, int> get subscriptionsByTier => Map.unmodifiable(_subscriptionsByTier);
+  Map<String, int> get subscriptionsByTier =>
+      Map.unmodifiable(_subscriptionsByTier);
   int get activeFeaturedListingsCount => _activeFeaturedListingsCount;
   int get totalFeaturedListingsCount => _totalFeaturedListingsCount;
   double get conversionRate => _conversionRate;
@@ -158,8 +162,7 @@ class AdminRevenueViewModel extends BaseProviderState with StreamSubscriptionMix
 
       // Count owners by tier (use active subscriptions)
       final activeSubs = allSubscriptions.where((sub) =>
-          sub.status == SubscriptionStatus.active &&
-          sub.endDate.isAfter(now));
+          sub.status == SubscriptionStatus.active && sub.endDate.isAfter(now));
 
       for (final sub in activeSubs) {
         final tier = sub.tier.firestoreValue;
@@ -288,8 +291,7 @@ class AdminRevenueViewModel extends BaseProviderState with StreamSubscriptionMix
     final now = DateTime.now();
     _monthlyRevenue = completedRevenues
         .where((r) =>
-            r.paymentDate.year == now.year &&
-            r.paymentDate.month == now.month)
+            r.paymentDate.year == now.year && r.paymentDate.month == now.month)
         .fold<double>(0.0, (sum, revenue) => sum + revenue.amount);
 
     _yearlyRevenue = completedRevenues
@@ -327,8 +329,7 @@ class AdminRevenueViewModel extends BaseProviderState with StreamSubscriptionMix
     final now = DateTime.now();
     _activeSubscriptionsCount = subscriptions
         .where((sub) =>
-            sub.status == SubscriptionStatus.active &&
-            sub.endDate.isAfter(now))
+            sub.status == SubscriptionStatus.active && sub.endDate.isAfter(now))
         .length;
 
     // Update by tier
@@ -339,8 +340,7 @@ class AdminRevenueViewModel extends BaseProviderState with StreamSubscriptionMix
     };
 
     final activeSubs = subscriptions.where((sub) =>
-        sub.status == SubscriptionStatus.active &&
-        sub.endDate.isAfter(now));
+        sub.status == SubscriptionStatus.active && sub.endDate.isAfter(now));
 
     for (final sub in activeSubs) {
       final tier = sub.tier.firestoreValue;
@@ -397,4 +397,3 @@ class AdminRevenueViewModel extends BaseProviderState with StreamSubscriptionMix
     super.dispose();
   }
 }
-

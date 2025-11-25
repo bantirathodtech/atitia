@@ -222,11 +222,12 @@ class GuestListWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildDetailRow(
-                          context, loc.ownerGuestDetailVehicleNumber, guest.vehicleNo!),
-                      if (guest.vehicleName != null && guest.vehicleName!.isNotEmpty)
-                        _buildDetailRow(
-                            context, loc.ownerGuestDetailVehicle, guest.vehicleName!),
+                      _buildDetailRow(context,
+                          loc.ownerGuestDetailVehicleNumber, guest.vehicleNo!),
+                      if (guest.vehicleName != null &&
+                          guest.vehicleName!.isNotEmpty)
+                        _buildDetailRow(context, loc.ownerGuestDetailVehicle,
+                            guest.vehicleName!),
                       if (guest.roomNumber != null)
                         _buildDetailRow(
                           context,
@@ -234,16 +235,16 @@ class GuestListWidget extends StatelessWidget {
                           guest.roomBedDisplay,
                         ),
                       if (guest.rent != null)
-                        _buildDetailRow(
-                            context, loc.ownerGuestDetailRent, guest.formattedRent),
+                        _buildDetailRow(context, loc.ownerGuestDetailRent,
+                            guest.formattedRent),
                       if (guest.deposit != null)
                         _buildDetailRow(context, loc.ownerGuestDetailDeposit,
                             guest.formattedDeposit),
                       if (guest.joiningDate != null)
                         _buildDetailRow(context, loc.ownerGuestDetailJoined,
                             guest.formattedJoiningDate),
-                      _buildDetailRow(
-                          context, loc.ownerGuestDetailStatus, guest.statusDisplay),
+                      _buildDetailRow(context, loc.ownerGuestDetailStatus,
+                          guest.statusDisplay),
                     ],
                   ),
                 ),
@@ -333,36 +334,37 @@ class GuestListWidget extends StatelessWidget {
                     onPressed: () => Navigator.of(context).pop(),
                     text: loc.cancel,
                   ),
-          PrimaryButton(
-            label: loc.ownerGuestUpdateAction,
-            onPressed: () async {
-              final viewModel =
-                  Provider.of<OwnerGuestViewModel>(context, listen: false);
-              final updatedGuest = guest.copyWith(
-                roomNumber: roomController.text.trim().isEmpty
-                    ? null
-                    : roomController.text.trim(),
-                bedNumber: bedController.text.trim().isEmpty
-                    ? null
-                    : bedController.text.trim(),
-              );
+                  PrimaryButton(
+                    label: loc.ownerGuestUpdateAction,
+                    onPressed: () async {
+                      final viewModel = Provider.of<OwnerGuestViewModel>(
+                          context,
+                          listen: false);
+                      final updatedGuest = guest.copyWith(
+                        roomNumber: roomController.text.trim().isEmpty
+                            ? null
+                            : roomController.text.trim(),
+                        bedNumber: bedController.text.trim().isEmpty
+                            ? null
+                            : bedController.text.trim(),
+                      );
 
-              final success = await viewModel.updateGuest(updatedGuest);
+                      final success = await viewModel.updateGuest(updatedGuest);
 
-              if (context.mounted) {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(success
-                        ? loc.ownerGuestRoomBedUpdateSuccess
-                        : loc.ownerGuestRoomBedUpdateFailure),
-                    backgroundColor:
-                        success ? AppColors.success : AppColors.error,
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(success
+                                ? loc.ownerGuestRoomBedUpdateSuccess
+                                : loc.ownerGuestRoomBedUpdateFailure),
+                            backgroundColor:
+                                success ? AppColors.success : AppColors.error,
+                          ),
+                        );
+                      }
+                    },
                   ),
-                );
-              }
-            },
-          ),
                 ],
               ),
             ],

@@ -30,9 +30,10 @@ class AppSubscriptionPaymentService with LoggingMixin {
   String? _appRazorpayKey;
   AppPaymentType? _currentPaymentType;
   String? _currentPaymentContextId; // subscriptionId or featuredListingId
-  
+
   // Repositories
-  final OwnerSubscriptionRepository _subscriptionRepo = OwnerSubscriptionRepository();
+  final OwnerSubscriptionRepository _subscriptionRepo =
+      OwnerSubscriptionRepository();
   final FeaturedListingRepository _featuredRepo = FeaturedListingRepository();
   final RevenueRepository _revenueRepo = RevenueRepository();
   final RemoteConfigServiceWrapper _remoteConfig = RemoteConfigServiceWrapper();
@@ -87,9 +88,10 @@ class AppSubscriptionPaymentService with LoggingMixin {
       // Fallback to environment config (if available)
       // TODO: Add to environment_config.dart when Razorpay account is created
       // _appRazorpayKey = EnvironmentConfig.appRazorpayKey;
-      
+
       // For now, throw error if key not found
-      throw Exception('App Razorpay key not configured. Please set in Remote Config or Environment Config.');
+      throw Exception(
+          'App Razorpay key not configured. Please set in Remote Config or Environment Config.');
     } catch (e) {
       logError(
         'Failed to load app Razorpay key',
@@ -179,7 +181,8 @@ class AppSubscriptionPaymentService with LoggingMixin {
         'key': _appRazorpayKey!,
         'amount': (amount * 100).toInt(), // Convert to paise
         'name': 'Atitia',
-        'description': '${plan.name} Subscription - ${billingPeriod.displayName}',
+        'description':
+            '${plan.name} Subscription - ${billingPeriod.displayName}',
         'prefill': {
           'contact': userPhone,
           'email': userEmail,
@@ -285,7 +288,8 @@ class AppSubscriptionPaymentService with LoggingMixin {
         'key': _appRazorpayKey!,
         'amount': (amount * 100).toInt(), // Convert to paise
         'name': 'Atitia',
-        'description': 'Featured Listing - $durationMonths Month${durationMonths > 1 ? 's' : ''}',
+        'description':
+            'Featured Listing - $durationMonths Month${durationMonths > 1 ? 's' : ''}',
         'prefill': {
           'contact': userPhone,
           'email': userEmail,
@@ -332,7 +336,8 @@ class AppSubscriptionPaymentService with LoggingMixin {
   }) async {
     try {
       // Update subscription status to active
-      final subscription = await _subscriptionRepo.getSubscription(subscriptionId);
+      final subscription =
+          await _subscriptionRepo.getSubscription(subscriptionId);
       if (subscription == null) {
         throw Exception('Subscription not found');
       }
@@ -347,7 +352,8 @@ class AppSubscriptionPaymentService with LoggingMixin {
       await _subscriptionRepo.updateSubscription(updatedSubscription);
 
       // Create revenue record
-      final revenueId = 'rev_${subscriptionId}_${DateTime.now().millisecondsSinceEpoch}';
+      final revenueId =
+          'rev_${subscriptionId}_${DateTime.now().millisecondsSinceEpoch}';
       final revenue = RevenueRecordModel(
         revenueId: revenueId,
         type: RevenueType.subscription,
@@ -398,7 +404,8 @@ class AppSubscriptionPaymentService with LoggingMixin {
   }) async {
     try {
       // Update featured listing status to active
-      final featuredListing = await _featuredRepo.getFeaturedListing(featuredListingId);
+      final featuredListing =
+          await _featuredRepo.getFeaturedListing(featuredListingId);
       if (featuredListing == null) {
         throw Exception('Featured listing not found');
       }
@@ -413,7 +420,8 @@ class AppSubscriptionPaymentService with LoggingMixin {
       await _featuredRepo.updateFeaturedListing(updatedListing);
 
       // Create revenue record
-      final revenueId = 'rev_${featuredListingId}_${DateTime.now().millisecondsSinceEpoch}';
+      final revenueId =
+          'rev_${featuredListingId}_${DateTime.now().millisecondsSinceEpoch}';
       final revenue = RevenueRecordModel(
         revenueId: revenueId,
         type: RevenueType.featuredListing,
@@ -495,15 +503,19 @@ class AppSubscriptionPaymentService with LoggingMixin {
     try {
       if (_currentPaymentType == AppPaymentType.subscription &&
           _currentPaymentContextId != null) {
-        final subscription = await _subscriptionRepo.getSubscription(_currentPaymentContextId!);
-        if (subscription != null && subscription.status == SubscriptionStatus.pendingPayment) {
+        final subscription =
+            await _subscriptionRepo.getSubscription(_currentPaymentContextId!);
+        if (subscription != null &&
+            subscription.status == SubscriptionStatus.pendingPayment) {
           // Keep as pending payment for retry, or mark as cancelled
           // For now, we'll leave it as pending so user can retry
         }
       } else if (_currentPaymentType == AppPaymentType.featuredListing &&
           _currentPaymentContextId != null) {
-        final listing = await _featuredRepo.getFeaturedListing(_currentPaymentContextId!);
-        if (listing != null && listing.status == FeaturedListingStatus.pending) {
+        final listing =
+            await _featuredRepo.getFeaturedListing(_currentPaymentContextId!);
+        if (listing != null &&
+            listing.status == FeaturedListingStatus.pending) {
           // Keep as pending for retry, or mark as cancelled
           // For now, we'll leave it as pending so user can retry
         }
@@ -547,4 +559,3 @@ class AppSubscriptionPaymentService with LoggingMixin {
     _appRazorpayKey = null;
   }
 }
-

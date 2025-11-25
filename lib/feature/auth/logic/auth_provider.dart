@@ -536,7 +536,7 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
           // User is admin - allow access without role selection
           _user = existingUser;
           _selectedRole = null;
-          
+
           // Update phone number from Firebase user to ensure it's current
           if (firebaseUser.phoneNumber != null &&
               firebaseUser.phoneNumber!.isNotEmpty) {
