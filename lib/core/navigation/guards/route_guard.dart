@@ -125,14 +125,21 @@ class RouteGuard {
   }
 
   /// Gets redirect path based on authentication and role
-  static String? getRedirectPath(String currentRoute, String? userRole) {
+  /// 
+  /// [skipAuthCheck] - When true, skips authentication check (useful for testing)
+  /// This allows testing role-based access logic without setting up Firebase Auth
+  static String? getRedirectPath(
+    String currentRoute,
+    String? userRole, {
+    bool skipAuthCheck = false,
+  }) {
     // Allow auth routes without authentication
     if (AppRoutes.isAuthRoute(currentRoute)) {
       return null; // Allow access
     }
 
-    // Check authentication
-    if (!isAuthenticated()) {
+    // Check authentication (unless skipped for testing)
+    if (!skipAuthCheck && !isAuthenticated()) {
       return AppRoutes.splash;
     }
 
