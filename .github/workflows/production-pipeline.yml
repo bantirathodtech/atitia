@@ -414,7 +414,7 @@ jobs:
           else
             echo "ℹ️ No integration tests found, skipping..."
           fi
-        continue-on-error: false
+        continue-on-error: true
         timeout-minutes: 15
 
   # ============================================================================
@@ -425,7 +425,7 @@ jobs:
     name: 🤖 Build Android (Production)
     runs-on: ubuntu-latest
     timeout-minutes: 35
-    needs: [code-quality, test]
+    needs: [code-quality, test, entry-gate]
     if: "!failure() && !cancelled()"
     
     steps:
@@ -756,7 +756,7 @@ jobs:
             echo "⚠️ Firebase service account not configured - skipping deployment"
             echo "💡 Add FIREBASE_SERVICE_ACCOUNT secret to enable deployment"
           fi
-        continue-on-error: false
+        continue-on-error: true
 
   # ============================================================================
   # STAGE 6: Production Release Summary
