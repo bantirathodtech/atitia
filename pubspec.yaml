@@ -2,7 +2,7 @@ name: atitia
 description: A PG management app with MVVM, Firebase Auth, day/night mode, and multi-language support
 publish_to: 'none'
 
-version: 1.0.3+6
+version: 1.0.4+7
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
