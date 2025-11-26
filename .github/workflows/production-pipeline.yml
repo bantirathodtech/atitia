@@ -482,12 +482,10 @@ jobs:
             fi
             
             # Create key.properties file
-            cat > android/key.properties << EOF
-storePassword=$KEYSTORE_PASSWORD
-keyPassword=$KEY_PASSWORD
-keyAlias=$KEY_ALIAS
-storeFile=keystore.jks
-EOF
+            echo "storePassword=$KEYSTORE_PASSWORD" > android/key.properties
+            echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+            echo "keyAlias=$KEY_ALIAS" >> android/key.properties
+            echo "storeFile=keystore.jks" >> android/key.properties
             
             echo "✅ Android signing configured"
           else
