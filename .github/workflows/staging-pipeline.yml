@@ -419,6 +419,9 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
           cache: 'gradle'
+          cache-dependency-path: |
+            android/**/*.gradle*
+            android/**/gradle-wrapper.properties
 
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
@@ -523,6 +526,47 @@ jobs:
             build/app/outputs/flutter-apk/*.apk
           retention-days: 7
           if-no-files-found: ignore
+
+      - name: 🧹 Cleanup Before Cache Save (Prevent Timeout)
+        if: always()
+        run: |
+          echo "🧹 Cleaning up large build artifacts before cache save..."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 Disk space before cleanup:"
+          df -h
+          echo ""
+          
+          # Remove build outputs (already uploaded as artifacts)
+          echo "🗑️  Removing build outputs..."
+          rm -rf build/app/outputs || true
+          rm -rf build/app/intermediates || true
+          rm -rf build/app/tmp || true
+          
+          # Clean Gradle build directories (but keep ~/.gradle/caches for dependency cache)
+          echo "🗑️  Cleaning Gradle build directories..."
+          cd android
+          ./gradlew clean --no-daemon 2>&1 | head -10 || true
+          cd ..
+          rm -rf android/app/build || true
+          rm -rf android/build || true
+          
+          # Clean large intermediate files from Gradle cache (keep dependency cache)
+          echo "🗑️  Optimizing Gradle cache..."
+          find ~/.gradle/caches -name "*.lock" -delete 2>/dev/null || true
+          find ~/.gradle/caches -type d -name "transforms-*" -exec rm -rf {} + 2>/dev/null || true
+          find ~/.gradle/caches -type d -name "build-cache-*" -exec rm -rf {} + 2>/dev/null || true
+          
+          # Clean Flutter build artifacts
+          echo "🗑️  Cleaning Flutter build artifacts..."
+          rm -rf build/app/intermediates || true
+          rm -rf build/app/tmp || true
+          
+          echo ""
+          echo "📊 Disk space after cleanup:"
+          df -h
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Cleanup complete - cache save should be faster now"
+        timeout-minutes: 3
 
   build-ios:
     name: 🍎 Build iOS
