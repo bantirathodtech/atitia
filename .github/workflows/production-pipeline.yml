@@ -464,41 +464,42 @@ jobs:
           # Check Android secrets
           echo "🤖 Checking Android secrets ($ANDROID_REQUIRED required)..."
           
-          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+          # Use length check to avoid multiline JSON issues with [ -n ] test
+          SECRET_LEN=$(printf '%s' "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | wc -c)
             echo "  ✅ ANDROID_KEYSTORE_BASE64 (length: $SECRET_LEN chars)"
           else
             echo "  ❌ ANDROID_KEYSTORE_BASE64 (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" | wc -c)
             echo "  ✅ ANDROID_KEYSTORE_PASSWORD (length: $SECRET_LEN chars)"
           else
             echo "  ❌ ANDROID_KEYSTORE_PASSWORD (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.ANDROID_KEY_ALIAS }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.ANDROID_KEY_ALIAS }}" | wc -c)
             echo "  ✅ ANDROID_KEY_ALIAS (length: $SECRET_LEN chars)"
           else
             echo "  ❌ ANDROID_KEY_ALIAS (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.ANDROID_KEY_PASSWORD }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.ANDROID_KEY_PASSWORD }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.ANDROID_KEY_PASSWORD }}" | wc -c)
             echo "  ✅ ANDROID_KEY_PASSWORD (length: $SECRET_LEN chars)"
           else
             echo "  ❌ ANDROID_KEY_PASSWORD (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | wc -c)
             echo "  ✅ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON (length: $SECRET_LEN chars)"
           else
             echo "  ❌ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON (not found or empty)"
@@ -513,49 +514,49 @@ jobs:
           # Check iOS secrets
           echo "🍎 Checking iOS secrets ($IOS_REQUIRED required - optional)..."
           
-          if [ -n "${{ secrets.IOS_CERTIFICATE_BASE64 }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | wc -c)
             echo "  ✅ IOS_CERTIFICATE_BASE64 (length: $SECRET_LEN chars)"
           else
             echo "  ❌ IOS_CERTIFICATE_BASE64 (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" | wc -c)
             echo "  ✅ IOS_CERTIFICATE_PASSWORD (length: $SECRET_LEN chars)"
           else
             echo "  ❌ IOS_CERTIFICATE_PASSWORD (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | wc -c)
             echo "  ✅ IOS_PROVISIONING_PROFILE_BASE64 (length: $SECRET_LEN chars)"
           else
             echo "  ❌ IOS_PROVISIONING_PROFILE_BASE64 (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" | wc -c)
             echo "  ✅ APP_STORE_CONNECT_API_KEY_ID (length: $SECRET_LEN chars)"
           else
             echo "  ❌ APP_STORE_CONNECT_API_KEY_ID (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.APP_STORE_CONNECT_API_ISSUER }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.APP_STORE_CONNECT_API_ISSUER }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.APP_STORE_CONNECT_API_ISSUER }}" | wc -c)
             echo "  ✅ APP_STORE_CONNECT_API_ISSUER (length: $SECRET_LEN chars)"
           else
             echo "  ❌ APP_STORE_CONNECT_API_ISSUER (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.APP_STORE_CONNECT_API_KEY }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | wc -c)
             echo "  ✅ APP_STORE_CONNECT_API_KEY (length: $SECRET_LEN chars)"
           else
             echo "  ❌ APP_STORE_CONNECT_API_KEY (not found or empty)"
@@ -570,17 +571,17 @@ jobs:
           # Check Web/Firebase secrets
           echo "🌐 Checking Web/Firebase secrets ($WEB_REQUIRED required)..."
           
-          if [ -n "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             WEB_COUNT=$((WEB_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | wc -c)
             echo "  ✅ FIREBASE_SERVICE_ACCOUNT (length: $SECRET_LEN chars)"
           else
             echo "  ❌ FIREBASE_SERVICE_ACCOUNT (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
+          SECRET_LEN=$(printf '%s' "${{ secrets.FIREBASE_PROJECT_ID }}" | wc -c | tr -d ' ')
+          if [ "$SECRET_LEN" -gt 0 ] 2>/dev/null; then
             WEB_COUNT=$((WEB_COUNT + 1))
-            SECRET_LEN=$(echo -n "${{ secrets.FIREBASE_PROJECT_ID }}" | wc -c)
             echo "  ✅ FIREBASE_PROJECT_ID (length: $SECRET_LEN chars)"
           else
             echo "  ❌ FIREBASE_PROJECT_ID (not found or empty)"
