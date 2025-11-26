@@ -419,6 +419,183 @@ jobs:
         timeout-minutes: 15
 
   # ============================================================================
+  # STAGE 3.5: Verify Deployment Secrets
+  # ============================================================================
+  
+  verify-deployment-secrets:
+    name: 🔍 Verify Deployment Secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [test, code-quality, security-audit, entry-gate]
+    if: "!failure() && !cancelled()"
+    
+    outputs:
+      android_deploy_enabled: ${{ steps.check-secrets.outputs.android_deploy_enabled }}
+      ios_deploy_enabled: ${{ steps.check-secrets.outputs.ios_deploy_enabled }}
+      web_deploy_enabled: ${{ steps.check-secrets.outputs.web_deploy_enabled }}
+    
+    steps:
+      - name: 🔍 Check Deployment Secrets
+        id: check-secrets
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🔍 VERIFYING DEPLOYMENT SECRETS"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          # Initialize counters
+          ANDROID_COUNT=0
+          ANDROID_REQUIRED=5
+          IOS_COUNT=0
+          IOS_REQUIRED=6
+          WEB_COUNT=0
+          WEB_REQUIRED=2
+          
+          # Check Android secrets
+          echo "🤖 Checking Android secrets ($ANDROID_REQUIRED required)..."
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            echo "  ✅ ANDROID_KEYSTORE_BASE64"
+          else
+            echo "  ❌ ANDROID_KEYSTORE_BASE64"
+          fi
+          
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ]; then
+            ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            echo "  ✅ ANDROID_KEYSTORE_PASSWORD"
+          else
+            echo "  ❌ ANDROID_KEYSTORE_PASSWORD"
+          fi
+          
+          if [ -n "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then
+            ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            echo "  ✅ ANDROID_KEY_ALIAS"
+          else
+            echo "  ❌ ANDROID_KEY_ALIAS"
+          fi
+          
+          if [ -n "${{ secrets.ANDROID_KEY_PASSWORD }}" ]; then
+            ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            echo "  ✅ ANDROID_KEY_PASSWORD"
+          else
+            echo "  ❌ ANDROID_KEY_PASSWORD"
+          fi
+          
+          if [ -n "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" ]; then
+            ANDROID_COUNT=$((ANDROID_COUNT + 1))
+            echo "  ✅ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"
+          else
+            echo "  ❌ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"
+          fi
+          
+          echo "  📊 Android: $ANDROID_COUNT/$ANDROID_REQUIRED secrets configured"
+          echo ""
+          
+          # Check iOS secrets
+          echo "🍎 Checking iOS secrets ($IOS_REQUIRED required)..."
+          if [ -n "${{ secrets.IOS_CERTIFICATE_BASE64 }}" ]; then
+            IOS_COUNT=$((IOS_COUNT + 1))
+            echo "  ✅ IOS_CERTIFICATE_BASE64"
+          else
+            echo "  ❌ IOS_CERTIFICATE_BASE64"
+          fi
+          
+          if [ -n "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" ]; then
+            IOS_COUNT=$((IOS_COUNT + 1))
+            echo "  ✅ IOS_CERTIFICATE_PASSWORD"
+          else
+            echo "  ❌ IOS_CERTIFICATE_PASSWORD"
+          fi
+          
+          if [ -n "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" ]; then
+            IOS_COUNT=$((IOS_COUNT + 1))
+            echo "  ✅ IOS_PROVISIONING_PROFILE_BASE64"
+          else
+            echo "  ❌ IOS_PROVISIONING_PROFILE_BASE64"
+          fi
+          
+          if [ -n "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" ]; then
+            IOS_COUNT=$((IOS_COUNT + 1))
+            echo "  ✅ APP_STORE_CONNECT_API_KEY_ID"
+          else
+            echo "  ❌ APP_STORE_CONNECT_API_KEY_ID"
+          fi
+          
+          if [ -n "${{ secrets.APP_STORE_CONNECT_API_ISSUER }}" ]; then
+            IOS_COUNT=$((IOS_COUNT + 1))
+            echo "  ✅ APP_STORE_CONNECT_API_ISSUER"
+          else
+            echo "  ❌ APP_STORE_CONNECT_API_ISSUER"
+          fi
+          
+          if [ -n "${{ secrets.APP_STORE_CONNECT_API_KEY }}" ]; then
+            IOS_COUNT=$((IOS_COUNT + 1))
+            echo "  ✅ APP_STORE_CONNECT_API_KEY"
+          else
+            echo "  ❌ APP_STORE_CONNECT_API_KEY"
+          fi
+          
+          echo "  📊 iOS: $IOS_COUNT/$IOS_REQUIRED secrets configured"
+          echo ""
+          
+          # Check Web/Firebase secrets
+          echo "🌐 Checking Web/Firebase secrets ($WEB_REQUIRED required)..."
+          if [ -n "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
+            WEB_COUNT=$((WEB_COUNT + 1))
+            echo "  ✅ FIREBASE_SERVICE_ACCOUNT"
+          else
+            echo "  ❌ FIREBASE_SERVICE_ACCOUNT"
+          fi
+          
+          if [ -n "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
+            WEB_COUNT=$((WEB_COUNT + 1))
+            echo "  ✅ FIREBASE_PROJECT_ID"
+          else
+            echo "  ❌ FIREBASE_PROJECT_ID"
+          fi
+          
+          echo "  📊 Web/Firebase: $WEB_COUNT/$WEB_REQUIRED secrets configured"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 SECRET VERIFICATION SUMMARY"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          # Set outputs based on secret counts
+          if [ "$ANDROID_COUNT" -eq "$ANDROID_REQUIRED" ]; then
+            echo "android_deploy_enabled=true" >> $GITHUB_OUTPUT
+            echo "✅ Android: $ANDROID_COUNT/$ANDROID_REQUIRED secrets → DEPLOYMENT ENABLED"
+          else
+            echo "android_deploy_enabled=false" >> $GITHUB_OUTPUT
+            echo "⏸️  Android: $ANDROID_COUNT/$ANDROID_REQUIRED secrets → DEPLOYMENT DISABLED"
+            echo "   Missing: $((ANDROID_REQUIRED - ANDROID_COUNT)) secret(s)"
+            echo "   💡 Add missing secrets to enable Android deployment"
+          fi
+          
+          if [ "$IOS_COUNT" -eq "$IOS_REQUIRED" ]; then
+            echo "ios_deploy_enabled=true" >> $GITHUB_OUTPUT
+            echo "✅ iOS: $IOS_COUNT/$IOS_REQUIRED secrets → DEPLOYMENT ENABLED"
+          else
+            echo "ios_deploy_enabled=false" >> $GITHUB_OUTPUT
+            echo "⏸️  iOS: $IOS_COUNT/$IOS_REQUIRED secrets → DEPLOYMENT DISABLED"
+            echo "   Missing: $((IOS_REQUIRED - IOS_COUNT)) secret(s)"
+            echo "   💡 Add missing secrets to enable iOS deployment (optional)"
+          fi
+          
+          if [ "$WEB_COUNT" -eq "$WEB_REQUIRED" ]; then
+            echo "web_deploy_enabled=true" >> $GITHUB_OUTPUT
+            echo "✅ Web/Firebase: $WEB_COUNT/$WEB_REQUIRED secrets → DEPLOYMENT ENABLED"
+          else
+            echo "web_deploy_enabled=false" >> $GITHUB_OUTPUT
+            echo "⏸️  Web/Firebase: $WEB_COUNT/$WEB_REQUIRED secrets → DEPLOYMENT DISABLED"
+            echo "   Missing: $((WEB_REQUIRED - WEB_COUNT)) secret(s)"
+            echo "   💡 Add missing secrets to enable Web deployment"
+          fi
+          
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  # ============================================================================
   # STAGE 4: Production Builds (All Platforms)
   # ============================================================================
   
@@ -426,8 +603,8 @@ jobs:
     name: 🤖 Build Android (Production)
     runs-on: ubuntu-latest
     timeout-minutes: 35
-    needs: [code-quality, test, entry-gate]
-    if: "!failure() && !cancelled()"
+    needs: [code-quality, test, entry-gate, verify-deployment-secrets]
+    if: "!failure() && !cancelled() && needs.verify-deployment-secrets.outputs.android_deploy_enabled == 'true'"
     
     steps:
       - name: 📥 Checkout Code
@@ -538,8 +715,8 @@ jobs:
     name: 🍎 Build iOS (Production)
     runs-on: macos-15
     timeout-minutes: 60
-    needs: [code-quality, test, entry-gate]
-    if: "!failure() && !cancelled()"
+    needs: [code-quality, test, entry-gate, verify-deployment-secrets]
+    if: "!failure() && !cancelled() && needs.verify-deployment-secrets.outputs.ios_deploy_enabled == 'true'"
     
     steps:
       - name: 📥 Checkout Code
@@ -610,8 +787,8 @@ jobs:
     name: 🌐 Build Web (Production)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [code-quality, test, entry-gate]
-    if: "!failure() && !cancelled()"
+    needs: [code-quality, test, entry-gate, verify-deployment-secrets]
+    if: "!failure() && !cancelled() && needs.verify-deployment-secrets.outputs.web_deploy_enabled == 'true'"
     
     steps:
       - name: 📥 Checkout Code
@@ -653,8 +830,8 @@ jobs:
     name: 📱 Deploy to Google Play Store
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: build-android-production
-    if: success() && !cancelled()
+    needs: [build-android-production, verify-deployment-secrets]
+    if: success() && !cancelled() && needs.verify-deployment-secrets.outputs.android_deploy_enabled == 'true'
     environment:
       name: production
     steps:
@@ -692,8 +869,8 @@ jobs:
     name: 🍎 Deploy to Apple App Store
     runs-on: macos-15
     timeout-minutes: 30
-    needs: build-ios-production
-    if: success() && !cancelled()
+    needs: [build-ios-production, verify-deployment-secrets]
+    if: success() && !cancelled() && needs.verify-deployment-secrets.outputs.ios_deploy_enabled == 'true'
     environment:
       name: production
     steps:
@@ -729,8 +906,8 @@ jobs:
     name: 🌐 Deploy to Firebase (Production)
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    needs: build-web-production
-    if: success() && !cancelled()
+    needs: [build-web-production, verify-deployment-secrets]
+    if: success() && !cancelled() && needs.verify-deployment-secrets.outputs.web_deploy_enabled == 'true'
     environment:
       name: production
     steps:
@@ -783,7 +960,7 @@ jobs:
   production-release-summary:
     name: 📋 Production Release Summary
     runs-on: ubuntu-latest
-    needs: [validate-production, production-approval, entry-gate, dependencies, code-quality, security-audit, test, build-android-production, build-ios-production, build-web-production, deploy-android-playstore, deploy-ios-appstore, deploy-firebase-production]
+    needs: [validate-production, production-approval, entry-gate, dependencies, code-quality, security-audit, test, verify-deployment-secrets, build-android-production, build-ios-production, build-web-production, deploy-android-playstore, deploy-ios-appstore, deploy-firebase-production]
     if: always()
     
     steps:
@@ -815,6 +992,27 @@ jobs:
           echo "| 📊 Code Quality | ${{ needs.code-quality.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🔒 Security | ${{ needs.security-audit.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🧪 Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 🔍 Deployment Secrets Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.verify-deployment-secrets.outputs.android_deploy_enabled }}" == "true" ]; then
+            echo "| 🤖 Android | ✅ Enabled |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🤖 Android | ⏸️ Disabled (missing secrets) |" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.verify-deployment-secrets.outputs.ios_deploy_enabled }}" == "true" ]; then
+            echo "| 🍎 iOS | ✅ Enabled |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🍎 iOS | ⏸️ Disabled (missing secrets) |" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ needs.verify-deployment-secrets.outputs.web_deploy_enabled }}" == "true" ]; then
+            echo "| 🌐 Web/Firebase | ✅ Enabled |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🌐 Web/Firebase | ⏸️ Disabled (missing secrets) |" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           
           echo "### Production Builds" >> $GITHUB_STEP_SUMMARY
