@@ -201,8 +201,8 @@ jobs:
     name: 🚪 Entry Gate
     runs-on: ubuntu-latest
     timeout-minutes: 2
-    needs: [validate-production]
-    if: always() && needs.validate-production.result == 'success'
+    needs: [validate-production, production-approval]
+    if: always() && needs.validate-production.result == 'success' && (needs.production-approval.result == 'success' || needs.production-approval.result == 'skipped' || github.event.inputs.skip_approval == 'true')
     
     steps:
       - name: 📥 Checkout Code
@@ -395,20 +395,14 @@ jobs:
         if: matrix.test-type == 'unit'
         run: |
           echo "🧪 Running unit tests..."
-          flutter test test/unit/ --no-pub --coverage || {
-            echo "⚠️ Unit tests completed with notes"
-            exit 0
-          }
+          flutter test test/unit/ --no-pub --coverage
         timeout-minutes: 12
 
       - name: 🎨 Run Widget Tests
         if: matrix.test-type == 'widget'
         run: |
           echo "🎨 Running widget tests..."
-          flutter test test/widget_test.dart --no-pub --coverage || {
-            echo "⚠️ Widget tests completed with notes"
-            exit 0
-          }
+          flutter test test/widget_test.dart --no-pub --coverage
         timeout-minutes: 8
 
       - name: 🔗 Run Integration Tests
@@ -416,14 +410,11 @@ jobs:
         run: |
           echo "🔗 Running integration tests..."
           if [ -d "test/integration" ] && [ "$(ls -A test/integration/*.dart 2>/dev/null)" ]; then
-            flutter test test/integration/ --no-pub --coverage || {
-              echo "⚠️ Integration tests completed with notes"
-              exit 0
-            }
+            flutter test test/integration/ --no-pub --coverage
           else
             echo "ℹ️ No integration tests found, skipping..."
           fi
-        continue-on-error: true
+        continue-on-error: false
         timeout-minutes: 15
 
   # ============================================================================
@@ -529,7 +520,7 @@ jobs:
     name: 🍎 Build iOS (Production)
     runs-on: macos-15
     timeout-minutes: 60
-    needs: [code-quality, test]
+    needs: [code-quality, test, entry-gate]
     if: "!failure() && !cancelled()"
     
     steps:
@@ -601,7 +592,7 @@ jobs:
     name: 🌐 Build Web (Production)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [code-quality, test]
+    needs: [code-quality, test, entry-gate]
     if: "!failure() && !cancelled()"
     
     steps:
@@ -752,17 +743,20 @@ jobs:
             if [ -n "$FIREBASE_PROJECT_ID" ] && [ "$FIREBASE_PROJECT_ID" != "" ]; then
               firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" || {
                 echo "❌ Firebase deployment failed"
+                rm -f /tmp/firebase-service-account.json
                 exit 1
               }
               echo "✅ Successfully deployed to Firebase Hosting (Production)"
+              rm -f /tmp/firebase-service-account.json
             else
               echo "⚠️ FIREBASE_PROJECT_ID not set - skipping deployment"
+              rm -f /tmp/firebase-service-account.json
             fi
           else
             echo "⚠️ Firebase service account not configured - skipping deployment"
             echo "💡 Add FIREBASE_SERVICE_ACCOUNT secret to enable deployment"
           fi
-        continue-on-error: true
+        continue-on-error: false
 
   # ============================================================================
   # STAGE 6: Production Release Summary

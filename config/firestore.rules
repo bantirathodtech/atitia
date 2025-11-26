@@ -444,7 +444,10 @@ service cloud.firestore {
         isAdmin()
       );
       allow list: if isAuthenticated() && isAdmin(); // Only admins can list all
-      allow create: if isAuthenticated(); // Created by payment service (server-side)
+      allow create: if isAuthenticated() && (
+        request.resource.data.ownerId == request.auth.uid ||
+        isAdmin()
+      ); // Must own the revenue record being created
       allow update: if isAuthenticated() && isAdmin(); // Only admins can update
       allow delete: if isAuthenticated() && isAdmin();
     }
