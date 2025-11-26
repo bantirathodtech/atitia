@@ -87,7 +87,7 @@ jobs:
             echo "📦 Version: $VERSION"
           else
             echo "📌 Manual dispatch detected"
-            VERSION="${TAG_VERSION:-${{ github.event.inputs.version_tag }}}"
+            VERSION="${{ github.event.inputs.version_tag }}"
             VERSION="${VERSION#v}"  # Remove 'v' prefix if present
             echo "📦 Version: $VERSION"
           fi
@@ -789,10 +789,12 @@ jobs:
           echo "| Gate | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| ✅ Validation | ${{ needs.validate-production.result }} |" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ needs.production-approval.result }}" == "success" ]; then
-            echo "| 👤 Approval | ✅ Approved |" >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ needs.approval-skip.result }}" == "success" ]; then
+          if [ "${{ github.event.inputs.skip_approval }}" == "true" ]; then
             echo "| 👤 Approval | ⚠️ Skipped (Emergency) |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.production-approval.result }}" == "success" ]; then
+            echo "| 👤 Approval | ✅ Approved |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.production-approval.result }}" == "skipped" ]; then
+            echo "| 👤 Approval | ⏳ Skipped (not required) |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 👤 Approval | ⏳ Pending |" >> $GITHUB_STEP_SUMMARY
           fi
