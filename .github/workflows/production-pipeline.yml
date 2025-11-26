@@ -30,6 +30,11 @@ env:
   FLUTTER_VERSION: '3.35.7' # Pinned for reproducibility
   APP_ID: 'com.avishio.atitia'
 
+# Explicit permissions required for secrets access in tag-triggered workflows
+permissions:
+  contents: read
+  secrets: read
+
 jobs:
   # ============================================================================
   # STAGE 1: Validation & Tag Verification
@@ -442,6 +447,12 @@ jobs:
           echo "🔍 VERIFYING DEPLOYMENT SECRETS"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo ""
+          echo "🔐 Debug: Checking secrets access..."
+          echo "   Workflow: ${{ github.workflow }}"
+          echo "   Event: ${{ github.event_name }}"
+          echo "   Ref: ${{ github.ref }}"
+          echo "   Repository: ${{ github.repository }}"
+          echo ""
           
           # Initialize counters
           ANDROID_COUNT=0
@@ -453,109 +464,135 @@ jobs:
           
           # Check Android secrets
           echo "🤖 Checking Android secrets ($ANDROID_REQUIRED required)..."
-          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+          
+          SECRET_VAL="${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
+          if [ -n "$SECRET_VAL" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ ANDROID_KEYSTORE_BASE64"
+            echo "  ✅ ANDROID_KEYSTORE_BASE64 (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ ANDROID_KEYSTORE_BASE64"
+            echo "  ❌ ANDROID_KEYSTORE_BASE64 (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ]; then
+          SECRET_VAL="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+          if [ -n "$SECRET_VAL" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ ANDROID_KEYSTORE_PASSWORD"
+            echo "  ✅ ANDROID_KEYSTORE_PASSWORD (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ ANDROID_KEYSTORE_PASSWORD"
+            echo "  ❌ ANDROID_KEYSTORE_PASSWORD (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then
+          SECRET_VAL="${{ secrets.ANDROID_KEY_ALIAS }}"
+          if [ -n "$SECRET_VAL" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ ANDROID_KEY_ALIAS"
+            echo "  ✅ ANDROID_KEY_ALIAS (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ ANDROID_KEY_ALIAS"
+            echo "  ❌ ANDROID_KEY_ALIAS (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.ANDROID_KEY_PASSWORD }}" ]; then
+          SECRET_VAL="${{ secrets.ANDROID_KEY_PASSWORD }}"
+          if [ -n "$SECRET_VAL" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ ANDROID_KEY_PASSWORD"
+            echo "  ✅ ANDROID_KEY_PASSWORD (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ ANDROID_KEY_PASSWORD"
+            echo "  ❌ ANDROID_KEY_PASSWORD (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" ]; then
+          SECRET_VAL="${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}"
+          if [ -n "$SECRET_VAL" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"
+            echo "  ✅ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON"
+            echo "  ❌ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON (not found or empty)"
           fi
           
           echo "  📊 Android: $ANDROID_COUNT/$ANDROID_REQUIRED secrets configured"
+          if [ "$ANDROID_COUNT" -lt "$ANDROID_REQUIRED" ]; then
+            echo "  ⚠️  Missing: $((ANDROID_REQUIRED - ANDROID_COUNT)) secret(s)"
+          fi
           echo ""
           
           # Check iOS secrets
-          echo "🍎 Checking iOS secrets ($IOS_REQUIRED required)..."
-          if [ -n "${{ secrets.IOS_CERTIFICATE_BASE64 }}" ]; then
+          echo "🍎 Checking iOS secrets ($IOS_REQUIRED required - optional)..."
+          
+          SECRET_VAL="${{ secrets.IOS_CERTIFICATE_BASE64 }}"
+          if [ -n "$SECRET_VAL" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ IOS_CERTIFICATE_BASE64"
+            echo "  ✅ IOS_CERTIFICATE_BASE64 (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ IOS_CERTIFICATE_BASE64"
+            echo "  ❌ IOS_CERTIFICATE_BASE64 (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" ]; then
+          SECRET_VAL="${{ secrets.IOS_CERTIFICATE_PASSWORD }}"
+          if [ -n "$SECRET_VAL" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ IOS_CERTIFICATE_PASSWORD"
+            echo "  ✅ IOS_CERTIFICATE_PASSWORD (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ IOS_CERTIFICATE_PASSWORD"
+            echo "  ❌ IOS_CERTIFICATE_PASSWORD (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" ]; then
+          SECRET_VAL="${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}"
+          if [ -n "$SECRET_VAL" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ IOS_PROVISIONING_PROFILE_BASE64"
+            echo "  ✅ IOS_PROVISIONING_PROFILE_BASE64 (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ IOS_PROVISIONING_PROFILE_BASE64"
+            echo "  ❌ IOS_PROVISIONING_PROFILE_BASE64 (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" ]; then
+          SECRET_VAL="${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
+          if [ -n "$SECRET_VAL" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ APP_STORE_CONNECT_API_KEY_ID"
+            echo "  ✅ APP_STORE_CONNECT_API_KEY_ID (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ APP_STORE_CONNECT_API_KEY_ID"
+            echo "  ❌ APP_STORE_CONNECT_API_KEY_ID (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.APP_STORE_CONNECT_API_ISSUER }}" ]; then
+          SECRET_VAL="${{ secrets.APP_STORE_CONNECT_API_ISSUER }}"
+          if [ -n "$SECRET_VAL" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ APP_STORE_CONNECT_API_ISSUER"
+            echo "  ✅ APP_STORE_CONNECT_API_ISSUER (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ APP_STORE_CONNECT_API_ISSUER"
+            echo "  ❌ APP_STORE_CONNECT_API_ISSUER (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.APP_STORE_CONNECT_API_KEY }}" ]; then
+          SECRET_VAL="${{ secrets.APP_STORE_CONNECT_API_KEY }}"
+          if [ -n "$SECRET_VAL" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ APP_STORE_CONNECT_API_KEY"
+            echo "  ✅ APP_STORE_CONNECT_API_KEY (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ APP_STORE_CONNECT_API_KEY"
+            echo "  ❌ APP_STORE_CONNECT_API_KEY (not found or empty)"
           fi
           
           echo "  📊 iOS: $IOS_COUNT/$IOS_REQUIRED secrets configured"
+          if [ "$IOS_COUNT" -lt "$IOS_REQUIRED" ]; then
+            echo "  ℹ️  Missing: $((IOS_REQUIRED - IOS_COUNT)) secret(s) (iOS deployment optional)"
+          fi
           echo ""
           
           # Check Web/Firebase secrets
           echo "🌐 Checking Web/Firebase secrets ($WEB_REQUIRED required)..."
-          if [ -n "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
+          
+          SECRET_VAL="${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          if [ -n "$SECRET_VAL" ]; then
             WEB_COUNT=$((WEB_COUNT + 1))
-            echo "  ✅ FIREBASE_SERVICE_ACCOUNT"
+            echo "  ✅ FIREBASE_SERVICE_ACCOUNT (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ FIREBASE_SERVICE_ACCOUNT"
+            echo "  ❌ FIREBASE_SERVICE_ACCOUNT (not found or empty)"
           fi
           
-          if [ -n "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
+          SECRET_VAL="${{ secrets.FIREBASE_PROJECT_ID }}"
+          if [ -n "$SECRET_VAL" ]; then
             WEB_COUNT=$((WEB_COUNT + 1))
-            echo "  ✅ FIREBASE_PROJECT_ID"
+            echo "  ✅ FIREBASE_PROJECT_ID (length: ${#SECRET_VAL} chars)"
           else
-            echo "  ❌ FIREBASE_PROJECT_ID"
+            echo "  ❌ FIREBASE_PROJECT_ID (not found or empty)"
           fi
           
           echo "  📊 Web/Firebase: $WEB_COUNT/$WEB_REQUIRED secrets configured"
+          if [ "$WEB_COUNT" -lt "$WEB_REQUIRED" ]; then
+            echo "  ⚠️  Missing: $((WEB_REQUIRED - WEB_COUNT)) secret(s)"
+          fi
           echo ""
+          
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "📊 SECRET VERIFICATION SUMMARY"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -569,7 +606,7 @@ jobs:
             echo "android_deploy_enabled=false" >> $GITHUB_OUTPUT
             echo "⏸️  Android: $ANDROID_COUNT/$ANDROID_REQUIRED secrets → DEPLOYMENT DISABLED"
             echo "   Missing: $((ANDROID_REQUIRED - ANDROID_COUNT)) secret(s)"
-            echo "   💡 Add missing secrets to enable Android deployment"
+            echo "   💡 Verify secrets are added at: https://github.com/${{ github.repository }}/settings/secrets/actions"
           fi
           
           if [ "$IOS_COUNT" -eq "$IOS_REQUIRED" ]; then
@@ -579,7 +616,7 @@ jobs:
             echo "ios_deploy_enabled=false" >> $GITHUB_OUTPUT
             echo "⏸️  iOS: $IOS_COUNT/$IOS_REQUIRED secrets → DEPLOYMENT DISABLED"
             echo "   Missing: $((IOS_REQUIRED - IOS_COUNT)) secret(s)"
-            echo "   💡 Add missing secrets to enable iOS deployment (optional)"
+            echo "   💡 iOS deployment is optional - add secrets when ready"
           fi
           
           if [ "$WEB_COUNT" -eq "$WEB_REQUIRED" ]; then
@@ -589,7 +626,7 @@ jobs:
             echo "web_deploy_enabled=false" >> $GITHUB_OUTPUT
             echo "⏸️  Web/Firebase: $WEB_COUNT/$WEB_REQUIRED secrets → DEPLOYMENT DISABLED"
             echo "   Missing: $((WEB_REQUIRED - WEB_COUNT)) secret(s)"
-            echo "   💡 Add missing secrets to enable Web deployment"
+            echo "   💡 Verify secrets are added at: https://github.com/${{ github.repository }}/settings/secrets/actions"
           fi
           
           echo ""
