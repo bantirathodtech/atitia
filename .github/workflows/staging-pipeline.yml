@@ -419,9 +419,6 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
           cache: 'gradle'
-          cache-dependency-path: |
-            android/**/*.gradle*
-            android/**/gradle-wrapper.properties
 
       - name: 🎯 Setup Flutter
         uses: subosito/flutter-action@v2
