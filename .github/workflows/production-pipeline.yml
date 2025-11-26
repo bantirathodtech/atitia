@@ -464,42 +464,42 @@ jobs:
           # Check Android secrets
           echo "🤖 Checking Android secrets ($ANDROID_REQUIRED required)..."
           
-          SECRET_VAL="${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ ANDROID_KEYSTORE_BASE64 (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | wc -c)
+            echo "  ✅ ANDROID_KEYSTORE_BASE64 (length: $SECRET_LEN chars)"
           else
             echo "  ❌ ANDROID_KEYSTORE_BASE64 (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ ANDROID_KEYSTORE_PASSWORD (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" | wc -c)
+            echo "  ✅ ANDROID_KEYSTORE_PASSWORD (length: $SECRET_LEN chars)"
           else
             echo "  ❌ ANDROID_KEYSTORE_PASSWORD (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.ANDROID_KEY_ALIAS }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ ANDROID_KEY_ALIAS (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.ANDROID_KEY_ALIAS }}" | wc -c)
+            echo "  ✅ ANDROID_KEY_ALIAS (length: $SECRET_LEN chars)"
           else
             echo "  ❌ ANDROID_KEY_ALIAS (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.ANDROID_KEY_PASSWORD }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.ANDROID_KEY_PASSWORD }}" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ ANDROID_KEY_PASSWORD (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.ANDROID_KEY_PASSWORD }}" | wc -c)
+            echo "  ✅ ANDROID_KEY_PASSWORD (length: $SECRET_LEN chars)"
           else
             echo "  ❌ ANDROID_KEY_PASSWORD (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" ]; then
             ANDROID_COUNT=$((ANDROID_COUNT + 1))
-            echo "  ✅ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" | wc -c)
+            echo "  ✅ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON (length: $SECRET_LEN chars)"
           else
             echo "  ❌ GOOGLE_PLAY_SERVICE_ACCOUNT_JSON (not found or empty)"
           fi
@@ -513,50 +513,50 @@ jobs:
           # Check iOS secrets
           echo "🍎 Checking iOS secrets ($IOS_REQUIRED required - optional)..."
           
-          SECRET_VAL="${{ secrets.IOS_CERTIFICATE_BASE64 }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.IOS_CERTIFICATE_BASE64 }}" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ IOS_CERTIFICATE_BASE64 (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | wc -c)
+            echo "  ✅ IOS_CERTIFICATE_BASE64 (length: $SECRET_LEN chars)"
           else
             echo "  ❌ IOS_CERTIFICATE_BASE64 (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.IOS_CERTIFICATE_PASSWORD }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ IOS_CERTIFICATE_PASSWORD (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" | wc -c)
+            echo "  ✅ IOS_CERTIFICATE_PASSWORD (length: $SECRET_LEN chars)"
           else
             echo "  ❌ IOS_CERTIFICATE_PASSWORD (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ IOS_PROVISIONING_PROFILE_BASE64 (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | wc -c)
+            echo "  ✅ IOS_PROVISIONING_PROFILE_BASE64 (length: $SECRET_LEN chars)"
           else
             echo "  ❌ IOS_PROVISIONING_PROFILE_BASE64 (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ APP_STORE_CONNECT_API_KEY_ID (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" | wc -c)
+            echo "  ✅ APP_STORE_CONNECT_API_KEY_ID (length: $SECRET_LEN chars)"
           else
             echo "  ❌ APP_STORE_CONNECT_API_KEY_ID (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.APP_STORE_CONNECT_API_ISSUER }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.APP_STORE_CONNECT_API_ISSUER }}" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ APP_STORE_CONNECT_API_ISSUER (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.APP_STORE_CONNECT_API_ISSUER }}" | wc -c)
+            echo "  ✅ APP_STORE_CONNECT_API_ISSUER (length: $SECRET_LEN chars)"
           else
             echo "  ❌ APP_STORE_CONNECT_API_ISSUER (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.APP_STORE_CONNECT_API_KEY }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.APP_STORE_CONNECT_API_KEY }}" ]; then
             IOS_COUNT=$((IOS_COUNT + 1))
-            echo "  ✅ APP_STORE_CONNECT_API_KEY (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | wc -c)
+            echo "  ✅ APP_STORE_CONNECT_API_KEY (length: $SECRET_LEN chars)"
           else
             echo "  ❌ APP_STORE_CONNECT_API_KEY (not found or empty)"
           fi
@@ -570,18 +570,18 @@ jobs:
           # Check Web/Firebase secrets
           echo "🌐 Checking Web/Firebase secrets ($WEB_REQUIRED required)..."
           
-          SECRET_VAL="${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
             WEB_COUNT=$((WEB_COUNT + 1))
-            echo "  ✅ FIREBASE_SERVICE_ACCOUNT (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | wc -c)
+            echo "  ✅ FIREBASE_SERVICE_ACCOUNT (length: $SECRET_LEN chars)"
           else
             echo "  ❌ FIREBASE_SERVICE_ACCOUNT (not found or empty)"
           fi
           
-          SECRET_VAL="${{ secrets.FIREBASE_PROJECT_ID }}"
-          if [ -n "$SECRET_VAL" ]; then
+          if [ -n "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
             WEB_COUNT=$((WEB_COUNT + 1))
-            echo "  ✅ FIREBASE_PROJECT_ID (length: ${#SECRET_VAL} chars)"
+            SECRET_LEN=$(echo -n "${{ secrets.FIREBASE_PROJECT_ID }}" | wc -c)
+            echo "  ✅ FIREBASE_PROJECT_ID (length: $SECRET_LEN chars)"
           else
             echo "  ❌ FIREBASE_PROJECT_ID (not found or empty)"
           fi
