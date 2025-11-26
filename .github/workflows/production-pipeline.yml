@@ -1,3 +1,4 @@
+
 name: 🚀 Production Pipeline - Release Deployment
 
 on:
@@ -459,15 +460,34 @@ jobs:
         run: |
           if [ -n "$KEYSTORE_BASE64" ] && [ "$KEYSTORE_BASE64" != "" ]; then
             echo "🔐 Configuring Android production signing..."
-            echo "$KEYSTORE_BASE64" | base64 -d > android/keystore.jks
+            
+            # Clean and decode base64 keystore (remove any whitespace/newlines)
+            echo "$KEYSTORE_BASE64" | tr -d '\n' | tr -d ' ' | base64 -d > android/keystore.jks
+            
+            # Verify keystore file was created and is not empty
+            if [ ! -f "android/keystore.jks" ] || [ ! -s "android/keystore.jks" ]; then
+              echo "❌ ERROR: Failed to create keystore file"
+              exit 1
+            fi
+            
+            echo "✅ Keystore file created ($(du -h android/keystore.jks | cut -f1))"
+            
+            # Validate keystore integrity using keytool (non-blocking check)
+            echo "🔍 Validating keystore integrity..."
+            if keytool -list -v -keystore android/keystore.jks -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" > /dev/null 2>&1; then
+              echo "✅ Keystore integrity validated successfully"
+            else
+              echo "⚠️  Warning: Keystore validation failed - this might indicate incorrect password or corrupted keystore"
+              echo "💡 Continuing with build attempt..."
+            fi
             
             # Create key.properties file
             cat > android/key.properties << EOF
-            storePassword=$KEYSTORE_PASSWORD
-            keyPassword=$KEY_PASSWORD
-            keyAlias=$KEY_ALIAS
-            storeFile=keystore.jks
-            EOF
+storePassword=$KEYSTORE_PASSWORD
+keyPassword=$KEY_PASSWORD
+keyAlias=$KEY_ALIAS
+storeFile=keystore.jks
+EOF
             
             echo "✅ Android signing configured"
           else
