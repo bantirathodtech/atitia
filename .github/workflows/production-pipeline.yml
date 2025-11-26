@@ -972,9 +972,30 @@ jobs:
             echo "$FIREBASE_SERVICE_ACCOUNT" > /tmp/firebase-service-account.json
             export GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-service-account.json
             
+            # Verify service account file was created
+            if [ ! -f /tmp/firebase-service-account.json ]; then
+              echo "❌ Failed to create service account file"
+              exit 1
+            fi
+            
+            # Extract project ID from service account JSON to verify
+            SA_PROJECT_ID=$(cat /tmp/firebase-service-account.json | grep -o '"project_id": "[^"]*"' | cut -d'"' -f4 || echo "")
+            echo "🔍 Service account project_id: ${SA_PROJECT_ID:-not-found}"
+            echo "🔍 FIREBASE_PROJECT_ID secret: ${FIREBASE_PROJECT_ID:-not-set}"
+            
             if [ -n "$FIREBASE_PROJECT_ID" ] && [ "$FIREBASE_PROJECT_ID" != "" ]; then
+              # List available projects first to debug
+              echo "🔍 Checking Firebase project access..."
+              firebase projects:list --json 2>&1 | head -20 || echo "⚠️ Could not list projects (may require auth)"
+              
+              echo "🚀 Deploying to Firebase Hosting..."
               firebase deploy --only hosting --project "$FIREBASE_PROJECT_ID" || {
                 echo "❌ Firebase deployment failed"
+                echo "💡 Troubleshooting:"
+                echo "   1. Verify service account has 'Firebase Hosting Admin' role"
+                echo "   2. Check project ID is correct: $FIREBASE_PROJECT_ID"
+                echo "   3. Ensure service account has access to project"
+                echo "   4. Go to: https://console.cloud.google.com/iam-admin/iam?project=$FIREBASE_PROJECT_ID"
                 rm -f /tmp/firebase-service-account.json
                 exit 1
               }
