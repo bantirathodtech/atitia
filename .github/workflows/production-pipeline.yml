@@ -992,7 +992,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     needs: [build-web-production, verify-deployment-secrets]
-    if: success() && !cancelled() && needs.verify-deployment-secrets.outputs.web_deploy_enabled == 'true'
+    if: needs.build-web-production.result == 'success' && !cancelled() && needs.verify-deployment-secrets.outputs.web_deploy_enabled == 'true'
     environment:
       name: production
     steps:
