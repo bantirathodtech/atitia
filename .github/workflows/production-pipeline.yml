@@ -32,7 +32,9 @@ env:
 
 # Explicit permissions required for tag-triggered workflows
 permissions:
-  contents: read
+  contents: write  # Changed to write for creating releases and updating CHANGELOG
+  pull-requests: read
+  issues: read
 
 jobs:
   # ============================================================================
@@ -288,6 +290,18 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      - name: 💾 Cache Flutter Pub Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.PUB_CACHE }}
+            .dart_tool
+            .packages
+            pubspec.lock
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: 📦 Get Dependencies
         run: flutter pub get
@@ -661,6 +675,29 @@ jobs:
           channel: stable
           cache: true
 
+      - name: 💾 Cache Flutter Pub Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.PUB_CACHE }}
+            .dart_tool
+            .packages
+            pubspec.lock
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: 💾 Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: 📦 Get Dependencies
         run: flutter pub get
         timeout-minutes: 3
@@ -837,6 +874,18 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      - name: 💾 Cache Flutter Pub Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.PUB_CACHE }}
+            .dart_tool
+            .packages
+            pubspec.lock
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: 📦 Get Dependencies
         run: flutter pub get
@@ -1122,4 +1171,392 @@ jobs:
           echo "2. Upload to App Store/Play Store (if not automated)" >> $GITHUB_STEP_SUMMARY
           echo "3. Verify Firebase production deployment" >> $GITHUB_STEP_SUMMARY
           echo "4. Monitor app store review process" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Job summary generated at run-time" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # STAGE 7: Release Notes Automation & GitHub Release Creation
+  # ============================================================================
+  
+  generate-release-notes:
+    name: 🎨 Generate Release Notes & Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [production-release-summary]
+    if: always() && needs.production-release-summary.result != 'cancelled'
+    permissions:
+      contents: write
+      pull-requests: read
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history needed for changelog generation
+
+      - name: 🔍 Get Previous Tag
+        id: previous-tag
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 "$TAG_NAME^" 2>/dev/null || echo "")
+          
+          if [ -z "$PREVIOUS_TAG" ]; then
+            # First release - use first commit
+            PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
+            echo "ℹ️  No previous tag found, using first commit: $PREVIOUS_TAG"
+          else
+            echo "📌 Previous tag: $PREVIOUS_TAG"
+          fi
+          
+          echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          echo "current_tag=$TAG_NAME" >> $GITHUB_OUTPUT
+
+      - name: 📝 Generate Release Notes
+        id: release-notes
+        run: |
+          PREV_TAG="${{ steps.previous-tag.outputs.previous_tag }}"
+          CURR_TAG="${{ steps.previous-tag.outputs.current_tag }}"
+          
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎨 GENERATING RELEASE NOTES"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Previous: $PREV_TAG"
+          echo "Current:  $CURR_TAG"
+          echo ""
+          
+          # Generate release notes from commits
+          RELEASE_NOTES_FILE=$(mktemp)
+          
+          echo "# Release $CURR_TAG" > "$RELEASE_NOTES_FILE"
+          echo "" >> "$RELEASE_NOTES_FILE"
+          echo "**Release Date:** $(date -u +'%Y-%m-%d')" >> "$RELEASE_NOTES_FILE"
+          echo "**Triggered by:** ${{ github.actor }}" >> "$RELEASE_NOTES_FILE"
+          echo "" >> "$RELEASE_NOTES_FILE"
+          echo "## 📋 Changes" >> "$RELEASE_NOTES_FILE"
+          echo "" >> "$RELEASE_NOTES_FILE"
+          
+          # Categorize commits by type (Conventional Commits format)
+          FEATURES=$(git log "$PREV_TAG..$CURR_TAG" --pretty=format:"- %s (%h)" --grep="^feat" || true)
+          FIXES=$(git log "$PREV_TAG..$CURR_TAG" --pretty=format:"- %s (%h)" --grep="^fix" || true)
+          DOCS=$(git log "$PREV_TAG..$CURR_TAG" --pretty=format:"- %s (%h)" --grep="^docs" || true)
+          PERF=$(git log "$PREV_TAG..$CURR_TAG" --pretty=format:"- %s (%h)" --grep="^perf" || true)
+          REFACTOR=$(git log "$PREV_TAG..$CURR_TAG" --pretty=format:"- %s (%h)" --grep="^refactor" || true)
+          CHORE=$(git log "$PREV_TAG..$CURR_TAG" --pretty=format:"- %s (%h)" --grep="^chore" || true)
+          OTHER=$(git log "$PREV_TAG..$CURR_TAG" --pretty=format:"- %s (%h)" --not --grep="^feat\|^fix\|^docs\|^perf\|^refactor\|^chore" || true)
+          
+          if [ -n "$FEATURES" ]; then
+            echo "### ✨ Features" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+            echo "$FEATURES" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+          fi
+          
+          if [ -n "$FIXES" ]; then
+            echo "### 🐛 Bug Fixes" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+            echo "$FIXES" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+          fi
+          
+          if [ -n "$PERF" ]; then
+            echo "### ⚡ Performance Improvements" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+            echo "$PERF" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+          fi
+          
+          if [ -n "$REFACTOR" ]; then
+            echo "### ♻️  Refactoring" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+            echo "$REFACTOR" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+          fi
+          
+          if [ -n "$DOCS" ]; then
+            echo "### 📚 Documentation" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+            echo "$DOCS" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+          fi
+          
+          if [ -n "$CHORE" ]; then
+            echo "### 🔧 Chores" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+            echo "$CHORE" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+          fi
+          
+          if [ -n "$OTHER" ]; then
+            echo "### 📦 Other Changes" >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+            echo "$OTHER" | head -20 >> "$RELEASE_NOTES_FILE"
+            echo "" >> "$RELEASE_NOTES_FILE"
+          fi
+          
+          # Get commit count
+          COMMIT_COUNT=$(git rev-list --count "$PREV_TAG..$CURR_TAG" 2>/dev/null || echo "0")
+          echo "" >> "$RELEASE_NOTES_FILE"
+          echo "---" >> "$RELEASE_NOTES_FILE"
+          echo "" >> "$RELEASE_NOTES_FILE"
+          echo "**Total commits:** $COMMIT_COUNT" >> "$RELEASE_NOTES_FILE"
+          
+          # Save to output
+          cat "$RELEASE_NOTES_FILE"
+          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+          cat "$RELEASE_NOTES_FILE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 📝 Update CHANGELOG.md
+        run: |
+          TAG_NAME="${{ steps.previous-tag.outputs.current_tag }}"
+          VERSION="${TAG_NAME#v}"  # Remove 'v' prefix
+          DATE=$(date -u +'%Y-%m-%d')
+          
+          # Create backup
+          cp CHANGELOG.md CHANGELOG.md.bak 2>/dev/null || true
+          
+          # Read current release notes
+          RELEASE_NOTES="${{ steps.release-notes.outputs.release_notes }}"
+          
+          # Extract changes section (everything after first ##)
+          CHANGES_SECTION=$(echo "$RELEASE_NOTES" | sed -n '/## 📋 Changes/,$p' | sed '1d')
+          
+          # Create new changelog entry
+          NEW_ENTRY="## [$VERSION] - $DATE"$'\n'$'\n'"$CHANGES_SECTION"$'\n'
+          
+          # Insert after [Unreleased] section
+          if grep -q "## \[Unreleased\]" CHANGELOG.md; then
+            awk -v entry="$NEW_ENTRY" '
+              /## \[Unreleased\]/ { 
+                print; 
+                getline; 
+                print; 
+                print entry; 
+                next 
+              } 
+              { print }
+            ' CHANGELOG.md.bak > CHANGELOG.md
+          else
+            # Prepend to file
+            echo "$NEW_ENTRY" | cat - CHANGELOG.md > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
+          fi
+          
+          # Update [Unreleased] link
+          REPO_URL="https://github.com/${{ github.repository }}"
+          sed -i.bak "s|\[Unreleased\]: .*|\[Unreleased\]: $REPO_URL/compare/$TAG_NAME...HEAD|" CHANGELOG.md
+          
+          # Add new version link
+          PREV_TAG="${{ steps.previous-tag.outputs.previous_tag }}"
+          if [ -n "$PREV_TAG" ] && [[ "$PREV_TAG" =~ ^v ]]; then
+            sed -i.bak "/\[Unreleased\]:/a\\
+[$VERSION]: $REPO_URL/compare/$PREV_TAG...$TAG_NAME
+" CHANGELOG.md
+          fi
+          
+          rm -f CHANGELOG.md.bak
+          
+          echo "✅ CHANGELOG.md updated"
+          git diff CHANGELOG.md || true
+
+      - name: 📤 Commit CHANGELOG.md Update
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          if git diff --quiet CHANGELOG.md; then
+            echo "ℹ️  No changes to CHANGELOG.md"
+          else
+            git add CHANGELOG.md
+            git commit -m "docs: update CHANGELOG.md for ${{ steps.previous-tag.outputs.current_tag }}"
+            git push origin main || echo "⚠️  Failed to push CHANGELOG (may require manual update)"
+          fi
+        continue-on-error: true
+
+      - name: 🚀 Create GitHub Release
+        if: success()
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.previous-tag.outputs.current_tag }}
+          name: Release ${{ steps.previous-tag.outputs.current_tag }}
+          body: |
+            ${{ steps.release-notes.outputs.release_notes }}
+            
+            ---
+            
+            ## 📦 Artifacts
+            
+            - Android AAB/APK: Available in [GitHub Actions artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - iOS IPA: Available in [GitHub Actions artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - Web Build: Available in [GitHub Actions artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================================
+  # STAGE 8: Monitoring & Notifications
+  # ============================================================================
+  
+  send-notifications:
+    name: 📊 Send Deployment Notifications
+    runs-on: ubuntu-latest
+    needs: [production-release-summary, generate-release-notes]
+    if: always()
+    continue-on-error: true
+    
+    steps:
+      - name: 📊 Determine Deployment Status
+        id: status
+        run: |
+          SUMMARY_RESULT="${{ needs.production-release-summary.result }}"
+          
+          if [ "$SUMMARY_RESULT" == "success" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "emoji=✅" >> $GITHUB_OUTPUT
+            echo "message=Production release successful" >> $GITHUB_OUTPUT
+          elif [ "$SUMMARY_RESULT" == "failure" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+            echo "message=Production release failed" >> $GITHUB_OUTPUT
+          elif [ "$SUMMARY_RESULT" == "cancelled" ]; then
+            echo "status=cancelled" >> $GITHUB_OUTPUT
+            echo "emoji=⚠️" >> $GITHUB_OUTPUT
+            echo "message=Production release cancelled" >> $GITHUB_OUTPUT
+          else
+            echo "status=unknown" >> $GITHUB_OUTPUT
+            echo "emoji=❓" >> $GITHUB_OUTPUT
+            echo "message=Production release status unknown" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📧 Send Slack Notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          STATUS="${{ steps.status.outputs.status }}"
+          EMOJI="${{ steps.status.outputs.emoji }}"
+          MESSAGE="${{ steps.status.outputs.message }}"
+          VERSION="${{ github.ref_name }}"
+          ACTOR="${{ github.actor }}"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          PAYLOAD=$(cat <<EOF
+          {
+            "text": "$EMOJI Production Release: $VERSION",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "$EMOJI Production Release: $VERSION"
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Status:*\n$MESSAGE"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Triggered by:*\n$ACTOR"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Version:*\n$VERSION"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Workflow:*\n<${RUN_URL}|View Details>"
+                  }
+                ]
+              }
+            ]
+          }
+          EOF
+          )
+          
+          curl -X POST -H 'Content-type: application/json' \
+            --data "$PAYLOAD" \
+            "$SLACK_WEBHOOK_URL" || echo "⚠️  Slack notification failed"
+        continue-on-error: true
+
+      - name: 📧 Send Discord Notification
+        if: env.DISCORD_WEBHOOK_URL != ''
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          STATUS="${{ steps.status.outputs.status }}"
+          EMOJI="${{ steps.status.outputs.emoji }}"
+          MESSAGE="${{ steps.status.outputs.message }}"
+          VERSION="${{ github.ref_name }}"
+          ACTOR="${{ github.actor }}"
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          # Discord color based on status
+          if [ "$STATUS" == "success" ]; then
+            COLOR=3066993  # Green
+          elif [ "$STATUS" == "failure" ]; then
+            COLOR=15158332  # Red
+          else
+            COLOR=16776960  # Yellow
+          fi
+          
+          PAYLOAD=$(cat <<EOF
+          {
+            "embeds": [{
+              "title": "$EMOJI Production Release: $VERSION",
+              "description": "$MESSAGE",
+              "color": $COLOR,
+              "fields": [
+                {
+                  "name": "Version",
+                  "value": "$VERSION",
+                  "inline": true
+                },
+                {
+                  "name": "Triggered by",
+                  "value": "$ACTOR",
+                  "inline": true
+                },
+                {
+                  "name": "Workflow",
+                  "value": "[View Details]($RUN_URL)",
+                  "inline": false
+                }
+              ],
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            }]
+          }
+          EOF
+          )
+          
+          curl -X POST -H 'Content-type: application/json' \
+            --data "$PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL" || echo "⚠️  Discord notification failed"
+        continue-on-error: true
+
+      - name: ✅ Notification Summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 NOTIFICATION STATUS"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "Status: ${{ steps.status.outputs.emoji }} ${{ steps.status.outputs.message }}"
+          echo "Version: ${{ github.ref_name }}"
+          echo ""
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            echo "✅ Slack webhook configured"
+          else
+            echo "ℹ️  Slack webhook not configured (optional)"
+          fi
+          if [ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]; then
+            echo "✅ Discord webhook configured"
+          else
+            echo "ℹ️  Discord webhook not configured (optional)"
+          fi
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 

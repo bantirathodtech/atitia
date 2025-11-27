@@ -8,6 +8,9 @@
 ![License](https://img.shields.io/badge/License-Proprietary-red)
 ![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-blue)
 
+[![Production Pipeline](https://github.com/bantirathodtech/atitia/workflows/%F0%9F%9A%80%20Production%20Pipeline%20-%20Release%20Deployment/badge.svg)](https://github.com/bantirathodtech/atitia/actions/workflows/production-pipeline.yml)
+[![CI/CD Status](https://github.com/bantirathodtech/atitia/workflows/%F0%9F%9A%80%20Production%20Pipeline%20-%20Release%20Deployment/badge.svg?branch=main)](https://github.com/bantirathodtech/atitia/actions)
+
 **A production-ready, enterprise-grade SaaS platform for Paying Guest (PG) management, connecting property owners and guests through a seamless, role-based experience.**
 
 [Features](#-features) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Contributing](#-contributing)
