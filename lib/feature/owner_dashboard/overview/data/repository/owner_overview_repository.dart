@@ -492,8 +492,9 @@ class OwnerOverviewRepository {
 
         // Only count if guest is linked to this owner's PG(s)
         if (pgId != null && guestPgId != pgId) continue;
-        if (!guestIds.contains(guestId) && guestStatus != 'payment_pending')
+        if (!guestIds.contains(guestId) && guestStatus != 'payment_pending') {
           continue;
+        }
 
         if (guestStatus == 'payment_pending') {
           pendingCount++;

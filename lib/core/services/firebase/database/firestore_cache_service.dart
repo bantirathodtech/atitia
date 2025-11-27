@@ -117,8 +117,9 @@ class FirestoreCacheService {
       if (kDebugMode) debugPrint('⚠️ Cache invalidation error: $e');
     }
 
-    if (kDebugMode)
+    if (kDebugMode) {
       debugPrint('✅ Cache invalidated for collection: $collection');
+    }
   }
 
   /// Clear all cache

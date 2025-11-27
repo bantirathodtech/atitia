@@ -96,7 +96,7 @@ class _DebounceStream<T> {
 
   void _emitLatest() {
     if (_hasValue && _latestValue != null) {
-      _controller.add(_latestValue!);
+      _controller.add(_latestValue as T);
       _hasValue = false;
     }
   }
