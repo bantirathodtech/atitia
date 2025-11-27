@@ -1346,9 +1346,8 @@ jobs:
           # Add new version link
           PREV_TAG="${{ steps.previous-tag.outputs.previous_tag }}"
           if [ -n "$PREV_TAG" ] && [[ "$PREV_TAG" =~ ^v ]]; then
-            sed -i.bak "/\[Unreleased\]:/a\\
-[$VERSION]: $REPO_URL/compare/$PREV_TAG...$TAG_NAME
-" CHANGELOG.md
+            NEW_LINE="[$VERSION]: $REPO_URL/compare/$PREV_TAG...$TAG_NAME"
+            awk -v line="$NEW_LINE" '/\[Unreleased\]:/ {print; print line; next} {print}' CHANGELOG.md > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
           fi
           
           rm -f CHANGELOG.md.bak
