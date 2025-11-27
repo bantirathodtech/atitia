@@ -4,7 +4,7 @@ name: 🚀 Production Pipeline - Release Deployment
 on:
   push:
     tags:
-      - 'v*.*.*'  # Triggers on semantic version tags (v1.0.0, v1.2.3, etc.)
+      - 'v*'  # Triggers on any version tag (v1.0.0, v1.2.3, v1.0.6, etc.)
   workflow_dispatch:
     inputs:
       version_tag:
