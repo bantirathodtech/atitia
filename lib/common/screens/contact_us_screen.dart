@@ -163,10 +163,14 @@ class ContactUsScreen extends StatelessWidget {
       if (await canLaunchUrl(emailUri)) {
         await launchUrl(emailUri);
       } else {
-        _showError(context, 'Could not open email client');
+        if (context.mounted) {
+          _showError(context, 'Could not open email client');
+        }
       }
     } catch (e) {
-      _showError(context, 'Failed to open email: $e');
+      if (context.mounted) {
+        _showError(context, 'Failed to open email: $e');
+      }
     }
   }
 
@@ -176,10 +180,14 @@ class ContactUsScreen extends StatelessWidget {
       if (await canLaunchUrl(phoneUri)) {
         await launchUrl(phoneUri);
       } else {
-        _showError(context, 'Could not make phone call');
+        if (context.mounted) {
+          _showError(context, 'Could not make phone call');
+        }
       }
     } catch (e) {
-      _showError(context, 'Failed to make phone call: $e');
+      if (context.mounted) {
+        _showError(context, 'Failed to make phone call: $e');
+      }
     }
   }
 
@@ -189,19 +197,25 @@ class ContactUsScreen extends StatelessWidget {
       if (await canLaunchUrl(whatsappUrl)) {
         await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
       } else {
-        _showError(context, 'Could not open WhatsApp');
+        if (context.mounted) {
+          _showError(context, 'Could not open WhatsApp');
+        }
       }
     } catch (e) {
-      _showError(context, 'Failed to open WhatsApp: $e');
+      if (context.mounted) {
+        _showError(context, 'Failed to open WhatsApp: $e');
+      }
     }
   }
 
   void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-      ),
-    );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 }

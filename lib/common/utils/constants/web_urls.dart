@@ -43,7 +43,7 @@ class WebUrls {
   // ==========================================================================
 
   /// Home page URL - Main landing page
-  static const String home = '$baseUrl';
+  static const String home = baseUrl;
 
   /// Contact Us page URL - Required for Razorpay KYC
   /// Accessible at: https://atitia-87925.web.app/contact-us
@@ -52,7 +52,6 @@ class WebUrls {
   // ==========================================================================
   // ACCOUNT MANAGEMENT PAGES
   // ==========================================================================
-
 
   // ==========================================================================
   // UTILITY METHODS
