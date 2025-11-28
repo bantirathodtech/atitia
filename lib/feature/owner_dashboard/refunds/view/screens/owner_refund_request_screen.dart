@@ -426,6 +426,7 @@ class _OwnerRefundRequestScreenState extends State<OwnerRefundRequestScreen> {
     // Check if refund request already exists
     final hasExisting = await viewModel
         .hasExistingRefundRequest(_selectedRevenueRecord!.revenueId);
+    if (!mounted) return;
     if (hasExisting) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
