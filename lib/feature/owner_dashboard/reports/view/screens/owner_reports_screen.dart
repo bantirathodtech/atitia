@@ -140,7 +140,8 @@ class _OwnerReportsScreenState extends State<OwnerReportsScreen>
             ],
           ).then((_) {
             // Navigate back after dialog is dismissed
-            if (mounted && Navigator.of(context).canPop()) {
+            if (!mounted) return;
+            if (Navigator.of(context).canPop()) {
               Navigator.of(context).pop();
             }
           });
