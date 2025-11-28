@@ -159,11 +159,17 @@ class _MockBaseProviderState extends BaseProviderState {
   String? get errorMessage => _errorMessage;
 
   @override
-  void setLoading(bool loading) {}
+  void setLoading(bool loading) {
+    super.setLoading(loading);
+  }
 
   @override
-  void setError(bool hasError, [String? message]) {}
+  void setError(bool hasError, [String? message]) {
+    super.setError(hasError, message);
+  }
 
   @override
-  void clearError() {}
+  void clearError() {
+    super.clearError();
+  }
 }

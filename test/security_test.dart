@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:atitia/common/utils/security/encryption_service.dart';
 import 'package:atitia/common/utils/security/input_validation_service.dart';
 import 'package:atitia/common/utils/security/api_security_service.dart';
-import 'package:atitia/common/utils/security/secure_storage_service.dart';
 import 'package:atitia/common/utils/security/security_monitoring_service.dart';
 
 void main() {
@@ -12,14 +11,12 @@ void main() {
     late EncryptionService encryptionService;
     late InputValidationService validationService;
     late ApiSecurityService apiSecurityService;
-    late SecureStorageService secureStorageService;
     late SecurityMonitoringService securityMonitoringService;
 
     setUp(() {
       encryptionService = EncryptionService();
       validationService = InputValidationService();
       apiSecurityService = ApiSecurityService();
-      secureStorageService = SecureStorageService();
       securityMonitoringService = SecurityMonitoringService();
 
       encryptionService.initialize();
