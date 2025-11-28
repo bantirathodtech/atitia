@@ -26,6 +26,9 @@ import '../../../../../core/models/subscription/subscription_plan_model.dart';
 import '../../../../../common/widgets/dialogs/premium_upgrade_dialog.dart';
 import '../widgets/revenue_analytics_widget.dart';
 import '../widgets/occupancy_analytics_widget.dart';
+import '../../../auth/logic/auth_provider.dart';
+import '../../overview/data/repository/owner_overview_repository.dart';
+import '../../overview/data/models/owner_overview_model.dart';
 
 /// Advanced analytics dashboard for Owner
 /// Provides comprehensive insights into revenue, occupancy, and performance
@@ -62,11 +65,14 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   String? _lastLoadedPgId;
   SelectedPgProvider? _selectedPgProvider;
 
-  // Sample data - replace with actual data from repositories
+  // Real data from repositories
   List<Map<String, dynamic>> _revenueData = [];
   List<Map<String, dynamic>> _occupancyData = [];
   bool _isLoading = false;
   String? _error;
+
+  // Repository for fetching real analytics data
+  final OwnerOverviewRepository _repository = OwnerOverviewRepository();
 
   @override
   void initState() {
@@ -115,12 +121,30 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
     });
 
     try {
-      // TODO: Replace with actual data loading from repositories
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      // Get owner ID from AuthProvider
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final ownerId = authProvider.user?.userId;
 
-      // Sample data generation
-      _revenueData = _generateSampleRevenueData(pgId);
-      _occupancyData = _generateSampleOccupancyData(pgId);
+      if (ownerId == null || ownerId.isEmpty) {
+        throw Exception('Owner ID not available. Please log in again.');
+      }
+
+      // Load data in parallel for better performance
+      final currentYear = DateTime.now().year;
+      final results = await Future.wait([
+        // Load revenue breakdown for current year
+        _repository.getMonthlyRevenueBreakdown(ownerId, currentYear),
+        // Load overview data for occupancy calculation
+        _repository.fetchOwnerOverviewData(ownerId, pgId: pgId),
+      ], eagerError: false);
+
+      // Transform revenue data from repository format to widget format
+      final monthlyBreakdown = results[0] as Map<String, double>;
+      _revenueData = _transformRevenueData(monthlyBreakdown, pgId);
+
+      // Transform occupancy data from overview model
+      final overviewData = results[1] as OwnerOverviewModel;
+      _occupancyData = _transformOccupancyData(overviewData, pgId);
 
       _lastLoadedPgId = pgId;
     } catch (e) {
@@ -142,6 +166,74 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
         });
       }
     }
+  }
+
+  /// Transforms monthly revenue breakdown from repository format to widget format
+  /// Repository format: {'month_1': 50000.0, 'month_2': 55000.0, ...}
+  /// Widget format: [{'month': 1, 'amount': 50000, 'pgId': '...', 'timestamp': ...}, ...]
+  List<Map<String, dynamic>> _transformRevenueData(
+    Map<String, double> monthlyBreakdown,
+    String? pgId,
+  ) {
+    final currentYear = DateTime.now().year;
+    final List<Map<String, dynamic>> revenueList = [];
+
+    for (int month = 1; month <= 12; month++) {
+      final monthKey = 'month_$month';
+      final amount = monthlyBreakdown[monthKey] ?? 0.0;
+
+      // Create timestamp for this month
+      final timestamp = DateTime(currentYear, month, 1);
+
+      revenueList.add({
+        'month': month,
+        'amount': amount.round(),
+        'pgId': pgId ?? '',
+        'timestamp': timestamp,
+        // Note: guestId is not available from monthly breakdown
+        // Widgets handle this gracefully with optional guestId
+      });
+    }
+
+    return revenueList;
+  }
+
+  /// Transforms occupancy data from overview model to widget format
+  /// Uses current occupancy rate for all months (historical data not available)
+  /// Widget format: [{'month': 1, 'occupancy': 85, 'isCurrent': false, 'pgId': '...', 'timestamp': ...}, ...]
+  List<Map<String, dynamic>> _transformOccupancyData(
+    OwnerOverviewModel overviewData,
+    String? pgId,
+  ) {
+    final currentYear = DateTime.now().year;
+    final currentMonth = DateTime.now().month;
+    final List<Map<String, dynamic>> occupancyList = [];
+
+    // Calculate occupancy rate from overview data
+    double occupancyRate = 0.0;
+    final totalBeds = overviewData.totalBeds;
+    final occupiedBeds = overviewData.occupiedBeds;
+    if (totalBeds > 0) {
+      occupancyRate = (occupiedBeds / totalBeds) * 100;
+    }
+
+    // Create occupancy data for all 12 months
+    // Note: Using current occupancy for all months since historical data is not available
+    // In production, you might want to track historical occupancy separately
+    for (int month = 1; month <= 12; month++) {
+      final timestamp = DateTime(currentYear, month, 1);
+      final isCurrent = month == currentMonth;
+
+      occupancyList.add({
+        'month': month,
+        'occupancy': occupancyRate.round(),
+        'isCurrent': isCurrent,
+        'pgId': pgId ?? '',
+        'timestamp': timestamp,
+      });
+    }
+
+    return occupancyList;
   }
 
   Future<void> _refreshData() async {
@@ -629,39 +721,4 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
     );
   }
 
-  // ==========================================================================
-  // SAMPLE DATA GENERATION (Replace with actual repository calls)
-  // ==========================================================================
-
-  List<Map<String, dynamic>> _generateSampleRevenueData(String pgId) {
-    return List.generate(12, (index) {
-      final month = index + 1;
-      final baseAmount = 50000 + (index * 5000);
-      final variation = (index % 3 == 0) ? 10000 : -5000;
-
-      return {
-        'month': month,
-        'amount': baseAmount + variation,
-        'guestId': 'guest_${index + 1}',
-        'pgId': pgId,
-        'timestamp': DateTime.now().subtract(Duration(days: 30 * (12 - index))),
-      };
-    });
-  }
-
-  List<Map<String, dynamic>> _generateSampleOccupancyData(String pgId) {
-    return List.generate(12, (index) {
-      final month = index + 1;
-      final baseOccupancy = 70 + (index * 2);
-      final variation = (index % 4 == 0) ? 15 : -5;
-
-      return {
-        'month': month,
-        'occupancy': (baseOccupancy + variation).clamp(0, 100),
-        'isCurrent': index == 11,
-        'pgId': pgId,
-        'timestamp': DateTime.now().subtract(Duration(days: 30 * (12 - index))),
-      };
-    });
-  }
 }
