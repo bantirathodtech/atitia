@@ -75,6 +75,12 @@ class AppRoutes {
   /// Terms of Service: '/terms-of-service'
   static const String termsOfService = '/terms-of-service';
 
+  /// Contact Us: '/contact-us'
+  static const String contactUs = '/contact-us';
+
+  /// Cancellation & Refund Policy: '/cancellation-refund'
+  static const String cancellationRefund = '/cancellation-refund';
+
   // MARK: - Owner Feature Routes
   // ==========================================
 
@@ -192,6 +198,15 @@ class AppRoutes {
         route == verification ||
         route == roleSelection ||
         route == registration;
+  }
+
+  /// Check if current route is a public route (accessible without authentication)
+  /// These routes are needed for compliance (Razorpay KYC, app store requirements)
+  static bool isPublicRoute(String route) {
+    return route == privacyPolicy ||
+        route == termsOfService ||
+        route == contactUs ||
+        route == cancellationRefund;
   }
 
   /// Check if current route is a guest flow

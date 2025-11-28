@@ -39,6 +39,8 @@ import '../../../feature/admin_dashboard/revenue/view/screens/admin_revenue_dash
 import '../../../feature/admin_dashboard/refunds/view/screens/admin_refund_approval_screen.dart';
 import '../../common/screens/privacy_policy_screen.dart';
 import '../../common/screens/terms_of_service_screen.dart';
+import '../../common/screens/contact_us_screen.dart';
+import '../../common/screens/cancellation_refund_policy_screen.dart';
 import '../../common/utils/constants/routes.dart';
 import '../../common/utils/logging/logging_helper.dart';
 import '../../../feature/auth/logic/auth_provider.dart';
@@ -370,6 +372,16 @@ class AppRouter {
         name: AppRoutes.termsOfService,
         builder: (context, state) => const TermsOfServiceScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.contactUs,
+        name: AppRoutes.contactUs,
+        builder: (context, state) => const ContactUsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.cancellationRefund,
+        name: AppRoutes.cancellationRefund,
+        builder: (context, state) => const CancellationRefundPolicyScreen(),
+      ),
     ],
 
     // Global error handler for undefined routes
@@ -392,6 +404,11 @@ class AppRouter {
 
       // Skip guard for auth routes (splash, phone auth, etc.)
       if (AppRoutes.isAuthRoute(currentRoute)) {
+        return null;
+      }
+
+      // Skip guard for public routes (policy pages - needed for Razorpay KYC)
+      if (AppRoutes.isPublicRoute(currentRoute)) {
         return null;
       }
 

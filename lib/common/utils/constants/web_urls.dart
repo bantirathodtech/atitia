@@ -18,44 +18,41 @@ class WebUrls {
   // BASE URL
   // ==========================================================================
 
-  /// Base URL for Atitia Google Sites
-  static const String baseUrl = 'https://sites.google.com/view/atitia';
+  /// Base URL for Atitia Firebase-hosted web app
+  /// Used for Razorpay KYC verification and app store compliance
+  static const String baseUrl = 'https://atitia-87925.web.app';
 
   // ==========================================================================
   // LEGAL & COMPLIANCE PAGES
   // ==========================================================================
 
   /// Privacy Policy URL - Required for app compliance
+  /// Accessible at: https://atitia-87925.web.app/privacy-policy
   static const String privacyPolicy = '$baseUrl/privacy-policy';
 
   /// Terms of Service URL - Required for app compliance
+  /// Accessible at: https://atitia-87925.web.app/terms-of-service
   static const String termsOfService = '$baseUrl/terms-of-service';
 
   /// Cancellation/Refund Policy URL - Required for Razorpay KYC
-  static const String refundPolicy = '$baseUrl/cancellationrefund';
+  /// Accessible at: https://atitia-87925.web.app/cancellation-refund
+  static const String refundPolicy = '$baseUrl/cancellation-refund';
 
   // ==========================================================================
   // BUSINESS & INFORMATION PAGES
   // ==========================================================================
 
   /// Home page URL - Main landing page
-  static const String home = '$baseUrl/home';
-
-  /// About Us page URL - Required for Razorpay KYC
-  static const String aboutUs = '$baseUrl/about-us';
+  static const String home = '$baseUrl';
 
   /// Contact Us page URL - Required for Razorpay KYC
+  /// Accessible at: https://atitia-87925.web.app/contact-us
   static const String contactUs = '$baseUrl/contact-us';
-
-  /// Pricing page URL - Required for Razorpay KYC
-  static const String pricing = '$baseUrl/pricing';
 
   // ==========================================================================
   // ACCOUNT MANAGEMENT PAGES
   // ==========================================================================
 
-  /// Account Deletion page URL - GDPR/compliance requirement
-  static const String accountDeletion = '$baseUrl/account-deletion';
 
   // ==========================================================================
   // UTILITY METHODS
@@ -66,15 +63,12 @@ class WebUrls {
         'privacyPolicy': privacyPolicy,
         'termsOfService': termsOfService,
         'refundPolicy': refundPolicy,
-        'accountDeletion': accountDeletion,
       };
 
   /// Get all business/information URLs as a map
   static Map<String, String> get businessUrls => {
         'home': home,
-        'aboutUs': aboutUs,
         'contactUs': contactUs,
-        'pricing': pricing,
       };
 
   /// Get all URLs as a single map

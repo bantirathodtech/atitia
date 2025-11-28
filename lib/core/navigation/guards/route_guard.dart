@@ -103,6 +103,10 @@ class RouteGuard {
     // Auth routes don't require authentication
     if (AppRoutes.isAuthRoute(route)) return false;
 
+    // Public routes (policy pages) don't require authentication
+    // These are needed for Razorpay KYC and app store compliance
+    if (AppRoutes.isPublicRoute(route)) return false;
+
     // All other routes require authentication
     return true;
   }
@@ -135,6 +139,11 @@ class RouteGuard {
   }) {
     // Allow auth routes without authentication
     if (AppRoutes.isAuthRoute(currentRoute)) {
+      return null; // Allow access
+    }
+
+    // Allow public routes (policy pages) without authentication
+    if (AppRoutes.isPublicRoute(currentRoute)) {
       return null; // Allow access
     }
 
