@@ -115,44 +115,6 @@ class WebUrlLauncher {
         context: context,
       );
 
-  /// Open About Us page
-  static Future<bool> openAboutUs({
-    LaunchMode mode = LaunchMode.externalApplication,
-    bool showError = false,
-    dynamic context,
-  }) =>
-      openUrl(
-        WebUrls.aboutUs,
-        mode: mode,
-        showError: showError,
-        context: context,
-      );
-
-  /// Open Pricing page
-  static Future<bool> openPricing({
-    LaunchMode mode = LaunchMode.externalApplication,
-    bool showError = false,
-    dynamic context,
-  }) =>
-      openUrl(
-        WebUrls.pricing,
-        mode: mode,
-        showError: showError,
-        context: context,
-      );
-
-  /// Open Account Deletion page
-  static Future<bool> openAccountDeletion({
-    LaunchMode mode = LaunchMode.externalApplication,
-    bool showError = false,
-    dynamic context,
-  }) =>
-      openUrl(
-        WebUrls.accountDeletion,
-        mode: mode,
-        showError: showError,
-        context: context,
-      );
 
   /// Open Home page
   static Future<bool> openHome({
