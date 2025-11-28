@@ -165,7 +165,8 @@ class EnvironmentConfig {
   /// ⚠️ WARNING: Never commit the actual secret! Use environment variable or secure storage.
   static const String googleSignInClientSecret = String.fromEnvironment(
     'GOOGLE_SIGN_IN_CLIENT_SECRET',
-    defaultValue: 'YOUR_CLIENT_SECRET_HERE', // Replace with actual secret from .secrets or env var
+    defaultValue:
+        'YOUR_CLIENT_SECRET_HERE', // Replace with actual secret from .secrets or env var
   );
 
   // ==========================================================================
