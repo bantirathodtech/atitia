@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'constants/web_urls.dart';
@@ -29,7 +30,7 @@ class WebUrlLauncher {
     String url, {
     LaunchMode mode = LaunchMode.externalApplication,
     bool showError = false,
-    dynamic context,
+    BuildContext? context,
   }) async {
     try {
       final uri = Uri.parse(url);
@@ -47,13 +48,13 @@ class WebUrlLauncher {
       // Launch URL
       final launched = await launchUrl(uri, mode: mode);
 
-      if (!launched && showError && context != null) {
+      if (!launched && showError && context != null && context.mounted) {
         _showError(context, 'Unable to open the link. Please try again.');
       }
 
       return launched;
     } catch (e) {
-      if (showError && context != null) {
+      if (showError && context != null && context.mounted) {
         _showError(
           context,
           'Unable to open the link: ${e.toString()}',
@@ -67,7 +68,7 @@ class WebUrlLauncher {
   static Future<bool> openPrivacyPolicy({
     LaunchMode mode = LaunchMode.externalApplication,
     bool showError = false,
-    dynamic context,
+    BuildContext? context,
   }) =>
       openUrl(
         WebUrls.privacyPolicy,
@@ -80,7 +81,7 @@ class WebUrlLauncher {
   static Future<bool> openTermsOfService({
     LaunchMode mode = LaunchMode.externalApplication,
     bool showError = false,
-    dynamic context,
+    BuildContext? context,
   }) =>
       openUrl(
         WebUrls.termsOfService,
@@ -93,7 +94,7 @@ class WebUrlLauncher {
   static Future<bool> openRefundPolicy({
     LaunchMode mode = LaunchMode.externalApplication,
     bool showError = false,
-    dynamic context,
+    BuildContext? context,
   }) =>
       openUrl(
         WebUrls.refundPolicy,
@@ -106,7 +107,7 @@ class WebUrlLauncher {
   static Future<bool> openContactUs({
     LaunchMode mode = LaunchMode.externalApplication,
     bool showError = false,
-    dynamic context,
+    BuildContext? context,
   }) =>
       openUrl(
         WebUrls.contactUs,
@@ -119,7 +120,7 @@ class WebUrlLauncher {
   static Future<bool> openHome({
     LaunchMode mode = LaunchMode.externalApplication,
     bool showError = false,
-    dynamic context,
+    BuildContext? context,
   }) =>
       openUrl(
         WebUrls.home,
@@ -128,12 +129,22 @@ class WebUrlLauncher {
         context: context,
       );
 
-  /// Show error message to user
-  /// Note: This is a placeholder. The caller should handle showing errors
-  /// using ScaffoldMessenger or similar UI components.
-  static void _showError(dynamic context, String message) {
-    // Error display should be handled by the caller
-    // This method exists for consistency but does not display errors
-    // to avoid Flutter dependencies in this utility class
+  /// Show error message to user using ScaffoldMessenger
+  /// Displays a SnackBar with the error message if context is provided and mounted
+  static void _showError(BuildContext? context, String message) {
+    if (context == null) return;
+    
+    // Check if context is still mounted before showing error
+    // This prevents errors when widget is disposed during async operations
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade700,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+      ),
+    );
   }
 }
