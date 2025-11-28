@@ -68,6 +68,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   // Real data from repositories
   List<Map<String, dynamic>> _revenueData = [];
   List<Map<String, dynamic>> _occupancyData = [];
+  Map<String, double> _performanceMetrics = {};
   bool _isLoading = false;
   String? _error;
 
@@ -132,19 +133,31 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
       // Load data in parallel for better performance
       final currentYear = DateTime.now().year;
       final results = await Future.wait([
-        // Load revenue breakdown for current year
-        _repository.getMonthlyRevenueBreakdown(ownerId, currentYear),
-        // Load overview data for occupancy calculation
+        // Load revenue breakdown with caching
+        _repository.getMonthlyRevenueBreakdownCached(ownerId, currentYear),
+        // Load overview data for current occupancy
         _repository.fetchOwnerOverviewData(ownerId, pgId: pgId),
+        // Load historical occupancy data
+        _repository.getHistoricalOccupancyData(pgId, currentYear),
+        // Load performance metrics
+        _repository.getPerformanceMetrics(ownerId, pgId: pgId),
       ], eagerError: false);
 
       // Transform revenue data from repository format to widget format
       final monthlyBreakdown = results[0] as Map<String, double>;
       _revenueData = _transformRevenueData(monthlyBreakdown, pgId);
 
-      // Transform occupancy data from overview model
+      // Transform occupancy data - use historical if available, otherwise use current
       final overviewData = results[1] as OwnerOverviewModel;
-      _occupancyData = _transformOccupancyData(overviewData, pgId);
+      final historicalOccupancy = results[2] as List<dynamic>; // List<OccupancyTrendModel>
+      _occupancyData = _transformOccupancyData(
+        overviewData,
+        pgId,
+        historicalData: historicalOccupancy,
+      );
+
+      // Store performance metrics
+      _performanceMetrics = results[3] as Map<String, double>;
 
       _lastLoadedPgId = pgId;
     } catch (e) {
@@ -201,34 +214,62 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   }
 
   /// Transforms occupancy data from overview model to widget format
-  /// Uses current occupancy rate for all months (historical data not available)
+  /// Uses historical data if available, otherwise falls back to current occupancy
   /// Widget format: [{'month': 1, 'occupancy': 85, 'isCurrent': false, 'pgId': '...', 'timestamp': ...}, ...]
   List<Map<String, dynamic>> _transformOccupancyData(
     OwnerOverviewModel overviewData,
-    String? pgId,
-  ) {
+    String? pgId, {
+    List<dynamic>? historicalData,
+  }) {
     final currentYear = DateTime.now().year;
     final currentMonth = DateTime.now().month;
     final List<Map<String, dynamic>> occupancyList = [];
 
-    // Calculate occupancy rate from overview data
-    double occupancyRate = 0.0;
+    // Calculate current occupancy rate as fallback
+    double currentOccupancyRate = 0.0;
     final totalBeds = overviewData.totalBeds;
     final occupiedBeds = overviewData.occupiedBeds;
     if (totalBeds > 0) {
-      occupancyRate = (occupiedBeds / totalBeds) * 100;
+      currentOccupancyRate = (occupiedBeds / totalBeds) * 100;
+    }
+
+    // Create a map of historical data by month for quick lookup
+    final Map<int, double> historicalMap = {};
+    if (historicalData != null && historicalData.isNotEmpty) {
+      for (var trend in historicalData) {
+        // Handle both OccupancyTrendModel and Map<String, dynamic>
+        int month;
+        double occupancyRate;
+        
+        if (trend is Map<String, dynamic>) {
+          final date = trend['date'] is DateTime
+              ? trend['date'] as DateTime
+              : DateTime.parse(trend['date'].toString());
+          month = date.month;
+          occupancyRate = (trend['occupancyRate'] as num?)?.toDouble() ?? 0.0;
+        } else {
+          // Assume it's OccupancyTrendModel
+          month = trend.date.month;
+          occupancyRate = trend.occupancyRate * 100; // Convert from 0-1 to 0-100
+        }
+        
+        if (month >= 1 && month <= 12) {
+          historicalMap[month] = occupancyRate;
+        }
+      }
     }
 
     // Create occupancy data for all 12 months
-    // Note: Using current occupancy for all months since historical data is not available
-    // In production, you might want to track historical occupancy separately
     for (int month = 1; month <= 12; month++) {
       final timestamp = DateTime(currentYear, month, 1);
       final isCurrent = month == currentMonth;
 
+      // Use historical data if available, otherwise use current occupancy
+      final occupancy = historicalMap[month] ?? currentOccupancyRate;
+
       occupancyList.add({
         'month': month,
-        'occupancy': occupancyRate.round(),
+        'occupancy': occupancy.round(),
         'isCurrent': isCurrent,
         'pgId': pgId ?? '',
         'timestamp': timestamp,
@@ -538,9 +579,18 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget _buildPerformanceMetrics(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final decimalFormatter = NumberFormat('0.0', loc.localeName);
-    final guestSatisfactionScore = decimalFormatter.format(4.8);
-    final responseTimeHours = decimalFormatter.format(2.3);
-    final maintenanceScore = decimalFormatter.format(9.2);
+    
+    // Use real performance metrics if available, otherwise show loading/placeholder
+    final metrics = _performanceMetrics;
+    final guestSatisfactionScore = decimalFormatter.format(
+      metrics['guestSatisfactionScore'] ?? 0.0,
+    );
+    final responseTimeHours = decimalFormatter.format(
+      metrics['avgResponseTimeHours'] ?? 0.0,
+    );
+    final maintenanceScore = decimalFormatter.format(
+      metrics['maintenanceScore'] ?? 0.0,
+    );
 
     final padding = context.responsivePadding;
     final cardGap =
