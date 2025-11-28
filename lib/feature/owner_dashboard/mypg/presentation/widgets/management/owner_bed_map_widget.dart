@@ -12,7 +12,9 @@ import '../../../../../../common/widgets/grids/responsive_grid.dart';
 import '../../../../../../common/widgets/text/caption_text.dart';
 import '../../../../../../common/widgets/text/body_text.dart';
 import '../../../../../../common/widgets/text/heading_small.dart';
+import '../../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../../common/widgets/chips/status_chip.dart';
+import '../../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../../core/services/localization/internationalization_service.dart';
 import '../../../../../../l10n/app_localizations.dart';
 import '../../../data/models/owner_pg_management_model.dart';
@@ -401,9 +403,9 @@ class OwnerBedMapWidget extends StatelessWidget {
                 status: guest?.status ?? (bed.isPending ? 'pending' : 'active'),
                 paymentStatus: paymentStatus,
                 compact: true,
-                onTap: () {
-                  // TODO: Navigate to guest details
-                },
+                onTap: guest != null
+                    ? () => _showGuestDetails(context, guest, loc)
+                    : null,
               );
             }).toList(),
           ),
@@ -757,5 +759,140 @@ class OwnerBedMapWidget extends StatelessWidget {
 
     // Show payment pending indicator if guest status is payment_pending
     return guest.status == 'payment_pending';
+  }
+
+  /// Shows guest details dialog
+  void _showGuestDetails(
+    BuildContext context,
+    OwnerGuestModel guest,
+    AppLocalizations? loc,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.paddingL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HeadingMedium(text: guest.fullName),
+              const SizedBox(height: AppSpacing.paddingM),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (guest.roomNumber != null || guest.bedNumber != null)
+                        _buildDetailRow(
+                          context,
+                          loc?.room ?? 'Room',
+                          '${guest.roomNumber ?? 'N/A'}, Bed ${guest.bedNumber ?? 'N/A'}',
+                        ),
+                      _buildDetailRow(
+                        context,
+                        loc?.phoneNumber ?? 'Phone',
+                        guest.phoneNumber,
+                      ),
+                      if (guest.email != null && guest.email!.isNotEmpty)
+                        _buildDetailRow(
+                          context,
+                          loc?.email ?? 'Email',
+                          guest.email!,
+                        ),
+                      if (guest.joiningDate != null)
+                        _buildDetailRow(
+                          context,
+                          loc?.checkIn ?? 'Check-in',
+                          _formatDate(guest.joiningDate!),
+                        ),
+                      if (guest.vacatingDate != null)
+                        _buildDetailRow(
+                          context,
+                          loc?.checkOut ?? 'Check-out',
+                          _formatDate(guest.vacatingDate!),
+                        ),
+                      if (guest.emergencyContactName != null &&
+                          guest.emergencyContactName!.isNotEmpty) ...[
+                        _buildDetailRow(
+                          context,
+                          loc?.emergencyContact ?? 'Emergency Contact',
+                          guest.emergencyContactName!,
+                        ),
+                        if (guest.emergencyContactPhone != null &&
+                            guest.emergencyContactPhone!.isNotEmpty)
+                          _buildDetailRow(
+                            context,
+                            loc?.emergencyPhone ?? 'Emergency Phone',
+                            guest.emergencyContactPhone!,
+                          ),
+                      ],
+                      if (guest.address != null && guest.address!.isNotEmpty)
+                        _buildDetailRow(
+                          context,
+                          loc?.address ?? 'Address',
+                          guest.address!,
+                        ),
+                      if (guest.occupation != null &&
+                          guest.occupation!.isNotEmpty)
+                        _buildDetailRow(
+                          context,
+                          loc?.occupation ?? 'Occupation',
+                          guest.occupation!,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.paddingM),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButtonWidget(
+                    onPressed: () => Navigator.of(context).pop(),
+                    text: loc?.close ?? 'Close',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Builds a detail row for guest details dialog
+  Widget _buildDetailRow(
+    BuildContext context,
+    String label,
+    String value,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.paddingS),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: BodyText(
+              text: label,
+              medium: true,
+            ),
+          ),
+          Expanded(
+            child: BodyText(text: value),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Formats date for display
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 }

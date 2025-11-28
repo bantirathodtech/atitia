@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../common/widgets/text/heading_medium.dart';
 import '../../../../../common/widgets/text/heading_large.dart';
@@ -34,6 +35,8 @@ import '../../../../../common/widgets/dashboard/payment_status_breakdown_widget.
 import '../../../../../common/widgets/loaders/enhanced_loading_state.dart';
 import '../../../../../common/widgets/indicators/enhanced_empty_state.dart';
 import '../../../../../common/widgets/animations/smooth_page_transition.dart';
+import '../../../../../common/utils/constants/routes.dart';
+import '../../../guests/viewmodel/owner_guest_viewmodel.dart';
 
 /// Owner Overview Screen - Dashboard home with comprehensive analytics
 /// Displays key metrics, revenue charts, and quick actions
@@ -573,7 +576,13 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
       pendingAmount: breakdown['pendingAmount']?.toDouble(),
       partialAmount: breakdown['partialAmount']?.toDouble(),
       onViewDetails: () {
-        // TODO: Navigate to payments/guests tab
+        // Navigate to guests tab in owner guest management screen
+        context.go(AppRoutes.ownerGuests);
+        // Set the selected tab to 'guests' (which shows payment info)
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final guestVM = Provider.of<OwnerGuestViewModel>(context, listen: false);
+          guestVM.setSelectedTab('guests');
+        });
       },
     );
   }
@@ -593,7 +602,13 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
     return RecentlyUpdatedGuestsWidget(
       guests: guestsList,
       onViewAll: () {
-        // TODO: Navigate to guests tab
+        // Navigate to guests tab in owner guest management screen
+        context.go(AppRoutes.ownerGuests);
+        // Set the selected tab to 'guests'
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final guestVM = Provider.of<OwnerGuestViewModel>(context, listen: false);
+          guestVM.setSelectedTab('guests');
+        });
       },
       maxDisplayCount: 5,
       daysToLookBack: 7,
