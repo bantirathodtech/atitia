@@ -115,9 +115,12 @@ class EnvironmentConfig {
   /// Google Sign-In Web Client ID
   /// ⚠️ SECRET: Store in environment variable or secure storage
   /// Get from: Google Cloud Console → APIs & Services → Credentials
+  /// Source: `.secrets/google-oauth/client_secret_google_oauth.json`
   static const String googleSignInWebClientId = String.fromEnvironment(
-      'GOOGLE_SIGN_IN_WEB_CLIENT_ID',
-      defaultValue: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com');
+    'GOOGLE_SIGN_IN_WEB_CLIENT_ID',
+    defaultValue:
+        '665010238088-md8lcd0vv27l3r63edbaoqjcgokbpggj.apps.googleusercontent.com',
+  );
 
   /// Google Sign-In Android Client ID
   /// ⚠️ SECRET: Store in environment variable or secure storage
@@ -158,9 +161,12 @@ class EnvironmentConfig {
   /// - See `GOOGLE_CLIENT_SECRET_SETUP.md` for setup guide
   /// - See `GOOGLE_CLIENT_SECRET_CREATE_NEW.md` for creating new secrets
   /// - See `.secrets/README.md` for secure storage setup
+  /// Source: `.secrets/google-oauth/client_secret_google_oauth.json`
+  /// ⚠️ WARNING: Never commit the actual secret! Use environment variable or secure storage.
   static const String googleSignInClientSecret = String.fromEnvironment(
-      'GOOGLE_SIGN_IN_CLIENT_SECRET',
-      defaultValue: 'YOUR_CLIENT_SECRET_HERE');
+    'GOOGLE_SIGN_IN_CLIENT_SECRET',
+    defaultValue: 'YOUR_CLIENT_SECRET_HERE', // Replace with actual secret from .secrets or env var
+  );
 
   // ==========================================================================
   // GOOGLE OAUTH JAVASCRIPT ORIGINS (for web development)
@@ -215,31 +221,66 @@ class EnvironmentConfig {
       'c35426383935af00f2f54b0bb7fc7cb6e8150f15';
 
   // ==========================================================================
-  // SUPABASE CONFIGURATION (if using)
+  // SUPABASE CONFIGURATION
   // ==========================================================================
 
   /// Supabase Project URL
-  ///
-  /// ⚠️ NOTE: Supabase credentials are actually configured in `lib/core/services/supabase/supabase_config.dart`
-  /// This field is kept for backward compatibility but is NOT used by the app.
-  ///
-  /// **To update Supabase credentials:**
-  /// - Edit: `lib/core/services/supabase/supabase_config.dart`
-  /// - The app uses `SupabaseConfig.supabaseUrl` and `SupabaseConfig.supabaseAnonKey`
-  ///
-  /// **Current Supabase Config Location:**
-  /// See: `lib/core/services/supabase/supabase_config.dart` for actual values
-  static const String supabaseUrl = 'your_supabase_url_here';
+  /// Get from: Supabase Dashboard → Settings → API → Project URL
+  /// Source: `.secrets` and `lib/core/services/supabase/supabase_config.dart`
+  static const String supabaseUrl = String.fromEnvironment(
+    'SUPABASE_URL',
+    defaultValue: 'https://iteharwqzobkolybqvsl.supabase.co',
+  );
 
   /// Supabase Anonymous Key (Public Key)
-  ///
-  /// ⚠️ NOTE: Supabase credentials are actually configured in `lib/core/services/supabase/supabase_config.dart`
-  /// This field is kept for backward compatibility but is NOT used by the app.
-  ///
-  /// **To update Supabase credentials:**
-  /// - Edit: `lib/core/services/supabase/supabase_config.dart`
-  /// - The app uses `SupabaseConfig.supabaseUrl` and `SupabaseConfig.supabaseAnonKey`
-  static const String supabaseAnonKey = 'your_supabase_anon_key_here';
+  /// This is safe to use in client-side code
+  /// Get from: Supabase Dashboard → Settings → API → anon/public key
+  /// Source: `.secrets` and `lib/core/services/supabase/supabase_config.dart`
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+    defaultValue:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZWhhcndxem9ia29seWJxdnNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MTUzMjYsImV4cCI6MjA3NTQ5MTMyNn0.AK5HCzXT_wafICarwp0-3nALJxQ0RjB6pPg0j9TbBcA',
+  );
+
+  /// Supabase Storage Bucket Name
+  static const String supabaseStorageBucket = 'atitia-storage';
+
+  // ==========================================================================
+  // RAZORPAY CONFIGURATION
+  // ==========================================================================
+
+  /// Razorpay API Key (App-level, for subscriptions/featured listings)
+  /// Get from: Razorpay Dashboard → Settings → API Keys
+  /// Source: `.secrets/api-keys/razorpay-test.json`
+  /// ⚠️ NOTE: This is the TEST key. Replace with production key for production builds.
+  static const String razorpayApiKey = String.fromEnvironment(
+    'RAZORPAY_API_KEY',
+    defaultValue: 'rzp_test_RlAOuGGXSxvL66',
+  );
+
+  /// Razorpay Key Secret (App-level, for server-side operations)
+  /// ⚠️ SECRET: Never expose in client code, use only in Cloud Functions
+  /// Get from: Razorpay Dashboard → Settings → API Keys
+  /// Source: `.secrets/api-keys/razorpay-test.json`
+  /// ⚠️ NOTE: This is the TEST secret. Replace with production secret for production builds.
+  static const String razorpayKeySecret = String.fromEnvironment(
+    'RAZORPAY_KEY_SECRET',
+    defaultValue: '2cwRmmNzqj3Bzpn0muOgO62U',
+  );
+
+  // ==========================================================================
+  // DISCORD WEBHOOK CONFIGURATION
+  // ==========================================================================
+
+  /// Discord Webhook URL (for notifications/alerts)
+  /// Get from: Discord Server → Server Settings → Integrations → Webhooks
+  /// Source: `.secrets/api-keys/DISCORD_WEBHOOK_URL.txt`
+  /// ⚠️ SECRET: Keep this URL private, it allows posting to your Discord channel
+  static const String discordWebhookUrl = String.fromEnvironment(
+    'DISCORD_WEBHOOK_URL',
+    defaultValue:
+        'https://discord.com/api/webhooks/1443555560091029576/OxxszMilMffKCLRpzO_n0LxUc3oQKvTy9J54t-o5uXohOJaSQG1jnxTiMMqBWcD4oGZE',
+  );
 
   // ==========================================================================
   // DEVELOPMENT vs PRODUCTION CONFIGURATION
@@ -447,6 +488,10 @@ class EnvironmentConfig {
       firebaseAndroidApiKey,
       firebaseIosApiKey,
       recaptchaEnterpriseSiteKey,
+      supabaseUrl,
+      supabaseAnonKey,
+      razorpayApiKey,
+      razorpayKeySecret,
     ];
 
     return requiredFields.every(
@@ -500,12 +545,23 @@ class EnvironmentConfig {
       missing.add('reCAPTCHA Enterprise Debug Token');
     }
 
-    if (supabaseUrl.contains('your_supabase_url_here')) {
+    // Check Supabase credentials (now using String.fromEnvironment with defaults)
+    // These should be set via environment variables for production
+    if (supabaseUrl.isEmpty || !supabaseUrl.startsWith('https://')) {
       missing.add('Supabase URL');
     }
 
-    if (supabaseAnonKey.contains('your_supabase_anon_key_here')) {
+    if (supabaseAnonKey.isEmpty || supabaseAnonKey.length < 50) {
       missing.add('Supabase Anon Key');
+    }
+
+    // Check Razorpay credentials (test keys are defaults, production should use env vars)
+    if (razorpayApiKey.isEmpty || !razorpayApiKey.startsWith('rzp_')) {
+      missing.add('Razorpay API Key');
+    }
+
+    if (razorpayKeySecret.isEmpty) {
+      missing.add('Razorpay Key Secret');
     }
 
     return missing;

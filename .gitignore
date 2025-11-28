@@ -79,6 +79,7 @@ secrets.json
 !.secrets/README.md
 !.secrets/**/README.md
 !.secrets/.gitkeep
+!.secrets/**/.env.example
 
 # Additional secret file patterns
 *.p12
