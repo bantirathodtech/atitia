@@ -116,10 +116,10 @@ class EnvironmentConfig {
   /// ⚠️ SECRET: Store in environment variable or secure storage
   /// Get from: Google Cloud Console → APIs & Services → Credentials
   /// Source: `.secrets/google-oauth/client_secret_google_oauth.json`
+  /// ⚠️ NOTE: Client ID is public but GitHub may flag it. Use environment variable for production.
   static const String googleSignInWebClientId = String.fromEnvironment(
     'GOOGLE_SIGN_IN_WEB_CLIENT_ID',
-    defaultValue:
-        '665010238088-md8lcd0vv27l3r63edbaoqjcgokbpggj.apps.googleusercontent.com',
+    defaultValue: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
   );
 
   /// Google Sign-In Android Client ID
