@@ -17,7 +17,6 @@
 // - Makes profile editing comfortable in different lighting conditions
 // ============================================================================
 
-
 import 'package:flutter/material.dart';
 // import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -209,7 +208,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
 
       // Generate file name with timestamp
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final fileName = 'profile_photo_$ownerId\_$timestamp.jpg';
+      final fileName = 'profile_photo_${ownerId}_$timestamp.jpg';
 
       // Show loading indicator
       if (mounted) {
@@ -258,7 +257,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
 
       // Generate file name with timestamp
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final fileName = 'aadhaar_photo_$ownerId\_$timestamp.jpg';
+      final fileName = 'aadhaar_photo_${ownerId}_$timestamp.jpg';
 
       // Show loading indicator
       if (mounted) {
