@@ -17,7 +17,6 @@
 // - Makes profile editing comfortable in different lighting conditions
 // ============================================================================
 
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 // import 'package:image_picker/image_picker.dart';
@@ -175,10 +174,12 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
   //   });
   // }
 
-  // ignore: unused_element
-  Future<File?> _pickImage() async {
+  /// Picks an image from gallery using ImagePickerHelper
+  Future<dynamic> _pickImage() async {
     try {
-      final imageFile = await ImagePickerHelper.pickImageFromGallery();
+      final imageFile = await ImagePickerHelper.pickImageFromGallery(
+        imageQuality: 85, // Good quality for profile photos
+      );
       return imageFile;
     } catch (e) {
       if (!mounted) return null;
@@ -188,41 +189,104 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
     }
   }
 
-  // Future<void> _onProfilePhotoSelected() async {
-  //   try {
-  //     final imageFile = await _pickImage();
-  //     if (imageFile != null) {
-  //       final viewModel = context.read<OwnerProfileViewModel>();
-  //       final url = await viewModel.uploadProfilePhoto(imageFile);
-  //       if (url != null) {
-  //         setState(() {
-  //           _uploadedProfilePhotoUrl = url;
-  //         });
-  //         _showSnackBar('Profile photo updated successfully');
-  //       }
-  //     }
-  //   } catch (e) {
-  //     _showSnackBar('Failed to upload profile photo: ${e.toString()}');
-  //   }
-  // }
+  /// Handles profile photo selection and upload
+  Future<void> _onProfilePhotoSelected() async {
+    if (!mounted) return;
 
-  // Future<void> _onAadhaarPhotoSelected() async {
-  //   try {
-  //     final imageFile = await _pickImage();
-  //     if (imageFile != null) {
-  //       final viewModel = context.read<OwnerProfileViewModel>();
-  //       final url = await viewModel.uploadAadhaarPhoto(imageFile);
-  //       if (url != null) {
-  //         setState(() {
-  //           _uploadedAadhaarPhotoUrl = url;
-  //         });
-  //         _showSnackBar('Aadhaar photo updated successfully');
-  //       }
-  //     }
-  //   } catch (e) {
-  //     _showSnackBar('Failed to upload Aadhaar photo: ${e.toString()}');
-  //   }
-  // }
+    try {
+      final imageFile = await _pickImage();
+      if (imageFile == null) return;
+
+      final viewModel = context.read<OwnerProfileViewModel>();
+      final authProvider = context.read<AuthProvider>();
+      final ownerId = authProvider.user?.userId;
+
+      if (ownerId == null || ownerId.isEmpty) {
+        final loc = AppLocalizations.of(context)!;
+        _showSnackBar(loc.ownerProfileUpdateFailure('Owner ID not available'));
+        return;
+      }
+
+      // Generate file name with timestamp
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = 'profile_photo_$ownerId\_$timestamp.jpg';
+
+      // Show loading indicator
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: BodyText(text: 'Uploading photo...'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+
+      // Upload photo
+      final photoUrl = await viewModel.uploadProfilePhoto(fileName, imageFile);
+
+      if (mounted) {
+        setState(() {
+          _uploadedProfilePhotoUrl = photoUrl;
+        });
+
+        _showSnackBar('Profile photo updated successfully');
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar('Failed to upload profile photo: ${e.toString()}');
+      }
+    }
+  }
+
+  /// Handles Aadhaar photo selection and upload
+  Future<void> _onAadhaarPhotoSelected() async {
+    if (!mounted) return;
+
+    try {
+      final imageFile = await _pickImage();
+      if (imageFile == null) return;
+
+      final viewModel = context.read<OwnerProfileViewModel>();
+      final authProvider = context.read<AuthProvider>();
+      final ownerId = authProvider.user?.userId;
+
+      if (ownerId == null || ownerId.isEmpty) {
+        final loc = AppLocalizations.of(context)!;
+        _showSnackBar(loc.ownerProfileUpdateFailure('Owner ID not available'));
+        return;
+      }
+
+      // Generate file name with timestamp
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = 'aadhaar_photo_$ownerId\_$timestamp.jpg';
+
+      // Show loading indicator
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: BodyText(text: 'Uploading photo...'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+
+      // Upload photo
+      final documentUrl =
+          await viewModel.uploadAadhaarDocument(fileName, imageFile);
+
+      if (mounted) {
+        setState(() {
+          _uploadedAadhaarPhotoUrl = documentUrl;
+        });
+
+        _showSnackBar('Aadhaar photo updated successfully');
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar('Failed to upload Aadhaar photo: ${e.toString()}');
+      }
+    }
+  }
 
   Future<void> _saveProfile() async {
     // if (!// _formKey.currentState!.validate()) return;
@@ -635,9 +699,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
                     icon: Icons.person_rounded,
                     imageUrl: _uploadedProfilePhotoUrl,
                     loc: loc,
-                    onTap: () {
-                      // TODO: Implement profile photo selection
-                    },
+                    onTap: _onProfilePhotoSelected,
                   ),
                   const SizedBox(height: AppSpacing.paddingM),
                   _buildDocumentUploadCard(
@@ -646,9 +708,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen>
                     icon: Icons.credit_card_rounded,
                     imageUrl: _uploadedAadhaarPhotoUrl,
                     loc: loc,
-                    onTap: () {
-                      // TODO: Implement Aadhaar photo selection
-                    },
+                    onTap: _onAadhaarPhotoSelected,
                   ),
                 ],
               ),
