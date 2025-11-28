@@ -115,7 +115,6 @@ class WebUrlLauncher {
         context: context,
       );
 
-
   /// Open Home page
   static Future<bool> openHome({
     LaunchMode mode = LaunchMode.externalApplication,
