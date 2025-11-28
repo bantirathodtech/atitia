@@ -8,6 +8,7 @@ import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/theme_colors.dart';
 import '../../../../../common/utils/extensions/context_extensions.dart';
 import '../../../../../common/utils/performance/memory_manager.dart';
+import '../../../../../common/utils/helpers/location_helper.dart';
 import '../../../../../common/widgets/app_bars/adaptive_app_bar.dart';
 import '../../../../../common/widgets/buttons/primary_button.dart';
 import '../../../../../common/widgets/indicators/empty_state.dart';
@@ -55,6 +56,8 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
   final ScrollController _scrollController = ScrollController();
   bool _showFilterPanel = false;
   bool _showSearchBar = false;
+  double? _userLatitude;
+  double? _userLongitude;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
 
@@ -96,10 +99,29 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
             Provider.of<GuestFavoritePgViewModel>(context, listen: false);
         favoriteVM.initializeFavorites(guestId);
       }
+
+      // Get user location for distance calculation
+      _getUserLocation();
     });
   }
 
   // Dispose is handled by MemoryManagementMixin
+
+  /// Get user's current location for distance calculation
+  Future<void> _getUserLocation() async {
+    try {
+      final position = await LocationHelper.getCurrentLocation();
+      if (position != null && mounted) {
+        setState(() {
+          _userLatitude = position.latitude;
+          _userLongitude = position.longitude;
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to get user location: $e');
+      // Silently fail - distance calculation will just not work
+    }
+  }
 
   /// Toggle filter panel visibility
   void _toggleFilterPanel() {
@@ -683,8 +705,8 @@ class _GuestPgListScreenState extends State<GuestPgListScreen>
       itemBuilder: (context, pg, index) {
         return GuestPgCard(
           pg: pg,
-          userLatitude: null, // TODO: Get from location service if needed
-          userLongitude: null, // TODO: Get from location service if needed
+          userLatitude: _userLatitude,
+          userLongitude: _userLongitude,
           isFeatured: pgVM.isPGFeatured(pg.pgId),
           onTap: () {
             pgVM.setSelectedPG(pg);
