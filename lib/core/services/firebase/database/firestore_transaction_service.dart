@@ -1,9 +1,10 @@
 // firestore_transaction_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../interfaces/transaction/transaction_service_interface.dart';
 
 /// Service for handling Firestore transactions
 /// Ensures atomic operations for critical business logic
-class FirestoreTransactionService {
+class FirestoreTransactionService implements ITransactionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Access Firestore instance

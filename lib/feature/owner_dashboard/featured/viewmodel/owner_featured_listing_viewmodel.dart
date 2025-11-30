@@ -11,6 +11,8 @@ import '../../../../../core/models/featured/featured_listing_model.dart';
 import '../../../../../core/repositories/featured/featured_listing_repository.dart';
 import '../../../../../core/services/payment/app_subscription_payment_service.dart';
 import '../../profile/data/repository/owner_profile_repository.dart';
+import '../../../../../core/interfaces/auth/viewmodel_auth_service_interface.dart';
+import '../../../../../core/adapters/auth/authentication_service_wrapper_adapter.dart';
 
 /// ViewModel for managing featured listings for owner's PGs
 /// Handles featured listing purchase, cancellation, and management
@@ -19,7 +21,7 @@ class OwnerFeaturedListingViewModel extends BaseProviderState
   final FeaturedListingRepository _featuredRepo;
   final OwnerProfileRepository _profileRepo;
   final AppSubscriptionPaymentService _paymentService;
-  final _authService = getIt.auth;
+  final IViewModelAuthService _authService;
   final _analyticsService = getIt.analytics;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
@@ -29,9 +31,11 @@ class OwnerFeaturedListingViewModel extends BaseProviderState
     FeaturedListingRepository? featuredRepo,
     OwnerProfileRepository? profileRepo,
     AppSubscriptionPaymentService? paymentService,
+    IViewModelAuthService? authService,
   })  : _featuredRepo = featuredRepo ?? FeaturedListingRepository(),
         _profileRepo = profileRepo ?? OwnerProfileRepository(),
-        _paymentService = paymentService ?? AppSubscriptionPaymentService();
+        _paymentService = paymentService ?? AppSubscriptionPaymentService(),
+        _authService = authService ?? AuthenticationServiceWrapperAdapter();
 
   List<FeaturedListingModel> _featuredListings = [];
   final Map<String, FeaturedListingModel?> _pgFeaturedListings =

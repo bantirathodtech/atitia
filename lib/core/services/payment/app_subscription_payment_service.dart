@@ -32,12 +32,23 @@ class AppSubscriptionPaymentService with LoggingMixin {
   AppPaymentType? _currentPaymentType;
   String? _currentPaymentContextId; // subscriptionId or featuredListingId
 
-  // Repositories
-  final OwnerSubscriptionRepository _subscriptionRepo =
-      OwnerSubscriptionRepository();
-  final FeaturedListingRepository _featuredRepo = FeaturedListingRepository();
-  final RevenueRepository _revenueRepo = RevenueRepository();
-  final RemoteConfigServiceWrapper _remoteConfig = RemoteConfigServiceWrapper();
+  // Repositories - injected via constructor for testability
+  final OwnerSubscriptionRepository _subscriptionRepo;
+  final FeaturedListingRepository _featuredRepo;
+  final RevenueRepository _revenueRepo;
+  final RemoteConfigServiceWrapper _remoteConfig;
+
+  /// Constructor with dependency injection
+  /// If repositories are not provided, creates them with default services
+  AppSubscriptionPaymentService({
+    OwnerSubscriptionRepository? subscriptionRepo,
+    FeaturedListingRepository? featuredRepo,
+    RevenueRepository? revenueRepo,
+    RemoteConfigServiceWrapper? remoteConfig,
+  })  : _subscriptionRepo = subscriptionRepo ?? OwnerSubscriptionRepository(),
+        _featuredRepo = featuredRepo ?? FeaturedListingRepository(),
+        _revenueRepo = revenueRepo ?? RevenueRepository(),
+        _remoteConfig = remoteConfig ?? RemoteConfigServiceWrapper();
 
   /// Callbacks
   Function(String, PaymentSuccessResponse)? _onSuccess;

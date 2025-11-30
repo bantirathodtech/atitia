@@ -6,13 +6,59 @@
 // Changed to: Removed unnecessary foundation.dart import
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:atitia/common/utils/performance/performance_test_utility.dart';
 import 'package:atitia/common/widgets/performance/optimized_list_view.dart';
 import 'package:atitia/common/widgets/images/adaptive_image.dart';
+import 'package:atitia/core/services/firebase/analytics/firebase_analytics_service.dart';
+import 'package:atitia/core/services/firebase/crashlytics/firebase_crashlytics_service.dart';
 
 void main() {
   group('Performance Tests', () {
+    setUpAll(() {
+      // Initialize GetIt with mock services for performance tests
+      final getIt = GetIt.instance;
+      
+      // Unregister existing services if they exist
+      try {
+        if (getIt.isRegistered<AnalyticsServiceWrapper>()) {
+          getIt.unregister<AnalyticsServiceWrapper>();
+        }
+      } catch (_) {}
+      
+      try {
+        if (getIt.isRegistered<CrashlyticsServiceWrapper>()) {
+          getIt.unregister<CrashlyticsServiceWrapper>();
+        }
+      } catch (_) {}
+
+      // Register mock analytics service
+      getIt.registerLazySingleton<AnalyticsServiceWrapper>(
+        () => _MockAnalyticsService(),
+      );
+
+      // Register mock crashlytics service
+      getIt.registerLazySingleton<CrashlyticsServiceWrapper>(
+        () => _MockCrashlyticsService(),
+      );
+    });
+
+    tearDownAll(() {
+      // Clean up GetIt
+      final getIt = GetIt.instance;
+      try {
+        if (getIt.isRegistered<AnalyticsServiceWrapper>()) {
+          getIt.unregister<AnalyticsServiceWrapper>();
+        }
+      } catch (_) {}
+      
+      try {
+        if (getIt.isRegistered<CrashlyticsServiceWrapper>()) {
+          getIt.unregister<CrashlyticsServiceWrapper>();
+        }
+      } catch (_) {}
+    });
     testWidgets('OptimizedListView performance test',
         (WidgetTester tester) async {
       // Test data
@@ -212,4 +258,75 @@ class _TestWidgetWithMixinState extends State<TestWidgetWithMixin> {
       ),
     );
   }
+}
+
+/// Mock AnalyticsServiceWrapper for performance tests
+class _MockAnalyticsService implements AnalyticsServiceWrapper {
+  @override
+  Future<void> logEvent({
+    required String name,
+    Map<String, Object>? parameters,
+  }) async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  Future<void> setUserId(String? userId) async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  Future<void> setUserProperty({
+    required String name,
+    required String value,
+  }) async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  Future<void> logScreenView({
+    required String screenName,
+    String screenClass = 'Flutter',
+  }) async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  Future<void> resetAnalyticsData() async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Mock CrashlyticsServiceWrapper for performance tests
+class _MockCrashlyticsService implements CrashlyticsServiceWrapper {
+  @override
+  Future<void> log(String message) async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  Future<void> recordError({
+    required dynamic exception,
+    required StackTrace stackTrace,
+    String? reason,
+    bool fatal = false,
+  }) async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  Future<void> setCustomKey(String key, dynamic value) async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  Future<void> setUserId(String userId) async {
+    // Mock implementation - do nothing
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

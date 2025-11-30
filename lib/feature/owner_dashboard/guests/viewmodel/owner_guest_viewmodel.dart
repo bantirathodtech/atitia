@@ -329,6 +329,7 @@ class OwnerGuestViewModel extends BaseProviderState {
           parameters: {'error': e.toString()},
         ),
       );
+      setLoading(false); // Ensure loading is set to false on error
     }
   }
 

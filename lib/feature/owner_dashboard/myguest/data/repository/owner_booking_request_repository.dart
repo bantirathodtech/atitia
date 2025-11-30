@@ -5,6 +5,7 @@ import '../../../../../core/interfaces/analytics/analytics_service_interface.dar
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/repositories/notification_repository.dart';
 import '../../../../../core/services/firebase/database/firestore_transaction_service.dart';
+import '../../../../../core/interfaces/transaction/transaction_service_interface.dart';
 import '../../../../../core/services/booking/booking_lifecycle_service.dart';
 import '../../../../../core/telemetry/cross_role_telemetry_service.dart';
 import '../models/owner_booking_request_model.dart';
@@ -16,7 +17,7 @@ class OwnerBookingRequestRepository {
   final IDatabaseService _databaseService;
   final IAnalyticsService _analyticsService;
   final NotificationRepository _notificationRepository;
-  final FirestoreTransactionService _transactionService;
+  final ITransactionService _transactionService;
   final BookingLifecycleService _bookingLifecycleService;
   final _telemetry = CrossRoleTelemetryService();
 
@@ -26,7 +27,7 @@ class OwnerBookingRequestRepository {
     IDatabaseService? databaseService,
     IAnalyticsService? analyticsService,
     NotificationRepository? notificationRepository,
-    FirestoreTransactionService? transactionService,
+    ITransactionService? transactionService,
     BookingLifecycleService? bookingLifecycleService,
   })  : _databaseService =
             databaseService ?? UnifiedServiceLocator.serviceFactory.database,
