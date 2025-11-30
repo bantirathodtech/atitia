@@ -8,6 +8,8 @@ import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../data/models/guest_complaint_model.dart';
 import '../data/repository/guest_complaint_repository.dart';
+import '../../../../core/interfaces/auth/viewmodel_auth_service_interface.dart';
+import '../../../../core/adapters/auth/authentication_service_wrapper_adapter.dart';
 
 /// ViewModel for managing guest complaints UI state and business logic
 /// Extends BaseProviderState for automatic service access and state management
@@ -15,14 +17,16 @@ import '../data/repository/guest_complaint_repository.dart';
 class GuestComplaintViewModel extends BaseProviderState
     with StreamSubscriptionMixin {
   final GuestComplaintRepository _repository;
-  final _authService = getIt.auth;
+  final IViewModelAuthService _authService;
   final _analyticsService = getIt.analytics;
 
   /// Constructor with dependency injection
   /// If repository is not provided, creates it with default services
   GuestComplaintViewModel({
     GuestComplaintRepository? repository,
-  }) : _repository = repository ?? GuestComplaintRepository();
+    IViewModelAuthService? authService,
+  })  : _repository = repository ?? GuestComplaintRepository(),
+        _authService = authService ?? AuthenticationServiceWrapperAdapter();
 
   List<GuestComplaintModel> _complaints = [];
   StreamSubscription<List<GuestComplaintModel>>? _complaintsSubscription;

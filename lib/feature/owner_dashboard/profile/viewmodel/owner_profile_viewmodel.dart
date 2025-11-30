@@ -8,6 +8,8 @@ import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
 import '../data/models/owner_profile_model.dart';
 import '../data/repository/owner_profile_repository.dart';
+import '../../../../../core/interfaces/auth/viewmodel_auth_service_interface.dart';
+import '../../../../../core/adapters/auth/authentication_service_wrapper_adapter.dart';
 
 /// ViewModel for managing owner profile data, updates, and document uploads
 /// Extends BaseProviderState for automatic state management
@@ -15,7 +17,7 @@ import '../data/repository/owner_profile_repository.dart';
 /// Enhanced with real-time streaming and comprehensive error handling
 class OwnerProfileViewModel extends BaseProviderState {
   final OwnerProfileRepository _repository;
-  final _authService = getIt.auth;
+  final IViewModelAuthService _authService;
   final _analyticsService = getIt.analytics;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
@@ -24,7 +26,9 @@ class OwnerProfileViewModel extends BaseProviderState {
   /// If repository is not provided, creates it with default services
   OwnerProfileViewModel({
     OwnerProfileRepository? repository,
-  }) : _repository = repository ?? OwnerProfileRepository();
+    IViewModelAuthService? authService,
+  })  : _repository = repository ?? OwnerProfileRepository(),
+        _authService = authService ?? AuthenticationServiceWrapperAdapter();
 
   OwnerProfile? _profile;
   StreamSubscription<OwnerProfile?>? _profileSubscription;

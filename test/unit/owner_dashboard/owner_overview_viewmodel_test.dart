@@ -2,102 +2,10 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:atitia/feature/owner_dashboard/overview/viewmodel/owner_overview_view_model.dart';
-import 'package:atitia/feature/owner_dashboard/overview/data/repository/owner_overview_repository.dart';
 import 'package:atitia/feature/owner_dashboard/overview/data/models/owner_overview_model.dart';
 import 'package:atitia/common/utils/exceptions/exceptions.dart';
-
-/// Mock repository for testing OwnerOverviewViewModel
-class MockOwnerOverviewRepository extends OwnerOverviewRepository {
-  OwnerOverviewModel? _mockOverviewData;
-  Map<String, double>? _mockMonthlyBreakdown;
-  Map<String, double>? _mockPropertyBreakdown;
-  Map<String, dynamic>? _mockPaymentStatusBreakdown;
-  List<Map<String, dynamic>>? _mockRecentlyUpdatedGuests;
-  Exception? _shouldThrow;
-
-  void setMockOverviewData(OwnerOverviewModel data) {
-    _mockOverviewData = data;
-  }
-
-  void setMockMonthlyBreakdown(Map<String, double> breakdown) {
-    _mockMonthlyBreakdown = breakdown;
-  }
-
-  void setMockPropertyBreakdown(Map<String, double> breakdown) {
-    _mockPropertyBreakdown = breakdown;
-  }
-
-  void setMockPaymentStatusBreakdown(Map<String, dynamic> breakdown) {
-    _mockPaymentStatusBreakdown = breakdown;
-  }
-
-  void setMockRecentlyUpdatedGuests(List<Map<String, dynamic>> guests) {
-    _mockRecentlyUpdatedGuests = guests;
-  }
-
-  void setShouldThrow(Exception? error) {
-    _shouldThrow = error;
-  }
-
-  void clearError() {
-    _shouldThrow = null;
-  }
-
-  @override
-  Future<OwnerOverviewModel> fetchOwnerOverviewData(
-    String ownerId, {
-    String? pgId,
-  }) async {
-    if (_shouldThrow != null) {
-      throw _shouldThrow!;
-    }
-    return _mockOverviewData ?? OwnerOverviewModel(ownerId: ownerId);
-  }
-
-  @override
-  Future<Map<String, double>> getMonthlyRevenueBreakdown(
-    String ownerId,
-    int year,
-  ) async {
-    if (_shouldThrow != null) {
-      throw _shouldThrow!;
-    }
-    return _mockMonthlyBreakdown ?? {};
-  }
-
-  @override
-  Future<Map<String, double>> getPropertyRevenueBreakdown(
-    String ownerId,
-  ) async {
-    if (_shouldThrow != null) {
-      throw _shouldThrow!;
-    }
-    return _mockPropertyBreakdown ?? {};
-  }
-
-  @override
-  Future<Map<String, dynamic>> getPaymentStatusBreakdown(
-    String ownerId, {
-    String? pgId,
-  }) async {
-    if (_shouldThrow != null) {
-      throw _shouldThrow!;
-    }
-    return _mockPaymentStatusBreakdown ?? {};
-  }
-
-  @override
-  Future<List<Map<String, dynamic>>> getRecentlyUpdatedGuests(
-    String ownerId, {
-    String? pgId,
-    int days = 7,
-  }) async {
-    if (_shouldThrow != null) {
-      throw _shouldThrow!;
-    }
-    return _mockRecentlyUpdatedGuests ?? [];
-  }
-}
+import '../../helpers/viewmodel_test_setup.dart';
+import '../../helpers/mock_repositories.dart';
 
 void main() {
   group('OwnerOverviewViewModel Tests', () {
@@ -106,6 +14,11 @@ void main() {
     const String testOwnerId = 'test_owner_123';
     const String testPgId = 'test_pg_123';
 
+    setUpAll(() {
+      // Initialize GetIt with mock services
+      ViewModelTestSetup.initialize();
+    });
+
     setUp(() {
       mockRepository = MockOwnerOverviewRepository();
       viewModel = OwnerOverviewViewModel(repository: mockRepository);
@@ -113,6 +26,11 @@ void main() {
 
     tearDown(() {
       // Clean up if needed
+    });
+
+    tearDownAll(() {
+      // Reset GetIt after all tests
+      ViewModelTestSetup.reset();
     });
 
     group('Initialization', () {
@@ -352,7 +270,7 @@ void main() {
         await viewModel.loadOverviewData(testOwnerId);
 
         // Assert
-        expect(viewModel.occupancyRate, 0.75); // 15/20 = 0.75
+        expect(viewModel.occupancyRate, 75.0); // 15/20 = 75% (percentage)
       });
 
       test('hasProperties should return true when properties exist', () async {

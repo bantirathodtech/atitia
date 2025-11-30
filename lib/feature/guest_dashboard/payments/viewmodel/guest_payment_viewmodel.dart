@@ -8,6 +8,8 @@ import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../data/models/guest_payment_model.dart';
 import '../data/repository/guest_payment_repository.dart';
 import '../../../../core/services/localization/internationalization_service.dart';
+import '../../../../core/interfaces/auth/viewmodel_auth_service_interface.dart';
+import '../../../../core/adapters/auth/authentication_service_wrapper_adapter.dart';
 
 /// ViewModel for managing guest payments UI state and business logic
 /// Extends BaseProviderState for automatic service access and state management
@@ -15,7 +17,7 @@ import '../../../../core/services/localization/internationalization_service.dart
 class GuestPaymentViewModel extends BaseProviderState
     with StreamSubscriptionMixin {
   final GuestPaymentRepository _repository;
-  final _authService = getIt.auth;
+  final IViewModelAuthService _authService;
   final _analyticsService = getIt.analytics;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
@@ -24,7 +26,9 @@ class GuestPaymentViewModel extends BaseProviderState
   /// If repository is not provided, creates it with default services
   GuestPaymentViewModel({
     GuestPaymentRepository? repository,
-  }) : _repository = repository ?? GuestPaymentRepository();
+    IViewModelAuthService? authService,
+  })  : _repository = repository ?? GuestPaymentRepository(),
+        _authService = authService ?? AuthenticationServiceWrapperAdapter();
 
   StreamSubscription<List<GuestPaymentModel>>? _paymentsSubscription;
   StreamSubscription<List<GuestPaymentModel>>? _pendingPaymentsSubscription;

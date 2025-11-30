@@ -404,17 +404,25 @@ class SecurityMonitoringService {
       final analytics = getIt.analytics;
 
       // Log security event to analytics
+      final parameters = <String, Object>{
+        'event_type': event.eventType,
+        'description': event.description,
+        'level': event.level.toString(),
+        'timestamp': event.timestamp.toIso8601String(),
+        if (event.userId != null) 'user_id': event.userId!,
+        if (event.deviceId != null) 'device_id': event.deviceId!,
+      };
+      
+      // Add metadata, filtering out null values
+      for (final entry in event.metadata.entries) {
+        if (entry.value != null) {
+          parameters[entry.key] = entry.value as Object;
+        }
+      }
+      
       analytics.logEvent(
         name: 'security_event',
-        parameters: {
-          'event_type': event.eventType,
-          'description': event.description,
-          'level': event.level.toString(),
-          'timestamp': event.timestamp.toIso8601String(),
-          if (event.userId != null) 'user_id': event.userId!,
-          if (event.deviceId != null) 'device_id': event.deviceId!,
-          ...event.metadata,
-        },
+        parameters: parameters,
       );
 
       // In debug mode, also log to console
@@ -452,17 +460,25 @@ class SecurityMonitoringService {
       final crashlytics = getIt.crashlytics;
 
       // Log security alert to analytics
+      final parameters = <String, Object>{
+        'alert_type': alert.alertType,
+        'description': alert.description,
+        'severity': alert.severity.toString(),
+        'timestamp': alert.timestamp.toIso8601String(),
+        if (alert.userId != null) 'user_id': alert.userId!,
+        if (alert.deviceId != null) 'device_id': alert.deviceId!,
+      };
+      
+      // Add metadata, filtering out null values
+      for (final entry in alert.metadata.entries) {
+        if (entry.value != null) {
+          parameters[entry.key] = entry.value as Object;
+        }
+      }
+      
       analytics.logEvent(
         name: 'security_alert',
-        parameters: {
-          'alert_type': alert.alertType,
-          'description': alert.description,
-          'severity': alert.severity.toString(),
-          'timestamp': alert.timestamp.toIso8601String(),
-          if (alert.userId != null) 'user_id': alert.userId!,
-          if (alert.deviceId != null) 'device_id': alert.deviceId!,
-          ...alert.metadata,
-        },
+        parameters: parameters,
       );
 
       // Log to Crashlytics for high-severity alerts
