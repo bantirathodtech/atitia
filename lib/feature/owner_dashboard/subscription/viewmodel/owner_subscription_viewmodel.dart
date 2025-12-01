@@ -12,6 +12,8 @@ import '../../../../../core/models/subscription/owner_subscription_model.dart';
 import '../../../../../core/repositories/subscription/owner_subscription_repository.dart';
 import '../../../../../core/services/payment/app_subscription_payment_service.dart';
 import '../../profile/data/repository/owner_profile_repository.dart';
+import '../../../../../core/interfaces/auth/viewmodel_auth_service_interface.dart';
+import '../../../../../core/adapters/auth/authentication_service_wrapper_adapter.dart';
 
 /// ViewModel for managing owner subscriptions
 /// Extends BaseProviderState for automatic state management
@@ -20,7 +22,7 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
   final OwnerSubscriptionRepository _subscriptionRepo;
   final OwnerProfileRepository _profileRepo;
   final AppSubscriptionPaymentService _paymentService;
-  final _authService = getIt.auth;
+  final IViewModelAuthService _authService;
   final _analyticsService = getIt.analytics;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
@@ -30,9 +32,11 @@ class OwnerSubscriptionViewModel extends BaseProviderState with LoggingMixin {
     OwnerSubscriptionRepository? subscriptionRepo,
     OwnerProfileRepository? profileRepo,
     AppSubscriptionPaymentService? paymentService,
+    IViewModelAuthService? authService,
   })  : _subscriptionRepo = subscriptionRepo ?? OwnerSubscriptionRepository(),
         _profileRepo = profileRepo ?? OwnerProfileRepository(),
-        _paymentService = paymentService ?? AppSubscriptionPaymentService();
+        _paymentService = paymentService ?? AppSubscriptionPaymentService(),
+        _authService = authService ?? AuthenticationServiceWrapperAdapter();
 
   OwnerSubscriptionModel? _currentSubscription;
   List<OwnerSubscriptionModel> _subscriptionHistory = [];

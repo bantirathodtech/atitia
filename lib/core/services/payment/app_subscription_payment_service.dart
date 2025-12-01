@@ -7,6 +7,7 @@ library;
 
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../../../common/utils/logging/logging_mixin.dart';
+import '../../../common/constants/environment_config.dart';
 import '../../models/subscription/subscription_plan_model.dart';
 import '../../models/subscription/owner_subscription_model.dart';
 import '../../models/featured/featured_listing_model.dart';
@@ -31,12 +32,23 @@ class AppSubscriptionPaymentService with LoggingMixin {
   AppPaymentType? _currentPaymentType;
   String? _currentPaymentContextId; // subscriptionId or featuredListingId
 
-  // Repositories
-  final OwnerSubscriptionRepository _subscriptionRepo =
-      OwnerSubscriptionRepository();
-  final FeaturedListingRepository _featuredRepo = FeaturedListingRepository();
-  final RevenueRepository _revenueRepo = RevenueRepository();
-  final RemoteConfigServiceWrapper _remoteConfig = RemoteConfigServiceWrapper();
+  // Repositories - injected via constructor for testability
+  final OwnerSubscriptionRepository _subscriptionRepo;
+  final FeaturedListingRepository _featuredRepo;
+  final RevenueRepository _revenueRepo;
+  final RemoteConfigServiceWrapper _remoteConfig;
+
+  /// Constructor with dependency injection
+  /// If repositories are not provided, creates them with default services
+  AppSubscriptionPaymentService({
+    OwnerSubscriptionRepository? subscriptionRepo,
+    FeaturedListingRepository? featuredRepo,
+    RevenueRepository? revenueRepo,
+    RemoteConfigServiceWrapper? remoteConfig,
+  })  : _subscriptionRepo = subscriptionRepo ?? OwnerSubscriptionRepository(),
+        _featuredRepo = featuredRepo ?? FeaturedListingRepository(),
+        _revenueRepo = revenueRepo ?? RevenueRepository(),
+        _remoteConfig = remoteConfig ?? RemoteConfigServiceWrapper();
 
   /// Callbacks
   Function(String, PaymentSuccessResponse)? _onSuccess;
@@ -72,9 +84,10 @@ class AppSubscriptionPaymentService with LoggingMixin {
   }
 
   /// Load app's Razorpay key from Remote Config or environment
+  /// Priority: Remote Config > EnvironmentConfig > Error
   Future<void> _loadAppRazorpayKey() async {
     try {
-      // Try Remote Config first
+      // Try Remote Config first (allows runtime updates without app rebuild)
       final remoteKey = _remoteConfig.getString('app_razorpay_key');
       if (remoteKey.isNotEmpty && remoteKey != 'app_razorpay_key') {
         _appRazorpayKey = remoteKey;
@@ -85,13 +98,20 @@ class AppSubscriptionPaymentService with LoggingMixin {
         return;
       }
 
-      // Fallback to environment config (if available)
-      // TODO: Add to environment_config.dart when Razorpay account is created
-      // _appRazorpayKey = EnvironmentConfig.appRazorpayKey;
+      // Fallback to EnvironmentConfig (single source of truth for all keys)
+      final envKey = EnvironmentConfig.razorpayApiKey;
+      if (envKey.isNotEmpty && envKey.startsWith('rzp_')) {
+        _appRazorpayKey = envKey;
+        logInfo(
+          'App Razorpay key loaded from EnvironmentConfig',
+          feature: 'payment',
+        );
+        return;
+      }
 
-      // For now, throw error if key not found
+      // If neither source has a valid key, throw error
       throw Exception(
-          'App Razorpay key not configured. Please set in Remote Config or Environment Config.');
+          'App Razorpay key not configured. Please set in Remote Config (app_razorpay_key) or Environment Config (RAZORPAY_API_KEY).');
     } catch (e) {
       logError(
         'Failed to load app Razorpay key',

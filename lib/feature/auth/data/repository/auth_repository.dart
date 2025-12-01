@@ -5,30 +5,34 @@ import '../../../../core/di/common/unified_service_locator.dart';
 import '../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../core/interfaces/auth/auth_service_interface.dart';
+import '../../../../core/services/external/google/google_sign_in_service.dart';
+import '../../../../core/services/external/apple/apple_sign_in_service.dart';
 import '../model/user_model.dart';
 
 /// Repository for authentication operations
 /// Handles phone OTP, Google sign-in, and user session management
 /// Enhanced with analytics tracking and comprehensive error handling
 ///
-/// Note: GoogleSignIn and AppleSignIn remain as direct dependencies as they
-/// are platform-specific services. Core auth operations use IAuthService.
+/// Note: GoogleSignIn and AppleSignIn are now injected via constructor for testability.
+/// Core auth operations use IAuthService.
 class AuthRepository {
   final IAuthService _authService;
-  final _googleSignInService =
-      getIt.googleSignIn; // Platform-specific, kept direct
-  final _appleSignInService =
-      getIt.appleSignIn; // Platform-specific, kept direct
+  final GoogleSignInServiceWrapper _googleSignInService;
+  final AppleSignInServiceWrapper _appleSignInService;
   final IAnalyticsService _analyticsService;
 
   /// Constructor with dependency injection
-  /// If services are not provided, uses UnifiedServiceLocator as fallback
+  /// If services are not provided, uses GetIt as fallback
   AuthRepository({
     IAuthService? authService,
     IAnalyticsService? analyticsService,
+    GoogleSignInServiceWrapper? googleSignInService,
+    AppleSignInServiceWrapper? appleSignInService,
   })  : _authService = authService ?? UnifiedServiceLocator.serviceFactory.auth,
         _analyticsService =
-            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics,
+        _googleSignInService = googleSignInService ?? getIt.googleSignIn,
+        _appleSignInService = appleSignInService ?? getIt.appleSignIn;
 
   /// Sends OTP verification code
   Future<void> sendVerificationCode({

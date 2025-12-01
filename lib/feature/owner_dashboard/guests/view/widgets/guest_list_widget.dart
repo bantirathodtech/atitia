@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../../common/styles/spacing.dart';
@@ -16,6 +17,10 @@ import '../../../../../common/widgets/loaders/adaptive_loader.dart';
 import '../../../../../common/widgets/chips/filter_chip.dart';
 import '../../../../../common/widgets/buttons/text_button.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../core/di/common/unified_service_locator.dart';
+import '../../../../../core/repositories/notification_repository.dart';
+import '../../../../../core/interfaces/database/database_service_interface.dart';
+import '../../../../../feature/auth/logic/auth_provider.dart';
 import '../../viewmodel/owner_guest_viewmodel.dart';
 import '../../data/models/owner_guest_model.dart';
 
@@ -511,80 +516,6 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Builds placeholder guest card
-  Widget _buildPlaceholderGuestCard(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.paddingM),
-      padding: const EdgeInsets.all(AppSpacing.paddingM),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusM),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: Row(
-        children: [
-          // Placeholder avatar
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(24),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.paddingM),
-          // Placeholder content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 16,
-                  width: 120,
-                  decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.paddingXS),
-                Container(
-                  height: 12,
-                  width: 80,
-                  decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Placeholder status
-          Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.paddingS, vertical: 4),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(AppSpacing.borderRadiusS),
-            ),
-            child: Container(
-              height: 12,
-              width: 60,
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .surfaceContainerHighest
-                    .withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(4),
-              ),
             ),
           ),
         ],
@@ -1164,73 +1095,55 @@ class _GuestListWidgetState extends State<GuestListWidget> {
   /// Sends message to guest
   void _sendMessageToGuest(BuildContext context, OwnerGuestViewModel guestVM,
       OwnerGuestModel guest, AppLocalizations? loc) {
+    final TextEditingController messageController = TextEditingController();
+    final NotificationRepository notificationRepo = NotificationRepository();
+    final IDatabaseService databaseService =
+        UnifiedServiceLocator.serviceFactory.database;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.paddingL),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              HeadingMedium(
-                  text: (AppLocalizations.of(context) ?? loc)?.sendMessage ??
-                      'Send Message'),
-              const SizedBox(height: AppSpacing.paddingM),
-              BodyText(
-                  text: (AppLocalizations.of(context) ?? loc)
-                          ?.messageToGuest(guest.displayName) ??
-                      'To: ${guest.displayName}'),
-              const SizedBox(height: AppSpacing.paddingM),
-              TextInput(
-                label:
-                    (AppLocalizations.of(context) ?? loc)?.message ?? 'Message',
-                hint: (AppLocalizations.of(context) ?? loc)?.enterMessageHint ??
-                    'Enter your message...',
-                maxLines: 3,
-              ),
-              const SizedBox(height: AppSpacing.paddingL),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButtonWidget(
-                    onPressed: () => Navigator.pop(context),
-                    text: (AppLocalizations.of(context) ?? loc)?.cancel ??
-                        'Cancel',
-                  ),
-                  const SizedBox(width: AppSpacing.paddingS),
-                  PrimaryButton(
-                    label:
-                        (AppLocalizations.of(context) ?? loc)?.send ?? 'Send',
-                    onPressed: () {
-                      Navigator.pop(context);
-                      // TODO: Implement send message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: BodyText(
-                            text: (AppLocalizations.of(context) ?? loc)
-                                    ?.messageSentSuccessfully ??
-                                'Message sent successfully',
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+      builder: (dialogContext) => _MessageDialog(
+        messageController: messageController,
+        guest: guest,
+        loc: loc,
+        notificationRepo: notificationRepo,
+        databaseService: databaseService,
+        authProvider: authProvider,
+        dialogContext: dialogContext,
       ),
     );
   }
 
   /// Calls guest
-  void _callGuest(OwnerGuestModel guest) {
-    // TODO: Implement phone call functionality
+  void _callGuest(OwnerGuestModel guest) async {
+    final phoneNumber = guest.phoneNumber.trim();
+    if (phoneNumber.isEmpty) {
+      return;
+    }
+
+    // Format phone number for tel: scheme
+    // Remove any spaces, dashes, or other characters
+    final cleanPhoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+
+    // Ensure phone number starts with + for international format
+    final formattedPhoneNumber = cleanPhoneNumber.startsWith('+')
+        ? cleanPhoneNumber
+        : '+91$cleanPhoneNumber'; // Default to India country code if not specified
+
+    final phoneUri = Uri(scheme: 'tel', path: formattedPhoneNumber);
+
+    try {
+      if (await canLaunchUrl(phoneUri)) {
+        await launchUrl(phoneUri, mode: LaunchMode.externalApplication);
+      } else {
+        // If canLaunchUrl returns false, try anyway (some devices may not support canLaunchUrl check)
+        await launchUrl(phoneUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      // Error launching phone dialer - silently fail as this is a convenience feature
+      debugPrint('Failed to launch phone dialer: $e');
+    }
   }
 
   /// Checks out guest
@@ -1270,18 +1183,56 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                   PrimaryButton(
                     label: (AppLocalizations.of(context) ?? loc)?.checkOut ??
                         'Check Out',
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.pop(context);
-                      // TODO: Implement checkout
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: BodyText(
-                            text: (AppLocalizations.of(context) ?? loc)
-                                    ?.guestCheckedOutSuccessfully ??
-                                'Guest checked out successfully',
-                          ),
-                        ),
-                      );
+
+                      try {
+                        // Update guest status to inactive and set checkout date
+                        final updatedGuest = guest.copyWith(
+                          status: 'inactive',
+                          checkOutDate: DateTime.now(),
+                          isActive: false,
+                          updatedAt: DateTime.now(),
+                        );
+
+                        final success = await guestVM.updateGuest(updatedGuest);
+
+                        if (context.mounted) {
+                          if (success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: BodyText(
+                                  text: (AppLocalizations.of(context) ?? loc)
+                                          ?.guestCheckedOutSuccessfully ??
+                                      'Guest checked out successfully',
+                                ),
+                                backgroundColor: AppColors.success,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: BodyText(
+                                  text: 'Failed to check out guest',
+                                ),
+                                backgroundColor: AppColors.error,
+                              ),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: BodyText(
+                                text:
+                                    'Failed to check out guest: ${e.toString()}',
+                              ),
+                              backgroundColor: AppColors.error,
+                            ),
+                          );
+                        }
+                      }
                     },
                   ),
                 ],
@@ -1291,5 +1242,194 @@ class _GuestListWidgetState extends State<GuestListWidget> {
         ),
       ),
     );
+  }
+}
+
+/// Stateful widget for message dialog to properly manage sending state
+class _MessageDialog extends StatefulWidget {
+  final TextEditingController messageController;
+  final OwnerGuestModel guest;
+  final AppLocalizations? loc;
+  final NotificationRepository notificationRepo;
+  final IDatabaseService databaseService;
+  final AuthProvider authProvider;
+  final BuildContext dialogContext;
+
+  const _MessageDialog({
+    required this.messageController,
+    required this.guest,
+    required this.loc,
+    required this.notificationRepo,
+    required this.databaseService,
+    required this.authProvider,
+    required this.dialogContext,
+  });
+
+  @override
+  State<_MessageDialog> createState() => _MessageDialogState();
+}
+
+class _MessageDialogState extends State<_MessageDialog> {
+  bool _isSending = false;
+
+  Future<void> _sendMessage() async {
+    final messageText = widget.messageController.text.trim();
+    if (messageText.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: BodyText(
+              text: (AppLocalizations.of(context) ?? widget.loc)
+                      ?.enterMessageHint ??
+                  'Please enter a message',
+            ),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isSending = true);
+
+    try {
+      final owner = widget.authProvider.user;
+      final ownerId = owner?.userId ?? '';
+      final ownerName = owner?.fullName ?? 'Owner';
+
+      // Save message to Firestore
+      final messageId = 'msg_${DateTime.now().millisecondsSinceEpoch}';
+      final messageData = {
+        'messageId': messageId,
+        'senderId': ownerId,
+        'senderName': ownerName,
+        'senderType': 'owner',
+        'receiverId': widget.guest.guestId,
+        'receiverName': widget.guest.guestName,
+        'receiverType': 'guest',
+        'message': messageText,
+        'pgId': widget.guest.pgId,
+        'bookingId': widget.guest.bookingId,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+        'read': false,
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+      };
+
+      await widget.databaseService.setDocument(
+        'messages',
+        messageId,
+        messageData,
+      );
+
+      // Send push notification to guest
+      await widget.notificationRepo.sendUserNotification(
+        userId: widget.guest.guestId,
+        type: 'owner_message',
+        title: 'Message from Owner',
+        body: messageText.length > 100
+            ? '${messageText.substring(0, 100)}...'
+            : messageText,
+        data: {
+          'messageId': messageId,
+          'senderId': ownerId,
+          'senderName': ownerName,
+          'pgId': widget.guest.pgId,
+          'bookingId': widget.guest.bookingId,
+        },
+      );
+
+      if (mounted) {
+        final navigatorContext = context;
+        Navigator.pop(widget.dialogContext);
+        ScaffoldMessenger.of(navigatorContext).showSnackBar(
+          SnackBar(
+            content: BodyText(
+              text: (AppLocalizations.of(navigatorContext) ?? widget.loc)
+                      ?.messageSentSuccessfully ??
+                  'Message sent successfully',
+            ),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        final navigatorContext = context;
+        ScaffoldMessenger.of(navigatorContext).showSnackBar(
+          SnackBar(
+            content: BodyText(
+              text: 'Failed to send message: ${e.toString()}',
+            ),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSending = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.borderRadiusL),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.paddingL),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            HeadingMedium(
+                text:
+                    (AppLocalizations.of(context) ?? widget.loc)?.sendMessage ??
+                        'Send Message'),
+            const SizedBox(height: AppSpacing.paddingM),
+            BodyText(
+                text: (AppLocalizations.of(context) ?? widget.loc)
+                        ?.messageToGuest(widget.guest.displayName) ??
+                    'To: ${widget.guest.displayName}'),
+            const SizedBox(height: AppSpacing.paddingM),
+            TextInput(
+              controller: widget.messageController,
+              label: (AppLocalizations.of(context) ?? widget.loc)?.message ??
+                  'Message',
+              hint: (AppLocalizations.of(context) ?? widget.loc)
+                      ?.enterMessageHint ??
+                  'Enter your message...',
+              maxLines: 3,
+            ),
+            const SizedBox(height: AppSpacing.paddingL),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButtonWidget(
+                  onPressed: _isSending
+                      ? () {}
+                      : () => Navigator.pop(widget.dialogContext),
+                  text: (AppLocalizations.of(context) ?? widget.loc)?.cancel ??
+                      'Cancel',
+                ),
+                const SizedBox(width: AppSpacing.paddingS),
+                PrimaryButton(
+                  label: (AppLocalizations.of(context) ?? widget.loc)?.send ??
+                      'Send',
+                  onPressed: _isSending ? () {} : _sendMessage,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    widget.messageController.dispose();
+    super.dispose();
   }
 }

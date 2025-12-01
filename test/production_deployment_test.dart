@@ -7,12 +7,10 @@ import 'package:atitia/core/monitoring/error_tracking.dart';
 
 void main() {
   group('Production Deployment Tests', () {
-    late ProductionConfig config;
     late ProductionMonitoring monitoring;
     late ErrorTracking errorTracking;
 
     setUp(() {
-      config = ProductionConfig();
       monitoring = ProductionMonitoring();
       errorTracking = ErrorTracking();
     });

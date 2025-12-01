@@ -1,16 +1,19 @@
 // firestore_transaction_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../interfaces/transaction/transaction_service_interface.dart';
 
 /// Service for handling Firestore transactions
 /// Ensures atomic operations for critical business logic
-class FirestoreTransactionService {
+class FirestoreTransactionService implements ITransactionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Access Firestore instance
+  @override
   FirebaseFirestore get firestore => _firestore;
 
   /// Run a transaction with automatic retries
   /// Use this for operations that must be atomic (e.g., booking approval)
+  @override
   Future<T> runTransaction<T>(
     Future<T> Function(Transaction transaction) updateFunction, {
     int maxAttempts = 5,
@@ -38,6 +41,7 @@ class FirestoreTransactionService {
 
   /// Approve booking request atomically
   /// Updates request status, creates booking, and updates guest assignment in one transaction
+  @override
   Future<void> approveBookingRequestTransactionally({
     required String requestId,
     required String collection,

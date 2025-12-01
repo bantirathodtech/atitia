@@ -13,8 +13,9 @@ import '../../../../../core/models/refund/refund_request_model.dart';
 import '../../../../../core/models/revenue/revenue_record_model.dart';
 import '../../../../../core/models/subscription/owner_subscription_model.dart';
 import '../../../../../core/models/featured/featured_listing_model.dart';
-import '../../../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
+import '../../../../../core/interfaces/auth/viewmodel_auth_service_interface.dart';
+import '../../../../../core/adapters/auth/authentication_service_wrapper_adapter.dart';
 
 /// ViewModel for Owner Refund Management
 /// Handles creating refund requests and viewing refund status
@@ -25,6 +26,7 @@ class OwnerRefundViewModel extends BaseProviderState
   final OwnerSubscriptionRepository _subscriptionRepo;
   final FeaturedListingRepository _featuredRepo;
   final IAnalyticsService _analyticsService;
+  final IViewModelAuthService _authService;
 
   // Refund data
   List<RefundRequestModel> _refundRequests = [];
@@ -42,12 +44,14 @@ class OwnerRefundViewModel extends BaseProviderState
     OwnerSubscriptionRepository? subscriptionRepo,
     FeaturedListingRepository? featuredRepo,
     IAnalyticsService? analyticsService,
+    IViewModelAuthService? authService,
   })  : _refundRepo = refundRepo ?? RefundRequestRepository(),
         _revenueRepo = revenueRepo ?? RevenueRepository(),
         _subscriptionRepo = subscriptionRepo ?? OwnerSubscriptionRepository(),
         _featuredRepo = featuredRepo ?? FeaturedListingRepository(),
         _analyticsService =
-            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics;
+            analyticsService ?? UnifiedServiceLocator.serviceFactory.analytics,
+        _authService = authService ?? AuthenticationServiceWrapperAdapter();
 
   // Getters
   List<RefundRequestModel> get refundRequests => _refundRequests;
@@ -61,7 +65,7 @@ class OwnerRefundViewModel extends BaseProviderState
   String get selectedStatusFilter => _selectedStatusFilter;
 
   /// Get current owner ID
-  String? get currentOwnerId => getIt.auth.currentUserId;
+  String? get currentOwnerId => _authService.currentUserId;
 
   /// Initialize ViewModel and load data
   Future<void> initialize() async {
@@ -91,6 +95,7 @@ class OwnerRefundViewModel extends BaseProviderState
       setLoading(false);
     } catch (e) {
       setError(true, 'Failed to initialize refund dashboard: $e');
+      setLoading(false); // Ensure loading is set to false on error
       debugPrint('❌ Error initializing owner refund dashboard: $e');
     }
   }

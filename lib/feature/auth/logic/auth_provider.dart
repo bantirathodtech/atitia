@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
 
+import '../../../common/constants/environment_config.dart';
 import '../../../common/lifecycle/state/provider_state.dart';
 import '../../../common/utils/constants/firestore.dart';
 import '../../../common/utils/exceptions/exceptions.dart';
@@ -11,9 +12,12 @@ import '../../../common/utils/logging/logging_mixin.dart';
 import '../../../core/db/flutter_secure_storage.dart';
 import '../../../core/di/firebase/di/firebase_service_locator.dart';
 import '../../../core/navigation/navigation_service.dart';
-import '../../../core/services/firebase/auth/firebase_auth_service.dart';
 import '../../../core/services/firebase/database/firestore_database_service.dart';
 import '../../../core/services/supabase/storage/supabase_storage_service.dart';
+import '../../../core/adapters/firebase/firebase_analytics_adapter.dart';
+import '../../../core/adapters/firebase/extended_auth_service_adapter.dart';
+import '../../../core/interfaces/auth/extended_auth_service_interface.dart';
+import '../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../core/utils/sample_data_creator.dart';
 import '../data/model/user_model.dart';
 import '../data/repository/auth_repository.dart';
@@ -23,15 +27,16 @@ import '../data/repository/auth_repository.dart';
 /// Handles phone OTP, Google sign-in, role-based navigation, and profile management
 /// Enhanced with analytics tracking and comprehensive error handling
 class AuthProvider extends BaseProviderState with LoggingMixin {
-  // Service access via GetIt
-  final AuthenticationServiceWrapper _authService = getIt.auth;
-  final FirestoreServiceWrapper _firestoreService = getIt.firestore;
-  final LocalStorageService _localStorage = getIt.localStorage;
-  final SupabaseStorageServiceWrapper _storageService = getIt.storage;
-  final NavigationService _navigation = getIt<NavigationService>();
-  final _analyticsService = getIt.analytics;
+  // Service dependencies - injected via constructor for testability
+  final IExtendedAuthService _authService;
+  final FirestoreServiceWrapper? _firestoreService; // Nullable for unit tests
+  final LocalStorageService _localStorage;
+  final SupabaseStorageServiceWrapper?
+      _storageService; // Nullable for unit tests
+  final NavigationService _navigation;
+  final IAnalyticsService _analyticsService;
   // final _appleSignInService = getIt.appleSignIn;
-  final AuthRepository _repository = AuthRepository();
+  late final AuthRepository _repository;
 
   UserModel? _user;
   String? _verificationId;
@@ -42,9 +47,59 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
   bool get sendingOtp => _sendingOtp;
   String? get verificationId => _verificationId;
 
-  /// Constructor that triggers initial user data load
+  /// Helper to get FirestoreServiceWrapper with error handling
+  /// Returns null if not available (for unit tests)
+  static FirestoreServiceWrapper? _getFirestoreServiceOrNullStatic() {
+    try {
+      return getIt.firestore;
+    } catch (_) {
+      // If FirestoreServiceWrapper is not registered, return null
+      // This allows unit tests to work without Firebase initialization
+      return null;
+    }
+  }
+
+  /// Helper to get SupabaseStorageServiceWrapper with error handling
+  /// Returns null if not available (for unit tests)
+  static SupabaseStorageServiceWrapper? _getStorageServiceOrNullStatic() {
+    try {
+      return getIt.storage;
+    } catch (_) {
+      // If SupabaseStorageServiceWrapper is not registered, return null
+      // This allows unit tests to work without Firebase initialization
+      return null;
+    }
+  }
+
+  /// Constructor with dependency injection
+  /// If services are not provided, uses GetIt as fallback
   /// This ensures user data is available immediately when provider is created
-  AuthProvider() {
+  AuthProvider({
+    IExtendedAuthService? authService,
+    FirestoreServiceWrapper? firestoreService,
+    LocalStorageService? localStorage,
+    SupabaseStorageServiceWrapper? storageService,
+    NavigationService? navigation,
+    IAnalyticsService? analyticsService,
+    AuthRepository? repository,
+  })  : _authService = authService ?? ExtendedAuthServiceAdapter(getIt.auth),
+        _firestoreService =
+            firestoreService ?? _getFirestoreServiceOrNullStatic(),
+        _localStorage = localStorage ?? getIt.localStorage,
+        _storageService = storageService ?? _getStorageServiceOrNullStatic(),
+        _navigation = navigation ?? getIt<NavigationService>(),
+        _analyticsService =
+            analyticsService ?? FirebaseAnalyticsAdapter(getIt.analytics) {
+    // Initialize repository after all fields are set (can't access 'this' in initializer)
+    // Use adapters to convert IExtendedAuthService to IAuthService for repository
+    _repository = repository ??
+        AuthRepository(
+          authService:
+              _authService, // IExtendedAuthService implements IAuthService
+          analyticsService: _analyticsService,
+          googleSignInService: getIt.googleSignIn,
+          appleSignInService: getIt.appleSignIn,
+        );
     _initializeUserData();
   }
 
@@ -367,6 +422,10 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       clearError();
       _sendingOtp = true;
 
+      // 🧪 AUTOMATIC TEST MODE DETECTION
+      // Check if phone number is a test phone number and enable test mode
+      EnvironmentConfig.setTestModeFromPhoneNumber(phoneNumber);
+
       await _analyticsService.logEvent(
         name: 'auth_phone_otp_send_attempt',
         parameters: {'phone_number': phoneNumber},
@@ -518,8 +577,21 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
   /// Handle successful authentication for any method
   Future<void> _handleSuccessfulAuthentication(User firebaseUser) async {
     try {
+      // 🧪 AUTOMATIC TEST MODE DETECTION
+      // Check if phone number from Firebase user is a test phone number
+      if (firebaseUser.phoneNumber != null &&
+          firebaseUser.phoneNumber!.isNotEmpty) {
+        EnvironmentConfig.setTestModeFromPhoneNumber(firebaseUser.phoneNumber!);
+      }
+
       // Check if user exists in Firestore
-      final userDoc = await _firestoreService.getDocument(
+      if (_firestoreService == null) {
+        // In unit tests, skip Firestore operations
+        debugPrint(
+            '⚠️ FirestoreServiceWrapper not available - skipping Firestore operations');
+        return;
+      }
+      final userDoc = await _firestoreService!.getDocument(
         FirestoreConstants.users,
         firebaseUser.uid,
       );
@@ -544,14 +616,16 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
           }
 
           // Update last login and phone number if changed
-          await _firestoreService.updateDocument(
-            FirestoreConstants.users,
-            firebaseUser.uid,
-            {
-              'lastLoginAt': DateTime.now(),
-              'phoneNumber': _user!.phoneNumber,
-            },
-          );
+          if (_firestoreService != null) {
+            await _firestoreService!.updateDocument(
+              FirestoreConstants.users,
+              firebaseUser.uid,
+              {
+                'lastLoginAt': DateTime.now(),
+                'phoneNumber': _user!.phoneNumber,
+              },
+            );
+          }
 
           // Save to local storage
           await _saveUserToPrefs(_user!);
@@ -605,14 +679,16 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
         }
 
         // Update last login and phone number if changed
-        await _firestoreService.updateDocument(
-          FirestoreConstants.users,
-          firebaseUser.uid,
-          {
-            'lastLoginAt': DateTime.now(),
-            'phoneNumber': _user!.phoneNumber,
-          },
-        );
+        if (_firestoreService != null) {
+          await _firestoreService!.updateDocument(
+            FirestoreConstants.users,
+            firebaseUser.uid,
+            {
+              'lastLoginAt': DateTime.now(),
+              'phoneNumber': _user!.phoneNumber,
+            },
+          );
+        }
       } else {
         // New user, create profile
         _user = await _createUserProfile(firebaseUser);
@@ -659,11 +735,13 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
     );
 
     // Save to Firestore
-    await _firestoreService.setDocument(
-      FirestoreConstants.users,
-      firebaseUser.uid,
-      userModel.toFirestore(),
-    );
+    if (_firestoreService != null) {
+      await _firestoreService!.setDocument(
+        FirestoreConstants.users,
+        firebaseUser.uid,
+        userModel.toFirestore(),
+      );
+    }
 
     // Clear selected role after creating profile
     _selectedRole = null;
@@ -766,8 +844,15 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       }
 
       // 🔥 STEP 3: Sync with Firestore (update if needed)
-      final doc =
-          await _firestoreService.getDocument(FirestoreConstants.users, userId);
+      if (_firestoreService == null) {
+        // In unit tests, skip Firestore operations
+        debugPrint(
+            '⚠️ FirestoreServiceWrapper not available - skipping Firestore sync');
+        return _user !=
+            null; // Return true if user was loaded from local storage
+      }
+      final doc = await _firestoreService!
+          .getDocument(FirestoreConstants.users, userId);
       if (!doc.exists) {
         await _analyticsService.logEvent(
           name: 'auth_auto_login_no_document',
@@ -780,7 +865,7 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       _user = UserModel.fromJson(doc.data() as Map<String, dynamic>);
 
       // Update last login timestamp
-      await _firestoreService.updateDocument(
+      await _firestoreService!.updateDocument(
         FirestoreConstants.users,
         userId,
         {'lastLoginAt': DateTime.now()},
@@ -924,6 +1009,9 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       // Sign out from all authentication providers
       await _authService.signOutFromAll();
 
+      // 🧪 Reset test mode on logout
+      EnvironmentConfig.resetTestMode();
+
       // Clear local data
       _user = null;
       _verificationId = null;
@@ -970,8 +1058,12 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
 
       final fileName = '${DateTime.now().millisecondsSinceEpoch}_profile.jpg';
       // Storage service handles both File and XFile automatically
-      final url = await _storageService.uploadFile(
-          file, 'users/${_user?.userId}/profile_photos/', fileName);
+      if (_storageService == null) {
+        throw StateError(
+            'StorageServiceWrapper not available for profile photo upload');
+      }
+      final url = await _storageService!
+          .uploadFile(file, 'users/${_user?.userId}/profile_photos/', fileName);
 
       _profilePhotoFile = file;
       _profilePhotoUrl = url;
@@ -1011,8 +1103,12 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
 
       final fileName = '${DateTime.now().millisecondsSinceEpoch}_aadhaar.jpg';
       // Storage service handles both File and XFile automatically
-      final url = await _storageService.uploadFile(
-          file, 'users/${_user?.userId}/documents/', fileName);
+      if (_storageService == null) {
+        throw StateError(
+            'StorageServiceWrapper not available for Aadhaar upload');
+      }
+      final url = await _storageService!
+          .uploadFile(file, 'users/${_user?.userId}/documents/', fileName);
 
       _aadhaarFile = file;
       _aadhaarUrl = url;
@@ -1067,6 +1163,10 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
   ) async {
     const int maxRetries = 3;
     const Duration retryDelay = Duration(seconds: 2);
+
+    // 🧪 AUTOMATIC TEST MODE DETECTION
+    // Check if phone number is a test phone number and enable test mode
+    EnvironmentConfig.setTestModeFromPhoneNumber(phoneNumber);
 
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
@@ -1197,6 +1297,12 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       final userModel = await _repository.verifySmsCode(credential);
       final userId = userModel.userId;
 
+      // 🧪 AUTOMATIC TEST MODE DETECTION
+      // Check if phone number is a test phone number and enable test mode
+      if (userModel.phoneNumber.isNotEmpty) {
+        EnvironmentConfig.setTestModeFromPhoneNumber(userModel.phoneNumber);
+      }
+
       // Check if user exists in Firestore
       final isNewUser = !await _checkUserExists(userId);
 
@@ -1268,11 +1374,13 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       _user = userData.copyWith(lastLoginAt: DateTime.now());
 
       // Update last login in Firestore
-      await _firestoreService.updateDocument(
-        FirestoreConstants.users,
-        userId,
-        {'lastLoginAt': DateTime.now()},
-      );
+      if (_firestoreService != null) {
+        await _firestoreService!.updateDocument(
+          FirestoreConstants.users,
+          userId,
+          {'lastLoginAt': DateTime.now()},
+        );
+      }
 
       await _saveUserToPrefs(_user!);
       notifyListeners();
@@ -1323,11 +1431,13 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
         updatedAt: DateTime.now(),
       );
 
-      await _firestoreService.setDocument(
-        FirestoreConstants.users,
-        userToSave.userId,
-        userToSave.toFirestore(),
-      );
+      if (_firestoreService != null) {
+        await _firestoreService!.setDocument(
+          FirestoreConstants.users,
+          userToSave.userId,
+          userToSave.toFirestore(),
+        );
+      }
 
       _user = userToSave;
       await _saveUserToPrefs(_user!);
@@ -1432,15 +1542,23 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
 
   /// Check if user exists in Firestore
   Future<bool> _checkUserExists(String userId) async {
+    if (_firestoreService == null) {
+      // In unit tests, return false if Firestore is not available
+      return false;
+    }
     final doc =
-        await _firestoreService.getDocument(FirestoreConstants.users, userId);
+        await _firestoreService!.getDocument(FirestoreConstants.users, userId);
     return doc.exists;
   }
 
   /// Get user by ID from Firestore
   Future<UserModel?> _getUserById(String userId) async {
+    if (_firestoreService == null) {
+      // In unit tests, return null if Firestore is not available
+      return null;
+    }
     final doc =
-        await _firestoreService.getDocument(FirestoreConstants.users, userId);
+        await _firestoreService!.getDocument(FirestoreConstants.users, userId);
     if (doc.exists) {
       return UserModel.fromJson(doc.data() as Map<String, dynamic>);
     }

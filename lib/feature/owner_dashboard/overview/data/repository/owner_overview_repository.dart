@@ -7,6 +7,9 @@ import '../../../../../common/utils/exceptions/exceptions.dart';
 import '../../../../../core/interfaces/analytics/analytics_service_interface.dart';
 import '../../../../../core/interfaces/database/database_service_interface.dart';
 import '../../../../../core/services/localization/internationalization_service.dart';
+import '../../../../../core/models/analytics/occupancy_trend_model.dart';
+import '../../../../../core/services/firebase/database/firestore_cache_service.dart';
+import '../../../../../common/utils/date/converter/date_service_converter.dart';
 import '../models/owner_overview_model.dart';
 
 /// Repository to fetch owner overview data from Firestore
@@ -746,5 +749,386 @@ class OwnerOverviewRepository {
         limit: 100,
       );
     }
+  }
+
+  // ==========================================================================
+  // HISTORICAL OCCUPANCY TRACKING
+  // ==========================================================================
+
+  /// Saves monthly occupancy snapshot to Firestore for historical tracking
+  /// Should be called monthly (e.g., via Cloud Function or scheduled task)
+  Future<void> saveMonthlyOccupancySnapshot(
+    String pgId,
+    int totalBeds,
+    int occupiedBeds,
+    int year,
+    int month, {
+    int newBookings = 0,
+    int checkOuts = 0,
+    double revenueGenerated = 0.0,
+  }) async {
+    try {
+      final date = DateTime(year, month, 1);
+      final occupancyRate = totalBeds > 0 ? (occupiedBeds / totalBeds) : 0.0;
+      final vacantBeds = totalBeds - occupiedBeds;
+
+      final snapshot = OccupancyTrendModel(
+        pgId: pgId,
+        date: date,
+        totalBeds: totalBeds,
+        occupiedBeds: occupiedBeds,
+        vacantBeds: vacantBeds,
+        occupancyRate: occupancyRate,
+        newBookings: newBookings,
+        checkOuts: checkOuts,
+        revenueGenerated: revenueGenerated,
+      );
+
+      // Use month-year as document ID for easy querying
+      final docId = '${pgId}_${year}_${month.toString().padLeft(2, '0')}';
+
+      // Convert to Firestore-compatible format (use Timestamp for date)
+      final snapshotMap = snapshot.toMap();
+      snapshotMap['date'] = Timestamp.fromDate(date);
+
+      await _databaseService.setDocument(
+        FirestoreConstants.occupancyTrends,
+        docId,
+        snapshotMap,
+      );
+
+      await _analyticsService.logEvent(
+        name: 'occupancy_snapshot_saved',
+        parameters: {
+          'pg_id': pgId,
+          'year': year,
+          'month': month,
+          'occupancy_rate': occupancyRate,
+        },
+      );
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'occupancy_snapshot_error',
+        parameters: {
+          'pg_id': pgId,
+          'error': e.toString(),
+        },
+      );
+      throw AppException(
+        message: _text(
+          'occupancySnapshotSaveFailed',
+          'Failed to save occupancy snapshot',
+        ),
+        details: e.toString(),
+      );
+    }
+  }
+
+  /// Fetches historical occupancy data for a specific year
+  /// Returns monthly occupancy snapshots
+  Future<List<OccupancyTrendModel>> getHistoricalOccupancyData(
+    String pgId,
+    int year,
+  ) async {
+    try {
+      // Try cache first
+      final cacheKey = 'occupancy_${pgId}_$year';
+      final cacheService = FirestoreCacheService();
+      final cachedSnapshot = await cacheService.getCachedQuery(cacheKey);
+
+      QuerySnapshot snapshot;
+      if (cachedSnapshot != null) {
+        snapshot = cachedSnapshot;
+      } else {
+        // Query Firestore for occupancy trends
+        final filters = <Map<String, dynamic>>[
+          {'field': 'pgId', 'value': pgId},
+        ];
+
+        snapshot = await _databaseService.queryCollection(
+          FirestoreConstants.occupancyTrends,
+          filters,
+          limit: 12, // Max 12 months
+        );
+
+        // Cache the result for 10 minutes
+        await cacheService.cacheQuery(
+          cacheKey,
+          snapshot,
+          ttl: const Duration(minutes: 10),
+        );
+      }
+
+      final List<OccupancyTrendModel> trends = [];
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        // Handle date conversion (can be Timestamp or String)
+        DateTime? trendDate;
+        if (data['date'] is Timestamp) {
+          trendDate = (data['date'] as Timestamp).toDate();
+        } else if (data['date'] != null) {
+          try {
+            trendDate = DateTime.parse(data['date'].toString());
+          } catch (e) {
+            // Skip invalid dates
+            continue;
+          }
+        }
+
+        // Filter by year
+        if (trendDate != null && trendDate.year == year) {
+          // Convert date back to string format for OccupancyTrendModel.fromMap
+          final modelData = Map<String, dynamic>.from(data);
+          if (modelData['date'] is Timestamp) {
+            modelData['date'] = DateServiceConverter.toService(
+              (modelData['date'] as Timestamp).toDate(),
+            );
+          }
+          trends.add(OccupancyTrendModel.fromMap(modelData));
+        }
+      }
+
+      // Sort by date (month)
+      trends.sort((a, b) => a.date.compareTo(b.date));
+
+      await _analyticsService.logEvent(
+        name: 'historical_occupancy_fetched',
+        parameters: {
+          'pg_id': pgId,
+          'year': year,
+          'count': trends.length,
+        },
+      );
+
+      return trends;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'historical_occupancy_error',
+        parameters: {
+          'pg_id': pgId,
+          'error': e.toString(),
+        },
+      );
+      throw AppException(
+        message: _text(
+          'historicalOccupancyFetchFailed',
+          'Failed to fetch historical occupancy data',
+        ),
+        details: e.toString(),
+      );
+    }
+  }
+
+  // ==========================================================================
+  // PERFORMANCE METRICS
+  // ==========================================================================
+
+  /// Calculates performance metrics from complaints and maintenance tasks
+  /// Returns: guestSatisfactionScore, avgResponseTimeHours, maintenanceScore
+  Future<Map<String, double>> getPerformanceMetrics(
+    String ownerId, {
+    String? pgId,
+  }) async {
+    try {
+      // Fetch complaints for response time calculation
+      final complaintsSnapshot = await _queryComplaintsOptimized(
+        ownerId: ownerId,
+        pgId: pgId,
+      );
+
+      // Fetch maintenance tasks for maintenance score
+      final maintenanceFilters = <Map<String, dynamic>>[
+        {'field': 'ownerId', 'value': ownerId},
+      ];
+      if (pgId != null) {
+        maintenanceFilters.add({'field': 'pgId', 'value': pgId});
+      }
+
+      final maintenanceSnapshot = await _databaseService.queryCollection(
+        FirestoreConstants.maintenanceTasks,
+        maintenanceFilters,
+        limit: 100,
+      );
+
+      // Calculate average response time (time from complaint creation to first owner reply)
+      double totalResponseTimeHours = 0.0;
+      int complaintsWithResponse = 0;
+      int totalComplaints = 0;
+      int resolvedComplaints = 0;
+
+      for (var doc in complaintsSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        totalComplaints++;
+
+        final createdAt = data['createdAt'] is Timestamp
+            ? (data['createdAt'] as Timestamp).toDate()
+            : DateTime.fromMillisecondsSinceEpoch(
+                data['createdAt'] as int? ?? 0,
+              );
+
+        final status = data['status'] as String? ?? 'pending';
+        if (status == 'resolved' || status == 'closed') {
+          resolvedComplaints++;
+        }
+
+        // Check for owner replies in messages array
+        final messages = data['messages'] as List<dynamic>? ?? [];
+        final ownerReplies = messages.where((msg) {
+          final msgData = msg as Map<String, dynamic>;
+          return msgData['senderType'] == 'owner' ||
+              msgData['senderId'] == 'owner';
+        }).toList();
+
+        if (ownerReplies.isNotEmpty) {
+          final firstReply = ownerReplies.first as Map<String, dynamic>;
+          final replyTime = firstReply['timestamp'] is Timestamp
+              ? (firstReply['timestamp'] as Timestamp).toDate()
+              : DateTime.fromMillisecondsSinceEpoch(
+                  firstReply['timestamp'] as int? ?? 0,
+                );
+
+          final responseTime = replyTime.difference(createdAt);
+          totalResponseTimeHours += responseTime.inHours.toDouble();
+          complaintsWithResponse++;
+        }
+      }
+
+      final avgResponseTimeHours = complaintsWithResponse > 0
+          ? totalResponseTimeHours / complaintsWithResponse
+          : 0.0;
+
+      // Calculate guest satisfaction score (based on complaint resolution rate)
+      // Higher resolution rate = higher satisfaction
+      final resolutionRate =
+          totalComplaints > 0 ? (resolvedComplaints / totalComplaints) : 1.0;
+      // Convert to 0-5 scale (5 = 100% resolution, 0 = 0% resolution)
+      final guestSatisfactionScore = resolutionRate * 5.0;
+
+      // Calculate maintenance score (based on completed vs scheduled tasks)
+      int completedTasks = 0;
+      int totalTasks = 0;
+      int onTimeCompletions = 0;
+
+      for (var doc in maintenanceSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        totalTasks++;
+
+        final status = data['status'] as String? ?? 'pending';
+        if (status == 'completed') {
+          completedTasks++;
+
+          // Check if completed on time
+          final scheduledDate = data['scheduledDate'] is Timestamp
+              ? (data['scheduledDate'] as Timestamp).toDate()
+              : DateTime.fromMillisecondsSinceEpoch(
+                  data['scheduledDate'] as int? ?? 0,
+                );
+          final completedDate = data['completedDate'] is Timestamp
+              ? (data['completedDate'] as Timestamp).toDate()
+              : DateTime.fromMillisecondsSinceEpoch(
+                  data['completedDate'] as int? ?? 0,
+                );
+
+          if (completedDate
+              .isBefore(scheduledDate.add(const Duration(days: 1)))) {
+            onTimeCompletions++;
+          }
+        }
+      }
+
+      // Maintenance score: 0-10 scale
+      // 50% from completion rate, 50% from on-time completion
+      final completionRate =
+          totalTasks > 0 ? (completedTasks / totalTasks) : 1.0;
+      final onTimeRate =
+          completedTasks > 0 ? (onTimeCompletions / completedTasks) : 1.0;
+      final maintenanceScore = (completionRate * 5.0) + (onTimeRate * 5.0);
+
+      final metrics = {
+        'guestSatisfactionScore': guestSatisfactionScore.clamp(0.0, 5.0),
+        'avgResponseTimeHours': avgResponseTimeHours,
+        'maintenanceScore': maintenanceScore.clamp(0.0, 10.0),
+      };
+
+      await _analyticsService.logEvent(
+        name: 'performance_metrics_calculated',
+        parameters: {
+          'owner_id': ownerId,
+          'pg_id': pgId ?? 'all',
+          ...metrics,
+        },
+      );
+
+      return metrics;
+    } catch (e) {
+      await _analyticsService.logEvent(
+        name: 'performance_metrics_error',
+        parameters: {
+          'owner_id': ownerId,
+          'error': e.toString(),
+        },
+      );
+      throw AppException(
+        message: _text(
+          'performanceMetricsFailed',
+          'Failed to calculate performance metrics',
+        ),
+        details: e.toString(),
+      );
+    }
+  }
+
+  // ==========================================================================
+  // CACHED ANALYTICS DATA
+  // ==========================================================================
+
+  /// Fetches monthly revenue breakdown with caching
+  Future<Map<String, double>> getMonthlyRevenueBreakdownCached(
+    String ownerId,
+    int year,
+  ) async {
+    final cacheKey = 'revenue_breakdown_${ownerId}_$year';
+    final cacheService = FirestoreCacheService();
+
+    // Try cache first (5 minute TTL)
+    final cachedSnapshot = await cacheService.getCachedQuery(cacheKey);
+    if (cachedSnapshot != null) {
+      // Reconstruct breakdown from cached data
+      final Map<String, double> breakdown = {};
+      for (int month = 1; month <= 12; month++) {
+        breakdown['month_$month'] = 0.0;
+      }
+
+      for (var doc in cachedSnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final date = data['date']?.toDate();
+        if (date != null && date.year == year) {
+          final amount = (data['amount'] ?? 0).toDouble();
+          final monthKey = 'month_${date.month}';
+          breakdown[monthKey] = (breakdown[monthKey] ?? 0) + amount;
+        }
+      }
+      return breakdown;
+    }
+
+    // Cache miss - fetch from repository
+    final breakdown = await getMonthlyRevenueBreakdown(ownerId, year);
+
+    // Cache the payments query for future use
+    // Note: We cache the payments query, not the breakdown itself
+    // This allows us to reconstruct the breakdown from cached payments
+    final paymentsSnapshot = await _queryPaymentsOptimized(
+      ownerId: ownerId,
+      status: 'collected',
+    );
+    await cacheService.cacheQuery(
+      cacheKey,
+      paymentsSnapshot,
+      ttl: const Duration(minutes: 5),
+    );
+
+    return breakdown;
   }
 }

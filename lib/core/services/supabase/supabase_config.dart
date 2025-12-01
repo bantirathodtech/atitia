@@ -1,19 +1,28 @@
 /// Supabase Configuration
 ///
-/// Store your Supabase credentials here
-/// Get these from: https://app.supabase.com/project/_/settings/api
+/// ⚠️ NOTE: Supabase credentials are now centralized in `EnvironmentConfig`.
+/// This class references `EnvironmentConfig` for all credentials.
+///
+/// Get credentials from: https://app.supabase.com/project/_/settings/api
+/// Source: `lib/common/constants/environment_config.dart`
+library;
+
+import '../../../common/constants/environment_config.dart';
+
 class SupabaseConfig {
   /// Supabase Project URL
   /// Example: 'https://your-project-id.supabase.co'
-  static const String supabaseUrl = 'https://iteharwqzobkolybqvsl.supabase.co';
+  /// ⚠️ NOTE: Now references EnvironmentConfig (single source of truth)
+  static String get supabaseUrl => EnvironmentConfig.supabaseUrl;
 
   /// Supabase Anon/Public Key
   /// This is safe to use in client-side code
-  static const String supabaseAnonKey =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZWhhcndxem9ia29seWJxdnNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MTUzMjYsImV4cCI6MjA3NTQ5MTMyNn0.AK5HCzXT_wafICarwp0-3nALJxQ0RjB6pPg0j9TbBcA';
+  /// ⚠️ NOTE: Now references EnvironmentConfig (single source of truth)
+  static String get supabaseAnonKey => EnvironmentConfig.supabaseAnonKey;
 
   /// Storage bucket name
-  static const String storageBucket = 'atitia-storage';
+  /// ⚠️ NOTE: Now references EnvironmentConfig (single source of truth)
+  static String get storageBucket => EnvironmentConfig.supabaseStorageBucket;
 
   /// Check if Supabase is configured
   static bool get isConfigured =>

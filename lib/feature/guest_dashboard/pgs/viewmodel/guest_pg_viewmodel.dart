@@ -1,7 +1,10 @@
 // lib/features/guest_dashboard/pgs/viewmodel/guest_pg_viewmodel.dart
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../../../common/lifecycle/mixin/stream_subscription_mixin.dart';
 import '../../../../common/lifecycle/state/provider_state.dart';
 import '../../../../common/utils/logging/logging_mixin.dart';
 import '../../../../common/utils/pg/pg_price_utils.dart';
@@ -16,7 +19,8 @@ import '../data/repository/guest_pg_repository.dart';
 /// ViewModel for managing guest PGs UI state and business logic
 /// Extends BaseProviderState for automatic service access and state management
 /// Coordinates between UI layer and Repository layer
-class GuestPgViewModel extends BaseProviderState with LoggingMixin {
+class GuestPgViewModel extends BaseProviderState
+    with LoggingMixin, StreamSubscriptionMixin {
   final GuestPgRepository _repository;
   final FeaturedListingRepository _featuredRepo;
   final _analyticsService = getIt.analytics;
@@ -64,6 +68,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
   bool? _parkingFilter;
   double? _minPriceFilter;
   double? _maxPriceFilter;
+  StreamSubscription<List<GuestPgModel>>? _pgStreamSubscription;
 
   /// Read-only list of available PGs for UI consumption
   List<GuestPgModel> get pgList => _pgList;
@@ -120,8 +125,15 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
   /// Loads all available PGs with real-time streaming
   /// Sets up continuous listener for PG listing updates
   /// Automatically manages loading state through BaseProviderState
+  /// Cancels previous subscription before creating a new one to prevent memory leaks
   void loadPGs(BuildContext context) {
     logMethodEntry('loadPGs');
+
+    // Cancel previous subscription if it exists to prevent memory leaks
+    // and ensure we only have one active stream subscription
+    _pgStreamSubscription?.cancel();
+    _pgStreamSubscription = null;
+
     setLoading(true);
     clearError();
 
@@ -134,7 +146,7 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
     _loadFeaturedPGIds();
 
     // Listen to real-time PG updates
-    _repository.getAllPGsStream().listen(
+    _pgStreamSubscription = _repository.getAllPGsStream().listen(
       (pgs) {
         _pgList = pgs;
         _updateFilteredPGs();
@@ -176,6 +188,11 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
         );
       },
     );
+
+    // Register subscription for automatic cleanup
+    if (_pgStreamSubscription != null) {
+      addSubscription(_pgStreamSubscription!);
+    }
 
     logMethodExit('loadPGs');
   }
@@ -776,5 +793,13 @@ class GuestPgViewModel extends BaseProviderState with LoggingMixin {
       setLoading(false);
       return [];
     }
+  }
+
+  @override
+  void dispose() {
+    // Cancel all stream subscriptions before disposing
+    _pgStreamSubscription?.cancel();
+    disposeAll();
+    super.dispose();
   }
 }

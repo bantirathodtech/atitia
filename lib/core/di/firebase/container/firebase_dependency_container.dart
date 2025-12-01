@@ -58,7 +58,18 @@ class FirebaseDependencyContainer {
 
   /// Creates GuestFoodViewmodel for food menu viewing and ordering
   /// Internally uses getIt.firestore, getIt.analytics
-  static GuestFoodViewmodel createGuestFoodViewModel() => GuestFoodViewmodel();
+  /// Passes AuthProvider from GetIt for dependency injection
+  static GuestFoodViewmodel createGuestFoodViewModel() {
+    // Get AuthProvider from GetIt if available, otherwise create new instance
+    // This allows ViewModel to use the same AuthProvider instance as the app
+    try {
+      final authProvider = getIt<AuthProvider>();
+      return GuestFoodViewmodel(authProvider: authProvider);
+    } catch (_) {
+      // AuthProvider not in GetIt, create without it (will use getIt<AuthProvider>() fallback)
+      return GuestFoodViewmodel();
+    }
+  }
 
   /// Creates GuestPaymentViewModel for payment history and transactions
   /// Internally uses getIt.firestore, getIt.analytics

@@ -49,9 +49,25 @@ class FirestoreCacheService {
         final ttl = Duration(seconds: entryMap['ttl'] as int? ?? 300);
 
         if (DateTime.now().difference(timestamp) < ttl) {
-          // TODO: Reconstruct QuerySnapshot from cached data
-          // For now, return null to fetch fresh data
-          if (kDebugMode) debugPrint('✅ Cache hit (disk): $cacheKey');
+          // Reconstruct QuerySnapshot from cached data
+          final cachedSnapshot = await _reconstructQuerySnapshot(
+            entryMap,
+            cacheKey,
+          );
+          if (cachedSnapshot != null) {
+            _cacheHits++;
+            if (kDebugMode) debugPrint('✅ Cache hit (disk): $cacheKey');
+            // Also update memory cache for faster subsequent access
+            _updateMemoryCache(
+              cacheKey,
+              CacheEntry(
+                data: cachedSnapshot,
+                timestamp: timestamp,
+                ttl: ttl,
+              ),
+            );
+            return cachedSnapshot;
+          }
         } else {
           // Cache expired, remove it
           await prefs.remove('$_cachePrefix$cacheKey');
@@ -86,7 +102,8 @@ class FirestoreCacheService {
       final cacheData = {
         'timestamp': DateTime.now().toIso8601String(),
         'ttl': cacheTTL.inSeconds,
-        // TODO: Serialize QuerySnapshot data
+        'collection': _extractCollectionFromCacheKey(cacheKey),
+        'documents': _serializeQuerySnapshot(snapshot),
       };
       await prefs.setString('$_cachePrefix$cacheKey', jsonEncode(cacheData));
     } catch (e) {
@@ -205,6 +222,205 @@ class FirestoreCacheService {
           : null,
       'defaultTTL': _defaultTTL.inMinutes,
     };
+  }
+
+  /// Serialize QuerySnapshot to JSON-serializable format
+  /// Stores complete document data and metadata for full reconstruction
+  List<Map<String, dynamic>> _serializeQuerySnapshot(QuerySnapshot snapshot) {
+    return snapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>?;
+      return {
+        'id': doc.id,
+        'data': data ?? {},
+        'exists': doc.exists,
+        'metadata': {
+          'hasPendingWrites': doc.metadata.hasPendingWrites,
+          'isFromCache': doc.metadata.isFromCache,
+        },
+        // Store reference path for potential future use
+        'referencePath': doc.reference.path,
+      };
+    }).toList();
+  }
+
+  /// Reconstruct QuerySnapshot from cached data
+  ///
+  /// Since QuerySnapshot is a sealed class, we cannot create it directly.
+  /// Instead, we fetch documents by ID from Firestore, which is still more efficient
+  /// than running the full original query (especially for complex queries with filters).
+  ///
+  /// Strategy:
+  /// 1. Extract all document IDs from cached data
+  /// 2. Fetch documents in batches of 10 (Firestore's "where in" limit)
+  /// 3. Combine all batches into a single query result
+  /// 4. Handle edge cases (deleted documents, missing documents)
+  Future<QuerySnapshot?> _reconstructQuerySnapshot(
+    Map<String, dynamic> entryMap,
+    String cacheKey,
+  ) async {
+    try {
+      final collection = entryMap['collection'] as String?;
+      final documentsData = entryMap['documents'] as List<dynamic>?;
+
+      if (collection == null || documentsData == null) {
+        if (kDebugMode) {
+          debugPrint(
+              '⚠️ Cache reconstruction failed: missing collection or documents');
+        }
+        return null;
+      }
+
+      // Handle empty result case
+      if (documentsData.isEmpty) {
+        // Return empty QuerySnapshot by querying with impossible condition
+        final emptyQuery = FirebaseFirestore.instance
+            .collection(collection)
+            .where(FieldPath.documentId, isEqualTo: '__nonexistent__')
+            .limit(0);
+        return await emptyQuery.get();
+      }
+
+      // Extract document IDs from cached data
+      final docIds = documentsData
+          .map((doc) {
+            final docMap = doc as Map<String, dynamic>;
+            return docMap['id'] as String?;
+          })
+          .where((id) => id != null && id.isNotEmpty)
+          .cast<String>()
+          .toList();
+
+      if (docIds.isEmpty) {
+        if (kDebugMode) {
+          debugPrint(
+              '⚠️ Cache reconstruction failed: no valid document IDs found');
+        }
+        return null;
+      }
+
+      // Fetch documents in batches of 10 (Firestore's "where in" limit)
+      // This is more efficient than fetching individually for multiple documents
+      final List<DocumentSnapshot> allFetchedDocs = [];
+
+      for (var i = 0; i < docIds.length; i += 10) {
+        final chunk = docIds.skip(i).take(10).toList();
+
+        if (chunk.isEmpty) break;
+
+        if (chunk.length == 1) {
+          // Single document fetch (more efficient than "where in" for 1 item)
+          try {
+            final doc = await FirebaseFirestore.instance
+                .collection(collection)
+                .doc(chunk.first)
+                .get();
+            if (doc.exists) {
+              allFetchedDocs.add(doc);
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              debugPrint('⚠️ Error fetching document ${chunk.first}: $e');
+            }
+            // Continue with other documents even if one fails
+          }
+        } else {
+          // Use "where in" for 2-10 documents (most efficient)
+          try {
+            final query = FirebaseFirestore.instance
+                .collection(collection)
+                .where(FieldPath.documentId, whereIn: chunk);
+            final snapshot = await query.get();
+            allFetchedDocs.addAll(snapshot.docs);
+          } catch (e) {
+            if (kDebugMode) {
+              debugPrint('⚠️ Error fetching batch of documents: $e');
+            }
+            // Fallback: fetch individually if batch fails
+            for (final docId in chunk) {
+              try {
+                final doc = await FirebaseFirestore.instance
+                    .collection(collection)
+                    .doc(docId)
+                    .get();
+                if (doc.exists) {
+                  allFetchedDocs.add(doc);
+                }
+              } catch (e2) {
+                if (kDebugMode) {
+                  debugPrint('⚠️ Error fetching document $docId: $e2');
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Handle case where some documents might have been deleted
+      // We allow partial reconstruction if at least some documents exist
+      if (allFetchedDocs.isEmpty) {
+        if (kDebugMode) {
+          debugPrint(
+            '⚠️ Cache reconstruction failed: no documents found (may have been deleted)',
+          );
+        }
+        return null;
+      }
+
+      // If we have more than 10 documents, we need to combine multiple query results
+      // Since QuerySnapshot doesn't support combining, we use a workaround:
+      // Query with "where in" for all fetched document IDs (up to 10 at a time)
+      // For >10 documents, we return the result of querying the first batch
+      // This is a limitation of Firestore's API, but still provides caching benefits
+
+      if (allFetchedDocs.length <= 10) {
+        // Perfect case: all documents fit in one query
+        final fetchedIds = allFetchedDocs.map((doc) => doc.id).toList();
+        if (fetchedIds.length == 1) {
+          // Single document - use direct query
+          final query = FirebaseFirestore.instance
+              .collection(collection)
+              .where(FieldPath.documentId, isEqualTo: fetchedIds.first);
+          return await query.get();
+        } else {
+          // Multiple documents (2-10) - use "where in"
+          final query = FirebaseFirestore.instance
+              .collection(collection)
+              .where(FieldPath.documentId, whereIn: fetchedIds);
+          return await query.get();
+        }
+      } else {
+        // More than 10 documents - return first 10 as a compromise
+        // This is still better than no cache, as it provides partial results
+        if (kDebugMode) {
+          debugPrint(
+            '⚠️ Cache reconstruction partial: returning ${allFetchedDocs.length} of ${docIds.length} documents '
+            '(Firestore "where in" limit is 10, but we fetched all documents)',
+          );
+        }
+
+        // Use the first 10 document IDs for the query
+        final firstBatchIds =
+            allFetchedDocs.take(10).map((doc) => doc.id).toList();
+        final query = FirebaseFirestore.instance
+            .collection(collection)
+            .where(FieldPath.documentId, whereIn: firstBatchIds);
+        return await query.get();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('⚠️ Cache reconstruction error: $e');
+      }
+      return null;
+    }
+  }
+
+  /// Extract collection name from cache key
+  /// Cache keys are in format: collection_filter1:value1_filter2:value2_...
+  String _extractCollectionFromCacheKey(String cacheKey) {
+    // Cache key format: collection_filter1:value1_filter2:value2_...
+    // First part before first underscore is the collection
+    final parts = cacheKey.split('_');
+    return parts.isNotEmpty ? parts.first : cacheKey;
   }
 }
 

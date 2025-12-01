@@ -20,7 +20,7 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   final _analyticsService = getIt.analytics;
   final InternationalizationService _i18n =
       InternationalizationService.instance;
-  final GuestInfoService _guestInfoService = GuestInfoService();
+  final GuestInfoService _guestInfoService;
 
   String _text(
     String key,
@@ -42,7 +42,9 @@ class OwnerPgManagementViewModel extends BaseProviderState {
   /// If repository is not provided, creates it with default services
   OwnerPgManagementViewModel({
     OwnerPgManagementRepository? repository,
-  }) : _repository = repository ?? OwnerPgManagementRepository();
+    GuestInfoService? guestInfoService,
+  })  : _repository = repository ?? OwnerPgManagementRepository(),
+        _guestInfoService = guestInfoService ?? GuestInfoService();
 
   List<OwnerBed> _beds = [];
   List<OwnerRoom> _rooms = [];

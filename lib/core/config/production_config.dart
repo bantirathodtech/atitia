@@ -1,9 +1,13 @@
 // lib/core/config/production_config.dart
 
 import 'package:flutter/foundation.dart';
+import '../../common/constants/environment_config.dart';
 
 /// Production configuration management
 /// Handles environment-specific settings and feature flags
+///
+/// ⚠️ NOTE: API keys and credentials are now centralized in `EnvironmentConfig`.
+/// This class references `EnvironmentConfig` for all sensitive credentials.
 class ProductionConfig {
   static final ProductionConfig _instance = ProductionConfig._internal();
   factory ProductionConfig() => _instance;
@@ -30,16 +34,18 @@ class ProductionConfig {
   static const int maxRetryAttempts = 3;
 
   // Firebase Configuration
-  static const String firebaseProjectId = 'atitia-app';
+  // ⚠️ NOTE: These now reference EnvironmentConfig (single source of truth)
+  static String get firebaseProjectId => EnvironmentConfig.firebaseProjectId;
   static const String firebaseAppId = 'com.charyatani.atitia';
-  static const String firebaseApiKey = 'AIzaSyBxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-  static const String firebaseAuthDomain = 'atitia-app.firebaseapp.com';
-  static const String firebaseStorageBucket = 'atitia-app.appspot.com';
+  static String get firebaseApiKey => EnvironmentConfig.firebaseWebApiKey;
+  static String get firebaseAuthDomain => EnvironmentConfig.firebaseAuthDomain;
+  static String get firebaseStorageBucket =>
+      EnvironmentConfig.firebaseStorageBucket;
 
   // Supabase Configuration
-  static const String supabaseUrl = 'https://atitia.supabase.co';
-  static const String supabaseAnonKey =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+  // ⚠️ NOTE: These now reference EnvironmentConfig (single source of truth)
+  static String get supabaseUrl => EnvironmentConfig.supabaseUrl;
+  static String get supabaseAnonKey => EnvironmentConfig.supabaseAnonKey;
 
   // Security Configuration
   static const bool enableEncryption = true;
@@ -149,6 +155,11 @@ class ProductionConfig {
 
       if (supabaseUrl.isEmpty) {
         throw Exception('Supabase URL is required');
+      }
+
+      // Validate that EnvironmentConfig has valid credentials
+      if (!EnvironmentConfig.validateCredentials()) {
+        throw Exception('Environment configuration validation failed');
       }
 
       // Validate numeric configurations

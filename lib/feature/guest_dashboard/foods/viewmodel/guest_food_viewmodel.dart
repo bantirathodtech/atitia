@@ -26,6 +26,7 @@ class GuestFoodViewmodel extends BaseProviderState with LoggingMixin {
   final BookingRepository _bookingRepository;
   final _analyticsService = getIt.analytics;
   final FoodFeedbackRepository _feedbackRepository;
+  final AuthProvider? _authProvider;
 
   /// Constructor with dependency injection
   /// If repositories are not provided, creates them with default services
@@ -33,9 +34,11 @@ class GuestFoodViewmodel extends BaseProviderState with LoggingMixin {
     OwnerFoodRepository? repository,
     BookingRepository? bookingRepository,
     FoodFeedbackRepository? feedbackRepository,
+    AuthProvider? authProvider,
   })  : _repository = repository ?? OwnerFoodRepository(),
         _bookingRepository = bookingRepository ?? BookingRepository(),
-        _feedbackRepository = feedbackRepository ?? FoodFeedbackRepository();
+        _feedbackRepository = feedbackRepository ?? FoodFeedbackRepository(),
+        _authProvider = authProvider;
 
   List<OwnerFoodMenu> _weeklyMenus = [];
   List<OwnerMenuOverride> _specialMenus = [];
@@ -61,7 +64,8 @@ class GuestFoodViewmodel extends BaseProviderState with LoggingMixin {
 
   Future<void> _loadBookedPgIfNeeded() async {
     if (_bookedPgId != null) return;
-    final guestId = getIt<AuthProvider>().user?.userId;
+    final authProvider = _authProvider ?? getIt<AuthProvider>();
+    final guestId = authProvider.user?.userId;
     if (guestId == null || guestId.isEmpty) return;
     final booking = await _bookingRepository.getGuestActiveBooking(guestId);
     if (booking != null) {
@@ -81,7 +85,8 @@ class GuestFoodViewmodel extends BaseProviderState with LoggingMixin {
       if (_bookedPgId == null) return;
     }
 
-    final guestId = getIt<AuthProvider>().user?.userId ?? '';
+    final authProvider = _authProvider ?? getIt<AuthProvider>();
+    final guestId = authProvider.user?.userId ?? '';
     if (guestId.isEmpty) return;
 
     final dateKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
@@ -212,7 +217,7 @@ class GuestFoodViewmodel extends BaseProviderState with LoggingMixin {
   Future<void> _loadGuestBooking() async {
     try {
       // Get current user ID from AuthProvider
-      final authProvider = getIt<AuthProvider>();
+      final authProvider = _authProvider ?? getIt<AuthProvider>();
       final userId = authProvider.user?.userId;
 
       if (userId == null) {

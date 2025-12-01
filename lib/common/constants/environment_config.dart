@@ -31,76 +31,217 @@ class EnvironmentConfig {
   static const String packageName = 'com.avishio.atitia';
 
   // ==========================================================================
+  // TEST MODE DETECTION (Runtime - Based on Phone Number)
+  // ==========================================================================
+
+  /// Test phone numbers that automatically enable test mode
+  /// Guest: +91 98765 43210 (or 9876543210)
+  /// Owner: +91 70207 97849 (or 7020797849)
+  static const List<String> _testPhoneNumbers = [
+    '9876543210', // Guest test phone
+    '7020797849', // Owner test phone
+    '+919876543210', // Guest with country code
+    '+917020797849', // Owner with country code
+    '919876543210', // Guest with country code (no +)
+    '917020797849', // Owner with country code (no +)
+  ];
+
+  /// Runtime flag to track if test mode is active (set based on phone number)
+  /// This is set when user logs in with test phone numbers
+  static bool _isTestModeActive = false;
+
+  /// Check if a phone number is a test phone number
+  /// Normalizes phone number (removes spaces, +, etc.) before checking
+  static bool isTestPhoneNumber(String phoneNumber) {
+    // Normalize phone number: remove spaces, +, dashes, parentheses
+    final normalized = phoneNumber
+        .replaceAll(RegExp(r'[\s+\-()]'), '')
+        .replaceAll('+91', '')
+        .replaceAll('91', '')
+        .trim();
+
+    // Check if normalized number matches any test phone number
+    return _testPhoneNumbers.any((testNumber) {
+      final normalizedTest = testNumber
+          .replaceAll(RegExp(r'[\s+\-()]'), '')
+          .replaceAll('+91', '')
+          .replaceAll('91', '')
+          .trim();
+      return normalized == normalizedTest;
+    });
+  }
+
+  /// Set test mode based on phone number (called from AuthProvider)
+  /// This enables test Firebase and test Razorpay automatically
+  static void setTestModeFromPhoneNumber(String phoneNumber) {
+    _isTestModeActive = isTestPhoneNumber(phoneNumber);
+    debugPrint(
+      '🧪 EnvironmentConfig: Test mode ${_isTestModeActive ? "ENABLED" : "DISABLED"} for phone: $phoneNumber',
+    );
+  }
+
+  /// Reset test mode (called on logout)
+  static void resetTestMode() {
+    _isTestModeActive = false;
+    debugPrint('🧪 EnvironmentConfig: Test mode RESET');
+  }
+
+  /// Check if test mode is currently active (runtime check)
+  static bool get isTestModeActive => _isTestModeActive;
+
+  // ==========================================================================
   // FIREBASE CONFIGURATION
   // ==========================================================================
 
+  /// Use Test Firebase Project
+  /// Priority:
+  /// 1. Runtime test mode (if user logged in with test phone number)
+  /// 2. Environment variable (USE_TEST_FIREBASE=true)
+  /// 3. Default: false (production)
+  static bool get useTestFirebase {
+    // Check runtime test mode first (set by phone number)
+    if (_isTestModeActive) {
+      return true;
+    }
+    // Fallback to environment variable
+    return const bool.fromEnvironment(
+      'USE_TEST_FIREBASE',
+      defaultValue: false,
+    );
+  }
+
   /// Firebase Project ID
-  static const String firebaseProjectId = 'atitia-87925';
+  /// Set USE_TEST_FIREBASE=true to use test Firebase project
+  static String get firebaseProjectId => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_PROJECT_ID',
+          defaultValue: 'YOUR_TEST_PROJECT_ID',
+        )
+      : 'atitia-87925';
 
   /// Firebase Project Number
-  static const String firebaseProjectNumber = '665010238088';
+  static String get firebaseProjectNumber => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_PROJECT_NUMBER',
+          defaultValue: 'YOUR_TEST_PROJECT_NUMBER',
+        )
+      : '665010238088';
 
   /// Firebase Storage Bucket
-  static const String firebaseStorageBucket =
-      'atitia-87925.firebasestorage.app';
+  static String get firebaseStorageBucket => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_STORAGE_BUCKET',
+          defaultValue: 'YOUR_TEST_PROJECT_ID.firebasestorage.app',
+        )
+      : 'atitia-87925.firebasestorage.app';
 
   /// Firebase Auth Domain
-  static const String firebaseAuthDomain = 'atitia-87925.firebaseapp.com';
+  static String get firebaseAuthDomain => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_AUTH_DOMAIN',
+          defaultValue: 'YOUR_TEST_PROJECT_ID.firebaseapp.com',
+        )
+      : 'atitia-87925.firebaseapp.com';
 
   // ==========================================================================
   // FIREBASE API KEYS (Platform Specific)
   // ==========================================================================
 
   /// Firebase Web API Key
-  static const String firebaseWebApiKey =
-      'AIzaSyArl95qqaPZNtT2_NVg9sY15t06zq5h6dg';
+  static String get firebaseWebApiKey => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_WEB_API_KEY',
+          defaultValue: 'YOUR_TEST_WEB_API_KEY',
+        )
+      : 'AIzaSyArl95qqaPZNtT2_NVg9sY15t06zq5h6dg';
 
   /// Firebase Android API Key
-  static const String firebaseAndroidApiKey =
-      'AIzaSyCWFaZgLfoGlJeLIrLNK_d9xFuYfqp6XtQ';
+  static String get firebaseAndroidApiKey => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_ANDROID_API_KEY',
+          defaultValue: 'YOUR_TEST_ANDROID_API_KEY',
+        )
+      : 'AIzaSyCWFaZgLfoGlJeLIrLNK_d9xFuYfqp6XtQ';
 
   /// Firebase iOS API Key
-  static const String firebaseIosApiKey =
-      'AIzaSyCzEcqX-xF7EqTWsrqkF0mihRdwBRxUZA8';
+  static String get firebaseIosApiKey => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_IOS_API_KEY',
+          defaultValue: 'YOUR_TEST_IOS_API_KEY',
+        )
+      : 'AIzaSyCzEcqX-xF7EqTWsrqkF0mihRdwBRxUZA8';
 
   /// Firebase macOS API Key
-  static const String firebaseMacosApiKey =
-      'AIzaSyCzEcqX-xF7EqTWsrqkF0mihRdwBRxUZA8';
+  static String get firebaseMacosApiKey => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_IOS_API_KEY', // macOS uses iOS credentials
+          defaultValue: 'YOUR_TEST_IOS_API_KEY',
+        )
+      : 'AIzaSyCzEcqX-xF7EqTWsrqkF0mihRdwBRxUZA8';
 
   /// Firebase Windows API Key
-  static const String firebaseWindowsApiKey =
-      'AIzaSyArl95qqaPZNtT2_NVg9sY15t06zq5h6dg';
+  static String get firebaseWindowsApiKey => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_WEB_API_KEY', // Windows uses Web credentials
+          defaultValue: 'YOUR_TEST_WEB_API_KEY',
+        )
+      : 'AIzaSyArl95qqaPZNtT2_NVg9sY15t06zq5h6dg';
 
   // ==========================================================================
   // FIREBASE APP IDs (Platform Specific)
   // ==========================================================================
 
   /// Firebase Web App ID
-  static const String firebaseWebAppId =
-      '1:665010238088:web:4ab7c29b9112469119a53d';
+  static String get firebaseWebAppId => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_WEB_APP_ID',
+          defaultValue: 'YOUR_TEST_WEB_APP_ID',
+        )
+      : '1:665010238088:web:4ab7c29b9112469119a53d';
 
   /// Firebase Android App ID
-  static const String firebaseAndroidAppId =
-      '1:665010238088:android:27a01be236b0ad9d19a53d';
+  static String get firebaseAndroidAppId => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_ANDROID_APP_ID',
+          defaultValue: 'YOUR_TEST_ANDROID_APP_ID',
+        )
+      : '1:665010238088:android:27a01be236b0ad9d19a53d';
 
   /// Firebase iOS App ID
-  static const String firebaseIosAppId =
-      '1:665010238088:ios:76437d681978a96019a53d';
+  static String get firebaseIosAppId => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_IOS_APP_ID',
+          defaultValue: 'YOUR_TEST_IOS_APP_ID',
+        )
+      : '1:665010238088:ios:76437d681978a96019a53d';
 
   /// Firebase macOS App ID
-  static const String firebaseMacosAppId =
-      '1:665010238088:ios:76437d681978a96019a53d';
+  static String get firebaseMacosAppId => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_IOS_APP_ID', // macOS uses iOS credentials
+          defaultValue: 'YOUR_TEST_IOS_APP_ID',
+        )
+      : '1:665010238088:ios:76437d681978a96019a53d';
 
   /// Firebase Windows App ID
-  static const String firebaseWindowsAppId =
-      '1:665010238088:web:128b16317971fd2819a53d';
+  static String get firebaseWindowsAppId => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_WEB_APP_ID', // Windows uses Web credentials
+          defaultValue: 'YOUR_TEST_WEB_APP_ID',
+        )
+      : '1:665010238088:web:128b16317971fd2819a53d';
 
   // ==========================================================================
   // FIREBASE MESSAGING & ANALYTICS
   // ==========================================================================
 
   /// Firebase Messaging Sender ID
-  static const String firebaseMessagingSenderId = '665010238088';
+  static String get firebaseMessagingSenderId => useTestFirebase
+      ? const String.fromEnvironment(
+          'FIREBASE_TEST_MESSAGING_SENDER_ID',
+          defaultValue: 'YOUR_TEST_PROJECT_NUMBER',
+        )
+      : '665010238088';
 
   /// Firebase Web Measurement ID
   static const String firebaseWebMeasurementId = 'G-SBS8EXZF76';
@@ -115,52 +256,68 @@ class EnvironmentConfig {
   /// Google Sign-In Web Client ID
   /// ⚠️ SECRET: Store in environment variable or secure storage
   /// Get from: Google Cloud Console → APIs & Services → Credentials
+  /// Source: `.secrets/google-oauth/client_secret_google_oauth.json`
+  /// ⚠️ NOTE: Client ID is public but GitHub may flag it. Use environment variable for production.
   static const String googleSignInWebClientId = String.fromEnvironment(
-      'GOOGLE_SIGN_IN_WEB_CLIENT_ID',
-      defaultValue: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com');
+    'GOOGLE_SIGN_IN_WEB_CLIENT_ID',
+    defaultValue:
+        '665010238088-md8lcd0vv27l3r63edbaoqjcgokbpggj.apps.googleusercontent.com', // Production key from .secrets/google-oauth/client_secret_google_oauth.json
+  );
 
   /// Google Sign-In Android Client ID
-  /// ⚠️ SECRET: Store in environment variable or secure storage
-  /// Get from: Google Cloud Console → APIs & Services → Credentials
+  ///
+  /// **Flutter Best Practice:**
+  /// - OAuth Client IDs are PUBLIC by design - safe to commit to Git
+  /// - Auto-created by Firebase in `android/app/google-services.json`
+  ///
+  /// Get from: `android/app/google-services.json` (auto-created by Firebase)
   static const String googleSignInAndroidClientId = String.fromEnvironment(
       'GOOGLE_SIGN_IN_ANDROID_CLIENT_ID',
-      defaultValue: 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com');
+      defaultValue:
+          '665010238088-27a01be236b0ad9d19a53d.apps.googleusercontent.com'); // Public Client ID - safe to commit
 
   /// Google Sign-In iOS Client ID
-  /// ⚠️ SECRET: Store in environment variable or secure storage
+  ///
+  /// **Flutter Best Practice:**
+  /// - OAuth Client IDs are PUBLIC by design - safe to commit to Git
+  /// - They're meant to be in client-side code
+  ///
   /// Get from: Google Cloud Console → APIs & Services → Credentials
   static const String googleSignInIosClientId = String.fromEnvironment(
       'GOOGLE_SIGN_IN_IOS_CLIENT_ID',
-      defaultValue: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com');
+      defaultValue:
+          '665010238088-b381opop8oqfkto97j4hgvlilg0uplik.apps.googleusercontent.com'); // Public Client ID - safe to commit
 
-  /// Google Sign-In Client Secret (for desktop platforms and server-side flows)
+  /// Google Sign-In Client Secret (for desktop platforms only)
   ///
   /// ⚠️ **CRITICAL SECURITY**: This is a sensitive credential - NEVER commit to Git!
   ///
-  /// **How to configure:**
-  /// 1. Store the actual secret in `.secrets/google-oauth/client_secret_google_oauth.json`
-  /// 2. Or use environment variable: `GOOGLE_SIGN_IN_CLIENT_SECRET`
-  /// 3. Or load from secure storage at runtime
+  /// **Flutter Best Practice:**
+  /// - Mobile/Web apps (Android, iOS, Web): Client Secret NOT needed (returns null)
+  /// - Desktop apps (macOS, Windows, Linux): Client Secret required
+  /// - Use environment variable: `GOOGLE_SIGN_IN_CLIENT_SECRET` (recommended)
+  /// - Or load from secure storage at runtime
   ///
-  /// **Where to find/replace this secret:**
+  /// **How to configure:**
+  /// ```bash
+  /// export GOOGLE_SIGN_IN_CLIENT_SECRET="GOCSPX-your-secret-here"
+  /// flutter run
+  /// ```
+  ///
+  /// **Where to find this secret:**
   /// - Google Cloud Console: https://console.cloud.google.com/apis/credentials?project=atitia-87925
   /// - Click "Web client (auto created by Google Service)"
   /// - Scroll to "Client secrets" section
-  /// - If you need to reset: Click "ADD SECRET" or "RESET SECRET"
   ///
   /// **Important Notes:**
-  /// - This is required for desktop platforms (macOS, Windows, Linux) Google Sign-In
-  /// - Also used for server-side authentication flows
-  /// - Google no longer allows viewing existing secrets - must create new one if lost
-  /// - If resetting, update this value immediately after generation
-  ///
-  /// **Related Documentation:**
-  /// - See `GOOGLE_CLIENT_SECRET_SETUP.md` for setup guide
-  /// - See `GOOGLE_CLIENT_SECRET_CREATE_NEW.md` for creating new secrets
-  /// - See `.secrets/README.md` for secure storage setup
+  /// - Only required for desktop platforms (macOS, Windows, Linux)
+  /// - NOT needed for mobile/web (Android, iOS, Web) - app returns null
+  /// - Backup stored in: `.secrets/google-oauth/client_secret_google_oauth.json` (for reference only)
+  /// - ⚠️ Use environment variable - do NOT hardcode in production!
   static const String googleSignInClientSecret = String.fromEnvironment(
-      'GOOGLE_SIGN_IN_CLIENT_SECRET',
-      defaultValue: 'YOUR_CLIENT_SECRET_HERE');
+    'GOOGLE_SIGN_IN_CLIENT_SECRET',
+    defaultValue: '', // Empty default - use environment variable for production
+  );
 
   // ==========================================================================
   // GOOGLE OAUTH JAVASCRIPT ORIGINS (for web development)
@@ -215,31 +372,99 @@ class EnvironmentConfig {
       'c35426383935af00f2f54b0bb7fc7cb6e8150f15';
 
   // ==========================================================================
-  // SUPABASE CONFIGURATION (if using)
+  // SUPABASE CONFIGURATION
   // ==========================================================================
 
   /// Supabase Project URL
-  ///
-  /// ⚠️ NOTE: Supabase credentials are actually configured in `lib/core/services/supabase/supabase_config.dart`
-  /// This field is kept for backward compatibility but is NOT used by the app.
-  ///
-  /// **To update Supabase credentials:**
-  /// - Edit: `lib/core/services/supabase/supabase_config.dart`
-  /// - The app uses `SupabaseConfig.supabaseUrl` and `SupabaseConfig.supabaseAnonKey`
-  ///
-  /// **Current Supabase Config Location:**
-  /// See: `lib/core/services/supabase/supabase_config.dart` for actual values
-  static const String supabaseUrl = 'your_supabase_url_here';
+  /// Get from: Supabase Dashboard → Settings → API → Project URL
+  /// Source: `.secrets` and `lib/core/services/supabase/supabase_config.dart`
+  static const String supabaseUrl = String.fromEnvironment(
+    'SUPABASE_URL',
+    defaultValue: 'https://iteharwqzobkolybqvsl.supabase.co',
+  );
 
   /// Supabase Anonymous Key (Public Key)
-  ///
-  /// ⚠️ NOTE: Supabase credentials are actually configured in `lib/core/services/supabase/supabase_config.dart`
-  /// This field is kept for backward compatibility but is NOT used by the app.
-  ///
-  /// **To update Supabase credentials:**
-  /// - Edit: `lib/core/services/supabase/supabase_config.dart`
-  /// - The app uses `SupabaseConfig.supabaseUrl` and `SupabaseConfig.supabaseAnonKey`
-  static const String supabaseAnonKey = 'your_supabase_anon_key_here';
+  /// This is safe to use in client-side code
+  /// Get from: Supabase Dashboard → Settings → API → anon/public key
+  /// Source: `.secrets` and `lib/core/services/supabase/supabase_config.dart`
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+    defaultValue:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZWhhcndxem9ia29seWJxdnNsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MTUzMjYsImV4cCI6MjA3NTQ5MTMyNn0.AK5HCzXT_wafICarwp0-3nALJxQ0RjB6pPg0j9TbBcA',
+  );
+
+  /// Supabase Storage Bucket Name
+  static const String supabaseStorageBucket = 'atitia-storage';
+
+  // ==========================================================================
+  // RAZORPAY CONFIGURATION
+  // ==========================================================================
+
+  /// Use Test Razorpay Keys
+  /// Priority:
+  /// 1. Runtime test mode (if user logged in with test phone number)
+  /// 2. Environment variable (USE_TEST_RAZORPAY=true)
+  /// 3. Default: false (production)
+  /// ⚠️ NOTE: `.secrets/api-keys/razorpay-*.json` files are for BACKUP ONLY.
+  /// The app ONLY uses values from EnvironmentConfig (this file).
+  static bool get useTestRazorpay {
+    // Check runtime test mode first (set by phone number)
+    if (_isTestModeActive) {
+      return true;
+    }
+    // Fallback to environment variable
+    return const bool.fromEnvironment(
+      'USE_TEST_RAZORPAY',
+      defaultValue: false,
+    );
+  }
+
+  /// Razorpay API Key (App-level, for subscriptions/featured listings)
+  /// Get from: Razorpay Dashboard → Settings → API Keys
+  /// ⚠️ NOTE: `.secrets/api-keys/razorpay-*.json` files are for BACKUP ONLY.
+  /// The app ONLY uses hardcoded values here. Set USE_TEST_RAZORPAY=true for test keys.
+  static String get razorpayApiKey => useTestRazorpay
+      ? const String.fromEnvironment(
+          'RAZORPAY_API_KEY',
+          defaultValue:
+              'rzp_test_RlAOuGGXSxvL66', // Test key (backup in .secrets/api-keys/razorpay-test.json)
+        )
+      : const String.fromEnvironment(
+          'RAZORPAY_API_KEY',
+          defaultValue:
+              'rzp_live_Rlw34MEmvHMQte', // Production key (backup in .secrets/api-keys/razorpay-production.json)
+        );
+
+  /// Razorpay Key Secret (App-level, for server-side operations)
+  /// ⚠️ SECRET: Never expose in client code, use only in Cloud Functions
+  /// Get from: Razorpay Dashboard → Settings → API Keys
+  /// ⚠️ NOTE: `.secrets/api-keys/razorpay-*.json` files are for BACKUP ONLY.
+  /// The app ONLY uses hardcoded values here. Set USE_TEST_RAZORPAY=true for test secret.
+  static String get razorpayKeySecret => useTestRazorpay
+      ? const String.fromEnvironment(
+          'RAZORPAY_KEY_SECRET',
+          defaultValue:
+              '2cwRmmNzqj3Bzpn0muOgO62U', // Test secret (backup in .secrets/api-keys/razorpay-test.json)
+        )
+      : const String.fromEnvironment(
+          'RAZORPAY_KEY_SECRET',
+          defaultValue:
+              'HYNmEFQ8GQc1CwwqnL6P121g', // Production secret (backup in .secrets/api-keys/razorpay-production.json)
+        );
+
+  // ==========================================================================
+  // DISCORD WEBHOOK CONFIGURATION
+  // ==========================================================================
+
+  /// Discord Webhook URL (for notifications/alerts)
+  /// Get from: Discord Server → Server Settings → Integrations → Webhooks
+  /// Source: `.secrets/api-keys/DISCORD_WEBHOOK_URL.txt`
+  /// ⚠️ SECRET: Keep this URL private, it allows posting to your Discord channel
+  static const String discordWebhookUrl = String.fromEnvironment(
+    'DISCORD_WEBHOOK_URL',
+    defaultValue:
+        'https://discord.com/api/webhooks/1443555560091029576/OxxszMilMffKCLRpzO_n0LxUc3oQKvTy9J54t-o5uXohOJaSQG1jnxTiMMqBWcD4oGZE',
+  );
 
   // ==========================================================================
   // DEVELOPMENT vs PRODUCTION CONFIGURATION
@@ -447,6 +672,10 @@ class EnvironmentConfig {
       firebaseAndroidApiKey,
       firebaseIosApiKey,
       recaptchaEnterpriseSiteKey,
+      supabaseUrl,
+      supabaseAnonKey,
+      razorpayApiKey,
+      razorpayKeySecret,
     ];
 
     return requiredFields.every(
@@ -500,12 +729,29 @@ class EnvironmentConfig {
       missing.add('reCAPTCHA Enterprise Debug Token');
     }
 
-    if (supabaseUrl.contains('your_supabase_url_here')) {
+    // Check Supabase credentials (now using String.fromEnvironment with defaults)
+    // These should be set via environment variables for production
+    if (supabaseUrl.isEmpty || !supabaseUrl.startsWith('https://')) {
       missing.add('Supabase URL');
     }
 
-    if (supabaseAnonKey.contains('your_supabase_anon_key_here')) {
+    if (supabaseAnonKey.isEmpty || supabaseAnonKey.length < 50) {
       missing.add('Supabase Anon Key');
+    }
+
+    // Check Razorpay credentials (production keys are defaults)
+    if (razorpayApiKey.isEmpty || !razorpayApiKey.startsWith('rzp_')) {
+      missing.add('Razorpay API Key');
+    }
+
+    if (razorpayKeySecret.isEmpty) {
+      missing.add('Razorpay Key Secret');
+    }
+
+    // Warn if using test keys in production mode (log to console)
+    if (isReleaseMode && razorpayApiKey.startsWith('rzp_test_')) {
+      debugPrint(
+          '⚠️  WARNING: Razorpay API Key is a TEST key. Use production key (rzp_live_*) for production builds.');
     }
 
     return missing;
