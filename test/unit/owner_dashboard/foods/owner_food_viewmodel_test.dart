@@ -138,7 +138,7 @@ void main() {
     });
 
     // Helper function to create test menu
-    OwnerFoodMenu _createTestMenu({
+    OwnerFoodMenu createTestMenu({
       String? menuId,
       String? ownerId,
       String? pgId,
@@ -157,7 +157,7 @@ void main() {
     }
 
     // Helper function to create test override
-    OwnerMenuOverride _createTestOverride({
+    OwnerMenuOverride createTestOverride({
       String? overrideId,
       String? ownerId,
       String? pgId,
@@ -253,7 +253,7 @@ void main() {
     group('saveWeeklyMenu', () {
       test('should save menu successfully', () async {
         // Arrange
-        final menu = _createTestMenu(menuId: 'new_menu');
+        final menu = createTestMenu(menuId: 'new_menu');
 
         // Act
         await viewModel.saveWeeklyMenu(menu);
@@ -267,8 +267,8 @@ void main() {
       test('should save multiple menus successfully', () async {
         // Arrange
         final menus = [
-          _createTestMenu(menuId: 'menu_1'),
-          _createTestMenu(menuId: 'menu_2'),
+          createTestMenu(menuId: 'menu_1'),
+          createTestMenu(menuId: 'menu_2'),
         ];
 
         // Act
@@ -292,7 +292,7 @@ void main() {
     group('saveOverride', () {
       test('should save override successfully', () async {
         // Arrange
-        final override = _createTestOverride(overrideId: 'new_override');
+        final override = createTestOverride(overrideId: 'new_override');
 
         // Act
         await viewModel.saveOverride(override);
@@ -334,7 +334,8 @@ void main() {
         // Assert
         expect(viewModel.weeklyMenus, isEmpty);
         expect(viewModel.overrides, isEmpty);
-        final stored = await mockLocalStorage.read('food_menu_loaded_$testOwnerId');
+        final stored =
+            await mockLocalStorage.read('food_menu_loaded_$testOwnerId');
         expect(stored, isNull);
       });
     });
@@ -366,4 +367,3 @@ void main() {
     });
   });
 }
-

@@ -580,7 +580,8 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
         context.go(AppRoutes.ownerGuests);
         // Set the selected tab to 'guests' (which shows payment info)
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final guestVM = Provider.of<OwnerGuestViewModel>(context, listen: false);
+          final guestVM =
+              Provider.of<OwnerGuestViewModel>(context, listen: false);
           guestVM.setSelectedTab('guests');
         });
       },
@@ -606,7 +607,8 @@ class _OwnerOverviewScreenState extends State<OwnerOverviewScreen> {
         context.go(AppRoutes.ownerGuests);
         // Set the selected tab to 'guests'
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final guestVM = Provider.of<OwnerGuestViewModel>(context, listen: false);
+          final guestVM =
+              Provider.of<OwnerGuestViewModel>(context, listen: false);
           guestVM.setSelectedTab('guests');
         });
       },

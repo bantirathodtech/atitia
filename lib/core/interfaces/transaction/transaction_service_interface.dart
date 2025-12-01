@@ -24,4 +24,3 @@ abstract class ITransactionService {
   /// Access to underlying firestore instance (if needed)
   dynamic get firestore;
 }
-

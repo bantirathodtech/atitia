@@ -149,7 +149,8 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
 
       // Transform occupancy data - use historical if available, otherwise use current
       final overviewData = results[1] as OwnerOverviewModel;
-      final historicalOccupancy = results[2] as List<dynamic>; // List<OccupancyTrendModel>
+      final historicalOccupancy =
+          results[2] as List<dynamic>; // List<OccupancyTrendModel>
       _occupancyData = _transformOccupancyData(
         overviewData,
         pgId,
@@ -238,7 +239,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
         // Handle both OccupancyTrendModel and Map<String, dynamic>
         int month;
         double occupancyRate;
-        
+
         if (trend is Map<String, dynamic>) {
           final date = trend['date'] is DateTime
               ? trend['date'] as DateTime
@@ -248,9 +249,10 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
         } else {
           // Assume it's OccupancyTrendModel
           month = trend.date.month;
-          occupancyRate = trend.occupancyRate * 100; // Convert from 0-1 to 0-100
+          occupancyRate =
+              trend.occupancyRate * 100; // Convert from 0-1 to 0-100
         }
-        
+
         if (month >= 1 && month <= 12) {
           historicalMap[month] = occupancyRate;
         }
@@ -577,7 +579,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
   Widget _buildPerformanceMetrics(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final decimalFormatter = NumberFormat('0.0', loc.localeName);
-    
+
     // Use real performance metrics if available, otherwise show loading/placeholder
     final metrics = _performanceMetrics;
     final guestSatisfactionScore = decimalFormatter.format(
@@ -770,5 +772,4 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
       ),
     );
   }
-
 }

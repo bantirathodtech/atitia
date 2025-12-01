@@ -202,8 +202,16 @@ void main() {
       test('should load recently updated guests successfully', () async {
         // Arrange
         final mockGuests = [
-          {'guestId': 'guest_1', 'name': 'Guest 1', 'updatedAt': DateTime.now()},
-          {'guestId': 'guest_2', 'name': 'Guest 2', 'updatedAt': DateTime.now()},
+          {
+            'guestId': 'guest_1',
+            'name': 'Guest 1',
+            'updatedAt': DateTime.now()
+          },
+          {
+            'guestId': 'guest_2',
+            'name': 'Guest 2',
+            'updatedAt': DateTime.now()
+          },
         ];
         mockRepository.setMockRecentlyUpdatedGuests(mockGuests);
 
@@ -376,4 +384,3 @@ void main() {
     });
   });
 }
-

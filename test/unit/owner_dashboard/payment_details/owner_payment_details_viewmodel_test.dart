@@ -115,7 +115,7 @@ void main() {
     });
 
     // Helper function to create test payment details
-    OwnerPaymentDetailsModel _createTestPaymentDetails({
+    OwnerPaymentDetailsModel createTestPaymentDetails({
       String? ownerId,
       String? bankName,
       String? upiId,
@@ -146,7 +146,7 @@ void main() {
     group('loadPaymentDetails', () {
       test('should load payment details successfully', () async {
         // Arrange
-        final details = _createTestPaymentDetails();
+        final details = createTestPaymentDetails();
         mockRepository.setMockPaymentDetails(details);
 
         // Act
@@ -164,7 +164,7 @@ void main() {
 
       test('should set loading state during load', () async {
         // Arrange
-        final details = _createTestPaymentDetails();
+        final details = createTestPaymentDetails();
         mockRepository.setMockPaymentDetails(details);
 
         // Act
@@ -207,7 +207,7 @@ void main() {
     group('savePaymentDetails', () {
       test('should save payment details successfully', () async {
         // Arrange
-        final details = _createTestPaymentDetails();
+        final details = createTestPaymentDetails();
 
         // Act
         final result = await viewModel.savePaymentDetails(details);
@@ -222,7 +222,7 @@ void main() {
 
       test('should set saving state during save', () async {
         // Arrange
-        final details = _createTestPaymentDetails();
+        final details = createTestPaymentDetails();
 
         // Act
         final future = viewModel.savePaymentDetails(details);
@@ -235,7 +235,7 @@ void main() {
 
       test('should handle save errors', () async {
         // Arrange
-        final details = _createTestPaymentDetails();
+        final details = createTestPaymentDetails();
         mockRepository.setShouldThrow(Exception('Save failed'));
 
         // Act
@@ -274,7 +274,8 @@ void main() {
     group('deleteQrCode', () {
       test('should delete QR code successfully', () async {
         // Act
-        final result = await viewModel.deleteQrCode('https://storage.url/qr.jpg');
+        final result =
+            await viewModel.deleteQrCode('https://storage.url/qr.jpg');
 
         // Assert
         expect(result, isTrue);
@@ -300,7 +301,7 @@ void main() {
     group('reset', () {
       test('should reset all state', () async {
         // Arrange
-        final details = _createTestPaymentDetails();
+        final details = createTestPaymentDetails();
         mockRepository.setMockPaymentDetails(details);
         await viewModel.loadPaymentDetails(testOwnerId);
 
@@ -318,7 +319,7 @@ void main() {
     group('Computed Properties', () {
       test('hasPaymentDetails should return true when details exist', () async {
         // Arrange
-        final details = _createTestPaymentDetails();
+        final details = createTestPaymentDetails();
         mockRepository.setMockPaymentDetails(details);
         await viewModel.loadPaymentDetails(testOwnerId);
 
@@ -326,9 +327,10 @@ void main() {
         expect(viewModel.hasPaymentDetails, isTrue);
       });
 
-      test('hasBankDetails should return true when bank details exist', () async {
+      test('hasBankDetails should return true when bank details exist',
+          () async {
         // Arrange
-        final details = _createTestPaymentDetails(bankName: 'Test Bank');
+        final details = createTestPaymentDetails(bankName: 'Test Bank');
         mockRepository.setMockPaymentDetails(details);
         await viewModel.loadPaymentDetails(testOwnerId);
 
@@ -338,7 +340,7 @@ void main() {
 
       test('hasUpiDetails should return true when UPI details exist', () async {
         // Arrange
-        final details = _createTestPaymentDetails(upiId: 'test@upi');
+        final details = createTestPaymentDetails(upiId: 'test@upi');
         mockRepository.setMockPaymentDetails(details);
         await viewModel.loadPaymentDetails(testOwnerId);
 
@@ -348,4 +350,3 @@ void main() {
     });
   });
 }
-

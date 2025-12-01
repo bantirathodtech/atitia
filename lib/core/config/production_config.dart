@@ -5,7 +5,7 @@ import '../../common/constants/environment_config.dart';
 
 /// Production configuration management
 /// Handles environment-specific settings and feature flags
-/// 
+///
 /// ⚠️ NOTE: API keys and credentials are now centralized in `EnvironmentConfig`.
 /// This class references `EnvironmentConfig` for all sensitive credentials.
 class ProductionConfig {
@@ -39,7 +39,8 @@ class ProductionConfig {
   static const String firebaseAppId = 'com.charyatani.atitia';
   static String get firebaseApiKey => EnvironmentConfig.firebaseWebApiKey;
   static String get firebaseAuthDomain => EnvironmentConfig.firebaseAuthDomain;
-  static String get firebaseStorageBucket => EnvironmentConfig.firebaseStorageBucket;
+  static String get firebaseStorageBucket =>
+      EnvironmentConfig.firebaseStorageBucket;
 
   // Supabase Configuration
   // ⚠️ NOTE: These now reference EnvironmentConfig (single source of truth)

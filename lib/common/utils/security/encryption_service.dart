@@ -101,10 +101,11 @@ class EncryptionService {
     // Use a combination of timestamp and a counter to ensure uniqueness
     final timestamp = DateTime.now().microsecondsSinceEpoch;
     final random = (timestamp * 1000 + _saltCounter++) % 0x7FFFFFFF;
-    final bytes = List<int>.generate(32, (i) => (random + i * 17 + timestamp % 256) % 256);
+    final bytes = List<int>.generate(
+        32, (i) => (random + i * 17 + timestamp % 256) % 256);
     return base64.encode(bytes);
   }
-  
+
   static int _saltCounter = 0;
 
   /// Generate secure random token

@@ -2,9 +2,11 @@
 ///
 /// ⚠️ NOTE: Supabase credentials are now centralized in `EnvironmentConfig`.
 /// This class references `EnvironmentConfig` for all credentials.
-/// 
+///
 /// Get credentials from: https://app.supabase.com/project/_/settings/api
 /// Source: `lib/common/constants/environment_config.dart`
+library;
+
 import '../../../common/constants/environment_config.dart';
 
 class SupabaseConfig {

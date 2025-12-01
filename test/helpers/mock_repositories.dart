@@ -5,7 +5,6 @@ import 'package:atitia/core/interfaces/analytics/analytics_service_interface.dar
 import 'package:atitia/core/interfaces/database/database_service_interface.dart';
 import 'package:atitia/feature/owner_dashboard/overview/data/repository/owner_overview_repository.dart';
 import 'package:atitia/feature/owner_dashboard/overview/data/models/owner_overview_model.dart';
-import 'package:atitia/common/utils/exceptions/exceptions.dart';
 import 'dart:async';
 
 /// Mock implementations of services for testing
@@ -228,4 +227,3 @@ class MockOwnerOverviewRepository extends OwnerOverviewRepository {
     );
   }
 }
-

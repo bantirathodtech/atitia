@@ -31,15 +31,84 @@ class EnvironmentConfig {
   static const String packageName = 'com.avishio.atitia';
 
   // ==========================================================================
+  // TEST MODE DETECTION (Runtime - Based on Phone Number)
+  // ==========================================================================
+
+  /// Test phone numbers that automatically enable test mode
+  /// Guest: +91 98765 43210 (or 9876543210)
+  /// Owner: +91 70207 97849 (or 7020797849)
+  static const List<String> _testPhoneNumbers = [
+    '9876543210', // Guest test phone
+    '7020797849', // Owner test phone
+    '+919876543210', // Guest with country code
+    '+917020797849', // Owner with country code
+    '919876543210', // Guest with country code (no +)
+    '917020797849', // Owner with country code (no +)
+  ];
+
+  /// Runtime flag to track if test mode is active (set based on phone number)
+  /// This is set when user logs in with test phone numbers
+  static bool _isTestModeActive = false;
+
+  /// Check if a phone number is a test phone number
+  /// Normalizes phone number (removes spaces, +, etc.) before checking
+  static bool isTestPhoneNumber(String phoneNumber) {
+    // Normalize phone number: remove spaces, +, dashes, parentheses
+    final normalized = phoneNumber
+        .replaceAll(RegExp(r'[\s+\-()]'), '')
+        .replaceAll('+91', '')
+        .replaceAll('91', '')
+        .trim();
+
+    // Check if normalized number matches any test phone number
+    return _testPhoneNumbers.any((testNumber) {
+      final normalizedTest = testNumber
+          .replaceAll(RegExp(r'[\s+\-()]'), '')
+          .replaceAll('+91', '')
+          .replaceAll('91', '')
+          .trim();
+      return normalized == normalizedTest;
+    });
+  }
+
+  /// Set test mode based on phone number (called from AuthProvider)
+  /// This enables test Firebase and test Razorpay automatically
+  static void setTestModeFromPhoneNumber(String phoneNumber) {
+    _isTestModeActive = isTestPhoneNumber(phoneNumber);
+    debugPrint(
+      '🧪 EnvironmentConfig: Test mode ${_isTestModeActive ? "ENABLED" : "DISABLED"} for phone: $phoneNumber',
+    );
+  }
+
+  /// Reset test mode (called on logout)
+  static void resetTestMode() {
+    _isTestModeActive = false;
+    debugPrint('🧪 EnvironmentConfig: Test mode RESET');
+  }
+
+  /// Check if test mode is currently active (runtime check)
+  static bool get isTestModeActive => _isTestModeActive;
+
+  // ==========================================================================
   // FIREBASE CONFIGURATION
   // ==========================================================================
 
-  /// Use Test Firebase Project (set USE_TEST_FIREBASE=true to enable)
-  /// When true, uses test Firebase credentials instead of production
-  static bool get useTestFirebase => const bool.fromEnvironment(
-        'USE_TEST_FIREBASE',
-        defaultValue: false,
-      );
+  /// Use Test Firebase Project
+  /// Priority:
+  /// 1. Runtime test mode (if user logged in with test phone number)
+  /// 2. Environment variable (USE_TEST_FIREBASE=true)
+  /// 3. Default: false (production)
+  static bool get useTestFirebase {
+    // Check runtime test mode first (set by phone number)
+    if (_isTestModeActive) {
+      return true;
+    }
+    // Fallback to environment variable
+    return const bool.fromEnvironment(
+      'USE_TEST_FIREBASE',
+      defaultValue: false,
+    );
+  }
 
   /// Firebase Project ID
   /// Set USE_TEST_FIREBASE=true to use test Firebase project
@@ -331,13 +400,24 @@ class EnvironmentConfig {
   // RAZORPAY CONFIGURATION
   // ==========================================================================
 
-  /// Use Test Razorpay Keys (set USE_TEST_RAZORPAY=true to use test keys)
+  /// Use Test Razorpay Keys
+  /// Priority:
+  /// 1. Runtime test mode (if user logged in with test phone number)
+  /// 2. Environment variable (USE_TEST_RAZORPAY=true)
+  /// 3. Default: false (production)
   /// ⚠️ NOTE: `.secrets/api-keys/razorpay-*.json` files are for BACKUP ONLY.
   /// The app ONLY uses values from EnvironmentConfig (this file).
-  static bool get useTestRazorpay => const bool.fromEnvironment(
-        'USE_TEST_RAZORPAY',
-        defaultValue: false,
-      );
+  static bool get useTestRazorpay {
+    // Check runtime test mode first (set by phone number)
+    if (_isTestModeActive) {
+      return true;
+    }
+    // Fallback to environment variable
+    return const bool.fromEnvironment(
+      'USE_TEST_RAZORPAY',
+      defaultValue: false,
+    );
+  }
 
   /// Razorpay API Key (App-level, for subscriptions/featured listings)
   /// Get from: Razorpay Dashboard → Settings → API Keys

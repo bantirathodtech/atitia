@@ -1,9 +1,7 @@
 // test/helpers/mock_app_subscription_payment_service.dart
 
-import 'package:atitia/core/services/payment/app_subscription_payment_service.dart';
 import 'package:atitia/core/models/subscription/subscription_plan_model.dart';
 import 'package:atitia/core/models/subscription/owner_subscription_model.dart';
-import 'package:atitia/core/models/featured/featured_listing_model.dart';
 
 /// Mock implementation of AppSubscriptionPaymentService for unit tests
 /// This avoids the UnifiedServiceLocator dependency issue
@@ -70,4 +68,3 @@ class MockAppSubscriptionPaymentService {
     // Mock implementation - no-op
   }
 }
-

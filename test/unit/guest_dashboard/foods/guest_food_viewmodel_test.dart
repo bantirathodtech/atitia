@@ -60,8 +60,7 @@ class MockBookingRepository extends BookingRepository {
   BookingModel? _mockActiveBooking;
   Exception? _shouldThrow;
 
-  MockBookingRepository()
-      : super(databaseService: MockDatabaseService());
+  MockBookingRepository() : super(databaseService: MockDatabaseService());
 
   void setMockBookings(List<BookingModel> bookings) {
     _mockBookings = bookings;
@@ -125,7 +124,7 @@ void main() {
 
       // Create mock AuthProvider for testing
       final mockAuthProvider = MockAuthProvider(mockUserId: testGuestId);
-      
+
       viewModel = GuestFoodViewmodel(
         repository: mockFoodRepository,
         bookingRepository: mockBookingRepository,
@@ -143,7 +142,7 @@ void main() {
     });
 
     // Helper function to create test booking
-    BookingModel _createTestBooking({
+    BookingModel createTestBooking({
       String? bookingId,
       String? guestId,
       String? pgId,
@@ -214,7 +213,7 @@ void main() {
     group('loadGuestMenu', () {
       test('should set loading state during load', () async {
         // Arrange
-        final booking = _createTestBooking(status: 'confirmed');
+        final booking = createTestBooking(status: 'confirmed');
         mockBookingRepository.setMockActiveBooking(booking);
 
         // Act
@@ -242,7 +241,7 @@ void main() {
     group('submitMealFeedback', () {
       test('should submit feedback successfully', () async {
         // Arrange
-        final booking = _createTestBooking(status: 'confirmed');
+        final booking = createTestBooking(status: 'confirmed');
         mockBookingRepository.setMockActiveBooking(booking);
         await viewModel.loadGuestMenu();
 
@@ -276,4 +275,3 @@ void main() {
     });
   });
 }
-

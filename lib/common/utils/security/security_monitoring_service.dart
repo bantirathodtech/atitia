@@ -412,14 +412,14 @@ class SecurityMonitoringService {
         if (event.userId != null) 'user_id': event.userId!,
         if (event.deviceId != null) 'device_id': event.deviceId!,
       };
-      
+
       // Add metadata, filtering out null values
       for (final entry in event.metadata.entries) {
         if (entry.value != null) {
           parameters[entry.key] = entry.value as Object;
         }
       }
-      
+
       analytics.logEvent(
         name: 'security_event',
         parameters: parameters,
@@ -468,14 +468,14 @@ class SecurityMonitoringService {
         if (alert.userId != null) 'user_id': alert.userId!,
         if (alert.deviceId != null) 'device_id': alert.deviceId!,
       };
-      
+
       // Add metadata, filtering out null values
       for (final entry in alert.metadata.entries) {
         if (entry.value != null) {
           parameters[entry.key] = entry.value as Object;
         }
       }
-      
+
       analytics.logEvent(
         name: 'security_alert',
         parameters: parameters,

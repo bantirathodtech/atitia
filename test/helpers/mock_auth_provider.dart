@@ -4,7 +4,6 @@ import 'package:atitia/feature/auth/logic/auth_provider.dart';
 import 'package:atitia/feature/auth/data/model/user_model.dart';
 import 'package:atitia/core/services/firebase/database/firestore_database_service.dart';
 import 'package:atitia/core/services/supabase/storage/supabase_storage_service.dart';
-import '../mocks/mock_services.dart';
 import 'package:atitia/core/navigation/navigation_service.dart';
 import 'package:atitia/core/db/flutter_secure_storage.dart';
 import 'package:atitia/feature/auth/data/repository/auth_repository.dart';
@@ -18,9 +17,6 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
-import 'package:atitia/core/services/firebase/database/firestore_database_service.dart';
-import 'package:atitia/core/services/supabase/storage/supabase_storage_service.dart';
-import '../mocks/mock_services.dart';
 import 'mock_google_sign_in_service.dart';
 import 'mock_apple_sign_in_service.dart';
 
@@ -43,16 +39,18 @@ class MockAuthProvider extends AuthProvider {
   })  : _mockUserId = mockUserId,
         _mockUser = mockUser,
         super(
-          authService: authService ?? _MockExtendedAuthService(mockUserId: mockUserId),
+          authService:
+              authService ?? _MockExtendedAuthService(mockUserId: mockUserId),
           firestoreService: firestoreService ?? _createMockFirestoreService(),
           localStorage: localStorage ?? LocalStorageService(),
           storageService: storageService ?? _createMockStorageService(),
           navigation: navigation ?? NavigationService(createMockGoRouter()),
           analyticsService: analyticsService ?? _MockIAnalyticsService(),
-          repository: repository ?? _MockAuthRepository(
-            authService: _MockIAuthService(mockUserId: mockUserId),
-            analyticsService: analyticsService ?? _MockIAnalyticsService(),
-          ),
+          repository: repository ??
+              _MockAuthRepository(
+                authService: _MockIAuthService(mockUserId: mockUserId),
+                analyticsService: analyticsService ?? _MockIAnalyticsService(),
+              ),
         );
 
   @override
@@ -86,15 +84,17 @@ class _MockAuthRepository extends AuthRepository {
   }) : super(
           authService: authService ?? _MockIAuthService(),
           analyticsService: analyticsService ?? _MockIAnalyticsService(),
-          googleSignInService: googleSignInService ?? MockGoogleSignInServiceWrapper(),
-          appleSignInService: appleSignInService ?? MockAppleSignInServiceWrapper(),
+          googleSignInService:
+              googleSignInService ?? MockGoogleSignInServiceWrapper(),
+          appleSignInService:
+              appleSignInService ?? MockAppleSignInServiceWrapper(),
         );
 }
 
 /// Mock IAuthService implementation
 class _MockIAuthService implements IAuthService {
   final String? _mockUserId;
-  
+
   _MockIAuthService({String? mockUserId}) : _mockUserId = mockUserId;
 
   @override
@@ -171,7 +171,6 @@ class _MockIAnalyticsService implements IAnalyticsService {
   @override
   Future<void> resetAnalyticsData() async {}
 }
-
 
 /// Mock implementation of IExtendedAuthService for unit testing
 class _MockExtendedAuthService implements IExtendedAuthService {
@@ -253,8 +252,7 @@ class _MockExtendedAuthService implements IExtendedAuthService {
   Widget? getGoogleSignInButton() => null;
 
   @override
-  Stream<GoogleSignInCredentials?> get googleSignInState =>
-      Stream.value(null);
+  Stream<GoogleSignInCredentials?> get googleSignInState => Stream.value(null);
 
   @override
   Future<void> signOutFromGoogle() async {}

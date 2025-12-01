@@ -19,14 +19,14 @@ void main() {
     setUpAll(() {
       // Initialize GetIt with mock services for performance tests
       final getIt = GetIt.instance;
-      
+
       // Unregister existing services if they exist
       try {
         if (getIt.isRegistered<AnalyticsServiceWrapper>()) {
           getIt.unregister<AnalyticsServiceWrapper>();
         }
       } catch (_) {}
-      
+
       try {
         if (getIt.isRegistered<CrashlyticsServiceWrapper>()) {
           getIt.unregister<CrashlyticsServiceWrapper>();
@@ -52,7 +52,7 @@ void main() {
           getIt.unregister<AnalyticsServiceWrapper>();
         }
       } catch (_) {}
-      
+
       try {
         if (getIt.isRegistered<CrashlyticsServiceWrapper>()) {
           getIt.unregister<CrashlyticsServiceWrapper>();

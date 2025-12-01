@@ -128,12 +128,12 @@ class GuestPgViewModel extends BaseProviderState
   /// Cancels previous subscription before creating a new one to prevent memory leaks
   void loadPGs(BuildContext context) {
     logMethodEntry('loadPGs');
-    
+
     // Cancel previous subscription if it exists to prevent memory leaks
     // and ensure we only have one active stream subscription
     _pgStreamSubscription?.cancel();
     _pgStreamSubscription = null;
-    
+
     setLoading(true);
     clearError();
 

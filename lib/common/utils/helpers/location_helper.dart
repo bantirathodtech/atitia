@@ -38,7 +38,8 @@ class LocationHelper {
       // Get current position
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium, // Balance between accuracy and battery
+          accuracy:
+              LocationAccuracy.medium, // Balance between accuracy and battery
           timeLimit: Duration(seconds: 10), // Timeout after 10 seconds
         ),
       );
@@ -69,4 +70,3 @@ class LocationHelper {
     return await Geolocator.isLocationServiceEnabled();
   }
 }
-

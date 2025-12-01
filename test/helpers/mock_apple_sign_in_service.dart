@@ -70,4 +70,3 @@ class MockAppleSignInServiceWrapper implements AppleSignInServiceWrapper {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
-

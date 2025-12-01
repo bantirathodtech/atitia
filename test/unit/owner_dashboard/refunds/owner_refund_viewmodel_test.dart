@@ -13,8 +13,6 @@ import 'package:atitia/core/models/featured/featured_listing_model.dart';
 import '../../../helpers/viewmodel_test_setup.dart';
 import '../../../helpers/mock_repositories.dart';
 import '../../../helpers/mock_auth_service.dart';
-import 'package:atitia/core/interfaces/analytics/analytics_service_interface.dart';
-import 'package:atitia/core/interfaces/auth/viewmodel_auth_service_interface.dart';
 import 'dart:async';
 
 // Mock RefundRequestRepository
@@ -42,7 +40,8 @@ class MockRefundRequestRepository extends RefundRequestRepository {
   }
 
   @override
-  Future<List<RefundRequestModel>> getOwnerRefundRequests(String ownerId) async {
+  Future<List<RefundRequestModel>> getOwnerRefundRequests(
+      String ownerId) async {
     if (_shouldThrow != null) {
       throw _shouldThrow!;
     }
@@ -68,7 +67,8 @@ class MockRefundRequestRepository extends RefundRequestRepository {
   }
 
   @override
-  Future<RefundRequestModel?> getRefundRequestByRevenueRecordId(String revenueRecordId) async {
+  Future<RefundRequestModel?> getRefundRequestByRevenueRecordId(
+      String revenueRecordId) async {
     if (_shouldThrow != null) {
       throw _shouldThrow!;
     }
@@ -105,7 +105,8 @@ class MockRevenueRepository extends RevenueRepository {
 }
 
 // Mock OwnerSubscriptionRepository
-class MockOwnerSubscriptionRepositoryForRefund extends OwnerSubscriptionRepository {
+class MockOwnerSubscriptionRepositoryForRefund
+    extends OwnerSubscriptionRepository {
   List<OwnerSubscriptionModel>? _mockSubscriptions;
   Exception? _shouldThrow;
 
@@ -152,7 +153,8 @@ class MockFeaturedListingRepositoryForRefund extends FeaturedListingRepository {
   }
 
   @override
-  Stream<List<FeaturedListingModel>> streamOwnerFeaturedListings(String ownerId) {
+  Stream<List<FeaturedListingModel>> streamOwnerFeaturedListings(
+      String ownerId) {
     if (_shouldThrow != null) {
       return Stream.error(_shouldThrow!);
     }
@@ -291,4 +293,3 @@ void main() {
     });
   });
 }
-

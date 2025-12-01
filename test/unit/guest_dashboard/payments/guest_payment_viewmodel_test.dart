@@ -7,7 +7,6 @@ import 'package:atitia/feature/guest_dashboard/payments/data/models/guest_paymen
 import '../../../helpers/viewmodel_test_setup.dart';
 import '../../../helpers/mock_repositories.dart';
 import '../../../helpers/mock_auth_service.dart';
-import '../../../helpers/mock_transaction_service.dart';
 import 'package:atitia/core/repositories/notification_repository.dart';
 import 'package:atitia/core/services/booking/booking_lifecycle_service.dart';
 import 'dart:async';
@@ -51,14 +50,16 @@ class MockGuestPaymentRepository extends GuestPaymentRepository {
   }) : super(
           databaseService: databaseService ?? MockDatabaseService(),
           analyticsService: analyticsService ?? MockAnalyticsService(),
-          notificationRepository: notificationRepository ?? MockNotificationRepository(
-              databaseService: databaseService ?? MockDatabaseService(),
-              analyticsService: analyticsService ?? MockAnalyticsService(),
-            ),
-          bookingLifecycleService: bookingLifecycleService ?? MockBookingLifecycleService(
-              databaseService: databaseService ?? MockDatabaseService(),
-              analyticsService: analyticsService ?? MockAnalyticsService(),
-            ),
+          notificationRepository: notificationRepository ??
+              MockNotificationRepository(
+                databaseService: databaseService ?? MockDatabaseService(),
+                analyticsService: analyticsService ?? MockAnalyticsService(),
+              ),
+          bookingLifecycleService: bookingLifecycleService ??
+              MockBookingLifecycleService(
+                databaseService: databaseService ?? MockDatabaseService(),
+                analyticsService: analyticsService ?? MockAnalyticsService(),
+              ),
         );
 
   void setMockPayments(List<GuestPaymentModel> payments) {
@@ -547,4 +548,3 @@ void main() {
     });
   });
 }
-

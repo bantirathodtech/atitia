@@ -244,11 +244,11 @@ class FirestoreCacheService {
   }
 
   /// Reconstruct QuerySnapshot from cached data
-  /// 
+  ///
   /// Since QuerySnapshot is a sealed class, we cannot create it directly.
   /// Instead, we fetch documents by ID from Firestore, which is still more efficient
   /// than running the full original query (especially for complex queries with filters).
-  /// 
+  ///
   /// Strategy:
   /// 1. Extract all document IDs from cached data
   /// 2. Fetch documents in batches of 10 (Firestore's "where in" limit)
@@ -264,7 +264,8 @@ class FirestoreCacheService {
 
       if (collection == null || documentsData == null) {
         if (kDebugMode) {
-          debugPrint('⚠️ Cache reconstruction failed: missing collection or documents');
+          debugPrint(
+              '⚠️ Cache reconstruction failed: missing collection or documents');
         }
         return null;
       }
@@ -291,7 +292,8 @@ class FirestoreCacheService {
 
       if (docIds.isEmpty) {
         if (kDebugMode) {
-          debugPrint('⚠️ Cache reconstruction failed: no valid document IDs found');
+          debugPrint(
+              '⚠️ Cache reconstruction failed: no valid document IDs found');
         }
         return null;
       }
@@ -299,12 +301,12 @@ class FirestoreCacheService {
       // Fetch documents in batches of 10 (Firestore's "where in" limit)
       // This is more efficient than fetching individually for multiple documents
       final List<DocumentSnapshot> allFetchedDocs = [];
-      
+
       for (var i = 0; i < docIds.length; i += 10) {
         final chunk = docIds.skip(i).take(10).toList();
-        
+
         if (chunk.isEmpty) break;
-        
+
         if (chunk.length == 1) {
           // Single document fetch (more efficient than "where in" for 1 item)
           try {
@@ -369,7 +371,7 @@ class FirestoreCacheService {
       // Query with "where in" for all fetched document IDs (up to 10 at a time)
       // For >10 documents, we return the result of querying the first batch
       // This is a limitation of Firestore's API, but still provides caching benefits
-      
+
       if (allFetchedDocs.length <= 10) {
         // Perfect case: all documents fit in one query
         final fetchedIds = allFetchedDocs.map((doc) => doc.id).toList();
@@ -395,9 +397,10 @@ class FirestoreCacheService {
             '(Firestore "where in" limit is 10, but we fetched all documents)',
           );
         }
-        
+
         // Use the first 10 document IDs for the query
-        final firstBatchIds = allFetchedDocs.take(10).map((doc) => doc.id).toList();
+        final firstBatchIds =
+            allFetchedDocs.take(10).map((doc) => doc.id).toList();
         final query = FirebaseFirestore.instance
             .collection(collection)
             .where(FieldPath.documentId, whereIn: firstBatchIds);
