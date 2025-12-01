@@ -133,7 +133,7 @@ class WebUrlLauncher {
   /// Displays a SnackBar with the error message if context is provided and mounted
   static void _showError(BuildContext? context, String message) {
     if (context == null) return;
-    
+
     // Check if context is still mounted before showing error
     // This prevents errors when widget is disposed during async operations
     if (!context.mounted) return;

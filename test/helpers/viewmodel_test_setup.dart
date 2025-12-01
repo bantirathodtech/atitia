@@ -7,7 +7,6 @@ import 'package:atitia/core/services/firebase/analytics/firebase_analytics_servi
 import 'package:atitia/core/services/firebase/auth/firebase_auth_service.dart';
 import 'package:atitia/core/services/firebase/database/firestore_database_service.dart';
 import 'package:atitia/core/services/supabase/storage/supabase_storage_service.dart';
-import 'package:atitia/core/services/localization/internationalization_service.dart';
 import 'package:atitia/core/services/external/google/google_sign_in_service.dart';
 import 'package:atitia/core/services/external/apple/apple_sign_in_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -111,8 +110,10 @@ class ViewModelTestSetup {
       } catch (e) {
         // If registration fails (Firebase not initialized), that's okay for unit tests.
         // Tests that require auth will fail, but that's expected.
-        print('Note: AuthenticationServiceWrapper not registered (Firebase not initialized).');
-        print('This is expected in unit tests. Tests requiring auth will fail.');
+        print(
+            'Note: AuthenticationServiceWrapper not registered (Firebase not initialized).');
+        print(
+            'This is expected in unit tests. Tests requiring auth will fail.');
       }
     }
 
@@ -343,7 +344,8 @@ class _MockUser implements User {
   Future<void> reload() async {}
 
   @override
-  Future<void> sendEmailVerification([ActionCodeSettings? actionCodeSettings]) async {}
+  Future<void> sendEmailVerification(
+      [ActionCodeSettings? actionCodeSettings]) async {}
 
   @override
   Future<User> unlink(String providerId) async => this;
@@ -367,7 +369,8 @@ class _MockUser implements User {
   Future<void> updateProfile({String? displayName, String? photoURL}) async {}
 
   @override
-  Future<void> verifyBeforeUpdateEmail(String newEmail, [ActionCodeSettings? actionCodeSettings]) async {}
+  Future<void> verifyBeforeUpdateEmail(String newEmail,
+      [ActionCodeSettings? actionCodeSettings]) async {}
 
   // Additional methods required by User interface
   @override
@@ -402,7 +405,8 @@ class _MockUser implements User {
   MultiFactor get multiFactor => throw UnimplementedError('Mock multiFactor');
 
   @override
-  Future<UserCredential> reauthenticateWithCredential(AuthCredential credential) async {
+  Future<UserCredential> reauthenticateWithCredential(
+      AuthCredential credential) async {
     throw UnimplementedError('Mock reauthenticateWithCredential');
   }
 
@@ -417,7 +421,8 @@ class _MockUser implements User {
   }
 
   @override
-  Future<UserCredential> reauthenticateWithProvider(AuthProvider provider) async {
+  Future<UserCredential> reauthenticateWithProvider(
+      AuthProvider provider) async {
     throw UnimplementedError('Mock reauthenticateWithProvider');
   }
 }
@@ -430,4 +435,3 @@ class _MockUserMetadata implements UserMetadata {
   @override
   DateTime? get lastSignInTime => DateTime.now();
 }
-

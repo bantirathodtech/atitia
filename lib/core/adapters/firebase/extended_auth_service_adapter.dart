@@ -157,4 +157,3 @@ class ExtendedAuthServiceAdapter implements IExtendedAuthService {
   @override
   bool get isSignedIn => _authService.isSignedIn;
 }
-

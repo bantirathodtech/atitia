@@ -17,4 +17,3 @@ class MockViewModelAuthService implements IViewModelAuthService {
     // Tests should create new instances with different user IDs
   }
 }
-

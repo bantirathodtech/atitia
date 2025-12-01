@@ -42,4 +42,3 @@ abstract class IExtendedAuthService implements IAuthService {
   // Additional properties
   bool get isSignedIn;
 }
-

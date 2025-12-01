@@ -157,26 +157,28 @@ class MockOwnerPgManagementRepository extends OwnerPgManagementRepository {
   @override
   Future<OwnerRevenueReport> getRevenueReport(String pgId) async {
     if (_shouldThrow != null) throw _shouldThrow!;
-    return _mockRevenueReport ?? OwnerRevenueReport(
-      collectedAmount: 0.0,
-      pendingAmount: 0.0,
-      totalAmount: 0.0,
-      totalPayments: 0,
-      collectedPayments: 0,
-      pendingPayments: 0,
-    );
+    return _mockRevenueReport ??
+        OwnerRevenueReport(
+          collectedAmount: 0.0,
+          pendingAmount: 0.0,
+          totalAmount: 0.0,
+          totalPayments: 0,
+          collectedPayments: 0,
+          pendingPayments: 0,
+        );
   }
 
   @override
   Future<OwnerOccupancyReport> getOccupancyReport(List<OwnerBed> beds) async {
     if (_shouldThrow != null) throw _shouldThrow!;
-    return _mockOccupancyReport ?? OwnerOccupancyReport(
-      totalBeds: beds.length,
-      occupiedBeds: beds.where((b) => b.isOccupied).length,
-      vacantBeds: beds.where((b) => b.isVacant).length,
-      pendingBeds: beds.where((b) => b.isPending).length,
-      maintenanceBeds: beds.where((b) => b.isUnderMaintenance).length,
-    );
+    return _mockOccupancyReport ??
+        OwnerOccupancyReport(
+          totalBeds: beds.length,
+          occupiedBeds: beds.where((b) => b.isOccupied).length,
+          vacantBeds: beds.where((b) => b.isVacant).length,
+          pendingBeds: beds.where((b) => b.isPending).length,
+          maintenanceBeds: beds.where((b) => b.isUnderMaintenance).length,
+        );
   }
 
   @override
@@ -397,4 +399,3 @@ void main() {
     });
   });
 }
-

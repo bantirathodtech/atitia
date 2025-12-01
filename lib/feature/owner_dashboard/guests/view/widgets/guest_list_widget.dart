@@ -1125,7 +1125,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
     // Format phone number for tel: scheme
     // Remove any spaces, dashes, or other characters
     final cleanPhoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
-    
+
     // Ensure phone number starts with + for international format
     final formattedPhoneNumber = cleanPhoneNumber.startsWith('+')
         ? cleanPhoneNumber
@@ -1185,7 +1185,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                         'Check Out',
                     onPressed: () async {
                       Navigator.pop(context);
-                      
+
                       try {
                         // Update guest status to inactive and set checkout date
                         final updatedGuest = guest.copyWith(
@@ -1213,7 +1213,7 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: BodyText(
-                                text: 'Failed to check out guest',
+                                  text: 'Failed to check out guest',
                                 ),
                                 backgroundColor: AppColors.error,
                               ),
@@ -1225,7 +1225,8 @@ class _GuestListWidgetState extends State<GuestListWidget> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: BodyText(
-                                text: 'Failed to check out guest: ${e.toString()}',
+                                text:
+                                    'Failed to check out guest: ${e.toString()}',
                               ),
                               backgroundColor: AppColors.error,
                             ),
@@ -1383,8 +1384,9 @@ class _MessageDialogState extends State<_MessageDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HeadingMedium(
-                text: (AppLocalizations.of(context) ?? widget.loc)?.sendMessage ??
-                    'Send Message'),
+                text:
+                    (AppLocalizations.of(context) ?? widget.loc)?.sendMessage ??
+                        'Send Message'),
             const SizedBox(height: AppSpacing.paddingM),
             BodyText(
                 text: (AppLocalizations.of(context) ?? widget.loc)

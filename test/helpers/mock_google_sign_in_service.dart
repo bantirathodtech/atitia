@@ -63,4 +63,3 @@ class MockGoogleSignInServiceWrapper implements GoogleSignInServiceWrapper {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
-

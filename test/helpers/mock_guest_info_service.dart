@@ -28,7 +28,8 @@ class MockGuestInfoService extends GuestInfoService {
   }
 
   @override
-  Future<Map<String, OwnerGuestModel>> getGuestsByUids(List<String> guestUids) async {
+  Future<Map<String, OwnerGuestModel>> getGuestsByUids(
+      List<String> guestUids) async {
     if (_shouldThrow != null) throw _shouldThrow!;
     if (_mockGuest != null) {
       return {for (var uid in guestUids) uid: _mockGuest!};
@@ -36,4 +37,3 @@ class MockGuestInfoService extends GuestInfoService {
     return {};
   }
 }
-

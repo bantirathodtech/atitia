@@ -180,7 +180,7 @@ void main() {
     });
 
     // Helper function to create test profile
-    GuestProfileModel _createTestProfile({
+    GuestProfileModel createTestProfile({
       String? userId,
       String? fullName,
       String? email,
@@ -207,7 +207,7 @@ void main() {
     group('loadGuestProfile', () {
       test('should load profile successfully', () async {
         // Arrange
-        final profile = _createTestProfile();
+        final profile = createTestProfile();
         mockRepository.setMockProfile(profile);
 
         // Act
@@ -223,7 +223,7 @@ void main() {
 
       test('should set loading state during load', () async {
         // Arrange
-        final profile = _createTestProfile();
+        final profile = createTestProfile();
         mockRepository.setMockProfile(profile);
 
         // Act
@@ -264,7 +264,7 @@ void main() {
     group('streamGuestProfile', () {
       test('should stream profile updates', () async {
         // Arrange
-        final profile = _createTestProfile();
+        final profile = createTestProfile();
         mockRepository.setMockProfile(profile);
 
         // Act
@@ -280,8 +280,8 @@ void main() {
     group('updateGuestProfile', () {
       test('should update profile successfully', () async {
         // Arrange
-        final profile = _createTestProfile();
-        final updatedProfile = _createTestProfile(fullName: 'Updated Name');
+        final profile = createTestProfile();
+        final updatedProfile = createTestProfile(fullName: 'Updated Name');
 
         // Act
         final result = await viewModel.updateGuestProfile(updatedProfile);
@@ -295,7 +295,7 @@ void main() {
 
       test('should handle update errors', () async {
         // Arrange
-        final profile = _createTestProfile();
+        final profile = createTestProfile();
         mockRepository.setShouldThrow(Exception('Update failed'));
 
         // Act
@@ -310,7 +310,7 @@ void main() {
     group('updateProfileFields', () {
       test('should update fields successfully', () async {
         // Arrange
-        final profile = _createTestProfile();
+        final profile = createTestProfile();
         mockRepository.setMockProfile(profile);
         await viewModel.loadGuestProfile(testUserId);
 
@@ -363,7 +363,7 @@ void main() {
     group('updateGuestStatus', () {
       test('should update status successfully', () async {
         // Arrange
-        final profile = _createTestProfile();
+        final profile = createTestProfile();
         mockRepository.setMockProfile(profile);
         await viewModel.loadGuestProfile(testUserId);
 
@@ -425,7 +425,7 @@ void main() {
 
       test('should save edited fields', () async {
         // Arrange
-        final profile = _createTestProfile();
+        final profile = createTestProfile();
         mockRepository.setMockProfile(profile);
         await viewModel.loadGuestProfile(testUserId);
         viewModel.startEditing();
@@ -472,7 +472,7 @@ void main() {
     group('refreshProfile', () {
       test('should refresh profile data', () async {
         // Arrange
-        final profile = _createTestProfile();
+        final profile = createTestProfile();
         mockRepository.setMockProfile(profile);
 
         // Act
@@ -507,4 +507,3 @@ void main() {
     });
   });
 }
-

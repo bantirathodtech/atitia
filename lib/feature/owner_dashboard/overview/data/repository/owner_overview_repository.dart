@@ -863,7 +863,7 @@ class OwnerOverviewRepository {
 
       for (var doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        
+
         // Handle date conversion (can be Timestamp or String)
         DateTime? trendDate;
         if (data['date'] is Timestamp) {
@@ -1001,9 +1001,8 @@ class OwnerOverviewRepository {
 
       // Calculate guest satisfaction score (based on complaint resolution rate)
       // Higher resolution rate = higher satisfaction
-      final resolutionRate = totalComplaints > 0
-          ? (resolvedComplaints / totalComplaints)
-          : 1.0;
+      final resolutionRate =
+          totalComplaints > 0 ? (resolvedComplaints / totalComplaints) : 1.0;
       // Convert to 0-5 scale (5 = 100% resolution, 0 = 0% resolution)
       final guestSatisfactionScore = resolutionRate * 5.0;
 
@@ -1032,7 +1031,8 @@ class OwnerOverviewRepository {
                   data['completedDate'] as int? ?? 0,
                 );
 
-          if (completedDate.isBefore(scheduledDate.add(const Duration(days: 1)))) {
+          if (completedDate
+              .isBefore(scheduledDate.add(const Duration(days: 1)))) {
             onTimeCompletions++;
           }
         }
@@ -1040,10 +1040,10 @@ class OwnerOverviewRepository {
 
       // Maintenance score: 0-10 scale
       // 50% from completion rate, 50% from on-time completion
-      final completionRate = totalTasks > 0 ? (completedTasks / totalTasks) : 1.0;
-      final onTimeRate = completedTasks > 0
-          ? (onTimeCompletions / completedTasks)
-          : 1.0;
+      final completionRate =
+          totalTasks > 0 ? (completedTasks / totalTasks) : 1.0;
+      final onTimeRate =
+          completedTasks > 0 ? (onTimeCompletions / completedTasks) : 1.0;
       final maintenanceScore = (completionRate * 5.0) + (onTimeRate * 5.0);
 
       final metrics = {

@@ -8,10 +8,12 @@ class FirestoreTransactionService implements ITransactionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Access Firestore instance
+  @override
   FirebaseFirestore get firestore => _firestore;
 
   /// Run a transaction with automatic retries
   /// Use this for operations that must be atomic (e.g., booking approval)
+  @override
   Future<T> runTransaction<T>(
     Future<T> Function(Transaction transaction) updateFunction, {
     int maxAttempts = 5,
@@ -39,6 +41,7 @@ class FirestoreTransactionService implements ITransactionService {
 
   /// Approve booking request atomically
   /// Updates request status, creates booking, and updates guest assignment in one transaction
+  @override
   Future<void> approveBookingRequestTransactionally({
     required String requestId,
     required String collection,

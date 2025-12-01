@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
 
+import '../../../common/constants/environment_config.dart';
 import '../../../common/lifecycle/state/provider_state.dart';
 import '../../../common/utils/constants/firestore.dart';
 import '../../../common/utils/exceptions/exceptions.dart';
@@ -421,6 +422,10 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       clearError();
       _sendingOtp = true;
 
+      // 🧪 AUTOMATIC TEST MODE DETECTION
+      // Check if phone number is a test phone number and enable test mode
+      EnvironmentConfig.setTestModeFromPhoneNumber(phoneNumber);
+
       await _analyticsService.logEvent(
         name: 'auth_phone_otp_send_attempt',
         parameters: {'phone_number': phoneNumber},
@@ -572,6 +577,13 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
   /// Handle successful authentication for any method
   Future<void> _handleSuccessfulAuthentication(User firebaseUser) async {
     try {
+      // 🧪 AUTOMATIC TEST MODE DETECTION
+      // Check if phone number from Firebase user is a test phone number
+      if (firebaseUser.phoneNumber != null &&
+          firebaseUser.phoneNumber!.isNotEmpty) {
+        EnvironmentConfig.setTestModeFromPhoneNumber(firebaseUser.phoneNumber!);
+      }
+
       // Check if user exists in Firestore
       if (_firestoreService == null) {
         // In unit tests, skip Firestore operations
@@ -997,6 +1009,9 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
       // Sign out from all authentication providers
       await _authService.signOutFromAll();
 
+      // 🧪 Reset test mode on logout
+      EnvironmentConfig.resetTestMode();
+
       // Clear local data
       _user = null;
       _verificationId = null;
@@ -1149,6 +1164,10 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
     const int maxRetries = 3;
     const Duration retryDelay = Duration(seconds: 2);
 
+    // 🧪 AUTOMATIC TEST MODE DETECTION
+    // Check if phone number is a test phone number and enable test mode
+    EnvironmentConfig.setTestModeFromPhoneNumber(phoneNumber);
+
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         _sendingOtp = true;
@@ -1277,6 +1296,12 @@ class AuthProvider extends BaseProviderState with LoggingMixin {
 
       final userModel = await _repository.verifySmsCode(credential);
       final userId = userModel.userId;
+
+      // 🧪 AUTOMATIC TEST MODE DETECTION
+      // Check if phone number is a test phone number and enable test mode
+      if (userModel.phoneNumber.isNotEmpty) {
+        EnvironmentConfig.setTestModeFromPhoneNumber(userModel.phoneNumber);
+      }
 
       // Check if user exists in Firestore
       final isNewUser = !await _checkUserExists(userId);

@@ -51,7 +51,8 @@ class MockOwnerGuestRepositoryGuests extends OwnerGuestRepository {
   }
 
   @override
-  Stream<List<OwnerGuestModel>> getGuestsStream(String ownerId, {String? pgId}) {
+  Stream<List<OwnerGuestModel>> getGuestsStream(String ownerId,
+      {String? pgId}) {
     if (_shouldThrow != null) {
       return Stream.error(_shouldThrow!);
     }
@@ -59,7 +60,8 @@ class MockOwnerGuestRepositoryGuests extends OwnerGuestRepository {
   }
 
   @override
-  Stream<List<OwnerComplaintModel>> getComplaintsStream(String ownerId, {String? pgId}) {
+  Stream<List<OwnerComplaintModel>> getComplaintsStream(String ownerId,
+      {String? pgId}) {
     if (_shouldThrow != null) {
       return Stream.error(_shouldThrow!);
     }
@@ -75,7 +77,8 @@ class MockOwnerGuestRepositoryGuests extends OwnerGuestRepository {
   }
 
   @override
-  Stream<List<OwnerServiceModel>> getServicesStream(String ownerId, {String? pgId}) {
+  Stream<List<OwnerServiceModel>> getServicesStream(String ownerId,
+      {String? pgId}) {
     if (_shouldThrow != null) {
       return Stream.error(_shouldThrow!);
     }
@@ -83,7 +86,8 @@ class MockOwnerGuestRepositoryGuests extends OwnerGuestRepository {
   }
 
   @override
-  Stream<List<Map<String, dynamic>>> getBookingRequestsStream(String ownerId, {String? pgId}) {
+  Stream<List<Map<String, dynamic>>> getBookingRequestsStream(String ownerId,
+      {String? pgId}) {
     if (_shouldThrow != null) {
       return Stream.error(_shouldThrow!);
     }
@@ -91,7 +95,8 @@ class MockOwnerGuestRepositoryGuests extends OwnerGuestRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> getGuestStats(String ownerId, {String? pgId}) async {
+  Future<Map<String, dynamic>> getGuestStats(String ownerId,
+      {String? pgId}) async {
     if (_shouldThrow != null) {
       throw _shouldThrow!;
     }
@@ -132,7 +137,7 @@ void main() {
     });
 
     // Helper function to create test guest
-    OwnerGuestModel _createTestGuest({
+    OwnerGuestModel createTestGuest({
       String? guestId,
       String? guestName,
       String? status,
@@ -180,7 +185,7 @@ void main() {
     group('initialize', () {
       test('should initialize and load data', () async {
         // Arrange
-        final guest = _createTestGuest();
+        final guest = createTestGuest();
         mockRepository.setMockGuests([guest]);
 
         // Act
@@ -212,7 +217,7 @@ void main() {
     group('selectGuest', () {
       test('should set selected guest', () {
         // Arrange
-        final guest = _createTestGuest();
+        final guest = createTestGuest();
 
         // Act
         viewModel.selectGuest(guest);
@@ -224,7 +229,7 @@ void main() {
 
       test('should clear selections', () {
         // Arrange
-        final guest = _createTestGuest();
+        final guest = createTestGuest();
         viewModel.selectGuest(guest);
 
         // Act
@@ -279,8 +284,10 @@ void main() {
     group('filteredGuests', () {
       test('should filter guests by search query', () async {
         // Arrange
-        final guest1 = _createTestGuest(guestId: 'guest_1', guestName: 'John Doe');
-        final guest2 = _createTestGuest(guestId: 'guest_2', guestName: 'Jane Smith');
+        final guest1 =
+            createTestGuest(guestId: 'guest_1', guestName: 'John Doe');
+        final guest2 =
+            createTestGuest(guestId: 'guest_2', guestName: 'Jane Smith');
         mockRepository.setMockGuests([guest1, guest2]);
         await viewModel.initialize(testOwnerId, pgId: testPgId);
         await Future.delayed(const Duration(milliseconds: 100));
@@ -296,8 +303,8 @@ void main() {
 
       test('should filter guests by status', () async {
         // Arrange
-        final guest1 = _createTestGuest(guestId: 'guest_1', status: 'active');
-        final guest2 = _createTestGuest(guestId: 'guest_2', status: 'inactive');
+        final guest1 = createTestGuest(guestId: 'guest_1', status: 'active');
+        final guest2 = createTestGuest(guestId: 'guest_2', status: 'inactive');
         mockRepository.setMockGuests([guest1, guest2]);
         await viewModel.initialize(testOwnerId, pgId: testPgId);
         await Future.delayed(const Duration(milliseconds: 100));
@@ -315,8 +322,8 @@ void main() {
     group('Computed Properties', () {
       test('totalGuests should return correct count', () async {
         // Arrange
-        final guest1 = _createTestGuest(guestId: 'guest_1');
-        final guest2 = _createTestGuest(guestId: 'guest_2');
+        final guest1 = createTestGuest(guestId: 'guest_1');
+        final guest2 = createTestGuest(guestId: 'guest_2');
         mockRepository.setMockGuests([guest1, guest2]);
         await viewModel.initialize(testOwnerId, pgId: testPgId);
         await Future.delayed(const Duration(milliseconds: 100));
@@ -327,8 +334,8 @@ void main() {
 
       test('activeGuests should return correct count', () async {
         // Arrange
-        final guest1 = _createTestGuest(guestId: 'guest_1', status: 'active');
-        final guest2 = _createTestGuest(guestId: 'guest_2', status: 'inactive');
+        final guest1 = createTestGuest(guestId: 'guest_1', status: 'active');
+        final guest2 = createTestGuest(guestId: 'guest_2', status: 'inactive');
         mockRepository.setMockGuests([guest1, guest2]);
         await viewModel.initialize(testOwnerId, pgId: testPgId);
         await Future.delayed(const Duration(milliseconds: 100));
@@ -341,7 +348,7 @@ void main() {
     group('updateGuest', () {
       test('should update guest successfully', () async {
         // Arrange
-        final guest = _createTestGuest();
+        final guest = createTestGuest();
 
         // Act
         await viewModel.updateGuest(guest);
@@ -353,7 +360,7 @@ void main() {
 
       test('should handle update errors', () async {
         // Arrange
-        final guest = _createTestGuest();
+        final guest = createTestGuest();
         mockRepository.setShouldThrow(Exception('Update failed'));
 
         // Act
@@ -365,4 +372,3 @@ void main() {
     });
   });
 }
-

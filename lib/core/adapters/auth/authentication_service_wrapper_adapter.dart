@@ -8,10 +8,10 @@ import '../../services/firebase/auth/firebase_auth_service.dart';
 class AuthenticationServiceWrapperAdapter implements IViewModelAuthService {
   final AuthenticationServiceWrapper _authService;
 
-  AuthenticationServiceWrapperAdapter([AuthenticationServiceWrapper? authService])
+  AuthenticationServiceWrapperAdapter(
+      [AuthenticationServiceWrapper? authService])
       : _authService = authService ?? AuthenticationServiceWrapper();
 
   @override
   String? get currentUserId => _authService.currentUserId;
 }
-

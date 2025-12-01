@@ -24,4 +24,3 @@ class MockNotificationRepository extends NotificationRepository {
     // Mock implementation - do nothing
   }
 }
-

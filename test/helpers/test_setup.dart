@@ -2,7 +2,7 @@
 
 import 'package:get_it/get_it.dart';
 import 'package:atitia/core/di/firebase/di/firebase_service_locator.dart';
-import 'package:atitia/core/services/analytics/firebase_analytics_service.dart';
+import 'package:atitia/core/services/firebase/analytics/firebase_analytics_service.dart';
 import '../mocks/mock_services.dart';
 
 /// Test setup helper for initializing GetIt with mock services
@@ -69,5 +69,61 @@ class MockAnalyticsServiceWrapper implements AnalyticsServiceWrapper {
     required String name,
     required String value,
   }) async {}
-}
 
+  @override
+  Future<void> logUserRegistration({String method = 'phone'}) async {}
+
+  @override
+  Future<void> logPropertySearch({
+    required String query,
+    int? resultsCount,
+  }) async {}
+
+  @override
+  Future<void> logBookingInitiated(
+      String propertyId, String bookingType) async {}
+
+  @override
+  Future<void> logPaymentCompleted(double amount, String paymentMethod) async {}
+
+  @override
+  Future<void> logPropertyView({
+    required String propertyId,
+    required String propertyType,
+    double? price,
+    String? location,
+  }) async {}
+
+  @override
+  Future<void> logBookingCompleted({
+    required String propertyId,
+    required double amount,
+    required int durationDays,
+    String? paymentMethod,
+  }) async {}
+
+  @override
+  Future<void> logUserProfileUpdate({
+    required String updateType,
+    bool? hasPhoto,
+  }) async {}
+
+  @override
+  Future<void> logAppOpened() async {}
+
+  @override
+  Future<void> logAppBackgrounded() async {}
+
+  @override
+  Future<void> logError({
+    required String errorType,
+    required String message,
+    String? screenName,
+  }) async {}
+
+  @override
+  Future<void> resetAnalyticsData() async {}
+
+  @override
+  Future<void> setAnalyticsCollectionEnabled(bool enabled) async {}
+}

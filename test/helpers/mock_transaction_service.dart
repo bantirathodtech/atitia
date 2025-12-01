@@ -63,4 +63,3 @@ class _MockCollectionReference {
 class _MockDocumentReference {
   // Mock methods that might be called
 }
-

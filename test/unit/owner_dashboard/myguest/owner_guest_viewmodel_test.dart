@@ -130,27 +130,31 @@ class MockOwnerBookingRequestRepository extends OwnerBookingRequestRepository {
     MockBookingLifecycleService? bookingLifecycleService,
   })  : _databaseService = databaseService ?? MockDatabaseService(),
         _analyticsService = analyticsService ?? MockAnalyticsService(),
-        _notificationRepository = notificationRepository ?? MockNotificationRepository(
-            databaseService: databaseService ?? MockDatabaseService(),
-            analyticsService: analyticsService ?? MockAnalyticsService(),
-          ),
+        _notificationRepository = notificationRepository ??
+            MockNotificationRepository(
+              databaseService: databaseService ?? MockDatabaseService(),
+              analyticsService: analyticsService ?? MockAnalyticsService(),
+            ),
         _transactionService = transactionService ?? MockTransactionService(),
-        _bookingLifecycleService = bookingLifecycleService ?? MockBookingLifecycleService(
-            databaseService: databaseService ?? MockDatabaseService(),
-            analyticsService: analyticsService ?? MockAnalyticsService(),
-          ),
+        _bookingLifecycleService = bookingLifecycleService ??
+            MockBookingLifecycleService(
+              databaseService: databaseService ?? MockDatabaseService(),
+              analyticsService: analyticsService ?? MockAnalyticsService(),
+            ),
         super(
           databaseService: databaseService ?? MockDatabaseService(),
           analyticsService: analyticsService ?? MockAnalyticsService(),
-          notificationRepository: notificationRepository ?? MockNotificationRepository(
-              databaseService: databaseService ?? MockDatabaseService(),
-              analyticsService: analyticsService ?? MockAnalyticsService(),
-            ),
+          notificationRepository: notificationRepository ??
+              MockNotificationRepository(
+                databaseService: databaseService ?? MockDatabaseService(),
+                analyticsService: analyticsService ?? MockAnalyticsService(),
+              ),
           transactionService: transactionService ?? MockTransactionService(),
-          bookingLifecycleService: bookingLifecycleService ?? MockBookingLifecycleService(
-              databaseService: databaseService ?? MockDatabaseService(),
-              analyticsService: analyticsService ?? MockAnalyticsService(),
-            ),
+          bookingLifecycleService: bookingLifecycleService ??
+              MockBookingLifecycleService(
+                databaseService: databaseService ?? MockDatabaseService(),
+                analyticsService: analyticsService ?? MockAnalyticsService(),
+              ),
         );
 
   void setMockRequests(List<OwnerBookingRequestModel> requests) {
@@ -184,10 +188,11 @@ class MockBedChangeRequestRepository extends BedChangeRequestRepository {
   }) : super(
           databaseService: databaseService ?? MockDatabaseService(),
           analyticsService: analyticsService ?? MockAnalyticsService(),
-          notificationRepository: notificationRepository ?? MockNotificationRepository(
-              databaseService: databaseService ?? MockDatabaseService(),
-              analyticsService: analyticsService ?? MockAnalyticsService(),
-            ),
+          notificationRepository: notificationRepository ??
+              MockNotificationRepository(
+                databaseService: databaseService ?? MockDatabaseService(),
+                analyticsService: analyticsService ?? MockAnalyticsService(),
+              ),
         );
 
   void setMockBedChangeRequests(List<BedChangeRequestModel> requests) {

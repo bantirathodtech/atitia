@@ -67,7 +67,8 @@ class MockGuestComplaintRepository extends GuestComplaintRepository {
   }) : super(
           databaseService: databaseService ?? MockDatabaseService(),
           storageService: storageService ?? MockStorageService(),
-          notificationRepository: notificationRepository ?? MockNotificationRepository(),
+          notificationRepository:
+              notificationRepository ?? MockNotificationRepository(),
         );
 
   void setMockComplaints(List<GuestComplaintModel> complaints) {
@@ -247,7 +248,8 @@ void main() {
     group('updateComplaint', () {
       test('should update complaint successfully', () async {
         // Arrange
-        final complaint = _createTestComplaint(complaintId: '1', status: 'resolved');
+        final complaint =
+            _createTestComplaint(complaintId: '1', status: 'resolved');
 
         // Act
         await viewModel.updateComplaint(complaint);
@@ -294,7 +296,8 @@ void main() {
 
         // Act
         try {
-          await viewModel.uploadComplaintImage(testGuestId, 'complaint_1', testFile);
+          await viewModel.uploadComplaintImage(
+              testGuestId, 'complaint_1', testFile);
         } catch (e) {
           // Expected to throw
         }
@@ -338,4 +341,3 @@ void main() {
     });
   });
 }
-

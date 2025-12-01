@@ -4,8 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:atitia/feature/owner_dashboard/profile/viewmodel/owner_profile_viewmodel.dart';
 import 'package:atitia/feature/owner_dashboard/profile/data/repository/owner_profile_repository.dart';
 import 'package:atitia/feature/owner_dashboard/profile/data/models/owner_profile_model.dart';
-import 'package:atitia/common/utils/exceptions/exceptions.dart';
-import 'package:atitia/common/lifecycle/state/provider_state.dart';
 import 'package:atitia/core/interfaces/storage/storage_service_interface.dart';
 import '../../../helpers/viewmodel_test_setup.dart';
 import '../../../helpers/mock_repositories.dart';
@@ -557,7 +555,8 @@ void main() {
         final file = <int>[1, 2, 3];
 
         // Act
-        final documentUrl = await viewModel.uploadAadhaarDocument(fileName, file);
+        final documentUrl =
+            await viewModel.uploadAadhaarDocument(fileName, file);
 
         // Assert
         expect(documentUrl, isNotEmpty);
@@ -757,4 +756,3 @@ void main() {
     });
   });
 }
-

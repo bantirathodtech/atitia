@@ -6,12 +6,10 @@ import 'package:atitia/core/repositories/subscription/owner_subscription_reposit
 import 'package:atitia/core/models/subscription/owner_subscription_model.dart';
 import 'package:atitia/core/models/subscription/subscription_plan_model.dart';
 import 'package:atitia/feature/owner_dashboard/profile/data/repository/owner_profile_repository.dart';
-import 'package:atitia/core/services/payment/app_subscription_payment_service.dart';
 import 'package:atitia/core/interfaces/storage/storage_service_interface.dart';
 import '../../../helpers/viewmodel_test_setup.dart';
 import '../../../helpers/mock_repositories.dart';
 import '../../../helpers/mock_auth_service.dart';
-import '../../../helpers/mock_app_subscription_payment_service.dart';
 import 'dart:async';
 
 // Mock Storage Service
@@ -89,7 +87,8 @@ class MockOwnerSubscriptionRepository extends OwnerSubscriptionRepository {
   }
 
   @override
-  Future<List<OwnerSubscriptionModel>> getAllSubscriptions(String ownerId) async {
+  Future<List<OwnerSubscriptionModel>> getAllSubscriptions(
+      String ownerId) async {
     if (_shouldThrow != null) {
       throw _shouldThrow!;
     }
@@ -206,4 +205,3 @@ void main() {
     });
   });
 }
-
