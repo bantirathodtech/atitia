@@ -163,7 +163,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
       _lastLoadedPgId = pgId;
     } catch (e) {
       if (!mounted) return;
-      
+
       // Get localization before setState to avoid BuildContext across async gap
       final loc = AppLocalizations.of(context);
       final errorMessage = loc?.analyticsLoadFailed(e.toString()) ??
@@ -172,7 +172,7 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
             'Failed to load analytics data: {error}',
             parameters: {'error': e.toString()},
           );
-      
+
       setState(() {
         _error = errorMessage;
       });
