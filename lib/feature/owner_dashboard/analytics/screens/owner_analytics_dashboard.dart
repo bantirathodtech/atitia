@@ -162,23 +162,25 @@ class _OwnerAnalyticsDashboardState extends State<OwnerAnalyticsDashboard>
 
       _lastLoadedPgId = pgId;
     } catch (e) {
-      if (mounted) {
-        final loc = AppLocalizations.of(context);
-        setState(() {
-          _error = loc?.analyticsLoadFailed(e.toString()) ??
-              _text(
-                'ownerAnalyticsLoadFailed',
-                'Failed to load analytics data: {error}',
-                parameters: {'error': e.toString()},
-              );
-        });
-      }
+      if (!mounted) return;
+
+      // Get localization before setState to avoid BuildContext across async gap
+      final loc = AppLocalizations.of(context);
+      final errorMessage = loc?.analyticsLoadFailed(e.toString()) ??
+          _text(
+            'ownerAnalyticsLoadFailed',
+            'Failed to load analytics data: {error}',
+            parameters: {'error': e.toString()},
+          );
+
+      setState(() {
+        _error = errorMessage;
+      });
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
