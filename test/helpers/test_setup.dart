@@ -1,9 +1,7 @@
 // test/helpers/test_setup.dart
 
 import 'package:get_it/get_it.dart';
-import 'package:atitia/core/di/firebase/di/firebase_service_locator.dart';
 import 'package:atitia/core/services/firebase/analytics/firebase_analytics_service.dart';
-import '../mocks/mock_services.dart';
 
 /// Test setup helper for initializing GetIt with mock services
 /// This allows ViewModels to be tested without actual Firebase connections

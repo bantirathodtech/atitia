@@ -1,7 +1,6 @@
 // test/helpers/mock_guest_info_service.dart
 
 import 'package:atitia/core/services/booking/guest_info_service.dart';
-import 'package:atitia/core/interfaces/database/database_service_interface.dart';
 import 'package:atitia/feature/owner_dashboard/myguest/data/models/owner_guest_model.dart';
 
 /// Mock implementation of GuestInfoService for unit tests
@@ -10,8 +9,8 @@ class MockGuestInfoService extends GuestInfoService {
   Exception? _shouldThrow;
 
   MockGuestInfoService({
-    IDatabaseService? databaseService,
-  }) : super(databaseService: databaseService);
+    super.databaseService,
+  });
 
   void setMockGuest(OwnerGuestModel? guest) {
     _mockGuest = guest;
