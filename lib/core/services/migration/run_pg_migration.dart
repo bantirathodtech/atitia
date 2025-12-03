@@ -21,4 +21,3 @@ Future<bool> migrateSinglePG(String pgId) async {
   final runner = MigrationRunner();
   return await runner.migrateSinglePG(pgId);
 }
-

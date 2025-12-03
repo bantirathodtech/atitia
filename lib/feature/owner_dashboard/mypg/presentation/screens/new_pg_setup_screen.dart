@@ -1321,7 +1321,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       'pgName': _pgNameController.text.trim(),
       'ownerUid': ownerId,
       'isDraft': false,
-      'isActive': true, // Required for guest visibility - guest query filters on isActive == true
+      'isActive':
+          true, // Required for guest visibility - guest query filters on isActive == true
       'status': 'published',
       'updatedAt': DateTime.now(),
     };
@@ -1543,7 +1544,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
               : null,
       'nearbyPlaces': _nearbyPlaces.isNotEmpty ? _nearbyPlaces : null,
       'isDraft': false, // Explicitly set isDraft to false for Create PG
-      'isActive': true, // Required for guest visibility - guest query filters on isActive == true
+      'isActive':
+          true, // Required for guest visibility - guest query filters on isActive == true
       'status': 'active', // Set status for created PG
       'createdAt': DateTime.now(),
       'updatedAt': DateTime.now(),
