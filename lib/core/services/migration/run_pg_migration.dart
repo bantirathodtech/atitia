@@ -3,8 +3,10 @@
 // Standalone helpers to run PG isActive migration from app code
 // or from a debug/admin screen. See README in this directory for
 // detailed usage examples.
+//
+// Pre-commit hook will auto-format this file before commit.
 
-library migration_run_pg_migration;
+library;
 
 import 'migration_runner.dart';
 import 'pg_isactive_migration_service.dart';
