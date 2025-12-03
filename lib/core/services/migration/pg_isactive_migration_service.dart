@@ -29,7 +29,7 @@ class PgIsActiveMigrationService {
         FirestoreConstants.pgs,
         [], // Empty filters = get all
       );
-      
+
       if (snapshot.docs.isEmpty) {
         await _analyticsService.logEvent(
           name: 'pg_migration_no_pgs',
@@ -51,7 +51,7 @@ class PgIsActiveMigrationService {
         try {
           final data = doc.data() as Map<String, dynamic>;
           final pgId = doc.id;
-          
+
           // Check if isActive field already exists
           if (data.containsKey('isActive')) {
             skippedCount++;
@@ -85,7 +85,7 @@ class PgIsActiveMigrationService {
         } catch (e) {
           final errorMsg = 'Failed to migrate PG ${doc.id}: $e';
           errors.add(errorMsg);
-          
+
           await _analyticsService.logEvent(
             name: 'pg_migration_error',
             parameters: {
@@ -134,7 +134,7 @@ class PgIsActiveMigrationService {
       }
 
       final data = doc.data() as Map<String, dynamic>;
-      
+
       // Check if isActive already exists
       if (data.containsKey('isActive')) {
         return false; // Already migrated
@@ -198,4 +198,3 @@ class MigrationResult {
     return 'MigrationResult(total: $totalPGs, updated: $updatedPGs, skipped: $skippedPGs, errors: ${errors.length})';
   }
 }
-
