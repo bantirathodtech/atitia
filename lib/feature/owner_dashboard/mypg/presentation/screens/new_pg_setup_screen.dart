@@ -4,8 +4,10 @@
 // Fully responsive and adaptive design with zero-state UI
 // Supports all screen sizes: mobile, tablet, desktop, large desktop
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../common/styles/spacing.dart';
 import '../../../../../common/styles/colors.dart';
@@ -165,7 +167,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     if (isEditMode) {
       _loadPgForEdit();
     } else {
-      _loadLatestDraftIfAny();
+      // Load draft from local storage (not Firestore)
+      _loadDraft();
     }
   }
 
@@ -325,105 +328,6 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     }
 
     setState(() {});
-  }
-
-  Future<void> _loadLatestDraftIfAny() async {
-    final authProvider = context.read<AuthProvider>();
-    final ownerId = authProvider.user?.userId ?? '';
-    if (ownerId.isEmpty) return;
-
-    final vm = context.read<OwnerPgManagementViewModel>();
-    final draft = await vm.fetchLatestDraftForOwner(ownerId);
-    if (draft == null) return;
-
-    // Normalize draft data: handle backward compatibility for old field names
-    final normalizedDraft = Map<String, dynamic>.from(draft);
-
-    // Debug: Log raw draft data
-    debugPrint(
-        '[DRAFT_RESTORE] Raw draft keys: ${normalizedDraft.keys.toList()}');
-    debugPrint(
-        '[DRAFT_RESTORE] Raw photos field type: ${normalizedDraft['photos'].runtimeType}');
-    debugPrint(
-        '[DRAFT_RESTORE] Raw photos value: ${normalizedDraft['photos']}');
-
-    // Handle old field name: rentConfiguration -> rentConfig
-    if (normalizedDraft.containsKey('rentConfiguration') &&
-        !normalizedDraft.containsKey('rentConfig')) {
-      normalizedDraft['rentConfig'] = normalizedDraft['rentConfiguration'];
-    }
-
-    // Handle old field name: deposit -> depositAmount
-    if (normalizedDraft.containsKey('deposit') &&
-        !normalizedDraft.containsKey('depositAmount')) {
-      normalizedDraft['depositAmount'] = normalizedDraft['deposit'];
-    }
-
-    // Ensure photos field exists and is a list
-    if (!normalizedDraft.containsKey('photos') ||
-        normalizedDraft['photos'] == null) {
-      debugPrint(
-          '[DRAFT_RESTORE] Photos field missing or null, initializing as empty list');
-      normalizedDraft['photos'] = <String>[];
-    } else if (normalizedDraft['photos'] is! List) {
-      // Convert to List if it's not already
-      debugPrint('[DRAFT_RESTORE] Photos field is not a List, converting');
-      normalizedDraft['photos'] = <String>[];
-    } else {
-      // Ensure photos list contains only strings
-      final photosList = normalizedDraft['photos'] as List;
-      debugPrint(
-          '[DRAFT_RESTORE] Photos list length before cleaning: ${photosList.length}');
-      normalizedDraft['photos'] = photosList
-          .where((p) => p != null && p.toString().trim().isNotEmpty)
-          .map((p) => p.toString().trim())
-          .toList();
-      debugPrint(
-          '[DRAFT_RESTORE] Photos list length after cleaning: ${normalizedDraft['photos'].length}');
-    }
-
-    // Map to entity-like fields used by form
-    try {
-      // Debug before creating entity
-      debugPrint(
-          '[DRAFT_RESTORE] Creating entity from draft, photos in normalizedDraft: ${normalizedDraft['photos']}');
-      debugPrint(
-          '[DRAFT_RESTORE] Photos type: ${normalizedDraft['photos'].runtimeType}');
-      debugPrint(
-          '[DRAFT_RESTORE] Photos length: ${(normalizedDraft['photos'] as List).length}');
-
-      _pgEntity = OwnerPgEntity.fromMap(normalizedDraft);
-
-      // Debug after creating entity
-      if (_pgEntity != null) {
-        debugPrint(
-            '[DRAFT_RESTORE] Entity created, entity.photos length: ${_pgEntity!.photos.length}');
-        debugPrint('[DRAFT_RESTORE] Entity.photos: ${_pgEntity!.photos}');
-      }
-
-      _populateFormFromEntity();
-
-      // Debug: Log photos restoration
-      debugPrint(
-          '[DRAFT_RESTORE] Restored photos: ${_uploadedPhotos.length} photos');
-      if (_uploadedPhotos.isNotEmpty) {
-        debugPrint('[DRAFT_RESTORE] First photo URL: ${_uploadedPhotos.first}');
-      }
-
-      // If draft has pgId, set widget.pgId? No: stay in create mode but allow updates via createOrUpdatePG using map
-      setState(() {});
-      debugPrint(
-          '[DRAFT_RESTORE] Restored latest draft ${normalizedDraft['pgId'] ?? normalizedDraft['id']}');
-    } catch (e, stackTrace) {
-      debugPrint('[DRAFT_RESTORE][ERROR] $e');
-      debugPrint('[DRAFT_RESTORE][ERROR] Stack trace: $stackTrace');
-      debugPrint(
-          '[DRAFT_RESTORE][ERROR] Draft data keys: ${normalizedDraft.keys.toList()}');
-      debugPrint(
-          '[DRAFT_RESTORE][ERROR] Photos in draft: ${normalizedDraft['photos']}');
-      debugPrint(
-          '[DRAFT_RESTORE][ERROR] Photos type: ${normalizedDraft['photos']?.runtimeType}');
-    }
   }
 
   void _parseFloorStructure(List<dynamic> floorStructure) {
@@ -1320,9 +1224,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       'name': _pgNameController.text.trim(),
       'pgName': _pgNameController.text.trim(),
       'ownerUid': ownerId,
-      'isDraft': false,
-      'isActive':
-          true, // Required for guest visibility - guest query filters on isActive == true
+      // NOTE: isDraft is NOT saved to Firestore - drafts are local only
+      // All PGs saved to Firestore are published and visible to guests
       'status': 'published',
       'updatedAt': DateTime.now(),
     };
@@ -1336,6 +1239,9 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
 
     if (!mounted) return;
     if (success) {
+      // Clear draft from local storage after successful publish
+      await _clearDraft();
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -1543,9 +1449,8 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
               ? _paymentInstructionsController.text.trim()
               : null,
       'nearbyPlaces': _nearbyPlaces.isNotEmpty ? _nearbyPlaces : null,
-      'isDraft': false, // Explicitly set isDraft to false for Create PG
-      'isActive':
-          true, // Required for guest visibility - guest query filters on isActive == true
+      // NOTE: isDraft is NOT saved to Firestore - drafts are local only
+      // All PGs saved to Firestore are published and visible to guests
       'status': 'active', // Set status for created PG
       'createdAt': DateTime.now(),
       'updatedAt': DateTime.now(),
@@ -1579,6 +1484,9 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     if (!mounted) return;
 
     if (success) {
+      // Clear draft from local storage after successful create/update
+      await _clearDraft();
+
       Navigator.of(context).pop(true);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1612,11 +1520,13 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
     }
   }
 
+  /// Save draft to local storage only (NOT to Firestore)
+  /// Drafts are only for form persistence - never saved to backend
   Future<void> _saveDraft() async {
     final authProvider = context.read<AuthProvider>();
     final ownerId = authProvider.user?.userId ?? '';
 
-    debugPrint('[SAVE_DRAFT] Save draft clicked by ownerId=$ownerId');
+    debugPrint('[SAVE_DRAFT] Save draft to local storage only (NOT Firestore)');
 
     if (ownerId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1627,8 +1537,6 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       debugPrint('[SAVE_DRAFT][ERROR] User not authenticated');
       return;
     }
-
-    final vm = context.read<OwnerPgManagementViewModel>();
 
     // Convert to floor structure format (partial allowed)
     final floorStructure = _floors.map((floor) {
@@ -1652,21 +1560,14 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       };
     }).toList();
 
-    final now = DateTime.now();
-
-    // Debug: Log photos before saving draft
-    debugPrint(
-        '[SAVE_DRAFT] Photos before save: ${_uploadedPhotos.length} photos');
-    if (_uploadedPhotos.isNotEmpty) {
-      debugPrint('[SAVE_DRAFT] First photo URL: ${_uploadedPhotos.first}');
-    }
+    final now = DateTime.now().toIso8601String();
 
     // Ensure photos is always a List<String> (not null)
     final photosToSave = _uploadedPhotos.isNotEmpty
         ? List<String>.from(_uploadedPhotos)
         : <String>[];
 
-    final pgData = {
+    final pgDraftData = {
       'name': _pgNameController.text.trim(),
       'pgName': _pgNameController.text.trim(),
       'address': _addressController.text.trim(),
@@ -1680,7 +1581,7 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
       'pgType': _selectedPgType ?? '',
       'mealType': _selectedMealType,
       'amenities': _selectedAmenities,
-      'photos': photosToSave, // Use explicit list, never null
+      'photos': photosToSave,
       'floorStructure': floorStructure,
       'rentConfig': {
         'oneShare':
@@ -1741,47 +1642,117 @@ class _NewPgSetupScreenState extends State<NewPgSetupScreen>
               ? _paymentInstructionsController.text.trim()
               : null,
       'nearbyPlaces': _nearbyPlaces.isNotEmpty ? _nearbyPlaces : null,
-      'status': 'draft',
-      'isDraft': true,
-      'createdAt': now,
-      'updatedAt': now,
+      'savedAt': now,
     };
 
-    debugPrint('[SAVE_DRAFT] Attempting to save draft: ${pgData.toString()}');
-
-    bool success;
     try {
-      if (isEditMode) {
-        success = await vm.updatePGDetails(widget.pgId!, pgData);
-        debugPrint('[SAVE_DRAFT] updatePGDetails returned $success');
-      } else {
-        success = await vm.createOrUpdatePG(pgData);
-        debugPrint('[SAVE_DRAFT] createOrUpdatePG returned $success');
-      }
-    } catch (e) {
-      debugPrint('[SAVE_DRAFT][ERROR] Exception: $e');
-      success = false;
-    }
+      // Save to local storage only (SharedPreferences)
+      final prefs = await SharedPreferences.getInstance();
+      final draftKey = 'pg_draft_$ownerId';
+      final draftJson = jsonEncode(pgDraftData);
+      await prefs.setString(draftKey, draftJson);
 
-    if (!mounted) return;
+      debugPrint('[SAVE_DRAFT] Draft saved to local storage successfully');
 
-    if (success) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(AppLocalizations.of(context)?.draftSaved ?? 'Draft saved'),
+          content: Text(AppLocalizations.of(context)?.draftSaved ??
+              'Draft saved locally'),
           backgroundColor: AppColors.success,
         ),
       );
-      debugPrint('[SAVE_DRAFT] Draft saved successfully');
-    } else {
+    } catch (e) {
+      debugPrint('[SAVE_DRAFT][ERROR] Failed to save draft: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(vm.errorMessage ?? 'Failed to save draft'),
+          content: Text('Failed to save draft: $e'),
           backgroundColor: AppColors.error,
         ),
       );
-      debugPrint('[SAVE_DRAFT][ERROR] Save failed: ${vm.errorMessage}');
+    }
+  }
+
+  /// Load draft from local storage when form opens (NOT from Firestore)
+  Future<void> _loadDraft() async {
+    if (isEditMode) return; // Don't load draft in edit mode
+
+    final authProvider = context.read<AuthProvider>();
+    final ownerId = authProvider.user?.userId ?? '';
+    if (ownerId.isEmpty) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final draftKey = 'pg_draft_$ownerId';
+      final draftJson = prefs.getString(draftKey);
+
+      if (draftJson == null) {
+        debugPrint('[LOAD_DRAFT] No draft found in local storage');
+        return;
+      }
+
+      final draftData = jsonDecode(draftJson) as Map<String, dynamic>;
+      debugPrint('[LOAD_DRAFT] Loading draft from local storage');
+
+      // Normalize draft data: handle backward compatibility for old field names
+      final normalizedDraft = Map<String, dynamic>.from(draftData);
+
+      // Handle old field name: rentConfiguration -> rentConfig
+      if (normalizedDraft.containsKey('rentConfiguration') &&
+          !normalizedDraft.containsKey('rentConfig')) {
+        normalizedDraft['rentConfig'] = normalizedDraft['rentConfiguration'];
+      }
+
+      // Handle old field name: deposit -> depositAmount
+      if (normalizedDraft.containsKey('deposit') &&
+          !normalizedDraft.containsKey('depositAmount')) {
+        normalizedDraft['depositAmount'] = normalizedDraft['deposit'];
+      }
+
+      // Ensure photos field exists and is a list
+      if (!normalizedDraft.containsKey('photos') ||
+          normalizedDraft['photos'] == null) {
+        normalizedDraft['photos'] = <String>[];
+      } else if (normalizedDraft['photos'] is! List) {
+        normalizedDraft['photos'] = <String>[];
+      } else {
+        final photosList = normalizedDraft['photos'] as List;
+        normalizedDraft['photos'] = photosList
+            .where((p) => p != null && p.toString().trim().isNotEmpty)
+            .map((p) => p.toString().trim())
+            .toList();
+      }
+
+      // Create entity from normalized draft
+      try {
+        _pgEntity = OwnerPgEntity.fromMap(normalizedDraft);
+        _populateFormFromEntity();
+        setState(() {}); // Refresh UI
+        debugPrint('[LOAD_DRAFT] Draft loaded and form populated successfully');
+      } catch (e, stackTrace) {
+        debugPrint(
+            '[LOAD_DRAFT][ERROR] Failed to create entity from draft: $e');
+        debugPrint('[LOAD_DRAFT][ERROR] Stack trace: $stackTrace');
+      }
+    } catch (e) {
+      debugPrint('[LOAD_DRAFT][ERROR] Failed to load draft: $e');
+    }
+  }
+
+  /// Clear draft from local storage after successful publish
+  Future<void> _clearDraft() async {
+    final authProvider = context.read<AuthProvider>();
+    final ownerId = authProvider.user?.userId ?? '';
+    if (ownerId.isEmpty) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final draftKey = 'pg_draft_$ownerId';
+      await prefs.remove(draftKey);
+      debugPrint('[CLEAR_DRAFT] Draft cleared from local storage');
+    } catch (e) {
+      debugPrint('[CLEAR_DRAFT][ERROR] Failed to clear draft: $e');
     }
   }
 }

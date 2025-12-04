@@ -1,24 +1,6 @@
 {
   "indexes": [
     {
-      "collectionGroup": "pgs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "isDraft",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "isActive",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "ownerUid",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
       "collectionGroup": "payments",
       "queryScope": "COLLECTION",
       "fields": [
@@ -144,20 +126,6 @@
         },
         {
           "fieldPath": "status",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "pgs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "isDraft",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "city",
           "order": "ASCENDING"
         }
       ]

@@ -154,10 +154,20 @@ class GuestPgViewModel extends BaseProviderState
         setLoading(false);
 
         logInfo(
-          _text('guestPgLoadSuccess', 'PGs loaded successfully'),
+          '${_text('guestPgLoadSuccess', 'PGs loaded successfully')} - Count: ${pgs.length}',
           feature: 'guest_pgs',
-          metadata: {'count': pgs.length},
+          metadata: {
+            'count': pgs.length,
+            'pg_ids': pgs.map((pg) => pg.pgId).toList(),
+          },
         );
+
+        if (pgs.isEmpty) {
+          logWarning(
+            'No PGs found - Check if PGs exist in Firestore. Note: Drafts are saved locally only and never appear in Firestore. All PGs in Firestore are published and visible.',
+            feature: 'guest_pgs',
+          );
+        }
 
         _analyticsService.logEvent(
           name: _i18n.translate('pgsLoadedEvent'),
