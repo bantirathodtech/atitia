@@ -144,25 +144,49 @@ class GuestPgRepository {
 
   /// Streams all available PGs with real-time updates
   /// Returns continuous stream for reactive UI updates
-  /// Filters out inactive PGs and drafts for guest consumption
-  /// OPTIMIZED: Filter at DB level using compound filters
+  /// Shows ALL PGs in Firestore (all are published - drafts are local-only)
+  ///
+  /// IMPORTANT: Drafts are NEVER saved to Firestore - they are local only
+  /// So ALL PGs in Firestore are published and visible to guests
   Stream<List<GuestPgModel>> getAllPGsStream() {
-    // OPTIMIZED: Use compound filter to exclude drafts and inactive PGs at DB level
+    // OPTIMIZED: Get all PGs from Firestore
+    // Drafts are saved locally only, so all PGs in Firestore are published
     // COST OPTIMIZATION: Limit to 50 PGs per stream
     return _databaseService
-        .getCollectionStreamWithCompoundFilter(
+        .getCollectionStream(
       FirestoreConstants.pgs,
-      [
-        {'field': 'isDraft', 'value': false},
-        {'field': 'isActive', 'value': true},
-      ],
       limit: 50,
     )
         .map((snapshot) {
-      final pgs = snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return GuestPgModel.fromMap(data);
-      }).toList();
+      print(
+          '🔍 [GuestPgRepository] Firestore snapshot received: ${snapshot.docs.length} documents');
+
+      final pgs = <GuestPgModel>[];
+      for (var doc in snapshot.docs) {
+        try {
+          final data = doc.data() as Map<String, dynamic>;
+
+          // Skip drafts if they somehow exist (shouldn't happen, but safety check)
+          final isDraft = data['isDraft'] as bool?;
+          if (isDraft == true) {
+            print(
+                '⏭️ [GuestPgRepository] Skipping draft PG (should not exist in Firestore): ${doc.id}');
+            continue;
+          }
+
+          final pg = GuestPgModel.fromMap(data);
+          print('✅ [GuestPgRepository] Parsed PG: ${pg.pgId} - ${pg.pgName}');
+          pgs.add(pg);
+        } catch (e) {
+          print(
+              '❌ [GuestPgRepository] Failed to parse PG document ${doc.id}: $e');
+          print('   Document data: ${doc.data()}');
+          // Skip invalid documents but continue processing others
+        }
+      }
+
+      print(
+          '📊 [GuestPgRepository] Total PGs parsed and visible: ${pgs.length}');
 
       // Log analytics for PG list loaded
       _analyticsService.logEvent(
@@ -174,6 +198,10 @@ class GuestPgRepository {
       );
 
       return pgs;
+    }).handleError((error, stackTrace) {
+      print('❌ [GuestPgRepository] Error in getAllPGsStream: $error');
+      print('   Stack trace: $stackTrace');
+      throw error;
     });
   }
 

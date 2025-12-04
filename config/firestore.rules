@@ -132,11 +132,12 @@ service cloud.firestore {
     
     // PGs Collection (alternative name for properties) - Cross-platform compatible
     match /pgs/{pgId} {
-      // List: Allow all authenticated users to list (we filter drafts in app code)
-      // This is needed because Firestore rules can't filter on list queries
+      // List: Allow all authenticated users to list active PGs
+      // Note: Drafts are saved locally only (never in Firestore), so all PGs here are published
       allow list: if isValidUser();
       
-      // Get: Only published PGs or owner/admin can read drafts
+      // Get: All authenticated users can read published PGs
+      // Backward compatibility: If isDraft exists and is true, only owner/admin can read
       allow get: if isValidUser() && (
         resource.data.isDraft != true ||
         resource.data.ownerUid == request.auth.uid ||
@@ -144,15 +145,13 @@ service cloud.firestore {
       );
 
       // Creates:
-      // - Owner can create PGs.
-      // - If creating a draft (isDraft == true), only ownerUid is required.
-      // - If creating a published PG (isDraft != true), require 'name' as well.
+      // - Owner can create PGs (published only - drafts are local-only)
+      // - Require ownerUid and name for published PGs
+      // - Note: isDraft should never be true in new creates (drafts are local-only)
       allow create: if isValidUser() &&
                        request.resource.data.ownerUid == request.auth.uid &&
-                       (
-                         (isDraftIncoming() && hasRequiredFields(request.resource.data, ['ownerUid'])) ||
-                         (!isDraftIncoming() && hasRequiredFields(request.resource.data, ['ownerUid', 'name']))
-                       );
+                       request.resource.data.isDraft != true &&
+                       hasRequiredFields(request.resource.data, ['ownerUid', 'name']);
 
       // Updates:
       // - Owner/admin can update PGs.
